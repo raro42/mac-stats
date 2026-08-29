@@ -12,20 +12,21 @@ Ralf, overnight Track B kept shipping product instant lanes (not digester-empty 
 | **v0.1.721** | `/ram` · `/ssd` · `/uptime` — power-strip RAM · SSD · Up chips (RAM/SSD≥85% hot · Up≥7d long) |
 | **v0.1.722** | `/discord` — Discord Ready / Offline with reconnect cues (Agent Ops glance parity) |
 | **v0.1.723** | `/ollama` · `/llm` — Ollama Ready / Offline with model · endpoint · circuit (menu-bar ✕ + AI Chat glance) |
+| **v0.1.724** | `/redmine` — Redmine Ready / Not set / Partial with URL host · key cue (Agent Ops health parity; config only) |
 
 ## Tried / context
 
 - Digester **open** empty (fast instant or filtered turns).
 - Design review **due=false** (grace); recommended surface still `feature-ai-chat`.
 - `debug.log` scan: no ERROR/WARN/panic clusters in the last window.
-- Fuel: standing backlog **p50** — Ready chips after strip/ring/Discord.
+- Fuel: standing backlog **p50** — Ready chips after strip/ring/Discord/Ollama → Redmine.
 
 ## Why it helps
 
-Asks like `/ollama`, `is ollama ready`, or `how's ollama` skip the LLM and return Ready/Offline with model · endpoint · circuit (same cues as menu-bar Ollama ✕ and the AI Chat model glance). Pull/list/chat/API asks still go to the agent. `/status` still shows the full health screen.
+Asks like `/redmine`, `is redmine ready`, or `how's redmine` skip the LLM and return Ready/Not set/Partial with host · key set (same cues as Agent Ops health Redmine). Ticket/issue/time/API asks still go to the agent. `/status` still shows the full health screen.
 
 ## Next fuel
 
 - Design review when grace ends (stale feature screens; `feature-ai-chat` recommended).
 - Digester open / product-owned `debug.log` errors when present.
-- Tool-heavy p50 patterns or Redmine health chip when digester surfaces them.
+- Brave/Perplexity key chip or tool-heavy p50 patterns when digester surfaces them.
