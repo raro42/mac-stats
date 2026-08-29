@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.720] - 2026-08-29
+
+### Added
+- **`/cpu` · `/gpu` · `/freq` · `/temp` instant operators** — `/cpu`, `/gpu`, `/freq`, `/ghz`, `/temp`, `/temperature` and NL (`what's the cpu`, `cpu usage`, `gpu percent`, `cpu frequency`) return the matching ring chip with hot marks (CPU ≥50% · GPU ≥15% · Freq ≥3.5 GHz · Temp ≥70°C; Discord + AI Chat; does not steal full `/rings`).
+
 ## [0.1.719] - 2026-08-29
 
 ### Added

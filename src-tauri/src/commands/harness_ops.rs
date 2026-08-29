@@ -2498,6 +2498,183 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
     out
 }
 
+/// Focused CPU ring asks (`/cpu` · `/gpu` · `/freq` · `/temp`) — not full `/rings`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RingChipAsk {
+    Cpu,
+    Gpu,
+    Freq,
+    Temp,
+}
+
+/// Parse `/cpu` · `/gpu` · `/freq` · `/temp` (and short NL). None when not a chip ask.
+pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return None;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("kill")
+        || n.contains("ring")
+        || n.contains("strip")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("cleanup")
+        || n.contains("clean up")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("detail")
+        || n.contains("pin")
+    {
+        return None;
+    }
+    if matches!(
+        n.as_str(),
+        "/cpu"
+            | "cpu"
+            | "cpu usage"
+            | "cpu percent"
+            | "cpu percentage"
+            | "cpu %"
+            | "show cpu"
+            | "list cpu"
+            | "cpu status"
+            | "what's the cpu"
+            | "whats the cpu"
+            | "what is the cpu"
+            | "how's the cpu"
+            | "hows the cpu"
+    ) {
+        return Some(RingChipAsk::Cpu);
+    }
+    if matches!(
+        n.as_str(),
+        "/gpu"
+            | "gpu"
+            | "gpu usage"
+            | "gpu percent"
+            | "gpu percentage"
+            | "gpu %"
+            | "show gpu"
+            | "list gpu"
+            | "gpu status"
+            | "what's the gpu"
+            | "whats the gpu"
+            | "what is the gpu"
+            | "how's the gpu"
+            | "hows the gpu"
+    ) {
+        return Some(RingChipAsk::Gpu);
+    }
+    if matches!(
+        n.as_str(),
+        "/freq"
+            | "/frequency"
+            | "/ghz"
+            | "freq"
+            | "frequency"
+            | "ghz"
+            | "cpu frequency"
+            | "cpu freq"
+            | "cpu ghz"
+            | "show freq"
+            | "list freq"
+            | "freq status"
+            | "what's the frequency"
+            | "whats the frequency"
+            | "what is the frequency"
+            | "what's the freq"
+            | "whats the freq"
+            | "what is the freq"
+            | "how's the frequency"
+            | "hows the frequency"
+    ) {
+        return Some(RingChipAsk::Freq);
+    }
+    if matches!(
+        n.as_str(),
+        "/temp"
+            | "/temperature"
+            | "temp"
+            | "temperature"
+            | "cpu temp"
+            | "cpu temperature"
+            | "show temp"
+            | "list temp"
+            | "temp status"
+            | "what's the temp"
+            | "whats the temp"
+            | "what is the temp"
+            | "what's the temperature"
+            | "whats the temperature"
+            | "what is the temperature"
+            | "how's the temp"
+            | "hows the temp"
+            | "how's the temperature"
+            | "hows the temperature"
+    ) {
+        return Some(RingChipAsk::Temp);
+    }
+    None
+}
+
+/// True for focused CPU · GPU · Freq · Temp ring asks (not full `/rings`).
+pub fn looks_like_ring_chip_request(content: &str) -> bool {
+    parse_ring_chip_ask(content).is_some()
+}
+
+/// Zero-LLM one-ring reply (CPU · GPU · Freq · Temp; live get_cpu_details; menu-bar amber cues).
+pub fn format_ring_chip_gateway(ask: RingChipAsk) -> String {
+    let d = crate::metrics::get_cpu_details();
+    match ask {
+        RingChipAsk::Cpu => {
+            let hot_mark = if ring_cpu_is_hot(d.usage) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**CPU** · {:.0}%{hot_mark}", d.usage)
+        }
+        RingChipAsk::Gpu => {
+            let hot_mark = if ring_gpu_is_hot(d.gpu_usage) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**GPU** · {:.0}%{hot_mark}", d.gpu_usage)
+        }
+        RingChipAsk::Freq => {
+            if d.frequency <= 0.0 {
+                return "**Freq** — _no frequency reading right now (open the CPU window)._"
+                    .to_string();
+            }
+            let hot_mark = if ring_freq_is_hot(d.frequency) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**Freq** · {:.2} GHz{hot_mark}", d.frequency)
+        }
+        RingChipAsk::Temp => {
+            if d.temperature <= 0.0 {
+                return "**Temp** — _no temperature reading right now (open the CPU window)._"
+                    .to_string();
+            }
+            let hot_mark = if ring_temp_is_hot(d.temperature) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**Temp** · {:.0}°C{hot_mark}", d.temperature)
+        }
+    }
+}
+
 /// Power strip All · Hot filter for `/strip` instant replies (menu-bar amber parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StripListFilter {
@@ -4007,6 +4184,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_rings_list_filter(content);
         return Some(format_rings_gateway(filter));
     }
+    if looks_like_ring_chip_request(content) {
+        if let Some(ask) = parse_ring_chip_ask(content) {
+            return Some(format_ring_chip_gateway(ask));
+        }
+    }
     if looks_like_strip_chip_request(content) {
         if let Some(ask) = parse_strip_chip_ask(content) {
             return Some(format_strip_chip_gateway(ask));
@@ -4071,6 +4253,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
+• `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
 • `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` — power-strip Bat · Heat · LPM chips\n\
 • `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
@@ -4393,6 +4576,50 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "whats hot on rings")
         && !q.contains("why")
         && !q.contains("process")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/cpu` · `/gpu` · `/freq` · `/temp` chip asks (v0.1.720).
+    if (q.contains("/cpu")
+        || q.contains("/gpu")
+        || q.contains("/freq")
+        || q.contains("/frequency")
+        || q.contains("/ghz")
+        || q.contains("/temp")
+        || q.contains("/temperature")
+        || q.contains("cpu usage")
+        || q.contains("cpu percent")
+        || q.contains("gpu usage")
+        || q.contains("gpu percent")
+        || q.contains("cpu frequency")
+        || q.contains("cpu temp")
+        || q.contains("cpu temperature")
+        || q == "cpu"
+        || q == "gpu"
+        || q == "freq"
+        || q == "frequency"
+        || q == "ghz"
+        || q == "temp"
+        || q == "temperature"
+        || q == "what's the cpu"
+        || q == "whats the cpu"
+        || q == "what is the cpu"
+        || q == "what's the gpu"
+        || q == "whats the gpu"
+        || q == "what is the gpu"
+        || q == "what's the freq"
+        || q == "whats the freq"
+        || q == "what is the frequency"
+        || q == "what's the temp"
+        || q == "whats the temp"
+        || q == "what is the temperature")
+        && !q.contains("why")
+        && !q.contains("process")
+        && !q.contains("ring")
+        && !q.contains("strip")
+        && !q.contains("detail")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -5750,6 +5977,14 @@ mod tests {
             rings_hot.to_lowercase().contains("hot") || rings_hot.to_lowercase().contains("ring"),
             "{rings_hot}"
         );
+        let cpu = try_operator_instant_reply("/cpu").expect("cpu");
+        assert!(cpu.to_lowercase().contains("cpu"), "{cpu}");
+        let gpu = try_operator_instant_reply("/gpu").expect("gpu");
+        assert!(gpu.to_lowercase().contains("gpu"), "{gpu}");
+        let freq = try_operator_instant_reply("/freq").expect("freq");
+        assert!(freq.to_lowercase().contains("freq"), "{freq}");
+        let temp = try_operator_instant_reply("/temp").expect("temp");
+        assert!(temp.to_lowercase().contains("temp"), "{temp}");
         let strip = try_operator_instant_reply("/strip").expect("strip");
         assert!(
             strip.to_lowercase().contains("power strip"),
@@ -6358,6 +6593,46 @@ mod tests {
     }
 
     #[test]
+    fn ring_chip_request_and_format() {
+        assert_eq!(parse_ring_chip_ask("/cpu"), Some(RingChipAsk::Cpu));
+        assert_eq!(
+            parse_ring_chip_ask("what's the cpu"),
+            Some(RingChipAsk::Cpu)
+        );
+        assert_eq!(parse_ring_chip_ask("cpu usage"), Some(RingChipAsk::Cpu));
+        assert_eq!(parse_ring_chip_ask("/gpu"), Some(RingChipAsk::Gpu));
+        assert_eq!(
+            parse_ring_chip_ask("what's the gpu"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert_eq!(parse_ring_chip_ask("/freq"), Some(RingChipAsk::Freq));
+        assert_eq!(parse_ring_chip_ask("/ghz"), Some(RingChipAsk::Freq));
+        assert_eq!(
+            parse_ring_chip_ask("cpu frequency"),
+            Some(RingChipAsk::Freq)
+        );
+        assert_eq!(parse_ring_chip_ask("/temp"), Some(RingChipAsk::Temp));
+        assert_eq!(
+            parse_ring_chip_ask("what's the temperature"),
+            Some(RingChipAsk::Temp)
+        );
+        assert!(parse_ring_chip_ask("/rings").is_none());
+        assert!(parse_ring_chip_ask("cpu rings").is_none());
+        assert!(parse_ring_chip_ask("hot rings").is_none());
+        assert!(parse_ring_chip_ask("why is the cpu hot").is_none());
+        assert!(parse_ring_chip_ask("cpu details").is_none());
+        assert!(looks_like_ring_chip_request("/temperature"));
+        let cpu = format_ring_chip_gateway(RingChipAsk::Cpu);
+        assert!(cpu.to_lowercase().contains("cpu"), "{cpu}");
+        let gpu = format_ring_chip_gateway(RingChipAsk::Gpu);
+        assert!(gpu.to_lowercase().contains("gpu"), "{gpu}");
+        let freq = format_ring_chip_gateway(RingChipAsk::Freq);
+        assert!(freq.to_lowercase().contains("freq"), "{freq}");
+        let temp = format_ring_chip_gateway(RingChipAsk::Temp);
+        assert!(temp.to_lowercase().contains("temp"), "{temp}");
+    }
+
+    #[test]
     fn strip_request_and_filter() {
         assert!(looks_like_strip_request("/strip"));
         assert!(looks_like_strip_request("power strip"));
@@ -6600,6 +6875,10 @@ mod tests {
         assert!(report.contains("/processes pinned"), "{report}");
         assert!(report.contains("/rings"), "{report}");
         assert!(report.contains("/rings hot"), "{report}");
+        assert!(report.contains("/cpu"), "{report}");
+        assert!(report.contains("/gpu"), "{report}");
+        assert!(report.contains("/freq"), "{report}");
+        assert!(report.contains("/temp"), "{report}");
         assert!(report.contains("/strip"), "{report}");
         assert!(report.contains("/strip hot"), "{report}");
         assert!(report.contains("/battery"), "{report}");

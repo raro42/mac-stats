@@ -2360,6 +2360,17 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/cpu` · `/gpu` · `/freq` · `/temp` — focused ring chips, no Ollama.
+    if crate::commands::harness_ops::looks_like_ring_chip_request(&content) {
+        if let Some(ask) = crate::commands::harness_ops::parse_ring_chip_ask(&content) {
+            let report = crate::commands::harness_ops::format_ring_chip_gateway(ask);
+            if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+                error!("Discord: failed to send ring chip: {}", e);
+            }
+            return;
+        }
+    }
+
     // `/strip` — power strip Hot list, no Ollama.
     if crate::commands::harness_ops::looks_like_strip_request(&content) {
         let filter = crate::commands::harness_ops::parse_strip_list_filter(&content);
