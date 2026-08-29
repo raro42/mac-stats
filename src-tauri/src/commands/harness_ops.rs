@@ -4007,8 +4007,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_rings_list_filter(content);
         return Some(format_rings_gateway(filter));
     }
-    if let Some(ask) = parse_strip_chip_ask(content) {
-        return Some(format_strip_chip_gateway(ask));
+    if looks_like_strip_chip_request(content) {
+        if let Some(ask) = parse_strip_chip_ask(content) {
+            return Some(format_strip_chip_gateway(ask));
+        }
     }
     if looks_like_strip_request(content) {
         let filter = parse_strip_list_filter(content);
