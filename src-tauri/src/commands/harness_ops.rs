@@ -2912,15 +2912,18 @@ pub fn format_strip_gateway(filter: StripListFilter) -> String {
     out
 }
 
-/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm`) — not full `/strip`.
+/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime`) — not full `/strip`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StripChipAsk {
     Battery,
     Heat,
     Lpm,
+    Ram,
+    Ssd,
+    Uptime,
 }
 
-/// Parse `/battery` · `/heat` · `/lpm` (and short NL). None when not a chip ask.
+/// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` (and short NL). None when not a chip ask.
 pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -2939,8 +2942,10 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         || n.contains("explain")
         || n.contains("cleanup")
         || n.contains("clean up")
+        || n.contains("reclaim")
         || n.contains("search")
         || n.contains("weather")
+        || n.contains("detail")
     {
         return None;
     }
@@ -3016,15 +3021,93 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     ) {
         return Some(StripChipAsk::Lpm);
     }
+    // RAM chip — not `/details` (full Load · RAM · Up).
+    if matches!(
+        n.as_str(),
+        "/ram"
+            | "ram"
+            | "memory"
+            | "mem"
+            | "/memory"
+            | "/mem"
+            | "ram percent"
+            | "ram percentage"
+            | "ram %"
+            | "memory percent"
+            | "memory %"
+            | "show ram"
+            | "list ram"
+            | "ram status"
+            | "what's the ram"
+            | "whats the ram"
+            | "what is the ram"
+            | "how's the ram"
+            | "hows the ram"
+            | "what's the memory"
+            | "whats the memory"
+            | "what is the memory"
+    ) {
+        return Some(StripChipAsk::Ram);
+    }
+    // SSD chip — not `/disk` Disk Cleanup (cleanup/reclaim rejected above).
+    if matches!(
+        n.as_str(),
+        "/ssd"
+            | "ssd"
+            | "disk percent"
+            | "disk percentage"
+            | "disk %"
+            | "ssd percent"
+            | "ssd %"
+            | "disk usage"
+            | "ssd usage"
+            | "show ssd"
+            | "list ssd"
+            | "ssd status"
+            | "what's the ssd"
+            | "whats the ssd"
+            | "what is the ssd"
+            | "how's the ssd"
+            | "hows the ssd"
+            | "how full is the disk"
+            | "how full is the ssd"
+            | "disk free"
+            | "free disk"
+            | "free space"
+    ) {
+        return Some(StripChipAsk::Ssd);
+    }
+    // Uptime chip — not full `/details` / `/strip`.
+    if matches!(
+        n.as_str(),
+        "/uptime"
+            | "/up"
+            | "uptime"
+            | "up time"
+            | "system uptime"
+            | "show uptime"
+            | "list uptime"
+            | "uptime status"
+            | "what's the uptime"
+            | "whats the uptime"
+            | "what is the uptime"
+            | "how's the uptime"
+            | "hows the uptime"
+            | "how long up"
+            | "how long has it been up"
+            | "how long has the mac been up"
+    ) {
+        return Some(StripChipAsk::Uptime);
+    }
     None
 }
 
-/// True for focused Bat · Heat · LPM chip asks (power-strip parity; not full `/strip`).
+/// True for focused Bat · Heat · LPM · RAM · SSD · Up chip asks (power-strip parity; not full `/strip`).
 pub fn looks_like_strip_chip_request(content: &str) -> bool {
     parse_strip_chip_ask(content).is_some()
 }
 
-/// Zero-LLM one-chip reply (Bat · Heat · LPM; live get_cpu_details; menu-bar amber cues).
+/// Zero-LLM one-chip reply (Bat · Heat · LPM · RAM · SSD · Up; live get_cpu_details; menu-bar amber cues).
 pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
     let d = crate::metrics::get_cpu_details();
     match ask {
@@ -3058,6 +3141,33 @@ pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
             let value = if on { "On" } else { "Off" };
             let hot_mark = if on { " · hot" } else { "" };
             format!("**LPM** · {value}{hot_mark}")
+        }
+        StripChipAsk::Ram => {
+            let hot_mark = if d.ram_percent >= OPS_STRIP_RAM_HOT_PCT {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**RAM** · {:.0}%{hot_mark}", d.ram_percent)
+        }
+        StripChipAsk::Ssd => {
+            let hot_mark = if d.disk_percent >= OPS_STRIP_SSD_HOT_PCT {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**SSD** · {:.0}%{hot_mark}", d.disk_percent)
+        }
+        StripChipAsk::Uptime => {
+            let hot_mark = if d.uptime_secs >= OPS_STRIP_UPTIME_LONG_SECS {
+                " · long"
+            } else {
+                ""
+            };
+            format!(
+                "**Up** · {}{hot_mark}",
+                format_system_uptime(d.uptime_secs)
+            )
         }
     }
 }
@@ -4255,7 +4365,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
 • `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` — power-strip Bat · Heat · LPM chips\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips\n\
 • `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
@@ -4655,35 +4765,62 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/battery` · `/heat` · `/lpm` chip asks (v0.1.719).
+    // `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` chip asks (v0.1.719–721).
     if (q.contains("/battery")
         || q.contains("/bat")
         || q.contains("/heat")
         || q.contains("/thermal")
         || q.contains("/lpm")
+        || q.contains("/ram")
+        || q.contains("/ssd")
+        || q.contains("/uptime")
+        || q.contains("/up")
+        || q.contains("/memory")
+        || q.contains("/mem")
         || q.contains("battery level")
         || q.contains("battery percent")
         || q.contains("thermal state")
         || q.contains("thermal pressure")
         || q.contains("low power mode")
         || q.contains("low-power mode")
+        || q.contains("ram percent")
+        || q.contains("memory percent")
+        || q.contains("disk usage")
+        || q.contains("ssd usage")
+        || q.contains("system uptime")
         || q == "battery"
         || q == "bat"
         || q == "heat"
         || q == "thermal"
         || q == "lpm"
         || q == "low power"
+        || q == "ram"
+        || q == "memory"
+        || q == "mem"
+        || q == "ssd"
+        || q == "uptime"
         || q == "what's the battery"
         || q == "whats the battery"
         || q == "what is the battery"
         || q == "what's the heat"
         || q == "whats the heat"
         || q == "what is the heat"
+        || q == "what's the ram"
+        || q == "whats the ram"
+        || q == "what is the ram"
+        || q == "what's the ssd"
+        || q == "whats the ssd"
+        || q == "what is the ssd"
+        || q == "what's the uptime"
+        || q == "whats the uptime"
+        || q == "what is the uptime"
         || q == "is lpm on"
         || q == "is low power mode on")
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("strip")
+        && !q.contains("cleanup")
+        && !q.contains("detail")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -6001,6 +6138,15 @@ mod tests {
         assert!(heat.to_lowercase().contains("heat"), "{heat}");
         let lpm = try_operator_instant_reply("/lpm").expect("lpm");
         assert!(lpm.to_lowercase().contains("lpm"), "{lpm}");
+        let ram = try_operator_instant_reply("/ram").expect("ram");
+        assert!(ram.to_lowercase().contains("ram"), "{ram}");
+        let ssd = try_operator_instant_reply("/ssd").expect("ssd");
+        assert!(ssd.to_lowercase().contains("ssd"), "{ssd}");
+        let uptime = try_operator_instant_reply("/uptime").expect("uptime");
+        assert!(
+            uptime.to_lowercase().contains("up"),
+            "{uptime}"
+        );
         let details = try_operator_instant_reply("/details").expect("details");
         assert!(
             details.to_lowercase().contains("details"),
@@ -6040,7 +6186,8 @@ mod tests {
         assert!(try_operator_instant_reply("save this to knowledge").is_none());
         assert!(try_operator_instant_reply("add a monitor for example.com").is_none());
         assert!(try_operator_instant_reply("clean now").is_none());
-        assert!(try_operator_instant_reply("disk usage").is_none());
+        assert!(try_operator_instant_reply("disk cleanup").is_some());
+        assert!(try_operator_instant_reply("disk usage").is_some()); // /ssd chip
         assert!(try_operator_instant_reply("why is there an error").is_none());
         assert!(try_operator_instant_reply("fix the error").is_none());
         assert!(try_operator_instant_reply("explain the warning").is_none());
@@ -6688,9 +6835,32 @@ mod tests {
             parse_strip_chip_ask("is lpm on"),
             Some(StripChipAsk::Lpm)
         );
+        assert_eq!(parse_strip_chip_ask("/ram"), Some(StripChipAsk::Ram));
+        assert_eq!(
+            parse_strip_chip_ask("what's the ram"),
+            Some(StripChipAsk::Ram)
+        );
+        assert_eq!(parse_strip_chip_ask("memory"), Some(StripChipAsk::Ram));
+        assert_eq!(parse_strip_chip_ask("/ssd"), Some(StripChipAsk::Ssd));
+        assert_eq!(
+            parse_strip_chip_ask("disk usage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("/uptime"),
+            Some(StripChipAsk::Uptime)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("system uptime"),
+            Some(StripChipAsk::Uptime)
+        );
+        assert_eq!(parse_strip_chip_ask("/up"), Some(StripChipAsk::Uptime));
         assert!(parse_strip_chip_ask("battery strip").is_none());
         assert!(parse_strip_chip_ask("/strip").is_none());
         assert!(parse_strip_chip_ask("/power").is_none());
+        assert!(parse_strip_chip_ask("/disk").is_none());
+        assert!(parse_strip_chip_ask("disk cleanup").is_none());
+        assert!(parse_strip_chip_ask("/details").is_none());
         assert!(parse_strip_chip_ask("what's hot").is_none());
         assert!(parse_strip_chip_ask("why is the battery low").is_none());
         assert!(looks_like_strip_chip_request("/thermal"));
@@ -6700,6 +6870,12 @@ mod tests {
         assert!(lpm.to_lowercase().contains("lpm"), "{lpm}");
         let bat = format_strip_chip_gateway(StripChipAsk::Battery);
         assert!(bat.to_lowercase().contains("bat"), "{bat}");
+        let ram = format_strip_chip_gateway(StripChipAsk::Ram);
+        assert!(ram.to_lowercase().contains("ram"), "{ram}");
+        let ssd = format_strip_chip_gateway(StripChipAsk::Ssd);
+        assert!(ssd.to_lowercase().contains("ssd"), "{ssd}");
+        let up = format_strip_chip_gateway(StripChipAsk::Uptime);
+        assert!(up.to_lowercase().contains("up"), "{up}");
     }
 
     #[test]
@@ -6884,6 +7060,9 @@ mod tests {
         assert!(report.contains("/battery"), "{report}");
         assert!(report.contains("/heat"), "{report}");
         assert!(report.contains("/lpm"), "{report}");
+        assert!(report.contains("/ram"), "{report}");
+        assert!(report.contains("/ssd"), "{report}");
+        assert!(report.contains("/uptime"), "{report}");
         assert!(report.contains("/details"), "{report}");
         assert!(report.contains("/details hot"), "{report}");
         assert!(report.contains("/load"), "{report}");

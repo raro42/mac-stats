@@ -2381,7 +2381,7 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
-    // `/battery` · `/heat` · `/lpm` — focused power-strip chips, no Ollama.
+    // `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` — focused power-strip chips, no Ollama.
     if crate::commands::harness_ops::looks_like_strip_chip_request(&content) {
         if let Some(ask) = crate::commands::harness_ops::parse_strip_chip_ask(&content) {
             let report = crate::commands::harness_ops::format_strip_chip_gateway(ask);

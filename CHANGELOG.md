@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.721] - 2026-08-29
+
+### Added
+- **`/ram` · `/ssd` · `/uptime` instant operators** — `/ram`, `/memory`, `/ssd`, `/uptime`, `/up` and NL (`what's the ram`, `disk usage`, `system uptime`) return the matching power-strip chip with hot/long marks (RAM/SSD ≥85% · Up ≥7d; Discord + AI Chat; does not steal full `/strip` or `/disk` Disk Cleanup).
+
 ## [0.1.720] - 2026-08-29
 
 ### Added
