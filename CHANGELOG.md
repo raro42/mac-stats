@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.722] - 2026-08-29
+
+### Added
+- **`/discord` instant operator** — `/discord` and NL (`discord status`, `is discord ready`, `gateway status`) return Discord Ready / Offline with reconnect cues (Agent Ops collapsed-glance parity; Discord + AI Chat; does not steal `/knowledge discord` or post/send asks).
+
 ## [0.1.721] - 2026-08-29
 
 ### Added

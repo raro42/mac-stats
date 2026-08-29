@@ -767,6 +767,29 @@ def looks_like_tool_starved_task(q: str) -> bool:
 
 def looks_like_discord_reach(q: str) -> bool:
     n = q.strip()
+    # Focused Ready/Offline chip (v0.1.722) — filter historical direct-lane noise.
+    if n in (
+        "/discord",
+        "discord",
+        "discord status",
+        "discord gateway",
+        "discord ready",
+        "discord offline",
+        "gateway status",
+        "gateway ready",
+        "bot gateway",
+        "is discord ready",
+        "is discord online",
+        "is discord connected",
+        "is discord offline",
+        "how's discord",
+        "hows discord",
+        "how's the discord",
+        "hows the discord",
+        "how's the gateway",
+        "hows the gateway",
+    ):
+        return True
     discordish = any(x in n for x in ("discord", "amvara", "server", "guild", "channel"))
     if discordish and (
         "talking on" in n

@@ -2270,6 +2270,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/discord` — Discord Ready / Offline chip (Agent Ops glance parity), no Ollama.
+    if crate::commands::harness_ops::looks_like_discord_gateway_request(&content) {
+        let report = crate::commands::harness_ops::format_discord_gateway_chip();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send discord gateway chip: {}", e);
+        }
+        return;
+    }
+
     // `/agents` — Agent Ops On/Off list, no Ollama.
     if crate::commands::harness_ops::looks_like_agents_request(&content) {
         let filter = crate::commands::harness_ops::parse_agents_list_filter(&content);

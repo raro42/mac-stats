@@ -4200,6 +4200,104 @@ pub fn format_status_gateway() -> String {
     lines.join("\n")
 }
 
+/// True for focused Discord gateway asks (`/discord` · Ready/Offline) — not Knowledge Discord,
+/// not free-form “post to Discord…”.
+pub fn looks_like_discord_gateway_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Knowledge / memory / post / message stay with their own handlers or the agent.
+    if n.contains("knowledge")
+        || n.contains("memory")
+        || n.contains("post")
+        || n.contains("send")
+        || n.contains("message")
+        || n.contains("channel list")
+        || n.contains("list channel")
+        || n.contains("guild")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/discord"
+            | "discord"
+            | "discord status"
+            | "discord gateway"
+            | "discord ready"
+            | "discord offline"
+            | "gateway status"
+            | "gateway ready"
+            | "bot gateway"
+            | "show discord"
+            | "list discord"
+            | "is discord ready"
+            | "is discord online"
+            | "is discord connected"
+            | "is discord offline"
+            | "is the bot ready"
+            | "is the bot connected"
+            | "is the gateway ready"
+            | "is the gateway connected"
+            | "discord connection"
+            | "discord reconnect"
+            | "discord disconnects"
+            | "how's discord"
+            | "hows discord"
+            | "how's the discord"
+            | "hows the discord"
+            | "how's the gateway"
+            | "hows the gateway"
+    )
+}
+
+/// Zero-LLM Discord Ready / Offline chip (Agent Ops collapsed-glance parity).
+pub fn format_discord_gateway_chip() -> String {
+    let ready = crate::discord::discord_bot_gateway_ready();
+    let token = crate::discord::discord_bot_token_configured();
+    let (ready_n, resume_n, disc_n) = crate::discord::discord_gateway_reconnect_stats();
+    let stage = crate::discord::discord_last_shard_stage()
+        .map(|s| format!("{:?}", s))
+        .unwrap_or_else(|| "unknown".into());
+    let ready_ago = crate::discord::discord_last_ready_at()
+        .map(|t| format!("{}s ago", t.elapsed().as_secs()))
+        .unwrap_or_else(|| "never".into());
+    let stage_lower = stage.to_lowercase();
+    if !token {
+        return "**Discord** · Offline · no token in Keychain".to_string();
+    }
+    if stage_lower == "disconnected" || !ready {
+        let mut line = format!("**Discord** · Offline · last Ready {ready_ago}");
+        if disc_n > 0 {
+            line.push_str(&format!(" · disc×{disc_n}"));
+        }
+        if !stage.is_empty() && stage != "unknown" {
+            line.push_str(&format!(" · stage={stage}"));
+        }
+        return line;
+    }
+    let mut line = if resume_n > 0 && disc_n == 0 && stage_lower == "resuming" {
+        format!("**Discord** · Resuming · {ready_ago}")
+    } else {
+        format!("**Discord** · Ready · {ready_ago}")
+    };
+    if disc_n > 0 {
+        line.push_str(&format!(" · disc×{disc_n}"));
+    } else if resume_n > 0 && !line.contains("Resuming") {
+        line.push_str(&format!(" · res×{resume_n}"));
+    }
+    line.push_str(&format!(" · stage={stage} · ready×{ready_n}"));
+    line
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4236,6 +4334,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_status_request(content) {
         return Some(format_status_gateway());
+    }
+    if looks_like_discord_gateway_request(content) {
+        return Some(format_discord_gateway_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4350,6 +4451,7 @@ pub fn format_ops_help_gateway() -> String {
     format!(
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` — one-screen health\n\
+• `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -4821,6 +4923,44 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("strip")
         && !q.contains("cleanup")
         && !q.contains("detail")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/discord` gateway Ready/Offline chip asks (v0.1.722).
+    if (q.contains("/discord")
+        || q == "discord"
+        || q.contains("discord status")
+        || q.contains("discord gateway")
+        || q.contains("discord ready")
+        || q.contains("discord offline")
+        || q.contains("gateway status")
+        || q.contains("gateway ready")
+        || q.contains("bot gateway")
+        || q.contains("is discord ready")
+        || q.contains("is discord online")
+        || q.contains("is discord connected")
+        || q.contains("is discord offline")
+        || q.contains("is the bot ready")
+        || q.contains("is the bot connected")
+        || q.contains("is the gateway ready")
+        || q.contains("is the gateway connected")
+        || q.contains("discord connection")
+        || q.contains("discord reconnect")
+        || q.contains("discord disconnects")
+        || q == "how's discord"
+        || q == "hows discord"
+        || q == "how's the discord"
+        || q == "hows the discord"
+        || q == "how's the gateway"
+        || q == "hows the gateway")
+        && !q.contains("knowledge")
+        && !q.contains("memory")
+        && !q.contains("post")
+        && !q.contains("send")
+        && !q.contains("message")
+        && !q.contains("why")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -6057,6 +6197,14 @@ mod tests {
     fn operator_instant_reply_covers_gateway_commands() {
         let status = try_operator_instant_reply("/status").expect("status");
         assert!(status.contains("mac-stats"));
+        let discord = try_operator_instant_reply("/discord").expect("discord");
+        assert!(
+            discord.to_lowercase().contains("discord"),
+            "{discord}"
+        );
+        assert!(try_operator_instant_reply("is discord ready").is_some());
+        assert!(try_operator_instant_reply("/knowledge discord").is_some()); // knowledge, not chip
+        assert!(try_operator_instant_reply("post to discord").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -7004,6 +7152,23 @@ mod tests {
     }
 
     #[test]
+    fn discord_gateway_request_detected() {
+        assert!(looks_like_discord_gateway_request("/discord"));
+        assert!(looks_like_discord_gateway_request("discord"));
+        assert!(looks_like_discord_gateway_request("discord status"));
+        assert!(looks_like_discord_gateway_request("is discord ready"));
+        assert!(looks_like_discord_gateway_request("gateway status"));
+        assert!(looks_like_discord_gateway_request("how's discord"));
+        assert!(!looks_like_discord_gateway_request("/knowledge discord"));
+        assert!(!looks_like_discord_gateway_request("discord knowledge"));
+        assert!(!looks_like_discord_gateway_request("post to discord"));
+        assert!(!looks_like_discord_gateway_request("send a discord message"));
+        assert!(!looks_like_discord_gateway_request("why is discord offline"));
+        let chip = format_discord_gateway_chip();
+        assert!(chip.to_lowercase().contains("discord"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7029,6 +7194,7 @@ mod tests {
     fn ops_help_lists_status() {
         let report = format_ops_help_gateway();
         assert!(report.contains("/status"), "{report}");
+        assert!(report.contains("/discord"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");
