@@ -2735,6 +2735,173 @@ pub fn format_strip_gateway(filter: StripListFilter) -> String {
     out
 }
 
+/// Details All · Hot filter for `/details` instant replies (collapsed glance parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DetailsListFilter {
+    All,
+    Hot,
+}
+
+/// Load attention — match Details collapsed glance `.is-hot` (Load ≥ 4).
+pub const OPS_DETAILS_LOAD_HOT: f64 = 4.0;
+
+fn details_load_is_hot(load_1: f64) -> bool {
+    load_1 >= OPS_DETAILS_LOAD_HOT
+}
+
+fn details_ram_is_hot(ram_pct: f32) -> bool {
+    ram_pct >= OPS_STRIP_RAM_HOT_PCT
+}
+
+/// Parse Hot from `/details hot`, `hot details`, etc. Default All.
+pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" hot")
+        || n == "details hot"
+        || n == "/details hot"
+        || n == "hot details"
+        || n == "which details are hot"
+        || n == "which detail is hot"
+        || n == "show hot details"
+        || n == "list hot details"
+        || n == "what's hot on details"
+        || n == "whats hot on details"
+    {
+        return DetailsListFilter::Hot;
+    }
+    DetailsListFilter::All
+}
+
+/// True for `/details` / `/load` / load average — not process details or strip/rings.
+pub fn looks_like_details_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("kill")
+        || n.contains("ring")
+        || n.contains("strip")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("more detail")
+        || n.contains("full detail")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/details"
+            | "details"
+            | "system details"
+            | "cpu details"
+            | "list details"
+            | "show details"
+            | "details status"
+            | "/details hot"
+            | "details hot"
+            | "hot details"
+            | "which details are hot"
+            | "which detail is hot"
+            | "show hot details"
+            | "list hot details"
+            | "what's hot on details"
+            | "whats hot on details"
+            | "/load"
+            | "load"
+            | "load average"
+            | "load avg"
+            | "system load"
+            | "cpu load"
+            | "show load"
+            | "list load"
+            | "what's the load"
+            | "whats the load"
+            | "what is the load"
+            | "load 1"
+            | "1-minute load"
+    )
+}
+
+/// Zero-LLM Details report (All · Hot; live get_cpu_details; glance Load≥4 · RAM≥85%).
+pub fn format_details_gateway(filter: DetailsListFilter) -> String {
+    let d = crate::metrics::get_cpu_details();
+    let load_hot = details_load_is_hot(d.load_1);
+    let ram_hot = details_ram_is_hot(d.ram_percent);
+    let up_long = d.uptime_secs >= OPS_STRIP_UPTIME_LONG_SECS;
+
+    let rows: [(&str, String, bool); 3] = [
+        ("Load", format!("{:.2}", d.load_1), load_hot),
+        ("RAM", format!("{:.0}%", d.ram_percent), ram_hot),
+        (
+            "Up",
+            format_system_uptime(d.uptime_secs),
+            // Glance hot is Load/RAM only; long uptime is informational (strip parity mark).
+            up_long,
+        ),
+    ];
+
+    // Hot filter matches Details glance wash (Load≥4 · RAM≥85%), not long Up alone.
+    let hot_n = rows
+        .iter()
+        .filter(|(label, _, hot)| *hot && (*label == "Load" || *label == "RAM"))
+        .count();
+    let title = match filter {
+        DetailsListFilter::All => {
+            format!("**Details** — Load · RAM · Up · {hot_n} hot")
+        }
+        DetailsListFilter::Hot => {
+            format!(
+                "**Details · Hot** — {hot_n} (Load≥{:.0} · RAM≥{:.0}%)",
+                OPS_DETAILS_LOAD_HOT, OPS_STRIP_RAM_HOT_PCT
+            )
+        }
+    };
+    let mut lines = vec![title];
+
+    let filtered: Vec<_> = match filter {
+        DetailsListFilter::All => rows.iter().collect(),
+        DetailsListFilter::Hot => rows
+            .iter()
+            .filter(|(label, _, hot)| *hot && (*label == "Load" || *label == "RAM"))
+            .collect(),
+    };
+
+    if filtered.is_empty() {
+        lines.push(match filter {
+            DetailsListFilter::All => {
+                "_Nothing here yet — open the CPU window so Details can fill in._".to_string()
+            }
+            DetailsListFilter::Hot => format!(
+                "_No Details row is hot right now (Load ≥{:.0} or RAM ≥{:.0}%)._",
+                OPS_DETAILS_LOAD_HOT, OPS_STRIP_RAM_HOT_PCT
+            ),
+        });
+    } else {
+        for (label, value, hot) in filtered {
+            let mark = if *label == "Up" && *hot {
+                " · long"
+            } else if *hot {
+                " · hot"
+            } else {
+                ""
+            };
+            lines.push(format!("• **{label}** · {value}{mark}"));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Perplexity Search All · Top · Snippet filter for `/perplexity` instant (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PerplexityListFilter {
@@ -3694,6 +3861,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_strip_list_filter(content);
         return Some(format_strip_gateway(filter));
     }
+    if looks_like_details_request(content) {
+        let filter = parse_details_list_filter(content);
+        return Some(format_details_gateway(filter));
+    }
     if looks_like_processes_request(content) {
         let filter = parse_processes_list_filter(content);
         return Some(format_processes_gateway(filter));
@@ -3746,6 +3917,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
+• `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -4095,6 +4267,43 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("ring")
         && !q.contains("cleanup")
         && !q.contains("clean up")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/details` · `/load` operator asks (v0.1.718).
+    if (q.contains("/details")
+        || q.contains("/load")
+        || q.contains("system details")
+        || q.contains("cpu details")
+        || q.contains("load average")
+        || q.contains("load avg")
+        || q.contains("system load")
+        || q.contains("cpu load")
+        || q.contains("hot details")
+        || q.contains("details hot")
+        || q.contains("which details are hot")
+        || q.contains("which detail is hot")
+        || q.contains("show hot details")
+        || q.contains("list hot details")
+        || q.contains("list details")
+        || q.contains("show details")
+        || q.contains("show load")
+        || q.contains("list load")
+        || q == "details"
+        || q == "load"
+        || q == "what's the load"
+        || q == "whats the load"
+        || q == "what is the load"
+        || q == "what's hot on details"
+        || q == "whats hot on details")
+        && !q.contains("why")
+        && !q.contains("process")
+        && !q.contains("ring")
+        && !q.contains("strip")
+        && !q.contains("more detail")
+        && !q.contains("full detail")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -5361,6 +5570,22 @@ mod tests {
             strip_hot.to_lowercase().contains("hot") || strip_hot.to_lowercase().contains("strip"),
             "{strip_hot}"
         );
+        let details = try_operator_instant_reply("/details").expect("details");
+        assert!(
+            details.to_lowercase().contains("details"),
+            "{details}"
+        );
+        let details_hot = try_operator_instant_reply("/details hot").expect("details hot");
+        assert!(
+            details_hot.to_lowercase().contains("hot")
+                || details_hot.to_lowercase().contains("details"),
+            "{details_hot}"
+        );
+        let load = try_operator_instant_reply("/load").expect("load");
+        assert!(
+            load.to_lowercase().contains("details") || load.to_lowercase().contains("load"),
+            "{load}"
+        );
         let perplexity = try_operator_instant_reply("/perplexity").expect("perplexity");
         assert!(
             perplexity.to_lowercase().contains("perplexity"),
@@ -5972,6 +6197,50 @@ mod tests {
     }
 
     #[test]
+    fn details_request_and_filter() {
+        assert!(looks_like_details_request("/details"));
+        assert!(looks_like_details_request("system details"));
+        assert!(looks_like_details_request("@Werner /details"));
+        assert!(looks_like_details_request("/details hot"));
+        assert!(looks_like_details_request("hot details"));
+        assert!(looks_like_details_request("/load"));
+        assert!(looks_like_details_request("load average"));
+        assert!(looks_like_details_request("what's the load"));
+        assert!(!looks_like_details_request("/hot"));
+        assert!(!looks_like_details_request("what's hot"));
+        assert!(!looks_like_details_request("/strip"));
+        assert!(!looks_like_details_request("/rings"));
+        assert!(!looks_like_details_request("process details"));
+        assert!(!looks_like_details_request("more details about weather"));
+        assert!(!looks_like_details_request("why is the load high"));
+        assert_eq!(
+            parse_details_list_filter("/details"),
+            DetailsListFilter::All
+        );
+        assert_eq!(
+            parse_details_list_filter("/details hot"),
+            DetailsListFilter::Hot
+        );
+        assert_eq!(
+            parse_details_list_filter("hot details"),
+            DetailsListFilter::Hot
+        );
+        assert!(details_load_is_hot(OPS_DETAILS_LOAD_HOT));
+        assert!(!details_load_is_hot(OPS_DETAILS_LOAD_HOT - 0.1));
+        assert!(details_ram_is_hot(OPS_STRIP_RAM_HOT_PCT));
+        assert!(!details_ram_is_hot(OPS_STRIP_RAM_HOT_PCT - 1.0));
+    }
+
+    #[test]
+    fn details_gateway_has_title() {
+        let report = format_details_gateway(DetailsListFilter::All);
+        assert!(report.to_lowercase().contains("details"), "{report}");
+        assert!(report.to_lowercase().contains("load"), "{report}");
+        let hot = format_details_gateway(DetailsListFilter::Hot);
+        assert!(hot.to_lowercase().contains("hot"), "{hot}");
+    }
+
+    #[test]
     fn perplexity_request_and_filter() {
         assert!(looks_like_perplexity_request("/perplexity"));
         assert!(looks_like_perplexity_request("last search"));
@@ -6094,6 +6363,9 @@ mod tests {
         assert!(report.contains("/rings hot"), "{report}");
         assert!(report.contains("/strip"), "{report}");
         assert!(report.contains("/strip hot"), "{report}");
+        assert!(report.contains("/details"), "{report}");
+        assert!(report.contains("/details hot"), "{report}");
+        assert!(report.contains("/load"), "{report}");
         assert!(report.contains("/hot"), "{report}");
         assert!(report.contains("/pinned"), "{report}");
         assert!(report.contains("/perplexity"), "{report}");

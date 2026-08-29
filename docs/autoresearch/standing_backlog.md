@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.718** — `/details` · `/details hot` · `/load` instant — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; Discord + AI Chat); ring keyboard hint no longer mentions removed All · Hot chips.
+
 - **v0.1.716** — `/strip` · `/strip hot` · `/power` instant — power strip Hot list (menu-bar amber / attention; Discord + AI Chat); Discord `/rings` wired.
 
 - **v0.1.715** — `/rings` · `/rings hot` instant — CPU · GPU · Freq · Temp Hot list (menu-bar amber thresholds; Discord + AI Chat; UI rings filter parity).

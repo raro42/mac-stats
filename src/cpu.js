@@ -3294,7 +3294,7 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to All · Hot filter (or Details) · at end → crosses to history charts · ↓ crosses to Top Processes filters (or Details) · Enter / Space activates';
+    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to Details · at end → crosses to history charts · ↓ crosses to Top Processes filters (or Details) · Enter / Space activates';
 }
 
 /**

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.718] - 2026-08-29
+
+### Added
+- **`/details` instant operator** — `/details`, `/details hot`, `/load` and NL (`load average`, `what's the load`, `system details`) list Details Load · RAM · Up with Hot at glance thresholds (Load ≥4 · RAM ≥85%; Discord + AI Chat; Details collapsed-glance parity).
+
+### Fixed
+- **Ring gauge keyboard hint** — no longer mentions the removed All · Hot filter chips (↑ goes to Details).
+
 ## [0.1.717] - 2026-08-29
 
 ### Removed

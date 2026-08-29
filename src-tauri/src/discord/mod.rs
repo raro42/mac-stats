@@ -2370,6 +2370,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/details` — Details Load · RAM · Up list, no Ollama.
+    if crate::commands::harness_ops::looks_like_details_request(&content) {
+        let filter = crate::commands::harness_ops::parse_details_list_filter(&content);
+        let report = crate::commands::harness_ops::format_details_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send details list: {}", e);
+        }
+        return;
+    }
+
     // `/perplexity` — last Perplexity Top/Snippet list, no Ollama.
     if crate::commands::harness_ops::looks_like_perplexity_request(&content) {
         let filter = crate::commands::harness_ops::parse_perplexity_list_filter(&content);
