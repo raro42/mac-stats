@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.715] - 2026-08-29
+
+### Added
+- **`/rings` instant operator** — `/rings`, `/rings hot` and NL (`cpu rings`, `hot rings`, `which rings are hot`) list CPU · GPU · Freq · Temp rings with Hot counts at menu-bar amber thresholds (CPU ≥50%, GPU ≥15%, Freq ≥3.5 GHz, Temp ≥70°C; Discord + AI Chat; CPU rings filter parity).
+
 ## [0.1.714] - 2026-08-29
 
 ### Added

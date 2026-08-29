@@ -2317,6 +2317,187 @@ pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
     out
 }
 
+/// CPU rings All · Hot filter for `/rings` instant replies (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RingsListFilter {
+    All,
+    Hot,
+}
+
+/// Hot thresholds — match `RING_HOT_*` in cpu.js / CPU rings Hot chip.
+pub const OPS_RING_HOT_CPU_PCT: f32 = 50.0;
+pub const OPS_RING_HOT_GPU_PCT: f32 = 15.0;
+pub const OPS_RING_HOT_FREQ_GHZ: f32 = 3.5;
+pub const OPS_RING_HOT_TEMP_C: f32 = 70.0;
+
+fn ring_cpu_is_hot(usage: f32) -> bool {
+    usage >= OPS_RING_HOT_CPU_PCT
+}
+
+fn ring_gpu_is_hot(gpu: f32) -> bool {
+    gpu >= OPS_RING_HOT_GPU_PCT
+}
+
+fn ring_freq_is_hot(freq_ghz: f32) -> bool {
+    freq_ghz >= OPS_RING_HOT_FREQ_GHZ
+}
+
+fn ring_temp_is_hot(temp_c: f32) -> bool {
+    temp_c >= OPS_RING_HOT_TEMP_C
+}
+
+/// Parse Hot from `/rings hot`, `hot rings`, etc. Default All.
+pub fn parse_rings_list_filter(content: &str) -> RingsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" hot")
+        || n == "rings hot"
+        || n == "/rings hot"
+        || n == "cpu rings hot"
+        || n == "hot rings"
+        || n == "hot ring"
+        || n == "which rings are hot"
+        || n == "which ring is hot"
+        || n == "show hot rings"
+        || n == "list hot rings"
+        || n == "what's hot on rings"
+        || n == "whats hot on rings"
+    {
+        return RingsListFilter::Hot;
+    }
+    RingsListFilter::All
+}
+
+/// True for `/rings` / `cpu rings` — Hot filter parity; not process `/hot` asks.
+pub fn looks_like_rings_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("kill")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/rings"
+            | "rings"
+            | "cpu rings"
+            | "ring gauges"
+            | "ring gauge"
+            | "metric rings"
+            | "list rings"
+            | "show rings"
+            | "rings status"
+            | "/rings hot"
+            | "rings hot"
+            | "cpu rings hot"
+            | "hot rings"
+            | "hot ring"
+            | "which rings are hot"
+            | "which ring is hot"
+            | "show hot rings"
+            | "list hot rings"
+            | "what's hot on rings"
+            | "whats hot on rings"
+    )
+}
+
+/// Zero-LLM CPU rings report (All · Hot; live get_cpu_details; menu-bar amber thresholds).
+pub fn format_rings_gateway(filter: RingsListFilter) -> String {
+    let d = crate::metrics::get_cpu_details();
+    let cpu = d.usage;
+    let gpu = d.gpu_usage;
+    let freq = d.frequency;
+    let temp = d.temperature;
+
+    let rows: [( &str, String, bool); 4] = [
+        (
+            "CPU",
+            format!("{cpu:.0}%"),
+            ring_cpu_is_hot(cpu),
+        ),
+        (
+            "GPU",
+            format!("{gpu:.0}%"),
+            ring_gpu_is_hot(gpu),
+        ),
+        (
+            "Freq",
+            if freq > 0.0 {
+                format!("{freq:.2} GHz")
+            } else {
+                "—".into()
+            },
+            freq > 0.0 && ring_freq_is_hot(freq),
+        ),
+        (
+            "Temp",
+            if temp > 0.0 {
+                format!("{temp:.0}°C")
+            } else {
+                "—".into()
+            },
+            temp > 0.0 && ring_temp_is_hot(temp),
+        ),
+    ];
+
+    let hot_n = rows.iter().filter(|(_, _, hot)| *hot).count();
+    let title = match filter {
+        RingsListFilter::All => {
+            format!("**CPU rings** — 4 · {hot_n} hot")
+        }
+        RingsListFilter::Hot => {
+            format!(
+                "**CPU rings · Hot** — {hot_n} (CPU≥{:.0}% · GPU≥{:.0}% · Freq≥{} GHz · Temp≥{:.0}°C)",
+                OPS_RING_HOT_CPU_PCT,
+                OPS_RING_HOT_GPU_PCT,
+                OPS_RING_HOT_FREQ_GHZ,
+                OPS_RING_HOT_TEMP_C
+            )
+        }
+    };
+    let mut lines = vec![title];
+
+    let filtered: Vec<_> = match filter {
+        RingsListFilter::All => rows.iter().collect(),
+        RingsListFilter::Hot => rows.iter().filter(|(_, _, hot)| *hot).collect(),
+    };
+
+    if filtered.is_empty() {
+        lines.push(match filter {
+            RingsListFilter::All => {
+                "_Nothing here yet — open the CPU window so rings can fill in._".to_string()
+            }
+            RingsListFilter::Hot => format!(
+                "_No ring is hot right now (CPU ≥{:.0}%, GPU ≥{:.0}%, Freq ≥{} GHz, or Temp ≥{:.0}°C)._",
+                OPS_RING_HOT_CPU_PCT,
+                OPS_RING_HOT_GPU_PCT,
+                OPS_RING_HOT_FREQ_GHZ,
+                OPS_RING_HOT_TEMP_C
+            ),
+        });
+    } else {
+        for (label, value, hot) in filtered {
+            let hot_mark = if *hot { " · hot" } else { "" };
+            lines.push(format!("• **{label}** · {value}{hot_mark}"));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Perplexity Search All · Top · Snippet filter for `/perplexity` instant (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PerplexityListFilter {
@@ -3268,6 +3449,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_debug_log_list_filter(content);
         return Some(format_debug_log_gateway(filter));
     }
+    if looks_like_rings_request(content) {
+        let filter = parse_rings_list_filter(content);
+        return Some(format_rings_gateway(filter));
+    }
     if looks_like_processes_request(content) {
         let filter = parse_processes_list_filter(content);
         return Some(format_processes_gateway(filter));
@@ -3318,6 +3503,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
+• `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -3613,6 +3799,30 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("fix")
         && !q.contains("explain")
         && !q.contains("clear log")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/rings` Hot operator asks (v0.1.715).
+    if (q.contains("/rings")
+        || q.contains("cpu rings")
+        || q.contains("ring gauges")
+        || q.contains("ring gauge")
+        || q.contains("metric rings")
+        || q.contains("hot rings")
+        || q.contains("rings hot")
+        || q.contains("which rings are hot")
+        || q.contains("which ring is hot")
+        || q.contains("show hot rings")
+        || q.contains("list hot rings")
+        || q.contains("list rings")
+        || q.contains("show rings")
+        || q == "rings"
+        || q == "what's hot on rings"
+        || q == "whats hot on rings")
+        && !q.contains("why")
+        && !q.contains("process")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -4862,6 +5072,13 @@ mod tests {
             processes_pinned.to_lowercase().contains("pinned"),
             "{processes_pinned}"
         );
+        let rings = try_operator_instant_reply("/rings").expect("rings");
+        assert!(rings.to_lowercase().contains("cpu rings"), "{rings}");
+        let rings_hot = try_operator_instant_reply("/rings hot").expect("rings hot");
+        assert!(
+            rings_hot.to_lowercase().contains("hot") || rings_hot.to_lowercase().contains("ring"),
+            "{rings_hot}"
+        );
         let perplexity = try_operator_instant_reply("/perplexity").expect("perplexity");
         assert!(
             perplexity.to_lowercase().contains("perplexity"),
@@ -5403,6 +5620,41 @@ mod tests {
     }
 
     #[test]
+    fn rings_request_and_filter() {
+        assert!(looks_like_rings_request("/rings"));
+        assert!(looks_like_rings_request("cpu rings"));
+        assert!(looks_like_rings_request("@Werner /rings"));
+        assert!(looks_like_rings_request("/rings hot"));
+        assert!(looks_like_rings_request("hot rings"));
+        assert!(looks_like_rings_request("which rings are hot"));
+        assert!(looks_like_rings_request("show hot rings"));
+        assert!(!looks_like_rings_request("/hot"));
+        assert!(!looks_like_rings_request("what's hot"));
+        assert!(!looks_like_rings_request("hot processes"));
+        assert!(!looks_like_rings_request("why are rings hot"));
+        assert_eq!(parse_rings_list_filter("/rings"), RingsListFilter::All);
+        assert_eq!(parse_rings_list_filter("/rings hot"), RingsListFilter::Hot);
+        assert_eq!(parse_rings_list_filter("hot rings"), RingsListFilter::Hot);
+        assert_eq!(
+            parse_rings_list_filter("which rings are hot"),
+            RingsListFilter::Hot
+        );
+        assert!(ring_cpu_is_hot(OPS_RING_HOT_CPU_PCT));
+        assert!(ring_gpu_is_hot(OPS_RING_HOT_GPU_PCT));
+        assert!(ring_freq_is_hot(OPS_RING_HOT_FREQ_GHZ));
+        assert!(ring_temp_is_hot(OPS_RING_HOT_TEMP_C));
+        assert!(!ring_cpu_is_hot(OPS_RING_HOT_CPU_PCT - 1.0));
+    }
+
+    #[test]
+    fn rings_gateway_has_title() {
+        let report = format_rings_gateway(RingsListFilter::All);
+        assert!(report.to_lowercase().contains("cpu rings"), "{report}");
+        let hot = format_rings_gateway(RingsListFilter::Hot);
+        assert!(hot.to_lowercase().contains("hot"), "{hot}");
+    }
+
+    #[test]
     fn perplexity_request_and_filter() {
         assert!(looks_like_perplexity_request("/perplexity"));
         assert!(looks_like_perplexity_request("last search"));
@@ -5521,6 +5773,8 @@ mod tests {
         assert!(report.contains("/processes"), "{report}");
         assert!(report.contains("/processes hot"), "{report}");
         assert!(report.contains("/processes pinned"), "{report}");
+        assert!(report.contains("/rings"), "{report}");
+        assert!(report.contains("/rings hot"), "{report}");
         assert!(report.contains("/hot"), "{report}");
         assert!(report.contains("/pinned"), "{report}");
         assert!(report.contains("/perplexity"), "{report}");
