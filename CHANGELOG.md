@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.728] - 2026-08-30
+
+### Added
+- **`/mcp` instant operator** — `/mcp` and NL (`mcp status`, `is mcp ready`, `how's mcp`, `mcp server`) return MCP Ready / Not set with stdio command or HTTP host cue (config only, no `tools/list` probe; Discord + AI Chat; does not steal `MCP: <tool>` invocations).
+
 ## [0.1.727] - 2026-08-30
 
 ### Added

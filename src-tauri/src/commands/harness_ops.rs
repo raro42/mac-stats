@@ -4771,6 +4771,105 @@ pub fn format_mastodon_ready_chip() -> String {
     }
 }
 
+/// True for focused MCP Ready/config asks (`/mcp` · MCP_SERVER_* config parity) —
+/// not `MCP: <tool>` invocations or tool how-to.
+pub fn looks_like_mcp_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Tool invocations and how-to stay with pre-route / agent.
+    if n.starts_with("mcp:")
+        || n.contains("mcp:")
+        || n.contains("mcp tool")
+        || n.contains("list tools")
+        || n.contains("list mcp")
+        || n.contains("call mcp")
+        || n.contains("use mcp")
+        || n.contains("invoke")
+        || n.contains("ori_")
+        || n.contains("mnemos")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/mcp"
+            | "mcp"
+            | "mcp status"
+            | "mcp ready"
+            | "mcp offline"
+            | "mcp configured"
+            | "mcp health"
+            | "mcp key"
+            | "mcp url"
+            | "mcp stdio"
+            | "mcp server"
+            | "mcp connection"
+            | "show mcp"
+            | "is mcp ready"
+            | "is mcp online"
+            | "is mcp connected"
+            | "is mcp offline"
+            | "is mcp configured"
+            | "is mcp set up"
+            | "is mcp setup"
+            | "how's mcp"
+            | "hows mcp"
+            | "how's the mcp"
+            | "hows the mcp"
+            | "mcp server status"
+            | "mcp server ready"
+            | "mcp server health"
+            | "mcp server configured"
+            | "is mcp server ready"
+            | "is mcp server configured"
+            | "is mcp server set up"
+            | "is mcp server setup"
+            | "how's mcp server"
+            | "hows mcp server"
+    )
+}
+
+/// Zero-LLM MCP Ready / Not set chip (config only; no tools/list live probe).
+pub fn format_mcp_ready_chip() -> String {
+    match crate::mcp::get_mcp_server_url() {
+        None => "**MCP** · Not set · add MCP_SERVER_URL or MCP_SERVER_STDIO".to_string(),
+        Some(cfg) => {
+            if let Some(rest) = cfg.strip_prefix("stdio:") {
+                let cmd = rest
+                    .split('|')
+                    .next()
+                    .unwrap_or("stdio")
+                    .trim();
+                let short = if cmd.chars().count() > 36 {
+                    let mut s: String = cmd.chars().take(33).collect();
+                    s.push('…');
+                    s
+                } else {
+                    cmd.to_string()
+                };
+                format!("**MCP** · Ready · stdio · {short}")
+            } else {
+                let host = shorten_redmine_url_for_chip(&cfg);
+                format!("**MCP** · Ready · http · {host}")
+            }
+        }
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4825,6 +4924,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_mastodon_ready_request(content) {
         return Some(format_mastodon_ready_chip());
+    }
+    if looks_like_mcp_ready_request(content) {
+        return Some(format_mcp_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4945,6 +5047,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
+• `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5653,6 +5756,43 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("timeline")
         && !q.contains("follow")
         && !q.contains("boost")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
+    // `/mcp` Ready/Not-set chip asks (v0.1.728).
+    if (q.contains("/mcp")
+        || q == "mcp"
+        || q.contains("mcp status")
+        || q.contains("mcp ready")
+        || q.contains("mcp offline")
+        || q.contains("mcp configured")
+        || q.contains("mcp health")
+        || q.contains("mcp key")
+        || q.contains("mcp url")
+        || q.contains("mcp stdio")
+        || q.contains("mcp server")
+        || q.contains("mcp connection")
+        || q.contains("is mcp ready")
+        || q.contains("is mcp online")
+        || q.contains("is mcp connected")
+        || q.contains("is mcp offline")
+        || q.contains("is mcp configured")
+        || q.contains("is mcp set up")
+        || q.contains("is mcp setup")
+        || q == "how's mcp"
+        || q == "hows mcp"
+        || q == "how's the mcp"
+        || q == "hows the mcp")
+        && !q.contains("mcp:")
+        && !q.contains("mcp tool")
+        && !q.contains("list tools")
+        && !q.contains("call mcp")
+        && !q.contains("use mcp")
+        && !q.contains("invoke")
+        && !q.contains("ori_")
         && !q.contains("why")
         && !q.contains("how to")
         && !q.chars().any(|c| c.is_ascii_digit())
@@ -6939,6 +7079,13 @@ mod tests {
         assert!(try_operator_instant_reply("how's mastodon").is_some());
         assert!(try_operator_instant_reply("post to mastodon").is_none());
         assert!(try_operator_instant_reply("toot hello").is_none());
+        let mcp = try_operator_instant_reply("/mcp").expect("mcp");
+        assert!(mcp.to_lowercase().contains("mcp"), "{mcp}");
+        assert!(try_operator_instant_reply("is mcp ready").is_some());
+        assert!(try_operator_instant_reply("how's mcp").is_some());
+        assert!(try_operator_instant_reply("mcp server status").is_some());
+        assert!(try_operator_instant_reply("mcp: list_tools").is_none());
+        assert!(try_operator_instant_reply("call mcp get_weather").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -8003,6 +8150,26 @@ mod tests {
     }
 
     #[test]
+    fn mcp_ready_request_detected() {
+        assert!(looks_like_mcp_ready_request("/mcp"));
+        assert!(looks_like_mcp_ready_request("mcp"));
+        assert!(looks_like_mcp_ready_request("mcp status"));
+        assert!(looks_like_mcp_ready_request("is mcp ready"));
+        assert!(looks_like_mcp_ready_request("is mcp configured"));
+        assert!(looks_like_mcp_ready_request("how's mcp"));
+        assert!(looks_like_mcp_ready_request("mcp server"));
+        assert!(looks_like_mcp_ready_request("mcp stdio"));
+        assert!(!looks_like_mcp_ready_request("mcp: get_weather"));
+        assert!(!looks_like_mcp_ready_request("MCP: list_tools {}"));
+        assert!(!looks_like_mcp_ready_request("call mcp tool"));
+        assert!(!looks_like_mcp_ready_request("list mcp tools"));
+        assert!(!looks_like_mcp_ready_request("how to use mcp"));
+        assert!(!looks_like_mcp_ready_request("use mcp for weather"));
+        let chip = format_mcp_ready_chip();
+        assert!(chip.to_lowercase().contains("mcp"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -8035,6 +8202,7 @@ mod tests {
         assert!(report.contains("/brave"), "{report}");
         assert!(report.contains("/perplexity key"), "{report}");
         assert!(report.contains("/mastodon"), "{report}");
+        assert!(report.contains("/mcp"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");
