@@ -12,12 +12,13 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.706** | `/sessions` instant operator (Live/Files list) |
 | **v0.1.707** | `/knowledge` instant operator (Discord/Core list) |
 | **v0.1.708** | `/schedules` Jobs/Deliveries filter (jobs · deliveries list) |
+| **v0.1.709** | `/monitors` instant operator (Up/Down/Slow list) |
 
-## This tick (~01:30)
+## This tick (~01:55)
 
-- Digester open empty; design review in grace.
-- Fuel: standing backlog p50 — Schedules Jobs/Deliveries parity for Discord + AI Chat.
-- **`/schedules`**, **`/schedules jobs`**, **`/schedules deliveries`** (+ NL) list active jobs and recent Discord deliveries without Ollama.
+- Digester open empty; design review in grace (`feature-ai-chat` recommended).
+- Fuel: standing backlog p50 — Monitors All · Up · Down · Slow had UI filter but no Discord/AI Chat instant list.
+- **`/monitors`**, **`/monitors up`**, **`/monitors down`**, **`/monitors slow`** (+ NL) list External / Monitors from cached status without Ollama.
 
 ## Next
 
