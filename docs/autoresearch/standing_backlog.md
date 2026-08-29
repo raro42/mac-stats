@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.721** — `/ram` · `/ssd` · `/uptime` instant — power-strip RAM · SSD · Up chips (RAM/SSD≥85% hot · Up≥7d long; Discord + AI Chat); does not steal `/strip` or `/disk` Disk Cleanup.
+
 - **v0.1.720** — `/cpu` · `/gpu` · `/freq` · `/temp` instant — ring chips at menu-bar amber (CPU≥50% · GPU≥15% · Freq≥3.5 GHz · Temp≥70°C; Discord + AI Chat); does not steal `/rings`.
 
 - **v0.1.719** — `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` instant — power-strip Bat · Heat · LPM chips (Bat≤20% · Heat Fair+ · LPM On hot; Discord + AI Chat); does not steal `/strip`.
