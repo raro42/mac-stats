@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.717] - 2026-08-29
+
+### Removed
+- **CPU rings All · Hot chips** — the filter row above the gauges is gone (less chrome). Amber wash on hot rings stays; `/rings` instant still works.
+
+### Added
+- **History sparklines from background samples** — on open, charts seed from the backend metrics buffer (`get_metrics_history`). Buffer loads/saves `~/.mac-stats/history.json` so graphs are not empty after the app has been measuring in the menu bar.
+
 ## [0.1.716] - 2026-08-29
 
 **GitHub Release** (first since **v0.1.458**). Ship tag **v0.1.716** includes product work from **0.1.459–0.1.716**. Overnight loop may cut further releases via `scripts/maybe_cut_github_release.py` when Latest falls behind.

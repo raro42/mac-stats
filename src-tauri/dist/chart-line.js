@@ -214,11 +214,44 @@
     drawLineChart(metric);
   }
 
+  function seedFromPoints(points) {
+    if (!Array.isArray(points) || !points.length) return false;
+    const getters = {
+      usage: (p) => p && p.cpu,
+      gpu: (p) => p && p.gpu,
+      frequency: (p) => p && p.frequency,
+      temperature: (p) => p && p.temperature,
+    };
+    const slice = points.slice(-LINE_CHART_POINTS);
+    const start = LINE_CHART_POINTS - slice.length;
+    for (const [metric, getter] of Object.entries(getters)) {
+      const line = new Array(LINE_CHART_POINTS).fill(EMPTY_POINT);
+      for (let i = 0; i < slice.length; i++) {
+        const v = getter(slice[i]);
+        if (typeof v !== "number" || !Number.isFinite(v)) continue;
+        // Temp/freq 0 means "no sample" in the backend cache path.
+        if ((metric === "temperature" || metric === "frequency") && v <= 0) {
+          continue;
+        }
+        line[start + i] = v;
+      }
+      dataBuffers[metric].line = line;
+    }
+    if (!canvases.usage) initializeCanvases();
+    COLORS = getColors();
+    Object.keys(dataBuffers).forEach((metric) => {
+      if (!contexts[metric] && canvases[metric]) setupCanvas(metric);
+      if (contexts[metric]) drawLineChart(metric);
+    });
+    return true;
+  }
+
   const api = {
     updateTemperature: (value) => updateCharts("temperature", value),
     updateUsage: (value) => updateCharts("usage", value),
     updateGpu: (value) => updateCharts("gpu", value),
     updateFrequency: (value) => updateCharts("frequency", value),
+    seedFromPoints,
     init: () => {
       initializeCanvases();
       COLORS = getColors();

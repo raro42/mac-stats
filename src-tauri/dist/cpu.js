@@ -2347,7 +2347,7 @@ function init() {
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
-  ensureRingsFilterChips();
+  removeRingsFilterChips();
   ensureRamStripStyles();
   pruneMetricStripChips();
   ensurePowerStripKeyboard();
@@ -2359,6 +2359,7 @@ function init() {
     // Call refresh immediately - don't wait for interval
     refresh();
     startRefresh();
+    void seedThemeHistoryFromBackend();
   } else {
     // Tauri not ready yet - wait for it
     waitForTauri((invokeFn) => {
@@ -2366,6 +2367,7 @@ function init() {
       // Call refresh immediately when Tauri becomes available
       refresh();
       startRefresh();
+      void seedThemeHistoryFromBackend();
     });
   }
 }
@@ -3125,9 +3127,7 @@ function getRingGaugeSection() {
   );
 }
 
-/** Ring gauges All · Hot filter (menu-bar amber / Top Processes Hot parity). */
-let ringsFilterMode = 'all';
-/** Menu-bar amber thresholds for CPU · GPU · Freq · Temp rings. */
+/** Ring gauges amber wash thresholds (menu-bar parity). No All/Hot chip row. */
 const RING_HOT_CPU_PCT = 50;
 const RING_HOT_GPU_PCT = 15;
 const RING_HOT_FREQ_GHZ = 3.5;
@@ -3167,89 +3167,15 @@ function historyChartContainerForRingKey(key) {
   return canvas ? canvas.closest('.history-chart-container') : null;
 }
 
-function isRingEntryHot(entry) {
-  return !!(entry && entry.card && entry.card.classList.contains('is-hot'));
-}
-
-/** All / Hot chips above the ring gauges. */
-function ensureRingsFilterChips() {
-  const section = getRingGaugeSection();
-  if (!section) return;
-  let wrap = document.getElementById('rings-filter-chips');
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.id = 'rings-filter-chips';
-    wrap.className = 'rings-filter-chips';
-    wrap.setAttribute('role', 'group');
-    wrap.setAttribute('aria-label', 'Ring metric filter');
-    wrap.innerHTML =
-      '<button type="button" class="rings-filter-chip is-active" data-rings-filter="all" aria-pressed="true" title="Show every ring">All</button>' +
-      `<button type="button" class="rings-filter-chip" data-rings-filter="hot" aria-pressed="false" title="Show rings that are hot (CPU ≥${RING_HOT_CPU_PCT}%, GPU ≥${RING_HOT_GPU_PCT}%, Freq ≥${RING_HOT_FREQ_GHZ} GHz, or Temp ≥${RING_HOT_TEMP_C}°C)">Hot <span class="rings-filter-count" data-rings-filter-count="hot">0</span></button>`;
-    section.insertBefore(wrap, section.firstChild);
-    wrap.addEventListener('click', (e) => {
-      const btn =
-        e.target && e.target.closest && e.target.closest('[data-rings-filter]');
-      if (!btn || !wrap.contains(btn)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      setRingsFilterMode(btn.getAttribute('data-rings-filter') || 'all');
-    });
-  }
-  wireFilterChipToolbarKeyboard(wrap);
-}
-
-function normalizeRingsFilterMode(mode) {
-  return mode === 'hot' ? 'hot' : 'all';
-}
-
-function setRingsFilterMode(mode) {
-  const next = normalizeRingsFilterMode(mode);
-  ringsFilterMode = next;
-  document.querySelectorAll('#rings-filter-chips [data-rings-filter]').forEach((btn) => {
-    const on = btn.getAttribute('data-rings-filter') === next;
-    btn.classList.toggle('is-active', on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
-  applyRingsFilter();
-}
-
-function ringsFilterMissHint() {
-  if (ringsFilterMode === 'hot') {
-    return `No ring is hot right now (CPU ≥${RING_HOT_CPU_PCT}%, GPU ≥${RING_HOT_GPU_PCT}%, Freq ≥${RING_HOT_FREQ_GHZ} GHz, or Temp ≥${RING_HOT_TEMP_C}°C).`;
-  }
-  return 'Try All, or clear the ring filter.';
-}
-
-function ensureRingsFilterMissState(section, show) {
-  if (!section) return;
-  const existing = section.querySelector('.rings-filter-miss');
-  if (!show) {
-    existing?.remove();
-    return;
-  }
-  let wrap = existing;
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.className = 'rings-filter-miss';
-    wrap.setAttribute('role', 'status');
-    wrap.innerHTML =
-      `<div class="rings-filter-miss-msg">Nothing matches this filter</div>` +
-      `<div class="rings-filter-miss-hint"></div>` +
-      `<button type="button" class="rings-filter-miss-cta rings-clear-filter">Clear filter</button>`;
-    section.appendChild(wrap);
-    wrap.querySelector('.rings-clear-filter')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setRingsFilterMode('all');
-    });
-  }
-  const hint = wrap.querySelector('.rings-filter-miss-hint');
-  if (hint) hint.textContent = ringsFilterMissHint();
+/** Drop the old All · Hot chip row if a prior build left it in the DOM. */
+function removeRingsFilterChips() {
+  document.getElementById('rings-filter-chips')?.remove();
+  document.querySelectorAll('.rings-filter-miss').forEach((el) => el.remove());
 }
 
 /** Apply menu-bar amber hot washes on ring cards + matching history charts. */
 function updateRingHotStates(data) {
-  ensureRingsFilterChips();
+  removeRingsFilterChips();
   const usage =
     typeof data?.usage === 'number' && Number.isFinite(data.usage)
       ? data.usage
@@ -3280,45 +3206,16 @@ function updateRingHotStates(data) {
     const hot = !!hotByKey[entry.key];
     entry.card.classList.toggle('is-hot', hot);
     entry.card.dataset.ringsHot = hot ? '1' : '0';
+    entry.card.style.display = '';
+    entry.card.hidden = false;
     const chart = historyChartContainerForRingKey(entry.key);
     if (chart) {
       chart.classList.toggle('is-hot', hot);
       chart.dataset.ringsHot = hot ? '1' : '0';
+      chart.style.display = '';
+      chart.hidden = false;
     }
   }
-  applyRingsFilter();
-}
-
-function applyRingsFilter() {
-  ensureRingsFilterChips();
-  const section = getRingGaugeSection();
-  const entries = getRingMetricCardEntries();
-  let hotCount = 0;
-  entries.forEach((entry) => {
-    if (isRingEntryHot(entry)) hotCount++;
-  });
-  const hotEl = document.querySelector('[data-rings-filter-count="hot"]');
-  if (hotEl) hotEl.textContent = String(hotCount);
-  document.querySelectorAll('#rings-filter-chips [data-rings-filter]').forEach((btn) => {
-    const key = btn.getAttribute('data-rings-filter');
-    btn.classList.toggle('has-hits', key === 'hot' ? hotCount > 0 : false);
-  });
-
-  let visible = 0;
-  entries.forEach((entry) => {
-    const hot = isRingEntryHot(entry);
-    const show = ringsFilterMode !== 'hot' || hot;
-    entry.card.style.display = show ? '' : 'none';
-    entry.card.hidden = !show;
-    const chart = historyChartContainerForRingKey(entry.key);
-    if (chart) {
-      chart.style.display = show ? '' : 'none';
-      chart.hidden = !show;
-    }
-    if (show) visible++;
-  });
-
-  ensureRingsFilterMissState(section, ringsFilterMode === 'hot' && visible === 0);
   refreshRingGaugeRovingTabindex();
   refreshHistorySparklineRovingTabindex();
 }
@@ -4896,6 +4793,7 @@ document.addEventListener("visibilitychange", () => {
       if (!refreshInterval) {
         startRefresh();
       }
+      void seedThemeHistoryFromBackend();
     } else {
       // Tauri not ready - initialize (will keep trying until ready)
       init();
@@ -18299,6 +18197,25 @@ function initIconLine() {
   ensureCpuHeaderToolbarKeyboard();
   ensureIconLineKeyboard();
   ensureFooterToolbarKeyboard();
+}
+
+
+/** Paint sparklines from backend history (menu-bar samples) so charts are not empty on open. */
+async function seedThemeHistoryFromBackend() {
+  ensureGpuHistoryChart();
+  const inv = getInvoke() || invoke;
+  if (!inv || typeof window.themeHistory?.seedFromPoints !== 'function') return;
+  try {
+    const result = await inv('get_metrics_history', {
+      time_range_seconds: 300,
+      max_display_points: 60,
+    });
+    if (result?.points?.length) {
+      window.themeHistory.seedFromPoints(result.points);
+    }
+  } catch (_) {
+    // History not ready yet — live feed fills charts on the next refresh ticks.
+  }
 }
 
 // Check if history data is available and show/hide dropdown accordingly

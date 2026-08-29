@@ -376,9 +376,7 @@ pub struct HistoryQueryResult {
 }
 
 impl HistoryBuffer {
-    /// Optional: Save history to disk for persistence across restarts
-    /// Saves to ~/.mac-stats/history.json
-    #[allow(dead_code)] // Reserved for future persistence feature
+    /// Save history to disk for persistence across restarts (`~/.mac-stats/history.json`).
     pub fn save_to_disk(&self) -> Result<(), String> {
         let home =
             std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;
@@ -403,9 +401,7 @@ impl HistoryBuffer {
         Ok(())
     }
 
-    /// Optional: Load history from disk
-    /// Loads from ~/.mac-stats/history.json if it exists
-    #[allow(dead_code)] // Reserved for future persistence feature
+    /// Load history from `~/.mac-stats/history.json` if it exists.
     pub fn load_from_disk() -> Result<Self, String> {
         let home =
             std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;

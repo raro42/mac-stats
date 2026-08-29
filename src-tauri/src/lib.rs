@@ -684,10 +684,20 @@ fn run_internal(open_cpu_window: bool) {
                 // Wait longer before first update to let background initialization complete
                 std::thread::sleep(std::time::Duration::from_millis(1500));
 
-                // Initialize history buffer (adaptive tiered storage with automatic downsampling)
+                // Initialize history buffer (load ~/.mac-stats/history.json when present)
                 if let Ok(mut history) = METRICS_HISTORY.try_lock() {
-                    *history = Some(metrics::history::HistoryBuffer::new());
-                    debug3!("Metrics history buffer initialized (capacity: 26 KB)");
+                    let loaded = metrics::history::HistoryBuffer::load_from_disk().unwrap_or_else(
+                        |e| {
+                            debug3!("Metrics history load failed ({}), starting empty", e);
+                            metrics::history::HistoryBuffer::new()
+                        },
+                    );
+                    let n = loaded.total_points();
+                    *history = Some(loaded);
+                    debug3!(
+                        "Metrics history buffer ready ({} points across tiers, capacity: 26 KB)",
+                        n
+                    );
                 } else {
                     debug3!("Warning: Could not initialize metrics history buffer - lock contention at startup");
                 }
@@ -1739,6 +1749,16 @@ fn run_internal(open_cpu_window: bool) {
                                 final_history_point.disk,
                                 final_history_point.temperature,
                                 final_history_point.frequency);
+                            // Persist about every 60 samples (~2–5 min) so reopen paints immediately.
+                            static HISTORY_SAVE_COUNTER: std::sync::atomic::AtomicU32 =
+                                std::sync::atomic::AtomicU32::new(0);
+                            let n = HISTORY_SAVE_COUNTER
+                                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                            if n % 60 == 0 {
+                                if let Err(e) = history.save_to_disk() {
+                                    debug3!("Metrics history save failed: {}", e);
+                                }
+                            }
                         }
                     } else {
                         debug3!("Could not lock history buffer for update (lock contention)");
@@ -1766,6 +1786,13 @@ fn run_internal(open_cpu_window: bool) {
                     target: "mac_stats::browser_shutdown",
                     "Tauri RunEvent::Exit: closing browser session"
                 );
+                if let Ok(history_opt) = METRICS_HISTORY.try_lock() {
+                    if let Some(history) = history_opt.as_ref() {
+                        if let Err(e) = history.save_to_disk() {
+                            debug3!("Metrics history save on exit failed: {}", e);
+                        }
+                    }
+                }
                 crate::logging::sync_debug_log_best_effort();
                 crate::browser_agent::close_browser_session();
                 crate::logging::sync_debug_log_best_effort();
