@@ -4412,6 +4412,98 @@ pub fn format_ollama_ready_chip() -> String {
     line
 }
 
+/// True for focused Redmine Ready/config asks (`/redmine` · Agent Ops health parity) —
+/// not ticket/issue/time-entry/API free-form.
+pub fn looks_like_redmine_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Tickets, issues, time, API how-to stay with pre-route / agent.
+    if n.contains("ticket")
+        || n.contains("issue")
+        || n.contains("time entr")
+        || n.contains("spent")
+        || n.contains(" hours")
+        || n.contains("api")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("comment")
+        || n.contains("search")
+        || n.contains("list ")
+        || n.contains("review")
+        || n.contains("journal")
+        || n.contains("attachment")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/redmine"
+            | "redmine"
+            | "redmine status"
+            | "redmine ready"
+            | "redmine offline"
+            | "redmine configured"
+            | "redmine health"
+            | "show redmine"
+            | "is redmine ready"
+            | "is redmine online"
+            | "is redmine connected"
+            | "is redmine offline"
+            | "is redmine configured"
+            | "is redmine set up"
+            | "is redmine setup"
+            | "redmine connection"
+            | "how's redmine"
+            | "hows redmine"
+            | "how's the redmine"
+            | "hows the redmine"
+            | "redmine url"
+            | "redmine key"
+    )
+}
+
+fn shorten_redmine_url_for_chip(url: &str) -> String {
+    let mut s = url.trim().trim_end_matches('/').to_string();
+    for prefix in ["https://", "http://"] {
+        if let Some(rest) = s.strip_prefix(prefix) {
+            s = rest.to_string();
+            break;
+        }
+    }
+    if s.chars().count() > 40 {
+        s.chars().take(37).collect::<String>() + "…"
+    } else {
+        s
+    }
+}
+
+/// Zero-LLM Redmine Ready / Not set chip (Agent Ops health Redmine parity; config only).
+pub fn format_redmine_ready_chip() -> String {
+    let url = crate::redmine::get_redmine_url();
+    let key = crate::redmine::get_redmine_api_key();
+    match (url.as_deref(), key.as_deref()) {
+        (None, None) => "**Redmine** · Not set · add URL + API key".to_string(),
+        (Some(_), None) => "**Redmine** · Partial · URL set · missing API key".to_string(),
+        (None, Some(_)) => "**Redmine** · Partial · API key set · missing URL".to_string(),
+        (Some(u), Some(_)) => {
+            let host = shorten_redmine_url_for_chip(u);
+            format!("**Redmine** · Ready · {host} · key set")
+        }
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4454,6 +4546,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_ollama_ready_request(content) {
         return Some(format_ollama_ready_chip());
+    }
+    if looks_like_redmine_ready_request(content) {
+        return Some(format_redmine_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4570,6 +4665,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/status` · `/health` · `/version` — one-screen health\n\
 • `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
+• `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5122,6 +5218,41 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains(" ticket")
         && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/redmine` Ready/Not-set chip asks (v0.1.724).
+    if (q.contains("/redmine")
+        || q == "redmine"
+        || q.contains("redmine status")
+        || q.contains("redmine ready")
+        || q.contains("redmine offline")
+        || q.contains("redmine configured")
+        || q.contains("redmine health")
+        || q.contains("is redmine ready")
+        || q.contains("is redmine online")
+        || q.contains("is redmine connected")
+        || q.contains("is redmine offline")
+        || q.contains("is redmine configured")
+        || q.contains("is redmine set up")
+        || q.contains("is redmine setup")
+        || q.contains("redmine connection")
+        || q == "how's redmine"
+        || q == "hows redmine"
+        || q == "how's the redmine"
+        || q == "hows the redmine"
+        || q.contains("redmine url")
+        || q.contains("redmine key"))
+        && !q.contains("ticket")
+        && !q.contains("issue")
+        && !q.contains("time entr")
+        && !q.contains("api")
+        && !q.contains("create")
+        && !q.contains("update")
+        && !q.contains("review")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && !q.chars().any(|c| c.is_ascii_digit())
     {
         return true;
     }
@@ -6370,6 +6501,12 @@ mod tests {
         assert!(try_operator_instant_reply("/llm").is_some());
         assert!(try_operator_instant_reply("pull llama3").is_none());
         assert!(try_operator_instant_reply("chat with ollama about weather").is_none());
+        let redmine = try_operator_instant_reply("/redmine").expect("redmine");
+        assert!(redmine.to_lowercase().contains("redmine"), "{redmine}");
+        assert!(try_operator_instant_reply("is redmine ready").is_some());
+        assert!(try_operator_instant_reply("how's redmine").is_some());
+        assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
+        assert!(try_operator_instant_reply("review ticket 7736").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -6488,6 +6625,7 @@ mod tests {
             "{perplexity_top}"
         );
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
+        assert!(try_operator_instant_reply("review redmine ticket 12").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
         assert!(try_operator_instant_reply("why is the site slow").is_none());
@@ -7351,6 +7489,24 @@ mod tests {
     }
 
     #[test]
+    fn redmine_ready_request_detected() {
+        assert!(looks_like_redmine_ready_request("/redmine"));
+        assert!(looks_like_redmine_ready_request("redmine"));
+        assert!(looks_like_redmine_ready_request("redmine status"));
+        assert!(looks_like_redmine_ready_request("is redmine ready"));
+        assert!(looks_like_redmine_ready_request("is redmine configured"));
+        assert!(looks_like_redmine_ready_request("how's redmine"));
+        assert!(!looks_like_redmine_ready_request("status of the redmine ticket"));
+        assert!(!looks_like_redmine_ready_request("review ticket 7736"));
+        assert!(!looks_like_redmine_ready_request("redmine issue 12"));
+        assert!(!looks_like_redmine_ready_request("how to query redmine api"));
+        assert!(!looks_like_redmine_ready_request("list redmine issues"));
+        assert!(!looks_like_redmine_ready_request("talk to redmine"));
+        let chip = format_redmine_ready_chip();
+        assert!(chip.to_lowercase().contains("redmine"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7379,6 +7535,7 @@ mod tests {
         assert!(report.contains("/discord"), "{report}");
         assert!(report.contains("/ollama"), "{report}");
         assert!(report.contains("/llm"), "{report}");
+        assert!(report.contains("/redmine"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

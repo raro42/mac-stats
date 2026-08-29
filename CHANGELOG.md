@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.724] - 2026-08-29
+
+### Added
+- **`/redmine` instant operator** — `/redmine` and NL (`redmine status`, `is redmine ready`, `how's redmine`) return Redmine Ready / Not set / Partial with URL host + key cue (Agent Ops health parity; config only, no live probe; Discord + AI Chat; does not steal ticket/issue/time/API asks).
+
 ## [0.1.723] - 2026-08-29
 
 ### Added
