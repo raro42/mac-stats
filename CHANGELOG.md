@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.716] - 2026-08-29
 
+**GitHub Release** (first since **v0.1.458**). Ship tag **v0.1.716** includes product work from **0.1.459–0.1.716**. Overnight loop may cut further releases via `scripts/maybe_cut_github_release.py` when Latest falls behind.
+
 ### Added
 - **`/strip` instant operator** — `/strip`, `/strip hot`, `/power` and NL (`power strip`, `hot strip`, `which strip is hot`) list battery/power-strip chips with Hot counts at menu-bar amber / attention cues (Bat ≤20% · LPM On · Heat Fair+ · Up ≥7d · CPU ≥50% · GPU ≥15% · Freq ≥3.5 GHz · Temp ≥70°C · RAM/SSD ≥85%; Discord + AI Chat).
 

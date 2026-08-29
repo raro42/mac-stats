@@ -8,6 +8,9 @@ Also runs a **~23:00 pending git flush** (commit+push dirty safe files) once per
 so finished work never sits uncommitted. See scripts/overnight_git_flush.py and
 .cursor/rules/no-uncommitted-leftovers.mdc.
 
+After a successful flush (same ~23:00 slot), may cut a **GitHub Release** when
+Cargo.toml is far enough ahead of Latest — scripts/maybe_cut_github_release.py.
+
 Does not spawn agents during daytime — only prints AGENT_LOOP_SLEEP_harness then.
 """
 
@@ -23,6 +26,7 @@ from pathlib import Path
 SENTINEL = "AGENT_LOOP_TICK_harness"
 SLEEP_NOTE = "AGENT_LOOP_SLEEP_harness"
 FLUSH_NOTE = "AGENT_LOOP_FLUSH_git"
+RELEASE_NOTE = "AGENT_LOOP_RELEASE"
 AGENT_NOTE = "AGENT_LOOP_AGENT"
 START_H, END_H = 20, 6
 FLUSH_H = 23
@@ -39,7 +43,9 @@ PROMPT = (
     "Overnight mac-stats autoresearch tick (surprise Ralf). Follow docs/autoresearch/program.md. "
     "Nightly minimum: ≥1 keep OR discard in results.tsv per 20:00–06:00 window; quiet is failure mode (max 1 quiet tick/night). "
     "Git discipline: when an experiment finishes, commit + push immediately (no dirty leftovers). "
-    "Around 23:00 the loop also runs scripts/overnight_git_flush.py as a backstop. "
+    "Around 23:00 the loop also runs scripts/overnight_git_flush.py as a backstop, "
+    "then scripts/maybe_cut_github_release.py when Cargo.toml is ahead of GitHub Latest "
+    "(do not wait for the user to ask for a release). "
     "(1) python3 scripts/digest_agent_runs.py "
     "(2) python3 scripts/watch_sibling_harnesses.py "
     "(3) python3 scripts/overnight_design_review.py "
@@ -110,8 +116,35 @@ def run_git_flush(now: datetime) -> None:
     # Stamp even on clean (exit 0) so we do not retry every tick; retry next night if failed hard.
     if proc.returncode == 0:
         FLUSH_STAMP.write_text(now.date().isoformat() + "\n")
+        run_maybe_release(now)
     elif "clean" in (proc.stdout or ""):
         FLUSH_STAMP.write_text(now.date().isoformat() + "\n")
+        run_maybe_release(now)
+
+
+def run_maybe_release(now: datetime) -> None:
+    """Cut a GitHub Release when enough patches shipped since Latest."""
+    script = ROOT / "scripts" / "maybe_cut_github_release.py"
+    if not script.is_file():
+        return
+    print(
+        f'{RELEASE_NOTE} {{"at":"{now.isoformat(timespec="seconds")}","script":"{script}"}}',
+        flush=True,
+    )
+    proc = subprocess.run(
+        ["python3", str(script)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if proc.stdout:
+        print(proc.stdout.rstrip(), flush=True)
+    if proc.stderr:
+        print(proc.stderr.rstrip(), flush=True)
+    print(
+        f'{RELEASE_NOTE} {{"exit":{proc.returncode}}}',
+        flush=True,
+    )
 
 
 def agent_still_running() -> bool:

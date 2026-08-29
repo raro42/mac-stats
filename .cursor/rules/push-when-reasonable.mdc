@@ -25,7 +25,19 @@ Prefer: commit → (install/verify if runtime) → **`git push -u origin HEAD`**
 
 ## Releases
 
-Pushing commits ≠ cutting a GitHub Release. Create a release only when the user asks, or when a ship clearly warrants a tagged release and prior practice on the repo matches that.
+Do **not** wait for the user to ask. Cut a GitHub Release when the product has
+moved on meaningfully from **GitHub Latest**:
+
+- Prefer `python3 scripts/maybe_cut_github_release.py` (gates: ~20+ patches, or
+  ≥7 days with ≥5 patches; once per day; clean `main`)
+- Overnight ~23:00 flush runs that script after `overnight_git_flush.py`
+- Agents may also run it after a coherent ship when Latest is stale
+- Tag = `Cargo.toml` version (`v0.1.x`); CI attaches the DMG
+- Homebrew cask SHA update is a follow-up after the asset exists
+  (`print-release-checksums.sh` → `Casks/mac-stats.rb` → `sync-homebrew-tap.sh`)
+
+Skip only when: secrets in the tree, red build, explicit “local only”, or Latest
+already matches `Cargo.toml`.
 
 ## Commits
 
