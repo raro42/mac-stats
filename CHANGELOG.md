@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.723] - 2026-08-29
+
+### Added
+- **`/ollama` · `/llm` instant operator** — `/ollama`, `/llm` and NL (`ollama status`, `is ollama ready`, `how's ollama`) return Ollama Ready / Offline with model · endpoint · circuit cues (menu-bar Ollama ✕ + AI Chat glance parity; Discord + AI Chat; does not steal pull/list/chat/API asks).
+
 ## [0.1.722] - 2026-08-29
 
 ### Added

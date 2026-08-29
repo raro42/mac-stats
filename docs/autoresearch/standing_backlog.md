@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.723** — `/ollama` · `/llm` instant — Ollama Ready / Offline with model · endpoint · circuit (menu-bar ✕ + AI Chat glance parity; Discord + AI Chat; does not steal pull/list/chat).
+
 - **v0.1.722** — `/discord` instant — Discord Ready / Offline with reconnect cues (Agent Ops glance parity; Discord + AI Chat; does not steal `/knowledge discord`).
 
 - **v0.1.721** — `/ram` · `/ssd` · `/uptime` instant — power-strip RAM · SSD · Up chips (RAM/SSD≥85% hot · Up≥7d long; Discord + AI Chat); does not steal `/strip` or `/disk` Disk Cleanup.

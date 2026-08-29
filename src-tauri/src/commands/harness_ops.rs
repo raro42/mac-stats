@@ -4298,6 +4298,120 @@ pub fn format_discord_gateway_chip() -> String {
     line
 }
 
+/// True for focused Ollama Ready/Offline asks (`/ollama` · menu-bar ✕ / AI Chat glance parity) —
+/// not pull/list/chat/API free-form.
+pub fn looks_like_ollama_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Pull / list / chat / configure stay with agent or OLLAMA_API pre-route.
+    if n.contains("pull")
+        || n.contains("push")
+        || n.contains("list model")
+        || n.contains("list models")
+        || n.contains("unload")
+        || n.contains("load model")
+        || n.contains("embed")
+        || n.contains("api")
+        || n.contains("chat with")
+        || n.contains("ask ollama")
+        || n.contains("ask the model")
+        || n.contains("install")
+        || n.contains("download")
+        || n.contains("change model")
+        || n.contains("set model")
+        || n.contains("set url")
+        || n.contains("configure")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" ticket")
+        || n.contains("redmine")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ollama"
+            | "/llm"
+            | "ollama"
+            | "llm"
+            | "ollama status"
+            | "llm status"
+            | "ollama ready"
+            | "ollama offline"
+            | "llm ready"
+            | "llm offline"
+            | "show ollama"
+            | "list ollama"
+            | "is ollama ready"
+            | "is ollama online"
+            | "is ollama connected"
+            | "is ollama offline"
+            | "is ollama down"
+            | "is the llm ready"
+            | "is the llm online"
+            | "is the llm connected"
+            | "is the llm offline"
+            | "is the llm down"
+            | "ollama connection"
+            | "llm connection"
+            | "ollama circuit"
+            | "how's ollama"
+            | "hows ollama"
+            | "how's the llm"
+            | "hows the llm"
+            | "how's ollama doing"
+            | "hows ollama doing"
+    )
+}
+
+fn shorten_ollama_endpoint_for_chip(endpoint: &str) -> String {
+    let mut s = endpoint.trim().trim_end_matches('/').to_string();
+    for prefix in ["https://", "http://"] {
+        if let Some(rest) = s.strip_prefix(prefix) {
+            s = rest.to_string();
+            break;
+        }
+    }
+    if s.chars().count() > 40 {
+        s.chars().take(37).collect::<String>() + "…"
+    } else {
+        s
+    }
+}
+
+/// Zero-LLM Ollama Ready / Offline chip (menu-bar Ollama ✕ + AI Chat model-glance parity).
+pub fn format_ollama_ready_chip() -> String {
+    let cfg = crate::commands::ollama_config::get_ollama_config();
+    let circuit_open = crate::ollama::ollama_http_circuit_is_open_for_menu();
+    let Some(c) = cfg else {
+        return "**Ollama** · Not set · configure URL".to_string();
+    };
+    let ep = shorten_ollama_endpoint_for_chip(&c.endpoint);
+    let model = {
+        let m = c.model.trim();
+        if m.is_empty() {
+            "no model".to_string()
+        } else {
+            m.to_string()
+        }
+    };
+    if circuit_open {
+        return format!("**Ollama** · Offline · circuit open · {model} · {ep}");
+    }
+    let mut line = format!("**Ollama** · Ready · {model} · {ep}");
+    if let Some(backend) = c.detected_backend.as_deref() {
+        if !backend.is_empty() && backend != "unknown" {
+            line.push_str(&format!(" · {backend}"));
+        }
+    }
+    line
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4337,6 +4451,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_discord_gateway_request(content) {
         return Some(format_discord_gateway_chip());
+    }
+    if looks_like_ollama_ready_request(content) {
+        return Some(format_ollama_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4452,6 +4569,7 @@ pub fn format_ops_help_gateway() -> String {
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` — one-screen health\n\
 • `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
+• `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -4960,6 +5078,47 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("post")
         && !q.contains("send")
         && !q.contains("message")
+        && !q.contains("why")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/ollama` · `/llm` Ready/Offline chip asks (v0.1.723).
+    if (q.contains("/ollama")
+        || q.contains("/llm")
+        || q == "ollama"
+        || q == "llm"
+        || q.contains("ollama status")
+        || q.contains("llm status")
+        || q.contains("ollama ready")
+        || q.contains("ollama offline")
+        || q.contains("llm ready")
+        || q.contains("llm offline")
+        || q.contains("is ollama ready")
+        || q.contains("is ollama online")
+        || q.contains("is ollama connected")
+        || q.contains("is ollama offline")
+        || q.contains("is ollama down")
+        || q.contains("is the llm ready")
+        || q.contains("is the llm online")
+        || q.contains("is the llm connected")
+        || q.contains("is the llm offline")
+        || q.contains("is the llm down")
+        || q.contains("ollama connection")
+        || q.contains("llm connection")
+        || q.contains("ollama circuit")
+        || q == "how's ollama"
+        || q == "hows ollama"
+        || q == "how's the llm"
+        || q == "hows the llm"
+        || q == "how's ollama doing"
+        || q == "hows ollama doing")
+        && !q.contains("pull")
+        && !q.contains("list model")
+        && !q.contains("chat with")
+        && !q.contains("ask ollama")
+        && !q.contains("install")
         && !q.contains("why")
         && !q.contains(" ticket")
         && !q.contains("redmine")
@@ -6205,6 +6364,12 @@ mod tests {
         assert!(try_operator_instant_reply("is discord ready").is_some());
         assert!(try_operator_instant_reply("/knowledge discord").is_some()); // knowledge, not chip
         assert!(try_operator_instant_reply("post to discord").is_none());
+        let ollama = try_operator_instant_reply("/ollama").expect("ollama");
+        assert!(ollama.to_lowercase().contains("ollama"), "{ollama}");
+        assert!(try_operator_instant_reply("is ollama ready").is_some());
+        assert!(try_operator_instant_reply("/llm").is_some());
+        assert!(try_operator_instant_reply("pull llama3").is_none());
+        assert!(try_operator_instant_reply("chat with ollama about weather").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -7169,6 +7334,23 @@ mod tests {
     }
 
     #[test]
+    fn ollama_ready_request_detected() {
+        assert!(looks_like_ollama_ready_request("/ollama"));
+        assert!(looks_like_ollama_ready_request("/llm"));
+        assert!(looks_like_ollama_ready_request("ollama"));
+        assert!(looks_like_ollama_ready_request("ollama status"));
+        assert!(looks_like_ollama_ready_request("is ollama ready"));
+        assert!(looks_like_ollama_ready_request("how's ollama"));
+        assert!(!looks_like_ollama_ready_request("pull llama3"));
+        assert!(!looks_like_ollama_ready_request("list models"));
+        assert!(!looks_like_ollama_ready_request("chat with ollama about weather"));
+        assert!(!looks_like_ollama_ready_request("why is ollama offline"));
+        assert!(!looks_like_ollama_ready_request("install ollama"));
+        let chip = format_ollama_ready_chip();
+        assert!(chip.to_lowercase().contains("ollama"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7195,6 +7377,8 @@ mod tests {
         let report = format_ops_help_gateway();
         assert!(report.contains("/status"), "{report}");
         assert!(report.contains("/discord"), "{report}");
+        assert!(report.contains("/ollama"), "{report}");
+        assert!(report.contains("/llm"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

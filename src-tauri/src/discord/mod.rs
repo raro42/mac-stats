@@ -2279,6 +2279,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/ollama` — Ollama Ready / Offline chip (menu-bar ✕ / AI Chat glance parity), no LLM call.
+    if crate::commands::harness_ops::looks_like_ollama_ready_request(&content) {
+        let report = crate::commands::harness_ops::format_ollama_ready_chip();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send ollama ready chip: {}", e);
+        }
+        return;
+    }
+
     // `/agents` — Agent Ops On/Off list, no Ollama.
     if crate::commands::harness_ops::looks_like_agents_request(&content) {
         let filter = crate::commands::harness_ops::parse_agents_list_filter(&content);

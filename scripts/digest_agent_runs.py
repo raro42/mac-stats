@@ -830,6 +830,44 @@ def looks_like_discord_reach(q: str) -> bool:
     )
 
 
+def looks_like_ollama_ready(q: str) -> bool:
+    """Focused Ollama Ready/Offline chip (v0.1.723) — filter historical direct-lane noise."""
+    n = q.strip().lower()
+    if n in (
+        "/ollama",
+        "/llm",
+        "ollama",
+        "llm",
+        "ollama status",
+        "llm status",
+        "ollama ready",
+        "ollama offline",
+        "llm ready",
+        "llm offline",
+        "is ollama ready",
+        "is ollama online",
+        "is ollama connected",
+        "is ollama offline",
+        "is ollama down",
+        "is the llm ready",
+        "is the llm online",
+        "is the llm connected",
+        "is the llm offline",
+        "is the llm down",
+        "ollama connection",
+        "llm connection",
+        "ollama circuit",
+        "how's ollama",
+        "hows ollama",
+        "how's the llm",
+        "hows the llm",
+        "how's ollama doing",
+        "hows ollama doing",
+    ):
+        return True
+    return False
+
+
 def is_now_instant_slowest_noise(r: dict) -> bool:
     """Drop historical turns from Slowest when they match shipped instant patterns."""
     if (r.get("lane") or "") == "instant":
@@ -914,7 +952,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         return True
     if looks_like_wakeup(q) or looks_like_overnight_improvements(q):
         return True
-    if looks_like_version_ask(q) or looks_like_discord_reach(q):
+    if looks_like_version_ask(q) or looks_like_discord_reach(q) or looks_like_ollama_ready(q):
         return True
     if looks_like_thread_clarifier(q):
         return True
