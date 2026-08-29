@@ -4695,6 +4695,82 @@ pub fn format_perplexity_ready_chip() -> String {
     }
 }
 
+/// True for focused Mastodon Ready/config asks (`/mastodon` · MASTODON_POST config parity) —
+/// not toot/post/timeline free-form.
+pub fn looks_like_mastodon_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Posts, toots, timeline, and tool how-to stay with pre-route / agent.
+    if n.contains("post ")
+        || n.starts_with("post ")
+        || n.contains("toot")
+        || n.contains("publish")
+        || n.contains("timeline")
+        || n.contains("follow")
+        || n.contains("boost")
+        || n.contains("favourite")
+        || n.contains("favorite")
+        || n.contains("mastodon_post")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/mastodon"
+            | "mastodon"
+            | "mastodon status"
+            | "mastodon ready"
+            | "mastodon offline"
+            | "mastodon configured"
+            | "mastodon health"
+            | "mastodon key"
+            | "mastodon token"
+            | "mastodon url"
+            | "show mastodon"
+            | "is mastodon ready"
+            | "is mastodon online"
+            | "is mastodon connected"
+            | "is mastodon offline"
+            | "is mastodon configured"
+            | "is mastodon set up"
+            | "is mastodon setup"
+            | "mastodon connection"
+            | "how's mastodon"
+            | "hows mastodon"
+            | "how's the mastodon"
+            | "hows the mastodon"
+    )
+}
+
+/// Zero-LLM Mastodon Ready / Not set / Partial chip (config only; no live probe).
+pub fn format_mastodon_ready_chip() -> String {
+    let url = crate::commands::reply_helpers::get_mastodon_instance_url();
+    let token = crate::commands::reply_helpers::get_mastodon_access_token();
+    match (url.as_deref(), token.as_deref()) {
+        (None, None) => "**Mastodon** · Not set · add instance URL + access token".to_string(),
+        (Some(_), None) => "**Mastodon** · Partial · URL set · missing access token".to_string(),
+        (None, Some(_)) => "**Mastodon** · Partial · token set · missing instance URL".to_string(),
+        (Some(u), Some(_)) => {
+            let host = shorten_redmine_url_for_chip(u);
+            format!("**Mastodon** · Ready · {host} · token set")
+        }
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4746,6 +4822,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_perplexity_ready_request(content) {
         return Some(format_perplexity_ready_chip());
+    }
+    if looks_like_mastodon_ready_request(content) {
+        return Some(format_mastodon_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4865,6 +4944,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
+• `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5540,6 +5620,41 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && q != "/perplexity"
         && q != "perplexity"
         && q != "perplexity search"
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
+    // `/mastodon` Ready/Not-set chip asks (v0.1.727).
+    if (q.contains("/mastodon")
+        || q == "mastodon"
+        || q.contains("mastodon status")
+        || q.contains("mastodon ready")
+        || q.contains("mastodon offline")
+        || q.contains("mastodon configured")
+        || q.contains("mastodon health")
+        || q.contains("mastodon key")
+        || q.contains("mastodon token")
+        || q.contains("mastodon url")
+        || q.contains("is mastodon ready")
+        || q.contains("is mastodon online")
+        || q.contains("is mastodon connected")
+        || q.contains("is mastodon offline")
+        || q.contains("is mastodon configured")
+        || q.contains("is mastodon set up")
+        || q.contains("is mastodon setup")
+        || q.contains("mastodon connection")
+        || q == "how's mastodon"
+        || q == "hows mastodon"
+        || q == "how's the mastodon"
+        || q == "hows the mastodon")
+        && !q.contains("toot")
+        && !q.contains("post ")
+        && !q.contains("publish")
+        && !q.contains("timeline")
+        && !q.contains("follow")
+        && !q.contains("boost")
+        && !q.contains("why")
+        && !q.contains("how to")
         && !q.chars().any(|c| c.is_ascii_digit())
     {
         return true;
@@ -6818,6 +6933,12 @@ mod tests {
         assert!(try_operator_instant_reply("how's perplexity").is_some());
         assert!(try_operator_instant_reply("perplexity status").is_some());
         assert!(try_operator_instant_reply("perplexity search for weather").is_none());
+        let mastodon = try_operator_instant_reply("/mastodon").expect("mastodon");
+        assert!(mastodon.to_lowercase().contains("mastodon"), "{mastodon}");
+        assert!(try_operator_instant_reply("is mastodon ready").is_some());
+        assert!(try_operator_instant_reply("how's mastodon").is_some());
+        assert!(try_operator_instant_reply("post to mastodon").is_none());
+        assert!(try_operator_instant_reply("toot hello").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -7865,6 +7986,23 @@ mod tests {
     }
 
     #[test]
+    fn mastodon_ready_request_detected() {
+        assert!(looks_like_mastodon_ready_request("/mastodon"));
+        assert!(looks_like_mastodon_ready_request("mastodon"));
+        assert!(looks_like_mastodon_ready_request("mastodon status"));
+        assert!(looks_like_mastodon_ready_request("is mastodon ready"));
+        assert!(looks_like_mastodon_ready_request("is mastodon configured"));
+        assert!(looks_like_mastodon_ready_request("how's mastodon"));
+        assert!(!looks_like_mastodon_ready_request("post to mastodon"));
+        assert!(!looks_like_mastodon_ready_request("toot hello world"));
+        assert!(!looks_like_mastodon_ready_request("mastodon timeline"));
+        assert!(!looks_like_mastodon_ready_request("how to use mastodon"));
+        assert!(!looks_like_mastodon_ready_request("publish on mastodon"));
+        let chip = format_mastodon_ready_chip();
+        assert!(chip.to_lowercase().contains("mastodon"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7896,6 +8034,7 @@ mod tests {
         assert!(report.contains("/redmine"), "{report}");
         assert!(report.contains("/brave"), "{report}");
         assert!(report.contains("/perplexity key"), "{report}");
+        assert!(report.contains("/mastodon"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

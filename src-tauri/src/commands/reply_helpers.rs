@@ -53,59 +53,72 @@ pub(crate) fn final_reply_from_tool_results(question: &str, tool_result: &str) -
     }
 }
 
-/// Resolve Mastodon credentials: instance URL and access token.
-/// Checks env vars (MASTODON_INSTANCE_URL, MASTODON_ACCESS_TOKEN), then ~/.mac-stats/.config.env,
-/// then Keychain (mastodon_instance_url, mastodon_access_token).
-pub(crate) fn get_mastodon_config() -> Option<(String, String)> {
-    let resolve = |env_key: &str, file_key: &str, keychain_key: &str| -> Option<String> {
-        if let Ok(v) = std::env::var(env_key) {
-            let v = v.trim().to_string();
-            if !v.is_empty() {
-                return Some(v);
-            }
+/// Resolve one Mastodon credential from env → `~/.mac-stats/.config.env` → Keychain.
+fn resolve_mastodon_secret(env_key: &str, file_key: &str, keychain_key: &str) -> Option<String> {
+    if let Ok(v) = std::env::var(env_key) {
+        let v = v.trim().to_string();
+        if !v.is_empty() {
+            return Some(v);
         }
-        for base in [
-            std::env::current_dir().ok(),
-            std::env::var("HOME").ok().map(std::path::PathBuf::from),
-        ]
-        .into_iter()
-        .flatten()
-        {
-            let paths = [
-                base.join(".config.env"),
-                base.join(".mac-stats").join(".config.env"),
-            ];
-            for p in &paths {
-                if let Ok(content) = std::fs::read_to_string(p) {
-                    for line in content.lines() {
-                        if let Some(val) = line.strip_prefix(file_key) {
-                            let val = val.trim().trim_matches('"').trim().to_string();
-                            if !val.is_empty() {
-                                return Some(val);
-                            }
+    }
+    for base in [
+        std::env::current_dir().ok(),
+        std::env::var("HOME").ok().map(std::path::PathBuf::from),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        let paths = [
+            base.join(".config.env"),
+            base.join(".mac-stats").join(".config.env"),
+        ];
+        for p in &paths {
+            if let Ok(content) = std::fs::read_to_string(p) {
+                for line in content.lines() {
+                    if let Some(val) = line.strip_prefix(file_key) {
+                        let val = val.trim().trim_matches('"').trim().to_string();
+                        if !val.is_empty() {
+                            return Some(val);
                         }
                     }
                 }
             }
         }
-        if let Ok(Some(v)) = crate::security::get_credential(keychain_key) {
-            if !v.is_empty() {
-                return Some(v);
-            }
+    }
+    if let Ok(Some(v)) = crate::security::get_credential(keychain_key) {
+        if !v.is_empty() {
+            return Some(v);
         }
-        None
-    };
-    let instance = resolve(
+    }
+    None
+}
+
+/// Mastodon instance URL only (for Ready/Partial chip; no live probe).
+pub(crate) fn get_mastodon_instance_url() -> Option<String> {
+    resolve_mastodon_secret(
         "MASTODON_INSTANCE_URL",
         "MASTODON_INSTANCE_URL=",
         "mastodon_instance_url",
-    )?;
-    let token = resolve(
+    )
+    .map(|u| u.trim_end_matches('/').to_string())
+}
+
+/// Mastodon access token only (for Ready/Partial chip; no live probe).
+pub(crate) fn get_mastodon_access_token() -> Option<String> {
+    resolve_mastodon_secret(
         "MASTODON_ACCESS_TOKEN",
         "MASTODON_ACCESS_TOKEN=",
         "mastodon_access_token",
-    )?;
-    Some((instance.trim_end_matches('/').to_string(), token))
+    )
+}
+
+/// Resolve Mastodon credentials: instance URL and access token.
+/// Checks env vars (MASTODON_INSTANCE_URL, MASTODON_ACCESS_TOKEN), then ~/.mac-stats/.config.env,
+/// then Keychain (mastodon_instance_url, mastodon_access_token).
+pub(crate) fn get_mastodon_config() -> Option<(String, String)> {
+    let instance = get_mastodon_instance_url()?;
+    let token = get_mastodon_access_token()?;
+    Some((instance, token))
 }
 
 /// Post a status to Mastodon. Visibility: public, unlisted, private, or direct.

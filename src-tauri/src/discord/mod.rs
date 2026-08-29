@@ -2429,6 +2429,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/mastodon` — Mastodon Ready / Not set chip (instance + token config), no LLM call.
+    if crate::commands::harness_ops::looks_like_mastodon_ready_request(&content) {
+        let report = crate::commands::harness_ops::format_mastodon_ready_chip();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send mastodon ready chip: {}", e);
+        }
+        return;
+    }
+
     // `/perplexity` — last Perplexity Top/Snippet list, no Ollama.
     if crate::commands::harness_ops::looks_like_perplexity_request(&content) {
         let filter = crate::commands::harness_ops::parse_perplexity_list_filter(&content);

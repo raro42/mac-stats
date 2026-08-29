@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.727] - 2026-08-30
+
+### Added
+- **`/mastodon` instant operator** — `/mastodon` and NL (`mastodon status`, `is mastodon ready`, `how's mastodon`) return Mastodon Ready / Not set / Partial with instance host + token cue (config only, no live probe; Discord + AI Chat; does not steal toot/post/timeline asks).
+
 ## [0.1.726] - 2026-08-30
 
 ### Added
