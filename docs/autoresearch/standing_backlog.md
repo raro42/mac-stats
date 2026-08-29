@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.719** — `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` instant — power-strip Bat · Heat · LPM chips (Bat≤20% · Heat Fair+ · LPM On hot; Discord + AI Chat); does not steal `/strip`.
+
 - **v0.1.718** — `/details` · `/details hot` · `/load` instant — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; Discord + AI Chat); ring keyboard hint no longer mentions removed All · Hot chips.
 
 - **v0.1.716** — `/strip` · `/strip hot` · `/power` instant — power strip Hot list (menu-bar amber / attention; Discord + AI Chat); Discord `/rings` wired.

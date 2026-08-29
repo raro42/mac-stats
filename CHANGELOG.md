@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.719] - 2026-08-29
+
+### Added
+- **`/battery` · `/heat` · `/lpm` instant operators** — `/battery`, `/bat`, `/heat`, `/thermal`, `/lpm` and NL (`what's the battery`, `thermal state`, `is lpm on`) return the matching power-strip chip with hot marks (Bat ≤20% · Heat Fair+ · LPM On; Discord + AI Chat; does not steal full `/strip`).
+
 ## [0.1.718] - 2026-08-29
 
 ### Added

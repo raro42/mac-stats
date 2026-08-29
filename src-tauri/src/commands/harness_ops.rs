@@ -2735,6 +2735,156 @@ pub fn format_strip_gateway(filter: StripListFilter) -> String {
     out
 }
 
+/// Focused power-strip chip asks (`/battery` · `/heat` · `/lpm`) — not full `/strip`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StripChipAsk {
+    Battery,
+    Heat,
+    Lpm,
+}
+
+/// Parse `/battery` · `/heat` · `/lpm` (and short NL). None when not a chip ask.
+pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return None;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("kill")
+        || n.contains("ring")
+        || n.contains("strip")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("cleanup")
+        || n.contains("clean up")
+        || n.contains("search")
+        || n.contains("weather")
+    {
+        return None;
+    }
+    // Battery chip — not "battery strip" (handled by `/strip`).
+    if matches!(
+        n.as_str(),
+        "/battery"
+            | "/bat"
+            | "battery"
+            | "bat"
+            | "battery level"
+            | "battery percent"
+            | "battery percentage"
+            | "battery %"
+            | "show battery"
+            | "list battery"
+            | "battery status"
+            | "what's the battery"
+            | "whats the battery"
+            | "what is the battery"
+            | "how's the battery"
+            | "hows the battery"
+            | "battery charge"
+            | "charge level"
+    ) {
+        return Some(StripChipAsk::Battery);
+    }
+    // Heat / thermal chip — not process `/hot`.
+    if matches!(
+        n.as_str(),
+        "/heat"
+            | "/thermal"
+            | "heat"
+            | "thermal"
+            | "thermal state"
+            | "thermal pressure"
+            | "heat state"
+            | "show heat"
+            | "list heat"
+            | "heat status"
+            | "what's the heat"
+            | "whats the heat"
+            | "what is the heat"
+            | "what's the thermal"
+            | "whats the thermal"
+            | "what is the thermal"
+            | "how's the heat"
+            | "hows the heat"
+    ) {
+        return Some(StripChipAsk::Heat);
+    }
+    // Low Power Mode chip — not bare `/power` (full strip).
+    if matches!(
+        n.as_str(),
+        "/lpm"
+            | "lpm"
+            | "low power"
+            | "low power mode"
+            | "low-power mode"
+            | "low-power"
+            | "show lpm"
+            | "list lpm"
+            | "lpm status"
+            | "is lpm on"
+            | "is lpm off"
+            | "is low power on"
+            | "is low power mode on"
+            | "is low power mode off"
+            | "low power status"
+            | "what's lpm"
+            | "whats lpm"
+            | "what is lpm"
+    ) {
+        return Some(StripChipAsk::Lpm);
+    }
+    None
+}
+
+/// True for focused Bat · Heat · LPM chip asks (power-strip parity; not full `/strip`).
+pub fn looks_like_strip_chip_request(content: &str) -> bool {
+    parse_strip_chip_ask(content).is_some()
+}
+
+/// Zero-LLM one-chip reply (Bat · Heat · LPM; live get_cpu_details; menu-bar amber cues).
+pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
+    let d = crate::metrics::get_cpu_details();
+    match ask {
+        StripChipAsk::Battery => {
+            if !d.has_battery || d.battery_level < 0.0 {
+                return "**Bat** — _no battery reading on this Mac right now._".to_string();
+            }
+            let bat_hot = d.battery_level <= OPS_STRIP_BAT_LOW_PCT && !d.is_charging;
+            let charge = if d.is_charging { " · charging" } else { "" };
+            let hot_mark = if bat_hot { " · hot" } else { "" };
+            format!(
+                "**Bat** · {:.0}%{charge}{hot_mark}",
+                d.battery_level
+            )
+        }
+        StripChipAsk::Heat => {
+            let heat = if d.thermal_state.trim().is_empty() {
+                "—"
+            } else {
+                d.thermal_state.trim()
+            };
+            let hot_mark = if strip_heat_is_attention(&d.thermal_state) {
+                " · hot"
+            } else {
+                ""
+            };
+            format!("**Heat** · {heat}{hot_mark}")
+        }
+        StripChipAsk::Lpm => {
+            let on = d.low_power_mode;
+            let value = if on { "On" } else { "Off" };
+            let hot_mark = if on { " · hot" } else { "" };
+            format!("**LPM** · {value}{hot_mark}")
+        }
+    }
+}
+
 /// Details All · Hot filter for `/details` instant replies (collapsed glance parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailsListFilter {
@@ -3857,6 +4007,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_rings_list_filter(content);
         return Some(format_rings_gateway(filter));
     }
+    if let Some(ask) = parse_strip_chip_ask(content) {
+        return Some(format_strip_chip_gateway(ask));
+    }
     if looks_like_strip_request(content) {
         let filter = parse_strip_list_filter(content);
         return Some(format_strip_gateway(filter));
@@ -3917,6 +4070,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` — power-strip Bat · Heat · LPM chips\n\
 • `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
@@ -4267,6 +4421,40 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("ring")
         && !q.contains("cleanup")
         && !q.contains("clean up")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/battery` · `/heat` · `/lpm` chip asks (v0.1.719).
+    if (q.contains("/battery")
+        || q.contains("/bat")
+        || q.contains("/heat")
+        || q.contains("/thermal")
+        || q.contains("/lpm")
+        || q.contains("battery level")
+        || q.contains("battery percent")
+        || q.contains("thermal state")
+        || q.contains("thermal pressure")
+        || q.contains("low power mode")
+        || q.contains("low-power mode")
+        || q == "battery"
+        || q == "bat"
+        || q == "heat"
+        || q == "thermal"
+        || q == "lpm"
+        || q == "low power"
+        || q == "what's the battery"
+        || q == "whats the battery"
+        || q == "what is the battery"
+        || q == "what's the heat"
+        || q == "whats the heat"
+        || q == "what is the heat"
+        || q == "is lpm on"
+        || q == "is low power mode on")
+        && !q.contains("why")
+        && !q.contains("process")
+        && !q.contains("strip")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -5570,6 +5758,12 @@ mod tests {
             strip_hot.to_lowercase().contains("hot") || strip_hot.to_lowercase().contains("strip"),
             "{strip_hot}"
         );
+        let bat = try_operator_instant_reply("/battery").expect("battery");
+        assert!(bat.to_lowercase().contains("bat"), "{bat}");
+        let heat = try_operator_instant_reply("/heat").expect("heat");
+        assert!(heat.to_lowercase().contains("heat"), "{heat}");
+        let lpm = try_operator_instant_reply("/lpm").expect("lpm");
+        assert!(lpm.to_lowercase().contains("lpm"), "{lpm}");
         let details = try_operator_instant_reply("/details").expect("details");
         assert!(
             details.to_lowercase().contains("details"),
@@ -6189,6 +6383,49 @@ mod tests {
     }
 
     #[test]
+    fn strip_chip_request_and_format() {
+        assert_eq!(
+            parse_strip_chip_ask("/battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("what's the battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(parse_strip_chip_ask("/bat"), Some(StripChipAsk::Battery));
+        assert_eq!(parse_strip_chip_ask("/heat"), Some(StripChipAsk::Heat));
+        assert_eq!(
+            parse_strip_chip_ask("thermal state"),
+            Some(StripChipAsk::Heat)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("what's the heat"),
+            Some(StripChipAsk::Heat)
+        );
+        assert_eq!(parse_strip_chip_ask("/lpm"), Some(StripChipAsk::Lpm));
+        assert_eq!(
+            parse_strip_chip_ask("low power mode"),
+            Some(StripChipAsk::Lpm)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("is lpm on"),
+            Some(StripChipAsk::Lpm)
+        );
+        assert!(parse_strip_chip_ask("battery strip").is_none());
+        assert!(parse_strip_chip_ask("/strip").is_none());
+        assert!(parse_strip_chip_ask("/power").is_none());
+        assert!(parse_strip_chip_ask("what's hot").is_none());
+        assert!(parse_strip_chip_ask("why is the battery low").is_none());
+        assert!(looks_like_strip_chip_request("/thermal"));
+        let heat = format_strip_chip_gateway(StripChipAsk::Heat);
+        assert!(heat.to_lowercase().contains("heat"), "{heat}");
+        let lpm = format_strip_chip_gateway(StripChipAsk::Lpm);
+        assert!(lpm.to_lowercase().contains("lpm"), "{lpm}");
+        let bat = format_strip_chip_gateway(StripChipAsk::Battery);
+        assert!(bat.to_lowercase().contains("bat"), "{bat}");
+    }
+
+    #[test]
     fn strip_gateway_has_title() {
         let report = format_strip_gateway(StripListFilter::All);
         assert!(report.to_lowercase().contains("power strip"), "{report}");
@@ -6363,6 +6600,9 @@ mod tests {
         assert!(report.contains("/rings hot"), "{report}");
         assert!(report.contains("/strip"), "{report}");
         assert!(report.contains("/strip hot"), "{report}");
+        assert!(report.contains("/battery"), "{report}");
+        assert!(report.contains("/heat"), "{report}");
+        assert!(report.contains("/lpm"), "{report}");
         assert!(report.contains("/details"), "{report}");
         assert!(report.contains("/details hot"), "{report}");
         assert!(report.contains("/load"), "{report}");
