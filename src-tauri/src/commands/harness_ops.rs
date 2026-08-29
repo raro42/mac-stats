@@ -2498,6 +2498,243 @@ pub fn format_rings_gateway(filter: RingsListFilter) -> String {
     out
 }
 
+/// Power strip All · Hot filter for `/strip` instant replies (menu-bar amber parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StripListFilter {
+    All,
+    Hot,
+}
+
+/// Strip attention thresholds — match power-strip / menu-bar washes in cpu.js.
+pub const OPS_STRIP_BAT_LOW_PCT: f32 = 20.0;
+pub const OPS_STRIP_UPTIME_LONG_SECS: u64 = 7 * 24 * 3600;
+pub const OPS_STRIP_RAM_HOT_PCT: f32 = 85.0;
+pub const OPS_STRIP_SSD_HOT_PCT: f32 = 85.0;
+
+fn format_system_uptime(secs: u64) -> String {
+    let days = secs / 86400;
+    let hours = (secs % 86400) / 3600;
+    let mins = (secs % 3600) / 60;
+    if days > 0 {
+        format!("{days}d {hours}h")
+    } else if hours > 0 {
+        format!("{hours}h {mins}m")
+    } else {
+        format!("{mins}m")
+    }
+}
+
+fn strip_heat_is_attention(thermal: &str) -> bool {
+    matches!(
+        thermal.trim(),
+        "Fair" | "Serious" | "Critical"
+    )
+}
+
+/// Parse Hot from `/strip hot`, `hot strip`, etc. Default All.
+pub fn parse_strip_list_filter(content: &str) -> StripListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" hot")
+        || n == "strip hot"
+        || n == "/strip hot"
+        || n == "power strip hot"
+        || n == "powerstrip hot"
+        || n == "/power hot"
+        || n == "hot strip"
+        || n == "hot power strip"
+        || n == "which strip is hot"
+        || n == "which chips are hot"
+        || n == "show hot strip"
+        || n == "list hot strip"
+        || n == "what's hot on strip"
+        || n == "whats hot on strip"
+        || n == "what's hot on the strip"
+        || n == "whats hot on the strip"
+    {
+        return StripListFilter::Hot;
+    }
+    StripListFilter::All
+}
+
+/// True for `/strip` / `power strip` — not process `/hot` or `/rings`.
+pub fn looks_like_strip_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("kill")
+        || n.contains("ring")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("cleanup")
+        || n.contains("clean up")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/strip"
+            | "strip"
+            | "power strip"
+            | "powerstrip"
+            | "/power"
+            | "power"
+            | "battery strip"
+            | "list strip"
+            | "show strip"
+            | "strip status"
+            | "power status"
+            | "/strip hot"
+            | "strip hot"
+            | "power strip hot"
+            | "powerstrip hot"
+            | "/power hot"
+            | "hot strip"
+            | "hot power strip"
+            | "which strip is hot"
+            | "which chips are hot"
+            | "show hot strip"
+            | "list hot strip"
+            | "what's hot on strip"
+            | "whats hot on strip"
+            | "what's hot on the strip"
+            | "whats hot on the strip"
+    )
+}
+
+/// Zero-LLM power strip report (All · Hot; live get_cpu_details; menu-bar amber cues).
+pub fn format_strip_gateway(filter: StripListFilter) -> String {
+    let d = crate::metrics::get_cpu_details();
+    let mut rows: Vec<(&str, String, bool)> = Vec::with_capacity(11);
+
+    if d.has_battery && d.battery_level >= 0.0 {
+        let bat_hot = d.battery_level <= OPS_STRIP_BAT_LOW_PCT && !d.is_charging;
+        let charge = if d.is_charging { " · charging" } else { "" };
+        rows.push((
+            "Bat",
+            format!("{:.0}%{charge}", d.battery_level),
+            bat_hot,
+        ));
+    }
+
+    rows.push((
+        "LPM",
+        if d.low_power_mode {
+            "On".into()
+        } else {
+            "Off".into()
+        },
+        d.low_power_mode,
+    ));
+
+    let heat = if d.thermal_state.trim().is_empty() {
+        "—".to_string()
+    } else {
+        d.thermal_state.clone()
+    };
+    rows.push((
+        "Heat",
+        heat,
+        strip_heat_is_attention(&d.thermal_state),
+    ));
+
+    rows.push((
+        "Up",
+        format_system_uptime(d.uptime_secs),
+        d.uptime_secs >= OPS_STRIP_UPTIME_LONG_SECS,
+    ));
+
+    rows.push((
+        "CPU",
+        format!("{:.0}%", d.usage),
+        ring_cpu_is_hot(d.usage),
+    ));
+    rows.push((
+        "GPU",
+        format!("{:.0}%", d.gpu_usage),
+        ring_gpu_is_hot(d.gpu_usage),
+    ));
+    rows.push((
+        "Freq",
+        if d.frequency > 0.0 {
+            format!("{:.2} GHz", d.frequency)
+        } else {
+            "—".into()
+        },
+        d.frequency > 0.0 && ring_freq_is_hot(d.frequency),
+    ));
+    rows.push((
+        "Temp",
+        if d.temperature > 0.0 {
+            format!("{:.0}°C", d.temperature)
+        } else {
+            "—".into()
+        },
+        d.temperature > 0.0 && ring_temp_is_hot(d.temperature),
+    ));
+    rows.push((
+        "RAM",
+        format!("{:.0}%", d.ram_percent),
+        d.ram_percent >= OPS_STRIP_RAM_HOT_PCT,
+    ));
+    rows.push((
+        "SSD",
+        format!("{:.0}%", d.disk_percent),
+        d.disk_percent >= OPS_STRIP_SSD_HOT_PCT,
+    ));
+
+    let hot_n = rows.iter().filter(|(_, _, hot)| *hot).count();
+    let title = match filter {
+        StripListFilter::All => {
+            format!("**Power strip** — {} · {hot_n} hot", rows.len())
+        }
+        StripListFilter::Hot => format!(
+            "**Power strip · Hot** — {hot_n} (Bat≤{:.0}% · Heat Fair+ · Up≥7d · CPU≥{:.0}% · GPU≥{:.0}% · Freq≥{} GHz · Temp≥{:.0}°C · RAM/SSD≥{:.0}%)",
+            OPS_STRIP_BAT_LOW_PCT,
+            OPS_RING_HOT_CPU_PCT,
+            OPS_RING_HOT_GPU_PCT,
+            OPS_RING_HOT_FREQ_GHZ,
+            OPS_RING_HOT_TEMP_C,
+            OPS_STRIP_RAM_HOT_PCT
+        ),
+    };
+    let mut lines = vec![title];
+
+    let filtered: Vec<_> = match filter {
+        StripListFilter::All => rows.iter().collect(),
+        StripListFilter::Hot => rows.iter().filter(|(_, _, hot)| *hot).collect(),
+    };
+
+    if filtered.is_empty() {
+        lines.push(match filter {
+            StripListFilter::All => {
+                "_Nothing here yet — open the CPU window so the strip can fill in._".to_string()
+            }
+            StripListFilter::Hot => {
+                "_No power-strip chip is hot right now (menu-bar amber / attention cues)._"
+                    .to_string()
+            }
+        });
+    } else {
+        for (label, value, hot) in filtered {
+            let hot_mark = if *hot { " · hot" } else { "" };
+            lines.push(format!("• **{label}** · {value}{hot_mark}"));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Perplexity Search All · Top · Snippet filter for `/perplexity` instant (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PerplexityListFilter {
@@ -3453,6 +3690,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_rings_list_filter(content);
         return Some(format_rings_gateway(filter));
     }
+    if looks_like_strip_request(content) {
+        let filter = parse_strip_list_filter(content);
+        return Some(format_strip_gateway(filter));
+    }
     if looks_like_processes_request(content) {
         let filter = parse_processes_list_filter(content);
         return Some(format_processes_gateway(filter));
@@ -3504,6 +3745,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
+• `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -3823,6 +4065,36 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "whats hot on rings")
         && !q.contains("why")
         && !q.contains("process")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/strip` Hot operator asks (v0.1.716).
+    if (q.contains("/strip")
+        || q.contains("/power")
+        || q.contains("power strip")
+        || q.contains("powerstrip")
+        || q.contains("battery strip")
+        || q.contains("hot strip")
+        || q.contains("strip hot")
+        || q.contains("which strip is hot")
+        || q.contains("which chips are hot")
+        || q.contains("show hot strip")
+        || q.contains("list hot strip")
+        || q.contains("list strip")
+        || q.contains("show strip")
+        || q == "strip"
+        || q == "power"
+        || q == "what's hot on strip"
+        || q == "whats hot on strip"
+        || q == "what's hot on the strip"
+        || q == "whats hot on the strip")
+        && !q.contains("why")
+        && !q.contains("process")
+        && !q.contains("ring")
+        && !q.contains("cleanup")
+        && !q.contains("clean up")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -5079,6 +5351,16 @@ mod tests {
             rings_hot.to_lowercase().contains("hot") || rings_hot.to_lowercase().contains("ring"),
             "{rings_hot}"
         );
+        let strip = try_operator_instant_reply("/strip").expect("strip");
+        assert!(
+            strip.to_lowercase().contains("power strip"),
+            "{strip}"
+        );
+        let strip_hot = try_operator_instant_reply("/strip hot").expect("strip hot");
+        assert!(
+            strip_hot.to_lowercase().contains("hot") || strip_hot.to_lowercase().contains("strip"),
+            "{strip_hot}"
+        );
         let perplexity = try_operator_instant_reply("/perplexity").expect("perplexity");
         assert!(
             perplexity.to_lowercase().contains("perplexity"),
@@ -5655,6 +5937,41 @@ mod tests {
     }
 
     #[test]
+    fn strip_request_and_filter() {
+        assert!(looks_like_strip_request("/strip"));
+        assert!(looks_like_strip_request("power strip"));
+        assert!(looks_like_strip_request("@Werner /strip"));
+        assert!(looks_like_strip_request("/strip hot"));
+        assert!(looks_like_strip_request("hot strip"));
+        assert!(looks_like_strip_request("which strip is hot"));
+        assert!(looks_like_strip_request("/power"));
+        assert!(!looks_like_strip_request("/hot"));
+        assert!(!looks_like_strip_request("what's hot"));
+        assert!(!looks_like_strip_request("/rings"));
+        assert!(!looks_like_strip_request("hot rings"));
+        assert!(!looks_like_strip_request("why is the strip hot"));
+        assert!(!looks_like_strip_request("disk cleanup"));
+        assert_eq!(parse_strip_list_filter("/strip"), StripListFilter::All);
+        assert_eq!(parse_strip_list_filter("/strip hot"), StripListFilter::Hot);
+        assert_eq!(parse_strip_list_filter("hot strip"), StripListFilter::Hot);
+        assert_eq!(
+            parse_strip_list_filter("what's hot on the strip"),
+            StripListFilter::Hot
+        );
+        assert!(strip_heat_is_attention("Fair"));
+        assert!(strip_heat_is_attention("Serious"));
+        assert!(!strip_heat_is_attention("Nominal"));
+    }
+
+    #[test]
+    fn strip_gateway_has_title() {
+        let report = format_strip_gateway(StripListFilter::All);
+        assert!(report.to_lowercase().contains("power strip"), "{report}");
+        let hot = format_strip_gateway(StripListFilter::Hot);
+        assert!(hot.to_lowercase().contains("hot"), "{hot}");
+    }
+
+    #[test]
     fn perplexity_request_and_filter() {
         assert!(looks_like_perplexity_request("/perplexity"));
         assert!(looks_like_perplexity_request("last search"));
@@ -5775,6 +6092,8 @@ mod tests {
         assert!(report.contains("/processes pinned"), "{report}");
         assert!(report.contains("/rings"), "{report}");
         assert!(report.contains("/rings hot"), "{report}");
+        assert!(report.contains("/strip"), "{report}");
+        assert!(report.contains("/strip hot"), "{report}");
         assert!(report.contains("/hot"), "{report}");
         assert!(report.contains("/pinned"), "{report}");
         assert!(report.contains("/perplexity"), "{report}");

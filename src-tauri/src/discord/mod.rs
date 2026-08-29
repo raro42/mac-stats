@@ -2350,6 +2350,26 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/rings` — CPU rings Hot list, no Ollama.
+    if crate::commands::harness_ops::looks_like_rings_request(&content) {
+        let filter = crate::commands::harness_ops::parse_rings_list_filter(&content);
+        let report = crate::commands::harness_ops::format_rings_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send rings list: {}", e);
+        }
+        return;
+    }
+
+    // `/strip` — power strip Hot list, no Ollama.
+    if crate::commands::harness_ops::looks_like_strip_request(&content) {
+        let filter = crate::commands::harness_ops::parse_strip_list_filter(&content);
+        let report = crate::commands::harness_ops::format_strip_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send power strip list: {}", e);
+        }
+        return;
+    }
+
     // `/perplexity` — last Perplexity Top/Snippet list, no Ollama.
     if crate::commands::harness_ops::looks_like_perplexity_request(&content) {
         let filter = crate::commands::harness_ops::parse_perplexity_list_filter(&content);
