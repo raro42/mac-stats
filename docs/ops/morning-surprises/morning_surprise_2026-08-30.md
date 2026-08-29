@@ -1,34 +1,19 @@
 # Morning surprise — 2026-08-30
 
-Ralf, overnight Track B kept shipping product instant lanes (not digester-empty quiet).
+Overnight Track B (mac-stats autoresearch) for Ralf.
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.718** | `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Hot: Load≥4 · RAM≥85%); ring kb hint drop All · Hot |
-| **v0.1.719** | `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` — power-strip Bat · Heat · LPM chips (Bat≤20% · Heat Fair+ · LPM On hot) |
-| **v0.1.720** | `/cpu` · `/gpu` · `/freq` · `/temp` — ring chips (CPU≥50% · GPU≥15% · Freq≥3.5 GHz · Temp≥70°C hot) |
-| **v0.1.721** | `/ram` · `/ssd` · `/uptime` — power-strip RAM · SSD · Up chips (RAM/SSD≥85% hot · Up≥7d long) |
-| **v0.1.722** | `/discord` — Discord Ready / Offline with reconnect cues (Agent Ops glance parity) |
-| **v0.1.723** | `/ollama` · `/llm` — Ollama Ready / Offline with model · endpoint · circuit (menu-bar ✕ + AI Chat glance) |
-| **v0.1.724** | `/redmine` — Redmine Ready / Not set / Partial with URL host · key cue (Agent Ops health parity; config only) |
-| **v0.1.725** | `/brave` — Brave Search Ready / Not set with key cue (config only; no live probe / quota burn) |
-| **v0.1.726** | `/perplexity key` — Perplexity Ready / Not set with key cue (config only; keeps `/perplexity` last-search) |
+| **v0.1.727** | `/mastodon` instant — Ready / Not set / Partial (instance + token; no live probe) |
+| **v0.1.726** | `/perplexity key` instant — Ready / Not set (API key; no live probe) |
 
-## Tried / context
+## Why it matters
 
-- Digester **open** empty (fast instant or filtered turns).
-- Design review **due=false** (grace); recommended surface still `feature-ai-chat`.
-- `debug.log` scan: no ERROR/WARN/panic clusters in the last window.
-- Fuel: standing backlog **p50** — Perplexity *key* chip after Brave Search key.
+Focused Ready-chip asks for Mastodon (and Perplexity key earlier) stay on the instant lane — no Ollama round-trip for “is it configured?” checks.
 
-## Why it helps
+## Tried / notes
 
-Asks like `/perplexity key`, `is perplexity ready`, or `perplexity status` skip the LLM and return Ready/Not set with key cue. `/perplexity` · Top · Snippet still list the last search. `perplexity search for …` still goes to search. No live Perplexity probe.
-
-## Next fuel
-
-- Design review when grace ends (stale feature screens; `feature-ai-chat` recommended).
-- Digester open / product-owned `debug.log` errors when present.
-- Mastodon Ready chip, MCP status, or tool-heavy p50 patterns when digester surfaces them.
+- Digester open empty this window; design-review screens still under grace.
+- Next fuel: MCP status chip, digester tool-heavy patterns, or design-review polish when due.
