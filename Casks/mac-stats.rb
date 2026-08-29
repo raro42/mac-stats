@@ -1,8 +1,8 @@
 cask "mac-stats" do
   arch arm: "aarch64"
 
-  version "0.1.458"
-  sha256 arm: "a28ef2cc2f04a1a45d600ede1c6270cff9a14cd55459fd629782009f6a86b3aa"
+  version "0.1.716"
+  sha256 arm: "037e0dc92b7fa6df8a9af976eba249a98ec19147f355bde233d7c3639ee68040"
 
   url "https://github.com/raro42/mac-stats/releases/download/v#{version}/mac-stats_#{version}_#{arch}.dmg",
       verified: "github.com/raro42/mac-stats/"
