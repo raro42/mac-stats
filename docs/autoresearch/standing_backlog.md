@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.715** — `/rings` · `/rings hot` instant — CPU · GPU · Freq · Temp Hot list (menu-bar amber thresholds; Discord + AI Chat; UI rings filter parity).
+
 - **v0.1.714** — `/processes pinned` · `/pinned` instant + pin sync to `~/.mac-stats/pinned_processes.json` (Discord + AI Chat; UI Pinned filter parity).
 
 - **v0.1.713** — `/perplexity` instant operator (top · snippet; Discord + AI Chat). Cache: perplexity_last.json.

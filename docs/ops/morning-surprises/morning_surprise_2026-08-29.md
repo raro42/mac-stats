@@ -13,6 +13,7 @@ Ralf, overnight Track B shipped product instant lanes (not digester-empty quiet)
 | **v0.1.712** | `/processes` · `/processes hot` · `/hot` — Top Processes Hot list (CPU≥15% · GPU≥15% · RAM≥1 GiB) |
 | **v0.1.713** | `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list (`perplexity_last.json`) |
 | **v0.1.714** | `/processes pinned` · `/pinned` — Top Processes Pinned list (`pinned_processes.json` sync from CPU window) |
+| **v0.1.715** | `/rings` · `/rings hot` — CPU · GPU · Freq · Temp Hot list (menu-bar amber: CPU≥50% · GPU≥15% · Freq≥3.5 GHz · Temp≥70°C) |
 
 Also earlier same night: `/knowledge` (**v0.1.707**), `/sessions` (**v0.1.706**), and related Agent Ops operator parity.
 
@@ -21,16 +22,14 @@ Also earlier same night: `/knowledge` (**v0.1.707**), `/sessions` (**v0.1.706**)
 - Digester **open** stayed empty (fast instant or filtered turns).
 - Design review **due=false** (grace); recommended surface still `feature-ai-chat`.
 - `debug.log` scan: no ERROR/WARN/panic clusters in the last window.
-- Fuel: standing backlog **p50** — UI filters without Discord/AI Chat instant lists; then pin sync.
-- Pins now live in `~/.mac-stats/pinned_processes.json` (localStorage still mirrors in the WebView).
-- Last Perplexity results persist from the CPU window search and from `PERPLEXITY_SEARCH` tool runs.
+- Fuel: standing backlog **p50** — UI filters without Discord/AI Chat instant lists; then pin sync; then CPU rings Hot.
 
 ## Why it helps
 
-Asks like `/processes pinned`, `show pinned`, or `/pinned` skip Ollama and return starred favorites immediately — same idea as Hot / Monitors / Disk / Agent Ops list operators. Discord sees the same pins as the CPU window.
+Asks like `/rings hot`, `hot rings`, or `which rings are hot` skip Ollama and return which metric rings sit at menu-bar amber — same idea as Top Processes Hot / Monitors Slow. `/hot` still means processes.
 
 ## Next fuel
 
 - Design review when grace ends (stale feature screens).
 - Digester open / product-owned `debug.log` errors when present.
-- Other tool-heavy p50 patterns when digester surfaces them (e.g. CPU rings Hot instant).
+- Other tool-heavy p50 patterns when digester surfaces them.
