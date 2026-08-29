@@ -4504,6 +4504,89 @@ pub fn format_redmine_ready_chip() -> String {
     }
 }
 
+/// True for focused Brave Search key/config asks (`/brave` · Settings key parity) —
+/// not web-search / BRAVE_SEARCH free-form.
+pub fn looks_like_brave_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Search queries and tool how-to stay with pre-route / agent.
+    if n.contains("search for")
+        || n.contains("look up")
+        || n.contains("look for")
+        || n.contains("google")
+        || n.contains("research")
+        || n.contains("brave_search")
+        || n.contains("find ")
+        || n.contains("web search")
+        || n.contains("query")
+        || n.contains("results")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.starts_with("search ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Bare "brave search" often means "search the web" — require status/key/ready cues.
+    if n == "brave search" {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/brave"
+            | "brave"
+            | "brave status"
+            | "brave ready"
+            | "brave offline"
+            | "brave configured"
+            | "brave health"
+            | "brave key"
+            | "show brave"
+            | "is brave ready"
+            | "is brave online"
+            | "is brave connected"
+            | "is brave offline"
+            | "is brave configured"
+            | "is brave set up"
+            | "is brave setup"
+            | "brave connection"
+            | "how's brave"
+            | "hows brave"
+            | "how's the brave"
+            | "hows the brave"
+            | "brave search status"
+            | "brave search key"
+            | "brave search ready"
+            | "brave search health"
+            | "brave search configured"
+            | "is brave search ready"
+            | "is brave search configured"
+            | "is brave search set up"
+            | "is brave search setup"
+            | "how's brave search"
+            | "hows brave search"
+    )
+}
+
+/// Zero-LLM Brave Search Ready / Not set chip (config only; no live ping / quota burn).
+pub fn format_brave_ready_chip() -> String {
+    match crate::commands::brave::get_brave_api_key() {
+        Some(_) => "**Brave Search** · Ready · key set".to_string(),
+        None => "**Brave Search** · Not set · add BRAVE_API_KEY".to_string(),
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4549,6 +4632,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_redmine_ready_request(content) {
         return Some(format_redmine_ready_chip());
+    }
+    if looks_like_brave_ready_request(content) {
+        return Some(format_brave_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4666,6 +4752,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
 • `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
+• `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5252,6 +5339,50 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("review")
         && !q.contains("why")
         && !q.contains("how to")
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
+    // `/brave` Ready/Not-set chip asks (v0.1.725).
+    if (q.contains("/brave")
+        || q == "brave"
+        || q.contains("brave status")
+        || q.contains("brave ready")
+        || q.contains("brave offline")
+        || q.contains("brave configured")
+        || q.contains("brave health")
+        || q.contains("brave key")
+        || q.contains("is brave ready")
+        || q.contains("is brave online")
+        || q.contains("is brave connected")
+        || q.contains("is brave offline")
+        || q.contains("is brave configured")
+        || q.contains("is brave set up")
+        || q.contains("is brave setup")
+        || q.contains("brave connection")
+        || q == "how's brave"
+        || q == "hows brave"
+        || q == "how's the brave"
+        || q == "hows the brave"
+        || q.contains("brave search status")
+        || q.contains("brave search key")
+        || q.contains("brave search ready")
+        || q.contains("brave search health")
+        || q.contains("brave search configured")
+        || q.contains("is brave search ready")
+        || q.contains("is brave search configured")
+        || q.contains("is brave search set up")
+        || q.contains("is brave search setup")
+        || q == "how's brave search"
+        || q == "hows brave search")
+        && !q.contains("search for")
+        && !q.contains("look up")
+        && !q.contains("google")
+        && !q.contains("research")
+        && !q.contains("brave_search")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && q != "brave search"
         && !q.chars().any(|c| c.is_ascii_digit())
     {
         return true;
@@ -6507,6 +6638,13 @@ mod tests {
         assert!(try_operator_instant_reply("how's redmine").is_some());
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("review ticket 7736").is_none());
+        let brave = try_operator_instant_reply("/brave").expect("brave");
+        assert!(brave.to_lowercase().contains("brave"), "{brave}");
+        assert!(try_operator_instant_reply("is brave ready").is_some());
+        assert!(try_operator_instant_reply("how's brave").is_some());
+        assert!(try_operator_instant_reply("brave search status").is_some());
+        assert!(try_operator_instant_reply("brave search").is_none());
+        assert!(try_operator_instant_reply("search for weather with brave").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -6626,6 +6764,7 @@ mod tests {
         );
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("review redmine ticket 12").is_none());
+        assert!(try_operator_instant_reply("brave search for barcelona").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
         assert!(try_operator_instant_reply("why is the site slow").is_none());
@@ -7507,6 +7646,27 @@ mod tests {
     }
 
     #[test]
+    fn brave_ready_request_detected() {
+        assert!(looks_like_brave_ready_request("/brave"));
+        assert!(looks_like_brave_ready_request("brave"));
+        assert!(looks_like_brave_ready_request("brave status"));
+        assert!(looks_like_brave_ready_request("is brave ready"));
+        assert!(looks_like_brave_ready_request("is brave configured"));
+        assert!(looks_like_brave_ready_request("how's brave"));
+        assert!(looks_like_brave_ready_request("brave search status"));
+        assert!(looks_like_brave_ready_request("brave search key"));
+        assert!(looks_like_brave_ready_request("is brave search ready"));
+        assert!(!looks_like_brave_ready_request("brave search"));
+        assert!(!looks_like_brave_ready_request("search for weather"));
+        assert!(!looks_like_brave_ready_request("brave search for news"));
+        assert!(!looks_like_brave_ready_request("how to use brave search"));
+        assert!(!looks_like_brave_ready_request("google barcelona"));
+        assert!(!looks_like_brave_ready_request("research climate"));
+        let chip = format_brave_ready_chip();
+        assert!(chip.to_lowercase().contains("brave"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7536,6 +7696,7 @@ mod tests {
         assert!(report.contains("/ollama"), "{report}");
         assert!(report.contains("/llm"), "{report}");
         assert!(report.contains("/redmine"), "{report}");
+        assert!(report.contains("/brave"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.725] - 2026-08-29
+
+### Added
+- **`/brave` instant operator** — `/brave` and NL (`brave status`, `is brave ready`, `how's brave`, `brave search status`) return Brave Search Ready / Not set with key cue (config only, no live probe / quota burn; Discord + AI Chat; does not steal web-search / `brave search for …` asks).
+
 ## [0.1.724] - 2026-08-29
 
 ### Added
