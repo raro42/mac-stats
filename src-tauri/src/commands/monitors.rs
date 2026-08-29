@@ -484,6 +484,77 @@ pub fn get_monitor_statuses_snapshot() -> Vec<(String, crate::monitors::MonitorS
         .collect()
 }
 
+/// One monitor row for Discord / AI Chat `/monitors` instant replies (cached status only).
+#[derive(Debug, Clone)]
+pub struct OpsMonitorRow {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+    /// `None` when never checked.
+    pub is_up: Option<bool>,
+    pub response_time_ms: Option<u64>,
+    pub error: Option<String>,
+    pub checked_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+/// List configured monitors with last cached status (no live HTTP check).
+pub fn list_monitors_for_ops() -> Vec<OpsMonitorRow> {
+    let configs = match get_monitor_configs().try_lock() {
+        Ok(c) => c,
+        Err(_) => return Vec::new(),
+    };
+    let stats = match get_monitor_stats().try_lock() {
+        Ok(s) => s,
+        Err(_) => return Vec::new(),
+    };
+    let urls = match get_monitor_urls().try_lock() {
+        Ok(u) => u,
+        Err(_) => return Vec::new(),
+    };
+    let mut rows: Vec<OpsMonitorRow> = configs
+        .values()
+        .map(|pm| {
+            let st = stats.get(&pm.id);
+            let last = st.and_then(|s| s.last_status.as_ref());
+            OpsMonitorRow {
+                id: pm.id.clone(),
+                name: pm.name.clone(),
+                url: urls
+                    .get(&pm.id)
+                    .cloned()
+                    .unwrap_or_else(|| pm.url.clone()),
+                is_up: last.map(|s| s.is_up),
+                response_time_ms: last.and_then(|s| s.response_time_ms),
+                error: last.and_then(|s| s.error.clone()),
+                checked_at: last
+                    .map(|s| s.checked_at)
+                    .or_else(|| st.and_then(|s| s.last_check)),
+            }
+        })
+        .collect();
+    // DOWN first, then slow UP, then other UP, then unchecked — Monitors list sort parity.
+    rows.sort_by(|a, b| {
+        let rank = |r: &OpsMonitorRow| -> u8 {
+            match r.is_up {
+                Some(false) => 0,
+                Some(true)
+                    if r.response_time_ms
+                        .map(|ms| ms >= 2000)
+                        .unwrap_or(false) =>
+                {
+                    1
+                }
+                Some(true) => 2,
+                None => 3,
+            }
+        };
+        rank(a)
+            .cmp(&rank(b))
+            .then_with(|| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()))
+    });
+    rows
+}
+
 /// Add a website monitor
 #[tauri::command]
 pub fn add_website_monitor(request: AddWebsiteMonitorRequest) -> Result<Monitor, String> {

@@ -2310,6 +2310,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/monitors` — External / Monitors Up/Down/Slow list, no Ollama.
+    if crate::commands::harness_ops::looks_like_monitors_request(&content) {
+        let filter = crate::commands::harness_ops::parse_monitors_list_filter(&content);
+        let report = crate::commands::harness_ops::format_monitors_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send monitors list: {}", e);
+        }
+        return;
+    }
+
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if crate::commands::harness_ops::looks_like_memory_scrub_request(&content) {
         let _ = new_message.channel_id.broadcast_typing(&ctx).await;

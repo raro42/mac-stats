@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.709] - 2026-08-29
+
+### Added
+- **`/monitors` instant operator** — `/monitors`, `/monitors up`, `/monitors down`, `/monitors slow` and NL (`list monitors`, `down monitors`, `slow monitors`, `which sites are down`) list External / Monitors with Up/Down/Slow counts from cached status (Discord + AI Chat; Monitors filter parity).
+
 ## [0.1.708] - 2026-08-29
 
 ### Added

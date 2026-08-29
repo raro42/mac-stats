@@ -1271,6 +1271,222 @@ pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
     out
 }
 
+/// Monitors All · Up · Down · Slow filter for `/monitors` instant replies (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MonitorsListFilter {
+    All,
+    Up,
+    Down,
+    Slow,
+}
+
+/// Menu-bar / UI Slow threshold for UP monitors (ms).
+pub const OPS_MONITOR_SLOW_MS: u64 = 2000;
+
+/// Parse Up/Down/Slow from `/monitors down`, `slow monitors`, etc. Default All.
+pub fn parse_monitors_list_filter(content: &str) -> MonitorsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" down")
+        || n == "down"
+        || n == "down monitors"
+        || n == "monitors down"
+        || n == "/monitors down"
+        || n == "sites down"
+        || n == "which sites are down"
+        || n == "what's down"
+        || n == "whats down"
+        || n == "what is down"
+        || n == "list down"
+        || n == "show down"
+    {
+        return MonitorsListFilter::Down;
+    }
+    if n.ends_with(" slow")
+        || n == "slow monitors"
+        || n == "monitors slow"
+        || n == "/monitors slow"
+        || n == "slow sites"
+        || n == "slow websites"
+        || n == "which sites are slow"
+    {
+        return MonitorsListFilter::Slow;
+    }
+    if n.ends_with(" up")
+        || n == "up monitors"
+        || n == "monitors up"
+        || n == "/monitors up"
+        || n == "sites up"
+        || n == "up sites"
+    {
+        return MonitorsListFilter::Up;
+    }
+    MonitorsListFilter::All
+}
+
+fn monitor_row_is_slow(r: &crate::commands::monitors::OpsMonitorRow) -> bool {
+    r.is_up == Some(true)
+        && r.response_time_ms
+            .map(|ms| ms >= OPS_MONITOR_SLOW_MS)
+            .unwrap_or(false)
+}
+
+/// True for `/monitors` / `list monitors` — Monitors Up/Down/Slow parity; not add/check asks.
+pub fn looks_like_monitors_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("remove")
+        || n.contains("delete")
+        || n.contains("check ")
+        || n.contains("check now")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || (n.starts_with("monitor ")
+            && n != "monitor list"
+            && n != "monitor status")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/monitors"
+            | "monitors"
+            | "list monitors"
+            | "show monitors"
+            | "my monitors"
+            | "all monitors"
+            | "monitor list"
+            | "website monitors"
+            | "site monitors"
+            | "sites status"
+            | "monitor status"
+            | "monitors status"
+            | "/monitors up"
+            | "monitors up"
+            | "up monitors"
+            | "sites up"
+            | "up sites"
+            | "/monitors down"
+            | "monitors down"
+            | "down monitors"
+            | "down"
+            | "sites down"
+            | "which sites are down"
+            | "what's down"
+            | "whats down"
+            | "what is down"
+            | "list down"
+            | "/monitors slow"
+            | "monitors slow"
+            | "slow monitors"
+            | "slow sites"
+            | "slow websites"
+            | "which sites are slow"
+    )
+}
+
+/// Zero-LLM monitors report (All · Up · Down · Slow filter parity; cached status only).
+pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
+    let rows = crate::commands::monitors::list_monitors_for_ops();
+    let up_n = rows.iter().filter(|r| r.is_up == Some(true)).count();
+    let down_n = rows.iter().filter(|r| r.is_up == Some(false)).count();
+    let slow_n = rows.iter().filter(|r| monitor_row_is_slow(r)).count();
+    let total = rows.len();
+    let title = match filter {
+        MonitorsListFilter::All => {
+            format!("**Monitors** — {total} · {up_n} up · {down_n} down · {slow_n} slow")
+        }
+        MonitorsListFilter::Up => format!("**Monitors · Up** — {up_n}"),
+        MonitorsListFilter::Down => format!("**Monitors · Down** — {down_n}"),
+        MonitorsListFilter::Slow => {
+            format!("**Monitors · Slow** — {slow_n} (≥{OPS_MONITOR_SLOW_MS} ms)")
+        }
+    };
+    let mut lines = vec![title];
+
+    fn row_line(r: &crate::commands::monitors::OpsMonitorRow) -> String {
+        let host = {
+            let u = r.url.trim();
+            if let Some(rest) = u.strip_prefix("https://").or_else(|| u.strip_prefix("http://"))
+            {
+                rest.split('/').next().unwrap_or(rest)
+            } else {
+                u
+            }
+        };
+        let label = if r.name.eq_ignore_ascii_case(host) || r.name.is_empty() {
+            host.to_string()
+        } else {
+            format!("{} · {}", r.name, host)
+        };
+        let age = r
+            .checked_at
+            .map(|t| age_from_rfc3339(&t.to_rfc3339()))
+            .unwrap_or_else(|| "—".into());
+        match r.is_up {
+            Some(true) => {
+                let ms = r
+                    .response_time_ms
+                    .map(|m| format!("{m} ms"))
+                    .unwrap_or_else(|| "—".into());
+                let slow_mark = if monitor_row_is_slow(r) { " · slow" } else { "" };
+                format!("• ✅ {label} · {ms}{slow_mark} · {age}")
+            }
+            Some(false) => {
+                let reason = r
+                    .error
+                    .as_deref()
+                    .map(|e| truncate_preview(e, 40))
+                    .filter(|e| !e.is_empty())
+                    .unwrap_or_else(|| "DOWN".into());
+                format!("• ❌ {label} · {reason} · {age}")
+            }
+            None => format!("• ⏳ {label} · waiting · {age}"),
+        }
+    }
+
+    const MAX_ROWS: usize = 12;
+    let filtered: Vec<_> = match filter {
+        MonitorsListFilter::All => rows.iter().collect(),
+        MonitorsListFilter::Up => rows.iter().filter(|r| r.is_up == Some(true)).collect(),
+        MonitorsListFilter::Down => rows.iter().filter(|r| r.is_up == Some(false)).collect(),
+        MonitorsListFilter::Slow => rows.iter().filter(|r| monitor_row_is_slow(r)).collect(),
+    };
+
+    if filtered.is_empty() {
+        let empty = match filter {
+            MonitorsListFilter::All => {
+                "_No monitors yet — add one under External / Monitors._"
+            }
+            MonitorsListFilter::Up => "_No UP monitors right now._",
+            MonitorsListFilter::Down => "_Nothing is DOWN right now._",
+            MonitorsListFilter::Slow => {
+                "_No UP site is slow right now (≥2000 ms)._"
+            }
+        };
+        lines.push(empty.to_string());
+    } else {
+        for r in filtered.iter().take(MAX_ROWS) {
+            lines.push(row_line(r));
+        }
+        if filtered.len() > MAX_ROWS {
+            lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentsListFilter {
@@ -2022,6 +2238,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_schedules_list_filter(content);
         return Some(format_schedules_gateway(filter));
     }
+    if looks_like_monitors_request(content) {
+        let filter = parse_monitors_list_filter(content);
+        return Some(format_monitors_gateway(filter));
+    }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
         return Some(if removed == 0 {
@@ -2060,6 +2280,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
+• `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -2262,6 +2483,32 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("schedule a")
         && !q.contains("create")
         && !q.contains(" for tomorrow")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/monitors` up/down/slow operator asks (v0.1.709).
+    if (q.contains("/monitors")
+        || q == "monitors"
+        || q.contains("list monitors")
+        || q.contains("show monitors")
+        || q.contains("monitors up")
+        || q.contains("monitors down")
+        || q.contains("monitors slow")
+        || q.contains("down monitors")
+        || q.contains("slow monitors")
+        || q.contains("up monitors")
+        || q.contains("sites down")
+        || q.contains("which sites are down")
+        || q.contains("which sites are slow")
+        || q == "what's down"
+        || q == "whats down"
+        || q == "what is down")
+        && !q.contains("why")
+        && !q.contains("add ")
+        && !q.contains("create")
+        && !q.contains("check ")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -3423,6 +3670,10 @@ mod tests {
         let schedules_del =
             try_operator_instant_reply("/schedules deliveries").expect("schedules deliveries");
         assert!(schedules_del.to_lowercase().contains("deliver"));
+        let monitors = try_operator_instant_reply("/monitors").expect("monitors");
+        assert!(monitors.to_lowercase().contains("monitor"));
+        let monitors_down = try_operator_instant_reply("/monitors down").expect("monitors down");
+        assert!(monitors_down.to_lowercase().contains("down"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -3433,6 +3684,7 @@ mod tests {
         assert!(try_operator_instant_reply("resume this session").is_none());
         assert!(try_operator_instant_reply("scrub memory").is_some());
         assert!(try_operator_instant_reply("save this to knowledge").is_none());
+        assert!(try_operator_instant_reply("add a monitor for example.com").is_none());
     }
 
     #[test]
@@ -3633,6 +3885,18 @@ mod tests {
             &["SKILL".into()],
             "SKILL: ui-weekly-review — Weekly Agent Ops polish per docs/041_ui_command_center"
         ));
+        assert!(is_insights_slowest_noise(
+            "instant",
+            50,
+            &[],
+            "/monitors down"
+        ));
+        assert!(is_insights_slowest_noise(
+            "instant",
+            80,
+            &[],
+            "list monitors"
+        ));
         assert!(!is_insights_slowest_noise(
             "direct",
             12_000,
@@ -3718,6 +3982,40 @@ mod tests {
     }
 
     #[test]
+    fn monitors_request_detected() {
+        assert!(looks_like_monitors_request("/monitors"));
+        assert!(looks_like_monitors_request("list monitors"));
+        assert!(looks_like_monitors_request("@Werner monitors"));
+        assert!(looks_like_monitors_request("/monitors up"));
+        assert!(looks_like_monitors_request("/monitors down"));
+        assert!(looks_like_monitors_request("/monitors slow"));
+        assert!(looks_like_monitors_request("down monitors"));
+        assert!(looks_like_monitors_request("slow monitors"));
+        assert!(looks_like_monitors_request("which sites are down"));
+        assert!(looks_like_monitors_request("what's down"));
+        assert!(looks_like_monitors_request("monitor list"));
+        assert!(!looks_like_monitors_request("add a monitor"));
+        assert!(!looks_like_monitors_request("why are monitors down"));
+        assert!(!looks_like_monitors_request("check monitor now"));
+        assert_eq!(
+            parse_monitors_list_filter("/monitors"),
+            MonitorsListFilter::All
+        );
+        assert_eq!(
+            parse_monitors_list_filter("/monitors up"),
+            MonitorsListFilter::Up
+        );
+        assert_eq!(
+            parse_monitors_list_filter("down monitors"),
+            MonitorsListFilter::Down
+        );
+        assert_eq!(
+            parse_monitors_list_filter("slow monitors"),
+            MonitorsListFilter::Slow
+        );
+    }
+
+    #[test]
     fn memory_scrub_request_detected() {
         assert!(looks_like_memory_scrub_request("scrub memory"));
         assert!(looks_like_memory_scrub_request("clean up memory"));
@@ -3778,6 +4076,8 @@ mod tests {
         assert!(report.contains("/agents"), "{report}");
         assert!(report.contains("/sessions"), "{report}");
         assert!(report.contains("/knowledge"), "{report}");
+        assert!(report.contains("/monitors"), "{report}");
+        assert!(report.contains("/monitors down"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }
@@ -3821,6 +4121,16 @@ mod tests {
         assert!(jobs.to_lowercase().contains("jobs"), "{jobs}");
         let dels = format_schedules_gateway(SchedulesListFilter::Deliveries);
         assert!(dels.to_lowercase().contains("deliver"), "{dels}");
+    }
+
+    #[test]
+    fn monitors_gateway_has_counts() {
+        let report = format_monitors_gateway(MonitorsListFilter::All);
+        assert!(report.to_lowercase().contains("monitor"), "{report}");
+        let down = format_monitors_gateway(MonitorsListFilter::Down);
+        assert!(down.to_lowercase().contains("down"), "{down}");
+        let slow = format_monitors_gateway(MonitorsListFilter::Slow);
+        assert!(slow.to_lowercase().contains("slow"), "{slow}");
     }
 
     #[test]
