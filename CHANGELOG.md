@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.747] - 2026-08-30
+
+### Added
+- **Top Processes Hot attention glance** — when any listed process is hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB), a **Hot · N hot** amber strip appears under the Top CPU/GPU/RAM glances (Agent Ops Fail/Slow / AI Chat Errors parity). Click or Enter opens the Hot filter and focuses the first hot row. Hidden while the section is collapsed (keep-header glances stay).
+
+
 ## [0.1.746] - 2026-08-30
 
 ### Added

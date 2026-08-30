@@ -1146,6 +1146,109 @@ function wireProcessesTopRamGlanceClick(glance) {
   });
 }
 
+/**
+ * Hot attention glance under Top Processes (Agent Ops Runs Fail/Slow / AI Chat Errors parity).
+ * Visible when the section is open and any listed process hits Hot thresholds.
+ */
+function ensureProcessesHotAttentionGlance() {
+  ensureProcessesTopRamGlance();
+  ensureProcessesFilterChips();
+  const chips = document.getElementById("processes-filter-chips");
+  const ram =
+    document.getElementById("processes-top-ram-glance") ||
+    document.getElementById("processes-top-gpu-glance") ||
+    document.getElementById("processes-top-glance") ||
+    document.getElementById("processes-header");
+  const list = document.getElementById("process-list");
+  let glance = document.getElementById("processes-hot-attention-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "processes-hot-attention-glance";
+    glance.className = "processes-hot-attention-glance";
+    glance.hidden = true;
+    glance.innerHTML = '<span id="processes-hot-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement("beforebegin", glance);
+    } else if (ram) {
+      ram.insertAdjacentElement("afterend", glance);
+    } else if (list?.parentNode) {
+      list.parentNode.insertBefore(glance, list);
+    } else {
+      return null;
+    }
+    wireProcessesHotAttentionGlanceClick(glance);
+  } else if (chips && glance.nextElementSibling !== chips) {
+    chips.insertAdjacentElement("beforebegin", glance);
+  }
+  return glance;
+}
+
+function applyProcessesHotAttentionGlanceState(hotCount, empty) {
+  const glance = ensureProcessesHotAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById("processes-hot-attention-glance-text");
+  if (isProcessesSectionCollapsed() || empty || hotCount <= 0) {
+    glance.hidden = true;
+    glance.classList.remove("has-hot");
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add("has-hot");
+  const label = hotCount === 1 ? "1 hot" : `${hotCount} hot`;
+  if (text) text.textContent = `Hot · ${label}`;
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = "Show hot processes only (Hot filter)";
+  glance.setAttribute(
+    "aria-label",
+    `Top Processes has ${label} — click to open Hot filter`
+  );
+}
+
+function activateProcessesHotAttentionGlance() {
+  if (isProcessesSectionCollapsed()) {
+    if (typeof window.showDetailsProcessesSections === "function") {
+      window.showDetailsProcessesSections();
+    }
+  }
+  setProcessesFilterMode("hot");
+  const list = document.getElementById("process-list");
+  const first =
+    list?.querySelector(".process-row.is-hot") ||
+    visibleProcessRows(list)[0];
+  if (first && typeof first.scrollIntoView === "function") {
+    const rows = visibleProcessRows(list);
+    rows.forEach((r) =>
+      r.setAttribute("tabindex", r === first ? "0" : "-1")
+    );
+    first.scrollIntoView({ block: "nearest" });
+    if (typeof first.focus === "function") first.focus();
+  } else {
+    const chip =
+      document.querySelector(
+        '#processes-filter-chips [data-processes-filter="hot"]'
+      ) || document.getElementById("processes-filter-chips");
+    chip?.focus?.();
+  }
+}
+
+function wireProcessesHotAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.processesHotAttentionWired === "1") return;
+  glance.dataset.processesHotAttentionWired = "1";
+  const activate = () => activateProcessesHotAttentionGlance();
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** All / Pinned / Hot chips (Monitors All/Up/Down filter parity). */
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
@@ -1268,6 +1371,7 @@ function applyProcessesListFilter() {
 
   if (waiting || rows.length === 0) {
     ensureProcessesFilterMissState(processList, false);
+    applyProcessesHotAttentionGlanceState(0, true);
     return;
   }
 
@@ -1287,6 +1391,7 @@ function applyProcessesListFilter() {
 
   ensureProcessesFilterMissState(processList, visible === 0);
   ensureProcessesListKbHint(processList, visible > 0);
+  applyProcessesHotAttentionGlanceState(hotCount, false);
 
   const visibleRows = visibleProcessRows(processList);
   visibleRows.forEach((r, i) => r.setAttribute("tabindex", i === 0 ? "0" : "-1"));
@@ -11184,6 +11289,11 @@ function initCollapsibleSections() {
       processesDivider.style.display = 'none';
     }
     syncProcessesCollapseA11y();
+    const hotAtt = document.getElementById('processes-hot-attention-glance');
+    if (hotAtt) {
+      hotAtt.hidden = true;
+      hotAtt.classList.remove('has-hot');
+    }
     // Refresh quiet Waiting glance when list is empty while collapsed.
     const topGlance = document.getElementById('processes-top-glance');
     if (topGlance && !window.__processesTopPid) {
@@ -11207,6 +11317,7 @@ function initCollapsibleSections() {
       processesDivider.style.display = '';
     }
     syncProcessesCollapseA11y();
+    applyProcessesListFilter();
     const topGlance = document.getElementById('processes-top-glance');
     if (topGlance && !window.__processesTopPid) {
       applyProcessesTopGlanceState({

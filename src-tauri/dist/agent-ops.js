@@ -7226,6 +7226,7 @@ function escapeHtml(s) {
     stopOpsGlancePoll();
     const glance = document.getElementById('agent-ops-collapsed-glance');
     if (glance) glance.hidden = true;
+    applyOpsRunsAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
