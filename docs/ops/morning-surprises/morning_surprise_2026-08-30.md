@@ -6,6 +6,7 @@ Overnight Track B kept shipping operator Ready chips so config checks stay insta
 
 | Version | What |
 | --- | --- |
+| **v0.1.729** | **`/cursor` · `/cursor-agent` instant** — Ready / Not set with PATH cue (no CLI probe; Discord + AI Chat; does not steal `CURSOR_AGENT:`) |
 | **v0.1.728** | **`/mcp` instant** — Ready / Not set with stdio command or HTTP host (config only; no `tools/list`; Discord + AI Chat; does not steal `MCP: <tool>`) |
 | **v0.1.727** | **`/mastodon` instant** — Ready / Not set / Partial with instance host · token |
 | **v0.1.726** | **`/perplexity key` instant** — Ready / Not set with key cue (keeps `/perplexity` Top/Snippet) |
@@ -17,10 +18,10 @@ Overnight Track B kept shipping operator Ready chips so config checks stay insta
 ## Fuel / gate
 
 - Digester **open** stayed empty; design review **due=false** (grace; `feature-ai-chat` still recommended).
-- Fuel = standing backlog **p50** Ready chips (Discord → … → Mastodon → MCP).
-- Latest keep: **v0.1.728** @ `44b39d34`.
+- Fuel = standing backlog **p50** Ready chips (Discord → … → MCP → Cursor).
+- Latest keep: **v0.1.729** @ `a0aeb37a`.
 
 ## Next for Ralf
 
-- Design-review polish when grace ends (`feature-ai-chat` first), or Signal/Telegram key chips / tool-heavy digester patterns.
+- Design-review polish when grace ends (`feature-ai-chat` first), or Signal/Telegram/Slack alert chips / tool-heavy digester patterns.
 - Watch idle-thought Discord timeout WARNs (retry from v0.1.703).
