@@ -3124,6 +3124,62 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 50%, currentColor);
 }
 
+/* Disk Cleanup — Reclaim/Due attention glance (Monitors Down/Slow / Hot parity) */
+.disk-cleanup-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.disk-cleanup-attention-glance[hidden] {
+  display: none !important;
+}
+
+.disk-cleanup-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.disk-cleanup-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+}
+
+.disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+  background: color-mix(in srgb, #ff9f0a 6%, transparent);
+  color: color-mix(in srgb, #ff9f0a 45%, currentColor);
+}
+
+.disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 34%, transparent);
+  background: color-mix(in srgb, #34c759 8%, transparent);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}
+
 /* Top Processes — top GPU glance (Top CPU / GPU-strip parity) */
 .processes-top-gpu-glance {
   display: flex;

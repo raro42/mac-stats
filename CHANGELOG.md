@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.749] - 2026-08-31
+
+### Added
+- **Disk Cleanup Reclaim/Due attention glance** — when any category is reclaimable or a run is due, a **Disk · N big · M reclaim · Due** strip appears above the category filters (Monitors Down/Slow / Top Processes Hot parity). Amber wash for Big/Reclaim, green for Due-only. Click or Enter opens Big (prefer) or Reclaim filter and focuses the first matching row, or Clean now when only Due. Hidden while the section is collapsed (keep-header glance stays).
+
 ## [0.1.748] - 2026-08-31
 
 ### Added
