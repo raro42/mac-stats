@@ -5899,6 +5899,184 @@ pub fn format_downloads_organizer_ready_chip() -> String {
     )
 }
 
+/// Shorten a vault path for the Ori Ready chip (`$HOME` → `~`).
+fn shorten_ori_vault_for_chip(path: &std::path::Path) -> String {
+    let raw = path.display().to_string();
+    let home_short = if let Ok(home) = std::env::var("HOME") {
+        if raw.starts_with(&home) {
+            format!("~{}", &raw[home.len()..])
+        } else {
+            raw.clone()
+        }
+    } else {
+        raw.clone()
+    };
+    if home_short.chars().count() > 40 {
+        let mut s: String = home_short.chars().take(37).collect();
+        s.push('…');
+        s
+    } else {
+        home_short
+    }
+}
+
+/// True for focused Ori Mnemos lifecycle Ready/config asks (`/ori` · `/mnemos`) —
+/// not MCP `ori_*` tools, markdown MEMORY_APPEND, scrub memory, or enable/disable how-tos.
+pub fn looks_like_ori_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Tool / memory actions and how-tos stay with pre-route / agent / scrub / MCP.
+    if n.starts_with("mcp:")
+        || n.contains("mcp:")
+        || n.contains("ori_")
+        || n.contains("memory_append")
+        || n.contains("memory append")
+        || n.contains("scrub memory")
+        || n.contains("save memory")
+        || n.contains("append memory")
+        || n.contains("write memory")
+        || n.contains("ori query")
+        || n.contains("ori orient")
+        || n.contains("ori add")
+        || n.contains("ori promote")
+        || n.contains("ori serve")
+        || n.contains("run ori")
+        || n.contains("call ori")
+        || n.contains("use ori")
+        || n.contains("enable ori")
+        || n.contains("disable ori")
+        || n.contains("enable mnemos")
+        || n.contains("disable mnemos")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ori"
+            | "/mnemos"
+            | "/ori-mnemos"
+            | "ori"
+            | "mnemos"
+            | "ori mnemos"
+            | "ori-mnemos"
+            | "ori status"
+            | "ori ready"
+            | "ori health"
+            | "ori on"
+            | "ori off"
+            | "ori vault"
+            | "ori lifecycle"
+            | "mnemos status"
+            | "mnemos ready"
+            | "mnemos health"
+            | "mnemos on"
+            | "mnemos off"
+            | "mnemos vault"
+            | "show ori"
+            | "show mnemos"
+            | "is ori ready"
+            | "is ori on"
+            | "is ori off"
+            | "is ori enabled"
+            | "is ori configured"
+            | "is ori set up"
+            | "is ori setup"
+            | "is mnemos ready"
+            | "is mnemos on"
+            | "is mnemos off"
+            | "is mnemos enabled"
+            | "is mnemos configured"
+            | "is mnemos set up"
+            | "is mnemos setup"
+            | "how's ori"
+            | "hows ori"
+            | "how's the ori"
+            | "hows the ori"
+            | "how's mnemos"
+            | "hows mnemos"
+            | "how's the mnemos"
+            | "hows the mnemos"
+            | "ori mnemos status"
+            | "ori mnemos ready"
+            | "ori lifecycle status"
+            | "ori lifecycle ready"
+    )
+}
+
+/// Zero-LLM Ori Mnemos lifecycle Ready chip (env/config only; no `ori` subprocess / MCP probe).
+pub fn format_ori_ready_chip() -> String {
+    use crate::config::Config;
+    if !Config::ori_lifecycle_enabled() {
+        return "**Ori** · Off · set `MAC_STATS_ORI_LIFECYCLE_ENABLED` + `ORI_VAULT` (config only)"
+            .to_string();
+    }
+    let raw = Config::ori_vault_path_raw();
+    let (vault_part, vault_ready) = if raw.trim().is_empty() {
+        ("vault not set".to_string(), false)
+    } else {
+        match Config::expand_user_path_str(raw.trim()) {
+            Some(p) if p.join(".ori").is_file() => (
+                format!("vault {}", shorten_ori_vault_for_chip(&p)),
+                true,
+            ),
+            Some(p) => (
+                format!(
+                    "vault {} · missing .ori",
+                    shorten_ori_vault_for_chip(&p)
+                ),
+                false,
+            ),
+            None => ("vault path invalid".to_string(), false),
+        }
+    };
+    let state = if vault_ready { "Ready" } else { "Partial" };
+    let orient = if Config::ori_hook_orient_on_session_start() {
+        "orient On"
+    } else {
+        "orient Off"
+    };
+    let prefetch = if Config::ori_prefetch_enabled() {
+        "prefetch On"
+    } else {
+        "prefetch Off"
+    };
+    let capture = if Config::ori_hook_capture_on_compaction() {
+        "capture On"
+    } else {
+        "capture Off"
+    };
+    let bin = Config::ori_binary();
+    let bin_short = if bin.chars().count() > 24 {
+        let mut s: String = bin.chars().take(21).collect();
+        s.push('…');
+        s
+    } else {
+        bin
+    };
+    format!(
+        "**Ori** · {state} · {vault_part} · {orient} · {prefetch} · {capture} · `{bin_short}` (config only)"
+    )
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -6241,6 +6419,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
+    if looks_like_ori_ready_request(content) {
+        return Some(format_ori_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6390,6 +6571,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
+• `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -8828,6 +9010,15 @@ mod tests {
         assert!(try_operator_instant_reply("run organizer now").is_none());
         assert!(try_operator_instant_reply("organize my downloads").is_none());
         assert!(try_operator_instant_reply("/disk").is_some()); // disk cleanup, not organizer
+        let ori = try_operator_instant_reply("/ori").expect("ori");
+        assert!(ori.to_lowercase().contains("ori"), "{ori}");
+        assert!(try_operator_instant_reply("/mnemos").is_some());
+        assert!(try_operator_instant_reply("is ori ready").is_some());
+        assert!(try_operator_instant_reply("how's mnemos").is_some());
+        assert!(try_operator_instant_reply("ori_orient").is_none());
+        assert!(try_operator_instant_reply("MCP: ori_query_ranked").is_none());
+        assert!(try_operator_instant_reply("enable ori").is_none());
+        assert!(try_operator_instant_reply("scrub memory").is_some()); // scrub lane, not Ori
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -10127,6 +10318,26 @@ mod tests {
         assert!(
             downloads_chip.contains("On") || downloads_chip.contains("Off"),
             "{downloads_chip}"
+        );
+        assert!(looks_like_ori_ready_request("/ori"));
+        assert!(looks_like_ori_ready_request("/mnemos"));
+        assert!(looks_like_ori_ready_request("ori"));
+        assert!(looks_like_ori_ready_request("mnemos"));
+        assert!(looks_like_ori_ready_request("ori status"));
+        assert!(looks_like_ori_ready_request("is ori ready"));
+        assert!(looks_like_ori_ready_request("how's mnemos"));
+        assert!(looks_like_ori_ready_request("ori vault"));
+        assert!(!looks_like_ori_ready_request("ori_orient"));
+        assert!(!looks_like_ori_ready_request("MCP: ori_query_ranked"));
+        assert!(!looks_like_ori_ready_request("enable ori"));
+        assert!(!looks_like_ori_ready_request("scrub memory"));
+        assert!(!looks_like_ori_ready_request("memory append note"));
+        assert!(!looks_like_ori_ready_request("how to use ori"));
+        let ori_chip = format_ori_ready_chip();
+        assert!(ori_chip.to_lowercase().contains("ori"), "{ori_chip}");
+        assert!(
+            ori_chip.contains("Off") || ori_chip.contains("Ready") || ori_chip.contains("Partial"),
+            "{ori_chip}"
         );
         let ai_chip = format_ai_agent_ready_chip();
         assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");

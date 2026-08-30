@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.742] - 2026-08-30
+
+### Added
+- **`/ori` · `/mnemos` instant operator** — Ori Mnemos lifecycle Ready / Off / Partial chip (vault · orient · prefetch · capture · binary; config/env only, no `ori` subprocess or MCP probe; Discord + AI Chat; does not steal MCP `ori_*`, `MEMORY_APPEND`, or scrub memory).
+
 ## [0.1.741] - 2026-08-30
 
 ### Added
