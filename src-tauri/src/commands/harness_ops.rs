@@ -4870,6 +4870,119 @@ pub fn format_mcp_ready_chip() -> String {
     }
 }
 
+/// True for focused Cursor agent Ready/PATH asks (`/cursor` · `/cursor-agent`) —
+/// not `CURSOR_AGENT:` tool invocations or coding handoffs.
+pub fn looks_like_cursor_agent_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Tool invocations and coding tasks stay with pre-route / agent.
+    if n.contains("cursor_agent:")
+        || n.contains("cursor-agent:")
+        || n.starts_with("cursor_agent ")
+        || n.contains("run cursor")
+        || n.contains("ask cursor")
+        || n.contains("use cursor")
+        || n.contains("invoke")
+        || n.contains("implement")
+        || n.contains("refactor")
+        || n.contains("fix ")
+        || n.contains("write ")
+        || n.contains("commit")
+        || n.contains("push")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/cursor"
+            | "/cursor-agent"
+            | "cursor"
+            | "cursor agent"
+            | "cursor-agent"
+            | "cursor_agent"
+            | "cursor status"
+            | "cursor agent status"
+            | "cursor-agent status"
+            | "cursor ready"
+            | "cursor agent ready"
+            | "cursor-agent ready"
+            | "cursor offline"
+            | "cursor agent offline"
+            | "cursor-agent offline"
+            | "cursor configured"
+            | "cursor agent configured"
+            | "cursor-agent configured"
+            | "cursor health"
+            | "cursor agent health"
+            | "cursor-agent health"
+            | "cursor path"
+            | "cursor agent path"
+            | "cursor-agent path"
+            | "show cursor"
+            | "show cursor agent"
+            | "show cursor-agent"
+            | "is cursor ready"
+            | "is cursor online"
+            | "is cursor connected"
+            | "is cursor offline"
+            | "is cursor configured"
+            | "is cursor set up"
+            | "is cursor setup"
+            | "is cursor agent ready"
+            | "is cursor agent online"
+            | "is cursor agent connected"
+            | "is cursor agent offline"
+            | "is cursor agent configured"
+            | "is cursor agent set up"
+            | "is cursor agent setup"
+            | "is cursor-agent ready"
+            | "is cursor-agent online"
+            | "is cursor-agent connected"
+            | "is cursor-agent offline"
+            | "is cursor-agent configured"
+            | "is cursor-agent set up"
+            | "is cursor-agent setup"
+            | "cursor connection"
+            | "cursor agent connection"
+            | "cursor-agent connection"
+            | "how's cursor"
+            | "hows cursor"
+            | "how's the cursor"
+            | "hows the cursor"
+            | "how's cursor agent"
+            | "hows cursor agent"
+            | "how's the cursor agent"
+            | "hows the cursor agent"
+            | "how's cursor-agent"
+            | "hows cursor-agent"
+            | "how's the cursor-agent"
+            | "hows the cursor-agent"
+    )
+}
+
+/// Zero-LLM Cursor agent Ready / Not set chip (PATH only; no CLI probe).
+pub fn format_cursor_agent_ready_chip() -> String {
+    if crate::commands::cursor_agent::is_cursor_agent_available() {
+        "**Cursor agent** · Ready · `cursor-agent` on PATH".to_string()
+    } else {
+        "**Cursor agent** · Not set · install `cursor-agent` on PATH".to_string()
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4927,6 +5040,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_mcp_ready_request(content) {
         return Some(format_mcp_ready_chip());
+    }
+    if looks_like_cursor_agent_ready_request(content) {
+        return Some(format_cursor_agent_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -5048,6 +5164,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
+• `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5793,6 +5910,66 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("use mcp")
         && !q.contains("invoke")
         && !q.contains("ori_")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
+    // `/cursor` · `/cursor-agent` Ready/Not-set chip asks (v0.1.729).
+    if (q.contains("/cursor")
+        || q.contains("/cursor-agent")
+        || q == "cursor"
+        || q == "cursor agent"
+        || q == "cursor-agent"
+        || q == "cursor_agent"
+        || q.contains("cursor status")
+        || q.contains("cursor agent status")
+        || q.contains("cursor-agent status")
+        || q.contains("cursor ready")
+        || q.contains("cursor agent ready")
+        || q.contains("cursor-agent ready")
+        || q.contains("cursor offline")
+        || q.contains("cursor configured")
+        || q.contains("cursor health")
+        || q.contains("cursor path")
+        || q.contains("is cursor ready")
+        || q.contains("is cursor online")
+        || q.contains("is cursor connected")
+        || q.contains("is cursor offline")
+        || q.contains("is cursor configured")
+        || q.contains("is cursor set up")
+        || q.contains("is cursor setup")
+        || q.contains("is cursor agent ready")
+        || q.contains("is cursor agent online")
+        || q.contains("is cursor agent connected")
+        || q.contains("is cursor agent offline")
+        || q.contains("is cursor agent configured")
+        || q.contains("is cursor agent set up")
+        || q.contains("is cursor agent setup")
+        || q.contains("is cursor-agent ready")
+        || q.contains("is cursor-agent online")
+        || q.contains("is cursor-agent connected")
+        || q.contains("is cursor-agent offline")
+        || q.contains("is cursor-agent configured")
+        || q.contains("is cursor-agent set up")
+        || q.contains("is cursor-agent setup")
+        || q == "how's cursor"
+        || q == "hows cursor"
+        || q == "how's the cursor"
+        || q == "hows the cursor"
+        || q == "how's cursor agent"
+        || q == "hows cursor agent"
+        || q == "how's cursor-agent"
+        || q == "hows cursor-agent")
+        && !q.contains("cursor_agent:")
+        && !q.contains("cursor-agent:")
+        && !q.contains("run cursor")
+        && !q.contains("ask cursor")
+        && !q.contains("use cursor")
+        && !q.contains("implement")
+        && !q.contains("refactor")
+        && !q.contains("commit")
         && !q.contains("why")
         && !q.contains("how to")
         && !q.chars().any(|c| c.is_ascii_digit())
@@ -7086,6 +7263,13 @@ mod tests {
         assert!(try_operator_instant_reply("mcp server status").is_some());
         assert!(try_operator_instant_reply("mcp: list_tools").is_none());
         assert!(try_operator_instant_reply("call mcp get_weather").is_none());
+        let cursor = try_operator_instant_reply("/cursor").expect("cursor");
+        assert!(cursor.to_lowercase().contains("cursor"), "{cursor}");
+        assert!(try_operator_instant_reply("/cursor-agent").is_some());
+        assert!(try_operator_instant_reply("is cursor agent ready").is_some());
+        assert!(try_operator_instant_reply("how's cursor-agent").is_some());
+        assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
+        assert!(try_operator_instant_reply("ask cursor to refactor auth").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -8170,6 +8354,29 @@ mod tests {
     }
 
     #[test]
+    fn cursor_agent_ready_request_detected() {
+        assert!(looks_like_cursor_agent_ready_request("/cursor"));
+        assert!(looks_like_cursor_agent_ready_request("/cursor-agent"));
+        assert!(looks_like_cursor_agent_ready_request("cursor"));
+        assert!(looks_like_cursor_agent_ready_request("cursor agent"));
+        assert!(looks_like_cursor_agent_ready_request("cursor-agent"));
+        assert!(looks_like_cursor_agent_ready_request("cursor status"));
+        assert!(looks_like_cursor_agent_ready_request("is cursor ready"));
+        assert!(looks_like_cursor_agent_ready_request("is cursor agent ready"));
+        assert!(looks_like_cursor_agent_ready_request("is cursor-agent configured"));
+        assert!(looks_like_cursor_agent_ready_request("how's cursor"));
+        assert!(looks_like_cursor_agent_ready_request("how's cursor-agent"));
+        assert!(!looks_like_cursor_agent_ready_request("CURSOR_AGENT: fix the bug"));
+        assert!(!looks_like_cursor_agent_ready_request("cursor_agent: commit and push"));
+        assert!(!looks_like_cursor_agent_ready_request("ask cursor to refactor auth"));
+        assert!(!looks_like_cursor_agent_ready_request("run cursor agent on this"));
+        assert!(!looks_like_cursor_agent_ready_request("how to use cursor agent"));
+        assert!(!looks_like_cursor_agent_ready_request("use cursor for weather"));
+        let chip = format_cursor_agent_ready_chip();
+        assert!(chip.to_lowercase().contains("cursor"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -8203,6 +8410,8 @@ mod tests {
         assert!(report.contains("/perplexity key"), "{report}");
         assert!(report.contains("/mastodon"), "{report}");
         assert!(report.contains("/mcp"), "{report}");
+        assert!(report.contains("/cursor"), "{report}");
+        assert!(report.contains("/cursor-agent"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

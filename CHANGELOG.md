@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.729] - 2026-08-30
+
+### Added
+- **`/cursor` · `/cursor-agent` instant operator** — `/cursor`, `/cursor-agent` and NL (`cursor status`, `is cursor agent ready`, `how's cursor-agent`) return Cursor agent Ready / Not set with PATH cue (no CLI probe; Discord + AI Chat; does not steal `CURSOR_AGENT:` invocations or coding handoffs).
+
 ## [0.1.728] - 2026-08-30
 
 ### Added
