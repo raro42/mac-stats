@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.731] - 2026-08-30
+
+### Added
+- **`/skills` instant operator** — `/skills` and NL (`list skills`, `skills catalog`, `installed skills`) return the installed skills catalog from `~/.mac-stats/agents/skills/` (Hermes skills_list / SKILLS_LIST parity; Discord + AI Chat; does not steal `SKILL:` / `SKILL_VIEW:` / create-edit asks).
+
 ## [0.1.730] - 2026-08-30
 
 ### Added

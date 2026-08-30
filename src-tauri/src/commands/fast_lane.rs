@@ -1546,6 +1546,8 @@ mod tests {
             "/direct",
             "/lite",
             "/agents",
+            "/skills",
+            "list skills",
             "/sessions",
             "/knowledge",
             "/schedules jobs",

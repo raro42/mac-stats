@@ -3692,6 +3692,95 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
     out
 }
 
+/// True for `/skills` / `list skills` — Hermes skills_list catalog; not SKILL: / SKILL_VIEW / manage.
+pub fn looks_like_skills_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    // Tool invocations and manage/run asks stay with the agent / tool loop.
+    if n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("skills_list")
+        || n.contains("skill_view")
+        || n.contains("skill_manage")
+        || n.starts_with("skill ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("write")
+        || n.contains("patch")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/skills"
+            | "skills"
+            | "list skills"
+            | "my skills"
+            | "which skills"
+            | "what skills"
+            | "all skills"
+            | "skill list"
+            | "skills list"
+            | "skills catalog"
+            | "skill catalog"
+            | "installed skills"
+            | "available skills"
+            | "skills installed"
+            | "skills available"
+    )
+}
+
+/// Zero-LLM skills catalog (Hermes skills_list / SKILLS_LIST parity).
+pub fn format_skills_gateway() -> String {
+    let skills = crate::skills::load_skills();
+    let title = if skills.is_empty() {
+        "**Skills** — 0 installed".to_string()
+    } else {
+        format!("**Skills** — {} installed", skills.len())
+    };
+    let mut lines = vec![title];
+    if skills.is_empty() {
+        lines.push(
+            "_None yet — add `skill-<n>-<topic>.md` under `~/.mac-stats/agents/skills/`._"
+                .to_string(),
+        );
+    } else {
+        for s in &skills {
+            let desc = s
+                .content
+                .lines()
+                .map(|l| l.trim())
+                .find(|l| !l.is_empty())
+                .unwrap_or("(no description)")
+                .chars()
+                .take(100)
+                .collect::<String>();
+            lines.push(format!("• `{}-{}` — {}", s.number, s.topic, desc));
+        }
+        lines.push(
+            "_Run: `SKILL: <n|topic>` · View: `SKILL_VIEW: <n|topic>`_".to_string(),
+        );
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Sessions All · Live · Files filter for `/sessions` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionsListFilter {
@@ -5351,6 +5440,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_agents_list_filter(content);
         return Some(format_agents_gateway(filter));
     }
+    if looks_like_skills_request(content) {
+        return Some(format_skills_gateway());
+    }
     if looks_like_sessions_request(content) {
         let filter = parse_sessions_list_filter(content);
         return Some(format_sessions_gateway(filter));
@@ -5449,6 +5541,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
+• `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
@@ -5609,6 +5702,26 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "agents off")
         && !q.contains("why")
         && !q.contains("create")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/skills` catalog operator asks (v0.1.731).
+    if (q.contains("/skills")
+        || q == "skills"
+        || q.contains("list skills")
+        || q.contains("skills catalog")
+        || q.contains("skill catalog")
+        || q.contains("installed skills")
+        || q.contains("available skills")
+        || q == "skill list"
+        || q == "skills list")
+        && !q.contains("skill:")
+        && !q.contains("skill=")
+        && !q.contains("why")
+        && !q.contains("create")
+        && !q.contains("run skill")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -7641,6 +7754,13 @@ mod tests {
         assert!(lite.to_lowercase().contains("lite runs"));
         let agents = try_operator_instant_reply("/agents").expect("agents");
         assert!(agents.to_lowercase().contains("agents"));
+        let skills = try_operator_instant_reply("/skills").expect("skills");
+        assert!(skills.to_lowercase().contains("skill"), "{skills}");
+        assert!(try_operator_instant_reply("list skills").is_some());
+        assert!(try_operator_instant_reply("skills catalog").is_some());
+        assert!(try_operator_instant_reply("SKILL: summarize").is_none());
+        assert!(try_operator_instant_reply("skill: 2").is_none());
+        assert!(try_operator_instant_reply("create a skill").is_none());
         let sessions = try_operator_instant_reply("/sessions").expect("sessions");
         assert!(sessions.to_lowercase().contains("sessions"));
         let knowledge = try_operator_instant_reply("/knowledge").expect("knowledge");
@@ -7784,6 +7904,25 @@ mod tests {
         assert_eq!(
             parse_agents_list_filter("disabled agents"),
             AgentsListFilter::Off
+        );
+    }
+
+    #[test]
+    fn skills_request_detected() {
+        assert!(looks_like_skills_request("/skills"));
+        assert!(looks_like_skills_request("list skills"));
+        assert!(looks_like_skills_request("skills catalog"));
+        assert!(looks_like_skills_request("installed skills"));
+        assert!(looks_like_skills_request("@Werner skills"));
+        assert!(!looks_like_skills_request("SKILL: summarize"));
+        assert!(!looks_like_skills_request("skill: 2"));
+        assert!(!looks_like_skills_request("create a skill"));
+        assert!(!looks_like_skills_request("run skill code"));
+        assert!(!looks_like_skills_request("why are skills empty"));
+        let skills_report = format_skills_gateway();
+        assert!(
+            skills_report.contains("**Skills**"),
+            "{skills_report}"
         );
     }
 
@@ -8840,6 +8979,7 @@ mod tests {
         assert!(report.contains("/lite"), "{report}");
         assert!(report.contains("/direct"), "{report}");
         assert!(report.contains("/agents"), "{report}");
+        assert!(report.contains("/skills"), "{report}");
         assert!(report.contains("/sessions"), "{report}");
         assert!(report.contains("/knowledge"), "{report}");
         assert!(report.contains("/monitors"), "{report}");
