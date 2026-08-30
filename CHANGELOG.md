@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`/downloads` · `/organizer` instant operator** — Downloads organizer On/Off chip (interval · dry-run · path · last run; config only, does not run; Discord + AI Chat; does not steal `/disk` Disk Cleanup, `BROWSER_DOWNLOAD`, or organize-now asks).
 
+### Fixed
+- **Perplexity Ready chip** — `perplexity search status` / `… key` / `… ready` no longer miss the Ready lane (over-broad `perplexity search ` reject).
+
 ## [0.1.740] - 2026-08-30
 
 ### Added
