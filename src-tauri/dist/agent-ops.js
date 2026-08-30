@@ -1939,6 +1939,114 @@ function preferOpsRunsLaneFromOverview() {
     setOpsRunsLaneFilter(instantN > 0 ? 'instant' : 'all');
 }
 
+/**
+ * Runs Fail/Slow attention glance under refresh (AI Chat Errors / Debug Log parity).
+ * Visible on every Agent Ops tab when recent runs have Fail or Slow hits.
+ */
+function ensureOpsRunsAttentionGlance() {
+    ensureOpsRefreshRowPlacement();
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor = refresh || health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-runs-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-runs-attention-glance';
+        glance.className = 'ops-runs-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-runs-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsRunsAttentionGlanceClick(glance);
+    }
+    return glance;
+}
+
+function countOpsRunsAttention() {
+    const recent = Array.isArray(opsRunsInsightsCache?.recent)
+        ? opsRunsInsightsCache.recent
+        : [];
+    return {
+        failN: recent.filter((r) => runsRowIsFail(r)).length,
+        slowN: recent.filter((r) => runsRowIsSlow(r)).length,
+    };
+}
+
+function applyOpsRunsAttentionGlanceState() {
+    const glance = ensureOpsRunsAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-runs-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-fail', 'has-slow');
+        return;
+    }
+    const { failN, slowN } = countOpsRunsAttention();
+    if (failN <= 0 && slowN <= 0) {
+        glance.hidden = true;
+        glance.classList.remove('has-fail', 'has-slow');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-fail', failN > 0);
+    glance.classList.toggle('has-slow', failN <= 0 && slowN > 0);
+    const parts = [];
+    if (failN > 0) {
+        parts.push(failN === 1 ? '1 failed' : `${failN} failed`);
+    }
+    if (slowN > 0) {
+        parts.push(slowN === 1 ? '1 slow' : `${slowN} slow`);
+    }
+    const label = parts.join(' · ');
+    if (text) text.textContent = `Runs · ${label}`;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    const filterHint = failN > 0 ? 'Fail' : 'Slow';
+    glance.title = `Open Runs · ${filterHint} filter`;
+    glance.setAttribute(
+        'aria-label',
+        `Agent Ops has ${label} — click to open Runs ${filterHint} filter`
+    );
+}
+
+function activateOpsRunsAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    preferOpsRunsLaneFromOverview();
+    selectOpsTab('runs');
+    const list = document.getElementById('ops-runs-list');
+    const first =
+        list?.querySelector('.ops-row.is-fail') ||
+        list?.querySelector('.ops-row.is-slow') ||
+        list?.querySelector('.ops-row');
+    if (first && typeof first.scrollIntoView === 'function') {
+        first.scrollIntoView({ block: 'nearest' });
+        if (typeof first.focus === 'function') first.focus();
+    } else {
+        const chip =
+            document.querySelector(
+                `#ops-runs-lane-chips [data-ops-runs-lane="${opsRunsLaneFilter}"]`
+            ) || document.getElementById('ops-runs-lane-chips');
+        chip?.focus?.();
+    }
+}
+
+function wireOpsRunsAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsRunsAttentionWired === '1') return;
+    glance.dataset.opsRunsAttentionWired = '1';
+    const activate = () => activateOpsRunsAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -6907,6 +7015,7 @@ function renderOpsRuns(insights) {
         }
         paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
         ensureOpsRunsLaneChips();
+        applyOpsRunsAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7036,6 +7145,7 @@ function renderOpsRuns(insights) {
         showOpsRunPreview('');
     }
     ensureOpsInsightsToolbarKeyboard();
+    applyOpsRunsAttentionGlanceState();
 }
 
 function escapeHtml(s) {

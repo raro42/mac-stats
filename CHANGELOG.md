@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.746] - 2026-08-30
+
+### Added
+- **Agent Ops Runs Fail/Slow glance** — when recent runs include Fail (`ok=false`) or Slow (≥2000 ms), a **Runs · N failed · M slow** strip appears under Refresh (AI Chat Errors / Debug Log parity). Red wash for Fail, amber for Slow-only. Click or Enter opens the Runs tab with Fail (prefer) or Slow filter and focuses the first matching row.
+
 ## [0.1.745] - 2026-08-30
 
 ### Added

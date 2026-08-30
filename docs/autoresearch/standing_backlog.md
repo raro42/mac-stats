@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.746** — Agent Ops Runs Fail/Slow glance (attention strip under Refresh; click → Runs Fail/Slow filter; design review / `feature-agent-ops`).
+
 - **v0.1.745** — AI Chat Errors glance (failed-turn strip + Last error wash; click → Errors filter; design review / `feature-ai-chat`).
 
 - **v0.1.744** — `/voice` · `/stt` instant — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; config only, no transcribe; Discord + AI Chat; does not steal voice-note / send-voice / enable-disable).

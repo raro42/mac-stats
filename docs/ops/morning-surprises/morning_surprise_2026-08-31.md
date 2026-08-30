@@ -1,26 +1,22 @@
 # Morning surprise — 2026-08-31
 
-Overnight Track B kept shipping: Ready chips early, then an AI Chat design-review polish.
+Overnight Track B (mac-stats autoresearch). Digester open stayed empty; design review under grace — still shipped visible polish.
 
-## Shipped tonight (so far)
+## Shipped
 
 | Version | What |
-| --- | --- |
-| **v0.1.745** | **AI Chat Errors glance** — red **Errors · N failed turns** strip when the transcript has `Error: …` replies (Debug Log error/warn parity). Click opens the Errors filter. Last-answer glance shows **Last error · …** with the same wash (opens Errors instead of copying). Design review / `feature-ai-chat` (screenshot recapture deferred — no on-screen CPU window). |
-| **v0.1.744** | **`/voice` · `/stt` instant** — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; config only; Discord + AI Chat; does not steal voice-note / send-voice / enable-disable) |
-| **v0.1.743** | **`/having_fun` · `/fun` · `/idle` instant** — Having fun / idle thoughts On/Off (channel count · idle · reply delays from `discord_channels.json`; config only; Discord + AI Chat; does not steal send/post / enable-disable) |
-| **v0.1.742** | **`/ori` · `/mnemos` instant** — Ori Mnemos lifecycle Ready / Off / Partial (vault · orient · prefetch · capture · binary; config/env only; Discord + AI Chat; does not steal MCP `ori_*` / MEMORY_APPEND / scrub) |
-| **v0.1.741** | **`/downloads` · `/organizer` instant** — Downloads organizer On/Off (interval · dry-run · path · last run; config only; Discord + AI Chat; Perplexity Ready `perplexity search status` reject fixed) |
-| **v0.1.740** | **`/compact` · `/menu-bar` · `/cpu-window` instant** — Compact Menu bar / CPU window On/Off (`menuBarCompact` · `cpuWindowCompact`; config only; Discord + AI Chat) |
+|---------|------|
+| **v0.1.746** | **Agent Ops Runs Fail/Slow glance** — attention strip under Refresh when recent runs Fail or Slow (≥2000 ms); click opens Runs Fail (prefer) or Slow filter (AI Chat Errors parity; `feature-agent-ops`). |
+| **v0.1.745** | **AI Chat Errors glance** — failed-turn strip + Last error wash; click → Errors filter (`feature-ai-chat`). |
+| **v0.1.744** | **`/voice` · `/stt` instant** — Discord voice STT Ready / Partial / Not set (config only). |
+| **v0.1.743** | **`/having_fun` · `/fun` · `/idle` instant** — idle-thoughts On/Off chip. |
 
-## Fuel / gate
+## Tried / notes
 
-- Digester **open** stayed empty; design review **due=false** (grace; `feature-ai-chat` still recommended).
-- Fuel = standing backlog **design-review polish** after Ready chips through `/voice`.
-- Latest keep: **v0.1.745** @ f967bd38.
+- Digester: no open Slowest / candidates this window.
+- Screenshot recapture for stale feature screens deferred (TCC / CPU window not captured this tick).
+- Idle-thought Discord send timeouts still rate-limited in `debug.log` — retry from v0.1.703; `/having_fun` for config glance.
 
-## Next for Ralf
+## Fitness
 
-- Recapture `feature-ai-chat.png` when the CPU window is on-screen (Problem Reporter was open during this tick).
-- Watch idle-thought Discord timeout WARNs (retry from v0.1.703); `/having_fun` shows idle/reply windows without Ollama.
-- Digester open / more tool-heavy patterns when they appear.
+Operators see Fail/Slow attention without opening the Runs tab first — same glance pattern as AI Chat Errors and Debug Log.
