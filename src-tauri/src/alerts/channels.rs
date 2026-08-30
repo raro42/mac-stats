@@ -9,7 +9,6 @@ pub trait AlertChannel: Send + Sync {
     fn send(&mut self, message: &str, context: &AlertContext) -> Result<()>;
     #[allow(dead_code)] // Part of trait API, may be used in future
     fn get_id(&self) -> &str;
-    #[allow(dead_code)] // Part of trait API, may be used in future
     fn get_name(&self) -> &str;
 }
 

@@ -96,6 +96,30 @@ pub fn list_alert_channels() -> Result<Vec<String>, String> {
         .list_channel_ids())
 }
 
+/// Count registered alert channels by display name (Telegram / Slack / Signal / Mastodon).
+pub fn count_registered_alert_channels(name: &str) -> usize {
+    get_alert_manager()
+        .lock()
+        .map(|m| m.count_channels_named(name))
+        .unwrap_or(0)
+}
+
+/// Count Keychain accounts with a given prefix that still resolve (config cue; no live send).
+pub fn count_alert_keychain_prefix(prefix: &str) -> usize {
+    crate::security::list_credentials()
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|a| a.starts_with(prefix))
+        .filter(|a| {
+            crate::security::get_credential(a)
+                .ok()
+                .flatten()
+                .map(|v| !v.trim().is_empty())
+                .unwrap_or(false)
+        })
+        .count()
+}
+
 /// Run alert evaluation in the background. Builds context from current metrics and monitor
 /// statuses, then evaluates all alerts. Called periodically from a background thread so
 /// SiteDown, BatteryLow, TemperatureHigh, CpuHigh etc. can fire without user action.

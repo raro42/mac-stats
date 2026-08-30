@@ -111,6 +111,14 @@ impl AlertManager {
         self.channels.keys().cloned().collect()
     }
 
+    /// Count registered channels whose `get_name()` matches (Telegram / Slack / Signal / Mastodon).
+    pub fn count_channels_named(&self, name: &str) -> usize {
+        self.channels
+            .values()
+            .filter(|c| c.get_name() == name)
+            .count()
+    }
+
     /// Evaluate all alerts against context.
     /// For rules with a `duration_secs` requirement (TemperatureHigh, CpuHigh), the condition
     /// must be true for at least that many consecutive seconds before the alert fires.

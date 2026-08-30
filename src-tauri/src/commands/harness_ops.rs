@@ -4983,6 +4983,272 @@ pub fn format_cursor_agent_ready_chip() -> String {
     }
 }
 
+fn alert_ready_reject_noise(n: &str) -> bool {
+    n.contains("send ")
+        || n.contains("post ")
+        || n.starts_with("post ")
+        || n.contains("message ")
+        || n.contains("notify ")
+        || n.contains("alert me")
+        || n.contains("fire ")
+        || n.contains("trigger")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("register")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+}
+
+/// True for focused Telegram alert Ready/config asks (`/telegram`) — not send/post.
+pub fn looks_like_telegram_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 || alert_ready_reject_noise(&n) {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/telegram"
+            | "telegram"
+            | "telegram status"
+            | "telegram ready"
+            | "telegram offline"
+            | "telegram configured"
+            | "telegram health"
+            | "telegram key"
+            | "telegram token"
+            | "telegram bot"
+            | "telegram alert"
+            | "telegram alerts"
+            | "show telegram"
+            | "is telegram ready"
+            | "is telegram online"
+            | "is telegram connected"
+            | "is telegram offline"
+            | "is telegram configured"
+            | "is telegram set up"
+            | "is telegram setup"
+            | "telegram connection"
+            | "how's telegram"
+            | "hows telegram"
+            | "how's the telegram"
+            | "hows the telegram"
+            | "telegram bot status"
+            | "telegram bot ready"
+            | "is telegram bot ready"
+            | "is telegram bot configured"
+            | "how's telegram bot"
+            | "hows telegram bot"
+    )
+}
+
+/// Zero-LLM Telegram alert Ready / Not set / Partial chip (config only; no live send).
+pub fn format_telegram_ready_chip() -> String {
+    let registered =
+        crate::commands::alerts::count_registered_alert_channels("Telegram");
+    let tokens = crate::commands::alerts::count_alert_keychain_prefix("telegram_bot_");
+    match (registered > 0, tokens > 0) {
+        (false, false) => {
+            "**Telegram** · Not set · register alert channel + Keychain bot token".to_string()
+        }
+        (true, false) => {
+            format!(
+                "**Telegram** · Partial · {registered} channel(s) · missing bot token"
+            )
+        }
+        (false, true) => {
+            format!("**Telegram** · Partial · {tokens} token(s) · register channel")
+        }
+        (true, true) => {
+            format!("**Telegram** · Ready · {registered} channel(s) · token set")
+        }
+    }
+}
+
+/// True for focused Slack alert Ready/config asks (`/slack`) — not post/notify.
+pub fn looks_like_slack_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 || alert_ready_reject_noise(&n) {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/slack"
+            | "slack"
+            | "slack status"
+            | "slack ready"
+            | "slack offline"
+            | "slack configured"
+            | "slack health"
+            | "slack key"
+            | "slack token"
+            | "slack webhook"
+            | "slack alert"
+            | "slack alerts"
+            | "show slack"
+            | "is slack ready"
+            | "is slack online"
+            | "is slack connected"
+            | "is slack offline"
+            | "is slack configured"
+            | "is slack set up"
+            | "is slack setup"
+            | "slack connection"
+            | "how's slack"
+            | "hows slack"
+            | "how's the slack"
+            | "hows the slack"
+            | "slack webhook status"
+            | "slack webhook ready"
+            | "is slack webhook ready"
+            | "is slack webhook configured"
+            | "how's slack webhook"
+            | "hows slack webhook"
+    )
+}
+
+/// Zero-LLM Slack alert Ready / Not set / Partial chip (config only; no live send).
+pub fn format_slack_ready_chip() -> String {
+    let registered = crate::commands::alerts::count_registered_alert_channels("Slack");
+    let hooks = crate::commands::alerts::count_alert_keychain_prefix("slack_webhook_");
+    match (registered > 0, hooks > 0) {
+        (false, false) => {
+            "**Slack** · Not set · register alert channel + Keychain webhook".to_string()
+        }
+        (true, false) => {
+            format!("**Slack** · Partial · {registered} channel(s) · missing webhook")
+        }
+        (false, true) => {
+            format!("**Slack** · Partial · {hooks} webhook(s) · register channel")
+        }
+        (true, true) => {
+            format!("**Slack** · Ready · {registered} channel(s) · webhook set")
+        }
+    }
+}
+
+/// True for focused Signal alert Ready/config asks (`/signal`) — not send.
+pub fn looks_like_signal_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 || alert_ready_reject_noise(&n) {
+        return false;
+    }
+    // OS signal / SIGTERM confusion stays with agent.
+    if n.contains("sigterm")
+        || n.contains("sigint")
+        || n.contains("sighup")
+        || n.contains("kill ")
+        || n.contains("process signal")
+        || n == "signal handler"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/signal"
+            | "signal"
+            | "signal status"
+            | "signal ready"
+            | "signal offline"
+            | "signal configured"
+            | "signal health"
+            | "signal key"
+            | "signal token"
+            | "signal alert"
+            | "signal alerts"
+            | "show signal"
+            | "is signal ready"
+            | "is signal online"
+            | "is signal connected"
+            | "is signal offline"
+            | "is signal configured"
+            | "is signal set up"
+            | "is signal setup"
+            | "signal connection"
+            | "how's signal"
+            | "hows signal"
+            | "how's the signal"
+            | "hows the signal"
+            | "signal app"
+            | "signal app status"
+            | "is signal app ready"
+            | "how's signal app"
+            | "hows signal app"
+    )
+}
+
+/// Zero-LLM Signal alert chip (placeholder channel; config only; no live send).
+pub fn format_signal_ready_chip() -> String {
+    let registered = crate::commands::alerts::count_registered_alert_channels("Signal");
+    if registered > 0 {
+        format!(
+            "**Signal** · Partial · {registered} channel(s) · REST API not wired yet"
+        )
+    } else {
+        "**Signal** · Not set · Signal REST API not wired yet".to_string()
+    }
+}
+
+/// True for focused alert-channels summary asks (`/alerts`) — not fire/create rules.
+pub fn looks_like_alerts_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 || alert_ready_reject_noise(&n) {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/alerts"
+            | "alerts"
+            | "alert channels"
+            | "alert channel"
+            | "alerts status"
+            | "alert status"
+            | "alerts ready"
+            | "alerts configured"
+            | "alerts health"
+            | "show alerts"
+            | "show alert channels"
+            | "list alerts"
+            | "list alert channels"
+            | "is alerts ready"
+            | "is alerts configured"
+            | "is alerts set up"
+            | "is alerts setup"
+            | "are alerts ready"
+            | "are alerts configured"
+            | "are alert channels ready"
+            | "are alert channels configured"
+            | "how's alerts"
+            | "hows alerts"
+            | "how's the alerts"
+            | "hows the alerts"
+            | "alert channels status"
+            | "alert channels ready"
+    )
+}
+
+/// Zero-LLM alert-channels summary (Telegram · Slack · Signal; config only).
+pub fn format_alerts_ready_chip() -> String {
+    let tg = format_telegram_ready_chip()
+        .trim_start_matches("**Telegram** · ")
+        .to_string();
+    let sl = format_slack_ready_chip()
+        .trim_start_matches("**Slack** · ")
+        .to_string();
+    let sg = format_signal_ready_chip()
+        .trim_start_matches("**Signal** · ")
+        .to_string();
+    format!("**Alerts** · Telegram {tg} · Slack {sl} · Signal {sg}")
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -5043,6 +5309,18 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_cursor_agent_ready_request(content) {
         return Some(format_cursor_agent_ready_chip());
+    }
+    if looks_like_telegram_ready_request(content) {
+        return Some(format_telegram_ready_chip());
+    }
+    if looks_like_slack_ready_request(content) {
+        return Some(format_slack_ready_chip());
+    }
+    if looks_like_signal_ready_request(content) {
+        return Some(format_signal_ready_chip());
+    }
+    if looks_like_alerts_ready_request(content) {
+        return Some(format_alerts_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -5165,6 +5443,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
+• `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5970,6 +6249,64 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("implement")
         && !q.contains("refactor")
         && !q.contains("commit")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
+    // `/telegram` · `/slack` · `/signal` · `/alerts` Ready chips (v0.1.730).
+    if (q.contains("/telegram")
+        || q == "telegram"
+        || q.contains("telegram status")
+        || q.contains("telegram ready")
+        || q.contains("telegram configured")
+        || q.contains("telegram health")
+        || q.contains("telegram bot")
+        || q.contains("telegram alert")
+        || q.contains("is telegram ready")
+        || q.contains("is telegram configured")
+        || q == "how's telegram"
+        || q == "hows telegram"
+        || q.contains("/slack")
+        || q == "slack"
+        || q.contains("slack status")
+        || q.contains("slack ready")
+        || q.contains("slack configured")
+        || q.contains("slack health")
+        || q.contains("slack webhook")
+        || q.contains("slack alert")
+        || q.contains("is slack ready")
+        || q.contains("is slack configured")
+        || q == "how's slack"
+        || q == "hows slack"
+        || q.contains("/signal")
+        || q == "signal"
+        || q.contains("signal status")
+        || q.contains("signal ready")
+        || q.contains("signal configured")
+        || q.contains("signal health")
+        || q.contains("signal alert")
+        || q.contains("is signal ready")
+        || q.contains("is signal configured")
+        || q == "how's signal"
+        || q == "hows signal"
+        || q.contains("/alerts")
+        || q == "alerts"
+        || q.contains("alert channels")
+        || q.contains("alerts status")
+        || q.contains("alert status")
+        || q.contains("are alerts ready")
+        || q.contains("are alert channels ready")
+        || q == "how's alerts"
+        || q == "hows alerts")
+        && !q.contains("send ")
+        && !q.contains("post ")
+        && !q.contains("message ")
+        && !q.contains("notify ")
+        && !q.contains("trigger")
+        && !q.contains("sigterm")
+        && !q.contains("sigint")
         && !q.contains("why")
         && !q.contains("how to")
         && !q.chars().any(|c| c.is_ascii_digit())
@@ -7270,6 +7607,26 @@ mod tests {
         assert!(try_operator_instant_reply("how's cursor-agent").is_some());
         assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
         assert!(try_operator_instant_reply("ask cursor to refactor auth").is_none());
+        let telegram = try_operator_instant_reply("/telegram").expect("telegram");
+        assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
+        assert!(try_operator_instant_reply("is telegram ready").is_some());
+        assert!(try_operator_instant_reply("how's telegram").is_some());
+        assert!(try_operator_instant_reply("send telegram hello").is_none());
+        let slack = try_operator_instant_reply("/slack").expect("slack");
+        assert!(slack.to_lowercase().contains("slack"), "{slack}");
+        assert!(try_operator_instant_reply("is slack ready").is_some());
+        assert!(try_operator_instant_reply("how's slack").is_some());
+        assert!(try_operator_instant_reply("post to slack").is_none());
+        let signal = try_operator_instant_reply("/signal").expect("signal");
+        assert!(signal.to_lowercase().contains("signal"), "{signal}");
+        assert!(try_operator_instant_reply("is signal ready").is_some());
+        assert!(try_operator_instant_reply("how's signal").is_some());
+        assert!(try_operator_instant_reply("send signal message").is_none());
+        let alerts = try_operator_instant_reply("/alerts").expect("alerts");
+        assert!(alerts.to_lowercase().contains("alert"), "{alerts}");
+        assert!(try_operator_instant_reply("alert channels").is_some());
+        assert!(try_operator_instant_reply("are alerts ready").is_some());
+        assert!(try_operator_instant_reply("trigger an alert").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -8377,6 +8734,64 @@ mod tests {
     }
 
     #[test]
+    fn telegram_ready_request_detected() {
+        assert!(looks_like_telegram_ready_request("/telegram"));
+        assert!(looks_like_telegram_ready_request("telegram"));
+        assert!(looks_like_telegram_ready_request("telegram status"));
+        assert!(looks_like_telegram_ready_request("is telegram ready"));
+        assert!(looks_like_telegram_ready_request("how's telegram"));
+        assert!(looks_like_telegram_ready_request("telegram bot status"));
+        assert!(!looks_like_telegram_ready_request("send telegram hello"));
+        assert!(!looks_like_telegram_ready_request("how to use telegram"));
+        let chip = format_telegram_ready_chip();
+        assert!(chip.to_lowercase().contains("telegram"), "{chip}");
+    }
+
+    #[test]
+    fn slack_ready_request_detected() {
+        assert!(looks_like_slack_ready_request("/slack"));
+        assert!(looks_like_slack_ready_request("slack"));
+        assert!(looks_like_slack_ready_request("slack status"));
+        assert!(looks_like_slack_ready_request("is slack ready"));
+        assert!(looks_like_slack_ready_request("how's slack"));
+        assert!(looks_like_slack_ready_request("slack webhook status"));
+        assert!(!looks_like_slack_ready_request("post to slack"));
+        assert!(!looks_like_slack_ready_request("how to use slack"));
+        let chip = format_slack_ready_chip();
+        assert!(chip.to_lowercase().contains("slack"), "{chip}");
+    }
+
+    #[test]
+    fn signal_ready_request_detected() {
+        assert!(looks_like_signal_ready_request("/signal"));
+        assert!(looks_like_signal_ready_request("signal"));
+        assert!(looks_like_signal_ready_request("signal status"));
+        assert!(looks_like_signal_ready_request("is signal ready"));
+        assert!(looks_like_signal_ready_request("how's signal"));
+        assert!(!looks_like_signal_ready_request("send signal message"));
+        assert!(!looks_like_signal_ready_request("sigterm"));
+        assert!(!looks_like_signal_ready_request("how to use signal"));
+        let chip = format_signal_ready_chip();
+        assert!(chip.to_lowercase().contains("signal"), "{chip}");
+    }
+
+    #[test]
+    fn alerts_ready_request_detected() {
+        assert!(looks_like_alerts_ready_request("/alerts"));
+        assert!(looks_like_alerts_ready_request("alerts"));
+        assert!(looks_like_alerts_ready_request("alert channels"));
+        assert!(looks_like_alerts_ready_request("are alerts ready"));
+        assert!(looks_like_alerts_ready_request("how's alerts"));
+        assert!(!looks_like_alerts_ready_request("trigger an alert"));
+        assert!(!looks_like_alerts_ready_request("create alert"));
+        let chip = format_alerts_ready_chip();
+        assert!(chip.to_lowercase().contains("alert"), "{chip}");
+        assert!(chip.to_lowercase().contains("telegram"), "{chip}");
+        assert!(chip.to_lowercase().contains("slack"), "{chip}");
+        assert!(chip.to_lowercase().contains("signal"), "{chip}");
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -8412,6 +8827,10 @@ mod tests {
         assert!(report.contains("/mcp"), "{report}");
         assert!(report.contains("/cursor"), "{report}");
         assert!(report.contains("/cursor-agent"), "{report}");
+        assert!(report.contains("/telegram"), "{report}");
+        assert!(report.contains("/slack"), "{report}");
+        assert!(report.contains("/signal"), "{report}");
+        assert!(report.contains("/alerts"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

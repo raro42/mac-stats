@@ -2494,6 +2494,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // Catch remaining operator instant chips (e.g. /redmine · /brave · /cursor · /telegram · /slack · /signal · /alerts)
+    // that AI Chat already serves via try_operator_instant_reply — Discord parity without duplicating every handler.
+    if let Some(report) = crate::commands::harness_ops::try_operator_instant_reply(&content) {
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send operator instant reply: {}", e);
+        }
+        return;
+    }
+
     let session_key = format!("discord:{}", channel_id_u64);
     crate::keyed_queue::run_serial(
         session_key,

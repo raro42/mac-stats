@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.730] - 2026-08-30
+
+### Added
+- **`/telegram` · `/slack` · `/signal` · `/alerts` instant operators** — Ready / Not set / Partial chips for alert channels (Keychain + in-memory registry; config only, no live send; Discord + AI Chat). Signal stays honest that the REST API is not wired. Does not steal send/post/notify asks. Discord also catches other Ready chips that were AI-Chat-only (`/redmine` · `/brave` · `/cursor`).
+
 ## [0.1.729] - 2026-08-30
 
 ### Added
