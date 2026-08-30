@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.742** — `/ori` · `/mnemos` instant — Ori Mnemos lifecycle Ready / Off / Partial (vault · orient · prefetch · capture · binary; config/env only, no subprocess; Discord + AI Chat; does not steal MCP `ori_*` / MEMORY_APPEND / scrub).
+
 - **v0.1.741** — `/downloads` · `/organizer` instant — Downloads organizer On/Off (interval · dry-run · path · last run; config only, no run-now; Discord + AI Chat; does not steal `/disk` / BROWSER_DOWNLOAD / organize-now). Perplexity Ready `perplexity search status` reject fixed.
 
 - **v0.1.740** — `/compact` · `/menu-bar` · `/cpu-window` instant — Compact Menu bar / CPU window On/Off (`menuBarCompact` · `cpuWindowCompact`; config only, no toggle; Discord + AI Chat; does not steal compaction / enable-disable).
