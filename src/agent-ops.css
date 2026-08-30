@@ -3232,6 +3232,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
 }
 
+.ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
 .ollama-collapsed-glance.is-empty {
   font-weight: 450;
   opacity: 0.85;
@@ -3437,9 +3443,59 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
 }
 
+.chat-answer-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
 .chat-answer-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 40%, transparent);
   background: color-mix(in srgb, #34c759 10%, transparent);
+}
+
+/* AI Chat — Errors glance (Debug Log error/warn parity; failed turns) */
+.chat-errors-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.chat-errors-glance[hidden] {
+  display: none !important;
+}
+
+.chat-errors-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.chat-errors-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.chat-errors-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
 /* AI Chat — All · You · Assistant (Monitors All/Up/Down parity) */

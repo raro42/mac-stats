@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.745** — AI Chat Errors glance (failed-turn strip + Last error wash; click → Errors filter; design review / `feature-ai-chat`).
+
 - **v0.1.744** — `/voice` · `/stt` instant — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; config only, no transcribe; Discord + AI Chat; does not steal voice-note / send-voice / enable-disable).
 
 - **v0.1.743** — `/having_fun` · `/fun` · `/idle` instant — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only, no send; Discord + AI Chat; does not steal send/post / enable-disable).

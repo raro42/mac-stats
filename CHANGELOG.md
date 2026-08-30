@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.745] - 2026-08-30
+
+### Added
+- **AI Chat Errors glance** — when the transcript has failed turns (`Error: …`), a red **Errors · N failed turns** strip appears under the header (Debug Log error/warn parity). Click or Enter opens the Errors filter and scrolls to the first failure. Last-answer glance shows **Last error · …** with the same wash and opens Errors instead of copying.
+
 ## [0.1.744] - 2026-08-30
 
 ### Added

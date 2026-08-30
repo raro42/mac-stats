@@ -655,6 +655,7 @@ function applyChatListFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensureChatFilterMissState(container, false);
+    applyChatErrorsGlanceState();
     return;
   }
 
@@ -684,6 +685,7 @@ function applyChatListFilter() {
   } else {
     ensureChatMessagesKbHint(container, false);
   }
+  applyChatErrorsGlanceState();
 }
 
 function getChatClearButton() {
@@ -790,20 +792,24 @@ function syncOllamaCollapsedGlance() {
     applyChatModelGlanceState();
     applyChatTurnGlanceState();
     applyChatAnswerGlanceState();
+    applyChatErrorsGlanceState();
     return;
   }
-  // One strip while collapsed — hide the expanded model/turn/answer glances.
+  // One strip while collapsed — hide the expanded model/turn/answer/errors glances.
   const model = document.getElementById('chat-model-glance');
   const turn = document.getElementById('chat-turn-glance');
   const answer = document.getElementById('chat-answer-glance');
+  const errors = document.getElementById('chat-errors-glance');
   if (model) model.hidden = true;
   if (turn) turn.hidden = true;
   if (answer) answer.hidden = true;
+  if (errors) errors.hidden = true;
 
   glance.hidden = false;
   const status = chatModelGlanceState.status || 'unknown';
   const modelName = getChatModelGlanceLabel();
   const turns = countChatTurns();
+  const errCount = countChatErrors();
   const preview = getChatTurnGlancePreview();
   let line = 'AI Chat';
   let wash = 'is-empty';
@@ -813,6 +819,14 @@ function syncOllamaCollapsedGlance() {
   } else if (status === 'unknown') {
     line = 'Not set · configure URL';
     wash = 'is-offline';
+  } else if (errCount > 0) {
+    const errLabel = errCount === 1 ? '1 failed' : `${errCount} failed`;
+    if (turns && preview) {
+      line = `${errLabel} · ${preview}`;
+    } else {
+      line = `Errors · ${errLabel}`;
+    }
+    wash = 'has-errors';
   } else if (turns && preview) {
     const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
     line = `${turnLabel} · ${preview}`;
@@ -828,6 +842,7 @@ function syncOllamaCollapsedGlance() {
   glance.classList.toggle('is-online', wash === 'is-online');
   glance.classList.toggle('is-offline', wash === 'is-offline');
   glance.classList.toggle('is-active', wash === 'is-active');
+  glance.classList.toggle('has-errors', wash === 'has-errors');
   glance.classList.toggle('is-empty', wash === 'is-empty');
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
@@ -837,6 +852,12 @@ function syncOllamaCollapsedGlance() {
     glance.setAttribute(
       'aria-label',
       `${line} — click to configure · ↑ AI Chat icon · ↓ footer`
+    );
+  } else if (wash === 'has-errors') {
+    glance.title = `Show AI Chat Errors filter · ${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand and show Errors · ↑ AI Chat icon · ↓ footer`
     );
   } else if (turns && preview) {
     glance.title = `Show AI Chat and focus composer · ${chainHint}`;
@@ -855,13 +876,26 @@ function syncOllamaCollapsedGlance() {
 
 function activateOllamaCollapsedGlance() {
   const status = chatModelGlanceState.status || 'unknown';
+  const errCount = countChatErrors();
   ensureOllamaSectionExpanded();
   syncOllamaCollapsedGlance();
   applyChatModelGlanceState();
   applyChatTurnGlanceState();
   applyChatAnswerGlanceState();
+  applyChatErrorsGlanceState();
   if (status !== 'connected') {
     showOllamaUrlDialog();
+    return;
+  }
+  if (errCount > 0) {
+    setChatFilterMode('errors');
+    const firstErr = document.querySelector(
+      '#chat-messages .chat-message.assistant.is-error'
+    );
+    if (firstErr && typeof firstErr.scrollIntoView === 'function') {
+      firstErr.scrollIntoView({ block: 'nearest' });
+      if (typeof firstErr.focus === 'function') firstErr.focus();
+    }
     return;
   }
   const container = document.getElementById('chat-messages');
@@ -1024,6 +1058,18 @@ function countChatTurns() {
     turns = document.querySelectorAll('#chat-messages .chat-message.user').length;
   }
   return turns;
+}
+
+/** Count failed assistant turns (Error: …) for the Errors glance / filter chip. */
+function countChatErrors() {
+  const nodes = document.querySelectorAll(
+    '#chat-messages .chat-message.assistant:not(.thinking)'
+  );
+  let n = 0;
+  nodes.forEach((el) => {
+    if (syncChatMessageErrorClass(el)) n++;
+  });
+  return n;
 }
 
 /** Turn glance under AI Chat header — scroll to latest + focus composer. */
@@ -1482,16 +1528,25 @@ function applyChatAnswerGlanceState() {
   const preview = getChatAnswerGlancePreview();
   if (!answer || !preview || chatSendInFlight) {
     glance.hidden = true;
-    glance.classList.remove('has-answer');
+    glance.classList.remove('has-answer', 'has-errors');
     return;
   }
+  const isErr = isChatErrorText(answer);
   glance.hidden = false;
-  glance.classList.add('has-answer');
-  if (text) text.textContent = `Last answer · ${preview}`;
+  glance.classList.toggle('has-answer', !isErr);
+  glance.classList.toggle('has-errors', isErr);
+  if (text) {
+    text.textContent = isErr ? `Last error · ${preview}` : `Last answer · ${preview}`;
+  }
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
-  glance.title = 'Copy last answer';
-  glance.setAttribute('aria-label', `Copy last answer: ${preview}`);
+  if (isErr) {
+    glance.title = 'Show failed turns (Errors filter)';
+    glance.setAttribute('aria-label', `Last error: ${preview} — click to show Errors`);
+  } else {
+    glance.title = 'Copy last answer';
+    glance.setAttribute('aria-label', `Copy last answer: ${preview}`);
+  }
 }
 
 function wireChatAnswerGlanceClick(glance) {
@@ -1501,8 +1556,97 @@ function wireChatAnswerGlanceClick(glance) {
     if (chatSendInFlight) return;
     const answer = getLastAssistantAnswerText();
     if (!answer) return;
+    if (isChatErrorText(answer)) {
+      ensureOllamaSectionExpanded();
+      setChatFilterMode('errors');
+      const firstErr = document.querySelector(
+        '#chat-messages .chat-message.assistant.is-error'
+      );
+      if (firstErr && typeof firstErr.scrollIntoView === 'function') {
+        firstErr.scrollIntoView({ block: 'nearest' });
+        firstErr.focus?.();
+      }
+      return;
+    }
     const ok = await copyChatTextToClipboard(answer);
     if (ok) flashChatAnswerGlanceCopied(glance);
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
+/** Errors glance under AI Chat — Debug Log error/warn glance parity (failed turns). */
+function ensureChatErrorsGlance() {
+  const answer = ensureChatAnswerGlance();
+  const turn = ensureChatTurnGlance();
+  const model = ensureChatModelGlance();
+  const header = document.getElementById('ollama-header');
+  const anchor = answer || turn || model || header;
+  if (!anchor) return null;
+  let glance = document.getElementById('chat-errors-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'chat-errors-glance';
+    glance.className = 'chat-errors-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="chat-errors-glance-text"></span>';
+    anchor.insertAdjacentElement('afterend', glance);
+    wireChatErrorsGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyChatErrorsGlanceState() {
+  if (isOllamaSectionCollapsed()) {
+    const glance = document.getElementById('chat-errors-glance');
+    if (glance) glance.hidden = true;
+    syncOllamaCollapsedGlance();
+    return;
+  }
+  const glance = ensureChatErrorsGlance();
+  if (!glance) return;
+  const text = document.getElementById('chat-errors-glance-text');
+  const n = countChatErrors();
+  if (n <= 0) {
+    glance.hidden = true;
+    glance.classList.remove('has-errors');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add('has-errors');
+  const label = n === 1 ? '1 failed turn' : `${n} failed turns`;
+  if (text) text.textContent = `Errors · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = 'Show failed turns only (Errors filter)';
+  glance.setAttribute(
+    'aria-label',
+    `AI Chat has ${label} — click to show Errors filter`
+  );
+}
+
+function wireChatErrorsGlanceClick(glance) {
+  if (!glance || glance.dataset.chatErrorsGlanceWired === '1') return;
+  glance.dataset.chatErrorsGlanceWired = '1';
+  const activate = () => {
+    ensureOllamaSectionExpanded();
+    setChatFilterMode('errors');
+    const firstErr = document.querySelector(
+      '#chat-messages .chat-message.assistant.is-error'
+    );
+    if (firstErr && typeof firstErr.scrollIntoView === 'function') {
+      firstErr.scrollIntoView({ block: 'nearest' });
+      if (typeof firstErr.focus === 'function') firstErr.focus();
+    }
   };
   glance.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1532,6 +1676,7 @@ function updateChatClearButton() {
   applyChatModelGlanceState();
   applyChatTurnGlanceState();
   applyChatAnswerGlanceState();
+  applyChatErrorsGlanceState();
   applyChatListFilter();
   ensureChatComposerToolbarKeyboard();
   refreshChatComposerRovingTabindex();

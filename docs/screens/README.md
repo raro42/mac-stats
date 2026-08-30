@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-30 (~22:45):** AI Chat Errors glance (v0.1.745). Recapture of `feature-ai-chat.png` deferred (no on-screen CPU window / Problem Reporter open); prior Aug 14 asset kept; polish grace marked.
 - **2026-08-28 (~00:10):** AI Chat keep-header (v0.1.685). Recapture of `feature-ai-chat.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-08-27 (~23:35):** Monitors keep-header (v0.1.684). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-08-27 (~23:10):** Agent Ops keep-header + Discord Ready glance toolbar chain (v0.1.683). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 12 asset kept; polish grace marked.
