@@ -21,6 +21,60 @@
 }
 
 /*
+ * One scroll for the CPU window: expand section bodies to full content height.
+ * Themes often pin processes / chat / logs with max-height + overflow, which
+ * makes each pane scroll on its own. Prefer shell scroll instead.
+ * Keep nested scroll on modals, dropdowns, and settings panes.
+ */
+#details-section,
+#processes-section,
+.apple-details,
+.apple-processes,
+.arch-details,
+.arch-processes,
+.swiss-details,
+.swiss-processes,
+.mat-details,
+.mat-processes,
+.cpu-details,
+.cpu-processes,
+.poster-details,
+.poster-processes,
+.details-section,
+.processes-section,
+.monitors-section,
+.logs-section,
+.ollama-section,
+.perplexity-section,
+.disk-cleanup-section,
+.agent-ops-section {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  min-height: auto !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.process-table,
+#process-list,
+.chat-messages,
+.logs-viewer,
+.perplexity-results,
+.agent-ops-panel,
+.ops-preview,
+.disk-cleanup-list,
+.disk-cleanup-scopes,
+.monitors-list,
+.ops-list {
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/*
  * Practically invisible scrollbars (all themes / nested panes).
  * Loads after theme cpu.css — overrides loud WKWebView / theme thumbs.
  * Thumb appears faintly only while the scrolling element is hovered.
@@ -353,11 +407,16 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .mat-processes,
 .cpu-details,
 .cpu-processes,
+.poster-details,
+.poster-processes,
 .details-section,
 .processes-section {
   position: relative;
   z-index: 1;
+  flex: 0 0 auto;
   flex-shrink: 0;
+  max-height: none;
+  overflow: visible;
 }
 
 .ops-close-btn {
@@ -978,9 +1037,8 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .agent-ops-panel {
   display: none;
   padding: 0 4px 12px;
-  max-height: min(70vh, 720px);
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  max-height: none;
+  overflow: visible;
 }
 
 .agent-ops-panel.active { display: block; }
@@ -1145,8 +1203,8 @@ button.ops-badge:disabled {
 .ops-preview {
   margin: 10px 0 0;
   padding: 12px;
-  max-height: 220px;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
   white-space: pre-wrap;
   word-break: break-word;
   font-size: 11px;
@@ -1461,9 +1519,10 @@ textarea.ops-agent-editor.is-dirty {
   text-align: left;
 }
 
-/* Shared AI chat empty state + taller transcript (all themes load agent-ops.css) */
+/* Shared AI chat empty state (transcript expands; shell scrolls) */
 .chat-messages {
-  max-height: min(320px, 42vh) !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 .chat-empty {
@@ -5656,8 +5715,8 @@ button.monitor-detail-url.is-just-saved {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 280px;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
 }
 .perplexity-result-item {
   padding: 8px 10px;

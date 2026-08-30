@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.739] - 2026-08-30
+
+### Changed
+- **CPU window scroll** — sections below the gauges (processes, chat, logs, and the rest) grow to full height. Scroll the outer shell once instead of each section on its own.
+
 ## [0.1.738] - 2026-08-30
 
 ### Fixed
