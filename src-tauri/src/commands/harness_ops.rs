@@ -3886,6 +3886,173 @@ pub fn format_tasks_gateway(filter: TasksListFilter) -> String {
     out
 }
 
+/// Plugins All · On · Off filter for `/plugins` instant replies.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PluginsListFilter {
+    All,
+    On,
+    Off,
+}
+
+/// Parse On/Off from `/plugins on`, `enabled plugins`, etc. Default All.
+pub fn parse_plugins_list_filter(content: &str) -> PluginsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" on")
+        || n.ends_with(" enabled")
+        || n == "enabled plugins"
+        || n == "on plugins"
+        || n == "plugins on"
+        || n == "/plugins on"
+    {
+        return PluginsListFilter::On;
+    }
+    if n.ends_with(" off")
+        || n.ends_with(" disabled")
+        || n == "disabled plugins"
+        || n == "off plugins"
+        || n == "plugins off"
+        || n == "/plugins off"
+    {
+        return PluginsListFilter::Off;
+    }
+    PluginsListFilter::All
+}
+
+/// True for `/plugins` / `list plugins` — registered script plugins; not run/add/remove.
+pub fn looks_like_plugins_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    if n.contains("plugin:")
+        || n.contains("run plugin")
+        || n.contains("execute")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("install")
+        || n.contains("write")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("tauri")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/plugins"
+            | "plugins"
+            | "list plugins"
+            | "my plugins"
+            | "which plugins"
+            | "what plugins"
+            | "all plugins"
+            | "plugin list"
+            | "plugins list"
+            | "plugins catalog"
+            | "installed plugins"
+            | "available plugins"
+            | "plugins installed"
+            | "plugins available"
+            | "/plugins on"
+            | "plugins on"
+            | "enabled plugins"
+            | "on plugins"
+            | "plugins enabled"
+            | "/plugins off"
+            | "plugins off"
+            | "disabled plugins"
+            | "off plugins"
+            | "plugins disabled"
+    )
+}
+
+/// Zero-LLM plugins catalog (registered script plugins; On/Off filter; no script run).
+pub fn format_plugins_gateway(filter: PluginsListFilter) -> String {
+    let mut plugins = crate::commands::plugins::list_registered_plugins();
+    plugins.sort_by(|a, b| {
+        a.name
+            .to_lowercase()
+            .cmp(&b.name.to_lowercase())
+            .then_with(|| a.id.cmp(&b.id))
+    });
+    let on_n = plugins.iter().filter(|p| p.enabled).count();
+    let off_n = plugins.len().saturating_sub(on_n);
+    let title = match filter {
+        PluginsListFilter::All => format!(
+            "**Plugins** — {on_n} on · {off_n} off ({total} total)",
+            total = plugins.len()
+        ),
+        PluginsListFilter::On => format!("**Plugins · On** — {on_n}"),
+        PluginsListFilter::Off => format!("**Plugins · Off** — {off_n}"),
+    };
+    let mut lines = vec![title];
+    fn plugin_row(p: &crate::plugins::Plugin) -> String {
+        let path = p.script_path.display();
+        let interval = p.schedule_interval_secs;
+        format!("• {} · `{id}` · every {interval}s · `{path}`", p.name, id = p.id)
+    }
+    match filter {
+        PluginsListFilter::All => {
+            if plugins.is_empty() {
+                lines.push(
+                    "_None registered yet — add a script plugin via Settings / `add_plugin` (no script run from this list)._"
+                        .to_string(),
+                );
+            } else {
+                if on_n > 0 {
+                    lines.push("**On**".to_string());
+                    for p in plugins.iter().filter(|p| p.enabled) {
+                        lines.push(plugin_row(p));
+                    }
+                }
+                if off_n > 0 {
+                    lines.push("**Off**".to_string());
+                    for p in plugins.iter().filter(|p| !p.enabled) {
+                        lines.push(plugin_row(p));
+                    }
+                }
+            }
+        }
+        PluginsListFilter::On => {
+            let ons: Vec<_> = plugins.iter().filter(|p| p.enabled).collect();
+            if ons.is_empty() {
+                lines.push("_None on right now._".to_string());
+            } else {
+                for p in ons {
+                    lines.push(plugin_row(p));
+                }
+            }
+        }
+        PluginsListFilter::Off => {
+            let offs: Vec<_> = plugins.iter().filter(|p| !p.enabled).collect();
+            if offs.is_empty() {
+                lines.push("_None off right now._".to_string());
+            } else {
+                for p in offs {
+                    lines.push(plugin_row(p));
+                }
+            }
+        }
+    }
+    lines.push(String::new());
+    lines.push(
+        "_List only — run/add/remove stay with the agent / Settings (no script execute)._"
+            .to_string(),
+    );
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Sessions All · Live · Files filter for `/sessions` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionsListFilter {
@@ -5552,6 +5719,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_tasks_list_filter(content);
         return Some(format_tasks_gateway(filter));
     }
+    if looks_like_plugins_request(content) {
+        let filter = parse_plugins_list_filter(content);
+        return Some(format_plugins_gateway(filter));
+    }
     if looks_like_sessions_request(content) {
         let filter = parse_sessions_list_filter(content);
         return Some(format_sessions_gateway(filter));
@@ -5652,6 +5823,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
 • `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
+• `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
@@ -5857,6 +6029,31 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("create")
         && !q.contains("append")
         && !q.contains("assign")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/plugins` catalog operator asks (v0.1.733).
+    if (q.contains("/plugins")
+        || q == "plugins"
+        || q.contains("list plugins")
+        || q.contains("plugins catalog")
+        || q.contains("installed plugins")
+        || q.contains("available plugins")
+        || q == "plugin list"
+        || q == "plugins list"
+        || q == "plugins on"
+        || q == "plugins off"
+        || q.contains("enabled plugins")
+        || q.contains("disabled plugins"))
+        && !q.contains("plugin:")
+        && !q.contains("run plugin")
+        && !q.contains("why")
+        && !q.contains("create")
+        && !q.contains("add ")
+        && !q.contains("install")
+        && !q.contains("tauri")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -7911,6 +8108,21 @@ mod tests {
         assert!(try_operator_instant_reply("TASK_CREATE: demo").is_none());
         assert!(try_operator_instant_reply("create a task").is_none());
         assert!(try_operator_instant_reply("show task 12").is_none());
+        let plugins = try_operator_instant_reply("/plugins").expect("plugins");
+        assert!(
+            plugins.to_lowercase().contains("plugin"),
+            "{plugins}"
+        );
+        assert!(try_operator_instant_reply("list plugins").is_some());
+        assert!(try_operator_instant_reply("plugins catalog").is_some());
+        let plugins_on = try_operator_instant_reply("/plugins on").expect("plugins on");
+        assert!(
+            plugins_on.to_lowercase().contains("plugin") || plugins_on.to_lowercase().contains("on"),
+            "{plugins_on}"
+        );
+        assert!(try_operator_instant_reply("run plugin foo").is_none());
+        assert!(try_operator_instant_reply("add a plugin").is_none());
+        assert!(try_operator_instant_reply("search for tauri plugins").is_none());
         let sessions = try_operator_instant_reply("/sessions").expect("sessions");
         assert!(sessions.to_lowercase().contains("sessions"));
         let knowledge = try_operator_instant_reply("/knowledge").expect("knowledge");
@@ -8082,10 +8294,31 @@ mod tests {
         assert_eq!(parse_tasks_list_filter("list tasks"), TasksListFilter::Active);
         assert_eq!(parse_tasks_list_filter("/tasks all"), TasksListFilter::All);
         assert_eq!(parse_tasks_list_filter("all tasks"), TasksListFilter::All);
+        assert!(looks_like_plugins_request("/plugins"));
+        assert!(looks_like_plugins_request("list plugins"));
+        assert!(looks_like_plugins_request("plugins catalog"));
+        assert!(looks_like_plugins_request("/plugins on"));
+        assert!(looks_like_plugins_request("disabled plugins"));
+        assert!(looks_like_plugins_request("@Werner plugins"));
+        assert!(!looks_like_plugins_request("run plugin foo"));
+        assert!(!looks_like_plugins_request("add a plugin"));
+        assert!(!looks_like_plugins_request("search for tauri plugins"));
+        assert!(!looks_like_plugins_request("why are plugins empty"));
+        assert_eq!(parse_plugins_list_filter("/plugins"), PluginsListFilter::All);
+        assert_eq!(parse_plugins_list_filter("/plugins on"), PluginsListFilter::On);
+        assert_eq!(
+            parse_plugins_list_filter("disabled plugins"),
+            PluginsListFilter::Off
+        );
         let skills_report = format_skills_gateway();
         assert!(
             skills_report.contains("**Skills**"),
             "{skills_report}"
+        );
+        let plugins_report = format_plugins_gateway(PluginsListFilter::All);
+        assert!(
+            plugins_report.contains("**Plugins**"),
+            "{plugins_report}"
         );
     }
 
@@ -9145,6 +9378,9 @@ mod tests {
         assert!(report.contains("/skills"), "{report}");
         assert!(report.contains("/tasks"), "{report}");
         assert!(report.contains("/tasks all"), "{report}");
+        assert!(report.contains("/plugins"), "{report}");
+        assert!(report.contains("/plugins on"), "{report}");
+        assert!(report.contains("/plugins off"), "{report}");
         assert!(report.contains("/sessions"), "{report}");
         assert!(report.contains("/knowledge"), "{report}");
         assert!(report.contains("/monitors"), "{report}");

@@ -73,12 +73,18 @@ pub fn execute_plugin(plugin_id: String) -> Result<PluginResult, String> {
     plugin.execute().map_err(|e| e.to_string())
 }
 
+/// Snapshot of registered plugins (for instant `/plugins` operator; no script run).
+pub fn list_registered_plugins() -> Vec<Plugin> {
+    get_plugin_manager()
+        .lock()
+        .map(|m| m.list_plugins().into_iter().cloned().collect())
+        .unwrap_or_default()
+}
+
 /// List all plugins
 #[tauri::command]
 pub fn list_plugins() -> Result<Vec<Plugin>, String> {
-    let manager = get_plugin_manager().lock().map_err(|e| e.to_string())?;
-
-    Ok(manager.list_plugins().into_iter().cloned().collect())
+    Ok(list_registered_plugins())
 }
 
 /// Run all due plugins

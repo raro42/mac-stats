@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.733] - 2026-08-30
+
+### Added
+- **`/plugins` · `/plugins on` · `/plugins off` instant operator** — registered script plugins On/Off list (Discord + AI Chat; Agents On/Off parity; no script run; does not steal add/run/remove or “search for tauri plugins”).
+
 ## [0.1.732] - 2026-08-30
 
 ### Added
