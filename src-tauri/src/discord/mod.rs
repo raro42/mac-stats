@@ -686,6 +686,37 @@ pub fn format_having_fun_ready_chip() -> String {
     format!("**Having fun** · {state} · {ch} · idle {idle} · reply {reply} (config only)")
 }
 
+/// Zero-LLM Discord voice STT Ready chip (model + ffmpeg path + Ollama config; no transcribe / no live Ollama).
+pub fn format_voice_stt_ready_chip() -> String {
+    let model = crate::config::Config::discord_voice_model();
+    let model_short = if model.chars().count() > 28 {
+        let mut s: String = model.chars().take(25).collect();
+        s.push('…');
+        s
+    } else {
+        model
+    };
+    let ffmpeg = if voice::ffmpeg_available() {
+        "ffmpeg On"
+    } else {
+        "ffmpeg Off"
+    };
+    let ollama_set = crate::commands::ollama_config::get_ollama_config().is_some();
+    let ollama = if ollama_set {
+        "Ollama set"
+    } else {
+        "Ollama not set"
+    };
+    let state = if ollama_set && voice::ffmpeg_available() {
+        "Ready"
+    } else if ollama_set || voice::ffmpeg_available() {
+        "Partial"
+    } else {
+        "Not set"
+    };
+    format!("**Voice** · {state} · `{model_short}` · {ffmpeg} · {ollama} (config only)")
+}
+
 /// True if the given Discord channel is configured as having_fun. Used by session compactor to avoid inventing task/platform context for casual chat.
 pub fn is_discord_channel_having_fun(channel_id: u64) -> bool {
     configured_having_fun_channel_ids().contains(&channel_id)

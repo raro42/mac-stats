@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.744] - 2026-08-30
+
+### Added
+- **`/voice` · `/stt` instant operator** — Discord voice STT Ready / Partial / Not set chip (transcription model · ffmpeg path · Ollama config; config only, no live transcribe; Discord + AI Chat; does not steal voice-note / send-voice / enable-disable asks).
+
 ## [0.1.743] - 2026-08-30
 
 ### Added

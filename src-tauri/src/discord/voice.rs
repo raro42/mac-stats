@@ -98,6 +98,11 @@ fn convert_to_wav16k(input: &Path, output: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// True when ffmpeg is findable for Discord voice STT (path / `MAC_STATS_FFMPEG` only; no convert).
+pub(super) fn ffmpeg_available() -> bool {
+    which_ffmpeg().is_some()
+}
+
 fn which_ffmpeg() -> Option<PathBuf> {
     if let Ok(p) = std::env::var("MAC_STATS_FFMPEG") {
         let pb = PathBuf::from(p.trim());

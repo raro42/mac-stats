@@ -6125,6 +6125,110 @@ pub fn format_having_fun_ready_chip() -> String {
     crate::discord::format_having_fun_ready_chip()
 }
 
+/// True for focused Discord voice STT Ready/config asks (`/voice` · `/stt`) —
+/// not live transcription, send-voice, or how-to enable.
+pub fn looks_like_voice_stt_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("transcribe")
+        || n.contains("transcript")
+        || n.contains("convert")
+        || n.contains("send voice")
+        || n.contains("post voice")
+        || n.contains("voice note")
+        || n.contains("voice message")
+        || n.contains("voice memo")
+        || n.contains("record ")
+        || n.contains("listen")
+        || n.contains("play ")
+        || n.contains("enable voice")
+        || n.contains("disable voice")
+        || n.contains("enable stt")
+        || n.contains("disable stt")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/voice"
+            | "/stt"
+            | "/speech"
+            | "/transcription"
+            | "voice"
+            | "stt"
+            | "speech"
+            | "voice status"
+            | "voice ready"
+            | "voice health"
+            | "voice on"
+            | "voice off"
+            | "stt status"
+            | "stt ready"
+            | "stt health"
+            | "stt on"
+            | "stt off"
+            | "speech status"
+            | "speech ready"
+            | "speech health"
+            | "speech to text"
+            | "speech-to-text"
+            | "voice stt"
+            | "voice transcription"
+            | "discord voice"
+            | "discord stt"
+            | "show voice"
+            | "show stt"
+            | "is voice ready"
+            | "is voice on"
+            | "is voice off"
+            | "is voice enabled"
+            | "is voice configured"
+            | "is voice set up"
+            | "is voice setup"
+            | "is stt ready"
+            | "is stt on"
+            | "is stt off"
+            | "is stt enabled"
+            | "is stt configured"
+            | "is speech ready"
+            | "how's voice"
+            | "hows voice"
+            | "how's the voice"
+            | "hows the voice"
+            | "how's stt"
+            | "hows stt"
+            | "how's the stt"
+            | "hows the stt"
+            | "how's speech"
+            | "hows speech"
+    )
+}
+
+/// Zero-LLM Discord voice STT Ready chip (model + ffmpeg + Ollama config; no transcribe).
+pub fn format_voice_stt_ready_chip() -> String {
+    crate::discord::format_voice_stt_ready_chip()
+}
+
 /// Zero-LLM Ori Mnemos lifecycle Ready chip (env/config only; no `ori` subprocess / MCP probe).
 pub fn format_ori_ready_chip() -> String {
     use crate::config::Config;
@@ -6528,6 +6632,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_having_fun_ready_request(content) {
         return Some(format_having_fun_ready_chip());
     }
+    if looks_like_voice_stt_ready_request(content) {
+        return Some(format_voice_stt_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6679,6 +6786,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only; does not steal send/post)\n\
+• `/voice` · `/stt` — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; no transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6705,7 +6813,6 @@ pub fn format_ops_help_gateway() -> String {
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
-• Voice notes — transcribed locally (Ollama audio) then answered like text\n\
 \n\
 **Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)",
         slow_ms = OPS_RUNS_SLOW_MS,
@@ -7101,6 +7208,50 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("have fun")
         && !q.contains("send ")
         && !q.contains("post ")
+        && !q.contains("enable ")
+        && !q.contains("disable ")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/voice` · `/stt` Ready chip asks (v0.1.744).
+    if (q.contains("/voice")
+        || q.contains("/stt")
+        || q.contains("/speech")
+        || q == "voice"
+        || q == "stt"
+        || q == "speech"
+        || q.contains("voice status")
+        || q.contains("voice ready")
+        || q.contains("stt status")
+        || q.contains("stt ready")
+        || q.contains("speech status")
+        || q.contains("speech ready")
+        || q.contains("speech to text")
+        || q.contains("speech-to-text")
+        || q.contains("voice stt")
+        || q.contains("discord voice")
+        || q.contains("discord stt")
+        || q.contains("is voice ready")
+        || q.contains("is voice on")
+        || q.contains("is stt ready")
+        || q.contains("how's voice")
+        || q.contains("hows voice")
+        || q.contains("how's stt")
+        || q.contains("hows stt")
+        || q.contains("how's speech")
+        || q.contains("hows speech"))
+        && !q.contains("transcribe")
+        && !q.contains("transcript")
+        && !q.contains("voice note")
+        && !q.contains("voice message")
+        && !q.contains("send voice")
         && !q.contains("enable ")
         && !q.contains("disable ")
         && !q.contains("turn on")
@@ -9175,6 +9326,15 @@ mod tests {
         assert!(try_operator_instant_reply("send idle thought").is_none());
         assert!(try_operator_instant_reply("enable having fun").is_none());
         assert!(try_operator_instant_reply("/discord").is_some()); // gateway, not having_fun
+        let voice = try_operator_instant_reply("/voice").expect("voice");
+        assert!(voice.to_lowercase().contains("voice"), "{voice}");
+        assert!(try_operator_instant_reply("/stt").is_some());
+        assert!(try_operator_instant_reply("is voice ready").is_some());
+        assert!(try_operator_instant_reply("how's stt").is_some());
+        assert!(try_operator_instant_reply("speech to text").is_some());
+        assert!(try_operator_instant_reply("transcribe this voice note").is_none());
+        assert!(try_operator_instant_reply("send voice message").is_none());
+        assert!(try_operator_instant_reply("enable voice").is_none());
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -10515,6 +10675,26 @@ mod tests {
         assert!(
             having_fun_chip.contains("On") || having_fun_chip.contains("Off"),
             "{having_fun_chip}"
+        );
+        assert!(looks_like_voice_stt_ready_request("/voice"));
+        assert!(looks_like_voice_stt_ready_request("/stt"));
+        assert!(looks_like_voice_stt_ready_request("voice"));
+        assert!(looks_like_voice_stt_ready_request("voice status"));
+        assert!(looks_like_voice_stt_ready_request("is voice ready"));
+        assert!(looks_like_voice_stt_ready_request("how's stt"));
+        assert!(looks_like_voice_stt_ready_request("speech to text"));
+        assert!(!looks_like_voice_stt_ready_request("transcribe this"));
+        assert!(!looks_like_voice_stt_ready_request("voice note"));
+        assert!(!looks_like_voice_stt_ready_request("send voice message"));
+        assert!(!looks_like_voice_stt_ready_request("enable voice"));
+        assert!(!looks_like_voice_stt_ready_request("how to enable voice"));
+        let voice_chip = format_voice_stt_ready_chip();
+        assert!(voice_chip.to_lowercase().contains("voice"), "{voice_chip}");
+        assert!(
+            voice_chip.contains("Ready")
+                || voice_chip.contains("Partial")
+                || voice_chip.contains("Not set"),
+            "{voice_chip}"
         );
         let ai_chip = format_ai_agent_ready_chip();
         assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.744** — `/voice` · `/stt` instant — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; config only, no transcribe; Discord + AI Chat; does not steal voice-note / send-voice / enable-disable).
+
 - **v0.1.743** — `/having_fun` · `/fun` · `/idle` instant — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only, no send; Discord + AI Chat; does not steal send/post / enable-disable).
 
 - **v0.1.742** — `/ori` · `/mnemos` instant — Ori Mnemos lifecycle Ready / Off / Partial (vault · orient · prefetch · capture · binary; config/env only, no subprocess; Discord + AI Chat; does not steal MCP `ori_*` / MEMORY_APPEND / scrub).
