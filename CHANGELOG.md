@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.735] - 2026-08-30
+
+### Added
+- **`/judge` instant operator** — Judge Ready / Off chip (`agentJudgeEnabled` · failure-only vs every run; config only, does not run the judge; Discord + AI Chat; does not steal “judge this” / enable/disable / score asks).
+
 ## [0.1.734] - 2026-08-30
 
 ### Added

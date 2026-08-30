@@ -5478,6 +5478,98 @@ pub fn format_browser_ready_chip() -> String {
     }
 }
 
+/// True for focused agent-judge Ready/config asks (`/judge`) —
+/// not “run the judge”, score this turn, or enable/disable how-tos.
+pub fn looks_like_judge_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Actions / how-tos stay with pre-route / agent.
+    if n.contains("run judge")
+        || n.contains("run the judge")
+        || n.contains("judge this")
+        || n.contains("judge that")
+        || n.contains("judge my")
+        || n.contains("judge the")
+        || n.contains("score this")
+        || n.contains("score the")
+        || n.contains("verdict for")
+        || n.contains("enable judge")
+        || n.contains("disable judge")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/judge"
+            | "judge"
+            | "judge status"
+            | "judge ready"
+            | "judge offline"
+            | "judge configured"
+            | "judge health"
+            | "judge mode"
+            | "agent judge"
+            | "agent judge status"
+            | "agent judge ready"
+            | "agent judge configured"
+            | "agent judge health"
+            | "agent judge mode"
+            | "show judge"
+            | "show agent judge"
+            | "is judge ready"
+            | "is judge online"
+            | "is judge offline"
+            | "is judge configured"
+            | "is judge set up"
+            | "is judge setup"
+            | "is judge enabled"
+            | "is agent judge ready"
+            | "is agent judge configured"
+            | "is agent judge enabled"
+            | "how's judge"
+            | "hows judge"
+            | "how's the judge"
+            | "hows the judge"
+            | "how's agent judge"
+            | "hows agent judge"
+            | "judge connection"
+            | "agent judge connection"
+            | "failure only judge"
+            | "failure-only judge"
+            | "judge on failure"
+            | "judge on failure only"
+    )
+}
+
+/// Zero-LLM agent-judge Ready / Off chip (config only; does not run the judge).
+pub fn format_judge_ready_chip() -> String {
+    if !crate::config::Config::agent_judge_enabled() {
+        return "**Judge** · Off · set `agentJudgeEnabled` true".to_string();
+    }
+    if crate::config::Config::agent_judge_on_failure_only() {
+        "**Judge** · Ready · failure-only (default)".to_string()
+    } else {
+        "**Judge** · Ready · every run".to_string()
+    }
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -5808,6 +5900,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_ready_request(content) {
         return Some(format_browser_ready_chip());
     }
+    if looks_like_judge_ready_request(content) {
+        return Some(format_judge_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -5953,6 +6048,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
+• `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6217,6 +6313,33 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("navigate")
         && !q.contains("click")
         && !q.contains("http")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/judge` Ready chip asks (v0.1.735).
+    if (q.contains("/judge")
+        || q == "judge"
+        || q.contains("judge status")
+        || q.contains("judge ready")
+        || q.contains("agent judge")
+        || q.contains("is judge ready")
+        || q.contains("is judge enabled")
+        || q.contains("is agent judge ready")
+        || q.contains("how's judge")
+        || q.contains("hows judge")
+        || q.contains("how's agent judge")
+        || q.contains("hows agent judge"))
+        && !q.contains("run judge")
+        && !q.contains("judge this")
+        && !q.contains("judge that")
+        && !q.contains("score this")
+        && !q.contains("enable judge")
+        && !q.contains("disable judge")
         && !q.contains("why")
         && !q.contains(" for ")
         && !q.contains(" about ")
@@ -8226,6 +8349,13 @@ mod tests {
         assert!(try_operator_instant_reply("BROWSER_SCREENSHOT: https://example.com").is_none());
         assert!(try_operator_instant_reply("take a screenshot of apple.com").is_none());
         assert!(try_operator_instant_reply("navigate to https://example.com").is_none());
+        let judge = try_operator_instant_reply("/judge").expect("judge");
+        assert!(judge.to_lowercase().contains("judge"), "{judge}");
+        assert!(try_operator_instant_reply("is judge ready").is_some());
+        assert!(try_operator_instant_reply("how's agent judge").is_some());
+        assert!(try_operator_instant_reply("judge this reply").is_none());
+        assert!(try_operator_instant_reply("run the judge").is_none());
+        assert!(try_operator_instant_reply("enable judge").is_none());
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -9461,6 +9591,19 @@ mod tests {
         assert!(!looks_like_browser_ready_request("click the login button"));
         assert!(!looks_like_browser_ready_request("how to use browser"));
         assert!(!looks_like_browser_ready_request("browse https://example.com"));
+        assert!(looks_like_judge_ready_request("/judge"));
+        assert!(looks_like_judge_ready_request("judge"));
+        assert!(looks_like_judge_ready_request("judge status"));
+        assert!(looks_like_judge_ready_request("is judge ready"));
+        assert!(looks_like_judge_ready_request("is agent judge enabled"));
+        assert!(looks_like_judge_ready_request("how's judge"));
+        assert!(looks_like_judge_ready_request("agent judge mode"));
+        assert!(!looks_like_judge_ready_request("judge this reply"));
+        assert!(!looks_like_judge_ready_request("run the judge"));
+        assert!(!looks_like_judge_ready_request("enable judge"));
+        assert!(!looks_like_judge_ready_request("how to use judge"));
+        let judge_chip = format_judge_ready_chip();
+        assert!(judge_chip.to_lowercase().contains("judge"), "{judge_chip}");
         let chip = format_browser_ready_chip();
         assert!(chip.to_lowercase().contains("browser"), "{chip}");
         assert!(chip.contains("CDP") || chip.contains("cdp"), "{chip}");
@@ -9562,6 +9705,7 @@ mod tests {
         assert!(report.contains("/cursor-agent"), "{report}");
         assert!(report.contains("/browser"), "{report}");
         assert!(report.contains("/cdp"), "{report}");
+        assert!(report.contains("/judge"), "{report}");
         assert!(report.contains("/telegram"), "{report}");
         assert!(report.contains("/slack"), "{report}");
         assert!(report.contains("/signal"), "{report}");
