@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.740] - 2026-08-30
+
+### Added
+- **`/compact` · `/menu-bar` · `/cpu-window` instant operator** — Compact Menu bar / CPU window On/Off chip (`menuBarCompact` · `cpuWindowCompact`; config only, does not toggle; Discord + AI Chat; does not steal session compaction / enable-disable asks).
+
 ## [0.1.739] - 2026-08-30
 
 ### Changed

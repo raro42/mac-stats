@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.740** — `/compact` · `/menu-bar` · `/cpu-window` instant — Compact Menu bar / CPU window On/Off (`menuBarCompact` · `cpuWindowCompact`; config only, no toggle; Discord + AI Chat; does not steal compaction / enable-disable).
+
 - **v0.1.736** — `/ai` · `/ai-agent` instant — AI On / Off (`aiAgentEnabled`; config only, no toggle; Discord + AI Chat; does not steal `/agents` / enable-disable / chat-with-AI).
 
 - **v0.1.735** — `/judge` instant — Judge Ready / Off (agentJudgeEnabled · failure-only vs every run; config only, no judge run; Discord + AI Chat; does not steal “judge this” / enable/disable / score).

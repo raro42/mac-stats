@@ -5673,6 +5673,100 @@ pub fn format_ai_agent_ready_chip() -> String {
     }
 }
 
+/// True for focused Settings Product compact asks (`/compact` · `/menu-bar` · `/cpu-window`) —
+/// not session compaction, enable/disable how-tos, or layout redesign tasks.
+pub fn looks_like_compact_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Compaction / memory / actions stay with pre-route / agent.
+    if n.contains("compaction")
+        || n.contains("compact memory")
+        || n.contains("compact session")
+        || n.contains("compact context")
+        || n.contains("context compact")
+        || n.contains("compact this")
+        || n.contains("compact the")
+        || n.contains("make compact")
+        || n.contains("enable compact")
+        || n.contains("disable compact")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/compact"
+            | "/compact menu"
+            | "/compact window"
+            | "/menu-bar"
+            | "/menubar"
+            | "/cpu-window"
+            | "compact"
+            | "compact status"
+            | "compact mode"
+            | "compact settings"
+            | "compact ready"
+            | "compact health"
+            | "compact on"
+            | "compact off"
+            | "menu bar compact"
+            | "menubar compact"
+            | "cpu window compact"
+            | "cpu-window compact"
+            | "show compact"
+            | "show menu bar compact"
+            | "show cpu window compact"
+            | "is compact on"
+            | "is compact off"
+            | "is menu bar compact"
+            | "is menubar compact"
+            | "is cpu window compact"
+            | "is cpu-window compact"
+            | "how's compact"
+            | "hows compact"
+            | "how's menu bar compact"
+            | "hows menu bar compact"
+            | "how's cpu window compact"
+            | "hows cpu window compact"
+            | "compact menu bar"
+            | "compact cpu window"
+            | "compact cpu-window"
+    )
+}
+
+/// Zero-LLM Settings Product compact chip (`menuBarCompact` · `cpuWindowCompact`; config only).
+pub fn format_compact_ready_chip() -> String {
+    let menu = if crate::config::Config::menu_bar_compact() {
+        "Menu bar On"
+    } else {
+        "Menu bar Off"
+    };
+    let window = if crate::config::Config::cpu_window_compact() {
+        "CPU window On"
+    } else {
+        "CPU window Off"
+    };
+    format!("**Compact** · {menu} · {window} · Settings Product (config only)")
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -6009,6 +6103,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ai_agent_ready_request(content) {
         return Some(format_ai_agent_ready_chip());
     }
+    if looks_like_compact_ready_request(content) {
+        return Some(format_compact_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6156,6 +6253,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
+• `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6481,6 +6579,36 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("turn off")
         && !q.contains("chat with")
         && !q.contains("ask ai")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/compact` · `/menu-bar` · `/cpu-window` Ready chip asks (v0.1.740).
+    if (q.contains("/compact")
+        || q.contains("/menu-bar")
+        || q.contains("/menubar")
+        || q.contains("/cpu-window")
+        || q == "compact"
+        || q.contains("compact status")
+        || q.contains("compact mode")
+        || q.contains("menu bar compact")
+        || q.contains("cpu window compact")
+        || q.contains("is menu bar compact")
+        || q.contains("is cpu window compact")
+        || q.contains("how's compact")
+        || q.contains("hows compact"))
+        && !q.contains("compaction")
+        && !q.contains("compact memory")
+        && !q.contains("compact session")
+        && !q.contains("compact context")
+        && !q.contains("enable compact")
+        && !q.contains("disable compact")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
         && !q.contains("why")
         && !q.contains(" for ")
         && !q.contains(" about ")
@@ -8506,6 +8634,16 @@ mod tests {
         assert!(try_operator_instant_reply("enable ai").is_none());
         assert!(try_operator_instant_reply("chat with ai about weather").is_none());
         assert!(try_operator_instant_reply("/agents").is_some()); // agents catalog, not AI chip
+        let compact = try_operator_instant_reply("/compact").expect("compact");
+        assert!(compact.to_lowercase().contains("compact"), "{compact}");
+        assert!(compact.to_lowercase().contains("menu"), "{compact}");
+        assert!(try_operator_instant_reply("/menu-bar").is_some());
+        assert!(try_operator_instant_reply("/cpu-window").is_some());
+        assert!(try_operator_instant_reply("is menu bar compact").is_some());
+        assert!(try_operator_instant_reply("how's compact").is_some());
+        assert!(try_operator_instant_reply("compact memory").is_none());
+        assert!(try_operator_instant_reply("enable compact").is_none());
+        assert!(try_operator_instant_reply("compact this session").is_none());
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -9772,6 +9910,19 @@ mod tests {
         assert!(!looks_like_ai_agent_ready_request("chat with ai"));
         assert!(!looks_like_ai_agent_ready_request("ask ai about weather"));
         assert!(!looks_like_ai_agent_ready_request("how to enable ai"));
+        assert!(looks_like_compact_ready_request("/compact"));
+        assert!(looks_like_compact_ready_request("/menu-bar"));
+        assert!(looks_like_compact_ready_request("/cpu-window"));
+        assert!(looks_like_compact_ready_request("compact"));
+        assert!(looks_like_compact_ready_request("compact status"));
+        assert!(looks_like_compact_ready_request("is menu bar compact"));
+        assert!(looks_like_compact_ready_request("is cpu window compact"));
+        assert!(looks_like_compact_ready_request("how's compact"));
+        assert!(!looks_like_compact_ready_request("compact memory"));
+        assert!(!looks_like_compact_ready_request("compact this session"));
+        assert!(!looks_like_compact_ready_request("enable compact"));
+        assert!(!looks_like_compact_ready_request("how to enable compact"));
+        assert!(!looks_like_compact_ready_request("run compaction"));
         let ai_chip = format_ai_agent_ready_chip();
         assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");
         assert!(
@@ -9882,6 +10033,9 @@ mod tests {
         assert!(report.contains("/judge"), "{report}");
         assert!(report.contains("/ai"), "{report}");
         assert!(report.contains("/ai-agent"), "{report}");
+        assert!(report.contains("/compact"), "{report}");
+        assert!(report.contains("/menu-bar"), "{report}");
+        assert!(report.contains("/cpu-window"), "{report}");
         assert!(report.contains("/telegram"), "{report}");
         assert!(report.contains("/slack"), "{report}");
         assert!(report.contains("/signal"), "{report}");
