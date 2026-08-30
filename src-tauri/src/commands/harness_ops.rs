@@ -5570,6 +5570,109 @@ pub fn format_judge_ready_chip() -> String {
     }
 }
 
+/// True for focused product AI On/Off asks (`/ai` · `/ai-agent`) —
+/// not enable/disable how-tos, `/agents` catalog, or chat-with-AI tasks.
+pub fn looks_like_ai_agent_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Actions / how-tos / agent catalog stay with pre-route / agent / `/agents`.
+    if n.contains("enable ai")
+        || n.contains("disable ai")
+        || n.contains("enable the ai")
+        || n.contains("disable the ai")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.starts_with("/agents")
+        || n == "agents"
+        || n.contains("list agents")
+        || n.contains("chat with")
+        || n.contains("talk to")
+        || n.contains("ask ai")
+        || n.contains("ask the ai")
+        || n.contains("message ")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/ai"
+            | "/ai-agent"
+            | "ai"
+            | "ai status"
+            | "ai ready"
+            | "ai offline"
+            | "ai configured"
+            | "ai health"
+            | "ai mode"
+            | "ai on"
+            | "ai off"
+            | "ai agent"
+            | "ai agent status"
+            | "ai agent ready"
+            | "ai agent offline"
+            | "ai agent configured"
+            | "ai agent health"
+            | "ai agent mode"
+            | "ai agent on"
+            | "ai agent off"
+            | "local ai"
+            | "local ai status"
+            | "local ai agent"
+            | "local ai ready"
+            | "show ai"
+            | "show ai agent"
+            | "is ai ready"
+            | "is ai online"
+            | "is ai offline"
+            | "is ai configured"
+            | "is ai set up"
+            | "is ai setup"
+            | "is ai enabled"
+            | "is ai on"
+            | "is ai off"
+            | "is the ai on"
+            | "is the ai off"
+            | "is the ai ready"
+            | "is the ai enabled"
+            | "is ai agent ready"
+            | "is ai agent configured"
+            | "is ai agent enabled"
+            | "is ai agent on"
+            | "is ai agent off"
+            | "how's ai"
+            | "hows ai"
+            | "how's the ai"
+            | "hows the ai"
+            | "how's ai agent"
+            | "hows ai agent"
+            | "ai connection"
+            | "ai agent connection"
+    )
+}
+
+/// Zero-LLM product AI On / Off chip (`aiAgentEnabled`; config only; does not toggle).
+pub fn format_ai_agent_ready_chip() -> String {
+    if crate::config::Config::ai_agent_enabled() {
+        "**AI** · On · Discord · schedules · Ollama tools".to_string()
+    } else {
+        "**AI** · Off · monitor-only · Settings or `aiAgentEnabled` true".to_string()
+    }
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -5903,6 +6006,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_judge_ready_request(content) {
         return Some(format_judge_ready_chip());
     }
+    if looks_like_ai_agent_ready_request(content) {
+        return Some(format_ai_agent_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6049,6 +6155,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
+• `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6340,6 +6447,40 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("score this")
         && !q.contains("enable judge")
         && !q.contains("disable judge")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/ai` · `/ai-agent` Ready chip asks (v0.1.736).
+    if (q.contains("/ai")
+        || q.contains("/ai-agent")
+        || q == "ai"
+        || q.contains("ai status")
+        || q.contains("ai ready")
+        || q.contains("ai agent status")
+        || q.contains("ai agent ready")
+        || q.contains("is ai ready")
+        || q.contains("is ai enabled")
+        || q.contains("is ai on")
+        || q.contains("is the ai on")
+        || q.contains("is ai agent ready")
+        || q.contains("how's ai")
+        || q.contains("hows ai")
+        || q.contains("how's the ai")
+        || q.contains("hows the ai")
+        || q.contains("local ai"))
+        && !q.contains("/agents")
+        && !q.contains("list agents")
+        && !q.contains("enable ai")
+        && !q.contains("disable ai")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
+        && !q.contains("chat with")
+        && !q.contains("ask ai")
         && !q.contains("why")
         && !q.contains(" for ")
         && !q.contains(" about ")
@@ -8356,6 +8497,15 @@ mod tests {
         assert!(try_operator_instant_reply("judge this reply").is_none());
         assert!(try_operator_instant_reply("run the judge").is_none());
         assert!(try_operator_instant_reply("enable judge").is_none());
+        let ai = try_operator_instant_reply("/ai").expect("ai");
+        assert!(ai.to_lowercase().contains("ai"), "{ai}");
+        assert!(try_operator_instant_reply("/ai-agent").is_some());
+        assert!(try_operator_instant_reply("is ai ready").is_some());
+        assert!(try_operator_instant_reply("is ai on").is_some());
+        assert!(try_operator_instant_reply("how's the ai").is_some());
+        assert!(try_operator_instant_reply("enable ai").is_none());
+        assert!(try_operator_instant_reply("chat with ai about weather").is_none());
+        assert!(try_operator_instant_reply("/agents").is_some()); // agents catalog, not AI chip
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -9604,6 +9754,30 @@ mod tests {
         assert!(!looks_like_judge_ready_request("how to use judge"));
         let judge_chip = format_judge_ready_chip();
         assert!(judge_chip.to_lowercase().contains("judge"), "{judge_chip}");
+        assert!(looks_like_ai_agent_ready_request("/ai"));
+        assert!(looks_like_ai_agent_ready_request("/ai-agent"));
+        assert!(looks_like_ai_agent_ready_request("ai"));
+        assert!(looks_like_ai_agent_ready_request("ai status"));
+        assert!(looks_like_ai_agent_ready_request("is ai ready"));
+        assert!(looks_like_ai_agent_ready_request("is ai on"));
+        assert!(looks_like_ai_agent_ready_request("is the ai enabled"));
+        assert!(looks_like_ai_agent_ready_request("how's ai"));
+        assert!(looks_like_ai_agent_ready_request("ai agent status"));
+        assert!(looks_like_ai_agent_ready_request("local ai"));
+        assert!(!looks_like_ai_agent_ready_request("enable ai"));
+        assert!(!looks_like_ai_agent_ready_request("disable ai"));
+        assert!(!looks_like_ai_agent_ready_request("turn on ai"));
+        assert!(!looks_like_ai_agent_ready_request("/agents"));
+        assert!(!looks_like_ai_agent_ready_request("list agents"));
+        assert!(!looks_like_ai_agent_ready_request("chat with ai"));
+        assert!(!looks_like_ai_agent_ready_request("ask ai about weather"));
+        assert!(!looks_like_ai_agent_ready_request("how to enable ai"));
+        let ai_chip = format_ai_agent_ready_chip();
+        assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");
+        assert!(
+            ai_chip.contains("On") || ai_chip.contains("Off"),
+            "{ai_chip}"
+        );
         let chip = format_browser_ready_chip();
         assert!(chip.to_lowercase().contains("browser"), "{chip}");
         assert!(chip.contains("CDP") || chip.contains("cdp"), "{chip}");
@@ -9706,6 +9880,8 @@ mod tests {
         assert!(report.contains("/browser"), "{report}");
         assert!(report.contains("/cdp"), "{report}");
         assert!(report.contains("/judge"), "{report}");
+        assert!(report.contains("/ai"), "{report}");
+        assert!(report.contains("/ai-agent"), "{report}");
         assert!(report.contains("/telegram"), "{report}");
         assert!(report.contains("/slack"), "{report}");
         assert!(report.contains("/signal"), "{report}");

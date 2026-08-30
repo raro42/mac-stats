@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.736] - 2026-08-30
+
+### Added
+- **`/ai` · `/ai-agent` instant operator** — AI On / Off chip (`aiAgentEnabled`; config only, does not toggle; Discord + AI Chat; does not steal `/agents` catalog or enable/disable / chat-with-AI asks).
+
 ## [0.1.735] - 2026-08-30
 
 ### Added
