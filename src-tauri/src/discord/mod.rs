@@ -654,6 +654,38 @@ fn count_configured_having_fun_channels() -> usize {
         .unwrap_or(0)
 }
 
+fn format_secs_range_for_chip(min: u64, max: u64) -> String {
+    fn one(s: u64) -> String {
+        if s >= 60 && s % 60 == 0 {
+            format!("{}m", s / 60)
+        } else if s < 60 {
+            format!("{s}s")
+        } else {
+            format!("{}m{}s", s / 60, s % 60)
+        }
+    }
+    if min == max {
+        one(min)
+    } else {
+        format!("{}–{}", one(min), one(max))
+    }
+}
+
+/// Zero-LLM Having fun / idle-thought Ready chip (`discord_channels.json` only; no send / no Ollama).
+pub fn format_having_fun_ready_chip() -> String {
+    let n = count_configured_having_fun_channels();
+    let p = get_having_fun_params();
+    let state = if n == 0 { "Off" } else { "On" };
+    let ch = if n == 1 {
+        "1 channel".to_string()
+    } else {
+        format!("{n} channels")
+    };
+    let idle = format_secs_range_for_chip(p.idle_thought_secs_min, p.idle_thought_secs_max);
+    let reply = format_secs_range_for_chip(p.response_delay_secs_min, p.response_delay_secs_max);
+    format!("**Having fun** · {state} · {ch} · idle {idle} · reply {reply} (config only)")
+}
+
 /// True if the given Discord channel is configured as having_fun. Used by session compactor to avoid inventing task/platform context for casual chat.
 pub fn is_discord_channel_having_fun(channel_id: u64) -> bool {
     configured_having_fun_channel_ids().contains(&channel_id)

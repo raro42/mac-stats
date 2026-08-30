@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.743] - 2026-08-30
+
+### Added
+- **`/having_fun` · `/fun` · `/idle` instant operator** — Having fun / idle thoughts On/Off chip (channel count · idle · reply delays from `discord_channels.json`; config only, no send; Discord + AI Chat; does not steal send/post or enable/disable how-tos).
+
 ## [0.1.742] - 2026-08-30
 
 ### Added

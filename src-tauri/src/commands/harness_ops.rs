@@ -6022,6 +6022,109 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
     )
 }
 
+/// True for focused Having fun / idle-thought Ready/config asks (`/having_fun` · `/fun` · `/idle`) —
+/// not send/post idle thoughts, enable/disable how-tos, or free-form “have fun …”.
+pub fn looks_like_having_fun_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("send ")
+        || n.contains("post ")
+        || n.starts_with("post ")
+        || n.contains("message ")
+        || n.contains("reply to")
+        || n.contains("have fun")
+        || n.contains("having fun with")
+        || n.contains("enable having")
+        || n.contains("disable having")
+        || n.contains("enable idle")
+        || n.contains("disable idle")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/having_fun"
+            | "/having-fun"
+            | "/fun"
+            | "/idle"
+            | "/idle-thought"
+            | "/idle-thoughts"
+            | "having fun"
+            | "having-fun"
+            | "having_fun"
+            | "having fun status"
+            | "having fun ready"
+            | "having fun health"
+            | "having fun on"
+            | "having fun off"
+            | "idle thoughts"
+            | "idle thought"
+            | "idle thoughts status"
+            | "idle thought status"
+            | "idle status"
+            | "idle ready"
+            | "idle health"
+            | "idle on"
+            | "idle off"
+            | "fun status"
+            | "fun ready"
+            | "fun health"
+            | "fun on"
+            | "fun off"
+            | "show having fun"
+            | "show idle"
+            | "show idle thoughts"
+            | "is having fun ready"
+            | "is having fun on"
+            | "is having fun off"
+            | "is having fun enabled"
+            | "is having fun configured"
+            | "is having fun set up"
+            | "is having fun setup"
+            | "is idle ready"
+            | "is idle on"
+            | "is idle off"
+            | "is idle enabled"
+            | "is idle configured"
+            | "how's having fun"
+            | "hows having fun"
+            | "how's the having fun"
+            | "hows the having fun"
+            | "how's idle"
+            | "hows idle"
+            | "how's the idle"
+            | "hows the idle"
+            | "how's idle thoughts"
+            | "hows idle thoughts"
+            | "how's fun"
+            | "hows fun"
+    )
+}
+
+/// Zero-LLM Having fun / idle-thought Ready chip (`discord_channels.json` only; no send).
+pub fn format_having_fun_ready_chip() -> String {
+    crate::discord::format_having_fun_ready_chip()
+}
+
 /// Zero-LLM Ori Mnemos lifecycle Ready chip (env/config only; no `ori` subprocess / MCP probe).
 pub fn format_ori_ready_chip() -> String {
     use crate::config::Config;
@@ -6422,6 +6525,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ori_ready_request(content) {
         return Some(format_ori_ready_chip());
     }
+    if looks_like_having_fun_ready_request(content) {
+        return Some(format_having_fun_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6572,6 +6678,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
+• `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6961,6 +7068,41 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("organize my")
         && !q.contains("enable download")
         && !q.contains("disable download")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/having_fun` · `/fun` · `/idle` Ready chip asks (v0.1.743).
+    if (q.contains("/having_fun")
+        || q.contains("/having-fun")
+        || q.contains("/fun")
+        || q.contains("/idle")
+        || q.contains("having fun")
+        || q.contains("having_fun")
+        || q.contains("idle thoughts")
+        || q.contains("idle thought")
+        || q.contains("idle status")
+        || q.contains("idle ready")
+        || q.contains("fun status")
+        || q.contains("fun ready")
+        || q.contains("is having fun")
+        || q.contains("how's having fun")
+        || q.contains("hows having fun")
+        || q.contains("how's idle")
+        || q.contains("hows idle")
+        || q.contains("how's fun")
+        || q.contains("hows fun"))
+        && !q.contains("have fun")
+        && !q.contains("send ")
+        && !q.contains("post ")
+        && !q.contains("enable ")
+        && !q.contains("disable ")
         && !q.contains("turn on")
         && !q.contains("turn off")
         && !q.contains("why")
@@ -9019,6 +9161,20 @@ mod tests {
         assert!(try_operator_instant_reply("MCP: ori_query_ranked").is_none());
         assert!(try_operator_instant_reply("enable ori").is_none());
         assert!(try_operator_instant_reply("scrub memory").is_some()); // scrub lane, not Ori
+        let having_fun = try_operator_instant_reply("/having_fun").expect("having_fun");
+        assert!(
+            having_fun.to_lowercase().contains("having fun"),
+            "{having_fun}"
+        );
+        assert!(try_operator_instant_reply("/fun").is_some());
+        assert!(try_operator_instant_reply("/idle").is_some());
+        assert!(try_operator_instant_reply("is having fun ready").is_some());
+        assert!(try_operator_instant_reply("how's idle").is_some());
+        assert!(try_operator_instant_reply("idle thoughts").is_some());
+        assert!(try_operator_instant_reply("have fun tonight").is_none());
+        assert!(try_operator_instant_reply("send idle thought").is_none());
+        assert!(try_operator_instant_reply("enable having fun").is_none());
+        assert!(try_operator_instant_reply("/discord").is_some()); // gateway, not having_fun
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -10338,6 +10494,27 @@ mod tests {
         assert!(
             ori_chip.contains("Off") || ori_chip.contains("Ready") || ori_chip.contains("Partial"),
             "{ori_chip}"
+        );
+        assert!(looks_like_having_fun_ready_request("/having_fun"));
+        assert!(looks_like_having_fun_ready_request("/fun"));
+        assert!(looks_like_having_fun_ready_request("/idle"));
+        assert!(looks_like_having_fun_ready_request("having fun"));
+        assert!(looks_like_having_fun_ready_request("having fun status"));
+        assert!(looks_like_having_fun_ready_request("is having fun ready"));
+        assert!(looks_like_having_fun_ready_request("how's idle"));
+        assert!(looks_like_having_fun_ready_request("idle thoughts"));
+        assert!(!looks_like_having_fun_ready_request("have fun tonight"));
+        assert!(!looks_like_having_fun_ready_request("send idle thought"));
+        assert!(!looks_like_having_fun_ready_request("enable having fun"));
+        assert!(!looks_like_having_fun_ready_request("how to enable idle"));
+        let having_fun_chip = format_having_fun_ready_chip();
+        assert!(
+            having_fun_chip.to_lowercase().contains("having fun"),
+            "{having_fun_chip}"
+        );
+        assert!(
+            having_fun_chip.contains("On") || having_fun_chip.contains("Off"),
+            "{having_fun_chip}"
         );
         let ai_chip = format_ai_agent_ready_chip();
         assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");
