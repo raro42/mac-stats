@@ -3781,6 +3781,111 @@ pub fn format_skills_gateway() -> String {
     out
 }
 
+/// Task list filter for `/tasks` instant — Active (open+WIP) or All statuses.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TasksListFilter {
+    Active,
+    All,
+}
+
+/// Parse Active/All from `/tasks all`, `all tasks`, etc. Default Active.
+pub fn parse_tasks_list_filter(content: &str) -> TasksListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" all")
+        || n == "all tasks"
+        || n == "tasks all"
+        || n == "/tasks all"
+        || n == "list all tasks"
+        || n == "all task"
+        || n.contains(" every status")
+        || n.contains("by status")
+    {
+        return TasksListFilter::All;
+    }
+    TasksListFilter::Active
+}
+
+/// True for `/tasks` / `list tasks` — TASK_LIST catalog; not create/show/status/append.
+pub fn looks_like_tasks_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    if n.contains("task:")
+        || n.contains("task_")
+        || n.contains("create")
+        || n.contains("append")
+        || n.contains("assign")
+        || n.contains("status")
+        || n.contains("close")
+        || n.contains("finish")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("sleep")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedule")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // "show task <id>" becomes "task <id>" after normalize — already rejected via digits.
+    // Bare "task" alone is too vague (could be create); require list-ish wording or /tasks.
+    matches!(
+        n.as_str(),
+        "/tasks"
+            | "/tasks all"
+            | "/tasks open"
+            | "/tasks active"
+            | "tasks"
+            | "list tasks"
+            | "my tasks"
+            | "which tasks"
+            | "what tasks"
+            | "all tasks"
+            | "open tasks"
+            | "active tasks"
+            | "wip tasks"
+            | "task list"
+            | "tasks list"
+            | "tasks catalog"
+            | "list open tasks"
+            | "list all tasks"
+            | "list my tasks"
+            | "tasks all"
+            | "tasks open"
+            | "tasks active"
+    )
+}
+
+/// Zero-LLM task list (TASK_LIST parity; Active = open+WIP, All = by status).
+pub fn format_tasks_gateway(filter: TasksListFilter) -> String {
+    let (title, body) = match filter {
+        TasksListFilter::All => (
+            "**All tasks**".to_string(),
+            crate::task::format_list_all_tasks().unwrap_or_else(|e| format!("(unavailable: {e})")),
+        ),
+        TasksListFilter::Active => (
+            "**Active tasks** (open · WIP)".to_string(),
+            crate::task::format_list_open_and_wip_tasks()
+                .unwrap_or_else(|e| format!("(unavailable: {e})")),
+        ),
+    };
+    let mut lines = vec![title, String::new(), body];
+    lines.push(String::new());
+    lines.push(
+        "_Create: `TASK_CREATE:` · Show: `TASK_SHOW: <id>` · `/tasks all` for every status_".to_string(),
+    );
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Sessions All · Live · Files filter for `/sessions` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionsListFilter {
@@ -5443,6 +5548,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skills_request(content) {
         return Some(format_skills_gateway());
     }
+    if looks_like_tasks_request(content) {
+        let filter = parse_tasks_list_filter(content);
+        return Some(format_tasks_gateway(filter));
+    }
     if looks_like_sessions_request(content) {
         let filter = parse_sessions_list_filter(content);
         return Some(format_sessions_gateway(filter));
@@ -5542,6 +5651,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
 • `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
+• `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
@@ -5722,6 +5832,31 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains("create")
         && !q.contains("run skill")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/tasks` catalog operator asks (v0.1.732).
+    if (q.contains("/tasks")
+        || q == "tasks"
+        || q.contains("list tasks")
+        || q.contains("list open tasks")
+        || q.contains("list all tasks")
+        || q.contains("open tasks")
+        || q.contains("active tasks")
+        || q.contains("all tasks")
+        || q.contains("my tasks")
+        || q == "task list"
+        || q == "tasks list"
+        || q == "tasks all"
+        || q == "tasks open")
+        && !q.contains("task:")
+        && !q.contains("task_")
+        && !q.contains("why")
+        && !q.contains("create")
+        && !q.contains("append")
+        && !q.contains("assign")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -7761,6 +7896,21 @@ mod tests {
         assert!(try_operator_instant_reply("SKILL: summarize").is_none());
         assert!(try_operator_instant_reply("skill: 2").is_none());
         assert!(try_operator_instant_reply("create a skill").is_none());
+        let tasks = try_operator_instant_reply("/tasks").expect("tasks");
+        assert!(
+            tasks.to_lowercase().contains("task") || tasks.to_lowercase().contains("open"),
+            "{tasks}"
+        );
+        assert!(try_operator_instant_reply("list tasks").is_some());
+        assert!(try_operator_instant_reply("open tasks").is_some());
+        let tasks_all = try_operator_instant_reply("/tasks all").expect("tasks all");
+        assert!(
+            tasks_all.to_lowercase().contains("all") || tasks_all.to_lowercase().contains("task"),
+            "{tasks_all}"
+        );
+        assert!(try_operator_instant_reply("TASK_CREATE: demo").is_none());
+        assert!(try_operator_instant_reply("create a task").is_none());
+        assert!(try_operator_instant_reply("show task 12").is_none());
         let sessions = try_operator_instant_reply("/sessions").expect("sessions");
         assert!(sessions.to_lowercase().contains("sessions"));
         let knowledge = try_operator_instant_reply("/knowledge").expect("knowledge");
@@ -7919,6 +8069,19 @@ mod tests {
         assert!(!looks_like_skills_request("create a skill"));
         assert!(!looks_like_skills_request("run skill code"));
         assert!(!looks_like_skills_request("why are skills empty"));
+        assert!(looks_like_tasks_request("/tasks"));
+        assert!(looks_like_tasks_request("list tasks"));
+        assert!(looks_like_tasks_request("open tasks"));
+        assert!(looks_like_tasks_request("all tasks"));
+        assert!(looks_like_tasks_request("@Werner tasks"));
+        assert!(!looks_like_tasks_request("TASK_CREATE: demo"));
+        assert!(!looks_like_tasks_request("create a task"));
+        assert!(!looks_like_tasks_request("show task 12"));
+        assert!(!looks_like_tasks_request("why are tasks empty"));
+        assert_eq!(parse_tasks_list_filter("/tasks"), TasksListFilter::Active);
+        assert_eq!(parse_tasks_list_filter("list tasks"), TasksListFilter::Active);
+        assert_eq!(parse_tasks_list_filter("/tasks all"), TasksListFilter::All);
+        assert_eq!(parse_tasks_list_filter("all tasks"), TasksListFilter::All);
         let skills_report = format_skills_gateway();
         assert!(
             skills_report.contains("**Skills**"),
@@ -8980,6 +9143,8 @@ mod tests {
         assert!(report.contains("/direct"), "{report}");
         assert!(report.contains("/agents"), "{report}");
         assert!(report.contains("/skills"), "{report}");
+        assert!(report.contains("/tasks"), "{report}");
+        assert!(report.contains("/tasks all"), "{report}");
         assert!(report.contains("/sessions"), "{report}");
         assert!(report.contains("/knowledge"), "{report}");
         assert!(report.contains("/monitors"), "{report}");

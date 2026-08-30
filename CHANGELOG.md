@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.732] - 2026-08-30
+
+### Added
+- **`/tasks` · `/tasks all` instant operator** — Active (open·WIP) or All task files from `~/.mac-stats/task/` (TASK_LIST parity; Discord + AI Chat; does not steal `TASK_CREATE:` / `TASK_SHOW:` / create-append-status asks).
+
 ## [0.1.731] - 2026-08-30
 
 ### Added
