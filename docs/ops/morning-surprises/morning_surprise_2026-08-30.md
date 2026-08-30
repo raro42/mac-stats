@@ -6,6 +6,7 @@ Overnight Track B kept shipping operator Ready chips and catalogs so config and 
 
 | Version | What |
 | --- | --- |
+| **v0.1.733** | **`/plugins` · `/plugins on` · `/plugins off` instant** — registered script plugins On/Off list (Agents On/Off parity; Discord + AI Chat; no script run; does not steal add/run/remove) |
 | **v0.1.732** | **`/tasks` · `/tasks all` instant** — Active (open·WIP) or All task files from `~/.mac-stats/task/` (TASK_LIST parity; Discord + AI Chat; does not steal `TASK_CREATE:` / `TASK_SHOW:`) |
 | **v0.1.731** | **`/skills` instant** — installed skills catalog from `~/.mac-stats/agents/skills/` (Hermes skills_list / SKILLS_LIST parity; Discord + AI Chat; does not steal `SKILL:` / `SKILL_VIEW:`) |
 | **v0.1.730** | **`/telegram` · `/slack` · `/signal` · `/alerts` instant** — Ready / Not set / Partial (Keychain + registry; Signal REST not wired; Discord catch-all for prior Ready chips) |
@@ -21,10 +22,10 @@ Overnight Track B kept shipping operator Ready chips and catalogs so config and 
 ## Fuel / gate
 
 - Digester **open** stayed empty; design review **due=false** (grace; `feature-ai-chat` still recommended).
-- Fuel = standing backlog **p50** — after `/skills`, task-list operators (`/tasks`).
-- Latest keep: **v0.1.732** @ `8dc0bf91`.
+- Fuel = standing backlog **p50** — after `/tasks`, plugins catalog (`/plugins` On/Off).
+- Latest keep: **v0.1.733** @ `2558517d`.
 
 ## Next for Ralf
 
-- Design-review polish when grace ends (`feature-ai-chat` first), or more tool-heavy digester patterns (`/plugins`).
+- Design-review polish when grace ends (`feature-ai-chat` first), or more tool-heavy digester patterns.
 - Watch idle-thought Discord timeout WARNs (retry from v0.1.703).
