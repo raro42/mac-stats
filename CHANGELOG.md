@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.750] - 2026-08-31
+
+### Added
+- **CPU rings Hot attention glance** — when any ring hits menu-bar amber (CPU ≥50%, GPU ≥15%, Freq ≥3.5 GHz, Temp ≥70°C), a **Hot · CPU · Temp** amber strip appears under the gauges (Top Processes Hot / Monitors Down/Slow parity). Click or Enter focuses the first hot ring with a brief flash. Does not restore the removed All · Hot chip row (v0.1.717). Design review / `feature-cpu-metrics`.
+
 ## [0.1.749] - 2026-08-31
 
 ### Added

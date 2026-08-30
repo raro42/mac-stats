@@ -3080,6 +3080,59 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 50%, currentColor);
 }
 
+/* CPU rings — Hot attention glance (Top Processes Hot / Monitors Down/Slow parity) */
+.rings-hot-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 4px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  width: 100%;
+  flex-basis: 100%;
+  grid-column: 1 / -1;
+  box-sizing: border-box;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.rings-hot-attention-glance[hidden] {
+  display: none !important;
+}
+
+.rings-hot-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.rings-hot-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.rings-hot-attention-glance.has-hot {
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+}
+
+.metric-card.is-hot-attention-flash {
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);
+  transition: box-shadow 0.25s ease;
+}
+
 /* Top Processes — Hot attention glance (Agent Ops Fail/Slow / AI Chat Errors parity) */
 .processes-hot-attention-glance {
   display: flex;

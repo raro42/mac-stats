@@ -3312,6 +3312,116 @@ function removeRingsFilterChips() {
   document.querySelectorAll('.rings-filter-miss').forEach((el) => el.remove());
 }
 
+const RING_HOT_LABELS = {
+  cpu: 'CPU',
+  gpu: 'GPU',
+  freq: 'Freq',
+  temp: 'Temp',
+};
+
+/**
+ * Hot attention glance under ring gauges (Top Processes Hot / Monitors Down/Slow parity).
+ * All · Hot filter chips stay removed (v0.1.717); click focuses the first hot ring.
+ */
+function ensureRingsHotAttentionGlance() {
+  const section = getRingGaugeSection();
+  if (!section) return null;
+  let glance = document.getElementById('rings-hot-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'rings-hot-attention-glance';
+    glance.className = 'rings-hot-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="rings-hot-attention-glance-text"></span>';
+    const hint = document.getElementById('ring-gauge-kb-hint');
+    if (hint) {
+      hint.insertAdjacentElement('beforebegin', glance);
+    } else {
+      section.appendChild(glance);
+    }
+    wireRingsHotAttentionGlanceClick(glance);
+  } else if (glance.parentNode !== section) {
+    const hint = document.getElementById('ring-gauge-kb-hint');
+    if (hint && hint.parentNode === section) {
+      hint.insertAdjacentElement('beforebegin', glance);
+    } else {
+      section.appendChild(glance);
+    }
+  }
+  return glance;
+}
+
+function applyRingsHotAttentionGlanceState(hotKeys) {
+  const glance = ensureRingsHotAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('rings-hot-attention-glance-text');
+  const keys = Array.isArray(hotKeys) ? hotKeys.filter(Boolean) : [];
+  if (keys.length <= 0) {
+    glance.hidden = true;
+    glance.classList.remove('has-hot');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add('has-hot');
+  const parts = keys.map((k) => RING_HOT_LABELS[k] || k);
+  const label = parts.join(' · ');
+  if (text) text.textContent = `Hot · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = 'Focus the first hot ring (menu-bar amber thresholds)';
+  glance.setAttribute(
+    'aria-label',
+    `Rings hot: ${label} — click to focus the first hot ring`
+  );
+}
+
+function activateRingsHotAttentionGlance() {
+  const entries = getRingMetricCardEntries().filter(
+    (e) => e.card?.dataset?.ringsHot === '1' || e.card?.classList?.contains('is-hot')
+  );
+  const first = entries[0];
+  if (!first) {
+    const glance = document.getElementById('rings-hot-attention-glance');
+    glance?.focus?.();
+    return;
+  }
+  const chips = getRingGaugeChips();
+  const focusEl =
+    chips.find((el) => first.card === el || first.card.contains(el)) ||
+    first.valueEl ||
+    first.card;
+  if (typeof first.card.scrollIntoView === 'function') {
+    first.card.scrollIntoView({ block: 'nearest' });
+  }
+  if (focusEl && chips.includes(focusEl)) {
+    refreshRingGaugeRovingTabindex(focusEl);
+    if (typeof focusEl.focus === 'function') focusEl.focus();
+  } else if (focusEl && typeof focusEl.focus === 'function') {
+    focusEl.focus();
+  }
+  first.card.classList.add('is-hot-attention-flash');
+  window.setTimeout(() => {
+    first.card.classList.remove('is-hot-attention-flash');
+  }, 900);
+}
+
+function wireRingsHotAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.ringsHotAttentionWired === '1') return;
+  glance.dataset.ringsHotAttentionWired = '1';
+  const activate = () => activateRingsHotAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Apply menu-bar amber hot washes on ring cards + matching history charts. */
 function updateRingHotStates(data) {
   removeRingsFilterChips();
@@ -3341,12 +3451,14 @@ function updateRingHotStates(data) {
     freq: freq != null && freq >= RING_HOT_FREQ_GHZ,
     temp: temp != null && temp >= RING_HOT_TEMP_C,
   };
+  const hotKeys = [];
   for (const entry of getRingMetricCardEntries()) {
     const hot = !!hotByKey[entry.key];
     entry.card.classList.toggle('is-hot', hot);
     entry.card.dataset.ringsHot = hot ? '1' : '0';
     entry.card.style.display = '';
     entry.card.hidden = false;
+    if (hot) hotKeys.push(entry.key);
     const chart = historyChartContainerForRingKey(entry.key);
     if (chart) {
       chart.classList.toggle('is-hot', hot);
@@ -3355,6 +3467,7 @@ function updateRingHotStates(data) {
       chart.hidden = false;
     }
   }
+  applyRingsHotAttentionGlanceState(hotKeys);
   refreshRingGaugeRovingTabindex();
   refreshHistorySparklineRovingTabindex();
 }

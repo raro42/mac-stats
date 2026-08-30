@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.750** — CPU rings Hot attention glance (**Hot · CPU · Temp** strip under gauges; click → first hot ring; design review / `feature-cpu-metrics`).
+
 - **v0.1.749** — Disk Cleanup Reclaim/Due attention glance (amber Big/Reclaim / green Due strip; click → Big or Reclaim filter or Clean now; design review / `feature-disk-cleanup`).
 
 - **v0.1.748** — External / Monitors Down/Slow attention glance (red Down / amber Slow strip; click → Down or Slow filter; design review / `feature-monitors`).
