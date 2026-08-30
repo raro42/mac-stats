@@ -4984,7 +4984,16 @@ pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains(" of ")
-        || n.starts_with("perplexity search ")
+        // Live search: "perplexity search for …" (status/key/ready stay in the allow list below).
+        || (n.starts_with("perplexity search ")
+            && !matches!(
+                n.as_str(),
+                "perplexity search status"
+                    | "perplexity search key"
+                    | "perplexity search ready"
+                    | "perplexity search health"
+                    | "perplexity search configured"
+            ))
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -5767,6 +5776,129 @@ pub fn format_compact_ready_chip() -> String {
     format!("**Compact** · {menu} · {window} · Settings Product (config only)")
 }
 
+/// True for focused Downloads organizer Ready/config asks (`/downloads` · `/organizer`) —
+/// not Disk Cleanup `/disk`, BROWSER_DOWNLOAD, run-now, or enable/disable how-tos.
+pub fn looks_like_downloads_organizer_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Actions / other surfaces stay with pre-route / agent / `/disk`.
+    if n.contains("browser_download")
+        || n.contains("browser download")
+        || n.contains("download file")
+        || n.contains("download this")
+        || n.contains("download the")
+        || n.contains("download from")
+        || n.contains("download url")
+        || n.contains("download http")
+        || n.contains("run organizer")
+        || n.contains("run downloads")
+        || n.contains("organize now")
+        || n.contains("organize my")
+        || n.contains("clean now")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("enable download")
+        || n.contains("disable download")
+        || n.contains("enable organizer")
+        || n.contains("disable organizer")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("switch on")
+        || n.contains("switch off")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/downloads"
+            | "/organizer"
+            | "/downloads-organizer"
+            | "downloads"
+            | "downloads organizer"
+            | "downloads status"
+            | "downloads ready"
+            | "downloads health"
+            | "downloads on"
+            | "downloads off"
+            | "organizer"
+            | "organizer status"
+            | "organizer ready"
+            | "organizer health"
+            | "organizer on"
+            | "organizer off"
+            | "show downloads"
+            | "show organizer"
+            | "is downloads ready"
+            | "is downloads on"
+            | "is downloads off"
+            | "is downloads enabled"
+            | "is organizer ready"
+            | "is organizer on"
+            | "is organizer off"
+            | "is organizer enabled"
+            | "how's downloads"
+            | "hows downloads"
+            | "how's the downloads"
+            | "hows the downloads"
+            | "how's organizer"
+            | "hows organizer"
+            | "how's the organizer"
+            | "hows the organizer"
+            | "downloads organizer status"
+            | "downloads organizer ready"
+    )
+}
+
+/// Zero-LLM Downloads organizer Ready chip (config + last-run summary; no run-now).
+pub fn format_downloads_organizer_ready_chip() -> String {
+    let st = crate::commands::downloads_organizer::get_downloads_organizer_status();
+    let on_off = if st.enabled { "On" } else { "Off" };
+    let interval = st.interval.trim();
+    let dry = if st.dry_run { "dry-run" } else { "live" };
+    let path = {
+        let raw = st.path_raw.trim();
+        if raw.is_empty() {
+            "~/Downloads".to_string()
+        } else if let Ok(home) = std::env::var("HOME") {
+            if raw.starts_with(&home) {
+                format!("~{}", &raw[home.len()..])
+            } else {
+                raw.to_string()
+            }
+        } else {
+            raw.to_string()
+        }
+    };
+    let last = match st.last_run_utc.as_deref() {
+        Some(ts) if !ts.is_empty() => {
+            let short = ts.get(..19).unwrap_or(ts);
+            format!(
+                "last {short}Z · moved {} · skip {} · fail {}",
+                st.moved, st.skipped, st.failed
+            )
+        }
+        _ => "last · never".to_string(),
+    };
+    format!(
+        "**Downloads** · {on_off} · {interval} · {dry} · {path} · {last} · Settings (config only)"
+    )
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -6106,6 +6238,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_compact_ready_request(content) {
         return Some(format_compact_ready_chip());
     }
+    if looks_like_downloads_organizer_ready_request(content) {
+        return Some(format_downloads_organizer_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -6254,6 +6389,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
+• `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6607,6 +6743,42 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("compact context")
         && !q.contains("enable compact")
         && !q.contains("disable compact")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/downloads` · `/organizer` Ready chip asks (v0.1.741).
+    if (q.contains("/downloads")
+        || q.contains("/organizer")
+        || q.contains("downloads-organizer")
+        || q == "downloads"
+        || q == "organizer"
+        || q.contains("downloads organizer")
+        || q.contains("downloads status")
+        || q.contains("organizer status")
+        || q.contains("is downloads ready")
+        || q.contains("is downloads on")
+        || q.contains("is organizer ready")
+        || q.contains("how's downloads")
+        || q.contains("hows downloads")
+        || q.contains("how's organizer")
+        || q.contains("hows organizer"))
+        && !q.contains("/disk")
+        && !q.contains("disk cleanup")
+        && !q.contains("browser_download")
+        && !q.contains("browser download")
+        && !q.contains("download file")
+        && !q.contains("run organizer")
+        && !q.contains("organize now")
+        && !q.contains("organize my")
+        && !q.contains("enable download")
+        && !q.contains("disable download")
         && !q.contains("turn on")
         && !q.contains("turn off")
         && !q.contains("why")
@@ -8644,6 +8816,18 @@ mod tests {
         assert!(try_operator_instant_reply("compact memory").is_none());
         assert!(try_operator_instant_reply("enable compact").is_none());
         assert!(try_operator_instant_reply("compact this session").is_none());
+        let downloads = try_operator_instant_reply("/downloads").expect("downloads");
+        assert!(
+            downloads.to_lowercase().contains("download"),
+            "{downloads}"
+        );
+        assert!(try_operator_instant_reply("/organizer").is_some());
+        assert!(try_operator_instant_reply("is downloads ready").is_some());
+        assert!(try_operator_instant_reply("how's organizer").is_some());
+        assert!(try_operator_instant_reply("download file from url").is_none());
+        assert!(try_operator_instant_reply("run organizer now").is_none());
+        assert!(try_operator_instant_reply("organize my downloads").is_none());
+        assert!(try_operator_instant_reply("/disk").is_some()); // disk cleanup, not organizer
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -9923,6 +10107,27 @@ mod tests {
         assert!(!looks_like_compact_ready_request("enable compact"));
         assert!(!looks_like_compact_ready_request("how to enable compact"));
         assert!(!looks_like_compact_ready_request("run compaction"));
+        assert!(looks_like_downloads_organizer_ready_request("/downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("/organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("downloads status"));
+        assert!(looks_like_downloads_organizer_ready_request("is downloads ready"));
+        assert!(looks_like_downloads_organizer_ready_request("how's organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("downloads organizer"));
+        assert!(!looks_like_downloads_organizer_ready_request("download file"));
+        assert!(!looks_like_downloads_organizer_ready_request("run organizer"));
+        assert!(!looks_like_downloads_organizer_ready_request("organize my downloads"));
+        assert!(!looks_like_downloads_organizer_ready_request("/disk"));
+        assert!(!looks_like_downloads_organizer_ready_request("enable downloads"));
+        let downloads_chip = format_downloads_organizer_ready_chip();
+        assert!(
+            downloads_chip.to_lowercase().contains("download"),
+            "{downloads_chip}"
+        );
+        assert!(
+            downloads_chip.contains("On") || downloads_chip.contains("Off"),
+            "{downloads_chip}"
+        );
         let ai_chip = format_ai_agent_ready_chip();
         assert!(ai_chip.to_lowercase().contains("ai"), "{ai_chip}");
         assert!(
@@ -10036,6 +10241,8 @@ mod tests {
         assert!(report.contains("/compact"), "{report}");
         assert!(report.contains("/menu-bar"), "{report}");
         assert!(report.contains("/cpu-window"), "{report}");
+        assert!(report.contains("/downloads"), "{report}");
+        assert!(report.contains("/organizer"), "{report}");
         assert!(report.contains("/telegram"), "{report}");
         assert!(report.contains("/slack"), "{report}");
         assert!(report.contains("/signal"), "{report}");

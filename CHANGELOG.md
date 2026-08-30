@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.741] - 2026-08-30
+
+### Added
+- **`/downloads` · `/organizer` instant operator** — Downloads organizer On/Off chip (interval · dry-run · path · last run; config only, does not run; Discord + AI Chat; does not steal `/disk` Disk Cleanup, `BROWSER_DOWNLOAD`, or organize-now asks).
+
 ## [0.1.740] - 2026-08-30
 
 ### Added
