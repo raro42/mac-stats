@@ -6,6 +6,7 @@ Overnight Track B kept shipping operator Ready chips and catalogs so config and 
 
 | Version | What |
 | --- | --- |
+| **v0.1.735** | **`/judge` instant** — Judge Ready / Off (`agentJudgeEnabled` · failure-only vs every run; config only, no judge run; Discord + AI Chat; does not steal “judge this” / enable/disable / score) |
 | **v0.1.734** | **`/browser` · `/cdp` instant** — Browser / CDP Ready / Off / Not set (Chromium path + port; config only, no live probe; Discord + AI Chat; does not steal `BROWSER_*` / screenshot / navigate) |
 | **v0.1.733** | **`/plugins` · `/plugins on` · `/plugins off` instant** — registered script plugins On/Off list (Agents On/Off parity; Discord + AI Chat; no script run; does not steal add/run/remove) |
 | **v0.1.732** | **`/tasks` · `/tasks all` instant** — Active (open·WIP) or All task files from `~/.mac-stats/task/` (TASK_LIST parity; Discord + AI Chat; does not steal `TASK_CREATE:` / `TASK_SHOW:`) |
@@ -23,8 +24,8 @@ Overnight Track B kept shipping operator Ready chips and catalogs so config and 
 ## Fuel / gate
 
 - Digester **open** stayed empty; design review **due=false** (grace; `feature-ai-chat` still recommended).
-- Fuel = standing backlog **p50** — after `/plugins`, Browser/CDP Ready chip (`/browser` · `/cdp`).
-- Latest keep: **v0.1.734** @ `64160a93`.
+- Fuel = standing backlog **p50** — after `/browser`, Judge Ready chip (`/judge`).
+- Latest keep: **v0.1.735**.
 
 ## Next for Ralf
 
