@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.738] - 2026-08-30
+
+### Fixed
+- **Temperature “SMC: No data”** — that label was wrong: SMC works; a missing helper (`thermalLevelFromCpuDetails`) threw after a good °C sample so the subtext never flipped to Thermal. Also hold the last good reading across momentary cache zeros.
+
 ## [0.1.737] - 2026-08-30
 
 ### Fixed

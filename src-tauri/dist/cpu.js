@@ -219,6 +219,28 @@ let previousValues = {
   totalPower: 0  // CRITICAL: Cache total power to prevent flickering in updateBatteryPower()
 };
 
+/**
+ * Prefer Apple NSProcessInfo.thermalState; else coarse °C bands for the subtext.
+ * Missing this helper left refresh throwing after a good °C sample — subtext stuck
+ * on the old "SMC: No data" path.
+ */
+function thermalLevelFromCpuDetails(data) {
+  const fromOs =
+    typeof data?.thermal_state === "string" ? data.thermal_state.trim() : "";
+  if (["Nominal", "Fair", "Serious", "Critical"].includes(fromOs)) {
+    return fromOs;
+  }
+  const t =
+    typeof data?.temperature === "number" && Number.isFinite(data.temperature)
+      ? data.temperature
+      : 0;
+  if (t <= 0) return null;
+  if (t >= 90) return "Critical";
+  if (t >= 80) return "Serious";
+  if (t >= 70) return "Fair";
+  return "Nominal";
+}
+
 // STEP 7: Batch DOM updates to reduce WebKit rendering
 // Collect all DOM changes and apply them in a single requestAnimationFrame
 let pendingDOMUpdates = [];
@@ -1343,6 +1365,19 @@ async function refresh() {
     const tempHint = document.getElementById("temperature-hint");
     const tempSubtext = document.getElementById("temperature-subtext");
     const newTemp = Math.round(data.temperature);
+    const hasFreshTemp =
+      typeof data.temperature === "number" &&
+      Number.isFinite(data.temperature) &&
+      data.temperature > 0;
+    if (hasFreshTemp) {
+      previousValues.temperature = data.temperature;
+    }
+    const heldTemp =
+      hasFreshTemp
+        ? data.temperature
+        : previousValues.temperature > 0
+          ? previousValues.temperature
+          : 0;
     
     if (shouldUpdateTemperature) {
       if (!data.can_read_temperature) {
@@ -1351,84 +1386,76 @@ async function refresh() {
         if (currentDisplay !== "—") {
           scheduleDOMUpdate(() => {
             tempEl.innerHTML = "—";
-            tempSubtext.textContent = "—";
+            if (tempSubtext) tempSubtext.textContent = "—";
           });
         }
         // Only show hint after multiple failed attempts
         const shouldShowHint = failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
-        if (tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
+        if (tempHint && tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
           scheduleDOMUpdate(() => {
             tempHint.style.display = shouldShowHint ? "block" : "none";
           });
         }
       } else {
         failedAttempts.temperature = 0;
-        if (tempHint.style.display !== "none") {
+        if (tempHint && tempHint.style.display !== "none") {
           scheduleDOMUpdate(() => {
             tempHint.style.display = "none";
           });
         }
-        // Show temperature even if it's 0.0 (might be unsupported Mac model)
-        // But show "—" if temperature is exactly 0.0 and we've been trying for a while
-        if (newTemp === 0 && data.temperature === 0.0) {
-          // Temperature is 0.0 - might be unsupported Mac model
-          // Still show it as "0°C" to indicate we're trying to read it
-          const numberText = "0";
-          const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
-          
+        // can_read is true. A 0.0 sample is usually a momentary cache miss / lock —
+        // not "SMC broken". Keep the last good °C; never show "SMC: No data" here.
+        if (heldTemp > 0) {
+          const numberText = `${Math.round(heldTemp)}`;
+          const currentText = tempEl.textContent.match(/^\d+/)
+            ? tempEl.textContent.match(/^\d+/)[0]
+            : "";
           if (currentText !== numberText) {
             scheduleDOMUpdate(() => {
-              // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
               if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
                 tempEl.firstChild.textContent = numberText;
               } else {
                 tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
               }
             });
-            previousValues.temperature = 0;
           }
-          if (tempSubtext.textContent !== "SMC: No data") {
-            scheduleDOMUpdate(() => {
-              tempSubtext.textContent = "SMC: No data";
-            });
-          }
-        } else {
-          const numberText = `${newTemp}`;
-          // Get current number by extracting digits from textContent (ignoring °C)
-          const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
-          
-          if (currentText !== numberText) {
-            scheduleDOMUpdate(() => {
-              // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
-              if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
-                tempEl.firstChild.textContent = numberText;
-              } else {
-                tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
-              }
-            });
-            previousValues.temperature = newTemp;
-          }
-          // Thermal state subtext — prefer OS thermalState; else °C bands
-          const thermalLevel = thermalLevelFromCpuDetails(data);
+          const thermalLevel = thermalLevelFromCpuDetails({
+            ...data,
+            temperature: heldTemp,
+          });
           const thermalText = thermalLevel
             ? `Thermal: ${thermalLevel}`
             : "Thermal: Nominal";
-          if (tempSubtext.textContent !== thermalText) {
+          if (tempSubtext && tempSubtext.textContent !== thermalText) {
             scheduleDOMUpdate(() => {
               tempSubtext.textContent = thermalText;
             });
           }
+        } else if (tempSubtext) {
+          // Capability OK but no sample yet — stay quiet, no false "SMC: No data".
+          const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
+          if (currentDisplay !== "—") {
+            scheduleDOMUpdate(() => {
+              tempEl.innerHTML = "—";
+            });
+          }
+          if (tempSubtext.textContent !== "—") {
+            scheduleDOMUpdate(() => {
+              tempSubtext.textContent = "—";
+            });
+          }
         }
       }
-      // Ring gauge and theme charts only when we refresh temperature
-      updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
+      // Ring gauge: use held °C so a cache miss does not collapse the ring to empty.
+      const ringTemp = data.can_read_temperature && heldTemp > 0 ? heldTemp : 0;
+      updateRingGauge("temperature-ring-progress", Math.min(100, ringTemp), 'temperature');
       
       ensureTempStrip();
       const tempStripEl = document.getElementById("temp-strip-value");
       const tempStripCell = document.getElementById("temp-strip");
       let tempStripText = "—";
-      if (data.can_read_temperature) {
-        tempStripText = `${newTemp}°C`;
+      if (data.can_read_temperature && heldTemp > 0) {
+        tempStripText = `${Math.round(heldTemp)}°C`;
       }
       if (tempStripEl && tempStripEl.textContent !== tempStripText) {
         scheduleDOMUpdate(() => {
@@ -1438,8 +1465,8 @@ async function refresh() {
       if (tempStripCell) {
         const hot =
           data.can_read_temperature &&
-          typeof data.temperature === "number" &&
-          data.temperature >= 70;
+          heldTemp > 0 &&
+          heldTemp >= 70;
         tempStripCell.classList.toggle("is-hot", hot);
         const title = "Show temperature ring";
         tempStripCell.title = title;
