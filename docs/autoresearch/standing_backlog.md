@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.732** — `/tasks` · `/tasks all` instant — Active (open·WIP) or All task files under `~/.mac-stats/task/` (TASK_LIST parity; Discord + AI Chat; does not steal `TASK_CREATE:` / `TASK_SHOW:` / create-append-status).
+
 - **v0.1.731** — `/skills` instant — installed skills catalog (Hermes skills_list / SKILLS_LIST; Discord + AI Chat; does not steal `SKILL:` / `SKILL_VIEW:`).
 
 - **v0.1.730** — `/telegram` · `/slack` · `/signal` · `/alerts` instant — alert channel Ready / Not set / Partial (Keychain + registry; no live send; Discord catch-all also covers prior Ready chips).
