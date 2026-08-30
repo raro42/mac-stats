@@ -245,6 +245,14 @@ body {
   white-space: nowrap;
 }
 
+/* Click-to-copy injects styles globally — keep poster values absolutely centered. */
+.poster-tile .metric-value[data-metric-copy="1"] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .metric-unit {
   font-size: 8px;
   font-weight: 300;

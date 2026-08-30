@@ -2495,10 +2495,17 @@ function ensureMetricValueCopyStyles() {
     .battery-level[data-metric-copy="1"],
     .power-value[data-metric-copy="1"] {
       cursor: pointer;
-      position: relative;
       border-radius: 8px;
       outline: none;
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    /* Flow-layout themes (Apple rings): need a containing block for Copied ::after.
+       Absolute-centered themes (data-poster, dark, …) must keep position:absolute —
+       overriding to relative + top:50% shifted GPU/Freq/Temp down vs CPU. */
+    .metric-card > .metric-value[data-metric-copy="1"],
+    .battery-level[data-metric-copy="1"],
+    .power-value[data-metric-copy="1"] {
+      position: relative;
     }
     .metric-value[data-metric-copy="1"]:hover,
     .battery-level[data-metric-copy="1"]:hover,

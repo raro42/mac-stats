@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.737] - 2026-08-30
+
+### Fixed
+- **Data Poster gauge alignment** — click-to-copy styles no longer force `position: relative` on absolute-centered metric values, so CPU / GPU / Freq / Temp numbers share one baseline again.
+
 ## [0.1.736] - 2026-08-30
 
 ### Added
