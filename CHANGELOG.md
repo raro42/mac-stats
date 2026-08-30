@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.734] - 2026-08-30
+
+### Added
+- **`/browser` · `/cdp` instant operator** — Browser / CDP Ready / Off / Not set chip (Chromium path + CDP port; config only, no live `/json/version` probe; Discord + AI Chat; does not steal `BROWSER_*` / screenshot / navigate asks).
+
 ## [0.1.733] - 2026-08-30
 
 ### Added

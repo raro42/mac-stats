@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.734** — `/browser` · `/cdp` instant — Browser / CDP Ready / Off / Not set (Chromium path + port; config only, no live probe; Discord + AI Chat; does not steal `BROWSER_*` / screenshot / navigate).
+
 - **v0.1.733** — `/plugins` · `/plugins on` · `/plugins off` instant — registered script plugins On/Off list (Agents On/Off parity; Discord + AI Chat; no script run; does not steal add/run/remove or “search for tauri plugins”).
 
 - **v0.1.732** — `/tasks` · `/tasks all` instant — Active (open·WIP) or All task files under `~/.mac-stats/task/` (TASK_LIST parity; Discord + AI Chat; does not steal `TASK_CREATE:` / `TASK_SHOW:` / create-append-status).

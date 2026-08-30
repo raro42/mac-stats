@@ -5344,6 +5344,140 @@ pub fn format_cursor_agent_ready_chip() -> String {
     }
 }
 
+/// True for focused Browser / CDP Ready asks (`/browser` · `/cdp`) —
+/// not BROWSER_* tools, screenshots, or navigate/click tasks.
+pub fn looks_like_browser_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Tool invocations and browse tasks stay with pre-route / agent.
+    if n.starts_with("browser_")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("scroll")
+        || n.contains("hover")
+        || n.contains("browse ")
+        || n.contains("open page")
+        || n.contains("open url")
+        || n.contains("take a")
+        || n.contains("capture")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("www.")
+        || n.contains("launch chrome")
+        || n.contains("start chrome")
+        || n.contains("start chromium")
+        || n.contains("invoke")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/browser"
+            | "/cdp"
+            | "browser"
+            | "cdp"
+            | "browser status"
+            | "browser ready"
+            | "browser offline"
+            | "browser configured"
+            | "browser health"
+            | "browser tools"
+            | "cdp status"
+            | "cdp ready"
+            | "cdp offline"
+            | "cdp configured"
+            | "cdp health"
+            | "cdp port"
+            | "chromium status"
+            | "chromium ready"
+            | "show browser"
+            | "show cdp"
+            | "is browser ready"
+            | "is browser online"
+            | "is browser connected"
+            | "is browser offline"
+            | "is browser configured"
+            | "is browser set up"
+            | "is browser setup"
+            | "is browser enabled"
+            | "is cdp ready"
+            | "is cdp online"
+            | "is cdp connected"
+            | "is cdp offline"
+            | "is cdp configured"
+            | "is cdp set up"
+            | "is cdp setup"
+            | "how's browser"
+            | "hows browser"
+            | "how's the browser"
+            | "hows the browser"
+            | "how's cdp"
+            | "hows cdp"
+            | "how's the cdp"
+            | "hows the cdp"
+            | "browser connection"
+            | "cdp connection"
+            | "browser cdp"
+            | "cdp browser"
+    )
+}
+
+/// Zero-LLM Browser / CDP Ready chip (config + binary path only; no live `/json/version` probe).
+pub fn format_browser_ready_chip() -> String {
+    let port = crate::config::Config::browser_cdp_port();
+    if !crate::config::Config::browser_tools_enabled() {
+        return format!(
+            "**Browser** · Off · set `browserToolsEnabled` true · CDP {port}"
+        );
+    }
+    let path = crate::config::Config::browser_chromium_executable_path();
+    let chrome_ok = if path.is_absolute() {
+        path.is_file()
+    } else {
+        // Relative / PATH-style name (Linux default): treat as present without probing PATH.
+        true
+    };
+    let short = path
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("Chromium");
+    let short = if short.chars().count() > 28 {
+        let mut s: String = short.chars().take(25).collect();
+        s.push('…');
+        s
+    } else {
+        short.to_string()
+    };
+    if chrome_ok {
+        format!("**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*")
+    } else if crate::config::Config::browser_chromium_executable_configured() {
+        format!(
+            "**Browser** · Not set · Chromium missing · CDP {port} · fix `browserChromiumExecutable`"
+        )
+    } else {
+        format!(
+            "**Browser** · Not set · install Google Chrome · CDP {port} (or set `browserChromiumExecutable`)"
+        )
+    }
+}
+
 fn alert_ready_reject_noise(n: &str) -> bool {
     n.contains("send ")
         || n.contains("post ")
@@ -5671,6 +5805,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_cursor_agent_ready_request(content) {
         return Some(format_cursor_agent_ready_chip());
     }
+    if looks_like_browser_ready_request(content) {
+        return Some(format_browser_ready_chip());
+    }
     if looks_like_telegram_ready_request(content) {
         return Some(format_telegram_ready_chip());
     }
@@ -5815,6 +5952,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
+• `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -6054,6 +6192,34 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("add ")
         && !q.contains("install")
         && !q.contains("tauri")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/browser` · `/cdp` Ready chip asks (v0.1.734).
+    if (q.contains("/browser")
+        || q.contains("/cdp")
+        || q == "browser"
+        || q == "cdp"
+        || q.contains("browser status")
+        || q.contains("cdp status")
+        || q.contains("is browser ready")
+        || q.contains("is cdp ready")
+        || q.contains("how's browser")
+        || q.contains("hows browser")
+        || q.contains("how's cdp")
+        || q.contains("hows cdp")
+        || q.contains("chromium status")
+        || q.contains("chromium ready"))
+        && !q.contains("browser_")
+        && !q.contains("screenshot")
+        && !q.contains("navigate")
+        && !q.contains("click")
+        && !q.contains("http")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -8052,6 +8218,14 @@ mod tests {
         assert!(try_operator_instant_reply("how's cursor-agent").is_some());
         assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
         assert!(try_operator_instant_reply("ask cursor to refactor auth").is_none());
+        let browser = try_operator_instant_reply("/browser").expect("browser");
+        assert!(browser.to_lowercase().contains("browser"), "{browser}");
+        assert!(try_operator_instant_reply("/cdp").is_some());
+        assert!(try_operator_instant_reply("is browser ready").is_some());
+        assert!(try_operator_instant_reply("how's cdp").is_some());
+        assert!(try_operator_instant_reply("BROWSER_SCREENSHOT: https://example.com").is_none());
+        assert!(try_operator_instant_reply("take a screenshot of apple.com").is_none());
+        assert!(try_operator_instant_reply("navigate to https://example.com").is_none());
         let telegram = try_operator_instant_reply("/telegram").expect("telegram");
         assert!(telegram.to_lowercase().contains("telegram"), "{telegram}");
         assert!(try_operator_instant_reply("is telegram ready").is_some());
@@ -9269,6 +9443,30 @@ mod tests {
     }
 
     #[test]
+    fn browser_ready_request_detected() {
+        assert!(looks_like_browser_ready_request("/browser"));
+        assert!(looks_like_browser_ready_request("/cdp"));
+        assert!(looks_like_browser_ready_request("browser"));
+        assert!(looks_like_browser_ready_request("cdp"));
+        assert!(looks_like_browser_ready_request("browser status"));
+        assert!(looks_like_browser_ready_request("cdp status"));
+        assert!(looks_like_browser_ready_request("is browser ready"));
+        assert!(looks_like_browser_ready_request("is cdp configured"));
+        assert!(looks_like_browser_ready_request("how's browser"));
+        assert!(looks_like_browser_ready_request("how's cdp"));
+        assert!(looks_like_browser_ready_request("chromium ready"));
+        assert!(!looks_like_browser_ready_request("BROWSER_SCREENSHOT: https://x.com"));
+        assert!(!looks_like_browser_ready_request("take a screenshot of apple.com"));
+        assert!(!looks_like_browser_ready_request("navigate to example.com"));
+        assert!(!looks_like_browser_ready_request("click the login button"));
+        assert!(!looks_like_browser_ready_request("how to use browser"));
+        assert!(!looks_like_browser_ready_request("browse https://example.com"));
+        let chip = format_browser_ready_chip();
+        assert!(chip.to_lowercase().contains("browser"), "{chip}");
+        assert!(chip.contains("CDP") || chip.contains("cdp"), "{chip}");
+    }
+
+    #[test]
     fn telegram_ready_request_detected() {
         assert!(looks_like_telegram_ready_request("/telegram"));
         assert!(looks_like_telegram_ready_request("telegram"));
@@ -9362,6 +9560,8 @@ mod tests {
         assert!(report.contains("/mcp"), "{report}");
         assert!(report.contains("/cursor"), "{report}");
         assert!(report.contains("/cursor-agent"), "{report}");
+        assert!(report.contains("/browser"), "{report}");
+        assert!(report.contains("/cdp"), "{report}");
         assert!(report.contains("/telegram"), "{report}");
         assert!(report.contains("/slack"), "{report}");
         assert!(report.contains("/signal"), "{report}");
