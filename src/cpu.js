@@ -6233,13 +6233,18 @@ function initMonitorsSection() {
     }
     const glance = document.getElementById('monitors-collapsed-glance');
     if (glance) glance.hidden = true;
+    const attention = document.getElementById('monitors-attention-glance');
+    if (attention) {
+      attention.hidden = true;
+      attention.classList.remove('has-down', 'has-slow');
+    }
   };
   applyMonitorsCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'monitors-content',
     getExpanded: () => !monitorsCollapsed,
-    ignoreSelector: '#monitors-menu-btn, #monitors-collapsed-glance',
+    ignoreSelector: '#monitors-menu-btn, #monitors-collapsed-glance, #monitors-attention-glance',
     onToggle: () => {
       monitorsCollapsed = !monitorsCollapsed;
       saveMonitorsCollapsedState(monitorsCollapsed);
@@ -6915,6 +6920,115 @@ function visibleMonitorItems(monitorsList) {
 /** UP latency ≥ this ms counts as Slow (menu-bar Mon amber / summary slowest parity). */
 const MONITOR_SLOW_MS = 2000;
 
+/**
+ * Down/Slow attention glance under Monitors summary (Agent Ops Fail/Slow / Hot parity).
+ * Visible when the section is open and any listed monitor is DOWN or Slow.
+ */
+function ensureMonitorsAttentionGlance() {
+  ensureMonitorsFilterChips();
+  const chips = document.getElementById('monitors-filter-chips');
+  const summary = document.getElementById('monitors-summary');
+  const list = document.getElementById('monitors-list');
+  let glance = document.getElementById('monitors-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'monitors-attention-glance';
+    glance.className = 'monitors-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="monitors-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement('beforebegin', glance);
+    } else if (summary) {
+      summary.insertAdjacentElement('afterend', glance);
+    } else if (list?.parentNode) {
+      list.parentNode.insertBefore(glance, list);
+    } else {
+      return null;
+    }
+    wireMonitorsAttentionGlanceClick(glance);
+  } else if (chips && glance.nextElementSibling !== chips) {
+    chips.insertAdjacentElement('beforebegin', glance);
+  }
+  return glance;
+}
+
+function applyMonitorsAttentionGlanceState(downCount, slowCount, empty) {
+  const glance = ensureMonitorsAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('monitors-attention-glance-text');
+  if (monitorsCollapsed || empty || (downCount <= 0 && slowCount <= 0)) {
+    glance.hidden = true;
+    glance.classList.remove('has-down', 'has-slow');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.toggle('has-down', downCount > 0);
+  glance.classList.toggle('has-slow', downCount <= 0 && slowCount > 0);
+  const parts = [];
+  if (downCount > 0) {
+    parts.push(downCount === 1 ? '1 down' : `${downCount} down`);
+  }
+  if (slowCount > 0) {
+    parts.push(slowCount === 1 ? '1 slow' : `${slowCount} slow`);
+  }
+  const label = parts.join(' · ');
+  if (text) text.textContent = `Monitors · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  const filterHint = downCount > 0 ? 'Down' : 'Slow';
+  glance.title = `Show ${filterHint} sites only (${filterHint} filter)`;
+  glance.setAttribute(
+    'aria-label',
+    `Monitors has ${label} — click to open ${filterHint} filter`
+  );
+}
+
+function activateMonitorsAttentionGlance() {
+  ensureMonitorsSectionExpanded();
+  const list = document.getElementById('monitors-list');
+  const items = list
+    ? Array.from(list.querySelectorAll('.monitor-item'))
+    : [];
+  const downN = items.filter((el) => el.classList.contains('is-down')).length;
+  setMonitorsFilterMode(downN > 0 ? 'down' : 'slow');
+  const first =
+    list?.querySelector('.monitor-item.is-down') ||
+    list?.querySelector('.monitor-item.is-slow') ||
+    visibleMonitorItems(list)[0];
+  if (first && typeof first.scrollIntoView === 'function') {
+    const rows = visibleMonitorItems(list);
+    rows.forEach((r) =>
+      r.setAttribute('tabindex', r === first ? '0' : '-1')
+    );
+    first.scrollIntoView({ block: 'nearest' });
+    if (typeof first.focus === 'function') first.focus();
+  } else {
+    const mode = downN > 0 ? 'down' : 'slow';
+    const chip =
+      document.querySelector(
+        `#monitors-filter-chips [data-monitors-filter="${mode}"]`
+      ) || document.getElementById('monitors-filter-chips');
+    chip?.focus?.();
+  }
+}
+
+function wireMonitorsAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.monitorsAttentionWired === '1') return;
+  glance.dataset.monitorsAttentionWired = '1';
+  const activate = () => activateMonitorsAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** All / Up / Down / Slow chips (Top Processes Hot filter parity). */
 function ensureMonitorsFilterChips() {
   const content = document.getElementById('monitors-content');
@@ -7051,6 +7165,7 @@ function applyMonitorsListFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensureMonitorsFilterMissState(monitorsList, false);
+    applyMonitorsAttentionGlanceState(0, 0, true);
     updateMonitorsHeight();
     return;
   }
@@ -7071,6 +7186,7 @@ function applyMonitorsListFilter() {
   ensureMonitorsFilterMissState(monitorsList, visible === 0);
   ensureMonitorsListKbHint(monitorsList, visible > 0);
   syncMonitorsListTabOrder(monitorsList);
+  applyMonitorsAttentionGlanceState(downCount, slowCount, false);
   updateMonitorsHeight();
 }
 
@@ -8533,14 +8649,16 @@ function updateMonitorsHeight() {
   const monitorsContent = document.getElementById('monitors-content');
   if (!monitorsList || !monitorsContent) return;
   
-  // Calculate height needed: summary + filter chips + each visible monitor item
+  // Calculate height needed: summary + attention + filter chips + each visible monitor item
   const monitorItems = visibleMonitorItems(monitorsList);
   const emptyEl =
     monitorsList.querySelector('.monitors-list-empty') ||
     monitorsList.querySelector('.monitors-filter-miss');
   const chips = document.getElementById('monitors-filter-chips');
+  const attention = document.getElementById('monitors-attention-glance');
   const itemHeight = 52; // row + down-meta / error lines
   const summaryHeight = 40;
+  const attentionHeight = attention && !attention.hidden ? 44 : 0;
   const chipsHeight = chips && !chips.hidden ? 36 : 0;
   const listMargin = 12;
   let openDetailExtra = 0;
@@ -8563,6 +8681,7 @@ function updateMonitorsHeight() {
   const emptyHeight = emptyEl ? 110 : 0;
   const totalHeight =
     summaryHeight +
+    attentionHeight +
     chipsHeight +
     (monitorItems.length > 0
       ? listMargin + monitorItems.length * itemHeight + openDetailExtra

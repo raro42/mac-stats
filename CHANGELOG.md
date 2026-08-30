@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.748] - 2026-08-31
+
+### Added
+- **External / Monitors Down/Slow attention glance** — when any listed site is DOWN or Slow (≥2000 ms), a **Monitors · N down · M slow** strip appears under the summary (Agent Ops Fail/Slow / Top Processes Hot parity). Red wash for Down, amber for Slow-only. Click or Enter opens the Down (prefer) or Slow filter and focuses the first matching row. Hidden while the section is collapsed (keep-header glance stays).
+
 ## [0.1.747] - 2026-08-30
 
 ### Added

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.748** — External / Monitors Down/Slow attention glance (red Down / amber Slow strip; click → Down or Slow filter; design review / `feature-monitors`).
+
 - **v0.1.747** — Top Processes Hot attention glance (amber strip; click → Hot filter; design review / `feature-processes`).
 
 
