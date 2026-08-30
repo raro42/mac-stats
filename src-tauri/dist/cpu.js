@@ -2068,6 +2068,7 @@ async function refresh() {
 
     feedThemeHistoryCharts(data, shouldUpdateTemperature);
     updateRingHotStates(data);
+    updatePowerStripHotAttention(data);
 
     // STEP 7: Update process list only every 15 seconds to reduce CPU usage
     // Use document fragment to batch DOM updates and reduce WebKit reflows
@@ -2939,6 +2940,53 @@ function openRamDetailsFromStrip() {
   flashRamDetails();
 }
 
+function flashUptimeDetails() {
+  const el = document.getElementById('uptime-value');
+  if (!el) return;
+  el.classList.add('is-uptime-highlight');
+  const label = el.previousElementSibling;
+  if (label && label.classList.contains('detail-label')) {
+    label.classList.add('is-uptime-highlight');
+  }
+  window.setTimeout(() => {
+    el.classList.remove('is-uptime-highlight');
+    if (label && label.classList.contains('detail-label')) {
+      label.classList.remove('is-uptime-highlight');
+    }
+  }, 1600);
+}
+
+function openUptimeFromStrip() {
+  if (typeof window.showCpuDetailsSection === 'function') {
+    window.showCpuDetailsSection();
+  } else if (typeof window.showDetailsProcessesSections === 'function') {
+    window.showDetailsProcessesSections();
+  }
+  const uptimeEl = document.getElementById('uptime-value');
+  if (uptimeEl && typeof uptimeEl.scrollIntoView === 'function') {
+    uptimeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  flashUptimeDetails();
+}
+
+function flashDiskCleanupSection() {
+  const section = document.querySelector('.disk-cleanup-section');
+  if (!section) return;
+  section.classList.add('is-disk-highlight');
+  window.setTimeout(() => section.classList.remove('is-disk-highlight'), 1600);
+}
+
+function openDiskCleanupFromStrip() {
+  if (typeof ensureDiskCleanupSectionExpanded === 'function') {
+    ensureDiskCleanupSectionExpanded();
+  }
+  const header = document.getElementById('disk-cleanup-header');
+  if (header && typeof header.scrollIntoView === 'function') {
+    header.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  flashDiskCleanupSection();
+}
+
 function flashCpuRing() {
   const card = document.getElementById("cpu-usage-card");
   if (!card) return;
@@ -3271,6 +3319,189 @@ const RING_HOT_CPU_PCT = 50;
 const RING_HOT_GPU_PCT = 15;
 const RING_HOT_FREQ_GHZ = 3.5;
 const RING_HOT_TEMP_C = 70;
+
+/** Power-strip Hot attention — `/strip hot` cues not covered by rings Hot. */
+const STRIP_HOT_BAT_LOW_PCT = 20;
+const STRIP_HOT_UPTIME_LONG_SECS = 7 * 24 * 3600;
+const STRIP_HOT_RAM_PCT = 85;
+const STRIP_HOT_SSD_PCT = 85;
+const STRIP_HOT_ORDER = ['bat', 'lpm', 'heat', 'up', 'ram', 'ssd'];
+const STRIP_HOT_LABELS = {
+  bat: 'Bat',
+  lpm: 'LPM',
+  heat: 'Heat',
+  up: 'Up',
+  ram: 'RAM',
+  ssd: 'SSD',
+};
+
+/**
+ * Collect power-strip Hot keys from live metrics (`/strip hot` parity minus rings).
+ * Order matches gateway strip rows: Bat · LPM · Heat · Up · RAM · SSD.
+ */
+function collectPowerStripHotKeys(data) {
+  if (!data || typeof data !== 'object') return [];
+  const hot = [];
+  const hasBat = !!data.has_battery;
+  const level =
+    typeof data.battery_level === 'number' && Number.isFinite(data.battery_level)
+      ? data.battery_level
+      : null;
+  if (
+    hasBat &&
+    level != null &&
+    level <= STRIP_HOT_BAT_LOW_PCT &&
+    !data.is_charging
+  ) {
+    hot.push('bat');
+  }
+  if (data.low_power_mode) hot.push('lpm');
+  const heat = thermalLevelFromCpuDetails(data);
+  if (heat === 'Fair' || heat === 'Serious' || heat === 'Critical') {
+    hot.push('heat');
+  }
+  const upSecs =
+    typeof data.uptime_secs === 'number' && Number.isFinite(data.uptime_secs)
+      ? data.uptime_secs
+      : 0;
+  if (upSecs >= STRIP_HOT_UPTIME_LONG_SECS) hot.push('up');
+  const ram =
+    typeof data.ram_percent === 'number' && Number.isFinite(data.ram_percent)
+      ? data.ram_percent
+      : null;
+  if (ram != null && ram >= STRIP_HOT_RAM_PCT) hot.push('ram');
+  const ssd =
+    typeof data.disk_percent === 'number' && Number.isFinite(data.disk_percent)
+      ? data.disk_percent
+      : null;
+  if (ssd != null && ssd >= STRIP_HOT_SSD_PCT) hot.push('ssd');
+  return STRIP_HOT_ORDER.filter((k) => hot.includes(k));
+}
+
+/**
+ * Hot attention glance under the battery/power strip (rings Hot / Monitors Down/Slow parity).
+ * Summarizes Bat low · LPM On · Heat Fair+ · Up≥7d · RAM/SSD≥85% without restoring slimmed chips.
+ */
+function ensurePowerStripHotAttentionGlance() {
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip || !strip.parentNode) return null;
+  let glance = document.getElementById('power-strip-hot-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'power-strip-hot-attention-glance';
+    glance.className = 'power-strip-hot-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="power-strip-hot-attention-glance-text"></span>';
+    strip.insertAdjacentElement('afterend', glance);
+    wirePowerStripHotAttentionGlanceClick(glance);
+  } else if (glance.previousElementSibling !== strip) {
+    strip.insertAdjacentElement('afterend', glance);
+  }
+  return glance;
+}
+
+function applyPowerStripHotAttentionGlanceState(hotKeys) {
+  const glance = ensurePowerStripHotAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('power-strip-hot-attention-glance-text');
+  const keys = Array.isArray(hotKeys) ? hotKeys.filter(Boolean) : [];
+  if (keys.length <= 0) {
+    glance.hidden = true;
+    glance.classList.remove('has-hot', 'has-bat', 'has-lpm');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add('has-hot');
+  glance.classList.toggle('has-bat', keys.includes('bat'));
+  glance.classList.toggle('has-lpm', keys.includes('lpm') && !keys.includes('bat'));
+  const parts = keys.map((k) => STRIP_HOT_LABELS[k] || k);
+  const label = parts.join(' · ');
+  if (text) text.textContent = `Hot · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title =
+    'Open the first hot power-strip cue (Bat≤20% · LPM On · Heat Fair+ · Up≥7d · RAM/SSD≥85%)';
+  glance.setAttribute(
+    'aria-label',
+    `Power strip hot: ${label} — click to open the first hot cue`
+  );
+}
+
+function activatePowerStripHotAttentionGlance() {
+  const keys = Array.isArray(window._powerStripHotKeys)
+    ? window._powerStripHotKeys
+    : [];
+  const first = keys[0];
+  if (!first) {
+    document.getElementById('power-strip-hot-attention-glance')?.focus?.();
+    return;
+  }
+  const glance = document.getElementById('power-strip-hot-attention-glance');
+  glance?.classList.add('is-hot-attention-flash');
+  window.setTimeout(() => glance?.classList.remove('is-hot-attention-flash'), 900);
+  switch (first) {
+    case 'bat':
+      openBatterySettingsFromStrip();
+      {
+        const info = document.querySelector('#battery-power-strip .battery-info');
+        info?.classList.add('is-hot-attention-flash');
+        window.setTimeout(() => info?.classList.remove('is-hot-attention-flash'), 900);
+        const bat = document.getElementById('battery-level');
+        if (bat && typeof bat.focus === 'function') {
+          refreshPowerStripRovingTabindex(bat);
+          bat.focus();
+        }
+      }
+      break;
+    case 'lpm': {
+      const cell = document.getElementById('lpm-strip');
+      if (cell) {
+        cell.classList.add('is-hot-attention-flash');
+        window.setTimeout(() => cell.classList.remove('is-hot-attention-flash'), 900);
+        refreshPowerStripRovingTabindex(cell);
+        if (typeof cell.focus === 'function') cell.focus();
+      }
+      break;
+    }
+    case 'heat':
+      openTempRingFromStrip();
+      break;
+    case 'up':
+      openUptimeFromStrip();
+      break;
+    case 'ram':
+      openRamDetailsFromStrip();
+      break;
+    case 'ssd':
+      openDiskCleanupFromStrip();
+      break;
+    default:
+      break;
+  }
+}
+
+function wirePowerStripHotAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.powerStripHotAttentionWired === '1') return;
+  glance.dataset.powerStripHotAttentionWired = '1';
+  const activate = () => activatePowerStripHotAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
+function updatePowerStripHotAttention(data) {
+  const keys = collectPowerStripHotKeys(data);
+  window._powerStripHotKeys = keys;
+  applyPowerStripHotAttentionGlanceState(keys);
+}
 
 function getRingMetricCardEntries() {
   const section = getRingGaugeSection();

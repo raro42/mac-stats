@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.751] - 2026-08-31
+
+### Added
+- **Power strip Hot attention glance** — when Bat is low (≤20% not charging), LPM is On, Heat is Fair+, Up ≥7d, or RAM/SSD ≥85%, a **Hot · Bat · Heat · …** strip appears under the battery/power row (`/strip hot` parity; rings keep their own Hot glance). Click or Enter opens the first hot cue (Battery settings · LPM focus · temp ring · Details Up/RAM · Disk Cleanup). Does not restore the slimmed metric chip row. Design review / `feature-cpu-metrics`.
+
 ## [0.1.750] - 2026-08-31
 
 ### Added
