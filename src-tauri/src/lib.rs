@@ -401,6 +401,9 @@ fn run_internal(open_cpu_window: bool) {
             mcp::get_mcp_settings_status,
             // Browser / fetch for Ollama
             commands::browser::fetch_page,
+            commands::browser::get_browser_settings_status,
+            commands::browser::save_browser_settings,
+            commands::browser::clear_browser_settings,
             // Discord commands
             commands::discord::configure_discord,
             commands::discord::is_discord_configured,

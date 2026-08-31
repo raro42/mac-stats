@@ -12600,6 +12600,177 @@ function initMcpSettings() {
   window.McpSettings = { refreshStatus: refreshMcpStatus };
 }
 
+function updateBrowserConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'browser-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshBrowserStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateBrowserConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_browser_settings_status');
+    const tools = !(st && st.toolsEnabled === false);
+    const ready = !!(st && st.ready);
+    const exists = !!(st && st.pathExists);
+    const port = (st && st.port) || 9222;
+    const short = (st && st.pathDisplay) || 'Chromium';
+    const configured = !!(st && st.pathConfigured);
+    if (!tools) {
+      updateBrowserConfigStatus(`Off · CDP ${port}`);
+    } else if (ready) {
+      updateBrowserConfigStatus(
+        configured
+          ? `Ready · CDP ${port} · ${short}`
+          : `Ready · CDP ${port} · ${short} (default)`
+      );
+    } else if (!exists) {
+      updateBrowserConfigStatus(
+        configured
+          ? `Not set · missing · CDP ${port}`
+          : `Not set · install Chrome · CDP ${port}`
+      );
+    } else {
+      updateBrowserConfigStatus(`Not set · CDP ${port}`);
+    }
+    const pathInput = document.getElementById('browser-chromium-path-input');
+    const portInput = document.getElementById('browser-cdp-port-input');
+    if (pathInput && configured && st.path && !pathInput.value) {
+      pathInput.placeholder = st.path;
+    }
+    if (portInput && !portInput.value) {
+      portInput.placeholder = String(port);
+    }
+  } catch (_) {
+    updateBrowserConfigStatus('—');
+  }
+  if (typeof window.applySettingsBrowserAttentionGlanceState === 'function') {
+    window.applySettingsBrowserAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Browser Chromium path + CDP port (MCP parity; config.json). */
+function initBrowserSettings() {
+  const saveBtn = document.getElementById('browser-save');
+  const clearBtn = document.getElementById('browser-clear');
+  const pathInput = document.getElementById('browser-chromium-path-input');
+  const portInput = document.getElementById('browser-cdp-port-input');
+  let browserBusy = false;
+
+  function setBrowserBusy(busy, which) {
+    browserBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashBrowserBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (pathInput || portInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (browserBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const path = (pathInput && pathInput.value.trim()) || '';
+      const portRaw = (portInput && portInput.value.trim()) || '';
+      let port = null;
+      if (portRaw) {
+        const n = parseInt(portRaw, 10);
+        if (!Number.isFinite(n) || n < 1024 || n > 65535) {
+          alert('CDP port must be an integer from 1024 to 65535.');
+          return;
+        }
+        port = n;
+      }
+      if (!path && port == null) {
+        alert('Paste a Chromium path and/or a CDP port first.');
+        return;
+      }
+      setBrowserBusy(true, 'save');
+      try {
+        await invoke('save_browser_settings', {
+          chromiumPath: path || null,
+          cdpPort: port,
+        });
+        if (pathInput) pathInput.value = '';
+        if (portInput) portInput.value = '';
+        setBrowserBusy(false);
+        flashBrowserBtn(saveBtn, 'Saved');
+        await refreshBrowserStatus();
+      } catch (e) {
+        console.error('Browser save:', e);
+        setBrowserBusy(false);
+        alert('Could not save Browser settings: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (browserBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setBrowserBusy(true, 'clear');
+      try {
+        await invoke('clear_browser_settings');
+        if (pathInput) pathInput.value = '';
+        if (portInput) portInput.value = '';
+        setBrowserBusy(false);
+        flashBrowserBtn(clearBtn, 'Cleared');
+        await refreshBrowserStatus();
+      } catch (e) {
+        console.error('Browser clear:', e);
+        setBrowserBusy(false);
+        alert('Could not clear Browser settings: ' + String(e));
+      }
+    });
+  }
+
+  refreshBrowserStatus();
+  window.BrowserSettings = { refreshStatus: refreshBrowserStatus };
+}
+
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
   const s = String(raw || '');
@@ -20002,6 +20173,7 @@ function initMonitoringFeatures() {
       initRedmineSettings();
       initMastodonSettings();
       initMcpSettings();
+      initBrowserSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

@@ -718,6 +718,17 @@
               </div>
               <div class="setting-note">HTTP/SSE URL or stdio pipe string for MCP tools. Either is enough. Stored in Keychain (or set MCP_SERVER_URL / MCP_SERVER_STDIO in .config.env).</div>
             </div>
+            <div class="setting-item" id="browser-setting">
+              <div class="setting-label">Browser / CDP</div>
+              <div class="browser-status settings-status" id="browser-settings-status">—</div>
+              <input type="text" id="browser-chromium-path-input" class="settings-input discord-token-input" placeholder="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" autocomplete="off" spellcheck="false" />
+              <input type="number" id="browser-cdp-port-input" class="settings-input discord-token-input" placeholder="9222" min="1024" max="65535" inputmode="numeric" />
+              <div class="settings-actions browser-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="browser-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="browser-clear">Clear</button>
+              </div>
+              <div class="setting-note">Chromium executable + CDP port for BROWSER_* tools. Saved in ~/.mac-stats/config.json (browserChromiumExecutable / browserCdpPort). Clear restores default Chrome + port 9222.</div>
+            </div>
           </section>
         </div>
       </div>

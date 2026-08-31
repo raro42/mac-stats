@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.768] - 2026-08-31
+
+### Added
+- **Settings Browser / CDP Chromium path + port** — Credentials now has Save / Clear for visible Chromium (`browserChromiumExecutable`) and CDP port (`browserCdpPort` in `~/.mac-stats/config.json`). When Chromium is missing, a **Browser · Not set · add Chromium path** red strip appears above the controls (MCP / Mastodon parity). Click focuses the path field. `/browser` Not-set cue mentions Settings. Clear restores default Google Chrome + port 9222.
+
 ## [0.1.767] - 2026-08-31
 
 ### Added

@@ -694,6 +694,106 @@ pub async fn fetch_page(url: String) -> Result<String, String> {
         .map_err(|e| format!("Task join: {}", e))?
 }
 
+fn read_app_config_json() -> serde_json::Value {
+    use serde_json::json;
+    let path = crate::config::Config::config_file_path();
+    std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_else(|| json!({}))
+}
+
+fn write_app_config_json(v: &serde_json::Value) -> Result<(), String> {
+    let path = crate::config::Config::config_file_path();
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let pretty = serde_json::to_string_pretty(v).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(&path, &pretty)
+}
+
+fn browser_chromium_path_exists() -> bool {
+    let path = crate::config::Config::browser_chromium_executable_path();
+    if path.is_absolute() {
+        path.is_file()
+    } else {
+        // Relative / PATH-style name: do not probe PATH here (matches ready chip).
+        true
+    }
+}
+
+/// Settings Credentials status for Browser / CDP (config only; no live `/json/version`).
+#[tauri::command]
+pub fn get_browser_settings_status() -> Result<serde_json::Value, String> {
+    let tools = crate::config::Config::browser_tools_enabled();
+    let port = crate::config::Config::browser_cdp_port();
+    let configured = crate::config::Config::browser_chromium_executable_configured();
+    let path = crate::config::Config::browser_chromium_executable_path();
+    let path_str = path.to_string_lossy().to_string();
+    let exists = browser_chromium_path_exists();
+    let short = path
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("Chromium")
+        .to_string();
+    let ready = tools && exists;
+    Ok(serde_json::json!({
+        "toolsEnabled": tools,
+        "port": port,
+        "pathConfigured": configured,
+        "path": if configured { path_str } else { String::new() },
+        "pathDisplay": short,
+        "pathExists": exists,
+        "ready": ready,
+    }))
+}
+
+/// Persist Browser Chromium path and/or CDP port into `~/.mac-stats/config.json`.
+#[tauri::command]
+pub fn save_browser_settings(
+    chromium_path: Option<String>,
+    cdp_port: Option<u16>,
+) -> Result<serde_json::Value, String> {
+    let path_trim = chromium_path
+        .as_ref()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let port_opt = cdp_port.filter(|p| *p >= 1024);
+    if path_trim.is_none() && port_opt.is_none() {
+        return Err(
+            "Paste a Chromium executable path and/or a CDP port (1024–65535) first.".into(),
+        );
+    }
+    let mut cfg = read_app_config_json();
+    let obj = cfg
+        .as_object_mut()
+        .ok_or_else(|| "config.json is not an object".to_string())?;
+    if let Some(p) = path_trim {
+        obj.insert(
+            "browserChromiumExecutable".into(),
+            serde_json::json!(p),
+        );
+    }
+    if let Some(port) = port_opt {
+        let port = port.clamp(1024, 65535);
+        obj.insert("browserCdpPort".into(), serde_json::json!(port));
+    }
+    write_app_config_json(&cfg)?;
+    get_browser_settings_status()
+}
+
+/// Clear custom Chromium path and reset CDP port to default (9222) in config.json.
+#[tauri::command]
+pub fn clear_browser_settings() -> Result<serde_json::Value, String> {
+    let mut cfg = read_app_config_json();
+    if let Some(obj) = cfg.as_object_mut() {
+        obj.remove("browserChromiumExecutable");
+        obj.remove("browserCdpPort");
+    }
+    write_app_config_json(&cfg)?;
+    get_browser_settings_status()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

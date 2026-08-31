@@ -5494,11 +5494,11 @@ pub fn format_browser_ready_chip() -> String {
         format!("**Browser** · Ready · CDP {port} · `{short}` · idle until BROWSER_*")
     } else if crate::config::Config::browser_chromium_executable_configured() {
         format!(
-            "**Browser** · Not set · Chromium missing · CDP {port} · fix `browserChromiumExecutable`"
+            "**Browser** · Not set · Chromium missing · CDP {port} · fix path in Settings or `browserChromiumExecutable`"
         )
     } else {
         format!(
-            "**Browser** · Not set · install Google Chrome · CDP {port} (or set `browserChromiumExecutable`)"
+            "**Browser** · Not set · install Google Chrome · CDP {port} (Settings or `browserChromiumExecutable`)"
         )
     }
 }
@@ -6795,7 +6795,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
-• `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
+• `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\

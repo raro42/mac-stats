@@ -397,6 +397,7 @@
       applySettingsRedmineAttentionGlanceState();
       applySettingsMastodonAttentionGlanceState();
       applySettingsMcpAttentionGlanceState();
+      applySettingsBrowserAttentionGlanceState();
     });
   }
 
@@ -411,6 +412,7 @@
     applySettingsRedmineAttentionGlanceState();
     applySettingsMastodonAttentionGlanceState();
     applySettingsMcpAttentionGlanceState();
+    applySettingsBrowserAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1544,6 +1546,98 @@
     });
   }
 
+  function isBrowserNotConfiguredForGlance() {
+    const statusEl = document.getElementById("browser-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—") return false;
+    return text.startsWith("not set");
+  }
+
+  /**
+   * Browser / CDP attention glance in Credentials (MCP parity).
+   * Visible when Settings is open and Browser is Not set (missing Chromium).
+   */
+  function ensureSettingsBrowserAttentionGlance() {
+    const browserSetting = document.getElementById("browser-setting");
+    let glance = document.getElementById("settings-browser-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-browser-attention-glance";
+      glance.className = "settings-browser-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-browser-attention-glance-text"></span>';
+      if (browserSetting) {
+        browserSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsBrowserAttentionGlanceClick(glance);
+    } else if (
+      browserSetting &&
+      browserSetting.firstElementChild !== glance
+    ) {
+      browserSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsBrowserAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isBrowserNotConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-browser-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsBrowserAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-browser-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    const label = "Browser · Not set · add Chromium path";
+    if (text) text.textContent = label;
+    glance.title =
+      "Browser needs a Chromium executable — click to set path or CDP port";
+    glance.setAttribute(
+      "aria-label",
+      "Browser not set — click to focus the Chromium path field"
+    );
+  }
+
+  function wireSettingsBrowserAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsBrowserAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsBrowserAttentionWired = "1";
+    const activate = () => {
+      const field = document.getElementById("browser-chromium-path-input");
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1690,7 +1784,9 @@
         el.id === "mastodon-url-input" ||
         el.id === "mastodon-token-input" ||
         el.id === "mcp-url-input" ||
-        el.id === "mcp-stdio-input") &&
+        el.id === "mcp-stdio-input" ||
+        el.id === "browser-chromium-path-input" ||
+        el.id === "browser-cdp-port-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -1877,6 +1973,10 @@
       "mcp-stdio-input",
       "mcp-save",
       "mcp-clear",
+      "browser-chromium-path-input",
+      "browser-cdp-port-input",
+      "browser-save",
+      "browser-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -1981,7 +2081,11 @@
             active?.id === "mcp-url-input" ||
             active?.id === "mcp-stdio-input" ||
             active?.id === "mcp-save" ||
-            active?.id === "mcp-clear"
+            active?.id === "mcp-clear" ||
+            active?.id === "browser-chromium-path-input" ||
+            active?.id === "browser-cdp-port-input" ||
+            active?.id === "browser-save" ||
+            active?.id === "browser-clear"
           ) {
             return;
           }
@@ -2006,7 +2110,9 @@
           active?.id === "mastodon-url-input" ||
           active?.id === "mastodon-token-input" ||
           active?.id === "mcp-url-input" ||
-          active?.id === "mcp-stdio-input";
+          active?.id === "mcp-stdio-input" ||
+          active?.id === "browser-chromium-path-input" ||
+          active?.id === "browser-cdp-port-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -2017,7 +2123,8 @@
                 active?.id === "brave-clear-key" ||
                 active?.id === "redmine-clear" ||
                 active?.id === "mastodon-clear" ||
-                active?.id === "mcp-clear") &&
+                active?.id === "mcp-clear" ||
+                active?.id === "browser-clear") &&
               tryChainPerplexitySettingsClearToFooter()
             ) {
               e.preventDefault();
@@ -2110,7 +2217,9 @@
             controls[next]?.id === "mastodon-url-input" ||
             controls[next]?.id === "mastodon-token-input" ||
             controls[next]?.id === "mcp-url-input" ||
-            controls[next]?.id === "mcp-stdio-input") &&
+            controls[next]?.id === "mcp-stdio-input" ||
+            controls[next]?.id === "browser-chromium-path-input" ||
+            controls[next]?.id === "browser-cdp-port-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -3352,6 +3461,8 @@
     applySettingsMastodonAttentionGlanceState;
   window.applySettingsMcpAttentionGlanceState =
     applySettingsMcpAttentionGlanceState;
+  window.applySettingsBrowserAttentionGlanceState =
+    applySettingsBrowserAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
