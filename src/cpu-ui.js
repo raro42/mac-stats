@@ -390,6 +390,7 @@
         );
         closeBtn.focus();
       }
+      applySettingsHelpAttentionGlanceState();
     });
   }
 
@@ -397,6 +398,7 @@
     const settingsModal = document.getElementById("settings-modal");
     if (!settingsModal) return;
     closeSettingsHelpSheet(false);
+    applySettingsHelpAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -828,6 +830,7 @@
       );
     }
     if (focusHelp !== false && helpBtn) helpBtn.focus();
+    applySettingsHelpAttentionGlanceState();
     return true;
   }
 
@@ -851,7 +854,96 @@
       el.classList.remove("is-just-copied");
       el._copiedFlashTimer = null;
     }, 1600);
+    applySettingsHelpAttentionGlanceState();
     return true;
+  }
+
+  /**
+   * Help cheat sheet attention glance in Product settings (Perplexity Key-not-set parity).
+   * Visible when Settings is open: closed → invite open; open → Enter/c copies hint.
+   */
+  function ensureSettingsHelpAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const actions = wrap?.querySelector(".settings-actions");
+    const helpSheet = document.getElementById("settings-help-sheet");
+    let glance = document.getElementById("settings-help-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-help-attention-glance";
+      glance.className = "settings-help-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-help-attention-glance-text"></span>';
+      if (actions) {
+        actions.insertAdjacentElement("beforebegin", glance);
+      } else if (helpSheet) {
+        helpSheet.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        wrap.appendChild(glance);
+      } else {
+        return null;
+      }
+      wireSettingsHelpAttentionGlanceClick(glance);
+    } else if (actions && glance.nextElementSibling !== actions) {
+      actions.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsHelpAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const glance = document.getElementById("settings-help-attention-glance");
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsHelpAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById("settings-help-attention-glance-text");
+    const sheetOpen = isSettingsHelpSheetOpen();
+    glance.hidden = false;
+    glance.classList.toggle("is-open", sheetOpen);
+    glance.classList.toggle("is-closed", !sheetOpen);
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    if (sheetOpen) {
+      if (text) text.textContent = "Help · open · Enter/c copies";
+      glance.title = "Cheat sheet is open — click to copy (Enter or c)";
+      glance.setAttribute(
+        "aria-label",
+        "Help cheat sheet open — click to copy to clipboard"
+      );
+      return;
+    }
+    if (text) text.textContent = "Help · cheat sheet · click Help";
+    glance.title = "Open the Help cheat sheet";
+    glance.setAttribute(
+      "aria-label",
+      "Help cheat sheet — click to open"
+    );
+  }
+
+  function wireSettingsHelpAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsHelpAttentionWired === "1") return;
+    glance.dataset.settingsHelpAttentionWired = "1";
+    const activate = () => {
+      if (isSettingsHelpSheetOpen()) {
+        copySettingsHelpSheet();
+        return;
+      }
+      const helpBtn = document.getElementById("settings-help-btn");
+      if (helpBtn && !helpBtn.disabled) helpBtn.click();
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
   }
 
   /**
@@ -1606,6 +1698,7 @@
           } catch (_) {
             /* focus optional */
           }
+          applySettingsHelpAttentionGlanceState();
           const originalLabel =
             helpBtn._saveFlashOriginalLabel || helpBtn.textContent || "Help / cheat sheet";
           helpBtn._saveFlashOriginalLabel = originalLabel;
@@ -1622,6 +1715,7 @@
           }
         } else {
           closeSettingsHelpSheet(true);
+          applySettingsHelpAttentionGlanceState();
         }
       });
     }

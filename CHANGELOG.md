@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.759] - 2026-08-31
+
+### Added
+- **Settings Help attention glance** — when Settings is open, a **Help · cheat sheet · click Help** accent strip appears above the Product actions (Perplexity Key-not-set / Help toolbar parity). Click or Enter opens the sheet. When open, switches to green **Help · open · Enter/c copies**; click copies the cheat sheet. Hidden when Settings closes.
+
 ## [0.1.758] - 2026-08-31
 
 ### Added
