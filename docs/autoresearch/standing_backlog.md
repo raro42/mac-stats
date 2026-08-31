@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.768** — Settings Browser / CDP Chromium path + port + not-set attention glance (**Browser · Not set · add Chromium path** in Credentials; config.json `browserChromiumExecutable` / `browserCdpPort`; `/browser` Not-set mentions Settings; MCP parity).
+
 - **v0.1.767** — Settings MCP server URL + stdio + not-set attention glance (**MCP · Not set · add URL or stdio** in Credentials; Keychain `mcp_server_url` / `mcp_server_stdio`; `/mcp` Not-set mentions Settings; Mastodon/Redmine/Brave/Perplexity/Discord parity).
 
 - **v0.1.766** — Settings Mastodon instance URL + access token + not-set/partial attention glance (**Mastodon · Not set / Partial** in Credentials; Keychain `mastodon_instance_url` / `mastodon_access_token`; `/mastodon` Not-set mentions Settings; Redmine/Brave/Perplexity/Discord parity).
