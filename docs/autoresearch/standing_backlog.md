@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.755** — Agent Ops Digest open attention glance (**Digest · N open · …** under Fail/Slow when digester has open candidates; click → first hint preview; design review / `feature-agent-ops`).
+
 - **v0.1.754** — Perplexity Top/error attention glance (**Search · error · …** / **Search · N results · Top** above All·Top·Snippet when open; click → focus query or Top filter; design review polish).
 
 - **v0.1.753** — Details Load/RAM Hot attention glance (**Hot · Load · RAM** above Details grid when open; click → first hot row; `/details hot` parity; design review / `feature-cpu-metrics`).
