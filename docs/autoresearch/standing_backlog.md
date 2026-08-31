@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.753** — Details Load/RAM Hot attention glance (**Hot · Load · RAM** above Details grid when open; click → first hot row; `/details hot` parity; design review / `feature-cpu-metrics`).
+
 - **v0.1.752** — Debug Log Error/Warn attention glance (**Logs · N errors · M warns** above toolbar when open; click → Error/Warn filter + first line; design review polish).
 
 - **v0.1.751** — Power strip Hot attention glance (**Hot · Bat · Heat · …** under slim power row; click → first cue; `/strip hot` parity; design review / `feature-cpu-metrics`).
