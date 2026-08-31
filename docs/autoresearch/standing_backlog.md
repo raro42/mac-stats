@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.764** — Settings Brave Search API key + key-not-set attention glance (**Brave · Not set · add API key** in Credentials; Keychain `brave_api_key`; `/brave` Not-set mentions Settings; Discord/Perplexity parity).
+
 - **v0.1.763** — Settings Perplexity key-not-set attention glance (**Search · Not set · add API key** above Perplexity controls when Credentials open; click → key field; Discord token-not-set parity).
 
 - **v0.1.762** — Hot ring gauges pulse (amber glow) instead of layout-shifting Hot bar under gauges.
