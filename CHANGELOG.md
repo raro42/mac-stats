@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.765] - 2026-08-31
+
+### Added
+- **Settings Redmine URL + API key** — Credentials now has Save / Clear for Redmine (Keychain `redmine_url` / `redmine_api_key`, same resolve order as env / `.config.env`). When not fully set, a **Redmine · Not set / Partial** red strip appears above the controls (Brave / Perplexity / Discord parity). Click focuses the missing field. `/redmine` Not-set cue mentions Settings.
+
 ## [0.1.764] - 2026-08-31
 
 ### Added

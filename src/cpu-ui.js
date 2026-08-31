@@ -394,6 +394,7 @@
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
+      applySettingsRedmineAttentionGlanceState();
     });
   }
 
@@ -405,6 +406,7 @@
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
+    applySettingsRedmineAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1221,6 +1223,122 @@
     });
   }
 
+  function isRedmineNotFullyConfiguredForGlance() {
+    const statusEl = document.getElementById("redmine-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—" || text === "ready") return false;
+    return (
+      text === "not set" ||
+      text.includes("no key") ||
+      text.includes("no url")
+    );
+  }
+
+  /**
+   * Redmine URL/key attention glance in Credentials (Brave key-not-set parity).
+   * Visible when Settings is open and Redmine is Not set or Partial.
+   */
+  function ensureSettingsRedmineAttentionGlance() {
+    const redmineSetting = document.getElementById("redmine-setting");
+    let glance = document.getElementById("settings-redmine-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-redmine-attention-glance";
+      glance.className = "settings-redmine-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-redmine-attention-glance-text"></span>';
+      if (redmineSetting) {
+        redmineSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsRedmineAttentionGlanceClick(glance);
+    } else if (
+      redmineSetting &&
+      redmineSetting.firstElementChild !== glance
+    ) {
+      redmineSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsRedmineAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isRedmineNotFullyConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-redmine-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsRedmineAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-redmine-attention-glance-text"
+    );
+    const statusEl = document.getElementById("redmine-settings-status");
+    const status = (statusEl?.textContent || "").trim().toLowerCase();
+    glance.hidden = false;
+    glance.classList.remove("is-not-set", "is-partial");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    let label = "Redmine · Not set · add URL + API key";
+    let partial = false;
+    if (status.includes("no key")) {
+      label = "Redmine · Partial · missing API key";
+      partial = true;
+    } else if (status.includes("no url")) {
+      label = "Redmine · Partial · missing URL";
+      partial = true;
+    }
+    glance.classList.add(partial ? "is-partial" : "is-not-set");
+    if (text) text.textContent = label;
+    glance.title = partial
+      ? "Redmine needs the missing field — click to focus it"
+      : "Redmine needs URL + API key — click to add them";
+    glance.setAttribute(
+      "aria-label",
+      partial
+        ? "Redmine partially configured — click to focus the missing field"
+        : "Redmine not set — click to focus the URL field"
+    );
+  }
+
+  function wireSettingsRedmineAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsRedmineAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsRedmineAttentionWired = "1";
+    const activate = () => {
+      const statusEl = document.getElementById("redmine-settings-status");
+      const status = (statusEl?.textContent || "").trim().toLowerCase();
+      let targetId = "redmine-url-input";
+      if (status.includes("no key") || status.includes("url set")) {
+        targetId = "redmine-api-key-input";
+      }
+      const field = document.getElementById(targetId);
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1359,7 +1477,11 @@
     }
     el.focus();
     if (
-      (el.id === "discord-token-input" || el.id === "perplexity-api-key-input") &&
+      (el.id === "discord-token-input" ||
+        el.id === "perplexity-api-key-input" ||
+        el.id === "brave-api-key-input" ||
+        el.id === "redmine-url-input" ||
+        el.id === "redmine-api-key-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -1534,6 +1656,10 @@
       "brave-api-key-input",
       "brave-save-key",
       "brave-clear-key",
+      "redmine-url-input",
+      "redmine-api-key-input",
+      "redmine-save",
+      "redmine-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -1623,7 +1749,14 @@
             active?.id === "view-debug-log" ||
             active?.id === "perplexity-api-key-input" ||
             active?.id === "perplexity-save-key" ||
-            active?.id === "perplexity-clear-key"
+            active?.id === "perplexity-clear-key" ||
+            active?.id === "brave-api-key-input" ||
+            active?.id === "brave-save-key" ||
+            active?.id === "brave-clear-key" ||
+            active?.id === "redmine-url-input" ||
+            active?.id === "redmine-api-key-input" ||
+            active?.id === "redmine-save" ||
+            active?.id === "redmine-clear"
           ) {
             return;
           }
@@ -1639,17 +1772,21 @@
           e.key === "h" ||
           e.key === "ArrowUp" ||
           e.key === "k";
+        const isCredInput =
+          active?.id === "discord-token-input" ||
+          active?.id === "perplexity-api-key-input" ||
+          active?.id === "brave-api-key-input" ||
+          active?.id === "redmine-url-input" ||
+          active?.id === "redmine-api-key-input";
         if (forward) {
-          if (
-            (active?.id === "discord-token-input" ||
-              active?.id === "perplexity-api-key-input") &&
-            !credentialsInputAtMoveBoundary(active, 1)
-          ) {
+          if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
           }
           if (idx === controls.length - 1) {
             if (
-              active?.id === "perplexity-clear-key" &&
+              (active?.id === "perplexity-clear-key" ||
+                active?.id === "brave-clear-key" ||
+                active?.id === "redmine-clear") &&
               tryChainPerplexitySettingsClearToFooter()
             ) {
               e.preventDefault();
@@ -1668,11 +1805,7 @@
           }
           next = idx + 1;
         } else if (back) {
-          if (
-            (active?.id === "discord-token-input" ||
-              active?.id === "perplexity-api-key-input") &&
-            !credentialsInputAtMoveBoundary(active, -1)
-          ) {
+          if (isCredInput && !credentialsInputAtMoveBoundary(active, -1)) {
             return;
           }
           if (
@@ -1739,7 +1872,10 @@
         controls[next].focus();
         if (
           (controls[next]?.id === "discord-token-input" ||
-            controls[next]?.id === "perplexity-api-key-input") &&
+            controls[next]?.id === "perplexity-api-key-input" ||
+            controls[next]?.id === "brave-api-key-input" ||
+            controls[next]?.id === "redmine-url-input" ||
+            controls[next]?.id === "redmine-api-key-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -2063,6 +2199,7 @@
       "discord-setting",
       "perplexity-setting",
       "brave-setting",
+      "redmine-setting",
       "icon-perplexity",
       "perplexity-section",
     ];
@@ -2973,6 +3110,8 @@
     applySettingsPerplexityKeyAttentionGlanceState;
   window.applySettingsBraveKeyAttentionGlanceState =
     applySettingsBraveKeyAttentionGlanceState;
+  window.applySettingsRedmineAttentionGlanceState =
+    applySettingsRedmineAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

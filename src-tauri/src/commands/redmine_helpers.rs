@@ -135,8 +135,8 @@ pub(crate) fn grounded_redmine_time_entries_failure_reply(
         || failure_lower.contains("redmine_url missing")
         || failure_lower.contains("redmine_api_key missing")
     {
-        "Redmine is not configured (need REDMINE_URL + REDMINE_API_KEY in ~/.mac-stats/.config.env; \
-run ./scripts/sync-home-config-env.sh and restart)."
+        "Redmine is not configured (need URL + API key in Settings → Credentials, or REDMINE_URL + \
+REDMINE_API_KEY in ~/.mac-stats/.config.env; run ./scripts/sync-home-config-env.sh and restart)."
     } else if failure_lower.contains("invalid url") {
         "the configured Redmine URL is invalid."
     } else if failure_lower.contains("dns")
@@ -170,9 +170,9 @@ pub(crate) fn grounded_redmine_config_failure_reply(text: &str) -> Option<String
         return None;
     }
     Some(
-        "Redmine is not configured for this install. Add `REDMINE_URL` and `REDMINE_API_KEY` to \
-`~/.mac-stats/.config.env` (or run `./scripts/sync-home-config-env.sh` from the mac-stats repo), \
-then restart mac-stats. No Redmine data was fetched."
+        "Redmine is not configured for this install. Open Settings → Credentials and add the Redmine \
+URL + API key (or set `REDMINE_URL` / `REDMINE_API_KEY` in `~/.mac-stats/.config.env` and run \
+`./scripts/sync-home-config-env.sh`), then restart mac-stats. No Redmine data was fetched."
             .to_string(),
     )
 }
@@ -355,6 +355,7 @@ mod tests {
         let text = "Redmine API failed: Redmine not configured (REDMINE_URL missing from ~/.mac-stats/.config.env or env). Answer without this result.";
         let reply = grounded_redmine_config_failure_reply(text).expect("expected config reply");
         assert!(reply.contains("~/.mac-stats/.config.env"));
+        assert!(reply.contains("Settings"));
         assert!(reply.contains("sync-home-config-env"));
         assert!(reply.contains("No Redmine data was fetched"));
     }

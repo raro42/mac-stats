@@ -1,7 +1,8 @@
 //! Redmine REST API client for the agent router.
 //!
 //! Provides GET, POST (create issue), and PUT (update issue / add notes) access to a Redmine instance.
-//! Auth via API key (`X-Redmine-API-Key` header). Config read from env or `.config.env`:
+//! Auth via API key (`X-Redmine-API-Key` header). Config read from env, `.config.env`, or Keychain
+//! (Settings Credentials — `redmine_url` / `redmine_api_key`):
 //!   REDMINE_URL=https://redmine.example.com
 //!   REDMINE_API_KEY=<key>
 //!
@@ -134,17 +135,52 @@ fn read_config(env_name: &str, file_keys: &[&str]) -> Option<String> {
     None
 }
 
+/// Keychain account for Redmine base URL (Settings Credentials Save).
+pub const REDMINE_URL_KEYCHAIN_ACCOUNT: &str = "redmine_url";
+/// Keychain account for Redmine API key (Settings Credentials Save).
+pub const REDMINE_API_KEY_KEYCHAIN_ACCOUNT: &str = "redmine_api_key";
+
 pub fn get_redmine_url() -> Option<String> {
-    read_config("REDMINE_URL", &["REDMINE_URL", "REDMINE-URL"])
+    if let Some(v) = read_config("REDMINE_URL", &["REDMINE_URL", "REDMINE-URL"]) {
+        return Some(v);
+    }
+    if let Ok(Some(v)) = crate::security::get_credential(REDMINE_URL_KEYCHAIN_ACCOUNT) {
+        let v = v.trim().to_string();
+        if !v.is_empty() {
+            return Some(v);
+        }
+    }
+    None
 }
 
 pub fn get_redmine_api_key() -> Option<String> {
-    read_config("REDMINE_API_KEY", &["REDMINE_API_KEY", "REDMINE-API-KEY"])
+    if let Some(v) = read_config("REDMINE_API_KEY", &["REDMINE_API_KEY", "REDMINE-API-KEY"]) {
+        return Some(v);
+    }
+    if let Ok(Some(v)) = crate::security::get_credential(REDMINE_API_KEY_KEYCHAIN_ACCOUNT) {
+        let v = v.trim().to_string();
+        if !v.is_empty() {
+            return Some(v);
+        }
+    }
+    None
 }
 
 /// Whether Redmine is configured (URL + API key both present).
 pub fn is_configured() -> bool {
     get_redmine_url().is_some() && get_redmine_api_key().is_some()
+}
+
+/// Settings Credentials status (env / `.config.env` / Keychain). Does not live-probe.
+#[tauri::command]
+pub fn get_redmine_settings_status() -> Result<serde_json::Value, String> {
+    let url = get_redmine_url().is_some();
+    let key = get_redmine_api_key().is_some();
+    Ok(serde_json::json!({
+        "url": url,
+        "key": key,
+        "ready": url && key,
+    }))
 }
 
 /// PUT paths that are allowed. Currently: updating issues (adding notes).

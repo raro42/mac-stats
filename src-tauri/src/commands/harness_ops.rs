@@ -4860,9 +4860,15 @@ pub fn format_redmine_ready_chip() -> String {
     let url = crate::redmine::get_redmine_url();
     let key = crate::redmine::get_redmine_api_key();
     match (url.as_deref(), key.as_deref()) {
-        (None, None) => "**Redmine** · Not set · add URL + API key".to_string(),
-        (Some(_), None) => "**Redmine** · Partial · URL set · missing API key".to_string(),
-        (None, Some(_)) => "**Redmine** · Partial · API key set · missing URL".to_string(),
+        (None, None) => {
+            "**Redmine** · Not set · add URL + API key (Settings or .config.env)".to_string()
+        }
+        (Some(_), None) => {
+            "**Redmine** · Partial · URL set · missing API key (Settings)".to_string()
+        }
+        (None, Some(_)) => {
+            "**Redmine** · Partial · API key set · missing URL (Settings)".to_string()
+        }
         (Some(u), Some(_)) => {
             let host = shorten_redmine_url_for_chip(u);
             format!("**Redmine** · Ready · {host} · key set")

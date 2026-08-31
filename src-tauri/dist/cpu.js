@@ -11989,6 +11989,8 @@ function initCollapsibleSections() {
 // ============================================================================
 const PERPLEXITY_KEYCHAIN_ACCOUNT = 'perplexity_api_key';
 const BRAVE_KEYCHAIN_ACCOUNT = 'brave_api_key';
+const REDMINE_URL_KEYCHAIN_ACCOUNT = 'redmine_url';
+const REDMINE_API_KEY_KEYCHAIN_ACCOUNT = 'redmine_api_key';
 
 function updateBraveConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'brave-settings-status');
@@ -12115,6 +12117,165 @@ function initBraveSettings() {
 
   refreshBraveStatus();
   window.BraveSettings = { refreshStatus: refreshBraveStatus };
+}
+
+function updateRedmineConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'redmine-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshRedmineStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateRedmineConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_redmine_settings_status');
+    const url = !!(st && st.url);
+    const key = !!(st && st.key);
+    if (url && key) updateRedmineConfigStatus('Ready');
+    else if (url) updateRedmineConfigStatus('URL set · no key');
+    else if (key) updateRedmineConfigStatus('Key set · no URL');
+    else updateRedmineConfigStatus('Not set');
+  } catch (_) {
+    updateRedmineConfigStatus('—');
+  }
+  if (typeof window.applySettingsRedmineAttentionGlanceState === 'function') {
+    window.applySettingsRedmineAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Redmine URL + API key (Brave key parity). */
+function initRedmineSettings() {
+  const saveBtn = document.getElementById('redmine-save');
+  const clearBtn = document.getElementById('redmine-clear');
+  const urlInput = document.getElementById('redmine-url-input');
+  const keyInput = document.getElementById('redmine-api-key-input');
+  let redmineBusy = false;
+
+  function setRedmineBusy(busy, which) {
+    redmineBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashRedmineBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (urlInput || keyInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (redmineBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const url = (urlInput && urlInput.value.trim()) || '';
+      const key = (keyInput && keyInput.value.trim()) || '';
+      if (!url && !key) {
+        alert('Paste a Redmine URL and/or API key first.');
+        return;
+      }
+      setRedmineBusy(true, 'save');
+      try {
+        if (url) {
+          await invoke('store_credential', {
+            request: { account: REDMINE_URL_KEYCHAIN_ACCOUNT, password: url },
+          });
+          if (urlInput) urlInput.value = '';
+        }
+        if (key) {
+          await invoke('store_credential', {
+            request: {
+              account: REDMINE_API_KEY_KEYCHAIN_ACCOUNT,
+              password: key,
+            },
+          });
+          if (keyInput) keyInput.value = '';
+        }
+        setRedmineBusy(false);
+        flashRedmineBtn(saveBtn, 'Saved');
+        await refreshRedmineStatus();
+      } catch (e) {
+        console.error('Redmine save:', e);
+        setRedmineBusy(false);
+        alert('Could not save Redmine credentials: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (redmineBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setRedmineBusy(true, 'clear');
+      try {
+        try {
+          await invoke('delete_credential', {
+            account: REDMINE_URL_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        try {
+          await invoke('delete_credential', {
+            account: REDMINE_API_KEY_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        if (urlInput) urlInput.value = '';
+        if (keyInput) keyInput.value = '';
+        setRedmineBusy(false);
+        flashRedmineBtn(clearBtn, 'Cleared');
+        await refreshRedmineStatus();
+      } catch (e) {
+        console.error('Redmine clear:', e);
+        setRedmineBusy(false);
+        alert('Could not clear Redmine credentials: ' + String(e));
+      }
+    });
+  }
+
+  refreshRedmineStatus();
+  window.RedmineSettings = { refreshStatus: refreshRedmineStatus };
 }
 
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
@@ -19516,6 +19677,7 @@ function initMonitoringFeatures() {
       initMonitorsSection();
       initPerplexitySection();
       initBraveSettings();
+      initRedmineSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

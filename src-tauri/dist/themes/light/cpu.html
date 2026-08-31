@@ -685,6 +685,17 @@
               </div>
               <div class="setting-note">Get a key at <a href="https://api-dashboard.search.brave.com/" target="_blank" rel="noopener noreferrer">api-dashboard.search.brave.com</a>. Stored in Keychain (or set BRAVE_API_KEY in .config.env).</div>
             </div>
+            <div class="setting-item" id="redmine-setting">
+              <div class="setting-label">Redmine</div>
+              <div class="redmine-status settings-status" id="redmine-settings-status">—</div>
+              <input type="url" id="redmine-url-input" class="settings-input discord-token-input" placeholder="https://redmine.example.com" autocomplete="off" />
+              <input type="password" id="redmine-api-key-input" class="settings-input discord-token-input" placeholder="Paste Redmine API key" autocomplete="off" />
+              <div class="settings-actions redmine-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="redmine-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="redmine-clear">Clear</button>
+              </div>
+              <div class="setting-note">Base URL + API key for tickets and time entries. Stored in Keychain (or set REDMINE_URL / REDMINE_API_KEY in .config.env).</div>
+            </div>
           </section>
         </div>
       </div>
