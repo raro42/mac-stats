@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.758** — Perplexity Key-not-set attention glance (**Search · Not set · add API key** above setup when expanded; click → inline key; design review polish).
+
 - **v0.1.757** — Agent Ops Discord Offline attention glance (**Discord · Offline · check gateway** / **Discord · Reconnect · disc×N** under Fail/Slow/Digest when expanded; click → Runs gateway preview; design review / `feature-agent-ops`).
 
 - **v0.1.756** — AI Chat Offline attention glance (**Chat · Offline · check Ollama** / **Chat · Not set · configure URL** above All·You·Assistant when open; click → Ollama URL; design review / `feature-ai-chat`).
