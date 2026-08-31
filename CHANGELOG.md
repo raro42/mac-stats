@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.756] - 2026-08-31
+
+### Added
+- **AI Chat Offline attention glance** — when AI Chat is open and Ollama is offline or not configured, a **Chat · Offline · check Ollama** / **Chat · Not set · configure URL** strip appears above the All · You · Assistant filters (Perplexity error / Errors parity). Amber wash for offline, red for not set. Click or Enter opens the Ollama URL dialog. Hidden while collapsed (model / collapsed glances stay). Design review / `feature-ai-chat`.
+
 ## [0.1.755] - 2026-08-31
 
 ### Added

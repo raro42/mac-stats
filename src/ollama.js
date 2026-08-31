@@ -804,6 +804,8 @@ function syncOllamaCollapsedGlance() {
   if (turn) turn.hidden = true;
   if (answer) answer.hidden = true;
   if (errors) errors.hidden = true;
+  const offlineAttention = document.getElementById('chat-offline-attention-glance');
+  if (offlineAttention) offlineAttention.hidden = true;
 
   glance.hidden = false;
   const status = chatModelGlanceState.status || 'unknown';
@@ -996,17 +998,16 @@ function applyChatModelGlanceState() {
       'aria-label',
       model ? `Connected — model ${model}. Click to change.` : 'Connected — choose a model'
     );
-    return;
-  }
-  if (status === 'error') {
+  } else if (status === 'error') {
     if (text) text.textContent = 'Offline · check Ollama';
     glance.title = 'Ollama is not available — click to set the URL';
     glance.setAttribute('aria-label', 'Ollama offline — click to configure URL');
-    return;
+  } else {
+    if (text) text.textContent = 'Not set · configure URL';
+    glance.title = 'Click to configure the Ollama URL';
+    glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
   }
-  if (text) text.textContent = 'Not set · configure URL';
-  glance.title = 'Click to configure the Ollama URL';
-  glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
+  applyChatOfflineAttentionGlanceState();
 }
 
 function wireChatModelGlanceClick(glance) {
@@ -1619,6 +1620,7 @@ function applyChatErrorsGlanceState() {
   if (n <= 0) {
     glance.hidden = true;
     glance.classList.remove('has-errors');
+    applyChatOfflineAttentionGlanceState();
     return;
   }
   glance.hidden = false;
@@ -1632,6 +1634,93 @@ function applyChatErrorsGlanceState() {
     'aria-label',
     `AI Chat has ${label} — click to show Errors filter`
   );
+  applyChatOfflineAttentionGlanceState();
+}
+
+/**
+ * Offline attention glance above AI Chat filters (Perplexity error / Errors parity).
+ * Visible when the section is open and Ollama is offline or not configured.
+ */
+function ensureChatOfflineAttentionGlance() {
+  ensureChatFilterChips();
+  const chips = document.getElementById('chat-filter-chips');
+  const chat = document.getElementById('ollama-chat');
+  let glance = document.getElementById('chat-offline-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'chat-offline-attention-glance';
+    glance.className = 'chat-offline-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="chat-offline-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement('beforebegin', glance);
+    } else if (chat) {
+      chat.insertAdjacentElement('afterbegin', glance);
+    } else {
+      return null;
+    }
+    wireChatOfflineAttentionGlanceClick(glance);
+  } else if (chips && glance.nextElementSibling !== chips) {
+    chips.insertAdjacentElement('beforebegin', glance);
+  }
+  return glance;
+}
+
+function applyChatOfflineAttentionGlanceState() {
+  if (isOllamaSectionCollapsed()) {
+    const glance = document.getElementById('chat-offline-attention-glance');
+    if (glance) glance.hidden = true;
+    return;
+  }
+  const glance = ensureChatOfflineAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('chat-offline-attention-glance-text');
+  const status = chatModelGlanceState.status || 'unknown';
+  if (status === 'connected') {
+    glance.hidden = true;
+    glance.classList.remove('is-offline', 'is-not-set');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.toggle('is-offline', status === 'error');
+  glance.classList.toggle('is-not-set', status === 'unknown');
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (status === 'error') {
+    if (text) text.textContent = 'Chat · Offline · check Ollama';
+    glance.title = 'Ollama is not available — click to set the URL';
+    glance.setAttribute(
+      'aria-label',
+      'AI Chat offline — click to configure Ollama URL'
+    );
+    return;
+  }
+  if (text) text.textContent = 'Chat · Not set · configure URL';
+  glance.title = 'Click to configure the Ollama URL';
+  glance.setAttribute(
+    'aria-label',
+    'Ollama not configured — click to set URL'
+  );
+}
+
+function wireChatOfflineAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.chatOfflineAttentionWired === '1') return;
+  glance.dataset.chatOfflineAttentionWired = '1';
+  const activate = () => {
+    ensureOllamaSectionExpanded();
+    showOllamaUrlDialog();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 function wireChatErrorsGlanceClick(glance) {

@@ -10205,7 +10205,7 @@ function initOllamaSection() {
   wireCollapsibleHeaderA11y(header, {
     contentId: 'ollama-content',
     getExpanded: () => !ollamaCollapsed,
-    ignoreSelector: '#ollama-menu-btn, #ollama-menu, #ollama-connection-indicator, #ollama-model-text, #ollama-model-select, #ollama-collapsed-glance, #chat-model-glance, #chat-turn-glance, #chat-answer-glance, #chat-errors-glance',
+    ignoreSelector: '#ollama-menu-btn, #ollama-menu, #ollama-connection-indicator, #ollama-model-text, #ollama-model-select, #ollama-collapsed-glance, #chat-model-glance, #chat-turn-glance, #chat-answer-glance, #chat-errors-glance, #chat-offline-attention-glance',
     onToggle: () => {
       ollamaCollapsed = !ollamaCollapsed;
       applyOllamaCollapsed();
@@ -10227,7 +10227,7 @@ function initOllamaSection() {
         menuBtn?.contains(e.target) ||
         menu?.contains(e.target) ||
         collapsedGlance?.contains(e.target) ||
-        e.target?.closest?.('#chat-model-glance, #chat-turn-glance, #chat-answer-glance, #chat-errors-glance')) {
+        e.target?.closest?.('#chat-model-glance, #chat-turn-glance, #chat-answer-glance, #chat-errors-glance, #chat-offline-attention-glance')) {
       return;
     }
     
