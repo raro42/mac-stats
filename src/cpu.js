@@ -18242,6 +18242,7 @@ function initLogsSection() {
     if (!logsSectionCollapsed) {
       applyLogsGlanceState(logsGlanceCounts);
     }
+  };
   applyCollapsed();
 
   wireCollapsibleHeaderA11y(header, {

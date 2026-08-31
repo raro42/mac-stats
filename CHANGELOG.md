@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.761] - 2026-08-31
+
+### Fixed
+- **CPU window blank / frozen UI** — `cpu.js` had a missing `}` in `initLogsSection()` (since v0.1.754). The script failed to parse, so gauges, processes, and the rest of the front never initialized.
+
 ## [0.1.760] - 2026-08-31
 
 ### Added
