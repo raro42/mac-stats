@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.753] - 2026-08-31
+
+### Added
+- **Details Load/RAM Hot attention glance** — when Details is open and Load ≥4 or RAM ≥85%, a **Hot · Load · RAM** amber strip appears above the Details grid (`/details hot` / collapsed glance parity). Click or Enter focuses the first hot row (Load flash, or RAM via existing strip open). Hidden while Details is collapsed (keep-header glance stays). Design review / `feature-cpu-metrics`.
+
 ## [0.1.752] - 2026-08-31
 
 ### Added
