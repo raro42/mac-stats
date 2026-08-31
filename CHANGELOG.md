@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.769] - 2026-08-31
+
+### Added
+- **Settings Cursor agent workspace + binary** — Credentials now has Save / Clear for CURSOR_AGENT workspace (`cursorAgentWorkspace`) and optional binary (`cursorAgentExecutable` in `~/.mac-stats/config.json`). When `cursor-agent` is missing, a **Cursor · Not set · add binary path** red strip appears above the controls (Browser / MCP parity). Click focuses the binary field. `/cursor` Not-set cue mentions Settings. Clear restores PATH default + `~/projects/mac-stats` when present.
+
 ## [0.1.768] - 2026-08-31
 
 ### Added

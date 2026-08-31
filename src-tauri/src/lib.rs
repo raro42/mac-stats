@@ -404,6 +404,9 @@ fn run_internal(open_cpu_window: bool) {
             commands::browser::get_browser_settings_status,
             commands::browser::save_browser_settings,
             commands::browser::clear_browser_settings,
+            commands::cursor_agent::get_cursor_agent_settings_status,
+            commands::cursor_agent::save_cursor_agent_settings,
+            commands::cursor_agent::clear_cursor_agent_settings,
             // Discord commands
             commands::discord::configure_discord,
             commands::discord::is_discord_configured,

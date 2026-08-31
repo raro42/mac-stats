@@ -732,6 +732,17 @@
               </div>
               <div class="setting-note">Chromium executable + CDP port for BROWSER_* tools. Saved in ~/.mac-stats/config.json (browserChromiumExecutable / browserCdpPort). Clear restores default Chrome + port 9222.</div>
             </div>
+            <div class="setting-item" id="cursor-agent-setting">
+              <div class="setting-label">Cursor agent</div>
+              <div class="cursor-agent-status settings-status" id="cursor-agent-settings-status">—</div>
+              <input type="text" id="cursor-agent-workspace-input" class="settings-input discord-token-input" placeholder="~/projects/mac-stats" autocomplete="off" spellcheck="false" />
+              <input type="text" id="cursor-agent-executable-input" class="settings-input discord-token-input" placeholder="cursor-agent (PATH) or /full/path" autocomplete="off" spellcheck="false" />
+              <div class="settings-actions cursor-agent-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="cursor-agent-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="cursor-agent-clear">Clear</button>
+              </div>
+              <div class="setting-note">Workspace + optional binary for CURSOR_AGENT. Saved in ~/.mac-stats/config.json (cursorAgentWorkspace / cursorAgentExecutable). Clear restores PATH default + ~/projects/mac-stats when present.</div>
+            </div>
           </section>
         </div>
       </div>

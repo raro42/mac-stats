@@ -12771,6 +12771,168 @@ function initBrowserSettings() {
   window.BrowserSettings = { refreshStatus: refreshBrowserStatus };
 }
 
+function updateCursorAgentConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'cursor-agent-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshCursorAgentStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateCursorAgentConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_cursor_agent_settings_status');
+    const ready = !!(st && st.ready);
+    const execConfigured = !!(st && st.executableConfigured);
+    const wsConfigured = !!(st && st.workspaceConfigured);
+    const wsShort = (st && st.workspaceDisplay) || 'workspace';
+    const execShort = (st && st.executableDisplay) || 'cursor-agent';
+    if (ready) {
+      updateCursorAgentConfigStatus(
+        execConfigured
+          ? `Ready · ${execShort} · ${wsShort}`
+          : `Ready · ${execShort} on PATH · ${wsShort}`
+      );
+    } else {
+      updateCursorAgentConfigStatus(
+        execConfigured
+          ? `Not set · missing · ${execShort}`
+          : 'Not set · install cursor-agent or set path'
+      );
+    }
+    const wsInput = document.getElementById('cursor-agent-workspace-input');
+    const exeInput = document.getElementById('cursor-agent-executable-input');
+    if (wsInput && st && st.workspace) {
+      wsInput.placeholder = st.workspace;
+    }
+    if (exeInput) {
+      if (execConfigured && st.executable) {
+        exeInput.placeholder = st.executable;
+      } else {
+        exeInput.placeholder = 'cursor-agent (PATH) or /full/path';
+      }
+    }
+    void wsConfigured;
+  } catch (_) {
+    updateCursorAgentConfigStatus('—');
+  }
+  if (typeof window.applySettingsCursorAgentAttentionGlanceState === 'function') {
+    window.applySettingsCursorAgentAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Cursor agent workspace + binary (Browser parity; config.json). */
+function initCursorAgentSettings() {
+  const saveBtn = document.getElementById('cursor-agent-save');
+  const clearBtn = document.getElementById('cursor-agent-clear');
+  const wsInput = document.getElementById('cursor-agent-workspace-input');
+  const exeInput = document.getElementById('cursor-agent-executable-input');
+  let cursorBusy = false;
+
+  function setCursorBusy(busy, which) {
+    cursorBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashCursorBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (wsInput || exeInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (cursorBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const workspace = (wsInput && wsInput.value.trim()) || '';
+      const executable = (exeInput && exeInput.value.trim()) || '';
+      if (!workspace && !executable) {
+        alert('Paste a workspace path and/or a cursor-agent binary path first.');
+        return;
+      }
+      setCursorBusy(true, 'save');
+      try {
+        await invoke('save_cursor_agent_settings', {
+          workspace: workspace || null,
+          executable: executable || null,
+        });
+        if (wsInput) wsInput.value = '';
+        if (exeInput) exeInput.value = '';
+        setCursorBusy(false);
+        flashCursorBtn(saveBtn, 'Saved');
+        await refreshCursorAgentStatus();
+      } catch (e) {
+        console.error('Cursor agent save:', e);
+        setCursorBusy(false);
+        alert('Could not save Cursor agent settings: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (cursorBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setCursorBusy(true, 'clear');
+      try {
+        await invoke('clear_cursor_agent_settings');
+        if (wsInput) wsInput.value = '';
+        if (exeInput) exeInput.value = '';
+        setCursorBusy(false);
+        flashCursorBtn(clearBtn, 'Cleared');
+        await refreshCursorAgentStatus();
+      } catch (e) {
+        console.error('Cursor agent clear:', e);
+        setCursorBusy(false);
+        alert('Could not clear Cursor agent settings: ' + String(e));
+      }
+    });
+  }
+
+  refreshCursorAgentStatus();
+  window.CursorAgentSettings = { refreshStatus: refreshCursorAgentStatus };
+}
+
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
   const s = String(raw || '');
@@ -20174,6 +20336,7 @@ function initMonitoringFeatures() {
       initMastodonSettings();
       initMcpSettings();
       initBrowserSettings();
+      initCursorAgentSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

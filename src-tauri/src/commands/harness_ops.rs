@@ -5360,12 +5360,26 @@ pub fn looks_like_cursor_agent_ready_request(content: &str) -> bool {
     )
 }
 
-/// Zero-LLM Cursor agent Ready / Not set chip (PATH only; no CLI probe).
+/// Zero-LLM Cursor agent Ready / Not set chip (PATH / Settings path; no CLI probe).
 pub fn format_cursor_agent_ready_chip() -> String {
+    let ws = crate::commands::cursor_agent::cursor_agent_workspace();
+    let ws_short = std::path::Path::new(&ws)
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or(&ws);
     if crate::commands::cursor_agent::is_cursor_agent_available() {
-        "**Cursor agent** · Ready · `cursor-agent` on PATH".to_string()
+        let bin = crate::commands::cursor_agent::cursor_agent_executable();
+        let bin_short = std::path::Path::new(&bin)
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or(&bin);
+        if crate::commands::cursor_agent::cursor_agent_executable_configured() {
+            format!("**Cursor agent** · Ready · `{bin_short}` · `{ws_short}`")
+        } else {
+            format!("**Cursor agent** · Ready · `{bin_short}` on PATH · `{ws_short}`")
+        }
     } else {
-        "**Cursor agent** · Not set · install `cursor-agent` on PATH".to_string()
+        "**Cursor agent** · Not set · install `cursor-agent` on PATH or set path in Settings".to_string()
     }
 }
 
@@ -6794,7 +6808,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
-• `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
+• `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\

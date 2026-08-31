@@ -398,6 +398,7 @@
       applySettingsMastodonAttentionGlanceState();
       applySettingsMcpAttentionGlanceState();
       applySettingsBrowserAttentionGlanceState();
+      applySettingsCursorAgentAttentionGlanceState();
     });
   }
 
@@ -413,6 +414,7 @@
     applySettingsMastodonAttentionGlanceState();
     applySettingsMcpAttentionGlanceState();
     applySettingsBrowserAttentionGlanceState();
+    applySettingsCursorAgentAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1638,6 +1640,98 @@
     });
   }
 
+  function isCursorAgentNotConfiguredForGlance() {
+    const statusEl = document.getElementById("cursor-agent-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—") return false;
+    return text.startsWith("not set");
+  }
+
+  /**
+   * Cursor agent attention glance in Credentials (Browser parity).
+   * Visible when Settings is open and Cursor agent is Not set.
+   */
+  function ensureSettingsCursorAgentAttentionGlance() {
+    const cursorSetting = document.getElementById("cursor-agent-setting");
+    let glance = document.getElementById("settings-cursor-agent-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-cursor-agent-attention-glance";
+      glance.className = "settings-cursor-agent-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-cursor-agent-attention-glance-text"></span>';
+      if (cursorSetting) {
+        cursorSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsCursorAgentAttentionGlanceClick(glance);
+    } else if (
+      cursorSetting &&
+      cursorSetting.firstElementChild !== glance
+    ) {
+      cursorSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsCursorAgentAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isCursorAgentNotConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-cursor-agent-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsCursorAgentAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-cursor-agent-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    const label = "Cursor · Not set · add binary path";
+    if (text) text.textContent = label;
+    glance.title =
+      "Cursor agent needs cursor-agent on PATH or a binary path — click to set";
+    glance.setAttribute(
+      "aria-label",
+      "Cursor agent not set — click to focus the binary path field"
+    );
+  }
+
+  function wireSettingsCursorAgentAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsCursorAgentAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsCursorAgentAttentionWired = "1";
+    const activate = () => {
+      const field = document.getElementById("cursor-agent-executable-input");
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1786,7 +1880,9 @@
         el.id === "mcp-url-input" ||
         el.id === "mcp-stdio-input" ||
         el.id === "browser-chromium-path-input" ||
-        el.id === "browser-cdp-port-input") &&
+        el.id === "browser-cdp-port-input" ||
+        el.id === "cursor-agent-workspace-input" ||
+        el.id === "cursor-agent-executable-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -1977,6 +2073,10 @@
       "browser-cdp-port-input",
       "browser-save",
       "browser-clear",
+      "cursor-agent-workspace-input",
+      "cursor-agent-executable-input",
+      "cursor-agent-save",
+      "cursor-agent-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -2085,7 +2185,11 @@
             active?.id === "browser-chromium-path-input" ||
             active?.id === "browser-cdp-port-input" ||
             active?.id === "browser-save" ||
-            active?.id === "browser-clear"
+            active?.id === "browser-clear" ||
+            active?.id === "cursor-agent-workspace-input" ||
+            active?.id === "cursor-agent-executable-input" ||
+            active?.id === "cursor-agent-save" ||
+            active?.id === "cursor-agent-clear"
           ) {
             return;
           }
@@ -2112,7 +2216,9 @@
           active?.id === "mcp-url-input" ||
           active?.id === "mcp-stdio-input" ||
           active?.id === "browser-chromium-path-input" ||
-          active?.id === "browser-cdp-port-input";
+          active?.id === "browser-cdp-port-input" ||
+          active?.id === "cursor-agent-workspace-input" ||
+          active?.id === "cursor-agent-executable-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -2124,7 +2230,8 @@
                 active?.id === "redmine-clear" ||
                 active?.id === "mastodon-clear" ||
                 active?.id === "mcp-clear" ||
-                active?.id === "browser-clear") &&
+                active?.id === "browser-clear" ||
+                active?.id === "cursor-agent-clear") &&
               tryChainPerplexitySettingsClearToFooter()
             ) {
               e.preventDefault();
@@ -2219,7 +2326,9 @@
             controls[next]?.id === "mcp-url-input" ||
             controls[next]?.id === "mcp-stdio-input" ||
             controls[next]?.id === "browser-chromium-path-input" ||
-            controls[next]?.id === "browser-cdp-port-input") &&
+            controls[next]?.id === "browser-cdp-port-input" ||
+            controls[next]?.id === "cursor-agent-workspace-input" ||
+            controls[next]?.id === "cursor-agent-executable-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -3463,6 +3572,8 @@
     applySettingsMcpAttentionGlanceState;
   window.applySettingsBrowserAttentionGlanceState =
     applySettingsBrowserAttentionGlanceState;
+  window.applySettingsCursorAgentAttentionGlanceState =
+    applySettingsCursorAgentAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
