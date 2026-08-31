@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00). Digester open stayed empty; design review in 
 
 | Version | What |
 |---------|------|
+| **v0.1.756** | **AI Chat Offline attention glance** — **Chat · Offline · check Ollama** / **Chat · Not set · configure URL** above role filters when expanded (`feature-ai-chat`) |
 | **v0.1.755** | **Agent Ops Digest open attention glance** — amber **Digest · N open · …** strip under Fail/Slow when digester has open candidates; click → Runs + first open hint preview (`feature-agent-ops`) |
 | **v0.1.754** | **Perplexity Top/error attention glance** — **Search · error / N results · Top** above filters when last search failed or exceeds Top-N |
 | **v0.1.753** | **Details Load/RAM Hot attention** — **Hot · Load · RAM** above Details grid (`/details hot`) |
@@ -21,12 +22,12 @@ Overnight Track B (20:00–06:00). Digester open stayed empty; design review in 
 ## Tried / notes
 
 - Digester open empty all night — no Slowest/latency fuel.
-- Design review due=false (grace on stale screens); polish marks refreshed for cpu-metrics / agent-ops / etc.
+- Design review due=false (grace on stale screens); polish marks refreshed for cpu-metrics / agent-ops / feature-ai-chat.
 - `debug.log` scan: no ERROR/WARN/panic clusters in window.
 - Screenshot recapture deferred (TCC / window-only when CPU on-screen).
 
 ## Next
 
-- Settings Help cheat sheet / empty-state polish, or AI Chat Offline wash, or recapture stale feature screens when due.
+- Settings Help cheat sheet / empty-state polish, or recapture stale feature screens when due.
 - Digester open / product-owned `debug.log` errors when present.
 - Problem Reporter for mac_stats after install/kickstart if it keeps appearing.
