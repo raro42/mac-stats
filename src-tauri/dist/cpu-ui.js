@@ -392,6 +392,7 @@
       }
       applySettingsHelpAttentionGlanceState();
       applySettingsJudgeAttentionGlanceState();
+      applySettingsDownloadsAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -412,6 +413,7 @@
     closeSettingsHelpSheet(false);
     applySettingsHelpAttentionGlanceState();
     applySettingsJudgeAttentionGlanceState();
+    applySettingsDownloadsAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -765,6 +767,7 @@
       "ai-agent-enabled-toggle",
       "agent-judge-enabled-toggle",
       "agent-judge-failure-only-toggle",
+      "downloads-organizer-enabled-toggle",
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
@@ -2037,6 +2040,114 @@
   }
 
   /**
+   * Downloads organizer attention glance in Product settings.
+   * Visible when Settings is open and organizer is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsDownloadsAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const downloadsToggle = document.getElementById(
+      "downloads-organizer-enabled-toggle"
+    );
+    const downloadsLabel = downloadsToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-downloads-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-downloads-attention-glance";
+      glance.className = "settings-downloads-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-downloads-attention-glance-text"></span>';
+      if (downloadsLabel) {
+        downloadsLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        const judgeNote = document.getElementById("agent-judge-settings-note");
+        if (judgeNote) {
+          judgeNote.insertAdjacentElement("afterend", glance);
+        } else {
+          wrap.insertAdjacentElement("beforeend", glance);
+        }
+      } else {
+        return null;
+      }
+      wireSettingsDownloadsAttentionGlanceClick(glance);
+    } else if (downloadsLabel && glance.nextElementSibling !== downloadsLabel) {
+      downloadsLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsDownloadsAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-downloads-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsDownloadsAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-downloads-attention-glance-text"
+    );
+    const downloadsToggle = document.getElementById(
+      "downloads-organizer-enabled-toggle"
+    );
+    const enabled = !!(downloadsToggle && downloadsToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "Downloads · Off · enable organizer";
+    glance.title =
+      "Downloads organizer is off — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "Downloads organizer off — click to focus Enable Downloads organizer"
+    );
+  }
+
+  function wireSettingsDownloadsAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsDownloadsAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsDownloadsAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById(
+        "downloads-organizer-enabled-toggle"
+      );
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -2893,6 +3004,9 @@
     const judgeFailureOnlyToggle = document.getElementById(
       "agent-judge-failure-only-toggle"
     );
+    const downloadsToggle = document.getElementById(
+      "downloads-organizer-enabled-toggle"
+    );
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
     const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
@@ -2902,6 +3016,7 @@
       !aiToggle &&
       !judgeToggle &&
       !judgeFailureOnlyToggle &&
+      !downloadsToggle &&
       !compactToggle &&
       !cpuWindowCompactToggle &&
       !helpBtn &&
@@ -2937,6 +3052,11 @@
         }
         syncJudgeFailureOnlyEnabled();
         applySettingsJudgeAttentionGlanceState();
+        if (downloadsToggle) {
+          const st = await invoke("get_downloads_organizer_status");
+          downloadsToggle.checked = !!(st && st.enabled);
+        }
+        applySettingsDownloadsAttentionGlanceState();
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
@@ -3004,6 +3124,22 @@
         }
       });
     }
+    if (downloadsToggle) {
+      downloadsToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_downloads_organizer_settings", {
+            patch: { enabled: !!downloadsToggle.checked },
+          });
+          applySettingsDownloadsAttentionGlanceState();
+          flashToggleLabelSaved(downloadsToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save downloadsOrganizerEnabled: " + e);
+        }
+      });
+    }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {
         try {
@@ -3045,9 +3181,10 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, menuBarCompact, cpuWindowCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
             "Judge: optional post-run check — Settings Product or /judge",
+            "Downloads organizer: Settings Product or /downloads (dry-run default)",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -3107,6 +3244,8 @@
           if (judgeFailureOnlyToggle) judgeFailureOnlyToggle.checked = true;
           syncJudgeFailureOnlyEnabled();
           applySettingsJudgeAttentionGlanceState();
+          if (downloadsToggle) downloadsToggle.checked = false;
+          applySettingsDownloadsAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
@@ -4083,6 +4222,8 @@
     applySettingsSignalAttentionGlanceState;
   window.applySettingsJudgeAttentionGlanceState =
     applySettingsJudgeAttentionGlanceState;
+  window.applySettingsDownloadsAttentionGlanceState =
+    applySettingsDownloadsAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

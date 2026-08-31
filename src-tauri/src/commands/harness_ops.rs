@@ -5898,7 +5898,10 @@ pub fn looks_like_downloads_organizer_ready_request(content: &str) -> bool {
 /// Zero-LLM Downloads organizer Ready chip (config + last-run summary; no run-now).
 pub fn format_downloads_organizer_ready_chip() -> String {
     let st = crate::commands::downloads_organizer::get_downloads_organizer_status();
-    let on_off = if st.enabled { "On" } else { "Off" };
+    if !st.enabled {
+        return "**Downloads** · Off · enable in Settings Product (or `downloadsOrganizerEnabled` true)"
+            .to_string();
+    }
     let interval = st.interval.trim();
     let dry = if st.dry_run { "dry-run" } else { "live" };
     let path = {
@@ -5926,7 +5929,7 @@ pub fn format_downloads_organizer_ready_chip() -> String {
         _ => "last · never".to_string(),
     };
     format!(
-        "**Downloads** · {on_off} · {interval} · {dry} · {path} · {last} · Settings (config only)"
+        "**Downloads** · On · {interval} · {dry} · {path} · {last} · Settings Product"
     )
 }
 
@@ -6828,7 +6831,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
-• `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
+• `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; no transcribe)\n\

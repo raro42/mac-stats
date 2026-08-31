@@ -623,6 +623,7 @@ impl Config {
         obj.insert("aiAgentEnabled".into(), json!(false));
         obj.insert("agentJudgeEnabled".into(), json!(false));
         obj.insert("agentJudgeOnFailureOnly".into(), json!(true));
+        obj.insert("downloadsOrganizerEnabled".into(), json!(false));
         obj.insert("menuBarCompact".into(), json!(true));
         obj.insert("windowDecorations".into(), json!(true));
         // Leave Discord tokens / .config.env alone — only config.json toggles.

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.774] - 2026-09-01
+
+### Added
+- **Settings Downloads organizer toggle + Off attention glance** — Product now has **Enable Downloads organizer** (`downloadsOrganizerEnabled` in `config.json`). When off, a **Downloads · Off · enable organizer** amber strip appears above the toggle (Judge glance parity). Click focuses the enable toggle. `/downloads` Off cue mentions Settings Product. Reset to monitor defaults turns the organizer off.
+
 ## [0.1.773] - 2026-09-01
 
 ### Added

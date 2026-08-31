@@ -166,7 +166,10 @@ pub fn set_downloads_organizer_settings(
 #[tauri::command]
 pub fn run_downloads_organizer_now() -> Result<String, String> {
     if !Config::downloads_organizer_enabled() {
-        return Err("Enable the Downloads organizer first (Settings, Downloads tab).".to_string());
+        return Err(
+            "Enable the Downloads organizer first (Settings Product or downloadsOrganizerEnabled)."
+                .to_string(),
+        );
     }
     downloads_organizer::run_organizer_pass();
     Ok("Organizer run finished. See ~/.mac-stats/debug.log and last run summary.".to_string())
