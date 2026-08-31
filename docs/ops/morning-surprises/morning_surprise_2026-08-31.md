@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00). Digester open was empty; design review under 
 
 | Version | What |
 |---------|------|
+| **v0.1.769** | Settings **Cursor agent** workspace + binary in Credentials (`config.json`); **Cursor · Not set · add binary path** glance; `/cursor` mentions Settings |
 | **v0.1.768** | Settings **Browser / CDP** Chromium path + CDP port in Credentials (`config.json`); **Browser · Not set · add Chromium path** glance; `/browser` mentions Settings |
 | **v0.1.767** | Settings **MCP** URL + stdio + not-set glance (Keychain) |
 | **v0.1.766** | Settings **Mastodon** instance URL + token + not-set/partial glance |
@@ -15,7 +16,7 @@ Overnight Track B (20:00–06:00). Digester open was empty; design review under 
 
 ## Tried / notes
 
-- Quiet digester — pulled standing backlog Credentials chain (Browser/CDP after MCP).
+- Quiet digester — pulled standing backlog Credentials chain (Cursor agent after Browser/CDP).
 - Stale feature screens still under design-review grace; recapture when due.
 
-Generated: 2026-08-31T22:21:01
+Generated: 2026-08-31T22:47:30
