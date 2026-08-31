@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.755] - 2026-08-31
+
+### Added
+- **Agent Ops Digest open attention glance** — when digester has open candidates and Agent Ops is expanded, a **Digest · N open · …** amber strip appears under Fail/Slow (health Digest / overview Digest parity). Click or Enter opens Runs and previews the first digester open hint. Hidden while collapsed (Discord Ready keep-header stays). Design review / `feature-agent-ops`.
+
 ## [0.1.754] - 2026-08-31
 
 ### Added

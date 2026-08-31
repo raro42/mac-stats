@@ -2047,6 +2047,114 @@ function wireOpsRunsAttentionGlanceClick(glance) {
     });
 }
 
+/**
+ * Digest open attention glance under Fail/Slow (health Digest / overview Digest parity).
+ * Visible on every Agent Ops tab when digester has open candidates.
+ */
+function ensureOpsDigestAttentionGlance() {
+    ensureOpsRunsAttentionGlance();
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor = runsAtt || refresh || health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-digest-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-digest-attention-glance';
+        glance.className = 'ops-digest-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-digest-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsDigestAttentionGlanceClick(glance);
+    } else if (runsAtt && glance.previousElementSibling !== runsAtt) {
+        runsAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function countOpsDigestOpenAttention() {
+    const insights = opsRunsInsightsCache || {};
+    const hints = Array.isArray(insights.digest_open_hints)
+        ? insights.digest_open_hints.map((h) => String(h || '').trim()).filter(Boolean)
+        : [];
+    const openN = Number(insights.digest_open_count);
+    const n = Number.isFinite(openN) && openN > 0 ? openN : hints.length;
+    return { openN: n, hints };
+}
+
+function applyOpsDigestAttentionGlanceState() {
+    const glance = ensureOpsDigestAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-digest-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-open');
+        return;
+    }
+    const { openN, hints } = countOpsDigestOpenAttention();
+    if (openN <= 0) {
+        glance.hidden = true;
+        glance.classList.remove('has-open');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.add('has-open');
+    const countLabel = openN === 1 ? '1 open' : `${openN} open`;
+    const preview = hints[0] ? String(hints[0]).slice(0, 42) : '';
+    if (text) {
+        text.textContent = preview
+            ? `Digest · ${countLabel} · ${preview}${hints[0].length > 42 ? '…' : ''}`
+            : `Digest · ${countLabel}`;
+    }
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Open Runs · preview first digester open hint';
+    glance.setAttribute(
+        'aria-label',
+        `Agent Ops digester has ${countLabel} — click to preview first hint on Runs`
+    );
+}
+
+function activateOpsDigestAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    const { hints } = countOpsDigestOpenAttention();
+    const first = hints[0];
+    if (first && openOpsDigestHintPreviewNavigate(first)) return;
+    selectOpsTab('runs');
+    const card = document.getElementById('ops-runs-insights');
+    const line =
+        card?.querySelector('.ops-insight-line[data-digest-hint]') ||
+        card?.querySelector('.ops-insight-sub') ||
+        card;
+    if (line && typeof line.scrollIntoView === 'function') {
+        try {
+            line.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } catch (_) {
+            /* ignore */
+        }
+    }
+    const digestBtn = document.getElementById('ops-digest-refresh-btn');
+    digestBtn?.focus?.();
+}
+
+function wireOpsDigestAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsDigestAttentionWired === '1') return;
+    glance.dataset.opsDigestAttentionWired = '1';
+    const activate = () => activateOpsDigestAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -7016,6 +7124,7 @@ function renderOpsRuns(insights) {
         paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
         ensureOpsRunsLaneChips();
         applyOpsRunsAttentionGlanceState();
+        applyOpsDigestAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7146,6 +7255,7 @@ function renderOpsRuns(insights) {
     }
     ensureOpsInsightsToolbarKeyboard();
     applyOpsRunsAttentionGlanceState();
+    applyOpsDigestAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -7227,6 +7337,7 @@ function escapeHtml(s) {
     const glance = document.getElementById('agent-ops-collapsed-glance');
     if (glance) glance.hidden = true;
     applyOpsRunsAttentionGlanceState();
+    applyOpsDigestAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
