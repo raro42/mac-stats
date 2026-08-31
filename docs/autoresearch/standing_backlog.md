@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.766** — Settings Mastodon instance URL + access token + not-set/partial attention glance (**Mastodon · Not set / Partial** in Credentials; Keychain `mastodon_instance_url` / `mastodon_access_token`; `/mastodon` Not-set mentions Settings; Redmine/Brave/Perplexity/Discord parity).
+
 - **v0.1.765** — Settings Redmine URL + API key + not-set/partial attention glance (**Redmine · Not set / Partial** in Credentials; Keychain `redmine_url` / `redmine_api_key`; `/redmine` Not-set mentions Settings; Brave/Perplexity/Discord parity).
 
 - **v0.1.764** — Settings Brave Search API key + key-not-set attention glance (**Brave · Not set · add API key** in Credentials; Keychain `brave_api_key`; `/brave` Not-set mentions Settings; Discord/Perplexity parity).

@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-31
 
-Overnight Track B (20:00–06:00). Digester open stayed empty; design review in grace. Standing-backlog Credentials polish continued through **v0.1.765** (Redmine). Daytime fixes **v0.1.761–762** repaired a blank CPU window and replaced the layout-shifting rings Hot bar with amber pulse.
+Overnight Track B (20:00–06:00). Digester open stayed empty; design review in grace. Standing-backlog Credentials polish continued through **v0.1.766** (Mastodon). Daytime fixes **v0.1.761–762** repaired a blank CPU window and replaced the layout-shifting rings Hot bar with amber pulse.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.766** | **Settings Mastodon instance URL + access token** — Credentials Save/Clear (Keychain `mastodon_instance_url` / `mastodon_access_token`); **Mastodon · Not set / Partial** red strip; `/mastodon` Not-set mentions Settings |
 | **v0.1.765** | **Settings Redmine URL + API key** — Credentials Save/Clear (Keychain `redmine_url` / `redmine_api_key`); **Redmine · Not set / Partial** red strip; `/redmine` Not-set mentions Settings |
 | **v0.1.764** | **Settings Brave Search API key** — Credentials Save/Clear (Keychain); **Brave · Not set · add API key** red strip; `/brave` Not-set mentions Settings |
 | **v0.1.763** | **Settings Perplexity key-not-set attention glance** — **Search · Not set · add API key** red strip in Credentials when Settings open; click focuses key field (Discord token-not-set parity) |
@@ -30,13 +31,14 @@ Overnight Track B (20:00–06:00). Digester open stayed empty; design review in 
 
 ## Tried / notes
 
-- Digester open empty — no Slowest/latency fuel; used standing backlog (Redmine Credentials after Brave).
+- Digester open empty — no Slowest/latency fuel; used standing backlog (Mastodon Credentials after Redmine).
 - Design review due=false (grace on stale screens); polish without recapture.
 - `debug.log` scan: no ERROR/WARN clusters in the 180m window this tick.
 - Screenshot recapture deferred (TCC / window-only when CPU on-screen).
+- Installed **v0.1.766**; Discord Bot connected after kickstart.
 
 ## Next fuel
 
 - Digester open / product `debug.log` errors when present.
 - Design review recapture when grace ends / CPU window on-screen (`feature-ai-chat` still oldest recommend).
-- Sibling ports / p50 patterns / Mastodon Ready in Credentials if missing.
+- Sibling ports / p50 patterns / Telegram·Slack·Signal alert Ready in Credentials if missing.
