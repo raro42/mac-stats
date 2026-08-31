@@ -20,6 +20,12 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.763** — Settings Perplexity key-not-set attention glance (**Search · Not set · add API key** above Perplexity controls when Credentials open; click → key field; Discord token-not-set parity).
+
+- **v0.1.762** — Hot ring gauges pulse (amber glow) instead of layout-shifting Hot bar under gauges.
+
+- **v0.1.761** — CPU window blank UI fix (`cpu.js` missing `}` in `initLogsSection`).
+
 - **v0.1.760** — Settings Discord token-not-set attention glance (**Discord · Not set · add bot token** above Discord bot controls when Credentials open; click → token field; Perplexity Key-not-set / Help parity).
 
 - **v0.1.759** — Settings Help attention glance (**Help · cheat sheet · click Help** accent strip above Product actions when Settings open; green **Help · open · Enter/c copies** when sheet open; click opens or copies).
