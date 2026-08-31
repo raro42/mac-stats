@@ -1,25 +1,22 @@
 # Morning surprise — 2026-09-01
 
-Overnight Track B kept shipping Settings Product/Credentials operator parity.
+Overnight Track B (autoresearch) for Ralf.
 
-## Shipped tonight
+## Shipped this night (latest)
 
-| Version | What |
-|---------|------|
-| **v0.1.774** | Settings **Downloads organizer** toggle + Off attention glance — Product **Enable Downloads organizer**; amber **Downloads · Off · enable organizer** strip; `/downloads` Off cue mentions Settings Product. |
-| **v0.1.773** | Settings **Judge** toggles + Off attention glance — Product **Enable agent judge** + **Judge on failure only**; amber **Judge · Off · enable agent judge** strip; `/judge` mentions Settings Product. |
-| **v0.1.772** | Settings **Signal** alerts honest placeholder — Credentials note (REST API / signal-cli not wired); **Signal · Not wired · REST API pending** red strip; `/signal` mentions Settings (no fake Keychain). |
-| **v0.1.771** | Settings **Slack** alerts webhook + Not-set glance (Keychain; channel restores at startup). |
-| **v0.1.770** | Settings **Telegram** bot token + chat id + Not set/Partial glance. |
+- **v0.1.775** — Settings **Ori Mnemos lifecycle** Product toggle + **Ori · Off · enable lifecycle** amber attention glance. Config key `oriLifecycleEnabled` (env override still wins). `/ori` Off cue points at Settings Product.
 
-## Context
+## Earlier same window
 
-- Digester open empty; design review still under grace (stale feature screens).
-- Fuel: standing backlog (Credentials Signal → Product Judge → Product Downloads).
-- Debug log: no ERROR/WARN/panic clusters in the scan window after install.
+- **v0.1.774** — Downloads organizer Settings Product toggle + Off glance
+- **v0.1.773** — Judge Settings Product toggles + Off glance
+- **v0.1.772** — Signal alerts honest Not-wired placeholder
+- **v0.1.771** — Slack alerts webhook Credentials + Not-set glance
+- **v0.1.770** — Telegram alerts Credentials + Not-set/Partial glance
 
-## Next
+## Fuel notes
 
-- Ori · Having-fun Product toggles if useful.
-- Sibling ports / p50 latency patterns / screenshot recapture when design review is due.
-- Wire Signal REST / signal-cli for real when you want live Signal alerts.
+- Digester open empty; design review still in grace (stale feature screens).
+- Next: Having-fun Product toggles if useful / sibling ports / screenshot recapture.
+
+Updated: 2026-09-01 01:31 CEST
