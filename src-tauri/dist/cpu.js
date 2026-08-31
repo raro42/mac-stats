@@ -12258,6 +12258,7 @@ function applyPerplexityResultsFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensurePerplexityFilterMissState(resultsEl, false);
+    applyPerplexityAttentionGlanceState();
     return;
   }
 
@@ -12274,6 +12275,7 @@ function applyPerplexityResultsFilter() {
 
   ensurePerplexityFilterMissState(resultsEl, visible === 0);
   syncPerplexityResultsTabOrder(resultsEl);
+  applyPerplexityAttentionGlanceState();
 }
 
 function focusPerplexityFilterChipFirst() {
@@ -13417,7 +13419,10 @@ function ensurePerplexityLastGlance() {
 
 function applyPerplexityLastGlanceState() {
   const glance = ensurePerplexityLastGlance();
-  if (!glance) return;
+  if (!glance) {
+    applyPerplexityAttentionGlanceState();
+    return;
+  }
   const text = document.getElementById('perplexity-last-glance-text');
   glance.classList.remove(
     'has-results',
@@ -13440,6 +13445,7 @@ function applyPerplexityLastGlanceState() {
       'aria-label',
       `Searching for ${preview}${perplexityCollapsed ? ' · ↑ Perplexity icon · ↓ footer' : ''}`
     );
+    applyPerplexityAttentionGlanceState();
     return;
   }
 
@@ -13459,6 +13465,7 @@ function applyPerplexityLastGlanceState() {
         'aria-label',
         `Last Perplexity search failed: ${preview}${chainAria}`
       );
+      applyPerplexityAttentionGlanceState();
       return;
     }
     glance.classList.add('has-results');
@@ -13472,6 +13479,7 @@ function applyPerplexityLastGlanceState() {
       'aria-label',
       `Last Perplexity search: ${preview}, ${outcome}. Click to open${chainAria}`
     );
+    applyPerplexityAttentionGlanceState();
     return;
   }
 
@@ -13489,6 +13497,7 @@ function applyPerplexityLastGlanceState() {
         perplexityCollapsed ? ' · ↑ Perplexity icon · ↓ footer' : ''
       }`
     );
+    applyPerplexityAttentionGlanceState();
     return;
   }
 
@@ -13504,10 +13513,133 @@ function applyPerplexityLastGlanceState() {
       'aria-label',
       'Perplexity ready — click to expand and search · ↑ Perplexity icon · ↓ footer'
     );
+    applyPerplexityAttentionGlanceState();
     return;
   }
 
   glance.hidden = true;
+  applyPerplexityAttentionGlanceState();
+}
+
+/**
+ * Top/error attention glance above Perplexity filters (Debug Log / Monitors Down·Slow parity).
+ * Visible when the section is open and the last search failed or has more than Top-N hits.
+ */
+function ensurePerplexityAttentionGlance() {
+  ensurePerplexityFilterChips();
+  const chips = document.getElementById('perplexity-filter-chips');
+  const content = document.getElementById('perplexity-content');
+  let glance = document.getElementById('perplexity-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'perplexity-attention-glance';
+    glance.className = 'perplexity-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="perplexity-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement('beforebegin', glance);
+    } else if (content) {
+      content.insertAdjacentElement('afterbegin', glance);
+    } else {
+      return null;
+    }
+    wirePerplexityAttentionGlanceClick(glance);
+  } else if (chips && glance.nextElementSibling !== chips) {
+    chips.insertAdjacentElement('beforebegin', glance);
+  }
+  return glance;
+}
+
+function applyPerplexityAttentionGlanceState() {
+  const glance = ensurePerplexityAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('perplexity-attention-glance-text');
+  const last = perplexityLastSearch;
+  const n = last ? Number(last.count) || 0 : 0;
+  const hasError = !!(last && last.error);
+  const hasTop = !!(last && !last.error && n > PERPLEXITY_TOP_N);
+  if (perplexityCollapsed || perplexitySearchBusyForGlance || (!hasError && !hasTop)) {
+    glance.hidden = true;
+    glance.classList.remove('has-error', 'has-top');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.toggle('has-error', hasError);
+  glance.classList.toggle('has-top', !hasError && hasTop);
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (hasError) {
+    const preview = truncatePerplexityGlancePreview(last.query || '', 36);
+    if (text) {
+      text.textContent = preview
+        ? `Search · error · ${preview}`
+        : 'Search · error';
+    }
+    glance.title = 'Show last search error (focus query)';
+    glance.setAttribute(
+      'aria-label',
+      `Last Perplexity search failed${preview ? `: ${preview}` : ''} — click to focus query`
+    );
+    return;
+  }
+  if (text) {
+    text.textContent = `Search · ${n} results · Top`;
+  }
+  glance.title = `Show top ${PERPLEXITY_TOP_N} results only (Top filter)`;
+  glance.setAttribute(
+    'aria-label',
+    `Last Perplexity search has ${n} results — click to open Top filter`
+  );
+}
+
+function activatePerplexityAttentionGlance() {
+  ensurePerplexitySectionExpanded();
+  const last = perplexityLastSearch;
+  const queryInput = document.getElementById('perplexity-query');
+  const resultsEl = document.getElementById('perplexity-results');
+  if (last && last.error) {
+    const errEl = resultsEl?.querySelector('.perplexity-empty-error');
+    if (errEl && typeof errEl.scrollIntoView === 'function') {
+      errEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    if (queryInput && typeof queryInput.focus === 'function') {
+      try {
+        queryInput.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    return;
+  }
+  setPerplexityFilterMode('top');
+  const first = visiblePerplexityResultItems(resultsEl)[0];
+  if (first && typeof first.scrollIntoView === 'function') {
+    first.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (typeof first.focus === 'function') first.focus();
+  } else {
+    const chip =
+      document.querySelector(
+        '#perplexity-filter-chips [data-perplexity-filter="top"]'
+      ) || document.getElementById('perplexity-filter-chips');
+    chip?.focus?.();
+  }
+}
+
+function wirePerplexityAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.perplexityAttentionWired === '1') return;
+  glance.dataset.perplexityAttentionWired = '1';
+  const activate = () => activatePerplexityAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 function wirePerplexityLastGlanceClick(glance) {

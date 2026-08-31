@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.754] - 2026-08-31
+
+### Added
+- **Perplexity Top/error attention glance** — when Perplexity Search is open and the last search failed or returned more than Top-N hits, a **Search · error · …** / **Search · N results · Top** strip appears above the All · Top · Snippet filters (Debug Log / Monitors Down·Slow parity). Red wash for error, amber for Top. Click or Enter focuses the query (error) or opens the Top filter and the first result. Hidden while collapsed (keep-header last-search glance stays). Design review polish.
+
 ## [0.1.753] - 2026-08-31
 
 ### Added
