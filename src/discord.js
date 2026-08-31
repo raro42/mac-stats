@@ -50,6 +50,11 @@
     } catch (_) {
       statusEl.textContent = "—";
     }
+    if (
+      typeof window.applySettingsDiscordTokenAttentionGlanceState === "function"
+    ) {
+      window.applySettingsDiscordTokenAttentionGlanceState();
+    }
   }
 
   function clearInput() {

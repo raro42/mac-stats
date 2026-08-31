@@ -391,6 +391,7 @@
         closeBtn.focus();
       }
       applySettingsHelpAttentionGlanceState();
+      applySettingsDiscordTokenAttentionGlanceState();
     });
   }
 
@@ -399,6 +400,7 @@
     if (!settingsModal) return;
     closeSettingsHelpSheet(false);
     applySettingsHelpAttentionGlanceState();
+    applySettingsDiscordTokenAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -932,6 +934,95 @@
       }
       const helpBtn = document.getElementById("settings-help-btn");
       if (helpBtn && !helpBtn.disabled) helpBtn.click();
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  function isDiscordTokenNotConfiguredForGlance() {
+    const statusEl = document.getElementById("discord-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    return text === "not configured";
+  }
+
+  /**
+   * Discord bot token attention glance in Credentials (Perplexity Key-not-set parity).
+   * Visible when Settings is open and no bot token is saved.
+   */
+  function ensureSettingsDiscordTokenAttentionGlance() {
+    const discordSetting = document.getElementById("discord-setting");
+    let glance = document.getElementById("settings-discord-token-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-discord-token-attention-glance";
+      glance.className = "settings-discord-token-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-discord-token-attention-glance-text"></span>';
+      if (discordSetting) {
+        discordSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsDiscordTokenAttentionGlanceClick(glance);
+    } else if (
+      discordSetting &&
+      discordSetting.firstElementChild !== glance
+    ) {
+      discordSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsDiscordTokenAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isDiscordTokenNotConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-discord-token-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsDiscordTokenAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-discord-token-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    if (text) text.textContent = "Discord · Not set · add bot token";
+    glance.title = "Discord needs a bot token — click to paste one";
+    glance.setAttribute(
+      "aria-label",
+      "Discord bot token not set — click to focus the token field"
+    );
+  }
+
+  function wireSettingsDiscordTokenAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsDiscordTokenAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsDiscordTokenAttentionWired = "1";
+    const activate = () => {
+      const tokenInput = document.getElementById("discord-token-input");
+      if (tokenInput && typeof tokenInput.focus === "function") {
+        try {
+          tokenInput.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
     };
     glance.addEventListener("click", (e) => {
       e.preventDefault();
@@ -2688,6 +2779,8 @@
     tryChainFooterVersionToPerplexitySettingsClearLast;
   window.tryChainFooterVersionToDiscordSettingsViewLogsLast =
     tryChainFooterVersionToDiscordSettingsViewLogsLast;
+  window.applySettingsDiscordTokenAttentionGlanceState =
+    applySettingsDiscordTokenAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

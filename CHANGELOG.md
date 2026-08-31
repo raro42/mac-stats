@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.760] - 2026-08-31
+
+### Added
+- **Settings Discord token-not-set attention glance** — when Settings Credentials is open and no Discord bot token is saved, a **Discord · Not set · add bot token** red strip appears above the Discord bot controls (Perplexity Key-not-set / Help attention parity). Click or Enter focuses the token field. Hidden when configured or Settings closes.
+
 ## [0.1.759] - 2026-08-31
 
 ### Added
