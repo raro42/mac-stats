@@ -621,6 +621,8 @@ impl Config {
             .unwrap_or_else(|| json!({}));
         let obj = after.as_object_mut().ok_or_else(|| "config.json is not an object".to_string())?;
         obj.insert("aiAgentEnabled".into(), json!(false));
+        obj.insert("agentJudgeEnabled".into(), json!(false));
+        obj.insert("agentJudgeOnFailureOnly".into(), json!(true));
         obj.insert("menuBarCompact".into(), json!(true));
         obj.insert("windowDecorations".into(), json!(true));
         // Leave Discord tokens / .config.env alone — only config.json toggles.
@@ -1187,6 +1189,11 @@ impl Config {
         false
     }
 
+    /// Persist `agentJudgeEnabled` in `~/.mac-stats/config.json`.
+    pub fn set_agent_judge_enabled(enabled: bool) -> Result<(), String> {
+        Self::merge_config_bool("agentJudgeEnabled", enabled)
+    }
+
     /// When true (default), the optional agent judge only runs if verification failed or the turn
     /// lane is `full`. Set `agentJudgeOnFailureOnly: false` to judge every enabled run (costly).
     pub fn agent_judge_on_failure_only() -> bool {
@@ -1211,6 +1218,11 @@ impl Config {
             }
         }
         true
+    }
+
+    /// Persist `agentJudgeOnFailureOnly` in `~/.mac-stats/config.json`.
+    pub fn set_agent_judge_on_failure_only(on_failure_only: bool) -> Result<(), String> {
+        Self::merge_config_bool("agentJudgeOnFailureOnly", on_failure_only)
     }
 
     /// Agent harness mode (OpenClaw/Hermes-style vs classic multi-phase).

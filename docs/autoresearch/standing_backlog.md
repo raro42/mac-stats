@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.773** — Settings Judge toggles + Off attention glance (Product; `/judge` mentions Settings).
+
 - **v0.1.772** — Settings Signal alerts honest placeholder (**Signal · Not wired · REST API pending** in Credentials; `/signal` mentions Settings; Slack/Telegram parity glance; no fake Keychain until Signal REST is wired).
 
 - **v0.1.771** — Settings Slack alerts webhook + not-set attention glance (**Slack · Not set · add webhook URL** in Credentials; Keychain `slack_webhook_slack_default`; channel restores at startup; `/slack` Not-set mentions Settings; Telegram parity).

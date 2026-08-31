@@ -1313,6 +1313,28 @@ pub fn set_ai_agent_enabled(enabled: bool) -> Result<bool, String> {
 }
 
 #[tauri::command]
+pub fn get_agent_judge_enabled() -> bool {
+    crate::config::Config::agent_judge_enabled()
+}
+
+#[tauri::command]
+pub fn set_agent_judge_enabled(enabled: bool) -> Result<bool, String> {
+    crate::config::Config::set_agent_judge_enabled(enabled)?;
+    Ok(crate::config::Config::agent_judge_enabled())
+}
+
+#[tauri::command]
+pub fn get_agent_judge_on_failure_only() -> bool {
+    crate::config::Config::agent_judge_on_failure_only()
+}
+
+#[tauri::command]
+pub fn set_agent_judge_on_failure_only(on_failure_only: bool) -> Result<bool, String> {
+    crate::config::Config::set_agent_judge_on_failure_only(on_failure_only)?;
+    Ok(crate::config::Config::agent_judge_on_failure_only())
+}
+
+#[tauri::command]
 pub fn get_menu_bar_compact() -> bool {
     crate::config::Config::menu_bar_compact()
 }

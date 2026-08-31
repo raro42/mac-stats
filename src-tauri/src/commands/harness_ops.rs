@@ -5600,12 +5600,13 @@ pub fn looks_like_judge_ready_request(content: &str) -> bool {
 /// Zero-LLM agent-judge Ready / Off chip (config only; does not run the judge).
 pub fn format_judge_ready_chip() -> String {
     if !crate::config::Config::agent_judge_enabled() {
-        return "**Judge** · Off · set `agentJudgeEnabled` true".to_string();
+        return "**Judge** · Off · enable in Settings Product (or `agentJudgeEnabled` true)"
+            .to_string();
     }
     if crate::config::Config::agent_judge_on_failure_only() {
-        "**Judge** · Ready · failure-only (default)".to_string()
+        "**Judge** · Ready · failure-only (default) · Settings Product".to_string()
     } else {
-        "**Judge** · Ready · every run".to_string()
+        "**Judge** · Ready · every run · Settings Product".to_string()
     }
 }
 
@@ -6824,7 +6825,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
-• `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\
+• `/judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\

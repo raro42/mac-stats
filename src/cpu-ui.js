@@ -391,6 +391,7 @@
         closeBtn.focus();
       }
       applySettingsHelpAttentionGlanceState();
+      applySettingsJudgeAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -410,6 +411,7 @@
     if (!settingsModal) return;
     closeSettingsHelpSheet(false);
     applySettingsHelpAttentionGlanceState();
+    applySettingsJudgeAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -761,6 +763,8 @@
     if (!wrap) return [];
     const ids = [
       "ai-agent-enabled-toggle",
+      "agent-judge-enabled-toggle",
+      "agent-judge-failure-only-toggle",
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
@@ -2033,6 +2037,107 @@
   }
 
   /**
+   * Agent judge attention glance in Product settings.
+   * Visible when Settings is open and judge is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsJudgeAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const judgeToggle = document.getElementById("agent-judge-enabled-toggle");
+    const judgeLabel = judgeToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-judge-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-judge-attention-glance";
+      glance.className = "settings-judge-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-judge-attention-glance-text"></span>';
+      if (judgeLabel) {
+        judgeLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        const aiNote = wrap.querySelector(".setting-note");
+        if (aiNote) {
+          aiNote.insertAdjacentElement("afterend", glance);
+        } else {
+          wrap.insertAdjacentElement("afterbegin", glance);
+        }
+      } else {
+        return null;
+      }
+      wireSettingsJudgeAttentionGlanceClick(glance);
+    } else if (judgeLabel && glance.nextElementSibling !== judgeLabel) {
+      judgeLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsJudgeAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-judge-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsJudgeAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-judge-attention-glance-text"
+    );
+    const judgeToggle = document.getElementById("agent-judge-enabled-toggle");
+    const enabled = !!(judgeToggle && judgeToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "Judge · Off · enable agent judge";
+    glance.title = "Agent judge is off — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "Judge off — click to focus Enable agent judge"
+    );
+  }
+
+  function wireSettingsJudgeAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsJudgeAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsJudgeAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById("agent-judge-enabled-toggle");
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
    * Enter/Space keep Help / Reset. Open Help sheet joins the chain; Esc closes.
@@ -2784,18 +2889,54 @@
 
   function initProductToggles() {
     const aiToggle = document.getElementById("ai-agent-enabled-toggle");
+    const judgeToggle = document.getElementById("agent-judge-enabled-toggle");
+    const judgeFailureOnlyToggle = document.getElementById(
+      "agent-judge-failure-only-toggle"
+    );
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
     const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
     const resetBtn = document.getElementById("settings-reset-defaults-btn");
     const helpSheet = document.getElementById("settings-help-sheet");
-    if (!aiToggle && !compactToggle && !cpuWindowCompactToggle && !helpBtn && !resetBtn) return;
+    if (
+      !aiToggle &&
+      !judgeToggle &&
+      !judgeFailureOnlyToggle &&
+      !compactToggle &&
+      !cpuWindowCompactToggle &&
+      !helpBtn &&
+      !resetBtn
+    ) {
+      return;
+    }
+
+    const syncJudgeFailureOnlyEnabled = () => {
+      if (!judgeFailureOnlyToggle) return;
+      const on = !!(judgeToggle && judgeToggle.checked);
+      judgeFailureOnlyToggle.disabled = !on;
+      const label = judgeFailureOnlyToggle
+        .closest?.(".setting-toggle")
+        ?.querySelector(".toggle-label");
+      if (label) {
+        label.style.opacity = on ? "" : "0.55";
+      }
+    };
 
     (async () => {
       try {
         const invoke = getInvoke();
         if (!invoke) return;
         if (aiToggle) aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
+        if (judgeToggle) {
+          judgeToggle.checked = !!(await invoke("get_agent_judge_enabled"));
+        }
+        if (judgeFailureOnlyToggle) {
+          judgeFailureOnlyToggle.checked = !!(await invoke(
+            "get_agent_judge_on_failure_only"
+          ));
+        }
+        syncJudgeFailureOnlyEnabled();
+        applySettingsJudgeAttentionGlanceState();
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
@@ -2830,6 +2971,38 @@
       } catch (_) {
         /* event bridge optional when not in Tauri */
       }
+    }
+    if (judgeToggle) {
+      judgeToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_agent_judge_enabled", {
+            enabled: judgeToggle.checked,
+          });
+          syncJudgeFailureOnlyEnabled();
+          applySettingsJudgeAttentionGlanceState();
+          flashToggleLabelSaved(judgeToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save agentJudgeEnabled: " + e);
+        }
+      });
+    }
+    if (judgeFailureOnlyToggle) {
+      judgeFailureOnlyToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_agent_judge_on_failure_only", {
+            onFailureOnly: judgeFailureOnlyToggle.checked,
+          });
+          flashToggleLabelSaved(judgeFailureOnlyToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save agentJudgeOnFailureOnly: " + e);
+        }
+      });
     }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {
@@ -2872,8 +3045,9 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, menuBarCompact, cpuWindowCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
+            "Judge: optional post-run check — Settings Product or /judge",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -2929,6 +3103,10 @@
           }
           const msg = await invoke("reset_config_to_monitor_defaults");
           if (aiToggle) aiToggle.checked = false;
+          if (judgeToggle) judgeToggle.checked = false;
+          if (judgeFailureOnlyToggle) judgeFailureOnlyToggle.checked = true;
+          syncJudgeFailureOnlyEnabled();
+          applySettingsJudgeAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
@@ -3903,6 +4081,8 @@
     applySettingsSlackAttentionGlanceState;
   window.applySettingsSignalAttentionGlanceState =
     applySettingsSignalAttentionGlanceState;
+  window.applySettingsJudgeAttentionGlanceState =
+    applySettingsJudgeAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

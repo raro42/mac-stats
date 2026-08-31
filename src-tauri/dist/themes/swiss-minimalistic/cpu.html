@@ -601,6 +601,15 @@
               </label>
               <div class="setting-note">Off = monitor only (no Discord / scheduler / Ollama startup). Restart after changing.</div>
               <label class="setting-toggle">
+                <input type="checkbox" id="agent-judge-enabled-toggle" />
+                <span class="toggle-label">Enable agent judge</span>
+              </label>
+              <label class="setting-toggle">
+                <input type="checkbox" id="agent-judge-failure-only-toggle" />
+                <span class="toggle-label">Judge on failure only</span>
+              </label>
+              <div class="setting-note" id="agent-judge-settings-note">After an agent run, an optional LLM checks the result. Off by default. Failure-only (default when on) skips success on instant/lite lanes.</div>
+              <label class="setting-toggle">
                 <input type="checkbox" id="menu-bar-compact-toggle" />
                 <span class="toggle-label">Compact menu bar (CPU / °C)</span>
               </label>

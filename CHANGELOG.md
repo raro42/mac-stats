@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.773] - 2026-09-01
+
+### Added
+- **Settings Judge toggles + Off attention glance** — Product now has **Enable agent judge** and **Judge on failure only** (`agentJudgeEnabled` / `agentJudgeOnFailureOnly` in `config.json`). When judge is off, a **Judge · Off · enable agent judge** amber strip appears above the toggles (Help / Signal glance parity). Click focuses the enable toggle. `/judge` Ready/Off cue mentions Settings Product. Reset to monitor defaults turns judge off and restores failure-only.
+
 ## [0.1.772] - 2026-09-01
 
 ### Added
