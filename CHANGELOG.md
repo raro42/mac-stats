@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.762] - 2026-08-31
+
+### Changed
+- **Hot ring gauges** — removed the layout-shifting “Hot · GPU · …” bar under the gauges. Hot rings now pulse with a soft amber glow on the gauge (GPU gets a slightly stronger ring pulse).
+
 ## [0.1.761] - 2026-08-31
 
 ### Fixed

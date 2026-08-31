@@ -1782,7 +1782,57 @@ textarea.ops-agent-editor.is-dirty {
   background-color: color-mix(in srgb, #ff9500 12%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 28%, transparent);
   border-radius: 12px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  animation: ring-gauge-hot-glow 2.4s ease-in-out infinite;
+}
+
+.metric-card.is-hot .ring-progress {
+  animation: ring-gauge-hot-stroke 2.4s ease-in-out infinite;
+}
+
+/* GPU ring — slightly stronger pulse when hot (no extra DOM / layout shift). */
+.metric-card.is-hot:has(#gpu-usage-value) .ring-progress {
+  animation: ring-gauge-hot-stroke-gpu 2s ease-in-out infinite;
+}
+
+@keyframes ring-gauge-hot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 26%, transparent);
+    background-color: color-mix(in srgb, #ff9500 10%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, #ff9500 44%, transparent),
+      0 0 14px color-mix(in srgb, #ff9500 22%, transparent);
+    background-color: color-mix(in srgb, #ff9500 16%, transparent);
+  }
+}
+
+@keyframes ring-gauge-hot-stroke {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px color-mix(in srgb, #ff9500 30%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px color-mix(in srgb, #ff9500 55%, transparent));
+  }
+}
+
+@keyframes ring-gauge-hot-stroke-gpu {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px color-mix(in srgb, #ff9500 40%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px color-mix(in srgb, #ff9500 70%, transparent));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-card.is-hot,
+  .metric-card.is-hot .ring-progress {
+    animation: none;
+  }
 }
 
 .history-chart-container.is-hot .history-chart-caption {
@@ -3125,59 +3175,6 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
   background: color-mix(in srgb, #ff9f0a 8%, transparent);
   color: color-mix(in srgb, #ff9f0a 50%, currentColor);
-}
-
-/* CPU rings — Hot attention glance (Top Processes Hot / Monitors Down/Slow parity) */
-.rings-hot-attention-glance {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 4px 0 2px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
-  font-size: 13px;
-  font-weight: 520;
-  line-height: 1.35;
-  cursor: pointer;
-  width: 100%;
-  flex-basis: 100%;
-  grid-column: 1 / -1;
-  box-sizing: border-box;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease;
-}
-
-.rings-hot-attention-glance[hidden] {
-  display: none !important;
-}
-
-.rings-hot-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
-}
-
-.rings-hot-attention-glance:focus-visible {
-  outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
-}
-
-.rings-hot-attention-glance.has-hot {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
-}
-
-.metric-card.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);
-  transition: box-shadow 0.25s ease;
 }
 
 /* Power strip — Hot attention glance (rings Hot / Monitors Down/Slow parity) */
