@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00). Digester open was empty; design review under 
 
 | Version | What |
 |---------|------|
+| **v0.1.770** | Settings **Telegram alerts** bot token + chat id in Credentials (Keychain); channel registers on Save and restores at startup; **Telegram · Not set / Partial** glance; `/telegram` mentions Settings |
 | **v0.1.769** | Settings **Cursor agent** workspace + binary in Credentials (`config.json`); **Cursor · Not set · add binary path** glance; `/cursor` mentions Settings |
 | **v0.1.768** | Settings **Browser / CDP** Chromium path + CDP port in Credentials (`config.json`); **Browser · Not set · add Chromium path** glance; `/browser` mentions Settings |
 | **v0.1.767** | Settings **MCP** URL + stdio + not-set glance (Keychain) |
@@ -16,7 +17,8 @@ Overnight Track B (20:00–06:00). Digester open was empty; design review under 
 
 ## Tried / notes
 
-- Quiet digester — pulled standing backlog Credentials chain (Cursor agent after Browser/CDP).
-- Stale feature screens still under design-review grace; recapture when due.
+- Quiet digester — pulled standing backlog Credentials chain (Telegram persistence after Cursor agent).
+- Next: Slack webhook Settings persistence / Signal placeholder / design-review screenshot recapture when due.
+- Stale feature screens still under design-review grace.
 
-Generated: 2026-08-31T22:47:30
+Generated: 2026-08-31T23:15:00
