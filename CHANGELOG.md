@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.752] - 2026-08-31
+
+### Added
+- **Debug Log Error/Warn attention glance** — when the log tail has ERROR or WARN lines and Debug Log is open, a **Logs · N errors · M warns** strip appears above the toolbar (Monitors Down/Slow / Hot parity). Red wash for Error, amber for Warn-only. Click or Enter opens the Error (prefer) or Warn filter and focuses the first matching line. Collapsed keep-header glance stays as the Quiet / error-warn summary.
+
 ## [0.1.751] - 2026-08-31
 
 ### Added

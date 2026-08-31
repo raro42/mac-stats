@@ -13813,28 +13813,27 @@ function applyLogsGlanceState({ error, warn }) {
   const wrn = Number(warn) || 0;
   logsGlanceCounts = { error: err, warn: wrn };
   glance.classList.remove('has-errors', 'has-warns-only', 'is-quiet');
-  const chainHint = logsSectionCollapsed
-    ? ' · ↑ → Debug Log icon · ↓ → footer'
-    : '';
-  const chainAria = logsSectionCollapsed
-    ? ' · ↑ Debug Log icon · ↓ footer'
-    : '';
+  // Expanded: keep-header glance hides — Error/Warn attention strip sits above filters.
+  if (!logsSectionCollapsed) {
+    glance.hidden = true;
+    applyLogsAttentionGlanceState({ error: err, warn: wrn });
+    return;
+  }
+  const chainHint = ' · ↑ → Debug Log icon · ↓ → footer';
+  const chainAria = ' · ↑ Debug Log icon · ↓ footer';
+  applyLogsAttentionGlanceState({ error: err, warn: wrn });
   if (err <= 0 && wrn <= 0) {
     // Collapsed: always show a glance so keep-header is useful (Perplexity parity).
-    if (logsSectionCollapsed) {
-      glance.hidden = false;
-      glance.classList.add('is-quiet');
-      if (text) text.textContent = 'Quiet · clean';
-      glance.setAttribute('role', 'button');
-      glance.tabIndex = 0;
-      glance.title = `Show Debug Log${chainHint}`;
-      glance.setAttribute(
-        'aria-label',
-        `Debug Log quiet — click to expand${chainAria}`
-      );
-      return;
-    }
-    glance.hidden = true;
+    glance.hidden = false;
+    glance.classList.add('is-quiet');
+    if (text) text.textContent = 'Quiet · clean';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = `Show Debug Log${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Debug Log quiet — click to expand${chainAria}`
+    );
     return;
   }
   glance.hidden = false;
@@ -13852,6 +13851,105 @@ function applyLogsGlanceState({ error, warn }) {
     'aria-label',
     `Debug Log tail has ${parts.join(' and ')} — click to filter${chainAria}`
   );
+}
+
+/**
+ * Error/Warn attention glance above Debug Log toolbar (Monitors Down/Slow parity).
+ * Visible when the section is open and the tail has ERROR or WARN lines.
+ */
+function ensureLogsAttentionGlance() {
+  ensureLogsFilterChips();
+  const toolbar =
+    document.querySelector('#logs-content .logs-toolbar') ||
+    document.querySelector('.logs-toolbar');
+  const content = document.getElementById('logs-content');
+  let glance = document.getElementById('logs-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'logs-attention-glance';
+    glance.className = 'logs-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="logs-attention-glance-text"></span>';
+    if (toolbar) {
+      toolbar.insertAdjacentElement('beforebegin', glance);
+    } else if (content) {
+      content.insertAdjacentElement('afterbegin', glance);
+    } else {
+      return null;
+    }
+    wireLogsAttentionGlanceClick(glance);
+  } else if (toolbar && glance.nextElementSibling !== toolbar) {
+    toolbar.insertAdjacentElement('beforebegin', glance);
+  }
+  return glance;
+}
+
+function applyLogsAttentionGlanceState({ error, warn }) {
+  const glance = ensureLogsAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('logs-attention-glance-text');
+  const err = Number(error) || 0;
+  const wrn = Number(warn) || 0;
+  if (logsSectionCollapsed || (err <= 0 && wrn <= 0)) {
+    glance.hidden = true;
+    glance.classList.remove('has-errors', 'has-warns-only');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.toggle('has-errors', err > 0);
+  glance.classList.toggle('has-warns-only', err <= 0 && wrn > 0);
+  const parts = [];
+  if (err > 0) parts.push(err === 1 ? '1 error' : `${err} errors`);
+  if (wrn > 0) parts.push(wrn === 1 ? '1 warn' : `${wrn} warns`);
+  const label = parts.join(' · ');
+  if (text) text.textContent = `Logs · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  const filterHint = err > 0 ? 'Error' : 'Warn';
+  glance.title = `Show ${filterHint} lines only (${filterHint} filter)`;
+  glance.setAttribute(
+    'aria-label',
+    `Debug Log has ${label} — click to open ${filterHint} filter`
+  );
+}
+
+function activateLogsAttentionGlance() {
+  ensureLogsSectionExpanded();
+  const mode = logsGlanceCounts.error > 0 ? 'error' : 'warn';
+  setLogsFilterMode(mode);
+  const viewer = document.getElementById('logs-viewer');
+  const first =
+    viewer?.querySelector('.logs-line.is-error') ||
+    viewer?.querySelector('.logs-line.is-warn') ||
+    visibleLogsLines(viewer)[0];
+  if (first && typeof first.scrollIntoView === 'function') {
+    syncLogsLinesTabOrder(viewer, first);
+    first.scrollIntoView({ block: 'nearest' });
+    if (typeof first.focus === 'function') first.focus();
+  } else {
+    const chip =
+      document.querySelector(
+        `#logs-filter-chips [data-logs-filter="${mode}"]`
+      ) || document.getElementById('logs-filter-chips');
+    chip?.focus?.();
+  }
+}
+
+function wireLogsAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.logsAttentionWired === '1') return;
+  glance.dataset.logsAttentionWired = '1';
+  const activate = () => activateLogsAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 function wireLogsErrorGlanceClick(glance) {
@@ -17732,6 +17830,7 @@ function initLogsSection() {
   ensureLogsFilterChips();
   ensureLogsToolbarKeyboard();
   ensureLogsErrorGlance();
+  ensureLogsAttentionGlance();
   startLogsGlancePoll();
 
   const logsIcon = document.getElementById('icon-logs');
@@ -17758,14 +17857,21 @@ function initLogsSection() {
     }
     const glance = document.getElementById('logs-error-glance');
     if (glance && logsSectionCollapsed) glance.hidden = true;
-  };
+    const attention = document.getElementById('logs-attention-glance');
+    if (attention) {
+      attention.hidden = true;
+      attention.classList.remove('has-errors', 'has-warns-only');
+    }
+    if (!logsSectionCollapsed) {
+      applyLogsGlanceState(logsGlanceCounts);
+    }
   applyCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'logs-content',
     getExpanded: () => !logsSectionCollapsed,
     ignoreSelector:
-      '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, #logs-error-glance, label',
+      '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, #logs-error-glance, #logs-attention-glance, label',
     onToggle: () => {
       logsSectionCollapsed = !logsSectionCollapsed;
       setSectionCollapsed('logs_collapsed', logsSectionCollapsed);
@@ -17776,6 +17882,7 @@ function initLogsSection() {
   header.addEventListener('click', (e) => {
     if (e.target && e.target.closest && e.target.closest('#logs-path-hint')) return;
     if (e.target && e.target.closest && e.target.closest('#logs-error-glance')) return;
+    if (e.target && e.target.closest && e.target.closest('#logs-attention-glance')) return;
     e.stopPropagation();
     logsSectionCollapsed = !logsSectionCollapsed;
     setSectionCollapsed('logs_collapsed', logsSectionCollapsed);
