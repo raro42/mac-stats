@@ -360,6 +360,9 @@ fn run_internal(open_cpu_window: bool) {
             commands::alerts::register_mastodon_channel,
             commands::alerts::remove_alert_channel,
             commands::alerts::list_alert_channels,
+            commands::alerts::get_telegram_settings_status,
+            commands::alerts::save_telegram_alert_settings,
+            commands::alerts::clear_telegram_alert_settings,
             // Plugin commands
             commands::plugins::add_plugin,
             commands::plugins::remove_plugin,
@@ -488,6 +491,9 @@ fn run_internal(open_cpu_window: bool) {
             if let Err(e) = monitors::load_monitors_internal() {
                 tracing::warn!("Failed to load monitors: {}", e);
             }
+
+            // Restore Settings Telegram alert channel from Keychain (token + chat id).
+            commands::alerts::restore_persisted_telegram_channel();
 
             // No default WebView in tauri.conf (windows: []). Destroy any stray ones so
             // WebKit GPU ("Graphics and Media") is not kept warm while menu-bar-only.

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.770] - 2026-08-31
+
+### Added
+- **Settings Telegram alerts bot token + chat id** — Credentials now has Save / Clear for Telegram alert delivery (Keychain `telegram_bot_default` / `telegram_chat_default`). Save registers the default channel; startup restores it when both values exist. When unset or partial, a **Telegram · Not set / Partial** red strip appears above the controls (Mastodon / Cursor parity). Click focuses the missing field. `/telegram` Not-set cue mentions Settings.
+
 ## [0.1.769] - 2026-08-31
 
 ### Added

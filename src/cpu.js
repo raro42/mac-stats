@@ -12933,6 +12933,143 @@ function initCursorAgentSettings() {
   window.CursorAgentSettings = { refreshStatus: refreshCursorAgentStatus };
 }
 
+function updateTelegramConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'telegram-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshTelegramStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateTelegramConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_telegram_settings_status');
+    const token = !!(st && st.token);
+    const chat = !!(st && st.chat);
+    if (token && chat) updateTelegramConfigStatus('Ready');
+    else if (token) updateTelegramConfigStatus('Token set · no chat id');
+    else if (chat) updateTelegramConfigStatus('Chat id set · no token');
+    else updateTelegramConfigStatus('Not set');
+  } catch (_) {
+    updateTelegramConfigStatus('—');
+  }
+  if (typeof window.applySettingsTelegramAttentionGlanceState === 'function') {
+    window.applySettingsTelegramAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Telegram bot token + chat id (Mastodon parity; Keychain + channel register). */
+function initTelegramSettings() {
+  const saveBtn = document.getElementById('telegram-save');
+  const clearBtn = document.getElementById('telegram-clear');
+  const tokenInput = document.getElementById('telegram-bot-token-input');
+  const chatInput = document.getElementById('telegram-chat-id-input');
+  let telegramBusy = false;
+
+  function setTelegramBusy(busy, which) {
+    telegramBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashTelegramBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (tokenInput || chatInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (telegramBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const botToken = (tokenInput && tokenInput.value.trim()) || '';
+      const chatId = (chatInput && chatInput.value.trim()) || '';
+      if (!botToken && !chatId) {
+        alert('Paste a Telegram bot token and/or chat id first.');
+        return;
+      }
+      setTelegramBusy(true, 'save');
+      try {
+        await invoke('save_telegram_alert_settings', {
+          botToken: botToken || null,
+          chatId: chatId || null,
+        });
+        if (tokenInput) tokenInput.value = '';
+        if (chatInput) chatInput.value = '';
+        setTelegramBusy(false);
+        flashTelegramBtn(saveBtn, 'Saved');
+        await refreshTelegramStatus();
+      } catch (e) {
+        console.error('Telegram save:', e);
+        setTelegramBusy(false);
+        alert('Could not save Telegram settings: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (telegramBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setTelegramBusy(true, 'clear');
+      try {
+        await invoke('clear_telegram_alert_settings');
+        if (tokenInput) tokenInput.value = '';
+        if (chatInput) chatInput.value = '';
+        setTelegramBusy(false);
+        flashTelegramBtn(clearBtn, 'Cleared');
+        await refreshTelegramStatus();
+      } catch (e) {
+        console.error('Telegram clear:', e);
+        setTelegramBusy(false);
+        alert('Could not clear Telegram settings: ' + String(e));
+      }
+    });
+  }
+
+  refreshTelegramStatus();
+  window.TelegramSettings = { refreshStatus: refreshTelegramStatus };
+}
+
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
   const s = String(raw || '');
@@ -20337,6 +20474,7 @@ function initMonitoringFeatures() {
       initMcpSettings();
       initBrowserSettings();
       initCursorAgentSettings();
+      initTelegramSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

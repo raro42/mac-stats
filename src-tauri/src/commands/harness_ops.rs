@@ -6386,19 +6386,27 @@ pub fn format_telegram_ready_chip() -> String {
     let registered =
         crate::commands::alerts::count_registered_alert_channels("Telegram");
     let tokens = crate::commands::alerts::count_alert_keychain_prefix("telegram_bot_");
-    match (registered > 0, tokens > 0) {
-        (false, false) => {
-            "**Telegram** · Not set · register alert channel + Keychain bot token".to_string()
+    let chat = crate::commands::alerts::get_telegram_chat_id().is_some();
+    match (registered > 0, tokens > 0, chat) {
+        (false, false, false) => {
+            "**Telegram** · Not set · add bot token + chat id (Settings)".to_string()
         }
-        (true, false) => {
+        (true, false, _) => {
             format!(
-                "**Telegram** · Partial · {registered} channel(s) · missing bot token"
+                "**Telegram** · Partial · {registered} channel(s) · missing bot token (Settings)"
             )
         }
-        (false, true) => {
-            format!("**Telegram** · Partial · {tokens} token(s) · register channel")
+        (false, true, false) => {
+            format!("**Telegram** · Partial · {tokens} token(s) · missing chat id (Settings)")
         }
-        (true, true) => {
+        (false, true, true) => {
+            "**Telegram** · Partial · token + chat set · Save again to register (Settings)"
+                .to_string()
+        }
+        (false, false, true) => {
+            "**Telegram** · Partial · chat id set · missing bot token (Settings)".to_string()
+        }
+        (true, true, _) => {
             format!("**Telegram** · Ready · {registered} channel(s) · token set")
         }
     }

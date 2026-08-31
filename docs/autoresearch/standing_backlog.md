@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.770** — Settings Telegram alerts bot token + chat id + not-set/partial attention glance (**Telegram · Not set / Partial** in Credentials; Keychain `telegram_bot_default` / `telegram_chat_default`; channel restores at startup; `/telegram` Not-set mentions Settings; Mastodon/Cursor parity).
+
 - **v0.1.769** — Settings Cursor agent workspace + binary + not-set attention glance (**Cursor · Not set · add binary path** in Credentials; config.json `cursorAgentWorkspace` / `cursorAgentExecutable`; `/cursor` Not-set mentions Settings; Browser parity).
 
 - **v0.1.768** — Settings Browser / CDP Chromium path + port + not-set attention glance (**Browser · Not set · add Chromium path** in Credentials; config.json `browserChromiumExecutable` / `browserCdpPort`; `/browser` Not-set mentions Settings; MCP parity).

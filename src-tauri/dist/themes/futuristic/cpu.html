@@ -698,6 +698,17 @@
               </div>
               <div class="setting-note">Workspace + optional binary for CURSOR_AGENT. Saved in ~/.mac-stats/config.json (cursorAgentWorkspace / cursorAgentExecutable). Clear restores PATH default + ~/projects/mac-stats when present.</div>
             </div>
+            <div class="setting-item" id="telegram-setting">
+              <div class="setting-label">Telegram alerts</div>
+              <div class="telegram-status settings-status" id="telegram-settings-status">—</div>
+              <input type="password" id="telegram-bot-token-input" class="settings-input discord-token-input" placeholder="Paste Telegram bot token" autocomplete="off" />
+              <input type="text" id="telegram-chat-id-input" class="settings-input discord-token-input" placeholder="Chat id (e.g. 123456789)" autocomplete="off" spellcheck="false" />
+              <div class="settings-actions telegram-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="telegram-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="telegram-clear">Clear</button>
+              </div>
+              <div class="setting-note">Bot token + chat id for alert delivery. Stored in Keychain; channel registers on Save and restores at startup. /telegram shows Ready when both are set.</div>
+            </div>
           </section>
         </div>
       </div>

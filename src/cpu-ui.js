@@ -399,6 +399,7 @@
       applySettingsMcpAttentionGlanceState();
       applySettingsBrowserAttentionGlanceState();
       applySettingsCursorAgentAttentionGlanceState();
+      applySettingsTelegramAttentionGlanceState();
     });
   }
 
@@ -415,6 +416,7 @@
     applySettingsMcpAttentionGlanceState();
     applySettingsBrowserAttentionGlanceState();
     applySettingsCursorAgentAttentionGlanceState();
+    applySettingsTelegramAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1732,6 +1734,123 @@
     });
   }
 
+  function isTelegramNotFullyConfiguredForGlance() {
+    const statusEl = document.getElementById("telegram-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—") return false;
+    if (text === "ready") return false;
+    return (
+      text === "not set" ||
+      text.includes("no chat") ||
+      text.includes("no token")
+    );
+  }
+
+  /**
+   * Telegram bot/chat attention glance in Credentials (Mastodon parity).
+   * Visible when Settings is open and Telegram is Not set or Partial.
+   */
+  function ensureSettingsTelegramAttentionGlance() {
+    const telegramSetting = document.getElementById("telegram-setting");
+    let glance = document.getElementById("settings-telegram-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-telegram-attention-glance";
+      glance.className = "settings-telegram-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-telegram-attention-glance-text"></span>';
+      if (telegramSetting) {
+        telegramSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsTelegramAttentionGlanceClick(glance);
+    } else if (
+      telegramSetting &&
+      telegramSetting.firstElementChild !== glance
+    ) {
+      telegramSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsTelegramAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isTelegramNotFullyConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-telegram-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsTelegramAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-telegram-attention-glance-text"
+    );
+    const statusEl = document.getElementById("telegram-settings-status");
+    const status = (statusEl?.textContent || "").trim().toLowerCase();
+    glance.hidden = false;
+    glance.classList.remove("is-not-set", "is-partial");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    let label = "Telegram · Not set · add bot token + chat id";
+    let partial = false;
+    if (status.includes("no chat")) {
+      label = "Telegram · Partial · missing chat id";
+      partial = true;
+    } else if (status.includes("no token")) {
+      label = "Telegram · Partial · missing bot token";
+      partial = true;
+    }
+    glance.classList.add(partial ? "is-partial" : "is-not-set");
+    if (text) text.textContent = label;
+    glance.title = partial
+      ? "Telegram needs the missing field — click to focus it"
+      : "Telegram needs bot token + chat id — click to add them";
+    glance.setAttribute(
+      "aria-label",
+      partial
+        ? "Telegram partially configured — click to focus the missing field"
+        : "Telegram not set — click to focus the bot token field"
+    );
+  }
+
+  function wireSettingsTelegramAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsTelegramAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsTelegramAttentionWired = "1";
+    const activate = () => {
+      const statusEl = document.getElementById("telegram-settings-status");
+      const status = (statusEl?.textContent || "").trim().toLowerCase();
+      let targetId = "telegram-bot-token-input";
+      if (status.includes("no chat") || status.includes("token set")) {
+        targetId = "telegram-chat-id-input";
+      }
+      const field = document.getElementById(targetId);
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1882,7 +2001,9 @@
         el.id === "browser-chromium-path-input" ||
         el.id === "browser-cdp-port-input" ||
         el.id === "cursor-agent-workspace-input" ||
-        el.id === "cursor-agent-executable-input") &&
+        el.id === "cursor-agent-executable-input" ||
+        el.id === "telegram-bot-token-input" ||
+        el.id === "telegram-chat-id-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -2077,6 +2198,10 @@
       "cursor-agent-executable-input",
       "cursor-agent-save",
       "cursor-agent-clear",
+      "telegram-bot-token-input",
+      "telegram-chat-id-input",
+      "telegram-save",
+      "telegram-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -2189,7 +2314,11 @@
             active?.id === "cursor-agent-workspace-input" ||
             active?.id === "cursor-agent-executable-input" ||
             active?.id === "cursor-agent-save" ||
-            active?.id === "cursor-agent-clear"
+            active?.id === "cursor-agent-clear" ||
+            active?.id === "telegram-bot-token-input" ||
+            active?.id === "telegram-chat-id-input" ||
+            active?.id === "telegram-save" ||
+            active?.id === "telegram-clear"
           ) {
             return;
           }
@@ -2218,7 +2347,9 @@
           active?.id === "browser-chromium-path-input" ||
           active?.id === "browser-cdp-port-input" ||
           active?.id === "cursor-agent-workspace-input" ||
-          active?.id === "cursor-agent-executable-input";
+          active?.id === "cursor-agent-executable-input" ||
+          active?.id === "telegram-bot-token-input" ||
+          active?.id === "telegram-chat-id-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -2328,7 +2459,9 @@
             controls[next]?.id === "browser-chromium-path-input" ||
             controls[next]?.id === "browser-cdp-port-input" ||
             controls[next]?.id === "cursor-agent-workspace-input" ||
-            controls[next]?.id === "cursor-agent-executable-input") &&
+            controls[next]?.id === "cursor-agent-executable-input" ||
+            controls[next]?.id === "telegram-bot-token-input" ||
+            controls[next]?.id === "telegram-chat-id-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -3574,6 +3707,8 @@
     applySettingsBrowserAttentionGlanceState;
   window.applySettingsCursorAgentAttentionGlanceState =
     applySettingsCursorAgentAttentionGlanceState;
+  window.applySettingsTelegramAttentionGlanceState =
+    applySettingsTelegramAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
