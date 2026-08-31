@@ -11993,6 +11993,8 @@ const REDMINE_URL_KEYCHAIN_ACCOUNT = 'redmine_url';
 const REDMINE_API_KEY_KEYCHAIN_ACCOUNT = 'redmine_api_key';
 const MASTODON_URL_KEYCHAIN_ACCOUNT = 'mastodon_instance_url';
 const MASTODON_TOKEN_KEYCHAIN_ACCOUNT = 'mastodon_access_token';
+const MCP_URL_KEYCHAIN_ACCOUNT = 'mcp_server_url';
+const MCP_STDIO_KEYCHAIN_ACCOUNT = 'mcp_server_stdio';
 
 function updateBraveConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'brave-settings-status');
@@ -12437,6 +12439,165 @@ function initMastodonSettings() {
 
   refreshMastodonStatus();
   window.MastodonSettings = { refreshStatus: refreshMastodonStatus };
+}
+
+function updateMcpConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'mcp-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshMcpStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateMcpConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_mcp_settings_status');
+    const url = !!(st && st.url);
+    const stdio = !!(st && st.stdio);
+    if (url && stdio) updateMcpConfigStatus('Ready · URL + stdio');
+    else if (stdio) updateMcpConfigStatus('Ready · stdio');
+    else if (url) updateMcpConfigStatus('Ready · URL');
+    else updateMcpConfigStatus('Not set');
+  } catch (_) {
+    updateMcpConfigStatus('—');
+  }
+  if (typeof window.applySettingsMcpAttentionGlanceState === 'function') {
+    window.applySettingsMcpAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear MCP HTTP URL and/or stdio (Mastodon parity). */
+function initMcpSettings() {
+  const saveBtn = document.getElementById('mcp-save');
+  const clearBtn = document.getElementById('mcp-clear');
+  const urlInput = document.getElementById('mcp-url-input');
+  const stdioInput = document.getElementById('mcp-stdio-input');
+  let mcpBusy = false;
+
+  function setMcpBusy(busy, which) {
+    mcpBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashMcpBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (urlInput || stdioInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (mcpBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const url = (urlInput && urlInput.value.trim()) || '';
+      const stdio = (stdioInput && stdioInput.value.trim()) || '';
+      if (!url && !stdio) {
+        alert('Paste an MCP HTTP/SSE URL and/or a stdio cmd|args string first.');
+        return;
+      }
+      setMcpBusy(true, 'save');
+      try {
+        if (url) {
+          await invoke('store_credential', {
+            request: { account: MCP_URL_KEYCHAIN_ACCOUNT, password: url },
+          });
+          if (urlInput) urlInput.value = '';
+        }
+        if (stdio) {
+          await invoke('store_credential', {
+            request: {
+              account: MCP_STDIO_KEYCHAIN_ACCOUNT,
+              password: stdio,
+            },
+          });
+          if (stdioInput) stdioInput.value = '';
+        }
+        setMcpBusy(false);
+        flashMcpBtn(saveBtn, 'Saved');
+        await refreshMcpStatus();
+      } catch (e) {
+        console.error('MCP save:', e);
+        setMcpBusy(false);
+        alert('Could not save MCP credentials: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (mcpBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setMcpBusy(true, 'clear');
+      try {
+        try {
+          await invoke('delete_credential', {
+            account: MCP_URL_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        try {
+          await invoke('delete_credential', {
+            account: MCP_STDIO_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        if (urlInput) urlInput.value = '';
+        if (stdioInput) stdioInput.value = '';
+        setMcpBusy(false);
+        flashMcpBtn(clearBtn, 'Cleared');
+        await refreshMcpStatus();
+      } catch (e) {
+        console.error('MCP clear:', e);
+        setMcpBusy(false);
+        alert('Could not clear MCP credentials: ' + String(e));
+      }
+    });
+  }
+
+  refreshMcpStatus();
+  window.McpSettings = { refreshStatus: refreshMcpStatus };
 }
 
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
@@ -19840,6 +20001,7 @@ function initMonitoringFeatures() {
       initBraveSettings();
       initRedmineSettings();
       initMastodonSettings();
+      initMcpSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

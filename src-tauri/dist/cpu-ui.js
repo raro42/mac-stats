@@ -396,6 +396,7 @@
       applySettingsBraveKeyAttentionGlanceState();
       applySettingsRedmineAttentionGlanceState();
       applySettingsMastodonAttentionGlanceState();
+      applySettingsMcpAttentionGlanceState();
     });
   }
 
@@ -409,6 +410,7 @@
     applySettingsBraveKeyAttentionGlanceState();
     applySettingsRedmineAttentionGlanceState();
     applySettingsMastodonAttentionGlanceState();
+    applySettingsMcpAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1457,6 +1459,91 @@
     });
   }
 
+  function isMcpNotConfiguredForGlance() {
+    const statusEl = document.getElementById("mcp-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—") return false;
+    return text === "not set";
+  }
+
+  /**
+   * MCP URL/stdio attention glance in Credentials (Mastodon parity).
+   * Visible when Settings is open and MCP is Not set.
+   */
+  function ensureSettingsMcpAttentionGlance() {
+    const mcpSetting = document.getElementById("mcp-setting");
+    let glance = document.getElementById("settings-mcp-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-mcp-attention-glance";
+      glance.className = "settings-mcp-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-mcp-attention-glance-text"></span>';
+      if (mcpSetting) {
+        mcpSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsMcpAttentionGlanceClick(glance);
+    } else if (mcpSetting && mcpSetting.firstElementChild !== glance) {
+      mcpSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsMcpAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isMcpNotConfiguredForGlance()) {
+      const glance = document.getElementById("settings-mcp-attention-glance");
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsMcpAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById("settings-mcp-attention-glance-text");
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    const label = "MCP · Not set · add URL or stdio";
+    if (text) text.textContent = label;
+    glance.title =
+      "MCP needs an HTTP/SSE URL or stdio cmd|args — click to add them";
+    glance.setAttribute(
+      "aria-label",
+      "MCP not set — click to focus the server URL field"
+    );
+  }
+
+  function wireSettingsMcpAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsMcpAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsMcpAttentionWired = "1";
+    const activate = () => {
+      const field = document.getElementById("mcp-url-input");
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1601,7 +1688,9 @@
         el.id === "redmine-url-input" ||
         el.id === "redmine-api-key-input" ||
         el.id === "mastodon-url-input" ||
-        el.id === "mastodon-token-input") &&
+        el.id === "mastodon-token-input" ||
+        el.id === "mcp-url-input" ||
+        el.id === "mcp-stdio-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -1784,6 +1873,10 @@
       "mastodon-token-input",
       "mastodon-save",
       "mastodon-clear",
+      "mcp-url-input",
+      "mcp-stdio-input",
+      "mcp-save",
+      "mcp-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -1884,7 +1977,11 @@
             active?.id === "mastodon-url-input" ||
             active?.id === "mastodon-token-input" ||
             active?.id === "mastodon-save" ||
-            active?.id === "mastodon-clear"
+            active?.id === "mastodon-clear" ||
+            active?.id === "mcp-url-input" ||
+            active?.id === "mcp-stdio-input" ||
+            active?.id === "mcp-save" ||
+            active?.id === "mcp-clear"
           ) {
             return;
           }
@@ -1907,7 +2004,9 @@
           active?.id === "redmine-url-input" ||
           active?.id === "redmine-api-key-input" ||
           active?.id === "mastodon-url-input" ||
-          active?.id === "mastodon-token-input";
+          active?.id === "mastodon-token-input" ||
+          active?.id === "mcp-url-input" ||
+          active?.id === "mcp-stdio-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -1917,7 +2016,8 @@
               (active?.id === "perplexity-clear-key" ||
                 active?.id === "brave-clear-key" ||
                 active?.id === "redmine-clear" ||
-                active?.id === "mastodon-clear") &&
+                active?.id === "mastodon-clear" ||
+                active?.id === "mcp-clear") &&
               tryChainPerplexitySettingsClearToFooter()
             ) {
               e.preventDefault();
@@ -2008,7 +2108,9 @@
             controls[next]?.id === "redmine-url-input" ||
             controls[next]?.id === "redmine-api-key-input" ||
             controls[next]?.id === "mastodon-url-input" ||
-            controls[next]?.id === "mastodon-token-input") &&
+            controls[next]?.id === "mastodon-token-input" ||
+            controls[next]?.id === "mcp-url-input" ||
+            controls[next]?.id === "mcp-stdio-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -3248,6 +3350,8 @@
     applySettingsRedmineAttentionGlanceState;
   window.applySettingsMastodonAttentionGlanceState =
     applySettingsMastodonAttentionGlanceState;
+  window.applySettingsMcpAttentionGlanceState =
+    applySettingsMcpAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

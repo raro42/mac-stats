@@ -6901,6 +6901,57 @@ button.is-just-saved,
   opacity: 1;
 }
 
+/* Settings — MCP not-set attention glance (Credentials; Mastodon parity) */
+.settings-mcp-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.settings-mcp-attention-glance[hidden] {
+  display: none !important;
+}
+
+.settings-mcp-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.settings-mcp-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.settings-mcp-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
+#mcp-save.is-just-saved {
+  background: rgba(52, 199, 89, 0.95) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  opacity: 1;
+}
+
 /* Settings — Perplexity key-not-set attention glance (Credentials; Discord token-not-set parity) */
 .settings-perplexity-key-attention-glance {
   display: flex;

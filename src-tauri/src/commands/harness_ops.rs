@@ -5229,7 +5229,10 @@ pub fn looks_like_mcp_ready_request(content: &str) -> bool {
 /// Zero-LLM MCP Ready / Not set chip (config only; no tools/list live probe).
 pub fn format_mcp_ready_chip() -> String {
     match crate::mcp::get_mcp_server_url() {
-        None => "**MCP** · Not set · add MCP_SERVER_URL or MCP_SERVER_STDIO".to_string(),
+        None => {
+            "**MCP** · Not set · add MCP_SERVER_URL or MCP_SERVER_STDIO (Settings or .config.env)"
+                .to_string()
+        }
         Some(cfg) => {
             if let Some(rest) = cfg.strip_prefix("stdio:") {
                 let cmd = rest
@@ -6790,7 +6793,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
-• `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
+• `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\
 • `/judge` — Judge Ready / Off (agentJudgeEnabled · failure-only; config only, no judge run)\n\

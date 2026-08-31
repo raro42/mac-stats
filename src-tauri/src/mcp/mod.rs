@@ -2,6 +2,7 @@
 //!
 //! Supports two transports: HTTP/SSE (remote) and stdio (local subprocess).
 //! Config: MCP_SERVER_URL (HTTP/SSE) or MCP_SERVER_STDIO (e.g. npx|-y|@openbnb/mcp-server-airbnb).
+//! Also Keychain (`mcp_server_url` / `mcp_server_stdio`) via Settings Credentials.
 //! See docs/010_mcp_agent.md.
 
 use serde::{Deserialize, Serialize};
@@ -9,6 +10,11 @@ use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
 use tracing::{info, warn};
+
+/// Keychain account for MCP HTTP/SSE URL (Settings Credentials).
+pub const MCP_URL_KEYCHAIN_ACCOUNT: &str = "mcp_server_url";
+/// Keychain account for MCP stdio spec `cmd|arg1|…` (Settings Credentials).
+pub const MCP_STDIO_KEYCHAIN_ACCOUNT: &str = "mcp_server_stdio";
 
 /// One MCP tool (name + description for agent list).
 #[derive(Debug, Clone)]
@@ -39,9 +45,95 @@ fn read_mcp_config_file(path: &Path) -> (Option<String>, Option<String>) {
     (url, stdio)
 }
 
+fn mcp_keychain_value(account: &str) -> Option<String> {
+    match crate::security::get_credential(account) {
+        Ok(Some(v)) => {
+            let v = v.trim().to_string();
+            if v.is_empty() {
+                None
+            } else {
+                Some(v)
+            }
+        }
+        _ => None,
+    }
+}
+
+/// True if MCP HTTP/SSE URL is set (env / `.config.env` / Keychain). Does not live-probe.
+pub fn mcp_http_url_configured() -> bool {
+    if let Ok(u) = std::env::var("MCP_SERVER_URL") {
+        if !u.trim().is_empty() {
+            return true;
+        }
+    }
+    for (url, _) in mcp_config_env_candidates() {
+        if url.is_some() {
+            return true;
+        }
+    }
+    mcp_keychain_value(MCP_URL_KEYCHAIN_ACCOUNT).is_some()
+}
+
+/// True if MCP stdio spec is set (env / `.config.env` / Keychain). Does not live-probe.
+pub fn mcp_stdio_configured() -> bool {
+    if let Ok(s) = std::env::var("MCP_SERVER_STDIO") {
+        if !s.trim().is_empty() {
+            return true;
+        }
+    }
+    for (_, stdio) in mcp_config_env_candidates() {
+        if stdio.is_some() {
+            return true;
+        }
+    }
+    mcp_keychain_value(MCP_STDIO_KEYCHAIN_ACCOUNT).is_some()
+}
+
+fn mcp_config_env_candidates() -> Vec<(Option<String>, Option<String>)> {
+    let mut out = Vec::new();
+    if let Ok(cwd) = std::env::current_dir() {
+        let p = cwd.join(".config.env");
+        if p.is_file() {
+            out.push(read_mcp_config_file(&p));
+        }
+        let p_src = cwd.join("src-tauri").join(".config.env");
+        if p_src.is_file() {
+            out.push(read_mcp_config_file(&p_src));
+        }
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        let p = Path::new(&home).join(".mac-stats").join(".config.env");
+        if p.is_file() {
+            out.push(read_mcp_config_file(&p));
+        }
+        // App bundle / LaunchAgent often starts with cwd outside the repo.
+        let p_repo = Path::new(&home)
+            .join("projects")
+            .join("mac-stats")
+            .join("src-tauri")
+            .join(".config.env");
+        if p_repo.is_file() {
+            out.push(read_mcp_config_file(&p_repo));
+        }
+    }
+    out
+}
+
+/// Settings Credentials status (env / `.config.env` / Keychain). Does not live-probe.
+#[tauri::command]
+pub fn get_mcp_settings_status() -> Result<serde_json::Value, String> {
+    let url = mcp_http_url_configured();
+    let stdio = mcp_stdio_configured();
+    Ok(serde_json::json!({
+        "url": url,
+        "stdio": stdio,
+        "ready": url || stdio,
+    }))
+}
+
 /// Get MCP server config: either stdio or HTTP/SSE.
 /// Returns Some("stdio:cmd|arg1|arg2") if MCP_SERVER_STDIO is set, else Some(url) if MCP_SERVER_URL is set.
-/// Checked: env MCP_SERVER_STDIO / MCP_SERVER_URL, then .config.env (cwd, src-tauri, ~/.mac-stats).
+/// Checked: env, then .config.env (cwd, src-tauri, ~/.mac-stats), then Keychain.
 pub fn get_mcp_server_url() -> Option<String> {
     if let Ok(s) = std::env::var("MCP_SERVER_STDIO") {
         let s = s.trim().to_string();
@@ -55,39 +147,19 @@ pub fn get_mcp_server_url() -> Option<String> {
             return Some(u);
         }
     }
-    if let Ok(cwd) = std::env::current_dir() {
-        let p = cwd.join(".config.env");
-        if p.is_file() {
-            let (url, stdio) = read_mcp_config_file(&p);
-            if let Some(s) = stdio {
-                return Some(format!("stdio:{}", s));
-            }
-            if let Some(u) = url {
-                return Some(u);
-            }
+    for (url, stdio) in mcp_config_env_candidates() {
+        if let Some(s) = stdio {
+            return Some(format!("stdio:{}", s));
         }
-        let p_src = cwd.join("src-tauri").join(".config.env");
-        if p_src.is_file() {
-            let (url, stdio) = read_mcp_config_file(&p_src);
-            if let Some(s) = stdio {
-                return Some(format!("stdio:{}", s));
-            }
-            if let Some(u) = url {
-                return Some(u);
-            }
+        if let Some(u) = url {
+            return Some(u);
         }
     }
-    if let Ok(home) = std::env::var("HOME") {
-        let p = Path::new(&home).join(".mac-stats").join(".config.env");
-        if p.is_file() {
-            let (url, stdio) = read_mcp_config_file(&p);
-            if let Some(s) = stdio {
-                return Some(format!("stdio:{}", s));
-            }
-            if let Some(u) = url {
-                return Some(u);
-            }
-        }
+    if let Some(s) = mcp_keychain_value(MCP_STDIO_KEYCHAIN_ACCOUNT) {
+        return Some(format!("stdio:{}", s));
+    }
+    if let Some(u) = mcp_keychain_value(MCP_URL_KEYCHAIN_ACCOUNT) {
+        return Some(u);
     }
     None
 }

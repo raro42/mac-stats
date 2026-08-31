@@ -687,6 +687,17 @@
               </div>
               <div class="setting-note">Instance URL + access token for MASTODON_POST. Stored in Keychain (or set MASTODON_INSTANCE_URL / MASTODON_ACCESS_TOKEN in .config.env).</div>
             </div>
+            <div class="setting-item" id="mcp-setting">
+              <div class="setting-label">MCP server</div>
+              <div class="mcp-status settings-status" id="mcp-settings-status">—</div>
+              <input type="url" id="mcp-url-input" class="settings-input discord-token-input" placeholder="https://mcp.example.com/sse" autocomplete="off" />
+              <input type="text" id="mcp-stdio-input" class="settings-input discord-token-input" placeholder="cmd|arg1|arg2 (stdio)" autocomplete="off" spellcheck="false" />
+              <div class="settings-actions mcp-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="mcp-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="mcp-clear">Clear</button>
+              </div>
+              <div class="setting-note">HTTP/SSE URL or stdio pipe string for MCP tools. Either is enough. Stored in Keychain (or set MCP_SERVER_URL / MCP_SERVER_STDIO in .config.env).</div>
+            </div>
           </section>
         </div>
       </div>

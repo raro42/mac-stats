@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.767] - 2026-08-31
+
+### Added
+- **Settings MCP server URL + stdio** — Credentials now has Save / Clear for MCP (Keychain `mcp_server_url` / `mcp_server_stdio`, same resolve order as env / `.config.env`). Either field is enough for Ready. When not set, a **MCP · Not set · add URL or stdio** red strip appears above the controls (Mastodon / Redmine / Brave parity). Click focuses the URL field. `/mcp` Not-set cue mentions Settings.
+
 ## [0.1.766] - 2026-08-31
 
 ### Added
