@@ -4687,6 +4687,56 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 50%, currentColor);
 }
 
+/* Agent Ops — Discord Offline/Reconnect attention glance (Digest open / Fail/Slow parity) */
+.ops-discord-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.ops-discord-attention-glance[hidden] {
+  display: none !important;
+}
+
+.ops-discord-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.ops-discord-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.ops-discord-attention-glance.has-offline {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
+.ops-discord-attention-glance.has-warn {
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+}
+
 /* Agent Ops Runs — All · Instant · Direct · Slow · Fail (Monitors Slow / AI Chat Errors parity) */
 .ops-runs-lane-chips {
   display: flex;

@@ -2155,6 +2155,113 @@ function wireOpsDigestAttentionGlanceClick(glance) {
     });
 }
 
+/**
+ * Discord Offline/Reconnect attention glance under Digest open (Runs Fail/Slow parity).
+ * Visible on every Agent Ops tab when the gateway is offline or reconnecting.
+ */
+function ensureOpsDiscordAttentionGlance() {
+    ensureOpsDigestAttentionGlance();
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor = digestAtt || runsAtt || refresh || health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-discord-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-discord-attention-glance';
+        glance.className = 'ops-discord-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-discord-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsDiscordAttentionGlanceClick(glance);
+    } else if (digestAtt && glance.previousElementSibling !== digestAtt) {
+        digestAtt.insertAdjacentElement('afterend', glance);
+    } else if (!digestAtt && runsAtt && glance.previousElementSibling !== runsAtt) {
+        runsAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsDiscordAttentionGlanceState() {
+    const glance = ensureOpsDiscordAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-discord-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-offline', 'has-warn');
+        return;
+    }
+    const parsed = parseOpsDiscordGateway(opsRunsInsightsCache?.discord_gateway);
+    if (parsed.wash !== 'offline' && parsed.wash !== 'warn') {
+        glance.hidden = true;
+        glance.classList.remove('has-offline', 'has-warn');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-offline', parsed.wash === 'offline');
+    glance.classList.toggle('has-warn', parsed.wash === 'warn');
+    if (text) {
+        if (parsed.wash === 'offline') {
+            text.textContent = 'Discord · Offline · check gateway';
+        } else if (parsed.discN > 0) {
+            text.textContent =
+                parsed.discN === 1
+                    ? 'Discord · Reconnect · disc×1'
+                    : `Discord · Reconnect · disc×${parsed.discN}`;
+        } else if (parsed.resumeN > 0) {
+            text.textContent = 'Discord · Resuming · check gateway';
+        } else {
+            text.textContent = 'Discord · Reconnect · check gateway';
+        }
+    }
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Open Runs · preview Discord gateway';
+    glance.setAttribute(
+        'aria-label',
+        `${parsed.glanceLine} — click to preview Discord gateway on Runs`
+    );
+}
+
+function activateOpsDiscordAttentionGlance() {
+    const gw = opsRunsInsightsCache?.discord_gateway;
+    if (gw && openOpsDiscordGatewayPreviewNavigate(gw)) return;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('runs');
+    const card = document.getElementById('ops-runs-insights');
+    const line =
+        card?.querySelector('.ops-insight-line[data-discord-gateway="1"]') ||
+        card?.querySelector('.ops-insight-sub') ||
+        card;
+    if (line && typeof line.scrollIntoView === 'function') {
+        try {
+            line.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } catch (_) {
+            /* ignore */
+        }
+    }
+    document.getElementById('ops-refresh-btn')?.focus?.();
+}
+
+function wireOpsDiscordAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsDiscordAttentionWired === '1') return;
+    glance.dataset.opsDiscordAttentionWired = '1';
+    const activate = () => activateOpsDiscordAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -7125,6 +7232,7 @@ function renderOpsRuns(insights) {
         ensureOpsRunsLaneChips();
         applyOpsRunsAttentionGlanceState();
         applyOpsDigestAttentionGlanceState();
+        applyOpsDiscordAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7256,6 +7364,7 @@ function renderOpsRuns(insights) {
     ensureOpsInsightsToolbarKeyboard();
     applyOpsRunsAttentionGlanceState();
     applyOpsDigestAttentionGlanceState();
+    applyOpsDiscordAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -7338,6 +7447,7 @@ function escapeHtml(s) {
     if (glance) glance.hidden = true;
     applyOpsRunsAttentionGlanceState();
     applyOpsDigestAttentionGlanceState();
+    applyOpsDiscordAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

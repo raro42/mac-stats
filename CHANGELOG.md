@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.757] - 2026-08-31
+
+### Added
+- **Agent Ops Discord Offline attention glance** — when Agent Ops is expanded and the Discord gateway is offline or reconnecting, a **Discord · Offline · check gateway** / **Discord · Reconnect · disc×N** strip appears under Fail/Slow and Digest open (health Discord / collapsed Ready parity). Red wash for offline, amber for reconnect noise. Click or Enter opens Runs and previews the gateway insight. Hidden while collapsed (Discord Ready keep-header stays). Design review / `feature-agent-ops`.
+
 ## [0.1.756] - 2026-08-31
 
 ### Added
