@@ -392,6 +392,7 @@
       }
       applySettingsHelpAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
+      applySettingsPerplexityKeyAttentionGlanceState();
     });
   }
 
@@ -401,6 +402,7 @@
     closeSettingsHelpSheet(false);
     applySettingsHelpAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
+    applySettingsPerplexityKeyAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1019,6 +1021,100 @@
       if (tokenInput && typeof tokenInput.focus === "function") {
         try {
           tokenInput.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  function isPerplexityKeyNotConfiguredForGlance() {
+    const statusEl = document.getElementById("perplexity-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    return text === "no key";
+  }
+
+  /**
+   * Perplexity API key attention glance in Credentials (Discord token-not-set parity).
+   * Visible when Settings is open and no Perplexity API key is saved.
+   */
+  function ensureSettingsPerplexityKeyAttentionGlance() {
+    const perplexitySetting = document.getElementById("perplexity-setting");
+    let glance = document.getElementById(
+      "settings-perplexity-key-attention-glance"
+    );
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-perplexity-key-attention-glance";
+      glance.className = "settings-perplexity-key-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-perplexity-key-attention-glance-text"></span>';
+      if (perplexitySetting) {
+        perplexitySetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsPerplexityKeyAttentionGlanceClick(glance);
+    } else if (
+      perplexitySetting &&
+      perplexitySetting.firstElementChild !== glance
+    ) {
+      perplexitySetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsPerplexityKeyAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isPerplexityKeyNotConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-perplexity-key-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsPerplexityKeyAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-perplexity-key-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    if (text) text.textContent = "Search · Not set · add API key";
+    glance.title = "Perplexity needs an API key — click to paste one";
+    glance.setAttribute(
+      "aria-label",
+      "Perplexity API key not set — click to focus the key field"
+    );
+  }
+
+  function wireSettingsPerplexityKeyAttentionGlanceClick(glance) {
+    if (
+      !glance ||
+      glance.dataset.settingsPerplexityKeyAttentionWired === "1"
+    ) {
+      return;
+    }
+    glance.dataset.settingsPerplexityKeyAttentionWired = "1";
+    const activate = () => {
+      const keyInput = document.getElementById("perplexity-api-key-input");
+      if (keyInput && typeof keyInput.focus === "function") {
+        try {
+          keyInput.focus();
         } catch (_) {
           /* ignore */
         }
@@ -2781,6 +2877,8 @@
     tryChainFooterVersionToDiscordSettingsViewLogsLast;
   window.applySettingsDiscordTokenAttentionGlanceState =
     applySettingsDiscordTokenAttentionGlanceState;
+  window.applySettingsPerplexityKeyAttentionGlanceState =
+    applySettingsPerplexityKeyAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

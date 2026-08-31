@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.763] - 2026-08-31
+
+### Added
+- **Settings Perplexity key-not-set attention glance** — when Settings Credentials is open and no Perplexity API key is saved, a **Search · Not set · add API key** red strip appears above the Perplexity controls (Discord token-not-set / Help parity). Click or Enter focuses the key field. Hidden when configured or Settings closes.
+
 ## [0.1.762] - 2026-08-31
 
 ### Changed

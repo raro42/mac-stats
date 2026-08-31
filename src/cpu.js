@@ -13257,6 +13257,11 @@ async function refreshPerplexityStatus() {
   }
   updatePerplexitySetupVisibility();
   applyPerplexityLastGlanceState();
+  if (
+    typeof window.applySettingsPerplexityKeyAttentionGlanceState === 'function'
+  ) {
+    window.applySettingsPerplexityKeyAttentionGlanceState();
+  }
 }
 
 function truncatePerplexityGlancePreview(raw, maxLen) {
