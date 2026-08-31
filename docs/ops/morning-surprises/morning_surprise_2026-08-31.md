@@ -1,12 +1,13 @@
 # Morning surprise — 2026-08-31
 
-Overnight Track B (20:00–06:00). Digester open stayed empty; design review in grace. Standing-backlog design-review polish continued the attention-glance series through **v0.1.759**.
+Overnight Track B (20:00–06:00). Digester open stayed empty; design review in grace. Standing-backlog design-review polish continued the attention-glance series through **v0.1.760**.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.759** | **Settings Help attention glance** — **Help · cheat sheet · click Help** accent strip when Settings Product is open; green **Help · open · Enter/c copies** when sheet open; click opens or copies |
+| **v0.1.760** | **Settings Discord token-not-set attention glance** — **Discord · Not set · add bot token** red strip in Credentials when Settings open; click focuses token field |
+| **v0.1.759** | **Settings Help attention glance** — **Help · cheat sheet · click Help** accent strip when Settings Product is open; green **Help · open · Enter/c copies** when sheet open |
 | **v0.1.758** | **Perplexity Key-not-set attention glance** — **Search · Not set · add API key** red strip above setup when Perplexity expanded without key |
 | **v0.1.757** | **Agent Ops Discord Offline attention glance** — **Discord · Offline · check gateway** / **Discord · Reconnect · disc×N** under Fail/Slow when Agent Ops expanded |
 | **v0.1.756** | **AI Chat Offline attention glance** — **Chat · Offline · check Ollama** / **Chat · Not set · configure URL** above role filters when expanded |
@@ -28,10 +29,10 @@ Overnight Track B (20:00–06:00). Digester open stayed empty; design review in 
 - Design review due=false (grace on stale screens); polish without recapture.
 - `debug.log` scan: no ERROR/WARN/panic clusters in window.
 - Screenshot recapture deferred (TCC / window-only when CPU on-screen).
-- **v0.1.759** installed to `/Applications/mac-stats.app` and running (PID verified).
+- **v0.1.760** installed to `/Applications/mac-stats.app` and running (PID verified).
 
 ## Next
 
-- Discord token-not-set attention in Settings Credentials, or recapture stale feature screens when due.
+- Settings Perplexity key attention in Credentials section, or recapture stale feature screens when due.
 - Digester open / product-owned `debug.log` errors when present.
-- Problem Reporter for mac_stats after install/kickstart if it keeps appearing.
+- p50 direct latency — more instant-lane patterns when digester shows fuel.

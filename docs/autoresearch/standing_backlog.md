@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.760** — Settings Discord token-not-set attention glance (**Discord · Not set · add bot token** above Discord bot controls when Credentials open; click → token field; Perplexity Key-not-set / Help parity).
+
+- **v0.1.759** — Settings Help attention glance (**Help · cheat sheet · click Help** accent strip above Product actions when Settings open; green **Help · open · Enter/c copies** when sheet open; click opens or copies).
+
 - **v0.1.758** — Perplexity Key-not-set attention glance (**Search · Not set · add API key** above setup when expanded; click → inline key; design review polish).
 
 - **v0.1.757** — Agent Ops Discord Offline attention glance (**Discord · Offline · check gateway** / **Discord · Reconnect · disc×N** under Fail/Slow/Digest when expanded; click → Runs gateway preview; design review / `feature-agent-ops`).
