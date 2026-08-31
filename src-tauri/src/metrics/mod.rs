@@ -1335,6 +1335,17 @@ pub fn set_agent_judge_on_failure_only(on_failure_only: bool) -> Result<bool, St
 }
 
 #[tauri::command]
+pub fn get_ori_lifecycle_enabled() -> bool {
+    crate::config::Config::ori_lifecycle_enabled()
+}
+
+#[tauri::command]
+pub fn set_ori_lifecycle_enabled(enabled: bool) -> Result<bool, String> {
+    crate::config::Config::set_ori_lifecycle_enabled(enabled)?;
+    Ok(crate::config::Config::ori_lifecycle_enabled())
+}
+
+#[tauri::command]
 pub fn get_menu_bar_compact() -> bool {
     crate::config::Config::menu_bar_compact()
 }

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.775] - 2026-09-01
+
+### Added
+- **Settings Ori Mnemos lifecycle toggle + Off attention glance** — Product now has **Enable Ori Mnemos lifecycle** (`oriLifecycleEnabled` in `config.json`; env override still wins). When off, an **Ori · Off · enable lifecycle** amber strip appears above the toggle (Downloads / Judge glance parity). Click focuses the enable toggle. `/ori` Off cue mentions Settings Product. Reset turns Ori off.
+
 ## [0.1.774] - 2026-09-01
 
 ### Added

@@ -624,6 +624,7 @@ impl Config {
         obj.insert("agentJudgeEnabled".into(), json!(false));
         obj.insert("agentJudgeOnFailureOnly".into(), json!(true));
         obj.insert("downloadsOrganizerEnabled".into(), json!(false));
+        obj.insert("oriLifecycleEnabled".into(), json!(false));
         obj.insert("menuBarCompact".into(), json!(true));
         obj.insert("windowDecorations".into(), json!(true));
         // Leave Discord tokens / .config.env alone — only config.json toggles.
@@ -2109,10 +2110,27 @@ impl Config {
     }
 
     /// Master gate: no Ori subprocesses or prompt injection unless true.
-    /// Env: `MAC_STATS_ORI_LIFECYCLE_ENABLED` or `ORI_LIFECYCLE_ENABLED`.
+    /// Config: `oriLifecycleEnabled` (bool). Env override: `MAC_STATS_ORI_LIFECYCLE_ENABLED` or `ORI_LIFECYCLE_ENABLED`.
     pub fn ori_lifecycle_enabled() -> bool {
-        Self::ori_env_bool("MAC_STATS_ORI_LIFECYCLE_ENABLED", "ORI_LIFECYCLE_ENABLED")
-            .unwrap_or(false)
+        if let Some(b) =
+            Self::ori_env_bool("MAC_STATS_ORI_LIFECYCLE_ENABLED", "ORI_LIFECYCLE_ENABLED")
+        {
+            return b;
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json.get("oriLifecycleEnabled").and_then(|v| v.as_bool()) {
+                    return b;
+                }
+            }
+        }
+        false
+    }
+
+    /// Persist `oriLifecycleEnabled` in `~/.mac-stats/config.json`.
+    pub fn set_ori_lifecycle_enabled(enabled: bool) -> Result<(), String> {
+        Self::merge_config_bool("oriLifecycleEnabled", enabled)
     }
 
     /// Vault root (must contain `.ori`). Env: `MAC_STATS_ORI_VAULT` or `ORI_VAULT`.

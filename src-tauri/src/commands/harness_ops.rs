@@ -6267,7 +6267,7 @@ pub fn format_voice_stt_ready_chip() -> String {
 pub fn format_ori_ready_chip() -> String {
     use crate::config::Config;
     if !Config::ori_lifecycle_enabled() {
-        return "**Ori** · Off · set `MAC_STATS_ORI_LIFECYCLE_ENABLED` + `ORI_VAULT` (config only)"
+        return "**Ori** · Off · enable in Settings Product (or `oriLifecycleEnabled` / `MAC_STATS_ORI_LIFECYCLE_ENABLED`)"
             .to_string();
     }
     let raw = Config::ori_vault_path_raw();
@@ -6314,7 +6314,7 @@ pub fn format_ori_ready_chip() -> String {
         bin
     };
     format!(
-        "**Ori** · {state} · {vault_part} · {orient} · {prefetch} · {capture} · `{bin_short}` (config only)"
+        "**Ori** · {state} · {vault_part} · {orient} · {prefetch} · {capture} · `{bin_short}` · Settings Product"
     )
 }
 
@@ -6832,7 +6832,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
-• `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
+• `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; no transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\

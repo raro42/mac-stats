@@ -393,6 +393,7 @@
       applySettingsHelpAttentionGlanceState();
       applySettingsJudgeAttentionGlanceState();
       applySettingsDownloadsAttentionGlanceState();
+      applySettingsOriAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -414,6 +415,7 @@
     applySettingsHelpAttentionGlanceState();
     applySettingsJudgeAttentionGlanceState();
     applySettingsDownloadsAttentionGlanceState();
+    applySettingsOriAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -768,6 +770,7 @@
       "agent-judge-enabled-toggle",
       "agent-judge-failure-only-toggle",
       "downloads-organizer-enabled-toggle",
+      "ori-lifecycle-enabled-toggle",
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
@@ -2148,6 +2151,104 @@
   }
 
   /**
+   * Ori Mnemos lifecycle attention glance in Product settings.
+   * Visible when Settings is open and Ori is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsOriAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const oriToggle = document.getElementById("ori-lifecycle-enabled-toggle");
+    const oriLabel = oriToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-ori-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-ori-attention-glance";
+      glance.className = "settings-ori-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML = '<span id="settings-ori-attention-glance-text"></span>';
+      if (oriLabel) {
+        oriLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        const downloadsNote = document.getElementById(
+          "downloads-organizer-settings-note"
+        );
+        if (downloadsNote) {
+          downloadsNote.insertAdjacentElement("afterend", glance);
+        } else {
+          wrap.insertAdjacentElement("beforeend", glance);
+        }
+      } else {
+        return null;
+      }
+      wireSettingsOriAttentionGlanceClick(glance);
+    } else if (oriLabel && glance.nextElementSibling !== oriLabel) {
+      oriLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsOriAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById("settings-ori-attention-glance");
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsOriAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById("settings-ori-attention-glance-text");
+    const oriToggle = document.getElementById("ori-lifecycle-enabled-toggle");
+    const enabled = !!(oriToggle && oriToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "Ori · Off · enable lifecycle";
+    glance.title = "Ori Mnemos lifecycle is off — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "Ori Mnemos lifecycle off — click to focus Enable Ori Mnemos lifecycle"
+    );
+  }
+
+  function wireSettingsOriAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsOriAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsOriAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById("ori-lifecycle-enabled-toggle");
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -3007,6 +3108,7 @@
     const downloadsToggle = document.getElementById(
       "downloads-organizer-enabled-toggle"
     );
+    const oriToggle = document.getElementById("ori-lifecycle-enabled-toggle");
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
     const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
@@ -3017,6 +3119,7 @@
       !judgeToggle &&
       !judgeFailureOnlyToggle &&
       !downloadsToggle &&
+      !oriToggle &&
       !compactToggle &&
       !cpuWindowCompactToggle &&
       !helpBtn &&
@@ -3057,6 +3160,10 @@
           downloadsToggle.checked = !!(st && st.enabled);
         }
         applySettingsDownloadsAttentionGlanceState();
+        if (oriToggle) {
+          oriToggle.checked = !!(await invoke("get_ori_lifecycle_enabled"));
+        }
+        applySettingsOriAttentionGlanceState();
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
@@ -3140,6 +3247,22 @@
         }
       });
     }
+    if (oriToggle) {
+      oriToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_ori_lifecycle_enabled", {
+            enabled: !!oriToggle.checked,
+          });
+          applySettingsOriAttentionGlanceState();
+          flashToggleLabelSaved(oriToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save oriLifecycleEnabled: " + e);
+        }
+      });
+    }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {
         try {
@@ -3181,10 +3304,11 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, menuBarCompact, cpuWindowCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, oriLifecycleEnabled, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
             "Judge: optional post-run check — Settings Product or /judge",
             "Downloads organizer: Settings Product or /downloads (dry-run default)",
+            "Ori Mnemos lifecycle: Settings Product or /ori (needs ORI_VAULT)",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -3246,6 +3370,8 @@
           applySettingsJudgeAttentionGlanceState();
           if (downloadsToggle) downloadsToggle.checked = false;
           applySettingsDownloadsAttentionGlanceState();
+          if (oriToggle) oriToggle.checked = false;
+          applySettingsOriAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
@@ -4224,6 +4350,8 @@
     applySettingsJudgeAttentionGlanceState;
   window.applySettingsDownloadsAttentionGlanceState =
     applySettingsDownloadsAttentionGlanceState;
+  window.applySettingsOriAttentionGlanceState =
+    applySettingsOriAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

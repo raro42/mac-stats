@@ -329,6 +329,8 @@ fn run_internal(open_cpu_window: bool) {
             metrics::set_agent_judge_enabled,
             metrics::get_agent_judge_on_failure_only,
             metrics::set_agent_judge_on_failure_only,
+            metrics::get_ori_lifecycle_enabled,
+            metrics::set_ori_lifecycle_enabled,
             metrics::get_menu_bar_compact,
             metrics::set_menu_bar_compact,
             metrics::get_cpu_window_compact,
