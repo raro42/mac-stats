@@ -4949,7 +4949,7 @@ pub fn looks_like_brave_ready_request(content: &str) -> bool {
 pub fn format_brave_ready_chip() -> String {
     match crate::commands::brave::get_brave_api_key() {
         Some(_) => "**Brave Search** · Ready · key set".to_string(),
-        None => "**Brave Search** · Not set · add BRAVE_API_KEY".to_string(),
+        None => "**Brave Search** · Not set · add API key (Settings or BRAVE_API_KEY)".to_string(),
     }
 }
 
@@ -10864,7 +10864,10 @@ mod tests {
         assert!(report.contains("/perplexity top"), "{report}");
         assert!(report.contains("/perplexity snippet"), "{report}");
         assert!(report.contains("/help"), "{report}");
-        assert!(report.contains("Voice"), "{report}");
+        assert!(report.contains("/voice"), "{report}");
+        assert!(report.contains("/stt"), "{report}");
+        assert!(report.contains("/ori"), "{report}");
+        assert!(report.contains("/having_fun"), "{report}");
     }
 
     #[test]

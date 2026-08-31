@@ -11988,6 +11988,134 @@ function initCollapsibleSections() {
 // Perplexity Search Section
 // ============================================================================
 const PERPLEXITY_KEYCHAIN_ACCOUNT = 'perplexity_api_key';
+const BRAVE_KEYCHAIN_ACCOUNT = 'brave_api_key';
+
+function updateBraveConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'brave-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshBraveStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateBraveConfigStatus('—');
+    return;
+  }
+  try {
+    const configured = await invoke('is_brave_configured');
+    updateBraveConfigStatus(configured ? 'Key set' : 'No key');
+  } catch (_) {
+    updateBraveConfigStatus('—');
+  }
+  if (typeof window.applySettingsBraveKeyAttentionGlanceState === 'function') {
+    window.applySettingsBraveKeyAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Brave Search API key (Perplexity key parity). */
+function initBraveSettings() {
+  const saveBtn = document.getElementById('brave-save-key');
+  const clearBtn = document.getElementById('brave-clear-key');
+  const keyInput = document.getElementById('brave-api-key-input');
+  let braveKeyBusy = false;
+
+  function setBraveKeyBusy(busy, which) {
+    braveKeyBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save key';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save key';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear key';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear key';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashBraveKeyBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && keyInput) {
+    saveBtn.addEventListener('click', async () => {
+      if (braveKeyBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const key = keyInput.value.trim();
+      if (!key) {
+        alert('Paste a Brave Search API key first.');
+        return;
+      }
+      setBraveKeyBusy(true, 'save');
+      try {
+        await invoke('store_credential', {
+          request: { account: BRAVE_KEYCHAIN_ACCOUNT, password: key },
+        });
+        keyInput.value = '';
+        setBraveKeyBusy(false);
+        flashBraveKeyBtn(saveBtn, 'Saved');
+        await refreshBraveStatus();
+      } catch (e) {
+        console.error('Brave save key:', e);
+        setBraveKeyBusy(false);
+        alert('Could not save Brave key: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (braveKeyBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setBraveKeyBusy(true, 'clear');
+      try {
+        await invoke('delete_credential', { account: BRAVE_KEYCHAIN_ACCOUNT });
+        if (keyInput) keyInput.value = '';
+        setBraveKeyBusy(false);
+        flashBraveKeyBtn(clearBtn, 'Cleared');
+        await refreshBraveStatus();
+      } catch (e) {
+        console.error('Brave clear key:', e);
+        setBraveKeyBusy(false);
+        alert('Could not clear Brave key: ' + String(e));
+      }
+    });
+  }
+
+  refreshBraveStatus();
+  window.BraveSettings = { refreshStatus: refreshBraveStatus };
+}
 
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
@@ -19387,6 +19515,7 @@ function initMonitoringFeatures() {
       initCollapsibleSections();
       initMonitorsSection();
       initPerplexitySection();
+      initBraveSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

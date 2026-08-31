@@ -641,6 +641,16 @@
               </div>
               <div class="setting-note">Get a key at <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer">perplexity.ai/settings/api</a>. Stored in Keychain.</div>
             </div>
+            <div class="setting-item" id="brave-setting">
+              <div class="setting-label">Brave Search API key</div>
+              <div class="brave-status settings-status" id="brave-settings-status">—</div>
+              <input type="password" id="brave-api-key-input" class="settings-input discord-token-input" placeholder="Paste Brave Search API key" autocomplete="off" />
+              <div class="settings-actions brave-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="brave-save-key">Save key</button>
+                <button type="button" class="settings-btn discord-btn" id="brave-clear-key">Clear key</button>
+              </div>
+              <div class="setting-note">Get a key at <a href="https://api-dashboard.search.brave.com/" target="_blank" rel="noopener noreferrer">api-dashboard.search.brave.com</a>. Stored in Keychain (or set BRAVE_API_KEY in .config.env).</div>
+            </div>
           </section>
         </div>
       </div>

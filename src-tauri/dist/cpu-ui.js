@@ -393,6 +393,7 @@
       applySettingsHelpAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
+      applySettingsBraveKeyAttentionGlanceState();
     });
   }
 
@@ -403,6 +404,7 @@
     applySettingsHelpAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
+    applySettingsBraveKeyAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1133,6 +1135,92 @@
     });
   }
 
+  function isBraveKeyNotConfiguredForGlance() {
+    const statusEl = document.getElementById("brave-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    return text === "no key";
+  }
+
+  /**
+   * Brave Search API key attention glance in Credentials (Perplexity key-not-set parity).
+   * Visible when Settings is open and no Brave API key is saved.
+   */
+  function ensureSettingsBraveKeyAttentionGlance() {
+    const braveSetting = document.getElementById("brave-setting");
+    let glance = document.getElementById("settings-brave-key-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-brave-key-attention-glance";
+      glance.className = "settings-brave-key-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-brave-key-attention-glance-text"></span>';
+      if (braveSetting) {
+        braveSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsBraveKeyAttentionGlanceClick(glance);
+    } else if (braveSetting && braveSetting.firstElementChild !== glance) {
+      braveSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsBraveKeyAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isBraveKeyNotConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-brave-key-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsBraveKeyAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-brave-key-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    if (text) text.textContent = "Brave · Not set · add API key";
+    glance.title = "Brave Search needs an API key — click to paste one";
+    glance.setAttribute(
+      "aria-label",
+      "Brave Search API key not set — click to focus the key field"
+    );
+  }
+
+  function wireSettingsBraveKeyAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsBraveKeyAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsBraveKeyAttentionWired = "1";
+    const activate = () => {
+      const keyInput = document.getElementById("brave-api-key-input");
+      if (keyInput && typeof keyInput.focus === "function") {
+        try {
+          keyInput.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1443,6 +1531,9 @@
       "perplexity-api-key-input",
       "perplexity-save-key",
       "perplexity-clear-key",
+      "brave-api-key-input",
+      "brave-save-key",
+      "brave-clear-key",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -1971,6 +2062,7 @@
       "icon-discord",
       "discord-setting",
       "perplexity-setting",
+      "brave-setting",
       "icon-perplexity",
       "perplexity-section",
     ];
@@ -2879,6 +2971,8 @@
     applySettingsDiscordTokenAttentionGlanceState;
   window.applySettingsPerplexityKeyAttentionGlanceState =
     applySettingsPerplexityKeyAttentionGlanceState;
+  window.applySettingsBraveKeyAttentionGlanceState =
+    applySettingsBraveKeyAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

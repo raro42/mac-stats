@@ -1,6 +1,7 @@
 //! Brave Search API integration for Ollama agents.
 //!
-//! API key from BRAVE_API_KEY env or .config.env (BRAVE_API_KEY=...).
+//! API key from BRAVE_API_KEY env, .config.env (BRAVE_API_KEY=...), or Keychain
+//! (`brave_api_key` — Settings Credentials Save key).
 //! See: https://api-dashboard.search.brave.com/documentation/guides/authentication
 //! Rate limits: https://api-dashboard.search.brave.com/documentation/guides/rate-limiting
 
@@ -8,6 +9,9 @@ use std::path::Path;
 use tracing::{info, warn};
 
 const BRAVE_WEB_SEARCH_URL: &str = "https://api.search.brave.com/res/v1/web/search";
+
+/// Keychain account used for Brave API key (same as frontend store_credential).
+pub const BRAVE_KEYCHAIN_ACCOUNT: &str = "brave_api_key";
 
 /// Rate limit header names (Brave Search API).
 const HDR_LIMIT: &str = "x-ratelimit-limit";
@@ -76,7 +80,7 @@ fn brave_key_from_config_env_file(path: &Path) -> Option<String> {
 }
 
 /// Get Brave API key: BRAVE_API_KEY / BRAVE-API-KEY env, then .config.env (cwd, cwd/src-tauri,
-/// ~/.mac-stats, and `$HOME/projects/mac-stats/src-tauri` for app-bundle launches).
+/// ~/.mac-stats, and `$HOME/projects/mac-stats/src-tauri` for app-bundle launches), then Keychain.
 /// In .config.env use BRAVE_API_KEY=... or BRAVE-API-KEY=...
 pub fn get_brave_api_key() -> Option<String> {
     for env_key in ["BRAVE_API_KEY", "BRAVE-API-KEY"] {
@@ -112,7 +116,18 @@ pub fn get_brave_api_key() -> Option<String> {
             }
         }
     }
+    if let Ok(Some(k)) = crate::security::get_credential(BRAVE_KEYCHAIN_ACCOUNT) {
+        if !k.trim().is_empty() {
+            return Some(k);
+        }
+    }
     None
+}
+
+/// Check if Brave Search is configured (env, .config.env, or Keychain). Does not validate the key.
+#[tauri::command]
+pub fn is_brave_configured() -> Result<bool, String> {
+    Ok(get_brave_api_key().is_some())
 }
 
 /// Single-result query to verify the subscription token (feature health; short timeout).

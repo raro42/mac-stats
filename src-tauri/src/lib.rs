@@ -395,6 +395,7 @@ fn run_internal(open_cpu_window: bool) {
             // Perplexity Search
             commands::perplexity::perplexity_search,
             commands::perplexity::is_perplexity_configured,
+            commands::brave::is_brave_configured,
             // Browser / fetch for Ollama
             commands::browser::fetch_page,
             // Discord commands
