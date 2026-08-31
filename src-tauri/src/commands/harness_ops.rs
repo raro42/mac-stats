@@ -6535,10 +6535,10 @@ pub fn format_signal_ready_chip() -> String {
     let registered = crate::commands::alerts::count_registered_alert_channels("Signal");
     if registered > 0 {
         format!(
-            "**Signal** · Partial · {registered} channel(s) · REST API not wired yet"
+            "**Signal** · Partial · {registered} channel(s) · REST API not wired yet (Settings)"
         )
     } else {
-        "**Signal** · Not set · Signal REST API not wired yet".to_string()
+        "**Signal** · Not wired · REST API not wired yet (Settings)".to_string()
     }
 }
 
@@ -10791,6 +10791,14 @@ mod tests {
         assert!(!looks_like_signal_ready_request("how to use signal"));
         let chip = format_signal_ready_chip();
         assert!(chip.to_lowercase().contains("signal"), "{chip}");
+        assert!(
+            chip.to_lowercase().contains("settings"),
+            "chip should mention Settings: {chip}"
+        );
+        assert!(
+            chip.to_lowercase().contains("not wired") || chip.to_lowercase().contains("rest api"),
+            "chip should stay honest about placeholder: {chip}"
+        );
     }
 
     #[test]

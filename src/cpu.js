@@ -13199,6 +13199,20 @@ function initSlackSettings() {
   window.SlackSettings = { refreshStatus: refreshSlackStatus };
 }
 
+/** Settings: Signal alerts honest placeholder (REST API not wired; Slack/Telegram parity glance). */
+function refreshSignalStatus() {
+  const el = document.getElementById('signal-settings-status');
+  if (el) el.textContent = 'Not wired';
+  if (typeof window.applySettingsSignalAttentionGlanceState === 'function') {
+    window.applySettingsSignalAttentionGlanceState();
+  }
+}
+
+function initSignalSettings() {
+  refreshSignalStatus();
+  window.SignalSettings = { refreshStatus: refreshSignalStatus };
+}
+
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
   const s = String(raw || '');
@@ -20605,6 +20619,7 @@ function initMonitoringFeatures() {
       initCursorAgentSettings();
       initTelegramSettings();
       initSlackSettings();
+      initSignalSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

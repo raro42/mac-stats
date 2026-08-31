@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.772] - 2026-09-01
+
+### Added
+- **Settings Signal alerts honest placeholder** — Credentials now shows a Signal alerts note (REST API / signal-cli not wired yet). A **Signal · Not wired · REST API pending** red strip appears when Settings is open (Slack/Telegram glance parity). Click scrolls to the note. `/signal` cue mentions Settings. Use Telegram or Slack for alert delivery until Signal is wired.
+
 ## [0.1.771] - 2026-08-31
 
 ### Added

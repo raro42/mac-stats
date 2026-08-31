@@ -7151,6 +7151,52 @@ button.is-just-saved,
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
+/* Settings — Signal not-wired attention glance (Credentials; honest placeholder) */
+.settings-signal-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+}
+
+.settings-signal-attention-glance[hidden] {
+  display: none !important;
+}
+
+.settings-signal-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.settings-signal-attention-glance:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+}
+
+.settings-signal-attention-glance.is-not-wired {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
 #slack-save.is-just-saved {
   background: rgba(52, 199, 89, 0.95) !important;
   border-color: transparent !important;

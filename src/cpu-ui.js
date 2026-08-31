@@ -401,6 +401,7 @@
       applySettingsCursorAgentAttentionGlanceState();
       applySettingsTelegramAttentionGlanceState();
       applySettingsSlackAttentionGlanceState();
+      applySettingsSignalAttentionGlanceState();
     });
   }
 
@@ -419,6 +420,7 @@
     applySettingsCursorAgentAttentionGlanceState();
     applySettingsTelegramAttentionGlanceState();
     applySettingsSlackAttentionGlanceState();
+    applySettingsSignalAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1925,6 +1927,93 @@
       if (field && typeof field.focus === "function") {
         try {
           field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
+   * Signal alerts attention glance in Credentials (honest placeholder).
+   * Visible when Settings is open — Signal REST API is not wired yet.
+   */
+  function ensureSettingsSignalAttentionGlance() {
+    const signalSetting = document.getElementById("signal-setting");
+    let glance = document.getElementById("settings-signal-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-signal-attention-glance";
+      glance.className = "settings-signal-attention-glance";
+      glance.innerHTML =
+        '<span id="settings-signal-attention-glance-text"></span>';
+      if (signalSetting) {
+        signalSetting.insertAdjacentElement("afterbegin", glance);
+      }
+      wireSettingsSignalAttentionGlanceClick(glance);
+    } else if (signalSetting && signalSetting.firstElementChild !== glance) {
+      signalSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsSignalAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-signal-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsSignalAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-signal-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.add("is-not-wired");
+    const label = "Signal · Not wired · REST API pending";
+    if (text) text.textContent = label;
+    glance.title =
+      "Signal alerts are not wired yet — click to read the Settings note";
+    glance.setAttribute(
+      "aria-label",
+      "Signal not wired — click to scroll to the Settings note"
+    );
+  }
+
+  function wireSettingsSignalAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsSignalAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsSignalAttentionWired = "1";
+    const activate = () => {
+      const note =
+        document.getElementById("signal-settings-note") ||
+        document.getElementById("signal-setting");
+      if (note && typeof note.scrollIntoView === "function") {
+        try {
+          note.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      if (note && typeof note.focus === "function") {
+        try {
+          if (!note.hasAttribute("tabindex")) note.tabIndex = -1;
+          note.focus();
         } catch (_) {
           /* ignore */
         }
@@ -3812,6 +3901,8 @@
     applySettingsTelegramAttentionGlanceState;
   window.applySettingsSlackAttentionGlanceState =
     applySettingsSlackAttentionGlanceState;
+  window.applySettingsSignalAttentionGlanceState =
+    applySettingsSignalAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
