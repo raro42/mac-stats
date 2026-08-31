@@ -13550,7 +13550,86 @@ function ensurePerplexityAttentionGlance() {
   return glance;
 }
 
+/**
+ * Key-not-set attention glance above Perplexity setup (AI Chat Offline / Errors parity).
+ * Visible when the section is open and no API key is configured.
+ */
+function ensurePerplexityKeyAttentionGlance() {
+  ensurePerplexitySetupPanel();
+  const setup = document.getElementById('perplexity-setup');
+  const content = document.getElementById('perplexity-content');
+  let glance = document.getElementById('perplexity-key-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'perplexity-key-attention-glance';
+    glance.className = 'perplexity-key-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="perplexity-key-attention-glance-text"></span>';
+    if (setup) {
+      setup.insertAdjacentElement('beforebegin', glance);
+    } else if (content) {
+      content.insertAdjacentElement('afterbegin', glance);
+    } else {
+      return null;
+    }
+    wirePerplexityKeyAttentionGlanceClick(glance);
+  } else if (setup && glance.nextElementSibling !== setup) {
+    setup.insertAdjacentElement('beforebegin', glance);
+  }
+  return glance;
+}
+
+function applyPerplexityKeyAttentionGlanceState() {
+  if (perplexityCollapsed || perplexityConfigured) {
+    const glance = document.getElementById('perplexity-key-attention-glance');
+    if (glance) glance.hidden = true;
+    return;
+  }
+  const glance = ensurePerplexityKeyAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('perplexity-key-attention-glance-text');
+  glance.hidden = false;
+  glance.classList.add('is-not-set');
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (text) text.textContent = 'Search · Not set · add API key';
+  glance.title = 'Perplexity needs an API key — click to paste one';
+  glance.setAttribute(
+    'aria-label',
+    'Perplexity API key not set — click to focus the key field'
+  );
+}
+
+function wirePerplexityKeyAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.perplexityKeyAttentionWired === '1') return;
+  glance.dataset.perplexityKeyAttentionWired = '1';
+  const activate = () => {
+    ensurePerplexitySectionExpanded();
+    updatePerplexitySetupVisibility();
+    const inlineKey = document.getElementById('perplexity-inline-key');
+    if (inlineKey && typeof inlineKey.focus === 'function') {
+      try {
+        inlineKey.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 function applyPerplexityAttentionGlanceState() {
+  applyPerplexityKeyAttentionGlanceState();
   const glance = ensurePerplexityAttentionGlance();
   if (!glance) return;
   const text = document.getElementById('perplexity-attention-glance-text');
@@ -13558,7 +13637,12 @@ function applyPerplexityAttentionGlanceState() {
   const n = last ? Number(last.count) || 0 : 0;
   const hasError = !!(last && last.error);
   const hasTop = !!(last && !last.error && n > PERPLEXITY_TOP_N);
-  if (perplexityCollapsed || perplexitySearchBusyForGlance || (!hasError && !hasTop)) {
+  if (
+    perplexityCollapsed ||
+    perplexitySearchBusyForGlance ||
+    !perplexityConfigured ||
+    (!hasError && !hasTop)
+  ) {
     glance.hidden = true;
     glance.classList.remove('has-error', 'has-top');
     return;

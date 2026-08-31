@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.758] - 2026-08-31
+
+### Added
+- **Perplexity Key-not-set attention glance** — when Perplexity Search is open and no API key is configured, a **Search · Not set · add API key** strip appears above the setup panel (AI Chat Offline / Top·error parity). Red wash. Click or Enter focuses the inline key field. Hidden while collapsed (keep-header **Key · add API key** glance stays). Design review polish.
+
 ## [0.1.757] - 2026-08-31
 
 ### Added
