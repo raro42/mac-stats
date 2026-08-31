@@ -397,6 +397,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::perplexity::is_perplexity_configured,
             commands::brave::is_brave_configured,
             redmine::get_redmine_settings_status,
+            commands::reply_helpers::get_mastodon_settings_status,
             // Browser / fetch for Ollama
             commands::browser::fetch_page,
             // Discord commands

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.766] - 2026-08-31
+
+### Added
+- **Settings Mastodon instance URL + access token** — Credentials now has Save / Clear for Mastodon (Keychain `mastodon_instance_url` / `mastodon_access_token`, same resolve order as env / `.config.env`). When not fully set, a **Mastodon · Not set / Partial** red strip appears above the controls (Redmine / Brave / Perplexity / Discord parity). Click focuses the missing field. `/mastodon` Not-set cue mentions Settings.
+
 ## [0.1.765] - 2026-08-31
 
 ### Added

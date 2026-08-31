@@ -395,6 +395,7 @@
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
       applySettingsRedmineAttentionGlanceState();
+      applySettingsMastodonAttentionGlanceState();
     });
   }
 
@@ -407,6 +408,7 @@
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
     applySettingsRedmineAttentionGlanceState();
+    applySettingsMastodonAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1339,6 +1341,122 @@
     });
   }
 
+  function isMastodonNotFullyConfiguredForGlance() {
+    const statusEl = document.getElementById("mastodon-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—" || text === "ready") return false;
+    return (
+      text === "not set" ||
+      text.includes("no token") ||
+      text.includes("no url")
+    );
+  }
+
+  /**
+   * Mastodon URL/token attention glance in Credentials (Redmine parity).
+   * Visible when Settings is open and Mastodon is Not set or Partial.
+   */
+  function ensureSettingsMastodonAttentionGlance() {
+    const mastodonSetting = document.getElementById("mastodon-setting");
+    let glance = document.getElementById("settings-mastodon-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-mastodon-attention-glance";
+      glance.className = "settings-mastodon-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-mastodon-attention-glance-text"></span>';
+      if (mastodonSetting) {
+        mastodonSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsMastodonAttentionGlanceClick(glance);
+    } else if (
+      mastodonSetting &&
+      mastodonSetting.firstElementChild !== glance
+    ) {
+      mastodonSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsMastodonAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isMastodonNotFullyConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-mastodon-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsMastodonAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-mastodon-attention-glance-text"
+    );
+    const statusEl = document.getElementById("mastodon-settings-status");
+    const status = (statusEl?.textContent || "").trim().toLowerCase();
+    glance.hidden = false;
+    glance.classList.remove("is-not-set", "is-partial");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    let label = "Mastodon · Not set · add URL + access token";
+    let partial = false;
+    if (status.includes("no token")) {
+      label = "Mastodon · Partial · missing access token";
+      partial = true;
+    } else if (status.includes("no url")) {
+      label = "Mastodon · Partial · missing instance URL";
+      partial = true;
+    }
+    glance.classList.add(partial ? "is-partial" : "is-not-set");
+    if (text) text.textContent = label;
+    glance.title = partial
+      ? "Mastodon needs the missing field — click to focus it"
+      : "Mastodon needs URL + access token — click to add them";
+    glance.setAttribute(
+      "aria-label",
+      partial
+        ? "Mastodon partially configured — click to focus the missing field"
+        : "Mastodon not set — click to focus the instance URL field"
+    );
+  }
+
+  function wireSettingsMastodonAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsMastodonAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsMastodonAttentionWired = "1";
+    const activate = () => {
+      const statusEl = document.getElementById("mastodon-settings-status");
+      const status = (statusEl?.textContent || "").trim().toLowerCase();
+      let targetId = "mastodon-url-input";
+      if (status.includes("no token") || status.includes("url set")) {
+        targetId = "mastodon-token-input";
+      }
+      const field = document.getElementById(targetId);
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -1481,7 +1599,9 @@
         el.id === "perplexity-api-key-input" ||
         el.id === "brave-api-key-input" ||
         el.id === "redmine-url-input" ||
-        el.id === "redmine-api-key-input") &&
+        el.id === "redmine-api-key-input" ||
+        el.id === "mastodon-url-input" ||
+        el.id === "mastodon-token-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -1660,6 +1780,10 @@
       "redmine-api-key-input",
       "redmine-save",
       "redmine-clear",
+      "mastodon-url-input",
+      "mastodon-token-input",
+      "mastodon-save",
+      "mastodon-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -1756,7 +1880,11 @@
             active?.id === "redmine-url-input" ||
             active?.id === "redmine-api-key-input" ||
             active?.id === "redmine-save" ||
-            active?.id === "redmine-clear"
+            active?.id === "redmine-clear" ||
+            active?.id === "mastodon-url-input" ||
+            active?.id === "mastodon-token-input" ||
+            active?.id === "mastodon-save" ||
+            active?.id === "mastodon-clear"
           ) {
             return;
           }
@@ -1777,7 +1905,9 @@
           active?.id === "perplexity-api-key-input" ||
           active?.id === "brave-api-key-input" ||
           active?.id === "redmine-url-input" ||
-          active?.id === "redmine-api-key-input";
+          active?.id === "redmine-api-key-input" ||
+          active?.id === "mastodon-url-input" ||
+          active?.id === "mastodon-token-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -1786,7 +1916,8 @@
             if (
               (active?.id === "perplexity-clear-key" ||
                 active?.id === "brave-clear-key" ||
-                active?.id === "redmine-clear") &&
+                active?.id === "redmine-clear" ||
+                active?.id === "mastodon-clear") &&
               tryChainPerplexitySettingsClearToFooter()
             ) {
               e.preventDefault();
@@ -1875,7 +2006,9 @@
             controls[next]?.id === "perplexity-api-key-input" ||
             controls[next]?.id === "brave-api-key-input" ||
             controls[next]?.id === "redmine-url-input" ||
-            controls[next]?.id === "redmine-api-key-input") &&
+            controls[next]?.id === "redmine-api-key-input" ||
+            controls[next]?.id === "mastodon-url-input" ||
+            controls[next]?.id === "mastodon-token-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -2200,6 +2333,7 @@
       "perplexity-setting",
       "brave-setting",
       "redmine-setting",
+      "mastodon-setting",
       "icon-perplexity",
       "perplexity-section",
     ];
@@ -3112,6 +3246,8 @@
     applySettingsBraveKeyAttentionGlanceState;
   window.applySettingsRedmineAttentionGlanceState =
     applySettingsRedmineAttentionGlanceState;
+  window.applySettingsMastodonAttentionGlanceState =
+    applySettingsMastodonAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

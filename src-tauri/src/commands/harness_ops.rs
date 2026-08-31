@@ -5137,9 +5137,16 @@ pub fn format_mastodon_ready_chip() -> String {
     let url = crate::commands::reply_helpers::get_mastodon_instance_url();
     let token = crate::commands::reply_helpers::get_mastodon_access_token();
     match (url.as_deref(), token.as_deref()) {
-        (None, None) => "**Mastodon** · Not set · add instance URL + access token".to_string(),
-        (Some(_), None) => "**Mastodon** · Partial · URL set · missing access token".to_string(),
-        (None, Some(_)) => "**Mastodon** · Partial · token set · missing instance URL".to_string(),
+        (None, None) => {
+            "**Mastodon** · Not set · add instance URL + access token (Settings or .config.env)"
+                .to_string()
+        }
+        (Some(_), None) => {
+            "**Mastodon** · Partial · URL set · missing access token (Settings)".to_string()
+        }
+        (None, Some(_)) => {
+            "**Mastodon** · Partial · token set · missing instance URL (Settings)".to_string()
+        }
         (Some(u), Some(_)) => {
             let host = shorten_redmine_url_for_chip(u);
             format!("**Mastodon** · Ready · {host} · token set")
@@ -6782,7 +6789,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
-• `/mastodon` — Mastodon Ready / Not set (instance URL + token; no live probe)\n\
+• `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; no live probe)\n\

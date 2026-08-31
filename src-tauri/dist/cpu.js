@@ -11991,6 +11991,8 @@ const PERPLEXITY_KEYCHAIN_ACCOUNT = 'perplexity_api_key';
 const BRAVE_KEYCHAIN_ACCOUNT = 'brave_api_key';
 const REDMINE_URL_KEYCHAIN_ACCOUNT = 'redmine_url';
 const REDMINE_API_KEY_KEYCHAIN_ACCOUNT = 'redmine_api_key';
+const MASTODON_URL_KEYCHAIN_ACCOUNT = 'mastodon_instance_url';
+const MASTODON_TOKEN_KEYCHAIN_ACCOUNT = 'mastodon_access_token';
 
 function updateBraveConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'brave-settings-status');
@@ -12276,6 +12278,165 @@ function initRedmineSettings() {
 
   refreshRedmineStatus();
   window.RedmineSettings = { refreshStatus: refreshRedmineStatus };
+}
+
+function updateMastodonConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'mastodon-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshMastodonStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateMastodonConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_mastodon_settings_status');
+    const url = !!(st && st.url);
+    const token = !!(st && st.token);
+    if (url && token) updateMastodonConfigStatus('Ready');
+    else if (url) updateMastodonConfigStatus('URL set · no token');
+    else if (token) updateMastodonConfigStatus('Token set · no URL');
+    else updateMastodonConfigStatus('Not set');
+  } catch (_) {
+    updateMastodonConfigStatus('—');
+  }
+  if (typeof window.applySettingsMastodonAttentionGlanceState === 'function') {
+    window.applySettingsMastodonAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Mastodon instance URL + access token (Redmine parity). */
+function initMastodonSettings() {
+  const saveBtn = document.getElementById('mastodon-save');
+  const clearBtn = document.getElementById('mastodon-clear');
+  const urlInput = document.getElementById('mastodon-url-input');
+  const tokenInput = document.getElementById('mastodon-token-input');
+  let mastodonBusy = false;
+
+  function setMastodonBusy(busy, which) {
+    mastodonBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashMastodonBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && (urlInput || tokenInput)) {
+    saveBtn.addEventListener('click', async () => {
+      if (mastodonBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const url = (urlInput && urlInput.value.trim()) || '';
+      const token = (tokenInput && tokenInput.value.trim()) || '';
+      if (!url && !token) {
+        alert('Paste a Mastodon instance URL and/or access token first.');
+        return;
+      }
+      setMastodonBusy(true, 'save');
+      try {
+        if (url) {
+          await invoke('store_credential', {
+            request: { account: MASTODON_URL_KEYCHAIN_ACCOUNT, password: url },
+          });
+          if (urlInput) urlInput.value = '';
+        }
+        if (token) {
+          await invoke('store_credential', {
+            request: {
+              account: MASTODON_TOKEN_KEYCHAIN_ACCOUNT,
+              password: token,
+            },
+          });
+          if (tokenInput) tokenInput.value = '';
+        }
+        setMastodonBusy(false);
+        flashMastodonBtn(saveBtn, 'Saved');
+        await refreshMastodonStatus();
+      } catch (e) {
+        console.error('Mastodon save:', e);
+        setMastodonBusy(false);
+        alert('Could not save Mastodon credentials: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (mastodonBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setMastodonBusy(true, 'clear');
+      try {
+        try {
+          await invoke('delete_credential', {
+            account: MASTODON_URL_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        try {
+          await invoke('delete_credential', {
+            account: MASTODON_TOKEN_KEYCHAIN_ACCOUNT,
+          });
+        } catch (_) {
+          /* missing ok */
+        }
+        if (urlInput) urlInput.value = '';
+        if (tokenInput) tokenInput.value = '';
+        setMastodonBusy(false);
+        flashMastodonBtn(clearBtn, 'Cleared');
+        await refreshMastodonStatus();
+      } catch (e) {
+        console.error('Mastodon clear:', e);
+        setMastodonBusy(false);
+        alert('Could not clear Mastodon credentials: ' + String(e));
+      }
+    });
+  }
+
+  refreshMastodonStatus();
+  window.MastodonSettings = { refreshStatus: refreshMastodonStatus };
 }
 
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
@@ -19678,6 +19839,7 @@ function initMonitoringFeatures() {
       initPerplexitySection();
       initBraveSettings();
       initRedmineSettings();
+      initMastodonSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

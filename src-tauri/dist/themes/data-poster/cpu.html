@@ -699,6 +699,17 @@
               </div>
               <div class="setting-note">Base URL + API key for tickets and time entries. Stored in Keychain (or set REDMINE_URL / REDMINE_API_KEY in .config.env).</div>
             </div>
+            <div class="setting-item" id="mastodon-setting">
+              <div class="setting-label">Mastodon</div>
+              <div class="mastodon-status settings-status" id="mastodon-settings-status">—</div>
+              <input type="url" id="mastodon-url-input" class="settings-input discord-token-input" placeholder="https://mastodon.social" autocomplete="off" />
+              <input type="password" id="mastodon-token-input" class="settings-input discord-token-input" placeholder="Paste Mastodon access token" autocomplete="off" />
+              <div class="settings-actions mastodon-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="mastodon-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="mastodon-clear">Clear</button>
+              </div>
+              <div class="setting-note">Instance URL + access token for MASTODON_POST. Stored in Keychain (or set MASTODON_INSTANCE_URL / MASTODON_ACCESS_TOKEN in .config.env).</div>
+            </div>
           </section>
         </div>
       </div>

@@ -121,6 +121,18 @@ pub(crate) fn get_mastodon_config() -> Option<(String, String)> {
     Some((instance, token))
 }
 
+/// Settings Credentials status (env / `.config.env` / Keychain). Does not live-probe.
+#[tauri::command]
+pub fn get_mastodon_settings_status() -> Result<serde_json::Value, String> {
+    let url = get_mastodon_instance_url().is_some();
+    let token = get_mastodon_access_token().is_some();
+    Ok(serde_json::json!({
+        "url": url,
+        "token": token,
+        "ready": url && token,
+    }))
+}
+
 /// Post a status to Mastodon. Visibility: public, unlisted, private, or direct.
 pub(crate) async fn mastodon_post(status: &str, visibility: &str) -> Result<String, String> {
     let (instance, token) = get_mastodon_config()
