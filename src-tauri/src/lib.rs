@@ -363,6 +363,9 @@ fn run_internal(open_cpu_window: bool) {
             commands::alerts::get_telegram_settings_status,
             commands::alerts::save_telegram_alert_settings,
             commands::alerts::clear_telegram_alert_settings,
+            commands::alerts::get_slack_settings_status,
+            commands::alerts::save_slack_alert_settings,
+            commands::alerts::clear_slack_alert_settings,
             // Plugin commands
             commands::plugins::add_plugin,
             commands::plugins::remove_plugin,
@@ -494,6 +497,8 @@ fn run_internal(open_cpu_window: bool) {
 
             // Restore Settings Telegram alert channel from Keychain (token + chat id).
             commands::alerts::restore_persisted_telegram_channel();
+            // Restore Settings Slack alert channel from Keychain (webhook URL).
+            commands::alerts::restore_persisted_slack_channel();
 
             // No default WebView in tauri.conf (windows: []). Destroy any stray ones so
             // WebKit GPU ("Graphics and Media") is not kept warm while menu-bar-only.

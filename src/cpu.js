@@ -13070,6 +13070,135 @@ function initTelegramSettings() {
   window.TelegramSettings = { refreshStatus: refreshTelegramStatus };
 }
 
+function updateSlackConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId || 'slack-settings-status');
+  if (el) el.textContent = statusText;
+}
+
+async function refreshSlackStatus() {
+  const invoke = getInvoke();
+  if (!invoke) {
+    updateSlackConfigStatus('—');
+    return;
+  }
+  try {
+    const st = await invoke('get_slack_settings_status');
+    const webhook = !!(st && st.webhook);
+    if (webhook) updateSlackConfigStatus('Ready');
+    else updateSlackConfigStatus('Not set');
+  } catch (_) {
+    updateSlackConfigStatus('—');
+  }
+  if (typeof window.applySettingsSlackAttentionGlanceState === 'function') {
+    window.applySettingsSlackAttentionGlanceState();
+  }
+}
+
+/** Settings: Save / Clear Slack webhook URL (Telegram parity; Keychain + channel register). */
+function initSlackSettings() {
+  const saveBtn = document.getElementById('slack-save');
+  const clearBtn = document.getElementById('slack-clear');
+  const webhookInput = document.getElementById('slack-webhook-input');
+  let slackBusy = false;
+
+  function setSlackBusy(busy, which) {
+    slackBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashSlackBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  if (saveBtn && webhookInput) {
+    saveBtn.addEventListener('click', async () => {
+      if (slackBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const webhookUrl = (webhookInput.value || '').trim();
+      if (!webhookUrl) {
+        alert('Paste a Slack incoming webhook URL first.');
+        return;
+      }
+      setSlackBusy(true, 'save');
+      try {
+        await invoke('save_slack_alert_settings', {
+          webhookUrl: webhookUrl || null,
+        });
+        webhookInput.value = '';
+        setSlackBusy(false);
+        flashSlackBtn(saveBtn, 'Saved');
+        await refreshSlackStatus();
+      } catch (e) {
+        console.error('Slack save:', e);
+        setSlackBusy(false);
+        alert('Could not save Slack settings: ' + String(e));
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      if (slackBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
+      const invoke = getInvoke();
+      if (!invoke) return;
+      setSlackBusy(true, 'clear');
+      try {
+        await invoke('clear_slack_alert_settings');
+        if (webhookInput) webhookInput.value = '';
+        setSlackBusy(false);
+        flashSlackBtn(clearBtn, 'Cleared');
+        await refreshSlackStatus();
+      } catch (e) {
+        console.error('Slack clear:', e);
+        setSlackBusy(false);
+        alert('Could not clear Slack settings: ' + String(e));
+      }
+    });
+  }
+
+  refreshSlackStatus();
+  window.SlackSettings = { refreshStatus: refreshSlackStatus };
+}
+
 /** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
 function formatPerplexitySnippet(raw) {
   const s = String(raw || '');
@@ -20475,6 +20604,7 @@ function initMonitoringFeatures() {
       initBrowserSettings();
       initCursorAgentSettings();
       initTelegramSettings();
+      initSlackSettings();
       initLogsSection();
       initDiskCleanupSection();
       initOllamaSection();

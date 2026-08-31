@@ -751,6 +751,16 @@
               </div>
               <div class="setting-note">Bot token + chat id for alert delivery. Stored in Keychain; channel registers on Save and restores at startup. /telegram shows Ready when both are set.</div>
             </div>
+            <div class="setting-item" id="slack-setting">
+              <div class="setting-label">Slack alerts</div>
+              <div class="slack-status settings-status" id="slack-settings-status">—</div>
+              <input type="password" id="slack-webhook-input" class="settings-input discord-token-input" placeholder="Paste Slack incoming webhook URL" autocomplete="off" />
+              <div class="settings-actions slack-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="slack-save">Save</button>
+                <button type="button" class="settings-btn discord-btn" id="slack-clear">Clear</button>
+              </div>
+              <div class="setting-note">Incoming webhook URL for alert delivery. Stored in Keychain; channel registers on Save and restores at startup. /slack shows Ready when set.</div>
+            </div>
           </section>
         </div>
       </div>

@@ -400,6 +400,7 @@
       applySettingsBrowserAttentionGlanceState();
       applySettingsCursorAgentAttentionGlanceState();
       applySettingsTelegramAttentionGlanceState();
+      applySettingsSlackAttentionGlanceState();
     });
   }
 
@@ -417,6 +418,7 @@
     applySettingsBrowserAttentionGlanceState();
     applySettingsCursorAgentAttentionGlanceState();
     applySettingsTelegramAttentionGlanceState();
+    applySettingsSlackAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -1851,6 +1853,96 @@
     });
   }
 
+  function isSlackNotFullyConfiguredForGlance() {
+    const statusEl = document.getElementById("slack-settings-status");
+    if (!statusEl) return false;
+    const text = (statusEl.textContent || "").trim().toLowerCase();
+    if (!text || text === "—") return false;
+    if (text === "ready") return false;
+    return text === "not set";
+  }
+
+  /**
+   * Slack webhook attention glance in Credentials (Telegram parity).
+   * Visible when Settings is open and Slack is Not set.
+   */
+  function ensureSettingsSlackAttentionGlance() {
+    const slackSetting = document.getElementById("slack-setting");
+    let glance = document.getElementById("settings-slack-attention-glance");
+    if (!glance) {
+      glance = document.createElement("div");
+      glance.id = "settings-slack-attention-glance";
+      glance.className = "settings-slack-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-slack-attention-glance-text"></span>';
+      if (slackSetting) {
+        slackSetting.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsSlackAttentionGlanceClick(glance);
+    } else if (slackSetting && slackSetting.firstElementChild !== glance) {
+      slackSetting.insertAdjacentElement("afterbegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsSlackAttentionGlanceState() {
+    if (!isSettingsModalOpen() || !isSlackNotFullyConfiguredForGlance()) {
+      const glance = document.getElementById(
+        "settings-slack-attention-glance"
+      );
+      if (glance) glance.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsSlackAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-slack-attention-glance-text"
+    );
+    glance.hidden = false;
+    glance.classList.remove("is-not-set", "is-partial");
+    glance.classList.add("is-not-set");
+    glance.setAttribute("role", "button");
+    glance.tabIndex = 0;
+    const label = "Slack · Not set · add webhook URL";
+    if (text) text.textContent = label;
+    glance.title = "Slack needs an incoming webhook URL — click to add it";
+    glance.setAttribute(
+      "aria-label",
+      "Slack not set — click to focus the webhook field"
+    );
+  }
+
+  function wireSettingsSlackAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsSlackAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsSlackAttentionWired = "1";
+    const activate = () => {
+      const field = document.getElementById("slack-webhook-input");
+      if (field && typeof field.focus === "function") {
+        try {
+          field.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
   /**
    * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
    * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
@@ -2003,7 +2095,8 @@
         el.id === "cursor-agent-workspace-input" ||
         el.id === "cursor-agent-executable-input" ||
         el.id === "telegram-bot-token-input" ||
-        el.id === "telegram-chat-id-input") &&
+        el.id === "telegram-chat-id-input" ||
+        el.id === "slack-webhook-input") &&
       typeof el.setSelectionRange === "function"
     ) {
       const len = (el.value || "").length;
@@ -2202,6 +2295,9 @@
       "telegram-chat-id-input",
       "telegram-save",
       "telegram-clear",
+      "slack-webhook-input",
+      "slack-save",
+      "slack-clear",
     ];
     return ids
       .map((id) => document.getElementById(id))
@@ -2318,7 +2414,10 @@
             active?.id === "telegram-bot-token-input" ||
             active?.id === "telegram-chat-id-input" ||
             active?.id === "telegram-save" ||
-            active?.id === "telegram-clear"
+            active?.id === "telegram-clear" ||
+            active?.id === "slack-webhook-input" ||
+            active?.id === "slack-save" ||
+            active?.id === "slack-clear"
           ) {
             return;
           }
@@ -2349,7 +2448,8 @@
           active?.id === "cursor-agent-workspace-input" ||
           active?.id === "cursor-agent-executable-input" ||
           active?.id === "telegram-bot-token-input" ||
-          active?.id === "telegram-chat-id-input";
+          active?.id === "telegram-chat-id-input" ||
+          active?.id === "slack-webhook-input";
         if (forward) {
           if (isCredInput && !credentialsInputAtMoveBoundary(active, 1)) {
             return;
@@ -2461,7 +2561,8 @@
             controls[next]?.id === "cursor-agent-workspace-input" ||
             controls[next]?.id === "cursor-agent-executable-input" ||
             controls[next]?.id === "telegram-bot-token-input" ||
-            controls[next]?.id === "telegram-chat-id-input") &&
+            controls[next]?.id === "telegram-chat-id-input" ||
+            controls[next]?.id === "slack-webhook-input") &&
           typeof controls[next].setSelectionRange === "function"
         ) {
           const len = (controls[next].value || "").length;
@@ -3709,6 +3810,8 @@
     applySettingsCursorAgentAttentionGlanceState;
   window.applySettingsTelegramAttentionGlanceState =
     applySettingsTelegramAttentionGlanceState;
+  window.applySettingsSlackAttentionGlanceState =
+    applySettingsSlackAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

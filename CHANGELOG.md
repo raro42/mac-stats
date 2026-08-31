@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.771] - 2026-08-31
+
+### Added
+- **Settings Slack alerts webhook** — Credentials now has Save / Clear for Slack alert delivery (Keychain `slack_webhook_slack_default`). Save registers the default Slack channel; startup restores it when the webhook exists. When unset, a **Slack · Not set · add webhook URL** red strip appears above the controls (Telegram parity). Click focuses the webhook field. `/slack` Not-set cue mentions Settings.
+
 ## [0.1.770] - 2026-08-31
 
 ### Added

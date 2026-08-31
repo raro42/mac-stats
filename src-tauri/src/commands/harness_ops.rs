@@ -6458,17 +6458,23 @@ pub fn looks_like_slack_ready_request(content: &str) -> bool {
 pub fn format_slack_ready_chip() -> String {
     let registered = crate::commands::alerts::count_registered_alert_channels("Slack");
     let hooks = crate::commands::alerts::count_alert_keychain_prefix("slack_webhook_");
-    match (registered > 0, hooks > 0) {
-        (false, false) => {
-            "**Slack** · Not set · register alert channel + Keychain webhook".to_string()
+    let settings = crate::commands::alerts::get_slack_webhook().is_some();
+    match (registered > 0, hooks > 0, settings) {
+        (false, false, _) => {
+            "**Slack** · Not set · add webhook URL (Settings)".to_string()
         }
-        (true, false) => {
-            format!("**Slack** · Partial · {registered} channel(s) · missing webhook")
+        (true, false, _) => {
+            format!(
+                "**Slack** · Partial · {registered} channel(s) · missing webhook (Settings)"
+            )
         }
-        (false, true) => {
-            format!("**Slack** · Partial · {hooks} webhook(s) · register channel")
+        (false, true, true) => {
+            "**Slack** · Partial · webhook set · Save again to register (Settings)".to_string()
         }
-        (true, true) => {
+        (false, true, false) => {
+            format!("**Slack** · Partial · {hooks} webhook(s) · register channel (Settings)")
+        }
+        (true, true, _) => {
             format!("**Slack** · Ready · {registered} channel(s) · webhook set")
         }
     }

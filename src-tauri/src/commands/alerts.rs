@@ -13,6 +13,11 @@ pub const TELEGRAM_BOT_KEYCHAIN_ACCOUNT: &str = "telegram_bot_default";
 /// Keychain account for the Settings Telegram chat id (persistence across restarts).
 pub const TELEGRAM_CHAT_KEYCHAIN_ACCOUNT: &str = "telegram_chat_default";
 
+/// Settings Slack channel id (distinct from Telegram `"default"` in the registry).
+pub const SLACK_SETTINGS_CHANNEL_ID: &str = "slack_default";
+/// Keychain account for the Settings Slack webhook (`slack_webhook_{id}`).
+pub const SLACK_WEBHOOK_KEYCHAIN_ACCOUNT: &str = "slack_webhook_slack_default";
+
 // Global alert manager (in production, use proper state management)
 fn get_alert_manager() -> &'static Mutex<AlertManager> {
     static ALERT_MANAGER: OnceLock<Mutex<AlertManager>> = OnceLock::new();
@@ -119,6 +124,76 @@ pub fn clear_telegram_alert_settings() -> Result<(), String> {
         .lock()
         .map_err(|e| e.to_string())?
         .remove_channel(TELEGRAM_SETTINGS_CHANNEL_ID);
+    Ok(())
+}
+
+/// Slack webhook URL from Keychain (Settings default channel), if set.
+pub fn get_slack_webhook() -> Option<String> {
+    keychain_nonempty(SLACK_WEBHOOK_KEYCHAIN_ACCOUNT)
+}
+
+/// Re-register the Settings Slack channel after restart when the webhook exists.
+pub fn restore_persisted_slack_channel() {
+    if get_slack_webhook().is_none() {
+        return;
+    }
+    let channel = SlackChannel::new(SLACK_SETTINGS_CHANNEL_ID.to_string());
+    if let Ok(mut mgr) = get_alert_manager().lock() {
+        mgr.register_channel(SLACK_SETTINGS_CHANNEL_ID.to_string(), Box::new(channel));
+        tracing::info!(
+            "Alert: restored Slack channel '{}' from Keychain",
+            SLACK_SETTINGS_CHANNEL_ID
+        );
+    }
+}
+
+/// Settings status for Slack alert Credentials (webhook + registered).
+#[tauri::command]
+pub fn get_slack_settings_status() -> Result<serde_json::Value, String> {
+    let webhook = get_slack_webhook().is_some();
+    let registered = count_registered_alert_channels("Slack") > 0;
+    Ok(serde_json::json!({
+        "webhook": webhook,
+        "registered": registered,
+        "ready": webhook && registered,
+    }))
+}
+
+/// Save Slack webhook URL to Keychain and register the Settings channel.
+#[tauri::command]
+pub fn save_slack_alert_settings(webhook_url: Option<String>) -> Result<(), String> {
+    let url_in = webhook_url
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let Some(url) = url_in else {
+        return Err("Paste a Slack incoming webhook URL first.".to_string());
+    };
+    if !(url.starts_with("https://hooks.slack.com/")
+        || url.starts_with("https://hooks.slack-gov.com/"))
+    {
+        return Err(
+            "Webhook URL should start with https://hooks.slack.com/ (or slack-gov)."
+                .to_string(),
+        );
+    }
+    crate::security::store_credential(SLACK_WEBHOOK_KEYCHAIN_ACCOUNT, &url)
+        .map_err(|e| format!("store webhook: {e}"))?;
+    let channel = SlackChannel::new(SLACK_SETTINGS_CHANNEL_ID.to_string());
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .register_channel(SLACK_SETTINGS_CHANNEL_ID.to_string(), Box::new(channel));
+    Ok(())
+}
+
+/// Clear Settings Slack Keychain webhook and remove the default Slack channel.
+#[tauri::command]
+pub fn clear_slack_alert_settings() -> Result<(), String> {
+    let _ = crate::security::delete_credential(SLACK_WEBHOOK_KEYCHAIN_ACCOUNT);
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remove_channel(SLACK_SETTINGS_CHANNEL_ID);
     Ok(())
 }
 
