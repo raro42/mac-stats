@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.757** — Agent Ops Discord Offline attention glance (**Discord · Offline · check gateway** / **Discord · Reconnect · disc×N** under Fail/Slow/Digest when expanded; click → Runs gateway preview; design review / `feature-agent-ops`).
+
 - **v0.1.756** — AI Chat Offline attention glance (**Chat · Offline · check Ollama** / **Chat · Not set · configure URL** above All·You·Assistant when open; click → Ollama URL; design review / `feature-ai-chat`).
 
 - **v0.1.755** — Agent Ops Digest open attention glance (**Digest · N open · …** under Fail/Slow when digester has open candidates; click → first hint preview; design review / `feature-agent-ops`).
