@@ -671,8 +671,12 @@ fn format_secs_range_for_chip(min: u64, max: u64) -> String {
     }
 }
 
-/// Zero-LLM Having fun / idle-thought Ready chip (`discord_channels.json` only; no send / no Ollama).
+/// Zero-LLM Having fun / idle-thought Ready chip (`havingFunEnabled` + `discord_channels.json`; no send / no Ollama).
 pub fn format_having_fun_ready_chip() -> String {
+    if !crate::config::Config::having_fun_enabled() {
+        return "**Having fun** · Off · enable in Settings Product (or `havingFunEnabled` / `MAC_STATS_HAVING_FUN_ENABLED`)"
+            .to_string();
+    }
     let n = count_configured_having_fun_channels();
     let p = get_having_fun_params();
     let state = if n == 0 { "Off" } else { "On" };
@@ -683,7 +687,9 @@ pub fn format_having_fun_ready_chip() -> String {
     };
     let idle = format_secs_range_for_chip(p.idle_thought_secs_min, p.idle_thought_secs_max);
     let reply = format_secs_range_for_chip(p.response_delay_secs_min, p.response_delay_secs_max);
-    format!("**Having fun** · {state} · {ch} · idle {idle} · reply {reply} (config only)")
+    format!(
+        "**Having fun** · {state} · {ch} · idle {idle} · reply {reply} · Settings Product"
+    )
 }
 
 /// Zero-LLM Discord voice STT Ready chip (model + ffmpeg path + Ollama config; no transcribe / no live Ollama).
@@ -938,6 +944,9 @@ fn buffer_having_fun_message(
     answer_asap: bool,
     message_id: Option<u64>,
 ) {
+    if !crate::config::Config::having_fun_enabled() {
+        return;
+    }
     if let Ok(mut map) = having_fun_states().lock() {
         let params = get_having_fun_params();
         let state = map.entry(channel_id).or_insert_with(|| {
@@ -1019,6 +1028,9 @@ async fn having_fun_background_loop(ctx: Context) {
         if !DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst) || bot_user_id().is_none() {
             info!("Having fun: exiting background loop (Discord disconnected)");
             break;
+        }
+        if !crate::config::Config::having_fun_enabled() {
+            continue;
         }
         tick_count = tick_count.wrapping_add(1);
 

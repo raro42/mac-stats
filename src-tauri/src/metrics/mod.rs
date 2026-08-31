@@ -1346,6 +1346,17 @@ pub fn set_ori_lifecycle_enabled(enabled: bool) -> Result<bool, String> {
 }
 
 #[tauri::command]
+pub fn get_having_fun_enabled() -> bool {
+    crate::config::Config::having_fun_enabled()
+}
+
+#[tauri::command]
+pub fn set_having_fun_enabled(enabled: bool) -> Result<bool, String> {
+    crate::config::Config::set_having_fun_enabled(enabled)?;
+    Ok(crate::config::Config::having_fun_enabled())
+}
+
+#[tauri::command]
 pub fn get_menu_bar_compact() -> bool {
     crate::config::Config::menu_bar_compact()
 }

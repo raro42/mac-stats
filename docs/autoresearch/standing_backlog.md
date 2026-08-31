@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.776** — Settings Having fun / idle thoughts toggle + Off attention glance (Product; `/having_fun` mentions Settings).
+
 - **v0.1.775** — Settings Ori Mnemos lifecycle toggle + Off attention glance (Product; `/ori` mentions Settings).
 
 - **v0.1.774** — Settings Downloads organizer toggle + Off attention glance (Product; `/downloads` mentions Settings).

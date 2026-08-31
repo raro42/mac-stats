@@ -394,6 +394,7 @@
       applySettingsJudgeAttentionGlanceState();
       applySettingsDownloadsAttentionGlanceState();
       applySettingsOriAttentionGlanceState();
+      applySettingsHavingFunAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -416,6 +417,7 @@
     applySettingsJudgeAttentionGlanceState();
     applySettingsDownloadsAttentionGlanceState();
     applySettingsOriAttentionGlanceState();
+    applySettingsHavingFunAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -771,6 +773,7 @@
       "agent-judge-failure-only-toggle",
       "downloads-organizer-enabled-toggle",
       "ori-lifecycle-enabled-toggle",
+      "having-fun-enabled-toggle",
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
@@ -2249,6 +2252,108 @@
   }
 
   /**
+   * Having fun / idle thoughts attention glance in Product settings.
+   * Visible when Settings is open and Having fun is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsHavingFunAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const funToggle = document.getElementById("having-fun-enabled-toggle");
+    const funLabel = funToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-having-fun-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-having-fun-attention-glance";
+      glance.className = "settings-having-fun-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-having-fun-attention-glance-text"></span>';
+      if (funLabel) {
+        funLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        const oriNote = document.getElementById("ori-lifecycle-settings-note");
+        if (oriNote) {
+          oriNote.insertAdjacentElement("afterend", glance);
+        } else {
+          wrap.insertAdjacentElement("beforeend", glance);
+        }
+      } else {
+        return null;
+      }
+      wireSettingsHavingFunAttentionGlanceClick(glance);
+    } else if (funLabel && glance.nextElementSibling !== funLabel) {
+      funLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsHavingFunAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-having-fun-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsHavingFunAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-having-fun-attention-glance-text"
+    );
+    const funToggle = document.getElementById("having-fun-enabled-toggle");
+    const enabled = !!(funToggle && funToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "Having fun · Off · enable idle thoughts";
+    glance.title =
+      "Having fun / idle thoughts is off — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "Having fun off — click to focus Enable Having fun / idle thoughts"
+    );
+  }
+
+  function wireSettingsHavingFunAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsHavingFunAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsHavingFunAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById("having-fun-enabled-toggle");
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -3109,6 +3214,7 @@
       "downloads-organizer-enabled-toggle"
     );
     const oriToggle = document.getElementById("ori-lifecycle-enabled-toggle");
+    const havingFunToggle = document.getElementById("having-fun-enabled-toggle");
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
     const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
@@ -3120,6 +3226,7 @@
       !judgeFailureOnlyToggle &&
       !downloadsToggle &&
       !oriToggle &&
+      !havingFunToggle &&
       !compactToggle &&
       !cpuWindowCompactToggle &&
       !helpBtn &&
@@ -3164,6 +3271,10 @@
           oriToggle.checked = !!(await invoke("get_ori_lifecycle_enabled"));
         }
         applySettingsOriAttentionGlanceState();
+        if (havingFunToggle) {
+          havingFunToggle.checked = !!(await invoke("get_having_fun_enabled"));
+        }
+        applySettingsHavingFunAttentionGlanceState();
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
@@ -3263,6 +3374,22 @@
         }
       });
     }
+    if (havingFunToggle) {
+      havingFunToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_having_fun_enabled", {
+            enabled: !!havingFunToggle.checked,
+          });
+          applySettingsHavingFunAttentionGlanceState();
+          flashToggleLabelSaved(havingFunToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save havingFunEnabled: " + e);
+        }
+      });
+    }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {
         try {
@@ -3304,11 +3431,12 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, oriLifecycleEnabled, menuBarCompact, cpuWindowCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, oriLifecycleEnabled, havingFunEnabled, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
             "Judge: optional post-run check — Settings Product or /judge",
             "Downloads organizer: Settings Product or /downloads (dry-run default)",
             "Ori Mnemos lifecycle: Settings Product or /ori (needs ORI_VAULT)",
+            "Having fun / idle thoughts: Settings Product or /having_fun (discord_channels.json)",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -3372,6 +3500,8 @@
           applySettingsDownloadsAttentionGlanceState();
           if (oriToggle) oriToggle.checked = false;
           applySettingsOriAttentionGlanceState();
+          if (havingFunToggle) havingFunToggle.checked = false;
+          applySettingsHavingFunAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
@@ -4352,6 +4482,8 @@
     applySettingsDownloadsAttentionGlanceState;
   window.applySettingsOriAttentionGlanceState =
     applySettingsOriAttentionGlanceState;
+  window.applySettingsHavingFunAttentionGlanceState =
+    applySettingsHavingFunAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

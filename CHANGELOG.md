@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.776] - 2026-09-01
+
+### Added
+- **Settings Having fun / idle thoughts toggle + Off attention glance** — Product now has **Enable Having fun / idle thoughts** (`havingFunEnabled` in `config.json`; env `MAC_STATS_HAVING_FUN_ENABLED`). Missing key stays **On** so existing Discord channels keep working. When off, a **Having fun · Off · enable idle thoughts** amber strip appears above the toggle (Ori / Downloads glance parity). Click focuses the enable toggle. Discord idle thoughts and replies pause while Off. `/having_fun` Off cue mentions Settings Product. Reset to monitor defaults turns Having fun off.
+
 ## [0.1.775] - 2026-09-01
 
 ### Added
