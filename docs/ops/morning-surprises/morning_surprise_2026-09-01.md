@@ -1,26 +1,26 @@
 # Morning surprise — 2026-09-01
 
-Overnight Track B kept shipping Settings Product kill switches and attention glances.
+Overnight Track B (20:00–06:00) kept shipping Settings Product kill switches + Off attention glances.
 
-## Shipped tonight (highlights)
+## Shipped tonight (latest first)
 
 | Version | What |
 |---------|------|
-| **v0.1.776** | **Settings Having fun / idle thoughts** — Product toggle (`havingFunEnabled`; missing key stays On). Amber **Having fun · Off · enable idle thoughts** strip. Discord idle thoughts/replies pause while Off. `/having_fun` Off cue → Settings Product. |
-| **v0.1.775** | Settings Ori Mnemos lifecycle toggle + Off attention glance |
-| **v0.1.774** | Settings Downloads organizer toggle + Off attention glance |
-| **v0.1.773** | Settings Judge toggles + Off attention glance |
-| **v0.1.772** | Settings Signal alerts honest placeholder (not wired) |
+| **v0.1.777** | Settings **Discord voice STT** toggle + **Voice · Off · enable voice STT** amber glance; Discord transcription pauses when Off; `/voice` Off cue → Settings Product |
+| **v0.1.776** | Settings **Having fun / idle thoughts** toggle + Off glance; Discord idle thoughts pause when Off; `/having_fun` → Settings |
+| **v0.1.775** | Settings **Ori Mnemos lifecycle** toggle + Off glance; `/ori` → Settings |
+| **v0.1.774** | Settings **Downloads organizer** toggle + Off glance; `/downloads` → Settings |
+| **v0.1.773** | Settings **Judge** toggles + Off glance; `/judge` → Settings |
+| **v0.1.772** | Settings **Signal** honest placeholder (Not wired); `/signal` → Settings |
+| **v0.1.771** | Settings **Slack** webhook + Not-set glance; `/slack` → Settings |
 
-## Also in this window
+## Fuel notes
 
-- Credentials attention glances earlier in the night: Slack, Telegram, Cursor, Browser/CDP, MCP, Mastodon, Redmine, Brave, Perplexity, Discord.
-- Digester open stayed empty; design-review screens still under grace (stale `feature-*` ages ~17–20d — recapture when CPU window is on-screen).
+- Digester open stayed empty; design-review screens still under grace.
+- No product ERROR/WARN clusters in the 3h debug.log window this tick.
+- Next: sibling ports / p50 patterns / screenshot recapture when TCC allows / Signal REST when ready.
 
-## Try it
+## Verify
 
-1. Open Settings → Product.
-2. Toggle **Enable Having fun / idle thoughts** Off → amber strip; `/having_fun` says Off + Settings.
-3. Turn it back On (or leave Off for quiet Discord channels).
-
-Ratchet: keep @ `dbec7bba` (v0.1.776).
+- `python3 scripts/autoresearch_ratchet.py verify` green for v0.1.777.
+- Keep logged @ `eb3a33d5`.
