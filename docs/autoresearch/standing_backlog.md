@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.781** — AI Chat Circuit-open attention glance (Offline · circuit open; `/ollama` parity; design review / `feature-ai-chat`).
+
 - **v0.1.780** — AI Chat No-model attention glance (Offline parity; `/ollama` pick-one cue; design review / `feature-ai-chat`).
 
 - **v0.1.779** — Settings Compact On attention glance (Product; `/compact` mentions expand in Settings).
