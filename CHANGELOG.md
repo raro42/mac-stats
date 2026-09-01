@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.799] - 2026-09-02
+
+### Added
+- **Agent Ops Signal health attention glance** — When `get_feature_health` reports Signal Not wired or Partial, Agent Ops shows an amber **Signal · Not wired · REST API pending** or **Partial · …** strip under Slack. Click opens Settings Credentials and scrolls to the Signal note. Adds config-only Signal probe to feature-health (`/signal` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.798] - 2026-09-02
 
 ### Added

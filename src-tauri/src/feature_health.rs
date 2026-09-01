@@ -777,6 +777,26 @@ fn probe_slack() -> FeatureHealth {
     }
 }
 
+/// Config-only Signal alerts probe (honest placeholder; REST API not wired; matches `/signal` instant lane).
+fn probe_signal() -> FeatureHealth {
+    let registered = crate::commands::alerts::count_registered_alert_channels("Signal");
+    if registered > 0 {
+        entry(
+            "Signal",
+            HealthStatus::Degraded,
+            Some(format!(
+                "{registered} channel(s) registered · REST API pending"
+            )),
+        )
+    } else {
+        entry(
+            "Signal",
+            HealthStatus::NotConfigured,
+            Some("REST API pending".into()),
+        )
+    }
+}
+
 /// Config-only Telegram alerts probe (bot token + chat id; matches `/telegram` instant lane).
 fn probe_telegram() -> FeatureHealth {
     let token = crate::commands::alerts::get_telegram_bot_token();
@@ -863,6 +883,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         probe_mastodon(),
         probe_telegram(),
         probe_slack(),
+        probe_signal(),
         s,
         i,
         probe_scheduler(),

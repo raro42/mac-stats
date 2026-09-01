@@ -442,6 +442,8 @@
   let opsPerplexityHealthCache = null;
   let opsMastodonHealthCache = null;
   let opsTelegramHealthCache = null;
+  let opsSlackHealthCache = null;
+  let opsSignalHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -3575,6 +3577,341 @@ function wireOpsTelegramAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Slack feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsSlackHealth(slack) {
+    const st = String(slack?.status || '').toLowerCase();
+    const msg = String(slack?.message || '').trim().toLowerCase();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Slack · Not set · add webhook URL';
+    } else if (wash === 'warn' && st === 'degraded' && msg.includes('save again to register')) {
+        glanceLine = 'Slack · Partial · save again to register';
+    } else if (wash === 'warn' && st === 'degraded' && msg.includes('missing webhook')) {
+        glanceLine = 'Slack · Partial · missing webhook';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check config';
+        glanceLine = `Slack · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check config';
+        glanceLine = `Slack · Partial · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Slack · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Slack · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Slack Not set/Partial attention glance under Telegram (feature_health parity).
+ * Visible on every Agent Ops tab when Slack probe is not ok.
+ */
+function ensureOpsSlackAttentionGlance() {
+    ensureOpsTelegramAttentionGlance();
+    const telegramAtt = document.getElementById('ops-telegram-attention-glance');
+    const mastodonAtt = document.getElementById('ops-mastodon-attention-glance');
+    const perplexityAtt = document.getElementById('ops-perplexity-attention-glance');
+    const cursorAtt = document.getElementById('ops-cursor-attention-glance');
+    const mcpAtt = document.getElementById('ops-mcp-attention-glance');
+    const browserAtt = document.getElementById('ops-browser-attention-glance');
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        telegramAtt ||
+        mastodonAtt ||
+        perplexityAtt ||
+        cursorAtt ||
+        mcpAtt ||
+        browserAtt ||
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-slack-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-slack-attention-glance';
+        glance.className = 'ops-slack-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-slack-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsSlackAttentionGlanceClick(glance);
+    } else if (telegramAtt && glance.previousElementSibling !== telegramAtt) {
+        telegramAtt.insertAdjacentElement('afterend', glance);
+    } else if (!telegramAtt && mastodonAtt && glance.previousElementSibling !== mastodonAtt) {
+        mastodonAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsSlackAttentionGlanceState() {
+    const glance = ensureOpsSlackAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-slack-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial');
+        return;
+    }
+    const parsed = parseOpsSlackHealth(opsSlackHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial');
+        return;
+    }
+    const isPartial = parsed.glanceLine.includes('Partial');
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-partial', isPartial);
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured' && !isPartial);
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Slack needs an incoming webhook URL — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Slack not configured — click to open Settings Credentials'
+        );
+    } else if (isPartial) {
+        glance.title = 'Slack needs the webhook saved — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    } else {
+        glance.title = 'Slack probe failed — click to check credentials in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsSlackAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            document.getElementById('slack-webhook-input')?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsSlackAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsSlackAttentionWired === '1') return;
+    glance.dataset.opsSlackAttentionWired = '1';
+    const activate = () => activateOpsSlackAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
+/** Parse Signal feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsSignalHealth(signal) {
+    const st = String(signal?.status || '').toLowerCase();
+    const msg = String(signal?.message || '').trim().toLowerCase();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Signal · Not wired · REST API pending';
+    } else if (wash === 'warn' && st === 'degraded' && msg.includes('channel')) {
+        const m = String(signal?.message || '').match(/(\d+)\s+channel/);
+        const n = m ? m[1] : '?';
+        glanceLine = `Signal · Partial · ${n} channel(s) · REST API pending`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'REST API pending';
+        glanceLine = `Signal · Partial · ${bit}`;
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check config';
+        glanceLine = `Signal · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Signal · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Signal · Not wired · REST API pending';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Signal Not wired/Partial attention glance under Slack (feature_health parity).
+ * Visible on every Agent Ops tab when Signal probe is not ok (REST API not wired yet).
+ */
+function ensureOpsSignalAttentionGlance() {
+    ensureOpsSlackAttentionGlance();
+    const slackAtt = document.getElementById('ops-slack-attention-glance');
+    const telegramAtt = document.getElementById('ops-telegram-attention-glance');
+    const mastodonAtt = document.getElementById('ops-mastodon-attention-glance');
+    const perplexityAtt = document.getElementById('ops-perplexity-attention-glance');
+    const cursorAtt = document.getElementById('ops-cursor-attention-glance');
+    const mcpAtt = document.getElementById('ops-mcp-attention-glance');
+    const browserAtt = document.getElementById('ops-browser-attention-glance');
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        slackAtt ||
+        telegramAtt ||
+        mastodonAtt ||
+        perplexityAtt ||
+        cursorAtt ||
+        mcpAtt ||
+        browserAtt ||
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-signal-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-signal-attention-glance';
+        glance.className = 'ops-signal-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-signal-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsSignalAttentionGlanceClick(glance);
+    } else if (slackAtt && glance.previousElementSibling !== slackAtt) {
+        slackAtt.insertAdjacentElement('afterend', glance);
+    } else if (!slackAtt && telegramAtt && glance.previousElementSibling !== telegramAtt) {
+        telegramAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsSignalAttentionGlanceState() {
+    const glance = ensureOpsSignalAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-signal-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial', 'has-not-wired');
+        return;
+    }
+    const parsed = parseOpsSignalHealth(opsSignalHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial', 'has-not-wired');
+        return;
+    }
+    const isPartial = parsed.glanceLine.includes('Partial');
+    const isNotWired = parsed.glanceLine.includes('Not wired');
+    glance.hidden = false;
+    glance.classList.toggle('has-not-wired', isNotWired);
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured' && !isNotWired);
+    glance.classList.toggle('has-partial', isPartial);
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured' && !isPartial && !isNotWired);
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (isNotWired || parsed.st === 'notconfigured') {
+        glance.title = 'Signal alerts are not wired yet — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Signal not wired — click to open Settings Credentials'
+        );
+    } else if (isPartial) {
+        glance.title = 'Signal REST API is not wired yet — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    } else {
+        glance.title = 'Signal probe failed — click to check Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsSignalAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const note =
+                document.getElementById('signal-settings-note') ||
+                document.getElementById('signal-setting');
+            if (note && typeof note.scrollIntoView === 'function') {
+                try {
+                    note.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } catch (_) {
+                    /* ignore */
+                }
+            }
+            if (note && typeof note.focus === 'function') {
+                try {
+                    if (!note.hasAttribute('tabindex')) note.tabIndex = -1;
+                    note.focus();
+                } catch (_) {
+                    /* ignore */
+                }
+            }
+        }, 80);
+    });
+}
+
+function wireOpsSignalAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsSignalAttentionWired === '1') return;
+    glance.dataset.opsSignalAttentionWired = '1';
+    const activate = () => activateOpsSignalAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -4252,7 +4589,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, slack, signal, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -4380,6 +4717,18 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsTelegramHealthCache = null;
     }
     applyOpsTelegramAttentionGlanceState();
+    if (slack) {
+        opsSlackHealthCache = slack;
+    } else {
+        opsSlackHealthCache = null;
+    }
+    applyOpsSlackAttentionGlanceState();
+    if (signal) {
+        opsSignalHealthCache = signal;
+    } else {
+        opsSignalHealthCache = null;
+    }
+    applyOpsSignalAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -6348,6 +6697,12 @@ async function refreshAgentOps(opts = {}) {
         const telegram = (features || []).find((h) =>
             String(h.name || '').toLowerCase() === 'telegram'
         );
+        const slack = (features || []).find((h) =>
+            String(h.name || '').toLowerCase() === 'slack'
+        );
+        const signal = (features || []).find((h) =>
+            String(h.name || '').toLowerCase() === 'signal'
+        );
         renderOpsHealth({
             version,
             insights,
@@ -6364,6 +6719,8 @@ async function refreshAgentOps(opts = {}) {
             perplexity,
             mastodon,
             telegram,
+            slack,
+            signal,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];
@@ -8639,6 +8996,7 @@ function renderOpsRuns(insights) {
         applyOpsPerplexityAttentionGlanceState();
         applyOpsMastodonAttentionGlanceState();
         applyOpsTelegramAttentionGlanceState();
+        applyOpsSlackAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -8780,6 +9138,7 @@ function renderOpsRuns(insights) {
     applyOpsPerplexityAttentionGlanceState();
     applyOpsMastodonAttentionGlanceState();
     applyOpsTelegramAttentionGlanceState();
+    applyOpsSlackAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -8872,6 +9231,7 @@ function escapeHtml(s) {
     applyOpsPerplexityAttentionGlanceState();
     applyOpsMastodonAttentionGlanceState();
     applyOpsTelegramAttentionGlanceState();
+    applyOpsSlackAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
