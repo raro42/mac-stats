@@ -6,6 +6,7 @@ Overnight Track B kept shipping AI Chat attention glances (design review / `feat
 
 | Version | What |
 |---------|------|
+| **v0.1.786** | AI Chat **Errors · N failed** attention glance (All filter; click → Errors filter) |
 | **v0.1.785** | AI Chat **Filter · You/Assistant/Errors** attention glance (active filter; click → All) |
 | **v0.1.784** | AI Chat **Continue · ask another** attention glance (history; click → composer) |
 | **v0.1.783** | AI Chat **Sending · wait** attention glance (in-flight) |
