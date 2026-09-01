@@ -2,14 +2,18 @@
 
 ## Shipped overnight
 
-**v0.1.796 — Agent Ops Mastodon health attention glance**
+**v0.1.797 — Agent Ops Telegram health attention glance**
 
-When Mastodon is not fully configured, Agent Ops now shows an amber attention strip under Perplexity:
+When Telegram alerts are not fully configured, Agent Ops now shows an amber attention strip under Mastodon:
 
-- **Mastodon · Not set · add URL + token** when both fields are missing
-- **Mastodon · Partial · missing access token** or **missing instance URL** when only one is set
+- **Telegram · Not set · add bot token + chat id** when both fields are missing
+- **Telegram · Partial · missing chat id** or **missing bot token** when only one is set
 
-Click opens Settings → Credentials and focuses the missing field. Backend adds a config-only Mastodon probe to `get_feature_health` (`/mastodon` instant-lane parity).
+Click opens Settings → Credentials and focuses the missing field. Backend adds a config-only Telegram probe to `get_feature_health` (`/telegram` instant-lane parity).
+
+**v0.1.796 — Agent Ops Mastodon health attention glance** (earlier tick)
+
+When Mastodon is not fully configured, Agent Ops shows an amber strip under Perplexity with the same click-to-Settings pattern.
 
 ## Context
 
@@ -19,6 +23,6 @@ Click opens Settings → Credentials and focuses the missing field. Backend adds
 
 ## Next up
 
-- Agent Ops Telegram/Slack health chain (after Mastodon).
+- Agent Ops Slack health chain (after Telegram).
 - Recapture `feature-ai-chat` screenshot when TCC allows.
 - p50 / sibling ports as backlog fuel.

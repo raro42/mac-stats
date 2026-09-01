@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.797** — Agent Ops Telegram health attention glance (**Telegram · Not set · add bot token + chat id** / **Partial · …** from `get_feature_health` config probe under Mastodon; Settings Credentials + `telegram-bot-token-input` / `telegram-chat-id-input`; design review / `feature-agent-ops`).
+
 - **v0.1.796** — Agent Ops Mastodon health attention glance (**Mastodon · Not set · add URL + token** / **Partial · …** from `get_feature_health` config probe under Perplexity; Settings Credentials + `mastodon-url-input` / `mastodon-token-input`; design review / `feature-agent-ops`).
 
 - **v0.1.795** — Agent Ops Perplexity health attention glance (**Perplexity · Not set · add API key** from `get_feature_health` config probe under Cursor; Settings Credentials + `perplexity-api-key-input`; design review / `feature-agent-ops`).
