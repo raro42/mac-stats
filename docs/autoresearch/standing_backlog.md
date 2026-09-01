@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.785** — AI Chat Filter attention glance (You/Assistant/Errors active filter; click → All; design review / `feature-ai-chat`).
+
 - **v0.1.784** — AI Chat Continue · ask another attention glance (history; design review / `feature-ai-chat`).
 
 - **v0.1.783** — AI Chat Sending attention glance (in-flight; design review / `feature-ai-chat`).
