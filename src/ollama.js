@@ -859,6 +859,9 @@ function syncOllamaCollapsedGlance() {
   } else if (status === 'unknown') {
     line = 'Not set · configure URL';
     wash = 'is-offline';
+  } else if (chatSendInFlight) {
+    line = preview ? `Sending · ${preview}` : 'Sending · wait';
+    wash = 'is-active';
   } else if (errCount > 0) {
     const errLabel = errCount === 1 ? '1 failed' : `${errCount} failed`;
     if (turns && preview) {
@@ -870,7 +873,7 @@ function syncOllamaCollapsedGlance() {
   } else if (turns && preview) {
     const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
     line = `${turnLabel} · ${preview}`;
-    wash = chatSendInFlight ? 'is-active' : 'is-online';
+    wash = 'is-online';
   } else if (modelName) {
     line = `Ready · try a starter · ${modelName}`;
     wash = 'is-online';
@@ -897,6 +900,12 @@ function syncOllamaCollapsedGlance() {
       circuit
         ? `${line} — click to expand · ↑ AI Chat icon · ↓ footer`
         : `${line} — click to configure · ↑ AI Chat icon · ↓ footer`
+    );
+  } else if (wash === 'is-active' && chatSendInFlight) {
+    glance.title = `Open AI Chat — reply in flight · ${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand and watch the reply · ↑ AI Chat icon · ↓ footer`
     );
   } else if (wash === 'has-errors') {
     glance.title = `Show AI Chat Errors filter · ${chainHint}`;
@@ -940,6 +949,18 @@ function activateOllamaCollapsedGlance() {
     } else {
       document.getElementById('chat-input')?.focus();
     }
+    return;
+  }
+  if (chatSendInFlight) {
+    const container = document.getElementById('chat-messages');
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+      const last = container.querySelector('.chat-message:last-child');
+      if (last && typeof last.scrollIntoView === 'function') {
+        last.scrollIntoView({ block: 'nearest' });
+      }
+    }
+    document.getElementById('chat-input')?.focus();
     return;
   }
   if (errCount > 0) {
@@ -1190,14 +1211,22 @@ function applyChatTurnGlanceState() {
   }
   glance.hidden = false;
   const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
-  if (text) text.textContent = `${turnLabel} · ${preview}`;
+  if (text) {
+    text.textContent = chatSendInFlight
+      ? `Sending · ${preview}`
+      : `${turnLabel} · ${preview}`;
+  }
   glance.classList.toggle('is-active', chatSendInFlight);
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
-  glance.title = 'Scroll to latest message and focus composer';
+  glance.title = chatSendInFlight
+    ? 'Reply in flight — scroll to latest'
+    : 'Scroll to latest message and focus composer';
   glance.setAttribute(
     'aria-label',
-    `${turnLabel} — last question "${preview}" — scroll to latest`
+    chatSendInFlight
+      ? `Sending reply for "${preview}" — scroll to latest`
+      : `${turnLabel} — last question "${preview}" — scroll to latest`
   );
 }
 
@@ -1725,11 +1754,6 @@ function isChatTrulyEmpty() {
   return !container.querySelector('.chat-message');
 }
 
-/**
- * Connection / model attention glance above AI Chat filters (Errors / Offline parity).
- * Visible when the section is open and Ollama is offline, not configured,
- * connected with no model selected, or Ready with an empty chat (try a starter).
- */
 function ensureChatOfflineAttentionGlance() {
   ensureChatFilterChips();
   const chips = document.getElementById('chat-filter-chips');
@@ -1755,6 +1779,12 @@ function ensureChatOfflineAttentionGlance() {
   return glance;
 }
 
+/**
+ * Connection / model attention glance above AI Chat filters (Errors / Offline parity).
+ * Visible when the section is open and Ollama is offline, not configured,
+ * connected with no model selected, Ready with an empty chat (try a starter),
+ * or a reply is in flight (Sending · wait).
+ */
 function applyChatOfflineAttentionGlanceState() {
   if (isOllamaSectionCollapsed()) {
     const glance = document.getElementById('chat-offline-attention-glance');
@@ -1768,16 +1798,36 @@ function applyChatOfflineAttentionGlanceState() {
   const model = getChatModelGlanceLabel();
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
+
+  const clearModeClasses = () => {
+    glance.classList.remove(
+      'is-offline',
+      'is-not-set',
+      'is-no-model',
+      'is-circuit',
+      'is-ready',
+      'is-sending'
+    );
+  };
+
+  if (chatSendInFlight) {
+    glance.hidden = false;
+    clearModeClasses();
+    glance.classList.add('is-sending');
+    if (text) text.textContent = 'Chat · Sending · wait';
+    glance.title = 'Reply in flight — click to scroll to latest';
+    glance.setAttribute(
+      'aria-label',
+      'AI Chat is sending — click to watch the reply'
+    );
+    return;
+  }
+
   if (status === 'connected') {
     if (model) {
       if (isChatTrulyEmpty()) {
         glance.hidden = false;
-        glance.classList.remove(
-          'is-offline',
-          'is-not-set',
-          'is-no-model',
-          'is-circuit'
-        );
+        clearModeClasses();
         glance.classList.add('is-ready');
         if (text) text.textContent = 'Chat · Ready · try a starter';
         glance.title = 'Ready — click to focus a starter prompt';
@@ -1788,17 +1838,11 @@ function applyChatOfflineAttentionGlanceState() {
         return;
       }
       glance.hidden = true;
-      glance.classList.remove(
-        'is-offline',
-        'is-not-set',
-        'is-no-model',
-        'is-circuit',
-        'is-ready'
-      );
+      clearModeClasses();
       return;
     }
     glance.hidden = false;
-    glance.classList.remove('is-offline', 'is-not-set', 'is-circuit', 'is-ready');
+    clearModeClasses();
     glance.classList.add('is-no-model');
     if (text) text.textContent = 'Chat · No model · pick one';
     glance.title = 'Connected — click to choose an Ollama model';
@@ -1809,7 +1853,7 @@ function applyChatOfflineAttentionGlanceState() {
     return;
   }
   glance.hidden = false;
-  glance.classList.remove('is-no-model', 'is-ready');
+  clearModeClasses();
   const circuit = status === 'error' && !!chatModelGlanceState.circuitOpen;
   glance.classList.toggle('is-circuit', circuit);
   glance.classList.toggle('is-offline', status === 'error' && !circuit);
@@ -1832,7 +1876,6 @@ function applyChatOfflineAttentionGlanceState() {
     }
     return;
   }
-  glance.classList.remove('is-circuit');
   if (text) text.textContent = 'Chat · Not set · configure URL';
   glance.title = 'Click to configure the Ollama URL';
   glance.setAttribute(
@@ -1846,6 +1889,18 @@ function wireChatOfflineAttentionGlanceClick(glance) {
   glance.dataset.chatOfflineAttentionWired = '1';
   const activate = () => {
     ensureOllamaSectionExpanded();
+    if (chatSendInFlight) {
+      const container = document.getElementById('chat-messages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        const last = container.querySelector('.chat-message:last-child');
+        if (last && typeof last.scrollIntoView === 'function') {
+          last.scrollIntoView({ block: 'nearest' });
+        }
+      }
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
     const status = chatModelGlanceState.status || 'unknown';
     if (status === 'connected' && !getChatModelGlanceLabel()) {
       const modelText = document.getElementById('ollama-model-text');
@@ -2273,6 +2328,8 @@ function setChatSendBusy(busy) {
     }
   }
   updateChatClearButton();
+  applyChatOfflineAttentionGlanceState();
+  syncOllamaCollapsedGlance();
 }
 
 /** Brief success flash on Send (save-button-feedback parity). */

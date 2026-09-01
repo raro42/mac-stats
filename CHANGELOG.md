@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.783] - 2026-09-01
+
+### Added
+- **AI Chat Sending attention glance** — While a reply is in flight, AI Chat shows accent **Chat · Sending · wait** above the filters (Ready / Offline parity). Click scrolls to the latest message. Turn glance and collapsed strip say **Sending · …**. Design review / `feature-ai-chat`.
+
 ## [0.1.782] - 2026-09-01
 
 ### Added

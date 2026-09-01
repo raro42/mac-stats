@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.783** — AI Chat Sending attention glance (in-flight; design review / `feature-ai-chat`).
+
 - **v0.1.782** — AI Chat Ready · try a starter attention glance (empty Ready; design review / `feature-ai-chat`).
 
 - **v0.1.781** — AI Chat Circuit-open attention glance (Offline · circuit open; `/ollama` parity; design review / `feature-ai-chat`).
