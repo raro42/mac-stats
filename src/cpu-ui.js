@@ -391,6 +391,7 @@
         closeBtn.focus();
       }
       applySettingsHelpAttentionGlanceState();
+      applySettingsAiAttentionGlanceState();
       applySettingsJudgeAttentionGlanceState();
       applySettingsDownloadsAttentionGlanceState();
       applySettingsOriAttentionGlanceState();
@@ -415,6 +416,7 @@
     if (!settingsModal) return;
     closeSettingsHelpSheet(false);
     applySettingsHelpAttentionGlanceState();
+    applySettingsAiAttentionGlanceState();
     applySettingsJudgeAttentionGlanceState();
     applySettingsDownloadsAttentionGlanceState();
     applySettingsOriAttentionGlanceState();
@@ -2465,6 +2467,99 @@
   }
 
   /**
+   * Local AI agent attention glance in Product settings.
+   * Visible when Settings is open and AI is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsAiAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const aiToggle = document.getElementById("ai-agent-enabled-toggle");
+    const aiLabel = aiToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-ai-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-ai-attention-glance";
+      glance.className = "settings-ai-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-ai-attention-glance-text"></span>';
+      if (aiLabel) {
+        aiLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        wrap.insertAdjacentElement("afterbegin", glance);
+      } else {
+        return null;
+      }
+      wireSettingsAiAttentionGlanceClick(glance);
+    } else if (aiLabel && glance.nextElementSibling !== aiLabel) {
+      aiLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsAiAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById("settings-ai-attention-glance");
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsAiAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById("settings-ai-attention-glance-text");
+    const aiToggle = document.getElementById("ai-agent-enabled-toggle");
+    const enabled = !!(aiToggle && aiToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "AI · Off · enable local AI";
+    glance.title =
+      "Local AI agent is off (monitor-only) — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "AI off — click to focus Enable local AI agent"
+    );
+  }
+
+  function wireSettingsAiAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsAiAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsAiAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById("ai-agent-enabled-toggle");
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -3367,6 +3462,7 @@
         const invoke = getInvoke();
         if (!invoke) return;
         if (aiToggle) aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
+        applySettingsAiAttentionGlanceState();
         if (judgeToggle) {
           judgeToggle.checked = !!(await invoke("get_agent_judge_enabled"));
         }
@@ -3413,6 +3509,7 @@
           if (!invoke) return;
           const v = await invoke("set_ai_agent_enabled", { enabled: aiToggle.checked });
           applyAiUiVisibility(!!v);
+          applySettingsAiAttentionGlanceState();
           flashToggleLabelSaved(aiToggle);
         } catch (e) {
           console.error(e);
@@ -3426,6 +3523,7 @@
           const on = !!ev.payload;
           aiToggle.checked = on;
           applyAiUiVisibility(on);
+          applySettingsAiAttentionGlanceState();
         });
       } catch (_) {
         /* event bridge optional when not in Tauri */
@@ -3630,6 +3728,7 @@
           }
           const msg = await invoke("reset_config_to_monitor_defaults");
           if (aiToggle) aiToggle.checked = false;
+          applySettingsAiAttentionGlanceState();
           if (judgeToggle) judgeToggle.checked = false;
           if (judgeFailureOnlyToggle) judgeFailureOnlyToggle.checked = true;
           syncJudgeFailureOnlyEnabled();
@@ -4618,6 +4717,8 @@
     applySettingsSignalAttentionGlanceState;
   window.applySettingsJudgeAttentionGlanceState =
     applySettingsJudgeAttentionGlanceState;
+  window.applySettingsAiAttentionGlanceState =
+    applySettingsAiAttentionGlanceState;
   window.applySettingsDownloadsAttentionGlanceState =
     applySettingsDownloadsAttentionGlanceState;
   window.applySettingsOriAttentionGlanceState =

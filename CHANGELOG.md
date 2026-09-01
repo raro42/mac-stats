@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.778] - 2026-09-01
+
+### Added
+- **Settings AI Off attention glance** — When Product Settings is open and **Enable local AI agent** is Off, an amber **AI · Off · enable local AI** strip appears above the toggle (Judge / Voice STT glance parity). Click focuses the enable toggle. `/ai` Off cue mentions Settings Product. Reset to monitor defaults still turns AI off (monitor-only).
+
 ## [0.1.777] - 2026-09-01
 
 ### Added

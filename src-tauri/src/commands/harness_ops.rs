@@ -5707,9 +5707,10 @@ pub fn looks_like_ai_agent_ready_request(content: &str) -> bool {
 /// Zero-LLM product AI On / Off chip (`aiAgentEnabled`; config only; does not toggle).
 pub fn format_ai_agent_ready_chip() -> String {
     if crate::config::Config::ai_agent_enabled() {
-        "**AI** · On · Discord · schedules · Ollama tools".to_string()
+        "**AI** · On · Discord · schedules · Ollama tools · Settings Product".to_string()
     } else {
-        "**AI** · Off · monitor-only · Settings or `aiAgentEnabled` true".to_string()
+        "**AI** · Off · monitor-only · enable in Settings Product (or `aiAgentEnabled` true)"
+            .to_string()
     }
 }
 
@@ -6829,7 +6830,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
-• `/ai` · `/ai-agent` — AI On / Off (aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
+• `/ai` · `/ai-agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
