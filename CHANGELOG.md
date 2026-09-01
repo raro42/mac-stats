@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.788] - 2026-09-01
+
+### Added
+- **Perplexity Filter attention glance** — When Top or Snippet filter is active, Perplexity shows a soft accent **Search · Filter · …** strip above the chips (AI Chat Filter parity). Click clears back to All. Collapsed strip says **Filter · …**. Design review polish.
+
 ## [0.1.787] - 2026-09-01
 
 ### Added

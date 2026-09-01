@@ -13291,6 +13291,13 @@ function ensurePerplexityFilterChips() {
   wireFilterChipToolbarKeyboard(wrap);
 }
 
+/** Human label for the active non-All Perplexity filter (Filter attention glance). */
+function perplexityFilterAttentionLabel() {
+  if (perplexityFilterMode === 'top') return 'Top';
+  if (perplexityFilterMode === 'snippet') return 'Snippet';
+  return '';
+}
+
 function setPerplexityFilterMode(mode) {
   const next = mode === 'top' || mode === 'snippet' ? mode : 'all';
   perplexityFilterMode = next;
@@ -13302,6 +13309,7 @@ function setPerplexityFilterMode(mode) {
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   applyPerplexityResultsFilter();
+  applyPerplexityLastGlanceState();
 }
 
 function ensurePerplexityFilterMissState(resultsEl, show) {
@@ -14549,6 +14557,22 @@ function applyPerplexityLastGlanceState() {
     'is-ready'
   );
 
+  const filterLabel = perplexityFilterAttentionLabel();
+  if (filterLabel && perplexityCollapsed) {
+    glance.hidden = false;
+    glance.classList.add('is-ready');
+    if (text) text.textContent = `Filter · ${filterLabel}`;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = `${filterLabel} filter active — click to expand and show All · ↑ → Perplexity icon · ↓ → footer`;
+    glance.setAttribute(
+      'aria-label',
+      `Perplexity ${filterLabel} filter — click to expand and clear · ↑ Perplexity icon · ↓ footer`
+    );
+    applyPerplexityAttentionGlanceState();
+    return;
+  }
+
   if (perplexitySearchBusyForGlance && perplexityLastSearch && perplexityLastSearch.query) {
     const preview = truncatePerplexityGlancePreview(perplexityLastSearch.query, 44);
     glance.hidden = false;
@@ -14750,6 +14774,22 @@ function applyPerplexityAttentionGlanceState() {
   const glance = ensurePerplexityAttentionGlance();
   if (!glance) return;
   const text = document.getElementById('perplexity-attention-glance-text');
+  const filterLabel = perplexityFilterAttentionLabel();
+  if (filterLabel && !perplexityCollapsed && perplexityConfigured) {
+    glance.hidden = false;
+    glance.classList.remove('has-error', 'has-top');
+    glance.classList.add('is-filter');
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (text) text.textContent = `Search · Filter · ${filterLabel}`;
+    glance.title = `${filterLabel} filter active — click to show All`;
+    glance.setAttribute(
+      'aria-label',
+      `Perplexity ${filterLabel} filter — click to clear`
+    );
+    return;
+  }
+  glance.classList.remove('is-filter');
   const last = perplexityLastSearch;
   const n = last ? Number(last.count) || 0 : 0;
   const hasError = !!(last && last.error);
@@ -14795,6 +14835,18 @@ function applyPerplexityAttentionGlanceState() {
 
 function activatePerplexityAttentionGlance() {
   ensurePerplexitySectionExpanded();
+  if (perplexityFilterAttentionLabel()) {
+    setPerplexityFilterMode('all');
+    const queryInput = document.getElementById('perplexity-query');
+    if (queryInput && typeof queryInput.focus === 'function') {
+      try {
+        queryInput.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    return;
+  }
   const last = perplexityLastSearch;
   const queryInput = document.getElementById('perplexity-query');
   const resultsEl = document.getElementById('perplexity-results');
@@ -14848,6 +14900,18 @@ function wirePerplexityLastGlanceClick(glance) {
   glance.dataset.perplexityGlanceWired = '1';
   const activate = () => {
     ensurePerplexitySectionExpanded();
+    if (perplexityFilterAttentionLabel()) {
+      setPerplexityFilterMode('all');
+      const queryInput = document.getElementById('perplexity-query');
+      if (queryInput && typeof queryInput.focus === 'function') {
+        try {
+          queryInput.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      return;
+    }
     if (!perplexityConfigured) {
       const inlineKey = document.getElementById('perplexity-inline-key');
       if (inlineKey && typeof inlineKey.focus === 'function') {

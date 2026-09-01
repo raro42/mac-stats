@@ -6616,6 +6616,12 @@ button.monitor-detail-url.is-just-saved {
   color: color-mix(in srgb, #ff9500 42%, currentColor);
 }
 
+.perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 5.5%, transparent);
+  color: color-mix(in srgb, var(--accent, #007aff) 42%, currentColor);
+}
+
 .perplexity-setup {
   display: flex;
   flex-direction: column;
