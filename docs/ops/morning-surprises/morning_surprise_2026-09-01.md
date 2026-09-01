@@ -6,6 +6,7 @@ Overnight Track B kept shipping Settings / AI Chat attention cues.
 
 | Version | What |
 |---------|------|
+| **v0.1.782** | AI Chat **Ready · try a starter** attention glance (empty Ready; starter chip focus) |
 | **v0.1.781** | AI Chat **Circuit open · retry soon** attention glance (menu-bar ✕ / `/ollama` parity) |
 | **v0.1.780** | AI Chat **No model · pick one** attention glance (Offline parity; `/ollama` cue) |
 | **v0.1.779** | Settings **Compact On** attention glance (Product; `/compact`) |
@@ -17,10 +18,10 @@ Overnight Track B kept shipping Settings / AI Chat attention cues.
 
 ## Why it matters
 
-Empty digester nights still move UX: kill-switches and chat setup gaps are visible in Settings / AI Chat, with one-click focus. Circuit-open no longer looks like a missing URL.
+Empty digester nights still move UX: kill-switches and chat setup gaps are visible in Settings / AI Chat, with one-click focus. Empty Ready chat now points at starter chips instead of a blank pane.
 
 ## Tried / notes
 
 - Digester open stayed empty; design review in grace (`feature-ai-chat` recommended).
-- No discard this window for the Circuit-open glance (verify green).
+- No discard this window for the Ready · try a starter glance (verify green).
 - Screenshot recapture for `feature-ai-chat` still pending TCC/window warm-up when convenient.
