@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.791** — Agent Ops Brave health attention glance (**Brave · Not set / Unavailable** from `get_feature_health` under Ollama; Settings Credentials + `brave-api-key-input`; design review / `feature-agent-ops`).
+
 - **v0.1.790** — Agent Ops Ollama health attention glance (**Ollama · Not set / Offline / Degraded** from `get_feature_health` under Redmine; URL dialog or model picker; design review / `feature-agent-ops`).
 
 - **v0.1.789** — Agent Ops Redmine health attention glance (**Redmine · Not set / Degraded / Unavailable** under Discord when probe not ok; Not set → Settings; else Redmine agent preview; design review / `feature-agent-ops`).

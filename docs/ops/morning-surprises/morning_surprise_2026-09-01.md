@@ -6,6 +6,7 @@ Overnight Track B kept shipping AI Chat + Perplexity + Agent Ops attention glanc
 
 | Version | What |
 |---------|------|
+| **v0.1.791** | Agent Ops **Brave · Not set / Unavailable** health attention glance (`get_feature_health`; Settings Credentials + API key field) |
 | **v0.1.790** | Agent Ops **Ollama · Not set / Offline / Degraded** health attention glance (`get_feature_health`; URL dialog or model picker) |
 | **v0.1.789** | Agent Ops **Redmine · Not set / Degraded / Unavailable** health attention glance (Settings or Redmine agent preview) |
 | **v0.1.788** | Perplexity **Filter · Top/Snippet** attention glance (click → All; collapsed parity) |
