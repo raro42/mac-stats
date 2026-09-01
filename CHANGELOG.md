@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.794] - 2026-09-01
+
+### Added
+- **Agent Ops Cursor health attention glance** — When `get_feature_health` reports Cursor agent Not set, Agent Ops shows an amber **Cursor · Not set · add binary path** strip under MCP. Click opens Settings Credentials and focuses the Cursor binary path field. Adds config-only Cursor probe to feature-health (PATH / Settings path; `/cursor` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.793] - 2026-09-01
 
 ### Added

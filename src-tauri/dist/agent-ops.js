@@ -438,6 +438,7 @@
   let opsBrowserHealthCache = null;
   /** Latest MCP feature-health probe (Agent Ops attention glance). */
   let opsMcpHealthCache = null;
+  let opsCursorHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -2971,6 +2972,144 @@ function wireOpsMcpAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Cursor agent feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsCursorHealth(cursor) {
+    const st = String(cursor?.status || '').toLowerCase();
+    const msg = String(cursor?.message || '').trim();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Cursor · Not set · add binary path';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check binary';
+        glanceLine = `Cursor · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check path';
+        glanceLine = `Cursor · Degraded · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Cursor · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Cursor · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Cursor Not set/Unavailable/Degraded attention glance under MCP (feature_health parity).
+ * Visible on every Agent Ops tab when Cursor agent probe is not ok.
+ */
+function ensureOpsCursorAttentionGlance() {
+    ensureOpsMcpAttentionGlance();
+    const mcpAtt = document.getElementById('ops-mcp-attention-glance');
+    const browserAtt = document.getElementById('ops-browser-attention-glance');
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        mcpAtt ||
+        browserAtt ||
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-cursor-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-cursor-attention-glance';
+        glance.className = 'ops-cursor-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-cursor-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsCursorAttentionGlanceClick(glance);
+    } else if (mcpAtt && glance.previousElementSibling !== mcpAtt) {
+        mcpAtt.insertAdjacentElement('afterend', glance);
+    } else if (!mcpAtt && browserAtt && glance.previousElementSibling !== browserAtt) {
+        browserAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsCursorAttentionGlanceState() {
+    const glance = ensureOpsCursorAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-cursor-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    const parsed = parseOpsCursorHealth(opsCursorHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured');
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Cursor agent needs cursor-agent on PATH or a binary path — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Cursor agent not configured — click to open Settings Credentials'
+        );
+    } else {
+        glance.title = 'Cursor agent probe failed — click to check binary path in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsCursorAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const field = document.getElementById('cursor-agent-executable-input');
+            field?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsCursorAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsCursorAttentionWired === '1') return;
+    glance.dataset.opsCursorAttentionWired = '1';
+    const activate = () => activateOpsCursorAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -3648,7 +3787,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -3752,6 +3891,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsMcpHealthCache = null;
     }
     applyOpsMcpAttentionGlanceState();
+    if (cursor) {
+        opsCursorHealthCache = cursor;
+    } else {
+        opsCursorHealthCache = null;
+    }
+    applyOpsCursorAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -5708,6 +5853,9 @@ async function refreshAgentOps(opts = {}) {
         const mcp = (features || []).find(
             (h) => String(h.name || '').toLowerCase() === 'mcp'
         );
+        const cursor = (features || []).find((h) =>
+            String(h.name || '').toLowerCase().includes('cursor')
+        );
         renderOpsHealth({
             version,
             insights,
@@ -5720,6 +5868,7 @@ async function refreshAgentOps(opts = {}) {
             brave,
             browser,
             mcp,
+            cursor,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];
@@ -7991,6 +8140,7 @@ function renderOpsRuns(insights) {
         applyOpsBraveAttentionGlanceState();
         applyOpsBrowserAttentionGlanceState();
         applyOpsMcpAttentionGlanceState();
+        applyOpsCursorAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -8128,6 +8278,7 @@ function renderOpsRuns(insights) {
     applyOpsBraveAttentionGlanceState();
     applyOpsBrowserAttentionGlanceState();
     applyOpsMcpAttentionGlanceState();
+    applyOpsCursorAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -8216,6 +8367,7 @@ function escapeHtml(s) {
     applyOpsBraveAttentionGlanceState();
     applyOpsBrowserAttentionGlanceState();
     applyOpsMcpAttentionGlanceState();
+    applyOpsCursorAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

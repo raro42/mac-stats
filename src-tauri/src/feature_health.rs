@@ -682,6 +682,28 @@ fn probe_scheduler() -> FeatureHealth {
     )
 }
 
+/// Config-only Cursor agent probe (PATH / Settings path; matches `/cursor` instant lane).
+fn probe_cursor() -> FeatureHealth {
+    if crate::commands::cursor_agent::is_cursor_agent_available() {
+        let bin = crate::commands::cursor_agent::cursor_agent_executable();
+        let bin_short = std::path::Path::new(&bin)
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or(&bin);
+        entry(
+            "Cursor agent",
+            HealthStatus::Ok,
+            Some(format!("`{bin_short}` available")),
+        )
+    } else {
+        entry(
+            "Cursor agent",
+            HealthStatus::NotConfigured,
+            Some("install cursor-agent on PATH or set path in Settings".into()),
+        )
+    }
+}
+
 /// Config-only MCP probe (no live `tools/list`; matches `/mcp` instant lane).
 fn probe_mcp() -> FeatureHealth {
     let url = crate::mcp::mcp_http_url_configured();
@@ -735,6 +757,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         om,
         r,
         probe_mcp(),
+        probe_cursor(),
         s,
         i,
         probe_scheduler(),
