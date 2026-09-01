@@ -2,14 +2,18 @@
 
 ## Shipped overnight
 
+**v0.1.800 — Instant lane: next schedule / next job**
+
+Short asks like `next schedule`, `when is the next job`, and `what's the next schedule` now return the upcoming fire time without Ollama (Discord + AI Chat). Matches Agent Ops **Next schedule** health card parity. Cuts p50 direct latency for common operator schedule checks.
+
 **v0.1.799 — Agent Ops Signal health attention glance**
 
-When Signal alerts are not wired (REST API pending), Agent Ops now shows an amber attention strip under Slack:
+When Signal alerts are not wired (REST API pending), Agent Ops shows an amber attention strip under Slack:
 
 - **Signal · Not wired · REST API pending** when no Signal channels are registered
 - **Signal · Partial · N channel(s) · REST API pending** when channels exist but REST is not wired
 
-Click opens Settings → Credentials and scrolls to the Signal note. Backend adds a config-only Signal probe to `get_feature_health` (`/signal` instant-lane parity).
+Click opens Settings → Credentials and scrolls to the Signal note.
 
 **v0.1.798 — Agent Ops Slack health attention glance** (earlier tick)
 
@@ -23,10 +27,10 @@ Telegram Not set/Partial strip under Mastodon with Settings focus.
 
 - Digester had no open candidates (9 turns, all instant/direct noise filtered).
 - Design review not due (grace on stale screenshots).
-- Debug log clean in the last 3h (1 non-product line filtered).
+- Debug log clean in the last 3h.
 
 ## Next up
 
-- Pivot to `feature-ai-chat` polish or p50 latency patterns.
+- More p50 instant patterns (tool-heavy asks still on direct lane).
 - Recapture `feature-ai-chat` screenshot when TCC allows.
 - Sibling ports (Hermes insights / session UX) as backlog fuel.
