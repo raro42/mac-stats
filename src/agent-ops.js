@@ -432,6 +432,8 @@
   let opsRedmineHealthCache = null;
   /** Latest Ollama feature-health probe (Agent Ops attention glance; distinct from AI Chat live state). */
   let opsOllamaHealthCache = null;
+  /** Latest Brave Search feature-health probe (Agent Ops attention glance). */
+  let opsBraveHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -2551,6 +2553,138 @@ function wireOpsOllamaAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Brave Search feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsBraveHealth(brave) {
+    const st = String(brave?.status || '').toLowerCase();
+    const msg = String(brave?.message || '').trim();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Brave · Not set · add API key';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check API key';
+        glanceLine = `Brave · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check quota';
+        glanceLine = `Brave · Degraded · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Brave · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Brave · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Brave Not set/Unavailable/Degraded attention glance under Ollama (feature_health parity).
+ * Visible on every Agent Ops tab when Brave Search probe is not ok.
+ */
+function ensureOpsBraveAttentionGlance() {
+    ensureOpsOllamaAttentionGlance();
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-brave-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-brave-attention-glance';
+        glance.className = 'ops-brave-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-brave-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsBraveAttentionGlanceClick(glance);
+    } else if (ollamaAtt && glance.previousElementSibling !== ollamaAtt) {
+        ollamaAtt.insertAdjacentElement('afterend', glance);
+    } else if (!ollamaAtt && redmineAtt && glance.previousElementSibling !== redmineAtt) {
+        redmineAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsBraveAttentionGlanceState() {
+    const glance = ensureOpsBraveAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-brave-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    const parsed = parseOpsBraveHealth(opsBraveHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured');
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Brave Search needs an API key — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Brave Search not configured — click to open Settings Credentials'
+        );
+    } else {
+        glance.title = 'Brave Search probe failed — click to check API key in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsBraveAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const field = document.getElementById('brave-api-key-input');
+            field?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsBraveAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsBraveAttentionWired === '1') return;
+    glance.dataset.opsBraveAttentionWired = '1';
+    const activate = () => activateOpsBraveAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -3228,7 +3362,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -3314,6 +3448,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsOllamaHealthCache = null;
     }
     applyOpsOllamaAttentionGlanceState();
+    if (brave) {
+        opsBraveHealthCache = brave;
+    } else {
+        opsBraveHealthCache = null;
+    }
+    applyOpsBraveAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -5261,6 +5401,9 @@ async function refreshAgentOps(opts = {}) {
         const ollama = (features || []).find(
             (h) => String(h.name || '').toLowerCase() === 'ollama'
         );
+        const brave = (features || []).find((h) =>
+            String(h.name || '').toLowerCase().includes('brave')
+        );
         renderOpsHealth({
             version,
             insights,
@@ -5270,6 +5413,7 @@ async function refreshAgentOps(opts = {}) {
             live,
             redmine,
             ollama,
+            brave,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];
@@ -7538,6 +7682,7 @@ function renderOpsRuns(insights) {
         applyOpsDiscordAttentionGlanceState();
         applyOpsRedmineAttentionGlanceState();
         applyOpsOllamaAttentionGlanceState();
+        applyOpsBraveAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7672,6 +7817,7 @@ function renderOpsRuns(insights) {
     applyOpsDiscordAttentionGlanceState();
     applyOpsRedmineAttentionGlanceState();
     applyOpsOllamaAttentionGlanceState();
+    applyOpsBraveAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -7757,6 +7903,7 @@ function escapeHtml(s) {
     applyOpsDiscordAttentionGlanceState();
     applyOpsRedmineAttentionGlanceState();
     applyOpsOllamaAttentionGlanceState();
+    applyOpsBraveAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
