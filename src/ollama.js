@@ -881,6 +881,23 @@ function syncOllamaCollapsedGlance() {
       line = `Errors · ${errLabel}`;
     }
     wash = 'has-errors';
+  } else if (status === 'connected' && modelName) {
+    const answer = getLastAssistantAnswerText();
+    const answerPreview = getChatAnswerGlancePreview();
+    if (answer && answerPreview && !isChatErrorText(answer)) {
+      line = `Last answer · ${answerPreview}`;
+      wash = 'is-online';
+    } else if (turns && preview) {
+      const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
+      line = `${turnLabel} · ${preview}`;
+      wash = 'is-online';
+    } else if (modelName && !turns) {
+      line = `Ready · try a starter · ${modelName}`;
+      wash = 'is-online';
+    } else {
+      line = 'Ready · pick a model';
+      wash = 'is-online';
+    }
   } else if (turns && preview) {
     const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
     line = `${turnLabel} · ${preview}`;
@@ -923,6 +940,12 @@ function syncOllamaCollapsedGlance() {
     glance.setAttribute(
       'aria-label',
       `${line} — click to expand and show Errors · ↑ AI Chat icon · ↓ footer`
+    );
+  } else if (line.startsWith('Last answer ·')) {
+    glance.title = `Copy last answer · ${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand and copy last answer · ↑ AI Chat icon · ↓ footer`
     );
   } else if (turns && preview) {
     glance.title = `Show AI Chat and focus composer · ${chainHint}`;
@@ -1320,6 +1343,26 @@ async function copyChatTextToClipboard(text) {
   }
 }
 
+function flashChatAttentionLastAnswerCopied(glance) {
+  if (!glance) return;
+  const text = document.getElementById('chat-offline-attention-glance-text');
+  if (glance._attentionCopiedTimer) {
+    clearTimeout(glance._attentionCopiedTimer);
+    glance._attentionCopiedTimer = null;
+  }
+  const prev = text ? text.textContent : '';
+  glance.classList.add('is-just-copied');
+  if (text) text.textContent = 'Chat · Copied';
+  glance.title = 'Copied last answer';
+  glance.setAttribute('aria-label', 'Copied last answer');
+  glance._attentionCopiedTimer = setTimeout(() => {
+    glance.classList.remove('is-just-copied');
+    glance._attentionCopiedTimer = null;
+    applyChatOfflineAttentionGlanceState();
+    if (text && prev) text.textContent = prev;
+  }, 1600);
+}
+
 function flashChatAnswerGlanceCopied(glance) {
   if (!glance) return;
   const text = document.getElementById('chat-answer-glance-text');
@@ -1336,6 +1379,7 @@ function flashChatAnswerGlanceCopied(glance) {
     glance.classList.remove('is-just-copied');
     glance._answerCopiedTimer = null;
     applyChatAnswerGlanceState();
+    applyChatOfflineAttentionGlanceState();
     if (text && !text.textContent) text.textContent = prev;
   }, 1600);
 }
@@ -1794,7 +1838,8 @@ function ensureChatOfflineAttentionGlance() {
  * Connection / model attention glance above AI Chat filters (Errors / Offline parity).
  * Visible when the section is open and Ollama is offline, not configured,
  * connected with no model selected, Ready with an empty chat (try a starter),
- * Continue with history (ask another), failed turns when filter is All (Errors · …),
+ * Continue with history (ask another), a successful last answer (copy),
+ * failed turns when filter is All (Errors · …),
  * a non-All filter is active (Filter · …), or a reply is in flight (Sending · wait).
  */
 function applyChatOfflineAttentionGlanceState() {
@@ -1821,9 +1866,14 @@ function applyChatOfflineAttentionGlanceState() {
       'is-continue',
       'is-sending',
       'is-filter',
-      'is-errors'
+      'is-errors',
+      'is-last-answer'
     );
   };
+
+  if (glance.classList.contains('is-just-copied') && glance._attentionCopiedTimer) {
+    return;
+  }
 
   if (chatSendInFlight) {
     glance.hidden = false;
@@ -1878,6 +1928,20 @@ function applyChatOfflineAttentionGlanceState() {
         glance.setAttribute(
           'aria-label',
           'AI Chat ready — click to try a starter'
+        );
+        return;
+      }
+      const answer = getLastAssistantAnswerText();
+      const answerPreview = getChatAnswerGlancePreview();
+      if (answer && answerPreview && !isChatErrorText(answer)) {
+        glance.hidden = false;
+        clearModeClasses();
+        glance.classList.add('is-last-answer');
+        if (text) text.textContent = `Chat · Last answer · ${answerPreview}`;
+        glance.title = 'Copy last answer';
+        glance.setAttribute(
+          'aria-label',
+          `Copy last answer: ${answerPreview}`
         );
         return;
       }
@@ -1991,6 +2055,18 @@ function wireChatOfflineAttentionGlanceClick(glance) {
       return;
     }
     if (status === 'connected' && getChatModelGlanceLabel() && !isChatTrulyEmpty()) {
+      const answer = getLastAssistantAnswerText();
+      if (answer && !isChatErrorText(answer)) {
+        copyChatTextToClipboard(answer).then((ok) => {
+          if (ok) {
+            const g = document.getElementById('chat-offline-attention-glance');
+            flashChatAttentionLastAnswerCopied(g);
+            const answerGlance = document.getElementById('chat-answer-glance');
+            if (answerGlance) flashChatAnswerGlanceCopied(answerGlance);
+          }
+        });
+        return;
+      }
       const container = document.getElementById('chat-messages');
       if (container) {
         container.scrollTop = container.scrollHeight;

@@ -3917,6 +3917,18 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
+.chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 32%, transparent);
+  background: color-mix(in srgb, #34c759 8%, transparent);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
+}
+
+.chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 42%, transparent);
+  background: color-mix(in srgb, #34c759 14%, transparent);
+  color: color-mix(in srgb, #34c759 62%, currentColor);
+}
+
 /* AI Chat — All · You · Assistant (Monitors All/Up/Down parity) */
 .chat-filter-chips {
   display: flex;

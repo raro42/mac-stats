@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.787] - 2026-09-01
+
+### Added
+- **AI Chat Last answer attention glance** — When AI Chat has a successful last reply (All filter, no errors), a green **Chat · Last answer · …** strip appears above the chips (Continue parity; last-answer glance parity). Click copies the reply. Collapsed strip says **Last answer · …**. Design review / `feature-ai-chat`.
+
 ## [0.1.786] - 2026-09-01
 
 ### Added
