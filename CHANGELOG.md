@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.796] - 2026-09-02
+
+### Added
+- **Agent Ops Mastodon health attention glance** — When `get_feature_health` reports Mastodon Not set or Partial, Agent Ops shows an amber **Mastodon · Not set · add URL + token** or **Partial · …** strip under Perplexity. Click opens Settings Credentials and focuses the missing Mastodon field. Adds config-only Mastodon probe to feature-health (`/mastodon` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.795] - 2026-09-01
 
 ### Added

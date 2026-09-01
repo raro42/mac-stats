@@ -721,6 +721,34 @@ fn probe_perplexity() -> FeatureHealth {
     }
 }
 
+/// Config-only Mastodon probe (instance URL + token; matches `/mastodon` instant lane).
+fn probe_mastodon() -> FeatureHealth {
+    let url = crate::commands::reply_helpers::get_mastodon_instance_url();
+    let token = crate::commands::reply_helpers::get_mastodon_access_token();
+    match (url.as_deref(), token.as_deref()) {
+        (Some(_), Some(_)) => entry(
+            "Mastodon",
+            HealthStatus::Ok,
+            Some("instance URL + access token configured".into()),
+        ),
+        (None, None) => entry(
+            "Mastodon",
+            HealthStatus::NotConfigured,
+            Some("add instance URL + access token".into()),
+        ),
+        (Some(_), None) => entry(
+            "Mastodon",
+            HealthStatus::Degraded,
+            Some("URL set · missing access token".into()),
+        ),
+        (None, Some(_)) => entry(
+            "Mastodon",
+            HealthStatus::Degraded,
+            Some("token set · missing instance URL".into()),
+        ),
+    }
+}
+
 /// Config-only MCP probe (no live `tools/list`; matches `/mcp` instant lane).
 fn probe_mcp() -> FeatureHealth {
     let url = crate::mcp::mcp_http_url_configured();
@@ -776,6 +804,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         probe_mcp(),
         probe_cursor(),
         probe_perplexity(),
+        probe_mastodon(),
         s,
         i,
         probe_scheduler(),
