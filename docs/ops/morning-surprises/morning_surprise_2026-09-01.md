@@ -6,6 +6,7 @@ Overnight Track B kept shipping AI Chat + Perplexity + Agent Ops attention glanc
 
 | Version | What |
 |---------|------|
+| **v0.1.794** | Agent Ops **Cursor · Not set · add binary path** health attention glance (`get_feature_health` config probe; Settings Credentials + Cursor binary field) |
 | **v0.1.793** | Agent Ops **MCP · Not set · add URL or stdio** health attention glance (`get_feature_health` config probe; Settings Credentials + MCP URL field) |
 | **v0.1.792** | Agent Ops **Browser · Not set / Unavailable / Degraded** health attention glance (`get_feature_health`; Settings Credentials + Chromium path field) |
 | **v0.1.791** | Agent Ops **Brave · Not set / Unavailable** health attention glance (`get_feature_health`; Settings Credentials + API key field) |
