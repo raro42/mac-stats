@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.793** — Agent Ops MCP health attention glance (**MCP · Not set · add URL or stdio** from `get_feature_health` config probe under Browser; Settings Credentials + `mcp-url-input`; design review / `feature-agent-ops`).
+
 - **v0.1.792** — Agent Ops Browser health attention glance (**Browser · Not set / Unavailable / Degraded** from `get_feature_health` under Brave; Settings Credentials + `browser-chromium-path-input`; design review / `feature-agent-ops`).
 
 - **v0.1.791** — Agent Ops Brave health attention glance (**Brave · Not set / Unavailable** from `get_feature_health` under Ollama; Settings Credentials + `brave-api-key-input`; design review / `feature-agent-ops`).
