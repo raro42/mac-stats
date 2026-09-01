@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.787** — AI Chat Last answer attention glance (Chat · Last answer · preview when successful reply; click copies; collapsed parity; design review / `feature-ai-chat`).
+
 - **v0.1.786** — AI Chat Errors attention glance (Chat · Errors · N failed when All; click → Errors filter; collapsed parity; design review / `feature-ai-chat`).
 
 - **v0.1.785** — AI Chat Filter attention glance (You/Assistant/Errors active filter; click → All; design review / `feature-ai-chat`).
