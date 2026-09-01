@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.784] - 2026-09-01
+
+### Added
+- **AI Chat Continue attention glance** — When AI Chat is open, Ollama is connected with a model, and the chat has turns, a soft accent **Chat · Continue · ask another** strip appears above the filters (Ready / Sending parity). Click scrolls to the latest message and focuses the composer. Design review / `feature-ai-chat`.
+
 ## [0.1.783] - 2026-09-01
 
 ### Added

@@ -1783,7 +1783,7 @@ function ensureChatOfflineAttentionGlance() {
  * Connection / model attention glance above AI Chat filters (Errors / Offline parity).
  * Visible when the section is open and Ollama is offline, not configured,
  * connected with no model selected, Ready with an empty chat (try a starter),
- * or a reply is in flight (Sending · wait).
+ * Continue with history (ask another), or a reply is in flight (Sending · wait).
  */
 function applyChatOfflineAttentionGlanceState() {
   if (isOllamaSectionCollapsed()) {
@@ -1806,6 +1806,7 @@ function applyChatOfflineAttentionGlanceState() {
       'is-no-model',
       'is-circuit',
       'is-ready',
+      'is-continue',
       'is-sending'
     );
   };
@@ -1837,8 +1838,17 @@ function applyChatOfflineAttentionGlanceState() {
         );
         return;
       }
-      glance.hidden = true;
+      const turns = countChatTurns();
+      const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
+      glance.hidden = false;
       clearModeClasses();
+      glance.classList.add('is-continue');
+      if (text) text.textContent = 'Chat · Continue · ask another';
+      glance.title = `${turnLabel} — click to focus the composer`;
+      glance.setAttribute(
+        'aria-label',
+        `AI Chat has ${turnLabel} — click to ask another`
+      );
       return;
     }
     glance.hidden = false;
@@ -1914,6 +1924,18 @@ function wireChatOfflineAttentionGlanceClick(glance) {
     if (status === 'connected' && isChatTrulyEmpty()) {
       ensureChatEmptyHint();
       if (focusChatEmptySuggestionFirst()) return;
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
+    if (status === 'connected' && getChatModelGlanceLabel() && !isChatTrulyEmpty()) {
+      const container = document.getElementById('chat-messages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        const last = container.querySelector('.chat-message:last-child');
+        if (last && typeof last.scrollIntoView === 'function') {
+          last.scrollIntoView({ block: 'nearest' });
+        }
+      }
       document.getElementById('chat-input')?.focus();
       return;
     }
