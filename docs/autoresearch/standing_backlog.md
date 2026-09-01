@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.777** — Settings Discord voice STT toggle + Off attention glance (Product; `/voice` mentions Settings).
+
 - **v0.1.776** — Settings Having fun / idle thoughts toggle + Off attention glance (Product; `/having_fun` mentions Settings).
 
 - **v0.1.775** — Settings Ori Mnemos lifecycle toggle + Off attention glance (Product; `/ori` mentions Settings).

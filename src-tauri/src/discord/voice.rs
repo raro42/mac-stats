@@ -308,6 +308,9 @@ pub(super) async fn maybe_augment_content_with_voice_transcript(
     msg: &Message,
     content: &str,
 ) -> Option<String> {
+    if !crate::config::Config::discord_voice_stt_enabled() {
+        return None;
+    }
     if !message_has_voice_or_audio(msg) {
         return None;
     }

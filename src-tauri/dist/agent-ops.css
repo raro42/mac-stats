@@ -7389,6 +7389,54 @@ button.is-just-saved,
   color: color-mix(in srgb, #ff9500 55%, currentColor);
 }
 
+/* Settings Product — Voice STT Off attention glance (Having fun parity) */
+.settings-voice-stt-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.settings-voice-stt-attention-glance[hidden] {
+  display: none !important;
+}
+
+.settings-voice-stt-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.settings-voice-stt-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.settings-voice-stt-attention-glance.is-off {
+  border-color: color-mix(in srgb, #ff9500 38%, transparent);
+  background: color-mix(in srgb, #ff9500 10%, transparent);
+  color: color-mix(in srgb, #ff9500 55%, currentColor);
+}
+
 #slack-save.is-just-saved {
   background: rgba(52, 199, 89, 0.95) !important;
   border-color: transparent !important;

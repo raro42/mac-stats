@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.777] - 2026-09-01
+
+### Added
+- **Settings Discord voice STT toggle + Off attention glance** — Product now has **Enable Discord voice STT** (`discordVoiceSttEnabled` in `config.json`; env `MAC_STATS_DISCORD_VOICE_STT_ENABLED`). Missing key stays **On** so existing voice notes keep working. When off, a **Voice · Off · enable voice STT** amber strip appears above the toggle (Having fun glance parity). Click focuses the enable toggle. Discord voice transcription pauses while Off. `/voice` Off cue mentions Settings Product. Reset to monitor defaults turns voice STT off.
+
 ## [0.1.776] - 2026-09-01
 
 ### Added

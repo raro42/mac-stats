@@ -333,6 +333,8 @@ fn run_internal(open_cpu_window: bool) {
             metrics::set_ori_lifecycle_enabled,
             metrics::get_having_fun_enabled,
             metrics::set_having_fun_enabled,
+            metrics::get_discord_voice_stt_enabled,
+            metrics::set_discord_voice_stt_enabled,
             metrics::get_menu_bar_compact,
             metrics::set_menu_bar_compact,
             metrics::get_cpu_window_compact,

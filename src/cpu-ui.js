@@ -395,6 +395,7 @@
       applySettingsDownloadsAttentionGlanceState();
       applySettingsOriAttentionGlanceState();
       applySettingsHavingFunAttentionGlanceState();
+      applySettingsVoiceSttAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -418,6 +419,7 @@
     applySettingsDownloadsAttentionGlanceState();
     applySettingsOriAttentionGlanceState();
     applySettingsHavingFunAttentionGlanceState();
+    applySettingsVoiceSttAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -774,6 +776,7 @@
       "downloads-organizer-enabled-toggle",
       "ori-lifecycle-enabled-toggle",
       "having-fun-enabled-toggle",
+      "discord-voice-stt-enabled-toggle",
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
@@ -2354,6 +2357,114 @@
   }
 
   /**
+   * Discord voice STT attention glance in Product settings.
+   * Visible when Settings is open and voice STT is Off — click focuses the enable toggle.
+   */
+  function ensureSettingsVoiceSttAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const voiceToggle = document.getElementById(
+      "discord-voice-stt-enabled-toggle"
+    );
+    const voiceLabel = voiceToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-voice-stt-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-voice-stt-attention-glance";
+      glance.className = "settings-voice-stt-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-voice-stt-attention-glance-text"></span>';
+      if (voiceLabel) {
+        voiceLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        const funNote = document.getElementById("having-fun-settings-note");
+        if (funNote) {
+          funNote.insertAdjacentElement("afterend", glance);
+        } else {
+          wrap.insertAdjacentElement("beforeend", glance);
+        }
+      } else {
+        return null;
+      }
+      wireSettingsVoiceSttAttentionGlanceClick(glance);
+    } else if (voiceLabel && glance.nextElementSibling !== voiceLabel) {
+      voiceLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsVoiceSttAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-voice-stt-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsVoiceSttAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-voice-stt-attention-glance-text"
+    );
+    const voiceToggle = document.getElementById(
+      "discord-voice-stt-enabled-toggle"
+    );
+    const enabled = !!(voiceToggle && voiceToggle.checked);
+    if (enabled) {
+      glance.hidden = true;
+      glance.classList.remove("is-off");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-off");
+    if (text) text.textContent = "Voice · Off · enable voice STT";
+    glance.title =
+      "Discord voice STT is off — click to focus the enable toggle";
+    glance.setAttribute(
+      "aria-label",
+      "Voice STT off — click to focus Enable Discord voice STT"
+    );
+  }
+
+  function wireSettingsVoiceSttAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsVoiceSttAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsVoiceSttAttentionWired = "1";
+    const activate = () => {
+      const toggle = document.getElementById(
+        "discord-voice-stt-enabled-toggle"
+      );
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -3215,6 +3326,9 @@
     );
     const oriToggle = document.getElementById("ori-lifecycle-enabled-toggle");
     const havingFunToggle = document.getElementById("having-fun-enabled-toggle");
+    const voiceSttToggle = document.getElementById(
+      "discord-voice-stt-enabled-toggle"
+    );
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
     const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
@@ -3227,6 +3341,7 @@
       !downloadsToggle &&
       !oriToggle &&
       !havingFunToggle &&
+      !voiceSttToggle &&
       !compactToggle &&
       !cpuWindowCompactToggle &&
       !helpBtn &&
@@ -3275,6 +3390,12 @@
           havingFunToggle.checked = !!(await invoke("get_having_fun_enabled"));
         }
         applySettingsHavingFunAttentionGlanceState();
+        if (voiceSttToggle) {
+          voiceSttToggle.checked = !!(await invoke(
+            "get_discord_voice_stt_enabled"
+          ));
+        }
+        applySettingsVoiceSttAttentionGlanceState();
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
@@ -3390,6 +3511,22 @@
         }
       });
     }
+    if (voiceSttToggle) {
+      voiceSttToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_discord_voice_stt_enabled", {
+            enabled: !!voiceSttToggle.checked,
+          });
+          applySettingsVoiceSttAttentionGlanceState();
+          flashToggleLabelSaved(voiceSttToggle);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save discordVoiceSttEnabled: " + e);
+        }
+      });
+    }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {
         try {
@@ -3431,12 +3568,13 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, oriLifecycleEnabled, havingFunEnabled, menuBarCompact, cpuWindowCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, agentJudgeEnabled, agentJudgeOnFailureOnly, downloadsOrganizerEnabled, oriLifecycleEnabled, havingFunEnabled, discordVoiceSttEnabled, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
             "Judge: optional post-run check — Settings Product or /judge",
             "Downloads organizer: Settings Product or /downloads (dry-run default)",
             "Ori Mnemos lifecycle: Settings Product or /ori (needs ORI_VAULT)",
             "Having fun / idle thoughts: Settings Product or /having_fun (discord_channels.json)",
+            "Discord voice STT: Settings Product or /voice (Ollama + ffmpeg)",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -3502,6 +3640,8 @@
           applySettingsOriAttentionGlanceState();
           if (havingFunToggle) havingFunToggle.checked = false;
           applySettingsHavingFunAttentionGlanceState();
+          if (voiceSttToggle) voiceSttToggle.checked = false;
+          applySettingsVoiceSttAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
@@ -4484,6 +4624,8 @@
     applySettingsOriAttentionGlanceState;
   window.applySettingsHavingFunAttentionGlanceState =
     applySettingsHavingFunAttentionGlanceState;
+  window.applySettingsVoiceSttAttentionGlanceState =
+    applySettingsVoiceSttAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

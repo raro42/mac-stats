@@ -6834,7 +6834,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
-• `/voice` · `/stt` — Discord voice STT Ready / Partial / Not set (model · ffmpeg · Ollama config; no transcribe)\n\
+• `/voice` · `/stt` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; no transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -10741,7 +10741,8 @@ mod tests {
         assert!(
             voice_chip.contains("Ready")
                 || voice_chip.contains("Partial")
-                || voice_chip.contains("Not set"),
+                || voice_chip.contains("Not set")
+                || voice_chip.contains("Off"),
             "{voice_chip}"
         );
         let ai_chip = format_ai_agent_ready_chip();

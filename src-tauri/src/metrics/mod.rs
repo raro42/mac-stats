@@ -1357,6 +1357,17 @@ pub fn set_having_fun_enabled(enabled: bool) -> Result<bool, String> {
 }
 
 #[tauri::command]
+pub fn get_discord_voice_stt_enabled() -> bool {
+    crate::config::Config::discord_voice_stt_enabled()
+}
+
+#[tauri::command]
+pub fn set_discord_voice_stt_enabled(enabled: bool) -> Result<bool, String> {
+    crate::config::Config::set_discord_voice_stt_enabled(enabled)?;
+    Ok(crate::config::Config::discord_voice_stt_enabled())
+}
+
+#[tauri::command]
 pub fn get_menu_bar_compact() -> bool {
     crate::config::Config::menu_bar_compact()
 }

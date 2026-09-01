@@ -694,6 +694,10 @@ pub fn format_having_fun_ready_chip() -> String {
 
 /// Zero-LLM Discord voice STT Ready chip (model + ffmpeg path + Ollama config; no transcribe / no live Ollama).
 pub fn format_voice_stt_ready_chip() -> String {
+    if !crate::config::Config::discord_voice_stt_enabled() {
+        return "**Voice** · Off · enable in Settings Product (or `discordVoiceSttEnabled` / `MAC_STATS_DISCORD_VOICE_STT_ENABLED`)"
+            .to_string();
+    }
     let model = crate::config::Config::discord_voice_model();
     let model_short = if model.chars().count() > 28 {
         let mut s: String = model.chars().take(25).collect();
@@ -720,7 +724,9 @@ pub fn format_voice_stt_ready_chip() -> String {
     } else {
         "Not set"
     };
-    format!("**Voice** · {state} · `{model_short}` · {ffmpeg} · {ollama} (config only)")
+    format!(
+        "**Voice** · {state} · `{model_short}` · {ffmpeg} · {ollama} · Settings Product (config only)"
+    )
 }
 
 /// True if the given Discord channel is configured as having_fun. Used by session compactor to avoid inventing task/platform context for casual chat.
@@ -3625,14 +3631,16 @@ impl EventHandler for Handler {
             content = DISCORD_IMAGE_ONLY_PROMPT.to_string();
         }
         // Discord voice notes: empty text + audio attachment — transcribe via local Ollama (gemma4).
-        if voice::message_has_voice_or_audio(&new_message) {
+        if crate::config::Config::discord_voice_stt_enabled()
+            && voice::message_has_voice_or_audio(&new_message)
+        {
             // Transcription can take several seconds; show typing so the channel isn't silent.
             let _ = new_message.channel_id.broadcast_typing(&ctx).await;
-        }
-        if let Some(augmented) =
-            voice::maybe_augment_content_with_voice_transcript(&new_message, &content).await
-        {
-            content = augmented;
+            if let Some(augmented) =
+                voice::maybe_augment_content_with_voice_transcript(&new_message, &content).await
+            {
+                content = augmented;
+            }
         }
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");

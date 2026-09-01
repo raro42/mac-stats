@@ -626,6 +626,7 @@ impl Config {
         obj.insert("downloadsOrganizerEnabled".into(), json!(false));
         obj.insert("oriLifecycleEnabled".into(), json!(false));
         obj.insert("havingFunEnabled".into(), json!(false));
+        obj.insert("discordVoiceSttEnabled".into(), json!(false));
         obj.insert("menuBarCompact".into(), json!(true));
         obj.insert("windowDecorations".into(), json!(true));
         // Leave Discord tokens / .config.env alone — only config.json toggles.
@@ -2162,6 +2163,36 @@ impl Config {
     /// Persist `havingFunEnabled` in `~/.mac-stats/config.json`.
     pub fn set_having_fun_enabled(enabled: bool) -> Result<(), String> {
         Self::merge_config_bool("havingFunEnabled", enabled)
+    }
+
+    /// Master gate for Discord voice-note STT (ffmpeg + Ollama transcript).
+    /// Config: `discordVoiceSttEnabled` (bool). Env: `MAC_STATS_DISCORD_VOICE_STT_ENABLED`.
+    /// Missing key defaults to **true** (existing voice notes keep working).
+    /// Reset to monitor defaults writes **false**.
+    pub fn discord_voice_stt_enabled() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_DISCORD_VOICE_STT_ENABLED") {
+            let l = s.to_lowercase();
+            if matches!(l.as_str(), "1" | "true" | "yes" | "on") {
+                return true;
+            }
+            if matches!(l.as_str(), "0" | "false" | "no" | "off") {
+                return false;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json.get("discordVoiceSttEnabled").and_then(|v| v.as_bool()) {
+                    return b;
+                }
+            }
+        }
+        true
+    }
+
+    /// Persist `discordVoiceSttEnabled` in `~/.mac-stats/config.json`.
+    pub fn set_discord_voice_stt_enabled(enabled: bool) -> Result<(), String> {
+        Self::merge_config_bool("discordVoiceSttEnabled", enabled)
     }
 
     /// Vault root (must contain `.ori`). Env: `MAC_STATS_ORI_VAULT` or `ORI_VAULT`.
