@@ -6,6 +6,7 @@ Overnight Track B kept shipping AI Chat + Perplexity + Agent Ops attention glanc
 
 | Version | What |
 |---------|------|
+| **v0.1.792** | Agent Ops **Browser · Not set / Unavailable / Degraded** health attention glance (`get_feature_health`; Settings Credentials + Chromium path field) |
 | **v0.1.791** | Agent Ops **Brave · Not set / Unavailable** health attention glance (`get_feature_health`; Settings Credentials + API key field) |
 | **v0.1.790** | Agent Ops **Ollama · Not set / Offline / Degraded** health attention glance (`get_feature_health`; URL dialog or model picker) |
 | **v0.1.789** | Agent Ops **Redmine · Not set / Degraded / Unavailable** health attention glance (Settings or Redmine agent preview) |
@@ -30,5 +31,6 @@ Overnight Track B kept shipping AI Chat + Perplexity + Agent Ops attention glanc
 ## Still open
 
 - Recapture stale `feature-ai-chat.png` / `feature-agent-ops.png` when TCC / window free.
+- Agent Ops MCP health attention glance (Browser shipped in v0.1.792).
 - Sibling ports / p50 tool-heavy patterns / Signal REST when ready.
 - Watch idle-thought Discord timeout WARNs after v0.1.703 retry.
