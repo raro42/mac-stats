@@ -1,28 +1,26 @@
 # Morning surprise — 2026-09-01
 
-Overnight Track B (20:00–06:00) kept shipping Settings Product kill switches, Off glances, then Compact On discoverability.
+Overnight Track B kept shipping Settings / AI Chat attention cues.
 
-## Shipped tonight (latest first)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.779** | Settings **Compact On** attention glance — **Compact · Menu / Window · expand for full UI** amber strip when Product open and either compact toggle is On; click → first On toggle; `/compact` On cue → expand in Settings Product |
-| **v0.1.778** | Settings **AI Off** attention glance — **AI · Off · enable local AI** amber strip when Product open and AI off; click → enable toggle; `/ai` → Settings Product |
-| **v0.1.777** | Settings **Discord voice STT** toggle + **Voice · Off · enable voice STT** amber glance; Discord transcription pauses when Off; `/voice` Off cue → Settings Product |
-| **v0.1.776** | Settings **Having fun / idle thoughts** toggle + Off glance; Discord idle thoughts pause when Off; `/having_fun` → Settings |
-| **v0.1.775** | Settings **Ori Mnemos lifecycle** toggle + Off glance; `/ori` → Settings |
-| **v0.1.774** | Settings **Downloads organizer** toggle + Off glance; `/downloads` → Settings |
-| **v0.1.773** | Settings **Judge** toggles + Off glance; `/judge` → Settings |
-| **v0.1.772** | Settings **Signal** honest placeholder (Not wired); `/signal` → Settings |
-| **v0.1.771** | Settings **Slack** webhook + Not-set glance; `/slack` → Settings |
+| **v0.1.780** | AI Chat **No model · pick one** attention glance (Offline parity; `/ollama` cue) |
+| **v0.1.779** | Settings **Compact On** attention glance (Product; `/compact`) |
+| **v0.1.778** | Settings **AI Off** attention glance (Product; `/ai`) |
+| **v0.1.777** | Settings Discord **voice STT** toggle + Off glance (`/voice`) |
+| **v0.1.776** | Settings **Having fun** toggle + Off glance (`/having_fun`) |
+| **v0.1.775** | Settings **Ori Mnemos** toggle + Off glance (`/ori`) |
+| **v0.1.774** | Settings **Downloads organizer** toggle + Off glance (`/downloads`) |
 
-## Fuel notes
+## Why it matters
 
-- Digester open stayed empty; design-review screens still under grace.
-- No product ERROR/WARN clusters in the 3h debug.log window this tick.
-- Next: sibling ports / p50 patterns / screenshot recapture when TCC allows / Signal REST when ready.
+Empty digester nights still move UX: kill-switches and chat setup gaps are visible in Settings / AI Chat, with one-click focus.
 
-## Verify
+## Tried / notes
 
-- `python3 scripts/autoresearch_ratchet.py verify` green for v0.1.779.
-- Keep logged @ `15dc5087`.
+- Digester open stayed empty; design review in grace (`feature-ai-chat` recommended).
+- No discard this window for the No-model glance (verify green).
+- Screenshot recapture for `feature-ai-chat` still pending TCC/window warm-up when convenient.
+
