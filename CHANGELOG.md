@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.793] - 2026-09-01
+
+### Added
+- **Agent Ops MCP health attention glance** — When `get_feature_health` reports MCP Not set, Agent Ops shows an amber **MCP · Not set · add URL or stdio** strip under Browser. Click opens Settings Credentials and focuses the MCP URL field. Adds config-only MCP to feature-health probes (no live `tools/list`; `/mcp` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.792] - 2026-09-01
 
 ### Added

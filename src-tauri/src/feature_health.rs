@@ -682,6 +682,34 @@ fn probe_scheduler() -> FeatureHealth {
     )
 }
 
+/// Config-only MCP probe (no live `tools/list`; matches `/mcp` instant lane).
+fn probe_mcp() -> FeatureHealth {
+    let url = crate::mcp::mcp_http_url_configured();
+    let stdio = crate::mcp::mcp_stdio_configured();
+    match (url, stdio) {
+        (true, true) => entry(
+            "MCP",
+            HealthStatus::Ok,
+            Some("HTTP URL and stdio configured (stdio preferred at runtime)".into()),
+        ),
+        (true, false) => entry(
+            "MCP",
+            HealthStatus::Ok,
+            Some("HTTP/SSE URL configured".into()),
+        ),
+        (false, true) => entry(
+            "MCP",
+            HealthStatus::Ok,
+            Some("stdio transport configured".into()),
+        ),
+        (false, false) => entry(
+            "MCP",
+            HealthStatus::NotConfigured,
+            Some("no MCP_SERVER_URL or MCP_SERVER_STDIO".into()),
+        ),
+    }
+}
+
 /// Run all probes (parallel async where applicable).
 pub async fn collect_feature_health() -> Vec<FeatureHealth> {
     collect_feature_health_with_brave(BraveProbeMode::Cached).await
@@ -706,6 +734,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         br,
         om,
         r,
+        probe_mcp(),
         s,
         i,
         probe_scheduler(),
