@@ -2,23 +2,22 @@
 
 ## Shipped overnight
 
-**v0.1.798 — Agent Ops Slack health attention glance**
+**v0.1.799 — Agent Ops Signal health attention glance**
 
-When Slack alerts are not fully configured, Agent Ops now shows an amber attention strip under Telegram:
+When Signal alerts are not wired (REST API pending), Agent Ops now shows an amber attention strip under Slack:
 
-- **Slack · Not set · add webhook URL** when no webhook is saved
-- **Slack · Partial · save again to register** when webhook exists but channel is not registered
-- **Slack · Partial · missing webhook** when channels are registered without a webhook
+- **Signal · Not wired · REST API pending** when no Signal channels are registered
+- **Signal · Partial · N channel(s) · REST API pending** when channels exist but REST is not wired
 
-Click opens Settings → Credentials and focuses the Slack webhook field. Backend adds a config-only Slack probe to `get_feature_health` (`/slack` instant-lane parity).
+Click opens Settings → Credentials and scrolls to the Signal note. Backend adds a config-only Signal probe to `get_feature_health` (`/signal` instant-lane parity).
+
+**v0.1.798 — Agent Ops Slack health attention glance** (earlier tick)
+
+Slack Not set/Partial strip under Telegram with Settings webhook focus.
 
 **v0.1.797 — Agent Ops Telegram health attention glance** (earlier tick)
 
-When Telegram alerts are not fully configured, Agent Ops shows an amber strip under Mastodon with the same click-to-Settings pattern.
-
-**v0.1.796 — Agent Ops Mastodon health attention glance** (earlier tick)
-
-Mastodon Not set/Partial strip under Perplexity with Settings focus.
+Telegram Not set/Partial strip under Mastodon with Settings focus.
 
 ## Context
 
@@ -28,6 +27,6 @@ Mastodon Not set/Partial strip under Perplexity with Settings focus.
 
 ## Next up
 
-- Agent Ops Signal health chain (honest Not wired placeholder).
+- Pivot to `feature-ai-chat` polish or p50 latency patterns.
 - Recapture `feature-ai-chat` screenshot when TCC allows.
-- p50 / sibling ports as backlog fuel.
+- Sibling ports (Hermes insights / session UX) as backlog fuel.
