@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.785] - 2026-09-01
+
+### Added
+- **AI Chat Filter attention glance** — When You, Assistant, or Errors filter is active, AI Chat shows a soft accent **Chat · Filter · …** strip above the chips (Continue / Sending parity). Click clears back to All. Collapsed strip says **Filter · …**. Design review / `feature-ai-chat`.
+
 ## [0.1.784] - 2026-09-01
 
 ### Added
