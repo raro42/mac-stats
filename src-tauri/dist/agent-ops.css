@@ -3601,6 +3601,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #34c759 6%, transparent);
 }
 
+.chat-model-glance.is-online.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 34%, transparent);
+  background: color-mix(in srgb, #ff9500 8%, transparent);
+  color: color-mix(in srgb, #ff9500 48%, currentColor);
+}
+
 .chat-model-glance.is-offline {
   border-color: color-mix(in srgb, #ff9500 32%, transparent);
   background: color-mix(in srgb, #ff9500 7%, transparent);
@@ -3813,7 +3819,7 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
-/* AI Chat — Offline attention glance (Perplexity error / Errors parity; expanded) */
+/* AI Chat — Offline / No-model attention glance (Errors parity; expanded) */
 .chat-offline-attention-glance {
   display: flex;
   align-items: center;
@@ -3852,6 +3858,12 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .chat-offline-attention-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 34%, transparent);
+  background: color-mix(in srgb, #ff9500 8%, transparent);
+  color: color-mix(in srgb, #ff9500 48%, currentColor);
+}
+
+.chat-offline-attention-glance.is-no-model {
   border-color: color-mix(in srgb, #ff9500 34%, transparent);
   background: color-mix(in srgb, #ff9500 8%, transparent);
   color: color-mix(in srgb, #ff9500 48%, currentColor);

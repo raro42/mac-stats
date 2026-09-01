@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.780] - 2026-09-01
+
+### Added
+- **AI Chat No-model attention glance** — When AI Chat is open and Ollama is connected but no model is selected, an amber **Chat · No model · pick one** strip appears above All·You·Assistant (Offline glance parity). Click opens the model picker. Model glance also gets an amber wash for **Model · pick one**. `/ollama` Ready with empty model says **no model · pick one**. Design review / `feature-ai-chat`.
+
 ## [0.1.779] - 2026-09-01
 
 ### Added

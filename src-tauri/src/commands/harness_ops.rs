@@ -4769,7 +4769,11 @@ pub fn format_ollama_ready_chip() -> String {
     if circuit_open {
         return format!("**Ollama** · Offline · circuit open · {model} · {ep}");
     }
-    let mut line = format!("**Ollama** · Ready · {model} · {ep}");
+    let mut line = if model == "no model" {
+        format!("**Ollama** · Ready · no model · pick one · {ep}")
+    } else {
+        format!("**Ollama** · Ready · {model} · {ep}")
+    };
     if let Some(backend) = c.detected_backend.as_deref() {
         if !backend.is_empty() && backend != "unknown" {
             line.push_str(&format!(" · {backend}"));
