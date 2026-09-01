@@ -2,18 +2,23 @@
 
 ## Shipped overnight
 
-**v0.1.797 — Agent Ops Telegram health attention glance**
+**v0.1.798 — Agent Ops Slack health attention glance**
 
-When Telegram alerts are not fully configured, Agent Ops now shows an amber attention strip under Mastodon:
+When Slack alerts are not fully configured, Agent Ops now shows an amber attention strip under Telegram:
 
-- **Telegram · Not set · add bot token + chat id** when both fields are missing
-- **Telegram · Partial · missing chat id** or **missing bot token** when only one is set
+- **Slack · Not set · add webhook URL** when no webhook is saved
+- **Slack · Partial · save again to register** when webhook exists but channel is not registered
+- **Slack · Partial · missing webhook** when channels are registered without a webhook
 
-Click opens Settings → Credentials and focuses the missing field. Backend adds a config-only Telegram probe to `get_feature_health` (`/telegram` instant-lane parity).
+Click opens Settings → Credentials and focuses the Slack webhook field. Backend adds a config-only Slack probe to `get_feature_health` (`/slack` instant-lane parity).
+
+**v0.1.797 — Agent Ops Telegram health attention glance** (earlier tick)
+
+When Telegram alerts are not fully configured, Agent Ops shows an amber strip under Mastodon with the same click-to-Settings pattern.
 
 **v0.1.796 — Agent Ops Mastodon health attention glance** (earlier tick)
 
-When Mastodon is not fully configured, Agent Ops shows an amber strip under Perplexity with the same click-to-Settings pattern.
+Mastodon Not set/Partial strip under Perplexity with Settings focus.
 
 ## Context
 
@@ -23,6 +28,6 @@ When Mastodon is not fully configured, Agent Ops shows an amber strip under Perp
 
 ## Next up
 
-- Agent Ops Slack health chain (after Telegram).
+- Agent Ops Signal health chain (honest Not wired placeholder).
 - Recapture `feature-ai-chat` screenshot when TCC allows.
 - p50 / sibling ports as backlog fuel.
