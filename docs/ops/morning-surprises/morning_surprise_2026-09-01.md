@@ -1,11 +1,13 @@
 # Morning surprise — 2026-09-01
 
-Overnight Track B kept shipping AI Chat attention glances (design review / `feature-ai-chat`). Digester open stayed empty; no debug.log clusters.
+Overnight Track B kept shipping AI Chat + Perplexity + Agent Ops attention glances (design review / standing backlog). Digester open stayed empty; no debug.log clusters.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.789** | Agent Ops **Redmine · Not set / Degraded / Unavailable** health attention glance (Settings or Redmine agent preview) |
+| **v0.1.788** | Perplexity **Filter · Top/Snippet** attention glance (click → All; collapsed parity) |
 | **v0.1.787** | AI Chat **Last answer · …** attention glance (copy strip; collapsed parity) |
 | **v0.1.786** | AI Chat **Errors · N failed** attention glance (All filter; click → Errors filter) |
 | **v0.1.785** | AI Chat **Filter · You/Assistant/Errors** attention glance (active filter; click → All) |
@@ -25,6 +27,7 @@ Overnight Track B kept shipping AI Chat attention glances (design review / `feat
 
 ## Still open
 
-- Recapture stale `feature-ai-chat.png` (and other feature screens) when TCC / window free.
+- Recapture stale `feature-ai-chat.png` / `feature-agent-ops.png` when TCC / window free.
+- Agent Ops Ollama health glance if needed beyond AI Chat Offline.
 - Sibling ports / p50 tool-heavy patterns / Signal REST when ready.
 - Watch idle-thought Discord timeout WARNs after v0.1.703 retry.
