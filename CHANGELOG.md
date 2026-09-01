@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.797] - 2026-09-02
+
+### Added
+- **Agent Ops Telegram health attention glance** — When `get_feature_health` reports Telegram Not set or Partial, Agent Ops shows an amber **Telegram · Not set · add bot token + chat id** or **Partial · …** strip under Mastodon. Click opens Settings Credentials and focuses the missing Telegram field. Adds config-only Telegram probe to feature-health (`/telegram` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.796] - 2026-09-02
 
 ### Added

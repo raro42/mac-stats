@@ -441,6 +441,7 @@
   let opsCursorHealthCache = null;
   let opsPerplexityHealthCache = null;
   let opsMastodonHealthCache = null;
+  let opsTelegramHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -3413,6 +3414,167 @@ function wireOpsMastodonAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Telegram feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsTelegramHealth(telegram) {
+    const st = String(telegram?.status || '').toLowerCase();
+    const msg = String(telegram?.message || '').trim().toLowerCase();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Telegram · Not set · add bot token + chat id';
+    } else if (wash === 'warn' && st === 'degraded' && msg.includes('missing chat id')) {
+        glanceLine = 'Telegram · Partial · missing chat id';
+    } else if (wash === 'warn' && st === 'degraded' && msg.includes('missing bot token')) {
+        glanceLine = 'Telegram · Partial · missing bot token';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check config';
+        glanceLine = `Telegram · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check config';
+        glanceLine = `Telegram · Partial · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Telegram · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Telegram · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Telegram Not set/Partial attention glance under Mastodon (feature_health parity).
+ * Visible on every Agent Ops tab when Telegram probe is not ok.
+ */
+function ensureOpsTelegramAttentionGlance() {
+    ensureOpsMastodonAttentionGlance();
+    const mastodonAtt = document.getElementById('ops-mastodon-attention-glance');
+    const perplexityAtt = document.getElementById('ops-perplexity-attention-glance');
+    const cursorAtt = document.getElementById('ops-cursor-attention-glance');
+    const mcpAtt = document.getElementById('ops-mcp-attention-glance');
+    const browserAtt = document.getElementById('ops-browser-attention-glance');
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        mastodonAtt ||
+        perplexityAtt ||
+        cursorAtt ||
+        mcpAtt ||
+        browserAtt ||
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-telegram-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-telegram-attention-glance';
+        glance.className = 'ops-telegram-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-telegram-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsTelegramAttentionGlanceClick(glance);
+    } else if (mastodonAtt && glance.previousElementSibling !== mastodonAtt) {
+        mastodonAtt.insertAdjacentElement('afterend', glance);
+    } else if (!mastodonAtt && perplexityAtt && glance.previousElementSibling !== perplexityAtt) {
+        perplexityAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsTelegramAttentionGlanceState() {
+    const glance = ensureOpsTelegramAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-telegram-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial');
+        return;
+    }
+    const parsed = parseOpsTelegramHealth(opsTelegramHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set', 'has-partial');
+        return;
+    }
+    const isPartial = parsed.glanceLine.includes('Partial');
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-partial', isPartial);
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured' && !isPartial);
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Telegram needs bot token + chat id — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Telegram not configured — click to open Settings Credentials'
+        );
+    } else if (isPartial) {
+        glance.title = 'Telegram needs the missing field — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    } else {
+        glance.title = 'Telegram probe failed — click to check credentials in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsTelegramAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const parsed = parseOpsTelegramHealth(opsTelegramHealthCache);
+            const msg = String(parsed.msg || '').toLowerCase();
+            let targetId = 'telegram-bot-token-input';
+            if (msg.includes('missing chat id') || msg.includes('token set')) {
+                targetId = 'telegram-chat-id-input';
+            }
+            document.getElementById(targetId)?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsTelegramAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsTelegramAttentionWired === '1') return;
+    glance.dataset.opsTelegramAttentionWired = '1';
+    const activate = () => activateOpsTelegramAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -4090,7 +4252,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, mastodon, telegram, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -4212,6 +4374,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsMastodonHealthCache = null;
     }
     applyOpsMastodonAttentionGlanceState();
+    if (telegram) {
+        opsTelegramHealthCache = telegram;
+    } else {
+        opsTelegramHealthCache = null;
+    }
+    applyOpsTelegramAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -6177,6 +6345,9 @@ async function refreshAgentOps(opts = {}) {
         const mastodon = (features || []).find((h) =>
             String(h.name || '').toLowerCase() === 'mastodon'
         );
+        const telegram = (features || []).find((h) =>
+            String(h.name || '').toLowerCase() === 'telegram'
+        );
         renderOpsHealth({
             version,
             insights,
@@ -6192,6 +6363,7 @@ async function refreshAgentOps(opts = {}) {
             cursor,
             perplexity,
             mastodon,
+            telegram,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];
@@ -8466,6 +8638,7 @@ function renderOpsRuns(insights) {
         applyOpsCursorAttentionGlanceState();
         applyOpsPerplexityAttentionGlanceState();
         applyOpsMastodonAttentionGlanceState();
+        applyOpsTelegramAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -8606,6 +8779,7 @@ function renderOpsRuns(insights) {
     applyOpsCursorAttentionGlanceState();
     applyOpsPerplexityAttentionGlanceState();
     applyOpsMastodonAttentionGlanceState();
+    applyOpsTelegramAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -8697,6 +8871,7 @@ function escapeHtml(s) {
     applyOpsCursorAttentionGlanceState();
     applyOpsPerplexityAttentionGlanceState();
     applyOpsMastodonAttentionGlanceState();
+    applyOpsTelegramAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

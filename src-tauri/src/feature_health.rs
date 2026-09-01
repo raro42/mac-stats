@@ -749,6 +749,34 @@ fn probe_mastodon() -> FeatureHealth {
     }
 }
 
+/// Config-only Telegram alerts probe (bot token + chat id; matches `/telegram` instant lane).
+fn probe_telegram() -> FeatureHealth {
+    let token = crate::commands::alerts::get_telegram_bot_token();
+    let chat = crate::commands::alerts::get_telegram_chat_id();
+    match (token.as_deref(), chat.as_deref()) {
+        (Some(_), Some(_)) => entry(
+            "Telegram",
+            HealthStatus::Ok,
+            Some("bot token + chat id configured".into()),
+        ),
+        (None, None) => entry(
+            "Telegram",
+            HealthStatus::NotConfigured,
+            Some("add bot token + chat id".into()),
+        ),
+        (Some(_), None) => entry(
+            "Telegram",
+            HealthStatus::Degraded,
+            Some("token set · missing chat id".into()),
+        ),
+        (None, Some(_)) => entry(
+            "Telegram",
+            HealthStatus::Degraded,
+            Some("chat id set · missing bot token".into()),
+        ),
+    }
+}
+
 /// Config-only MCP probe (no live `tools/list`; matches `/mcp` instant lane).
 fn probe_mcp() -> FeatureHealth {
     let url = crate::mcp::mcp_http_url_configured();
@@ -805,6 +833,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         probe_cursor(),
         probe_perplexity(),
         probe_mastodon(),
+        probe_telegram(),
         s,
         i,
         probe_scheduler(),
