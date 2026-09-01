@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) kept shipping Settings Product kill switches +
 
 | Version | What |
 |---------|------|
+| **v0.1.778** | Settings **AI Off** attention glance — **AI · Off · enable local AI** amber strip when Product open and AI off; click → enable toggle; `/ai` → Settings Product |
 | **v0.1.777** | Settings **Discord voice STT** toggle + **Voice · Off · enable voice STT** amber glance; Discord transcription pauses when Off; `/voice` Off cue → Settings Product |
 | **v0.1.776** | Settings **Having fun / idle thoughts** toggle + Off glance; Discord idle thoughts pause when Off; `/having_fun` → Settings |
 | **v0.1.775** | Settings **Ori Mnemos lifecycle** toggle + Off glance; `/ori` → Settings |
@@ -18,9 +19,9 @@ Overnight Track B (20:00–06:00) kept shipping Settings Product kill switches +
 
 - Digester open stayed empty; design-review screens still under grace.
 - No product ERROR/WARN clusters in the 3h debug.log window this tick.
-- Next: sibling ports / p50 patterns / screenshot recapture when TCC allows / Signal REST when ready.
+- Next: Compact On glance if useful / sibling ports / p50 patterns / screenshot recapture when TCC allows / Signal REST when ready.
 
 ## Verify
 
-- `python3 scripts/autoresearch_ratchet.py verify` green for v0.1.777.
-- Keep logged @ `eb3a33d5`.
+- `python3 scripts/autoresearch_ratchet.py verify` green for v0.1.778.
+- Keep logged @ `cd9c4002`.
