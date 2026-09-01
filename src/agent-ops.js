@@ -434,6 +434,8 @@
   let opsOllamaHealthCache = null;
   /** Latest Brave Search feature-health probe (Agent Ops attention glance). */
   let opsBraveHealthCache = null;
+  /** Latest Browser (CDP) feature-health probe (Agent Ops attention glance). */
+  let opsBrowserHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -2685,6 +2687,152 @@ function wireOpsBraveAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Browser (CDP) feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsBrowserHealth(browser) {
+    const st = String(browser?.status || '').toLowerCase();
+    const msg = String(browser?.message || '').trim();
+    let wash = 'ok';
+    if (st === 'degraded') {
+        if (/idle until first/i.test(msg) && /binary found/i.test(msg)) {
+            return { st, msg, wash: 'ok', glanceLine: '' };
+        }
+        wash = 'warn';
+    } else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    const pathMissing =
+        /path not available|path missing|binary path not/i.test(msg) ||
+        /configured chromium path missing/i.test(msg);
+
+    let glanceLine = '';
+    if (wash === 'bad' && pathMissing) {
+        glanceLine = 'Browser · Not set · add Chromium path';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check CDP';
+        glanceLine = `Browser · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && pathMissing) {
+        glanceLine = 'Browser · Not set · add Chromium path';
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check CDP port';
+        glanceLine = `Browser · Degraded · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Browser · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Browser · check config';
+    }
+    return { st, msg, wash, glanceLine, pathMissing };
+}
+
+/**
+ * Browser Not set/Unavailable/Degraded attention glance under Brave (feature_health parity).
+ * Visible on every Agent Ops tab when Browser (CDP) probe is not ok.
+ */
+function ensureOpsBrowserAttentionGlance() {
+    ensureOpsBraveAttentionGlance();
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-browser-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-browser-attention-glance';
+        glance.className = 'ops-browser-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-browser-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsBrowserAttentionGlanceClick(glance);
+    } else if (braveAtt && glance.previousElementSibling !== braveAtt) {
+        braveAtt.insertAdjacentElement('afterend', glance);
+    } else if (!braveAtt && ollamaAtt && glance.previousElementSibling !== ollamaAtt) {
+        ollamaAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsBrowserAttentionGlanceState() {
+    const glance = ensureOpsBrowserAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-browser-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    const parsed = parseOpsBrowserHealth(opsBrowserHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.pathMissing || parsed.glanceLine.includes('Not set'));
+    glance.classList.toggle(
+        'has-warn',
+        parsed.wash === 'warn' && !parsed.pathMissing && !parsed.glanceLine.includes('Not set')
+    );
+    glance.classList.toggle('has-bad', parsed.wash === 'bad' && !parsed.pathMissing);
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.pathMissing || parsed.glanceLine.includes('Not set')) {
+        glance.title = 'Browser needs a Chromium executable — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Browser not configured — click to open Settings Credentials'
+        );
+    } else {
+        glance.title = 'Browser (CDP) probe failed — click to check path and port in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsBrowserAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const field = document.getElementById('browser-chromium-path-input');
+            field?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsBrowserAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsBrowserAttentionWired === '1') return;
+    glance.dataset.opsBrowserAttentionWired = '1';
+    const activate = () => activateOpsBrowserAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -3362,7 +3510,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -3454,6 +3602,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsBraveHealthCache = null;
     }
     applyOpsBraveAttentionGlanceState();
+    if (browser) {
+        opsBrowserHealthCache = browser;
+    } else {
+        opsBrowserHealthCache = null;
+    }
+    applyOpsBrowserAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -5404,6 +5558,9 @@ async function refreshAgentOps(opts = {}) {
         const brave = (features || []).find((h) =>
             String(h.name || '').toLowerCase().includes('brave')
         );
+        const browser = (features || []).find((h) =>
+            String(h.name || '').toLowerCase().includes('browser')
+        );
         renderOpsHealth({
             version,
             insights,
@@ -5414,6 +5571,7 @@ async function refreshAgentOps(opts = {}) {
             redmine,
             ollama,
             brave,
+            browser,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];
@@ -7683,6 +7841,7 @@ function renderOpsRuns(insights) {
         applyOpsRedmineAttentionGlanceState();
         applyOpsOllamaAttentionGlanceState();
         applyOpsBraveAttentionGlanceState();
+        applyOpsBrowserAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7818,6 +7977,7 @@ function renderOpsRuns(insights) {
     applyOpsRedmineAttentionGlanceState();
     applyOpsOllamaAttentionGlanceState();
     applyOpsBraveAttentionGlanceState();
+    applyOpsBrowserAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -7904,6 +8064,7 @@ function escapeHtml(s) {
     applyOpsRedmineAttentionGlanceState();
     applyOpsOllamaAttentionGlanceState();
     applyOpsBraveAttentionGlanceState();
+    applyOpsBrowserAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

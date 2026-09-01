@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.792] - 2026-09-01
+
+### Added
+- **Agent Ops Browser health attention glance** — When `get_feature_health` reports Browser (CDP) Not set, Unavailable, or Degraded (except idle-until-first-use), Agent Ops shows an amber/red **Browser · …** strip under Brave. Click opens Settings Credentials and focuses the Chromium path field. Design review / `feature-agent-ops`.
+
 ## [0.1.791] - 2026-09-01
 
 ### Added
