@@ -428,6 +428,8 @@
   /** Wall time ≥ this ms counts as Slow (Monitors MONITOR_SLOW_MS / menu-bar Mon parity). */
   const OPS_RUNS_SLOW_MS = 2000;
   let opsRunsInsightsCache = null;
+  /** Latest Redmine feature-health probe (Agent Ops health card + attention glance). */
+  let opsRedmineHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -2262,6 +2264,142 @@ function wireOpsDiscordAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Redmine feature-health (health card + attention glance). */
+function parseOpsRedmineHealth(redmine) {
+    const st = String(redmine?.status || '').toLowerCase();
+    const msg = String(redmine?.message || '').trim();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Redmine · Not set · add URL + key';
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check config';
+        glanceLine = `Redmine · Degraded · ${bit}`;
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check config';
+        glanceLine = `Redmine · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Redmine · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Redmine · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Redmine Not set/Degraded/Unavailable attention glance under Discord (health card parity).
+ * Visible on every Agent Ops tab when Redmine is not ok.
+ */
+function ensureOpsRedmineAttentionGlance() {
+    ensureOpsDiscordAttentionGlance();
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor = discordAtt || digestAtt || runsAtt || refresh || health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-redmine-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-redmine-attention-glance';
+        glance.className = 'ops-redmine-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-redmine-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsRedmineAttentionGlanceClick(glance);
+    } else if (discordAtt && glance.previousElementSibling !== discordAtt) {
+        discordAtt.insertAdjacentElement('afterend', glance);
+    } else if (!discordAtt && digestAtt && glance.previousElementSibling !== digestAtt) {
+        digestAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsRedmineAttentionGlanceState() {
+    const glance = ensureOpsRedmineAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-redmine-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    const parsed = parseOpsRedmineHealth(opsRedmineHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured');
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Redmine needs URL + API key — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Redmine not configured — click to open Settings Credentials'
+        );
+    } else {
+        glance.title = 'Open Agents · preview Redmine agent';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Redmine agent preview`
+        );
+    }
+}
+
+function activateOpsRedmineAttentionGlance() {
+    const parsed = parseOpsRedmineHealth(opsRedmineHealthCache);
+    if (parsed.st === 'notconfigured') {
+        document.getElementById('settings-btn')?.click();
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                const field = document.getElementById('redmine-url-input');
+                field?.focus?.();
+            }, 80);
+        });
+        return;
+    }
+    const redmineAgent = findOpsRedmineAgent();
+    if (redmineAgent && openOpsAgentPreviewNavigate(redmineAgent)) return;
+    const card = document.querySelector('.ops-health-card[data-health="redmine"]');
+    if (card && typeof card.click === 'function') {
+        if (agentOpsCollapsed) applyOpsCollapsed(false);
+        card.click();
+        return;
+    }
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('agents');
+}
+
+function wireOpsRedmineAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsRedmineAttentionWired === '1') return;
+    glance.dataset.opsRedmineAttentionWired = '1';
+    const activate = () => activateOpsRedmineAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -3014,7 +3152,11 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             }
         }
         if (typeof syncOpsIconHealth === 'function') syncOpsIconHealth(redmine);
+        opsRedmineHealthCache = redmine;
+    } else {
+        opsRedmineHealthCache = null;
     }
+    applyOpsRedmineAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -7233,6 +7375,7 @@ function renderOpsRuns(insights) {
         applyOpsRunsAttentionGlanceState();
         applyOpsDigestAttentionGlanceState();
         applyOpsDiscordAttentionGlanceState();
+        applyOpsRedmineAttentionGlanceState();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -7365,6 +7508,7 @@ function renderOpsRuns(insights) {
     applyOpsRunsAttentionGlanceState();
     applyOpsDigestAttentionGlanceState();
     applyOpsDiscordAttentionGlanceState();
+    applyOpsRedmineAttentionGlanceState();
 }
 
 function escapeHtml(s) {
@@ -7448,6 +7592,7 @@ function escapeHtml(s) {
     applyOpsRunsAttentionGlanceState();
     applyOpsDigestAttentionGlanceState();
     applyOpsDiscordAttentionGlanceState();
+    applyOpsRedmineAttentionGlanceState();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

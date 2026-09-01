@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.789** — Agent Ops Redmine health attention glance (**Redmine · Not set / Degraded / Unavailable** under Discord when probe not ok; Not set → Settings; else Redmine agent preview; design review / `feature-agent-ops`).
+
 - **v0.1.788** — Perplexity Filter attention glance (Search · Filter · Top/Snippet when active; click → All; collapsed Filter · … parity; design review polish).
 
 - **v0.1.787** — AI Chat Last answer attention glance (Chat · Last answer · preview when successful reply; click copies; collapsed parity; design review / `feature-ai-chat`).

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.789] - 2026-09-01
+
+### Added
+- **Agent Ops Redmine health attention glance** — When Redmine is Not set, Degraded, or Unavailable, Agent Ops shows an amber/red **Redmine · …** strip under Fail/Slow/Digest/Discord (health card parity). Not set opens Settings Credentials; otherwise click opens the Redmine agent preview. Design review / `feature-agent-ops`.
+
 ## [0.1.788] - 2026-09-01
 
 ### Added
