@@ -749,6 +749,34 @@ fn probe_mastodon() -> FeatureHealth {
     }
 }
 
+/// Config-only Slack alerts probe (webhook + registered channel; matches `/slack` instant lane).
+fn probe_slack() -> FeatureHealth {
+    let webhook = crate::commands::alerts::get_slack_webhook().is_some();
+    let registered = crate::commands::alerts::count_registered_alert_channels("Slack") > 0;
+    match (webhook, registered) {
+        (true, true) => entry(
+            "Slack",
+            HealthStatus::Ok,
+            Some("webhook URL configured".into()),
+        ),
+        (false, false) => entry(
+            "Slack",
+            HealthStatus::NotConfigured,
+            Some("add webhook URL".into()),
+        ),
+        (true, false) => entry(
+            "Slack",
+            HealthStatus::Degraded,
+            Some("webhook set · Save again to register".into()),
+        ),
+        (false, true) => entry(
+            "Slack",
+            HealthStatus::Degraded,
+            Some("channels registered · missing webhook".into()),
+        ),
+    }
+}
+
 /// Config-only Telegram alerts probe (bot token + chat id; matches `/telegram` instant lane).
 fn probe_telegram() -> FeatureHealth {
     let token = crate::commands::alerts::get_telegram_bot_token();
@@ -834,6 +862,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         probe_perplexity(),
         probe_mastodon(),
         probe_telegram(),
+        probe_slack(),
         s,
         i,
         probe_scheduler(),

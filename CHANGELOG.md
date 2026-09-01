@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.798] - 2026-09-02
+
+### Added
+- **Agent Ops Slack health attention glance** — When `get_feature_health` reports Slack Not set or Partial, Agent Ops shows an amber **Slack · Not set · add webhook URL** or **Partial · …** strip under Telegram. Click opens Settings Credentials and focuses the Slack webhook field. Adds config-only Slack probe to feature-health (`/slack` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.797] - 2026-09-02
 
 ### Added
