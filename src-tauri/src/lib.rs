@@ -387,6 +387,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama_config::get_ollama_config,
             commands::ollama_config::list_ollama_models_at_endpoint,
             commands::ollama_config::check_ollama_connection,
+            commands::ollama_config::ollama_circuit_is_open,
             commands::ollama_config::get_default_ollama_system_prompt,
             // Ollama chat commands
             commands::ollama_chat::ollama_chat,

@@ -171,6 +171,12 @@ pub async fn list_ollama_models_at_endpoint(endpoint: String) -> Result<Vec<Stri
     Ok(list.models.into_iter().map(|m| m.name).collect())
 }
 
+/// True when the Ollama HTTP circuit is fully open (menu-bar ✕ / AI Chat circuit glance).
+#[tauri::command]
+pub fn ollama_circuit_is_open() -> bool {
+    crate::ollama::ollama_http_circuit_is_open_for_menu()
+}
+
 /// Check Ollama connection (async, non-blocking)
 #[tauri::command]
 pub async fn check_ollama_connection() -> Result<bool, String> {

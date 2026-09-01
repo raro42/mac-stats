@@ -287,9 +287,32 @@ async function checkOllamaConnection() {
       }
     }
 
+    const circuitOpen = await readOllamaCircuitOpen();
+    // Circuit open blocks chat even when /api/tags still answers — prefer circuit cue.
+    if (circuitOpen) {
+      if (typeof window.updateOllamaIconStatus === 'function') {
+        window.updateOllamaIconStatus('error');
+      }
+      if (statusEl) {
+        statusEl.textContent = 'Ollama circuit open — retry soon';
+        statusEl.classList.remove('connected');
+      }
+      if (connectionIndicator) {
+        connectionIndicator.classList.remove('connected');
+        connectionIndicator.title = 'Ollama circuit open — chat paused; retry soon';
+      }
+      chatModelGlanceState = {
+        status: 'error',
+        model: String(localStorage.getItem('ollama_model') || '').trim(),
+        circuitOpen: true,
+      };
+      applyChatModelGlanceState();
+      return false;
+    }
     chatModelGlanceState = {
       status: connected ? 'connected' : connectionFailed ? 'error' : 'unknown',
       model: String(localStorage.getItem('ollama_model') || '').trim(),
+      circuitOpen: false,
     };
     applyChatModelGlanceState();
     
@@ -310,7 +333,12 @@ async function checkOllamaConnection() {
       connectionIndicator.classList.remove('connected');
       connectionIndicator.title = 'Error: Ollama not available - Check if Ollama is running';
     }
-    chatModelGlanceState = { status: 'error', model: '' };
+    const circuitOpen = await readOllamaCircuitOpen();
+    chatModelGlanceState = {
+      status: 'error',
+      model: String(localStorage.getItem('ollama_model') || '').trim(),
+      circuitOpen,
+    };
     applyChatModelGlanceState();
     return false;
   }
@@ -704,7 +732,15 @@ function truncateChatGlancePreview(text, maxLen = 48) {
 }
 
 /** Connection snapshot for the model glance (updated by checkOllamaConnection). */
-let chatModelGlanceState = { status: 'unknown', model: '' };
+let chatModelGlanceState = { status: 'unknown', model: '', circuitOpen: false };
+
+async function readOllamaCircuitOpen() {
+  try {
+    return !!(await invoke('ollama_circuit_is_open'));
+  } catch (_) {
+    return false;
+  }
+}
 
 function shortChatModelName(modelName, maxLen = 28) {
   const name = String(modelName || '').trim();
@@ -816,7 +852,9 @@ function syncOllamaCollapsedGlance() {
   let line = 'AI Chat';
   let wash = 'is-empty';
   if (status === 'error') {
-    line = 'Offline · check Ollama';
+    line = chatModelGlanceState.circuitOpen
+      ? 'Circuit open · retry soon'
+      : 'Offline · check Ollama';
     wash = 'is-offline';
   } else if (status === 'unknown') {
     line = 'Not set · configure URL';
@@ -850,10 +888,15 @@ function syncOllamaCollapsedGlance() {
   glance.tabIndex = 0;
   const chainHint = '↑ → AI Chat icon · ↓ → footer';
   if (wash === 'is-offline') {
-    glance.title = `Open AI Chat — configure Ollama · ${chainHint}`;
+    const circuit = !!chatModelGlanceState.circuitOpen;
+    glance.title = circuit
+      ? `Open AI Chat — circuit open, retry soon · ${chainHint}`
+      : `Open AI Chat — configure Ollama · ${chainHint}`;
     glance.setAttribute(
       'aria-label',
-      `${line} — click to configure · ↑ AI Chat icon · ↓ footer`
+      circuit
+        ? `${line} — click to expand · ↑ AI Chat icon · ↓ footer`
+        : `${line} — click to configure · ↑ AI Chat icon · ↓ footer`
     );
   } else if (wash === 'has-errors') {
     glance.title = `Show AI Chat Errors filter · ${chainHint}`;
@@ -886,7 +929,11 @@ function activateOllamaCollapsedGlance() {
   applyChatAnswerGlanceState();
   applyChatErrorsGlanceState();
   if (status !== 'connected') {
-    showOllamaUrlDialog();
+    if (!chatModelGlanceState.circuitOpen) {
+      showOllamaUrlDialog();
+    } else {
+      document.getElementById('chat-input')?.focus();
+    }
     return;
   }
   if (errCount > 0) {
@@ -989,6 +1036,7 @@ function applyChatModelGlanceState() {
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
   if (status === 'connected') {
+    glance.classList.remove('is-circuit');
     const label = model ? `Model · ${model}` : 'Model · pick one';
     if (text) text.textContent = label;
     glance.classList.toggle('is-no-model', !model);
@@ -1001,11 +1049,24 @@ function applyChatModelGlanceState() {
     );
   } else if (status === 'error') {
     glance.classList.remove('is-no-model');
-    if (text) text.textContent = 'Offline · check Ollama';
-    glance.title = 'Ollama is not available — click to set the URL';
-    glance.setAttribute('aria-label', 'Ollama offline — click to configure URL');
+    const circuit = !!chatModelGlanceState.circuitOpen;
+    glance.classList.toggle('is-circuit', circuit);
+    if (text) {
+      text.textContent = circuit
+        ? 'Offline · circuit open'
+        : 'Offline · check Ollama';
+    }
+    glance.title = circuit
+      ? 'Ollama circuit open — chat paused; retry soon'
+      : 'Ollama is not available — click to set the URL';
+    glance.setAttribute(
+      'aria-label',
+      circuit
+        ? 'Ollama circuit open — retry soon'
+        : 'Ollama offline — click to configure URL'
+    );
   } else {
-    glance.classList.remove('is-no-model');
+    glance.classList.remove('is-no-model', 'is-circuit');
     if (text) text.textContent = 'Not set · configure URL';
     glance.title = 'Click to configure the Ollama URL';
     glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
@@ -1025,6 +1086,10 @@ function wireChatModelGlanceClick(glance) {
         modelText.click();
         return;
       }
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
+    if (chatModelGlanceState.circuitOpen) {
       document.getElementById('chat-input')?.focus();
       return;
     }
@@ -1686,11 +1751,11 @@ function applyChatOfflineAttentionGlanceState() {
   if (status === 'connected') {
     if (model) {
       glance.hidden = true;
-      glance.classList.remove('is-offline', 'is-not-set', 'is-no-model');
+      glance.classList.remove('is-offline', 'is-not-set', 'is-no-model', 'is-circuit');
       return;
     }
     glance.hidden = false;
-    glance.classList.remove('is-offline', 'is-not-set');
+    glance.classList.remove('is-offline', 'is-not-set', 'is-circuit');
     glance.classList.add('is-no-model');
     if (text) text.textContent = 'Chat · No model · pick one';
     glance.title = 'Connected — click to choose an Ollama model';
@@ -1702,17 +1767,29 @@ function applyChatOfflineAttentionGlanceState() {
   }
   glance.hidden = false;
   glance.classList.remove('is-no-model');
-  glance.classList.toggle('is-offline', status === 'error');
+  const circuit = status === 'error' && !!chatModelGlanceState.circuitOpen;
+  glance.classList.toggle('is-circuit', circuit);
+  glance.classList.toggle('is-offline', status === 'error' && !circuit);
   glance.classList.toggle('is-not-set', status === 'unknown');
   if (status === 'error') {
-    if (text) text.textContent = 'Chat · Offline · check Ollama';
-    glance.title = 'Ollama is not available — click to set the URL';
-    glance.setAttribute(
-      'aria-label',
-      'AI Chat offline — click to configure Ollama URL'
-    );
+    if (circuit) {
+      if (text) text.textContent = 'Chat · Circuit open · retry soon';
+      glance.title = 'Ollama circuit open — chat paused; retry soon';
+      glance.setAttribute(
+        'aria-label',
+        'AI Chat paused — Ollama circuit open; retry soon'
+      );
+    } else {
+      if (text) text.textContent = 'Chat · Offline · check Ollama';
+      glance.title = 'Ollama is not available — click to set the URL';
+      glance.setAttribute(
+        'aria-label',
+        'AI Chat offline — click to configure Ollama URL'
+      );
+    }
     return;
   }
+  glance.classList.remove('is-circuit');
   if (text) text.textContent = 'Chat · Not set · configure URL';
   glance.title = 'Click to configure the Ollama URL';
   glance.setAttribute(
@@ -1733,6 +1810,10 @@ function wireChatOfflineAttentionGlanceClick(glance) {
         modelText.click();
         return;
       }
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
+    if (chatModelGlanceState.circuitOpen) {
       document.getElementById('chat-input')?.focus();
       return;
     }

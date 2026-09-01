@@ -3612,6 +3612,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 7%, transparent);
 }
 
+.chat-model-glance.is-offline.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+  background: color-mix(in srgb, #ff9500 10%, transparent);
+  color: color-mix(in srgb, #ff9500 52%, currentColor);
+}
+
 /* AI Chat — turn glance (Top CPU / Monitors summary parity) */
 .chat-turn-glance {
   display: flex;
@@ -3861,6 +3867,12 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9500 34%, transparent);
   background: color-mix(in srgb, #ff9500 8%, transparent);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
+}
+
+.chat-offline-attention-glance.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+  background: color-mix(in srgb, #ff9500 10%, transparent);
+  color: color-mix(in srgb, #ff9500 52%, currentColor);
 }
 
 .chat-offline-attention-glance.is-no-model {

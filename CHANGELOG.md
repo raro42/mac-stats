@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.781] - 2026-09-01
+
+### Added
+- **AI Chat Circuit-open attention glance** — When the Ollama HTTP circuit is open, AI Chat shows amber **Chat · Circuit open · retry soon** above the filters (and **Offline · circuit open** on the model glance / collapsed strip) instead of a generic Offline cue. Click expands without opening the URL dialog. Menu-bar ✕ and `/ollama` Offline · circuit open stay the source of truth. Design review / `feature-ai-chat`.
+
 ## [0.1.780] - 2026-09-01
 
 ### Added
