@@ -439,6 +439,7 @@
   /** Latest MCP feature-health probe (Agent Ops attention glance). */
   let opsMcpHealthCache = null;
   let opsCursorHealthCache = null;
+  let opsPerplexityHealthCache = null;
   /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
   const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
@@ -3110,6 +3111,148 @@ function wireOpsCursorAttentionGlanceClick(glance) {
     });
 }
 
+/** Parse Perplexity feature-health (get_feature_health probe; Agent Ops attention glance). */
+function parseOpsPerplexityHealth(perplexity) {
+    const st = String(perplexity?.status || '').toLowerCase();
+    const msg = String(perplexity?.message || '').trim();
+    let wash = 'ok';
+    if (st === 'notconfigured') wash = 'warn';
+    else if (st === 'degraded') wash = 'warn';
+    else if (st === 'unavailable') wash = 'bad';
+    else if (st === 'ok') wash = 'ok';
+    else if (st) wash = 'warn';
+
+    let glanceLine = '';
+    if (wash === 'warn' && st === 'notconfigured') {
+        glanceLine = 'Perplexity · Not set · add API key';
+    } else if (wash === 'bad') {
+        const bit = msg ? msg.slice(0, 24) : 'check config';
+        glanceLine = `Perplexity · Unavailable · ${bit}`;
+    } else if (wash === 'warn' && st === 'degraded') {
+        const bit = msg ? msg.slice(0, 28) : 'check key';
+        glanceLine = `Perplexity · Degraded · ${bit}`;
+    } else if (wash === 'warn' && msg) {
+        glanceLine = `Perplexity · ${st} · ${msg.slice(0, 24)}`;
+    } else if (wash === 'warn') {
+        glanceLine = 'Perplexity · check config';
+    }
+    return { st, msg, wash, glanceLine };
+}
+
+/**
+ * Perplexity Not set/Unavailable/Degraded attention glance under Cursor (feature_health parity).
+ * Visible on every Agent Ops tab when Perplexity probe is not ok.
+ */
+function ensureOpsPerplexityAttentionGlance() {
+    ensureOpsCursorAttentionGlance();
+    const cursorAtt = document.getElementById('ops-cursor-attention-glance');
+    const mcpAtt = document.getElementById('ops-mcp-attention-glance');
+    const browserAtt = document.getElementById('ops-browser-attention-glance');
+    const braveAtt = document.getElementById('ops-brave-attention-glance');
+    const ollamaAtt = document.getElementById('ops-ollama-attention-glance');
+    const redmineAtt = document.getElementById('ops-redmine-attention-glance');
+    const discordAtt = document.getElementById('ops-discord-attention-glance');
+    const digestAtt = document.getElementById('ops-digest-attention-glance');
+    const runsAtt = document.getElementById('ops-runs-attention-glance');
+    const refresh = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    const anchor =
+        cursorAtt ||
+        mcpAtt ||
+        browserAtt ||
+        braveAtt ||
+        ollamaAtt ||
+        redmineAtt ||
+        discordAtt ||
+        digestAtt ||
+        runsAtt ||
+        refresh ||
+        health;
+    if (!anchor) return null;
+    let glance = document.getElementById('ops-perplexity-attention-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'ops-perplexity-attention-glance';
+        glance.className = 'ops-perplexity-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="ops-perplexity-attention-glance-text"></span>';
+        anchor.insertAdjacentElement('afterend', glance);
+        wireOpsPerplexityAttentionGlanceClick(glance);
+    } else if (cursorAtt && glance.previousElementSibling !== cursorAtt) {
+        cursorAtt.insertAdjacentElement('afterend', glance);
+    } else if (!cursorAtt && mcpAtt && glance.previousElementSibling !== mcpAtt) {
+        mcpAtt.insertAdjacentElement('afterend', glance);
+    }
+    return glance;
+}
+
+function applyOpsPerplexityAttentionGlanceState() {
+    const glance = ensureOpsPerplexityAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById('ops-perplexity-attention-glance-text');
+    if (agentOpsCollapsed) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    const parsed = parseOpsPerplexityHealth(opsPerplexityHealthCache);
+    if (parsed.wash === 'ok' || !parsed.glanceLine) {
+        glance.hidden = true;
+        glance.classList.remove('has-warn', 'has-bad', 'has-not-set');
+        return;
+    }
+    glance.hidden = false;
+    glance.classList.toggle('has-not-set', parsed.st === 'notconfigured');
+    glance.classList.toggle('has-warn', parsed.wash === 'warn' && parsed.st !== 'notconfigured');
+    glance.classList.toggle('has-bad', parsed.wash === 'bad');
+    if (text) text.textContent = parsed.glanceLine;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.st === 'notconfigured') {
+        glance.title = 'Perplexity Search needs an API key — click to open Settings';
+        glance.setAttribute(
+            'aria-label',
+            'Perplexity Search not configured — click to open Settings Credentials'
+        );
+    } else {
+        glance.title = 'Perplexity probe failed — click to check API key in Settings';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to open Settings Credentials`
+        );
+    }
+}
+
+function activateOpsPerplexityAttentionGlance() {
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    document.getElementById('settings-btn')?.click();
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const field =
+                document.getElementById('perplexity-api-key-input') ||
+                document.getElementById('perplexity-inline-key');
+            field?.focus?.();
+        }, 80);
+    });
+}
+
+function wireOpsPerplexityAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.opsPerplexityAttentionWired === '1') return;
+    glance.dataset.opsPerplexityAttentionWired = '1';
+    const activate = () => activateOpsPerplexityAttentionGlance();
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
 function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
@@ -3787,7 +3930,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, sessionFiles }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, ollama, brave, browser, mcp, cursor, perplexity, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     const sessionN = (sessionFiles || []).length;
     setText(
@@ -3897,6 +4040,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsCursorHealthCache = null;
     }
     applyOpsCursorAttentionGlanceState();
+    if (perplexity) {
+        opsPerplexityHealthCache = perplexity;
+    } else {
+        opsPerplexityHealthCache = null;
+    }
+    applyOpsPerplexityAttentionGlanceState();
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
     const scheduleEl = document.getElementById('ops-health-schedule');
@@ -5856,6 +6005,9 @@ async function refreshAgentOps(opts = {}) {
         const cursor = (features || []).find((h) =>
             String(h.name || '').toLowerCase().includes('cursor')
         );
+        const perplexity = (features || []).find((h) =>
+            String(h.name || '').toLowerCase().includes('perplexity')
+        );
         renderOpsHealth({
             version,
             insights,
@@ -5869,6 +6021,7 @@ async function refreshAgentOps(opts = {}) {
             browser,
             mcp,
             cursor,
+            perplexity,
             sessionFiles: files || [],
         });
         opsAgentsCache = agents || [];

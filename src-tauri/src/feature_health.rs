@@ -704,6 +704,23 @@ fn probe_cursor() -> FeatureHealth {
     }
 }
 
+/// Config-only Perplexity probe (API key; matches `/perplexity key` instant lane).
+fn probe_perplexity() -> FeatureHealth {
+    if crate::commands::perplexity::get_perplexity_api_key().is_some() {
+        entry(
+            "Perplexity Search",
+            HealthStatus::Ok,
+            Some("API key configured".into()),
+        )
+    } else {
+        entry(
+            "Perplexity Search",
+            HealthStatus::NotConfigured,
+            Some("add API key in Settings".into()),
+        )
+    }
+}
+
 /// Config-only MCP probe (no live `tools/list`; matches `/mcp` instant lane).
 fn probe_mcp() -> FeatureHealth {
     let url = crate::mcp::mcp_http_url_configured();
@@ -758,6 +775,7 @@ async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<Fe
         r,
         probe_mcp(),
         probe_cursor(),
+        probe_perplexity(),
         s,
         i,
         probe_scheduler(),

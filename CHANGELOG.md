@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.795] - 2026-09-01
+
+### Added
+- **Agent Ops Perplexity health attention glance** — When `get_feature_health` reports Perplexity Search Not set, Agent Ops shows an amber **Perplexity · Not set · add API key** strip under Cursor. Click opens Settings Credentials and focuses the Perplexity API key field. Adds config-only Perplexity probe to feature-health (`/perplexity key` parity). Design review / `feature-agent-ops`.
+
 ## [0.1.794] - 2026-09-01
 
 ### Added
