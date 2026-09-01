@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.790] - 2026-09-01
+
+### Added
+- **Agent Ops Ollama health attention glance** — When `get_feature_health` reports Ollama Not set, Offline, or Degraded, Agent Ops shows an amber/red **Ollama · …** strip under Redmine/Discord (distinct from AI Chat live circuit state). Not set/Offline opens the Ollama URL dialog; Degraded opens AI Chat model picker. Design review / `feature-agent-ops`.
+
 ## [0.1.789] - 2026-09-01
 
 ### Added
