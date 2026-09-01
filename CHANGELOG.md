@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.800] - 2026-09-02
+
+### Added
+- **Instant lane: next schedule / next job** — `next schedule`, `when is the next job`, and similar short asks return the upcoming fire time without Ollama (Discord + AI Chat; Agent Ops Next schedule health parity; p50 latency).
+
 ## [0.1.799] - 2026-09-02
 
 ### Added

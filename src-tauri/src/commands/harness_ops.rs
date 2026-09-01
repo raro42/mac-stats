@@ -1076,6 +1076,92 @@ pub fn parse_schedules_list_filter(content: &str) -> SchedulesListFilter {
     SchedulesListFilter::All
 }
 
+/// True for short “next schedule / next job” asks — Agent Ops health Next schedule parity; not full list.
+pub fn looks_like_next_schedule_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.starts_with("schedule a")
+        || n.starts_with("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("remove")
+        || n.contains("delete")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("tonight")
+        || n.contains("this night")
+        || n.contains("this evening")
+        || n.contains("plan for")
+        || n.contains("planned")
+        || n.contains("agenda")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "next schedule"
+            | "/next schedule"
+            | "next scheduled"
+            | "next scheduled job"
+            | "next scheduled task"
+            | "next job"
+            | "next cron"
+            | "next cron job"
+            | "when is the next schedule"
+            | "when is the next job"
+            | "when's the next schedule"
+            | "when's the next job"
+            | "what's the next schedule"
+            | "what is the next schedule"
+            | "what's the next job"
+            | "what is the next job"
+            | "whats the next schedule"
+            | "whats the next job"
+    )
+}
+
+/// Zero-LLM next schedule fire (Agent Ops health Next schedule card parity).
+pub fn format_next_schedule_gateway() -> String {
+    let snap = crate::scheduler::scheduler_operator_snapshot();
+    if snap.total_entries == 0 {
+        return "**Schedules:** no jobs loaded — add one in Agent Ops → Schedules or via Discord `SCHEDULE` tools."
+            .to_string();
+    }
+    match (
+        snap.next_run_at.as_deref(),
+        snap.next_task_preview.as_deref(),
+        snap.seconds_until_next_fire,
+    ) {
+        (Some(at), Some(task), Some(secs)) => {
+            let when = if secs < 3600 {
+                format!("{}m", (secs / 60).max(1))
+            } else {
+                format!("{}h", (secs + 1800) / 3600)
+            };
+            let preview: String = task.chars().take(72).collect();
+            format!(
+                "**Next schedule** · **{at}** (~{when}) — {preview}\n\n**{n}** job(s) loaded · Agent Ops → Schedules for the full list.",
+                n = snap.total_entries
+            )
+        }
+        (Some(at), Some(task), None) => {
+            let preview: String = task.chars().take(72).collect();
+            format!(
+                "**Next schedule** · **{at}** — {preview}\n\n**{n}** job(s) loaded · Agent Ops → Schedules for the full list.",
+                n = snap.total_entries
+            )
+        }
+        _ => format!(
+            "**Schedules:** **{}** job(s) loaded but no upcoming fire computed yet.",
+            snap.total_entries
+        ),
+    }
+}
+
 /// True for Hermes-style `/schedules` / `/cron list` — Agent Ops Jobs/Deliveries parity; not create asks.
 pub fn looks_like_schedules_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -6757,6 +6843,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_knowledge_list_filter(content);
         return Some(format_knowledge_gateway(filter));
     }
+    if looks_like_next_schedule_request(content) {
+        return Some(format_next_schedule_gateway());
+    }
     if looks_like_schedules_request(content) {
         let filter = parse_schedules_list_filter(content);
         return Some(format_schedules_gateway(filter));
@@ -9939,6 +10028,24 @@ mod tests {
         assert_eq!(
             parse_schedules_list_filter("recent deliveries"),
             SchedulesListFilter::Deliveries
+        );
+    }
+
+    #[test]
+    fn next_schedule_request_detected() {
+        assert!(looks_like_next_schedule_request("next schedule"));
+        assert!(looks_like_next_schedule_request("/next schedule"));
+        assert!(looks_like_next_schedule_request("when is the next job"));
+        assert!(looks_like_next_schedule_request("what's the next schedule"));
+        assert!(looks_like_next_schedule_request("@Werner next job"));
+        assert!(!looks_like_next_schedule_request("list schedules"));
+        assert!(!looks_like_next_schedule_request("schedule a task for tomorrow"));
+        assert!(!looks_like_next_schedule_request("what's planned for tonight"));
+        assert!(!looks_like_next_schedule_request("why is the next schedule late"));
+        let reply = try_operator_instant_reply("next schedule").expect("next schedule instant");
+        assert!(
+            reply.contains("Next schedule") || reply.contains("Schedules"),
+            "reply: {reply}"
         );
     }
 
