@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.782] - 2026-09-01
+
+### Added
+- **AI Chat Ready · try a starter attention glance** — When AI Chat is open, Ollama is connected with a model, and the chat is empty, a green **Chat · Ready · try a starter** strip appears above the filters (Offline / No-model parity). Click focuses the first starter chip. Collapsed strip says **Ready · try a starter · model**. Design review / `feature-ai-chat`.
+
 ## [0.1.781] - 2026-09-01
 
 ### Added
