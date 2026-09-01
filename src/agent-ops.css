@@ -3911,6 +3911,12 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, var(--accent, #007aff) 42%, currentColor);
 }
 
+.chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
 /* AI Chat — All · You · Assistant (Monitors All/Up/Down parity) */
 .chat-filter-chips {
   display: flex;

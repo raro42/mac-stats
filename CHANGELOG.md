@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.786] - 2026-09-01
+
+### Added
+- **AI Chat Errors attention glance** — When failed turns exist and the filter is All, AI Chat shows a red **Chat · Errors · N failed** strip above the chips (collapsed Errors parity; Continue no longer hides failures). Click opens the Errors filter and scrolls to the first failed turn. Design review / `feature-ai-chat`.
+
 ## [0.1.785] - 2026-09-01
 
 ### Added

@@ -1794,8 +1794,8 @@ function ensureChatOfflineAttentionGlance() {
  * Connection / model attention glance above AI Chat filters (Errors / Offline parity).
  * Visible when the section is open and Ollama is offline, not configured,
  * connected with no model selected, Ready with an empty chat (try a starter),
- * Continue with history (ask another), a non-All filter is active (Filter · …),
- * or a reply is in flight (Sending · wait).
+ * Continue with history (ask another), failed turns when filter is All (Errors · …),
+ * a non-All filter is active (Filter · …), or a reply is in flight (Sending · wait).
  */
 function applyChatOfflineAttentionGlanceState() {
   if (isOllamaSectionCollapsed()) {
@@ -1820,7 +1820,8 @@ function applyChatOfflineAttentionGlanceState() {
       'is-ready',
       'is-continue',
       'is-sending',
-      'is-filter'
+      'is-filter',
+      'is-errors'
     );
   };
 
@@ -1847,6 +1848,21 @@ function applyChatOfflineAttentionGlanceState() {
     glance.setAttribute(
       'aria-label',
       `AI Chat ${filterLabel} filter — click to clear`
+    );
+    return;
+  }
+
+  const errCount = countChatErrors();
+  if (status === 'connected' && errCount > 0) {
+    const errLabel = errCount === 1 ? '1 failed' : `${errCount} failed`;
+    glance.hidden = false;
+    clearModeClasses();
+    glance.classList.add('is-errors');
+    if (text) text.textContent = `Chat · Errors · ${errLabel}`;
+    glance.title = `${errLabel} turn${errCount === 1 ? '' : 's'} — click to show Errors filter`;
+    glance.setAttribute(
+      'aria-label',
+      `AI Chat has ${errLabel} — click to show failed turns`
     );
     return;
   }
@@ -1928,6 +1944,21 @@ function wireChatOfflineAttentionGlanceClick(glance) {
     ensureOllamaSectionExpanded();
     if (chatFilterAttentionLabel()) {
       setChatFilterMode('all');
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
+    if (
+      (chatModelGlanceState.status || 'unknown') === 'connected' &&
+      countChatErrors() > 0
+    ) {
+      setChatFilterMode('errors');
+      const firstErr = document.querySelector(
+        '#chat-messages .chat-message.assistant.is-error'
+      );
+      if (firstErr && typeof firstErr.scrollIntoView === 'function') {
+        firstErr.scrollIntoView({ block: 'nearest' });
+        firstErr.focus?.();
+      }
       document.getElementById('chat-input')?.focus();
       return;
     }
