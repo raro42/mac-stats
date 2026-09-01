@@ -397,6 +397,7 @@
       applySettingsOriAttentionGlanceState();
       applySettingsHavingFunAttentionGlanceState();
       applySettingsVoiceSttAttentionGlanceState();
+      applySettingsCompactAttentionGlanceState();
       applySettingsDiscordTokenAttentionGlanceState();
       applySettingsPerplexityKeyAttentionGlanceState();
       applySettingsBraveKeyAttentionGlanceState();
@@ -422,6 +423,7 @@
     applySettingsOriAttentionGlanceState();
     applySettingsHavingFunAttentionGlanceState();
     applySettingsVoiceSttAttentionGlanceState();
+    applySettingsCompactAttentionGlanceState();
     applySettingsDiscordTokenAttentionGlanceState();
     applySettingsPerplexityKeyAttentionGlanceState();
     applySettingsBraveKeyAttentionGlanceState();
@@ -2560,6 +2562,121 @@
   }
 
   /**
+   * Compact Menu bar / CPU window attention glance in Product settings.
+   * Visible when Settings is open and either compact toggle is On — click focuses
+   * the first On toggle (menu bar preferred).
+   */
+  function ensureSettingsCompactAttentionGlance() {
+    const wrap = document.getElementById("product-setting");
+    const menuToggle = document.getElementById("menu-bar-compact-toggle");
+    const menuLabel = menuToggle?.closest?.(".setting-toggle");
+    let glance = document.getElementById("settings-compact-attention-glance");
+    if (!glance) {
+      glance = document.createElement("button");
+      glance.type = "button";
+      glance.id = "settings-compact-attention-glance";
+      glance.className = "settings-compact-attention-glance";
+      glance.hidden = true;
+      glance.innerHTML =
+        '<span id="settings-compact-attention-glance-text"></span>';
+      if (menuLabel) {
+        menuLabel.insertAdjacentElement("beforebegin", glance);
+      } else if (wrap) {
+        wrap.insertAdjacentElement("beforeend", glance);
+      } else {
+        return null;
+      }
+      wireSettingsCompactAttentionGlanceClick(glance);
+    } else if (menuLabel && glance.nextElementSibling !== menuLabel) {
+      menuLabel.insertAdjacentElement("beforebegin", glance);
+    }
+    return glance;
+  }
+
+  function applySettingsCompactAttentionGlanceState() {
+    if (!isSettingsModalOpen()) {
+      const existing = document.getElementById(
+        "settings-compact-attention-glance"
+      );
+      if (existing) existing.hidden = true;
+      return;
+    }
+    const glance = ensureSettingsCompactAttentionGlance();
+    if (!glance) return;
+    const text = document.getElementById(
+      "settings-compact-attention-glance-text"
+    );
+    const menuToggle = document.getElementById("menu-bar-compact-toggle");
+    const windowToggle = document.getElementById("cpu-window-compact-toggle");
+    const menuOn = !!(menuToggle && menuToggle.checked);
+    const windowOn = !!(windowToggle && windowToggle.checked);
+    if (!menuOn && !windowOn) {
+      glance.hidden = true;
+      glance.classList.remove("is-on");
+      return;
+    }
+    glance.hidden = false;
+    glance.classList.add("is-on");
+    let label = "Compact · On · expand for full UI";
+    if (menuOn && windowOn) {
+      label = "Compact · Menu · Window · expand for full UI";
+    } else if (menuOn) {
+      label = "Compact · Menu bar On · expand for full UI";
+    } else {
+      label = "Compact · CPU window On · expand for full UI";
+    }
+    if (text) text.textContent = label;
+    glance.title =
+      "Compact mode is on — click to focus the compact toggle (turn off for full UI)";
+    glance.setAttribute(
+      "aria-label",
+      "Compact on — click to focus compact Menu bar or CPU window toggle"
+    );
+  }
+
+  function wireSettingsCompactAttentionGlanceClick(glance) {
+    if (!glance || glance.dataset.settingsCompactAttentionWired === "1") {
+      return;
+    }
+    glance.dataset.settingsCompactAttentionWired = "1";
+    const activate = () => {
+      const menuToggle = document.getElementById("menu-bar-compact-toggle");
+      const windowToggle = document.getElementById("cpu-window-compact-toggle");
+      const toggle =
+        menuToggle && menuToggle.checked
+          ? menuToggle
+          : windowToggle && windowToggle.checked
+            ? windowToggle
+            : menuToggle || windowToggle;
+      if (toggle) {
+        try {
+          toggle.focus();
+        } catch (_) {
+          /* ignore */
+        }
+        if (typeof toggle.scrollIntoView === "function") {
+          try {
+            toggle.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          } catch (_) {
+            /* ignore */
+          }
+        }
+      }
+    };
+    glance.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+    glance.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+    });
+  }
+
+  /**
    * Agent judge attention glance in Product settings.
    * Visible when Settings is open and judge is Off — click focuses the enable toggle.
    */
@@ -3496,6 +3613,7 @@
         if (cpuWindowCompactToggle) {
           cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
         }
+        applySettingsCompactAttentionGlanceState();
         applyAiUiVisibility(aiToggle ? aiToggle.checked : true);
       } catch (e) {
         console.warn("product toggles load", e);
@@ -3631,6 +3749,7 @@
           const invoke = getInvoke();
           if (!invoke) return;
           await invoke("set_menu_bar_compact", { compact: compactToggle.checked });
+          applySettingsCompactAttentionGlanceState();
           flashToggleLabelSaved(compactToggle);
         } catch (e) {
           console.error(e);
@@ -3648,6 +3767,7 @@
           if (on && typeof window.applyCpuWindowCompactLayout === "function") {
             window.applyCpuWindowCompactLayout(true);
           }
+          applySettingsCompactAttentionGlanceState();
           flashToggleLabelSaved(cpuWindowCompactToggle);
         } catch (e) {
           console.error(e);
@@ -3673,6 +3793,7 @@
             "Ori Mnemos lifecycle: Settings Product or /ori (needs ORI_VAULT)",
             "Having fun / idle thoughts: Settings Product or /having_fun (discord_channels.json)",
             "Discord voice STT: Settings Product or /voice (Ollama + ffmpeg)",
+            "Compact Menu bar / CPU window: Settings Product or /compact (On glance when compact)",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
@@ -3743,6 +3864,7 @@
           applySettingsVoiceSttAttentionGlanceState();
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
+          applySettingsCompactAttentionGlanceState();
           applyAiUiVisibility(false);
           resetBtn.disabled = false;
           if (typeof window.flashSaveButton === "function") {
@@ -4727,6 +4849,8 @@
     applySettingsHavingFunAttentionGlanceState;
   window.applySettingsVoiceSttAttentionGlanceState =
     applySettingsVoiceSttAttentionGlanceState;
+  window.applySettingsCompactAttentionGlanceState =
+    applySettingsCompactAttentionGlanceState;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

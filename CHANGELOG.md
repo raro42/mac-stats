@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.779] - 2026-09-01
+
+### Added
+- **Settings Compact On attention glance** — When Product Settings is open and **Compact Menu bar** and/or **Compact CPU window** is On, an amber **Compact · … · expand for full UI** strip appears above the compact toggles (AI / Voice STT glance parity). Click focuses the first On toggle. `/compact` On cue mentions expand in Settings Product. Reset still turns Menu bar compact On (monitor default).
+
 ## [0.1.778] - 2026-09-01
 
 ### Added

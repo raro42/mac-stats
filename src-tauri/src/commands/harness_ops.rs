@@ -5795,17 +5795,26 @@ pub fn looks_like_compact_ready_request(content: &str) -> bool {
 
 /// Zero-LLM Settings Product compact chip (`menuBarCompact` · `cpuWindowCompact`; config only).
 pub fn format_compact_ready_chip() -> String {
-    let menu = if crate::config::Config::menu_bar_compact() {
+    let menu_on = crate::config::Config::menu_bar_compact();
+    let window_on = crate::config::Config::cpu_window_compact();
+    let menu = if menu_on {
         "Menu bar On"
     } else {
         "Menu bar Off"
     };
-    let window = if crate::config::Config::cpu_window_compact() {
+    let window = if window_on {
         "CPU window On"
     } else {
         "CPU window Off"
     };
-    format!("**Compact** · {menu} · {window} · Settings Product (config only)")
+    // When either compact toggle is On, point at the Product glance (expand for full UI).
+    if menu_on || window_on {
+        format!(
+            "**Compact** · {menu} · {window} · expand in Settings Product (or turn toggles Off)"
+        )
+    } else {
+        format!("**Compact** · {menu} · {window} · Settings Product (config only)")
+    }
 }
 
 /// True for focused Downloads organizer Ready/config asks (`/downloads` · `/organizer`) —

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.779** — Settings Compact On attention glance (Product; `/compact` mentions expand in Settings).
+
 - **v0.1.778** — Settings AI Off attention glance (Product; `/ai` mentions Settings).
 
 - **v0.1.777** — Settings Discord voice STT toggle + Off attention glance (Product; `/voice` mentions Settings).
