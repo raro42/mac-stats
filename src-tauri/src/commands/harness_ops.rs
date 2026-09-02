@@ -3740,7 +3740,7 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
     if looks_like_agents_request(content) {
         return false;
     }
-    // Notes / memory / skills paths stay on their own lanes.
+    // Notes / memory / skills / prompts paths stay on their own lanes.
     if looks_like_memory_path_request(content) {
         return false;
     }
@@ -3767,6 +3767,8 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
         || n.contains("skills")
         || n.contains("memory")
         || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
         || n.contains("soul")
         || n.contains("mood")
         || n.starts_with("agent:")
@@ -4094,6 +4096,114 @@ pub fn format_plugins_path_gateway() -> String {
     let display = dir.display().to_string();
     format!(
         "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · no run from this ask."
+    )
+}
+
+/// True for short “where is the prompts folder / prompts path…” asks.
+/// Config path only — does not open, edit, or list planning/execution prompt files.
+pub fn looks_like_prompts_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_plugins_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("rewrite")
+        || n.contains("change ")
+        || n.contains("update ")
+        || n.contains("planning prompt")
+        || n.contains("execution prompt")
+        || n.contains("system prompt")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let prompts_ctx = n.contains("prompts folder")
+        || n.contains("prompt folder")
+        || n.contains("prompts directory")
+        || n.contains("prompt directory")
+        || n.contains("prompts dir")
+        || n.contains("prompt dir")
+        || n.contains("prompts path")
+        || n.contains("prompt path")
+        || ((n.contains("prompts") || n.contains("prompt"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !prompts_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "prompts path"
+            | "prompt path"
+            | "prompts folder"
+            | "prompt folder"
+            | "prompts directory"
+            | "prompt directory"
+            | "prompts dir"
+            | "prompt dir"
+            | "where is prompts folder"
+            | "where is the prompts folder"
+            | "where is prompt folder"
+            | "where is the prompt folder"
+            | "where is prompts directory"
+            | "where is the prompts directory"
+            | "where is prompt directory"
+            | "where is the prompt directory"
+            | "where is prompts dir"
+            | "where is the prompts dir"
+            | "where are prompts"
+            | "where do prompts go"
+            | "prompts location"
+            | "prompt location"
+            | "prompts home"
+            | "prompt home"
+    ) || (prompts_ctx && pathish)
+}
+
+/// Zero-LLM prompts directory path (config only; no open/edit).
+pub fn format_prompts_path_gateway() -> String {
+    let dir = crate::config::Config::prompts_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Prompts dir:** `{display}` · planning + execution `.md` · edit files on disk · `/agents` for soul/skill."
     )
 }
 
@@ -8783,6 +8893,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_plugins_path_request(content) {
         return Some(format_plugins_path_gateway());
     }
+    if looks_like_prompts_path_request(content) {
+        return Some(format_prompts_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8962,6 +9075,7 @@ pub fn format_ops_help_gateway() -> String {
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
+• `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10401,6 +10515,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only plugins/scripts dir path asks (v0.1.820) — config only; no list/run.
     if looks_like_plugins_path_request(question) {
+        return true;
+    }
+    // Read-only prompts dir path asks (v0.1.821) — config only; no open/edit.
+    if looks_like_prompts_path_request(question) {
         return true;
     }
     false
@@ -12692,6 +12810,30 @@ mod tests {
             try_operator_instant_reply("where is the plugins folder").expect("plugins path instant");
         assert!(reply.contains("Plugins/scripts dir"));
         assert!(reply.contains("scripts") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn prompts_path_request_detected() {
+        assert!(looks_like_prompts_path_request("prompts path"));
+        assert!(looks_like_prompts_path_request("prompt path"));
+        assert!(looks_like_prompts_path_request("prompts folder"));
+        assert!(looks_like_prompts_path_request("where is the prompts folder"));
+        assert!(looks_like_prompts_path_request("prompts directory"));
+        assert!(looks_like_prompts_path_request("where are prompts"));
+        assert!(looks_like_prompts_path_request("where do prompts go"));
+        assert!(looks_like_prompts_path_request("prompts location"));
+        assert!(!looks_like_prompts_path_request("edit planning prompt"));
+        assert!(!looks_like_prompts_path_request("open execution prompt"));
+        assert!(!looks_like_prompts_path_request("list prompts"));
+        assert!(!looks_like_prompts_path_request("system prompt"));
+        assert!(!looks_like_prompts_path_request("agents path"));
+        assert!(!looks_like_prompts_path_request("skills path"));
+        assert!(!looks_like_agents_path_request("prompts path"));
+        assert!(!looks_like_agents_path_request("where is the prompts folder"));
+        let reply =
+            try_operator_instant_reply("where is the prompts folder").expect("prompts path instant");
+        assert!(reply.contains("Prompts dir"));
+        assert!(reply.contains("prompts") || reply.contains(".mac-stats"));
     }
 
     #[test]
