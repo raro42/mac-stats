@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.823** — Startup: skip macOS crash-restore modal (`ApplePersistenceIgnoreState`; LaunchAgent/overnight restarts no longer block Discord on `NSPersistentUIRestorer`).
+
 - **v0.1.822** — Instant lane: tmp directory path (`tmp path`, `where is the tmp folder`, `temp directory`; config only; no list/prune; p50 latency).
 
 - **v0.1.821** — Instant lane: prompts directory path (`prompts path`, `where is the prompts folder`, `prompts directory`; config only; no open/edit; p50 latency).

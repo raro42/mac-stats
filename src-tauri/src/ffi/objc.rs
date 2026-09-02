@@ -5,8 +5,29 @@
 
 use objc2::msg_send;
 use objc2::runtime::{AnyClass, AnyObject, Sel};
-use objc2_foundation::NSProcessInfo;
+use objc2_foundation::{NSProcessInfo, NSString, NSUserDefaults};
 use thiserror::Error;
+
+/// Suppress macOS crash-restore / persistent-UI modal alerts.
+///
+/// LaunchAgent + frequent overnight restarts can leave Saved Application State that
+/// triggers `NSPersistentUIRestorer` → blocking `NSAlert runModal` on the main thread
+/// before Tauri setup finishes — Discord/scheduler never start. Menu-bar apps have no
+/// windows to restore.
+///
+/// Safe: `NSUserDefaults` standardUserDefaults + setBool:forKey: (no CF ownership).
+pub fn ignore_macos_persistent_ui_state() {
+    let defaults = NSUserDefaults::standardUserDefaults();
+    let key = NSString::from_str("ApplePersistenceIgnoreState");
+    defaults.setBool_forKey(true, &key);
+    // Also disable window quit-keep for any future non-LSUIElement surfaces.
+    let keeps = NSString::from_str("NSQuitAlwaysKeepsWindows");
+    defaults.setBool_forKey(false, &keeps);
+    tracing::debug!(
+        target: "mac_stats::ffi",
+        "ApplePersistenceIgnoreState=YES (skip crash-restore modal)"
+    );
+}
 
 /// Apple thermal pressure from `NSProcessInfo.thermalState` (user-mode; no root).
 ///

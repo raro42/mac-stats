@@ -287,6 +287,9 @@ fn run_internal(open_cpu_window: bool) {
         };
     }
 
+    // Menu-bar / LaunchAgent: skip macOS crash-restore modal (blocks main thread → no Discord).
+    crate::ffi::objc::ignore_macos_persistent_ui_state();
+
     // SIGINT/SIGTERM/SIGHUP often terminate the process without Tauri emitting `RunEvent::Exit`
     // first. Register a handler so `close_browser_session()` still runs (browser-use-style safety).
     match ctrlc::set_handler(|| {

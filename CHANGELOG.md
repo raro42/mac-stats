@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.823] - 2026-09-03
+
+### Fixed
+- **Startup: skip macOS crash-restore modal** — set `ApplePersistenceIgnoreState` early so LaunchAgent / overnight restarts do not block the main thread on `NSPersistentUIRestorer` (Discord and the scheduler were never starting).
+
 ## [0.1.822] - 2026-09-03
 
 ### Fixed
