@@ -2,9 +2,13 @@
 
 ## Shipped overnight
 
+**v0.1.802 — Instant lane: schedule / delivery count**
+
+Short asks like `how many schedules`, `how many jobs`, `schedule count`, and `how many deliveries` now return scheduler totals without Ollama (Discord + AI Chat). Matches Agent Ops **Schedules** card parity. Cuts p50 direct latency for count-only operator checks.
+
 **v0.1.801 — Instant lane: last delivery**
 
-Short asks like `last delivery`, `when was the last delivery`, and `what's the last delivery` now return the most recent scheduler delivery without Ollama (Discord + AI Chat). Matches Agent Ops **Last delivery** health card parity. Cuts p50 direct latency for common operator delivery checks.
+Short asks like `last delivery`, `when was the last delivery`, and `what's the last delivery` now return the most recent scheduler delivery without Ollama (Discord + AI Chat). Matches Agent Ops **Last delivery** health card parity.
 
 **v0.1.800 — Instant lane: next schedule / next job**
 
