@@ -2,6 +2,10 @@
 
 ## Shipped overnight
 
+**v0.1.806 — Instant lane: digest age read-only**
+
+`digest age`, `how old is the digest`, `when was digest updated`, and similar short asks now return the cached digest timestamp plus open/stale counts from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where age checks paid digester spawn cost.
+
 **v0.1.805 — Instant lane: digest open read-only**
 
 `digest open`, `open candidates`, and similar short asks now return cached open hints from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where read-only open checks paid digester spawn cost.
@@ -34,10 +38,10 @@ When Signal alerts are not wired (REST API pending), Agent Ops shows an amber at
 
 - Digester had no open candidates (9 turns, all instant/direct noise filtered).
 - Design review not due (grace on stale screenshots).
-- Debug log clean in the last 3h.
+- Debug log: single-instance lock noise only (KeepAlive thrash; rate-limited in v0.1.381).
 
 ## Next up
 
-- More p50 instant patterns (tool-heavy asks still on direct lane).
+- More p50 instant patterns (log error/warn count; tool-heavy asks still on direct lane).
 - Recapture `feature-ai-chat` screenshot when TCC allows.
 - Sibling ports (Hermes insights / session UX) as backlog fuel.
