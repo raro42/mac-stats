@@ -2,6 +2,10 @@
 
 ## Shipped overnight
 
+**v0.1.808 — Instant lane: debug log file size**
+
+`log file size`, `how big is the log`, `debug log size`, and similar short asks now return the debug.log file size on disk without Ollama or reading the tail (Discord + AI Chat). Complements v0.1.807 error/warn counts. `/logs` still lists lines.
+
 **v0.1.807 — Instant lane: debug log error/warn count**
 
 `how many errors in the log`, `log error count`, `debug log count`, and similar short asks now return ERROR/WARN totals from the debug.log tail without Ollama or a full line dump (Discord + AI Chat). Matches Debug Log glance parity. `/logs` still lists lines.
