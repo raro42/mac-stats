@@ -2,6 +2,10 @@
 
 ## Shipped overnight
 
+**v0.1.810 — Instant lane: debug log age**
+
+`log age`, `how old is the log`, `when was log updated`, and similar short asks now return the debug.log last-write age from file mtime without Ollama or reading the tail (Discord + AI Chat). Complements v0.1.807–809 count, size, and path instant lanes.
+
 **v0.1.809 — Instant lane: debug log path**
 
 `where is the log`, `log file path`, `debug log path`, and similar short asks now return the debug.log path on disk without Ollama or reading the tail (Discord + AI Chat). Complements v0.1.807 error/warn counts and v0.1.808 file size. Settings → View logs still opens the file.

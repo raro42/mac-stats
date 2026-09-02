@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.810** — Instant lane: debug log age (`log age`, `how old is the log`, `when was log updated`; mtime only; p50 latency).
+
 - **v0.1.809** — Instant lane: debug log path (`where is the log`, `log file path`, `debug log path`; config only; p50 latency).
 
 - **v0.1.808** — Instant lane: debug log file size (`log file size`, `how big is the log`, `debug log size`; stat only; p50 latency).
