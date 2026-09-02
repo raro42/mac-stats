@@ -2,9 +2,13 @@
 
 ## Shipped overnight
 
+**v0.1.803 — Instant lane: operator inventory counts**
+
+Short asks like `how many agents`, `how many monitors`, `task count`, `how many sessions`, `skill count`, `how many plugins`, `knowledge count`, and `how many open candidates` now return inventory totals without Ollama (Discord + AI Chat). Matches Agent Ops overview cards. Cuts p50 direct latency for count-only operator checks.
+
 **v0.1.802 — Instant lane: schedule / delivery count**
 
-Short asks like `how many schedules`, `how many jobs`, `schedule count`, and `how many deliveries` now return scheduler totals without Ollama (Discord + AI Chat). Matches Agent Ops **Schedules** card parity. Cuts p50 direct latency for count-only operator checks.
+Short asks like `how many schedules`, `how many jobs`, `schedule count`, and `how many deliveries` now return scheduler totals without Ollama (Discord + AI Chat). Matches Agent Ops **Schedules** card parity.
 
 **v0.1.801 — Instant lane: last delivery**
 

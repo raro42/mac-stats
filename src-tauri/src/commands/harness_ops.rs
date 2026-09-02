@@ -7126,7 +7126,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_schedule_count_request(content) {
         return Some(format_schedule_count_gateway(content));
     }
-    if let Some(kind) = parse_operator_count_kind(content) {
+    if looks_like_operator_count_request(content) {
+        let kind = parse_operator_count_kind(content)
+            .expect("looks_like_operator_count_request implies kind");
         return Some(format_operator_count_gateway(kind));
     }
     if looks_like_schedules_request(content) {
@@ -10398,8 +10400,9 @@ mod tests {
             parse_operator_count_kind("how many open candidates"),
             Some(OperatorCountKind::DigestOpen)
         );
-        assert!(parse_operator_count_kind("how many jobs").is_none());
-        assert!(parse_operator_count_kind("list agents").is_none());
+        assert!(looks_like_operator_count_request("how many agents"));
+        assert!(!looks_like_operator_count_request("how many jobs"));
+        assert!(!looks_like_operator_count_request("list agents"));
         assert!(parse_operator_count_kind("why are there so many tasks").is_none());
         let agents = try_operator_instant_reply("how many agents").expect("agent count instant");
         assert!(agents.contains("Agents") && agents.contains("on"));
