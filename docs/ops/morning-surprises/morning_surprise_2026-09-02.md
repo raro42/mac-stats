@@ -2,6 +2,10 @@
 
 ## Shipped overnight
 
+**v0.1.807 — Instant lane: debug log error/warn count**
+
+`how many errors in the log`, `log error count`, `debug log count`, and similar short asks now return ERROR/WARN totals from the debug.log tail without Ollama or a full line dump (Discord + AI Chat). Matches Debug Log glance parity. `/logs` still lists lines.
+
 **v0.1.806 — Instant lane: digest age read-only**
 
 `digest age`, `how old is the digest`, `when was digest updated`, and similar short asks now return the cached digest timestamp plus open/stale counts from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where age checks paid digester spawn cost.
@@ -42,6 +46,6 @@ When Signal alerts are not wired (REST API pending), Agent Ops shows an amber at
 
 ## Next up
 
-- More p50 instant patterns (log error/warn count; tool-heavy asks still on direct lane).
+- More p50 instant patterns (tool-heavy asks still on direct lane).
 - Recapture `feature-ai-chat` screenshot when TCC allows.
 - Sibling ports (Hermes insights / session UX) as backlog fuel.
