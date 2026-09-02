@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.810] - 2026-09-02
+
+### Fixed
+- **Instant lane: debug log age** — `log age`, `how old is the log`, `when was log updated`, and similar asks return the debug.log last-write age from file mtime without Ollama or reading the tail (Discord + AI Chat; p50 latency).
+
 ## [0.1.809] - 2026-09-02
 
 ### Fixed

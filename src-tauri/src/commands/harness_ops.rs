@@ -3027,6 +3027,101 @@ pub fn format_debug_log_path_gateway() -> String {
     format!("**Debug Log:** `{display}` · Settings → View logs · `/logs` for tail.")
 }
 
+/// Last debug.log modification time (metadata only; no tail read).
+pub fn snapshot_debug_log_modified_ms() -> Result<Option<u64>, String> {
+    let path = crate::config::Config::log_file_path();
+    if !path.exists() {
+        return Ok(None);
+    }
+    let modified = std::fs::metadata(&path)
+        .map_err(|e| format!("Failed to stat log: {e}"))?
+        .modified()
+        .map_err(|e| format!("Failed to read log mtime: {e}"))?;
+    let ms = modified
+        .duration_since(std::time::SystemTime::UNIX_EPOCH)
+        .map_err(|e| format!("Invalid log mtime: {e}"))?
+        .as_millis() as u64;
+    Ok(Some(ms))
+}
+
+/// True for short “how old is the log / log age…” asks.
+pub fn looks_like_debug_log_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if looks_like_debug_log_count_request(content)
+        || looks_like_debug_log_size_request(content)
+        || looks_like_debug_log_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("tail")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("clear")
+        || n.contains("rotate")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+    {
+        return false;
+    }
+    let log_ctx = n.contains("log") || n.contains("debug");
+    if !log_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "log age"
+            | "debug log age"
+            | "how old is the log"
+            | "how old is debug log"
+            | "how old is the debug log"
+            | "when was the log updated"
+            | "when was log updated"
+            | "when was debug log updated"
+            | "when was the debug log updated"
+            | "log last modified"
+            | "debug log last modified"
+            | "log updated"
+            | "debug log updated"
+            | "is the log stale"
+            | "is debug log stale"
+    ) || (n.contains("age") && log_ctx)
+        || (n.contains("old") && log_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && log_ctx)
+        || (n.contains("stale") && log_ctx)
+}
+
+/// Zero-LLM debug.log age from file mtime (stat only; no tail read).
+pub fn format_debug_log_age_gateway() -> String {
+    match snapshot_debug_log_modified_ms() {
+        Ok(None) => {
+            "**Debug Log:** no file yet · logging starts on first write · `/logs` when lines appear."
+                .to_string()
+        }
+        Ok(Some(ms)) => {
+            let age = age_from_ms(ms);
+            format!(
+                "**Debug Log:** last write **{age}** ago · `/logs` for tail · Settings → View logs."
+            )
+        }
+        Err(e) => format!("**Debug Log** — could not stat file: {e}"),
+    }
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -7678,6 +7773,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_debug_log_path_request(content) {
         return Some(format_debug_log_path_gateway());
     }
+    if looks_like_debug_log_age_request(content) {
+        return Some(format_debug_log_age_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -7847,6 +7945,7 @@ pub fn format_ops_help_gateway() -> String {
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
+• `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9246,6 +9345,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only debug.log path asks (v0.1.809) — config only, no tail read.
     if looks_like_debug_log_path_request(question) {
+        return true;
+    }
+    // Read-only debug.log age asks (v0.1.810) — mtime only, no tail read.
+    if looks_like_debug_log_age_request(question) {
         return true;
     }
     false
@@ -11315,6 +11418,19 @@ mod tests {
         assert!(!looks_like_debug_log_path_request("log file size"));
         assert!(!looks_like_debug_log_path_request("how many errors in the log"));
         assert!(!looks_like_debug_log_path_request("/logs error"));
+        assert!(!looks_like_debug_log_path_request("how old is the log"));
+    }
+
+    #[test]
+    fn debug_log_age_request_detected() {
+        assert!(looks_like_debug_log_age_request("log age"));
+        assert!(looks_like_debug_log_age_request("how old is the log"));
+        assert!(looks_like_debug_log_age_request("when was log updated"));
+        assert!(looks_like_debug_log_age_request("debug log last modified"));
+        assert!(!looks_like_debug_log_age_request("log file size"));
+        assert!(!looks_like_debug_log_age_request("where is the log"));
+        assert!(!looks_like_debug_log_age_request("how many errors in the log"));
+        assert!(!looks_like_debug_log_age_request("/logs error"));
         let path = try_operator_instant_reply("where is the log").expect("log path instant");
         assert!(path.contains("Debug Log"));
         assert!(path.contains("mac-stats") || path.contains(".mac-stats"));
