@@ -4358,6 +4358,140 @@ pub fn format_tmp_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the uploads folder / uploads path…” asks.
+/// Config path only — does not list, upload, or open files under `~/.mac-stats/uploads/`.
+pub fn looks_like_uploads_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal sibling path / browser-status / disk-cleanup asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("pdf")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let upload_ctx = n.contains("uploads folder")
+        || n.contains("uploads directory")
+        || n.contains("uploads dir")
+        || n.contains("uploads path")
+        || n.contains("upload folder")
+        || n.contains("upload directory")
+        || n.contains("upload dir")
+        || n.contains("upload path")
+        || n.contains("browser uploads")
+        || n.contains("browser upload")
+        || n.contains("mac-stats uploads")
+        || n.contains("mac stats uploads")
+        || n == "uploads"
+        || (n.contains("upload")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !upload_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "uploads path"
+            | "upload path"
+            | "uploads folder"
+            | "upload folder"
+            | "uploads directory"
+            | "upload directory"
+            | "uploads dir"
+            | "upload dir"
+            | "where is uploads folder"
+            | "where is the uploads folder"
+            | "where is upload folder"
+            | "where is the upload folder"
+            | "where is uploads directory"
+            | "where is the uploads directory"
+            | "where is upload directory"
+            | "where is the upload directory"
+            | "where is uploads dir"
+            | "where is the uploads dir"
+            | "where are uploads"
+            | "where do uploads go"
+            | "where do upload files go"
+            | "uploads location"
+            | "upload location"
+            | "uploads home"
+            | "browser uploads"
+            | "browser upload path"
+            | "browser uploads path"
+            | "browser uploads folder"
+            | "mac-stats uploads"
+            | "mac stats uploads"
+            | "uploads"
+    ) || (upload_ctx && pathish)
+}
+
+/// Zero-LLM uploads directory path (config only; no list/upload).
+pub fn format_uploads_path_gateway() -> String {
+    let dir = crate::config::Config::browser_uploads_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Uploads dir:** `{display}` · BROWSER_UPLOAD roots · put files here · `/browser` for CDP status."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9050,6 +9184,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_tmp_path_request(content) {
         return Some(format_tmp_path_gateway());
     }
+    if looks_like_uploads_path_request(content) {
+        return Some(format_uploads_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9231,6 +9368,7 @@ pub fn format_ops_help_gateway() -> String {
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
+• `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10678,6 +10816,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only tmp dir path asks (v0.1.822) — config only; no list/prune.
     if looks_like_tmp_path_request(question) {
+        return true;
+    }
+    // Read-only uploads dir path asks (v0.1.824) — config only; no list/upload.
+    if looks_like_uploads_path_request(question) {
         return true;
     }
     false
@@ -13017,6 +13159,33 @@ mod tests {
         let reply = try_operator_instant_reply("where is the tmp folder").expect("tmp path instant");
         assert!(reply.contains("Tmp dir"));
         assert!(reply.contains("tmp") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn uploads_path_request_detected() {
+        assert!(looks_like_uploads_path_request("uploads path"));
+        assert!(looks_like_uploads_path_request("upload path"));
+        assert!(looks_like_uploads_path_request("uploads folder"));
+        assert!(looks_like_uploads_path_request("where is the uploads folder"));
+        assert!(looks_like_uploads_path_request("uploads directory"));
+        assert!(looks_like_uploads_path_request("where are uploads"));
+        assert!(looks_like_uploads_path_request("where do uploads go"));
+        assert!(looks_like_uploads_path_request("browser uploads path"));
+        assert!(looks_like_uploads_path_request("mac-stats uploads"));
+        assert!(!looks_like_uploads_path_request("list uploads"));
+        assert!(!looks_like_uploads_path_request("upload this file"));
+        assert!(!looks_like_uploads_path_request("BROWSER_UPLOAD: foo.txt"));
+        assert!(!looks_like_uploads_path_request("clean uploads"));
+        assert!(!looks_like_uploads_path_request("prune uploads"));
+        assert!(!looks_like_uploads_path_request("/disk reclaim"));
+        assert!(!looks_like_uploads_path_request("tmp path"));
+        assert!(!looks_like_uploads_path_request("where is config"));
+        assert!(!looks_like_uploads_path_request("/browser"));
+        assert!(!looks_like_tmp_path_request("uploads path"));
+        let reply =
+            try_operator_instant_reply("where is the uploads folder").expect("uploads path instant");
+        assert!(reply.contains("Uploads dir"));
+        assert!(reply.contains("uploads") || reply.contains(".mac-stats"));
     }
 
     #[test]

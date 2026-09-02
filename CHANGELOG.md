@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.824] - 2026-09-03
+
+### Fixed
+- **Instant lane: uploads directory path** — `uploads path`, `where is the uploads folder`, `upload directory`, and similar asks return `~/.mac-stats/uploads/` without Ollama (Discord + AI Chat; does not list or upload; p50 latency).
+
 ## [0.1.823] - 2026-09-03
 
 ### Fixed
