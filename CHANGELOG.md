@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.801] - 2026-09-02
+
+### Added
+- **Instant lane: last delivery** — `last delivery`, `when was the last delivery`, and similar short asks return the most recent scheduler delivery without Ollama (Discord + AI Chat; Agent Ops Last delivery health parity; p50 latency).
+
 ## [0.1.800] - 2026-09-02
 
 ### Added

@@ -1048,7 +1048,6 @@ pub fn parse_schedules_list_filter(content: &str) -> SchedulesListFilter {
         || n == "delivery"
         || n == "recent deliveries"
         || n == "last deliveries"
-        || n == "last delivery"
         || n == "list deliveries"
         || n == "show deliveries"
         || n == "my deliveries"
@@ -1121,6 +1120,63 @@ pub fn looks_like_next_schedule_request(content: &str) -> bool {
             | "what is the next job"
             | "whats the next schedule"
             | "whats the next job"
+    )
+}
+
+/// True for short “last delivery” asks — Agent Ops health Last delivery parity; not full list.
+pub fn looks_like_last_delivery_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("deliveries")
+        || n.contains("list ")
+        || n.contains("show ")
+        || n.contains("recent ")
+        || n.starts_with("schedule")
+        || n.contains("create")
+        || n.contains("why")
+        || n.contains(" about ")
+        || n.contains("failed")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "last delivery"
+            | "/last delivery"
+            | "when was the last delivery"
+            | "when's the last delivery"
+            | "when is the last delivery"
+            | "what's the last delivery"
+            | "what is the last delivery"
+            | "whats the last delivery"
+    )
+}
+
+/// Zero-LLM last scheduler delivery (Agent Ops health Last delivery card parity).
+pub fn format_last_delivery_gateway() -> String {
+    let deliveries = crate::scheduler::list_scheduler_delivery_awareness();
+    if deliveries.is_empty() {
+        return "**Deliveries:** nothing recorded yet — fired jobs that post to Discord show up here."
+            .to_string();
+    }
+    let last = &deliveries[0];
+    let age = age_from_rfc3339(&last.utc);
+    let preview: String = last.summary.chars().take(72).collect();
+    let sid = last
+        .schedule_id
+        .as_deref()
+        .filter(|s| !s.is_empty())
+        .unwrap_or("—");
+    let total = deliveries.len();
+    format!(
+        "**Last delivery** · **{utc}** ({age} ago) — `{sid}` · ch {channel}\n\n{preview}\n\n**{total}** recorded · Agent Ops → Schedules for the full list.",
+        utc = last.utc,
+        channel = last.channel_id
     )
 }
 
@@ -1218,7 +1274,6 @@ pub fn looks_like_schedules_request(content: &str) -> bool {
             | "delivery"
             | "recent deliveries"
             | "last deliveries"
-            | "last delivery"
             | "list deliveries"
             | "show deliveries"
             | "my deliveries"
@@ -6846,6 +6901,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_next_schedule_request(content) {
         return Some(format_next_schedule_gateway());
     }
+    if looks_like_last_delivery_request(content) {
+        return Some(format_last_delivery_gateway());
+    }
     if looks_like_schedules_request(content) {
         let filter = parse_schedules_list_filter(content);
         return Some(format_schedules_gateway(filter));
@@ -10043,8 +10101,23 @@ mod tests {
         assert!(!looks_like_next_schedule_request("what's planned for tonight"));
         assert!(!looks_like_next_schedule_request("why is the next schedule late"));
         let reply = try_operator_instant_reply("next schedule").expect("next schedule instant");
+        assert!(reply.contains("Next schedule") || reply.contains("Schedules"));
+    }
+
+    #[test]
+    fn last_delivery_request_detected() {
+        assert!(looks_like_last_delivery_request("last delivery"));
+        assert!(looks_like_last_delivery_request("/last delivery"));
+        assert!(looks_like_last_delivery_request("when was the last delivery"));
+        assert!(looks_like_last_delivery_request("what's the last delivery"));
+        assert!(looks_like_last_delivery_request("@Werner last delivery"));
+        assert!(!looks_like_last_delivery_request("last deliveries"));
+        assert!(!looks_like_last_delivery_request("list deliveries"));
+        assert!(!looks_like_last_delivery_request("recent deliveries"));
+        assert!(!looks_like_last_delivery_request("why did the last delivery fail"));
+        let reply = try_operator_instant_reply("last delivery").expect("last delivery instant");
         assert!(
-            reply.contains("Next schedule") || reply.contains("Schedules"),
+            reply.contains("Last delivery") || reply.contains("Deliveries"),
             "reply: {reply}"
         );
     }
