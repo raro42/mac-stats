@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.813] - 2026-09-02
+
+### Fixed
+- **Instant lane: runs.jsonl path** — `runs path`, `where is runs.jsonl`, `runs file path`, and similar asks return `~/.mac-stats/runs.jsonl` without Ollama (Discord + AI Chat; does not list, count, or prune; p50 latency).
+
 ## [0.1.812] - 2026-09-02
 
 ### Fixed

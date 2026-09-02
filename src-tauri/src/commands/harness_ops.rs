@@ -3311,6 +3311,100 @@ pub fn format_screenshots_path_gateway() -> String {
     )
 }
 
+/// True for short “where is runs.jsonl / runs file path…” asks.
+/// Config path only — does not list, count, prune, or open insights.
+pub fn looks_like_runs_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal count / list / insights / failed / slow / lane dumps.
+    if looks_like_runs_count_request(content)
+        || looks_like_insights_request(content)
+        || looks_like_failed_runs_request(content)
+        || looks_like_slow_runs_request(content)
+        || looks_like_instant_runs_request(content)
+        || looks_like_direct_runs_request(content)
+        || looks_like_lite_runs_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("insights")
+        || n.contains("failed")
+        || n.contains("slow")
+        || n.contains("prune")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("open ")
+        || n.contains("tail")
+        || n.contains("read ")
+    {
+        return false;
+    }
+    let runs_ctx = n.contains("runs.jsonl")
+        || n.contains("runs jsonl")
+        || ((n.contains("runs") || n.contains("run log") || n.contains("run file"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")));
+    if !runs_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "runs path"
+            | "runs.jsonl path"
+            | "runs jsonl path"
+            | "runs file path"
+            | "run log path"
+            | "runs log path"
+            | "where is runs.jsonl"
+            | "where is the runs.jsonl"
+            | "where is runs jsonl"
+            | "where is the runs file"
+            | "where is runs file"
+            | "where is the run log"
+            | "where is run log"
+            | "where are runs"
+            | "runs file location"
+            | "runs.jsonl location"
+            | "runs folder"
+            | "runs directory"
+    ) || (runs_ctx && pathish)
+}
+
+/// Zero-LLM runs.jsonl path (config only; no list/count/prune).
+pub fn format_runs_path_gateway() -> String {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    let display = path.display().to_string();
+    format!(
+        "**Runs:** `{display}` · Agent Ops → Runs · `/insights` · Disk Cleanup can prune old lines."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -7971,6 +8065,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_screenshots_path_request(content) {
         return Some(format_screenshots_path_gateway());
     }
+    if looks_like_runs_path_request(content) {
+        return Some(format_runs_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8143,6 +8240,7 @@ pub fn format_ops_help_gateway() -> String {
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
+• `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9554,6 +9652,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only screenshots dir path asks (v0.1.812) — config only; no list/take.
     if looks_like_screenshots_path_request(question) {
+        return true;
+    }
+    // Read-only runs.jsonl path asks (v0.1.813) — config only; no list/count.
+    if looks_like_runs_path_request(question) {
         return true;
     }
     false
@@ -11678,6 +11780,25 @@ mod tests {
             try_operator_instant_reply("where are screenshots").expect("screenshots path instant");
         assert!(reply.contains("Screenshots"));
         assert!(reply.contains("screenshots") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn runs_path_request_detected() {
+        assert!(looks_like_runs_path_request("runs path"));
+        assert!(looks_like_runs_path_request("runs.jsonl path"));
+        assert!(looks_like_runs_path_request("where is runs.jsonl"));
+        assert!(looks_like_runs_path_request("runs file path"));
+        assert!(looks_like_runs_path_request("where is the runs file"));
+        assert!(looks_like_runs_path_request("run log path"));
+        assert!(!looks_like_runs_path_request("how many runs"));
+        assert!(!looks_like_runs_path_request("/insights"));
+        assert!(!looks_like_runs_path_request("/failed"));
+        assert!(!looks_like_runs_path_request("list runs"));
+        assert!(!looks_like_runs_path_request("where is config"));
+        assert!(!looks_like_runs_path_request("screenshot path"));
+        let reply = try_operator_instant_reply("where is runs.jsonl").expect("runs path instant");
+        assert!(reply.contains("Runs"));
+        assert!(reply.contains("runs.jsonl") || reply.contains(".mac-stats"));
     }
 
     #[test]
