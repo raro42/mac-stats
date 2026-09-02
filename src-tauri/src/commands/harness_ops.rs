@@ -1157,6 +1157,66 @@ pub fn looks_like_last_delivery_request(content: &str) -> bool {
     )
 }
 
+/// True for short “how many schedules/jobs/deliveries” count asks — not full list or next fire.
+pub fn looks_like_schedule_count_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("why")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("next ")
+        || n.contains("when ")
+    {
+        return false;
+    }
+    if looks_like_next_schedule_request(content) || looks_like_last_delivery_request(content) {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "how many schedules"
+            | "how many jobs"
+            | "how many cron jobs"
+            | "how many cron"
+            | "how many scheduled jobs"
+            | "how many scheduled"
+            | "schedule count"
+            | "job count"
+            | "cron count"
+            | "schedules count"
+            | "jobs count"
+            | "number of schedules"
+            | "number of jobs"
+            | "how many deliveries"
+            | "delivery count"
+            | "deliveries count"
+            | "number of deliveries"
+    )
+}
+
+/// Zero-LLM schedule or delivery count (Agent Ops Schedules card parity).
+pub fn format_schedule_count_gateway(content: &str) -> String {
+    let n = normalize_operator_command(content);
+    if n.contains("delivery") || n.contains("deliveries") {
+        let n = crate::scheduler::list_scheduler_delivery_awareness().len();
+        return format!(
+            "**Deliveries:** **{n}** recorded · Agent Ops → Schedules for the list."
+        );
+    }
+    let snap = crate::scheduler::scheduler_operator_snapshot();
+    format!(
+        "**Schedules:** **{n}** job(s) loaded · Agent Ops → Schedules for the full list.",
+        n = snap.total_entries
+    )
+}
+
 /// Zero-LLM last scheduler delivery (Agent Ops health Last delivery card parity).
 pub fn format_last_delivery_gateway() -> String {
     let deliveries = crate::scheduler::list_scheduler_delivery_awareness();
@@ -6904,6 +6964,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_last_delivery_request(content) {
         return Some(format_last_delivery_gateway());
     }
+    if looks_like_schedule_count_request(content) {
+        return Some(format_schedule_count_gateway(content));
+    }
     if looks_like_schedules_request(content) {
         let filter = parse_schedules_list_filter(content);
         return Some(format_schedules_gateway(filter));
@@ -10120,6 +10183,23 @@ mod tests {
             reply.contains("Last delivery") || reply.contains("Deliveries"),
             "reply: {reply}"
         );
+    }
+
+    #[test]
+    fn schedule_count_request_detected() {
+        assert!(looks_like_schedule_count_request("how many schedules"));
+        assert!(looks_like_schedule_count_request("how many jobs"));
+        assert!(looks_like_schedule_count_request("schedule count"));
+        assert!(looks_like_schedule_count_request("how many deliveries"));
+        assert!(looks_like_schedule_count_request("@Werner how many cron jobs"));
+        assert!(!looks_like_schedule_count_request("list schedules"));
+        assert!(!looks_like_schedule_count_request("next schedule"));
+        assert!(!looks_like_schedule_count_request("when is the next job"));
+        assert!(!looks_like_schedule_count_request("why are there so many jobs"));
+        let jobs = try_operator_instant_reply("how many jobs").expect("job count instant");
+        assert!(jobs.contains("Schedules") && jobs.contains("job"));
+        let dels = try_operator_instant_reply("how many deliveries").expect("delivery count instant");
+        assert!(dels.contains("Deliveries"));
     }
 
     #[test]

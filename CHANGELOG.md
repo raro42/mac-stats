@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.802] - 2026-09-02
+
+### Added
+- **Instant lane: schedule / delivery count** — `how many schedules`, `how many jobs`, `schedule count`, `how many deliveries`, and similar short asks return counts without Ollama (Discord + AI Chat; Agent Ops Schedules parity; p50 latency).
+
 ## [0.1.801] - 2026-09-02
 
 ### Added
