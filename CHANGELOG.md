@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.803] - 2026-09-02
+
+### Added
+- **Instant lane: operator inventory counts** — `how many agents`, `how many monitors`, `task count`, `how many sessions`, `skill count`, `how many plugins`, `knowledge count`, and `how many open candidates` return counts without Ollama (Discord + AI Chat; Agent Ops overview parity; p50 latency).
+
 ## [0.1.802] - 2026-09-02
 
 ### Added

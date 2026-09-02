@@ -1201,6 +1201,165 @@ pub fn looks_like_schedule_count_request(content: &str) -> bool {
     )
 }
 
+/// Which operator inventory a short count ask targets (not full lists).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OperatorCountKind {
+    Agents,
+    Monitors,
+    Tasks,
+    Sessions,
+    Skills,
+    Plugins,
+    Knowledge,
+    DigestOpen,
+}
+
+/// Parse count-only operator asks — Agent Ops card parity; not list/create asks.
+pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return None;
+    }
+    if looks_like_schedule_count_request(content) {
+        return None;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("why")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("next ")
+        || n.contains("when ")
+        || n.contains("last ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return None;
+    }
+    if n.contains("open candidate")
+        || n.contains("digest open")
+        || n.contains("open digest")
+        || n == "how many open"
+        || n == "open count"
+        || n == "digest count"
+        || n == "candidate count"
+    {
+        return Some(OperatorCountKind::DigestOpen);
+    }
+    if n.contains("agent") {
+        return Some(OperatorCountKind::Agents);
+    }
+    if n.contains("monitor") || (n.contains("site") && n.contains("how many")) {
+        return Some(OperatorCountKind::Monitors);
+    }
+    if n.contains("task") {
+        return Some(OperatorCountKind::Tasks);
+    }
+    if n.contains("session") {
+        return Some(OperatorCountKind::Sessions);
+    }
+    if n.contains("skill") {
+        return Some(OperatorCountKind::Skills);
+    }
+    if n.contains("plugin") {
+        return Some(OperatorCountKind::Plugins);
+    }
+    if n.contains("knowledge") || n.contains("memories") || n.contains("memory file") {
+        return Some(OperatorCountKind::Knowledge);
+    }
+    None
+}
+
+/// True for short “how many agents/monitors/tasks…” count asks.
+pub fn looks_like_operator_count_request(content: &str) -> bool {
+    parse_operator_count_kind(content).is_some()
+}
+
+/// Zero-LLM operator inventory counts (Agent Ops overview parity; not full lists).
+pub fn format_operator_count_gateway(kind: OperatorCountKind) -> String {
+    match kind {
+        OperatorCountKind::Agents => {
+            let agents = crate::agents::load_all_agents();
+            let on_n = agents.iter().filter(|a| a.enabled).count();
+            let off_n = agents.len().saturating_sub(on_n);
+            format!(
+                "**Agents:** **{on_n}** on · **{off_n}** off (**{total}** total) · Agent Ops → Agents for the list.",
+                total = agents.len()
+            )
+        }
+        OperatorCountKind::Monitors => {
+            let rows = crate::commands::monitors::list_monitors_for_ops();
+            let up_n = rows.iter().filter(|r| r.is_up == Some(true)).count();
+            let down_n = rows.iter().filter(|r| r.is_up == Some(false)).count();
+            let slow_n = rows.iter().filter(|r| monitor_row_is_slow(r)).count();
+            format!(
+                "**Monitors:** **{total}** total · **{up_n}** up · **{down_n}** down · **{slow_n}** slow · External / Monitors for the list.",
+                total = rows.len()
+            )
+        }
+        OperatorCountKind::Tasks => match crate::task::count_tasks_by_status() {
+            Ok((open, wip, paused, finished, unsuccessful)) => {
+                let active = open + wip;
+                let total = active + paused + finished + unsuccessful;
+                format!(
+                    "**Tasks:** **{active}** active (open **{open}** · wip **{wip}**) · **{total}** total · `/tasks` or Agent Ops for the list."
+                )
+            }
+            Err(e) => format!("**Tasks:** unavailable ({e})"),
+        },
+        OperatorCountKind::Sessions => {
+            let live_n = list_live_sessions().len();
+            let files_n = list_session_files(Some(20)).map(|f| f.len()).unwrap_or(0);
+            format!(
+                "**Sessions:** **{live_n}** live · **{files_n}** files · Agent Ops → Sessions for the list."
+            )
+        }
+        OperatorCountKind::Skills => {
+            let n = crate::skills::load_skills().len();
+            format!(
+                "**Skills:** **{n}** installed · `/skills` for the catalog."
+            )
+        }
+        OperatorCountKind::Plugins => {
+            let plugins = crate::commands::plugins::list_registered_plugins();
+            let on_n = plugins.iter().filter(|p| p.enabled).count();
+            let off_n = plugins.len().saturating_sub(on_n);
+            format!(
+                "**Plugins:** **{on_n}** on · **{off_n}** off (**{total}** total) · `/plugins` for the list.",
+                total = plugins.len()
+            )
+        }
+        OperatorCountKind::Knowledge => {
+            let files = list_memory_files().unwrap_or_default();
+            let discord_n = files
+                .iter()
+                .filter(|f| knowledge_row_is_discord(&f.kind))
+                .count();
+            let core_n = files
+                .iter()
+                .filter(|f| knowledge_row_is_core(&f.kind))
+                .count();
+            format!(
+                "**Knowledge:** **{discord_n}** Discord · **{core_n}** Core (**{total}** files) · Agent Ops → Knowledge for the list.",
+                total = files.len()
+            )
+        }
+        OperatorCountKind::DigestOpen => {
+            let summary = load_digest_summary();
+            if summary.open_count == 0 {
+                "**Digest:** **0** open candidates · run `/digest` for a fresh scan.".to_string()
+            } else {
+                format!(
+                    "**Digest:** **{}** open candidate(s) · `/digest` or Agent Ops → Runs for hints.",
+                    summary.open_count
+                )
+            }
+        }
+    }
+}
+
 /// Zero-LLM schedule or delivery count (Agent Ops Schedules card parity).
 pub fn format_schedule_count_gateway(content: &str) -> String {
     let n = normalize_operator_command(content);
@@ -6967,6 +7126,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_schedule_count_request(content) {
         return Some(format_schedule_count_gateway(content));
     }
+    if let Some(kind) = parse_operator_count_kind(content) {
+        return Some(format_operator_count_gateway(kind));
+    }
     if looks_like_schedules_request(content) {
         let filter = parse_schedules_list_filter(content);
         return Some(format_schedules_gateway(filter));
@@ -10200,6 +10362,51 @@ mod tests {
         assert!(jobs.contains("Schedules") && jobs.contains("job"));
         let dels = try_operator_instant_reply("how many deliveries").expect("delivery count instant");
         assert!(dels.contains("Deliveries"));
+    }
+
+    #[test]
+    fn operator_count_request_detected() {
+        assert_eq!(
+            parse_operator_count_kind("how many agents"),
+            Some(OperatorCountKind::Agents)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many monitors"),
+            Some(OperatorCountKind::Monitors)
+        );
+        assert_eq!(
+            parse_operator_count_kind("task count"),
+            Some(OperatorCountKind::Tasks)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many sessions"),
+            Some(OperatorCountKind::Sessions)
+        );
+        assert_eq!(
+            parse_operator_count_kind("skill count"),
+            Some(OperatorCountKind::Skills)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many plugins"),
+            Some(OperatorCountKind::Plugins)
+        );
+        assert_eq!(
+            parse_operator_count_kind("knowledge count"),
+            Some(OperatorCountKind::Knowledge)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many open candidates"),
+            Some(OperatorCountKind::DigestOpen)
+        );
+        assert!(parse_operator_count_kind("how many jobs").is_none());
+        assert!(parse_operator_count_kind("list agents").is_none());
+        assert!(parse_operator_count_kind("why are there so many tasks").is_none());
+        let agents = try_operator_instant_reply("how many agents").expect("agent count instant");
+        assert!(agents.contains("Agents") && agents.contains("on"));
+        let digest = try_operator_instant_reply("digest open count")
+            .or_else(|| try_operator_instant_reply("how many open candidates"))
+            .expect("digest open count instant");
+        assert!(digest.contains("Digest") || digest.contains("open"));
     }
 
     #[test]
