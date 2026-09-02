@@ -2,18 +2,17 @@
 
 ## Shipped overnight
 
+**v0.1.801 — Instant lane: last delivery**
+
+Short asks like `last delivery`, `when was the last delivery`, and `what's the last delivery` now return the most recent scheduler delivery without Ollama (Discord + AI Chat). Matches Agent Ops **Last delivery** health card parity. Cuts p50 direct latency for common operator delivery checks.
+
 **v0.1.800 — Instant lane: next schedule / next job**
 
-Short asks like `next schedule`, `when is the next job`, and `what's the next schedule` now return the upcoming fire time without Ollama (Discord + AI Chat). Matches Agent Ops **Next schedule** health card parity. Cuts p50 direct latency for common operator schedule checks.
+Short asks like `next schedule`, `when is the next job`, and `what's the next schedule` now return the upcoming fire time without Ollama (Discord + AI Chat). Matches Agent Ops **Next schedule** health card parity.
 
 **v0.1.799 — Agent Ops Signal health attention glance**
 
-When Signal alerts are not wired (REST API pending), Agent Ops shows an amber attention strip under Slack:
-
-- **Signal · Not wired · REST API pending** when no Signal channels are registered
-- **Signal · Partial · N channel(s) · REST API pending** when channels exist but REST is not wired
-
-Click opens Settings → Credentials and scrolls to the Signal note.
+When Signal alerts are not wired (REST API pending), Agent Ops shows an amber attention strip under Slack. Click opens Settings → Credentials and scrolls to the Signal note.
 
 **v0.1.798 — Agent Ops Slack health attention glance** (earlier tick)
 
