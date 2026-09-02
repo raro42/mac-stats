@@ -3840,6 +3840,115 @@ pub fn format_agents_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the skills folder / skills path…” asks.
+/// Config path only — does not list catalog, run SKILL:, or manage skills.
+pub fn looks_like_skills_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal `/skills` catalog.
+    if looks_like_skills_request(content) {
+        return false;
+    }
+    if looks_like_agents_path_request(content) || looks_like_memory_path_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let skills_ctx = n.contains("skills folder")
+        || n.contains("skill folder")
+        || n.contains("skills directory")
+        || n.contains("skill directory")
+        || n.contains("skills dir")
+        || n.contains("skill dir")
+        || n.contains("skills path")
+        || n.contains("skill path")
+        || ((n.contains("skills") || n.contains("skill"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !skills_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "skills path"
+            | "skill path"
+            | "skills folder"
+            | "skill folder"
+            | "skills directory"
+            | "skill directory"
+            | "skills dir"
+            | "skill dir"
+            | "where is skills folder"
+            | "where is the skills folder"
+            | "where is skill folder"
+            | "where is the skill folder"
+            | "where is skills directory"
+            | "where is the skills directory"
+            | "where is skill directory"
+            | "where is the skill directory"
+            | "where is skills dir"
+            | "where is the skills dir"
+            | "where are skills"
+            | "where do skills go"
+            | "skills location"
+            | "skill location"
+            | "skills home"
+            | "skill home"
+    ) || (skills_ctx && pathish)
+}
+
+/// Zero-LLM skills directory path (config only; no list/run).
+pub fn format_skills_path_gateway() -> String {
+    let dir = crate::config::Config::skills_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -5490,6 +5599,11 @@ pub fn looks_like_skills_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("ticket")
         || n.contains("redmine")
+        || n.contains("path")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("where")
+        || n.contains("location")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -8515,6 +8629,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_agents_path_request(content) {
         return Some(format_agents_path_gateway());
     }
+    if looks_like_skills_path_request(content) {
+        return Some(format_skills_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8692,6 +8809,7 @@ pub fn format_ops_help_gateway() -> String {
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
+• `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10125,6 +10243,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_agents_path_request(question) {
         return true;
     }
+    // Read-only skills dir path asks (v0.1.819) — config only; no list/run.
+    if looks_like_skills_path_request(question) {
+        return true;
+    }
     false
 }
 
@@ -11517,6 +11639,8 @@ mod tests {
         assert!(!looks_like_skills_request("create a skill"));
         assert!(!looks_like_skills_request("run skill code"));
         assert!(!looks_like_skills_request("why are skills empty"));
+        assert!(!looks_like_skills_request("skills path"));
+        assert!(!looks_like_skills_request("where is the skills folder"));
         assert!(looks_like_tasks_request("/tasks"));
         assert!(looks_like_tasks_request("list tasks"));
         assert!(looks_like_tasks_request("open tasks"));
@@ -12360,6 +12484,30 @@ mod tests {
             try_operator_instant_reply("where is the agents folder").expect("agents path instant");
         assert!(reply.contains("Agents dir"));
         assert!(reply.contains("agents") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn skills_path_request_detected() {
+        assert!(looks_like_skills_path_request("skills path"));
+        assert!(looks_like_skills_path_request("skill path"));
+        assert!(looks_like_skills_path_request("skills folder"));
+        assert!(looks_like_skills_path_request("where is the skills folder"));
+        assert!(looks_like_skills_path_request("skills directory"));
+        assert!(looks_like_skills_path_request("where are skills"));
+        assert!(looks_like_skills_path_request("where do skills go"));
+        assert!(looks_like_skills_path_request("skills location"));
+        assert!(!looks_like_skills_path_request("/skills"));
+        assert!(!looks_like_skills_path_request("list skills"));
+        assert!(!looks_like_skills_path_request("skills catalog"));
+        assert!(!looks_like_skills_path_request("create a skill"));
+        assert!(!looks_like_skills_path_request("SKILL: summarize"));
+        assert!(!looks_like_skills_path_request("agents path"));
+        assert!(!looks_like_skills_path_request("memory path"));
+        assert!(!looks_like_skills_request("skills path"));
+        let reply =
+            try_operator_instant_reply("where is the skills folder").expect("skills path instant");
+        assert!(reply.contains("Skills dir"));
+        assert!(reply.contains("skills") || reply.contains(".mac-stats"));
     }
 
     #[test]

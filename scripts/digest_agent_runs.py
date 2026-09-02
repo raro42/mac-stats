@@ -30,6 +30,8 @@ SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
 # v0.1.319–320 — climate/clima/klima voice asks → Open-Meteo (was Brave link-farm).
 SHIPPED_CLIMATE_WEATHER = datetime(2026, 7, 30, 8, 0, tzinfo=timezone.utc)
+# v0.1.818 — STT Elmasnow → El Masnou so Open-Meteo instant beats Brave weather.
+SHIPPED_ELMASNOW_WEATHER = datetime(2026, 9, 2, 20, 55, tzinfo=timezone.utc)
 SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
 # v0.1.133 — scheduled SKILL tasks no longer instant-refused for commit/push.
@@ -1099,6 +1101,10 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
     if ts < SHIPPED_CLIMATE_WEATHER and (
         "climate" in ql or "clima" in ql or "klima" in ql or "masnou" in ql
     ):
+        if "open-meteo" in hl or "weather via search" in hl or "brave" in hl or "instant" in hl:
+            return True
+    # v0.1.818 — Elmasnow STT → El Masnou (Brave weather loop closed).
+    if ts < SHIPPED_ELMASNOW_WEATHER and "elmasnow" in ql:
         if "open-meteo" in hl or "weather via search" in hl or "brave" in hl or "instant" in hl:
             return True
     if "version" in ql and "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:

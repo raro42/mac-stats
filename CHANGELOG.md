@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.819] - 2026-09-02
+
+### Fixed
+- **Instant lane: skills directory path** — `skills path`, `where is the skills folder`, `skills directory`, and similar asks return `~/.mac-stats/agents/skills/` without Ollama (Discord + AI Chat; does not list or run; p50 latency).
+
 ## [0.1.818] - 2026-09-02
 
 ### Fixed
