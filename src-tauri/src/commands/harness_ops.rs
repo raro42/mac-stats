@@ -3405,6 +3405,110 @@ pub fn format_runs_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the task folder / task path…” asks.
+/// Config path only — does not list, create, show, or change tasks.
+pub fn looks_like_task_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal `/tasks` catalog, create/show/append, or inventory counts.
+    if looks_like_tasks_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("append")
+        || n.contains("assign")
+        || n.contains("status")
+        || n.contains("close")
+        || n.contains("finish")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("task:")
+        || n.contains("task_")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedule")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let task_ctx = n.contains("task folder")
+        || n.contains("tasks folder")
+        || n.contains("task directory")
+        || n.contains("tasks directory")
+        || n.contains("task dir")
+        || n.contains("tasks dir")
+        || n.contains("task path")
+        || n.contains("tasks path")
+        || ((n.contains("task") || n.contains("tasks"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !task_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "task path"
+            | "tasks path"
+            | "task folder"
+            | "tasks folder"
+            | "task directory"
+            | "tasks directory"
+            | "task dir"
+            | "tasks dir"
+            | "where is task folder"
+            | "where is the task folder"
+            | "where is tasks folder"
+            | "where is the tasks folder"
+            | "where is task directory"
+            | "where is the task directory"
+            | "where is tasks directory"
+            | "where is the tasks directory"
+            | "where is task dir"
+            | "where is the task dir"
+            | "where are tasks"
+            | "where do tasks go"
+            | "task file path"
+            | "tasks file path"
+            | "task location"
+            | "tasks location"
+    ) || (task_ctx && pathish)
+}
+
+/// Zero-LLM task directory path (config only; no list/create).
+pub fn format_task_path_gateway() -> String {
+    let dir = crate::config::Config::task_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Tasks:** `{display}` · `/tasks` for Active list · `TASK_CREATE:` to add one."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -8068,6 +8172,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_runs_path_request(content) {
         return Some(format_runs_path_gateway());
     }
+    if looks_like_task_path_request(content) {
+        return Some(format_task_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8241,6 +8348,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
+• `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9656,6 +9764,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only runs.jsonl path asks (v0.1.813) — config only; no list/count.
     if looks_like_runs_path_request(question) {
+        return true;
+    }
+    // Read-only task dir path asks (v0.1.814) — config only; no list/create.
+    if looks_like_task_path_request(question) {
         return true;
     }
     false
@@ -11799,6 +11911,28 @@ mod tests {
         let reply = try_operator_instant_reply("where is runs.jsonl").expect("runs path instant");
         assert!(reply.contains("Runs"));
         assert!(reply.contains("runs.jsonl") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn task_path_request_detected() {
+        assert!(looks_like_task_path_request("task path"));
+        assert!(looks_like_task_path_request("tasks path"));
+        assert!(looks_like_task_path_request("task folder"));
+        assert!(looks_like_task_path_request("where is the task folder"));
+        assert!(looks_like_task_path_request("task directory"));
+        assert!(looks_like_task_path_request("where is task dir"));
+        assert!(looks_like_task_path_request("where do tasks go"));
+        assert!(!looks_like_task_path_request("/tasks"));
+        assert!(!looks_like_task_path_request("list tasks"));
+        assert!(!looks_like_task_path_request("how many tasks"));
+        assert!(!looks_like_task_path_request("create a task"));
+        assert!(!looks_like_task_path_request("TASK_CREATE: demo"));
+        assert!(!looks_like_task_path_request("where is config"));
+        assert!(!looks_like_task_path_request("runs path"));
+        assert!(!looks_like_tasks_request("task path"));
+        let reply = try_operator_instant_reply("where is the task folder").expect("task path instant");
+        assert!(reply.contains("Tasks"));
+        assert!(reply.contains("task") || reply.contains(".mac-stats"));
     }
 
     #[test]

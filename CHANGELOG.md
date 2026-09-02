@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.814] - 2026-09-02
+
+### Fixed
+- **Instant lane: task directory path** — `task path`, `where is the task folder`, `task directory`, and similar asks return `~/.mac-stats/task/` without Ollama (Discord + AI Chat; does not list or create; p50 latency).
+
 ## [0.1.813] - 2026-09-02
 
 ### Fixed

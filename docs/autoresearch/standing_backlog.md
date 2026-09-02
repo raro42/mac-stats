@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.814** — Instant lane: task directory path (`task path`, `where is the task folder`, `task directory`; config only; no list/create; p50 latency).
+
 - **v0.1.813** — Instant lane: runs.jsonl path (`runs path`, `where is runs.jsonl`, `runs file path`; config only; no list/count/prune; p50 latency).
 
 - **v0.1.812** — Instant lane: screenshots path (`screenshot path`, `where are screenshots`, `screenshot folder`; config only; no take/list/prune; p50 latency).
