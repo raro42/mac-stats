@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.811] - 2026-09-02
+
+### Fixed
+- **Instant lane: config path / data home** — `where is config`, `config path`, `mac-stats home`, `where is data directory`, and similar asks return `config.json` and `~/.mac-stats` paths without Ollama (Discord + AI Chat; p50 latency).
+
 ## [0.1.810] - 2026-09-02
 
 ### Fixed

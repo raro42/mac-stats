@@ -3122,6 +3122,120 @@ pub fn format_debug_log_age_gateway() -> String {
     }
 }
 
+/// True for short “where is config / mac-stats home / data directory…” asks.
+pub fn looks_like_config_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal debug.log path / size / age / list lanes.
+    if looks_like_debug_log_count_request(content)
+        || looks_like_debug_log_size_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_debug_log_age_request(content)
+        || looks_like_debug_log_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("configure")
+        || n.contains("open settings")
+        || n.contains("cursor")
+        || n.contains("chromium")
+        || n.contains("browser")
+        || n.contains("ollama")
+        || n.contains("keychain")
+        || n.contains("screenshot")
+        || n.contains("log")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home");
+    if !pathish {
+        return false;
+    }
+    let config_ctx = n.contains("config")
+        || n.contains("config.json")
+        || n.contains("mac-stats home")
+        || n.contains("mac stats home")
+        || n.contains("data home")
+        || n.contains("data dir")
+        || n.contains("data directory")
+        || n.contains("mac-stats data")
+        || n.contains("mac stats data")
+        || n.contains("mac-stats folder")
+        || n.contains("mac stats folder")
+        || n.contains(".mac-stats");
+    if !config_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "where is config"
+            | "where is the config"
+            | "where is config.json"
+            | "where is the config.json"
+            | "where is mac-stats config"
+            | "where is mac stats config"
+            | "config path"
+            | "config file path"
+            | "config.json path"
+            | "mac-stats config path"
+            | "mac stats config path"
+            | "mac-stats home"
+            | "mac stats home"
+            | "data directory"
+            | "data dir"
+            | "where is data dir"
+            | "where is the data dir"
+            | "where is data directory"
+            | "where is the data directory"
+            | "where is mac-stats data"
+            | "where is mac stats data"
+            | "where is mac-stats folder"
+            | "where is mac stats folder"
+            | "where is .mac-stats"
+            | ".mac-stats path"
+            | "mac-stats folder"
+            | "mac stats folder"
+    ) || ((n.contains("config") || n.contains(".mac-stats") || n.contains("mac-stats") || n.contains("mac stats"))
+        && pathish)
+        || (n.contains("data") && (n.contains("dir") || n.contains("directory") || n.contains("home") || n.contains("folder")) && pathish)
+}
+
+/// Zero-LLM config.json + data-home paths (config only; no file read).
+pub fn format_config_path_gateway() -> String {
+    let config = crate::config::Config::config_file_path();
+    let home = config
+        .parent()
+        .map(|p| p.display().to_string())
+        .unwrap_or_else(|| "~/.mac-stats".into());
+    let config_display = config.display().to_string();
+    format!(
+        "**Config:** `{config_display}` · data home `{home}` · Settings for credentials · `/logs` for debug.log."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -7776,6 +7890,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_debug_log_age_request(content) {
         return Some(format_debug_log_age_gateway());
     }
+    if looks_like_config_path_request(content) {
+        return Some(format_config_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -7946,6 +8063,7 @@ pub fn format_ops_help_gateway() -> String {
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
+• `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9349,6 +9467,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only debug.log age asks (v0.1.810) — mtime only, no tail read.
     if looks_like_debug_log_age_request(question) {
+        return true;
+    }
+    // Read-only config.json / data-home path asks (v0.1.811) — config only.
+    if looks_like_config_path_request(question) {
         return true;
     }
     false
@@ -11434,6 +11556,25 @@ mod tests {
         let path = try_operator_instant_reply("where is the log").expect("log path instant");
         assert!(path.contains("Debug Log"));
         assert!(path.contains("mac-stats") || path.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn config_path_request_detected() {
+        assert!(looks_like_config_path_request("where is config"));
+        assert!(looks_like_config_path_request("config path"));
+        assert!(looks_like_config_path_request("config file path"));
+        assert!(looks_like_config_path_request("mac-stats home"));
+        assert!(looks_like_config_path_request("where is data directory"));
+        assert!(looks_like_config_path_request("where is .mac-stats"));
+        assert!(!looks_like_config_path_request("where is the log"));
+        assert!(!looks_like_config_path_request("configure ollama"));
+        assert!(!looks_like_config_path_request("edit config"));
+        assert!(!looks_like_config_path_request("change config"));
+        assert!(!looks_like_config_path_request("cursor path"));
+        assert!(!looks_like_config_path_request("screenshot folder"));
+        let reply = try_operator_instant_reply("where is config").expect("config path instant");
+        assert!(reply.contains("Config"));
+        assert!(reply.contains("config.json") || reply.contains(".mac-stats"));
     }
 
     #[test]
