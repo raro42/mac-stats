@@ -2,6 +2,10 @@
 
 ## Shipped overnight
 
+**v0.1.809 — Instant lane: debug log path**
+
+`where is the log`, `log file path`, `debug log path`, and similar short asks now return the debug.log path on disk without Ollama or reading the tail (Discord + AI Chat). Complements v0.1.807 error/warn counts and v0.1.808 file size. Settings → View logs still opens the file.
+
 **v0.1.808 — Instant lane: debug log file size**
 
 `log file size`, `how big is the log`, `debug log size`, and similar short asks now return the debug.log file size on disk without Ollama or reading the tail (Discord + AI Chat). Complements v0.1.807 error/warn counts. `/logs` still lists lines.
@@ -12,31 +16,31 @@
 
 **v0.1.806 — Instant lane: digest age read-only**
 
-`digest age`, `how old is the digest`, `when was digest updated`, and similar short asks now return the cached digest timestamp plus open/stale counts from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where age checks paid digester spawn cost.
+`digest age`, `how old is the digest`, `when was digest updated`, and similar short asks now return the cached digest timestamp plus open/stale counts from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes.
 
 **v0.1.805 — Instant lane: digest open read-only**
 
-`digest open`, `open candidates`, and similar short asks now return cached open hints from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where read-only open checks paid digester spawn cost.
+`digest open`, `open candidates`, and similar short asks now return cached open hints from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes.
 
 **v0.1.804 — Instant lane: runs count**
 
-Short asks like `how many runs`, `run count`, `how many failed runs`, `failure count`, `how many slow runs`, and lane-specific counts (instant/direct/lite) now return `runs.jsonl` totals without Ollama (Discord + AI Chat). Matches Agent Ops **Runs** overview parity.
+Short asks like `how many runs`, `run count`, `how many failed runs`, and lane-specific counts now return `runs.jsonl` totals without Ollama (Discord + AI Chat).
 
 **v0.1.803 — Instant lane: operator inventory counts**
 
-Short asks like `how many agents`, `how many monitors`, `task count`, `how many sessions`, `skill count`, `how many plugins`, `knowledge count`, and `how many open candidates` now return inventory totals without Ollama (Discord + AI Chat). Matches Agent Ops overview cards.
+Short asks like `how many agents`, `how many monitors`, `task count`, and `how many open candidates` now return inventory totals without Ollama (Discord + AI Chat).
 
 **v0.1.802 — Instant lane: schedule / delivery count**
 
-Short asks like `how many schedules`, `how many jobs`, `schedule count`, and `how many deliveries` now return scheduler totals without Ollama (Discord + AI Chat). Matches Agent Ops **Schedules** card parity.
+Short asks like `how many schedules` and `how many deliveries` now return scheduler totals without Ollama (Discord + AI Chat).
 
 **v0.1.801 — Instant lane: last delivery**
 
-Short asks like `last delivery`, `when was the last delivery`, and `what's the last delivery` now return the most recent scheduler delivery without Ollama (Discord + AI Chat). Matches Agent Ops **Last delivery** health card parity.
+Short asks like `last delivery` and `when was the last delivery` now return the most recent scheduler delivery without Ollama (Discord + AI Chat).
 
 **v0.1.800 — Instant lane: next schedule / next job**
 
-Short asks like `next schedule`, `when is the next job`, and `what's the next schedule` now return the upcoming fire time without Ollama (Discord + AI Chat). Matches Agent Ops **Next schedule** health card parity.
+Short asks like `next schedule` and `when is the next job` now return the upcoming fire time without Ollama (Discord + AI Chat).
 
 **v0.1.799 — Agent Ops Signal health attention glance**
 
