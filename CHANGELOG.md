@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.825] - 2026-09-03
+
+### Fixed
+- **Instant lane: CDP traces directory path** — `traces path`, `where is the traces folder`, `cdp traces`, and similar asks return `~/.mac-stats/traces/` without Ollama (Discord + AI Chat; does not list or prune; p50 latency).
+
 ## [0.1.824] - 2026-09-03
 
 ### Fixed

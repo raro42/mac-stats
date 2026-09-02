@@ -4492,6 +4492,151 @@ pub fn format_uploads_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the traces folder / traces path…” asks.
+/// Config path only — does not list, prune, or open CDP trace JSON under `~/.mac-stats/traces/`.
+pub fn looks_like_traces_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal sibling path / browser-status / disk-cleanup / stack-trace asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if n.contains("stacktrace")
+        || n.contains("stack trace")
+        || n.contains("backtrace")
+        || n.contains("back trace")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let traces_ctx = n.contains("traces folder")
+        || n.contains("traces directory")
+        || n.contains("traces dir")
+        || n.contains("traces path")
+        || n.contains("trace folder")
+        || n.contains("trace directory")
+        || n.contains("trace dir")
+        || n.contains("trace path")
+        || n.contains("cdp traces")
+        || n.contains("cdp trace")
+        || n.contains("cdp_trace")
+        || n.contains("browser traces")
+        || n.contains("browser trace")
+        || n.contains("mac-stats traces")
+        || n.contains("mac stats traces")
+        || n == "traces"
+        || (n.contains("trace")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !traces_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "traces path"
+            | "trace path"
+            | "traces folder"
+            | "trace folder"
+            | "traces directory"
+            | "trace directory"
+            | "traces dir"
+            | "trace dir"
+            | "where is traces folder"
+            | "where is the traces folder"
+            | "where is trace folder"
+            | "where is the trace folder"
+            | "where is traces directory"
+            | "where is the traces directory"
+            | "where is trace directory"
+            | "where is the trace directory"
+            | "where is traces dir"
+            | "where is the traces dir"
+            | "where are traces"
+            | "where do traces go"
+            | "where do cdp traces go"
+            | "traces location"
+            | "trace location"
+            | "traces home"
+            | "cdp traces"
+            | "cdp trace path"
+            | "cdp traces path"
+            | "cdp traces folder"
+            | "browser traces"
+            | "browser traces path"
+            | "browser traces folder"
+            | "mac-stats traces"
+            | "mac stats traces"
+            | "traces"
+    ) || (traces_ctx && pathish)
+}
+
+/// Zero-LLM CDP traces directory path (config only; no list/prune).
+pub fn format_traces_path_gateway() -> String {
+    let dir = crate::config::Config::browser_cdp_traces_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Traces dir:** `{display}` · CDP `*_cdp_trace.json` · pruned by retention · `/browser` for CDP status."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9187,6 +9332,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_uploads_path_request(content) {
         return Some(format_uploads_path_gateway());
     }
+    if looks_like_traces_path_request(content) {
+        return Some(format_traces_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9369,6 +9517,7 @@ pub fn format_ops_help_gateway() -> String {
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
+• `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10820,6 +10969,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only uploads dir path asks (v0.1.824) — config only; no list/upload.
     if looks_like_uploads_path_request(question) {
+        return true;
+    }
+    // Read-only CDP traces dir path asks (v0.1.825) — config only; no list/prune.
+    if looks_like_traces_path_request(question) {
         return true;
     }
     false
@@ -13186,6 +13339,34 @@ mod tests {
             try_operator_instant_reply("where is the uploads folder").expect("uploads path instant");
         assert!(reply.contains("Uploads dir"));
         assert!(reply.contains("uploads") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn traces_path_request_detected() {
+        assert!(looks_like_traces_path_request("traces path"));
+        assert!(looks_like_traces_path_request("trace path"));
+        assert!(looks_like_traces_path_request("traces folder"));
+        assert!(looks_like_traces_path_request("where is the traces folder"));
+        assert!(looks_like_traces_path_request("traces directory"));
+        assert!(looks_like_traces_path_request("where are traces"));
+        assert!(looks_like_traces_path_request("where do cdp traces go"));
+        assert!(looks_like_traces_path_request("cdp traces path"));
+        assert!(looks_like_traces_path_request("browser traces path"));
+        assert!(looks_like_traces_path_request("mac-stats traces"));
+        assert!(!looks_like_traces_path_request("list traces"));
+        assert!(!looks_like_traces_path_request("prune traces"));
+        assert!(!looks_like_traces_path_request("clean traces"));
+        assert!(!looks_like_traces_path_request("stack trace"));
+        assert!(!looks_like_traces_path_request("backtrace"));
+        assert!(!looks_like_traces_path_request("/disk reclaim"));
+        assert!(!looks_like_traces_path_request("uploads path"));
+        assert!(!looks_like_traces_path_request("where is config"));
+        assert!(!looks_like_traces_path_request("/browser"));
+        assert!(!looks_like_uploads_path_request("traces path"));
+        let reply =
+            try_operator_instant_reply("where is the traces folder").expect("traces path instant");
+        assert!(reply.contains("Traces dir"));
+        assert!(reply.contains("traces") || reply.contains(".mac-stats"));
     }
 
     #[test]
