@@ -3629,6 +3629,106 @@ pub fn format_memory_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the session folder / session path…” asks.
+/// Config path only — does not list, resume, open, or delete sessions.
+pub fn looks_like_session_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal `/sessions` Live/Files catalog or inventory counts.
+    if looks_like_sessions_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("resume")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("compact")
+        || n.contains("reset")
+        || n.contains("session:")
+        || n.contains("session_")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let session_ctx = n.contains("session folder")
+        || n.contains("sessions folder")
+        || n.contains("session directory")
+        || n.contains("sessions directory")
+        || n.contains("session dir")
+        || n.contains("sessions dir")
+        || n.contains("session path")
+        || n.contains("sessions path")
+        || ((n.contains("session") || n.contains("sessions"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !session_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "session path"
+            | "sessions path"
+            | "session folder"
+            | "sessions folder"
+            | "session directory"
+            | "sessions directory"
+            | "session dir"
+            | "sessions dir"
+            | "where is session folder"
+            | "where is the session folder"
+            | "where is sessions folder"
+            | "where is the sessions folder"
+            | "where is session directory"
+            | "where is the session directory"
+            | "where is sessions directory"
+            | "where is the sessions directory"
+            | "where is session dir"
+            | "where is the session dir"
+            | "where are sessions"
+            | "where do sessions go"
+            | "session file path"
+            | "sessions file path"
+            | "session location"
+            | "sessions location"
+    ) || (session_ctx && pathish)
+}
+
+/// Zero-LLM session directory path (config only; no list/resume).
+pub fn format_session_path_gateway() -> String {
+    let dir = crate::config::Config::session_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Sessions:** `{display}` · `/sessions` for Live/Files · Agent Ops → Sessions."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -8298,6 +8398,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
     }
+    if looks_like_session_path_request(content) {
+        return Some(format_session_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8473,6 +8576,7 @@ pub fn format_ops_help_gateway() -> String {
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
+• `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9896,6 +10000,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory/notes path asks (v0.1.815) — config only; no list/save/scrub.
     if looks_like_memory_path_request(question) {
+        return true;
+    }
+    // Read-only session dir path asks (v0.1.816) — config only; no list/resume.
+    if looks_like_session_path_request(question) {
         return true;
     }
     false
@@ -12084,6 +12192,30 @@ mod tests {
         let reply = try_operator_instant_reply("where are notes").expect("memory path instant");
         assert!(reply.contains("Memory"));
         assert!(reply.contains("notes") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn session_path_request_detected() {
+        assert!(looks_like_session_path_request("session path"));
+        assert!(looks_like_session_path_request("sessions path"));
+        assert!(looks_like_session_path_request("session folder"));
+        assert!(looks_like_session_path_request("where is the session folder"));
+        assert!(looks_like_session_path_request("session directory"));
+        assert!(looks_like_session_path_request("where are sessions"));
+        assert!(looks_like_session_path_request("where do sessions go"));
+        assert!(looks_like_session_path_request("session location"));
+        assert!(!looks_like_session_path_request("/sessions"));
+        assert!(!looks_like_session_path_request("list sessions"));
+        assert!(!looks_like_session_path_request("live sessions"));
+        assert!(!looks_like_session_path_request("session files"));
+        assert!(!looks_like_session_path_request("resume this session"));
+        assert!(!looks_like_session_path_request("where is config"));
+        assert!(!looks_like_session_path_request("memory path"));
+        assert!(!looks_like_sessions_request("session path"));
+        let reply =
+            try_operator_instant_reply("where is the session folder").expect("session path instant");
+        assert!(reply.contains("Sessions"));
+        assert!(reply.contains("session") || reply.contains(".mac-stats"));
     }
 
     #[test]
