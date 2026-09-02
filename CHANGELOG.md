@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.817] - 2026-09-02
+
+### Fixed
+- **Instant lane: agents directory path** — `agents path`, `where is the agents folder`, `agents directory`, and similar asks return `~/.mac-stats/agents/` without Ollama (Discord + AI Chat; does not list or create; p50 latency).
+
 ## [0.1.816] - 2026-09-02
 
 ### Fixed

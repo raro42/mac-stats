@@ -3729,6 +3729,117 @@ pub fn format_session_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the agents folder / agents path…” asks.
+/// Config path only — does not list On/Off, create, edit, or enable agents.
+pub fn looks_like_agents_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal `/agents` On/Off catalog or inventory counts.
+    if looks_like_agents_request(content) {
+        return false;
+    }
+    // Notes / memory / skills paths stay on their own lanes.
+    if looks_like_memory_path_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("skill")
+        || n.contains("skills")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.starts_with("agent:")
+        || n.contains("agent:")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agents_ctx = n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent dir")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || ((n.contains("agents") || n.contains("agent"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !agents_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "agents path"
+            | "agent path"
+            | "agents folder"
+            | "agent folder"
+            | "agents directory"
+            | "agent directory"
+            | "agents dir"
+            | "agent dir"
+            | "where is agents folder"
+            | "where is the agents folder"
+            | "where is agent folder"
+            | "where is the agent folder"
+            | "where is agents directory"
+            | "where is the agents directory"
+            | "where is agent directory"
+            | "where is the agent directory"
+            | "where is agents dir"
+            | "where is the agents dir"
+            | "where are agents"
+            | "where do agents go"
+            | "agents location"
+            | "agent location"
+            | "agents home"
+            | "agent home"
+    ) || (agents_ctx && pathish)
+}
+
+/// Zero-LLM agents directory path (config only; no list/create).
+pub fn format_agents_path_gateway() -> String {
+    let dir = crate::config::Config::agents_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Agents dir:** `{display}` · `/agents` for On/Off · Agent Ops → Agents."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -8401,6 +8512,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_path_request(content) {
         return Some(format_session_path_gateway());
     }
+    if looks_like_agents_path_request(content) {
+        return Some(format_agents_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8577,6 +8691,7 @@ pub fn format_ops_help_gateway() -> String {
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
+• `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10004,6 +10119,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session dir path asks (v0.1.816) — config only; no list/resume.
     if looks_like_session_path_request(question) {
+        return true;
+    }
+    // Read-only agents dir path asks (v0.1.817) — config only; no list/create.
+    if looks_like_agents_path_request(question) {
         return true;
     }
     false
@@ -12216,6 +12335,31 @@ mod tests {
             try_operator_instant_reply("where is the session folder").expect("session path instant");
         assert!(reply.contains("Sessions"));
         assert!(reply.contains("session") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn agents_path_request_detected() {
+        assert!(looks_like_agents_path_request("agents path"));
+        assert!(looks_like_agents_path_request("agent path"));
+        assert!(looks_like_agents_path_request("agents folder"));
+        assert!(looks_like_agents_path_request("where is the agents folder"));
+        assert!(looks_like_agents_path_request("agents directory"));
+        assert!(looks_like_agents_path_request("where are agents"));
+        assert!(looks_like_agents_path_request("where do agents go"));
+        assert!(looks_like_agents_path_request("agents location"));
+        assert!(!looks_like_agents_path_request("/agents"));
+        assert!(!looks_like_agents_path_request("list agents"));
+        assert!(!looks_like_agents_path_request("agents on"));
+        assert!(!looks_like_agents_path_request("create an agent"));
+        assert!(!looks_like_agents_path_request("memory path"));
+        assert!(!looks_like_agents_path_request("notes folder"));
+        assert!(!looks_like_agents_path_request("skills path"));
+        assert!(!looks_like_agents_path_request("session path"));
+        assert!(!looks_like_agents_request("agents path"));
+        let reply =
+            try_operator_instant_reply("where is the agents folder").expect("agents path instant");
+        assert!(reply.contains("Agents dir"));
+        assert!(reply.contains("agents") || reply.contains(".mac-stats"));
     }
 
     #[test]
