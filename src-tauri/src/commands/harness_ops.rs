@@ -3880,6 +3880,8 @@ pub fn looks_like_skills_path_request(content: &str) -> bool {
         || n.contains("catalog")
         || n.contains("installed")
         || n.contains("available")
+        || n.contains("plugin")
+        || n.contains("scripts")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -3946,6 +3948,152 @@ pub fn format_skills_path_gateway() -> String {
     let display = dir.display().to_string();
     format!(
         "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run."
+    )
+}
+
+/// True for short “where is the plugins/scripts folder / plugins path…” asks.
+/// Config path only — does not list On/Off, run, add, or remove plugins.
+pub fn looks_like_plugins_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal `/plugins` On/Off catalog.
+    if looks_like_plugins_request(content) {
+        return false;
+    }
+    if looks_like_skills_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_memory_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("run plugin")
+        || n.contains("execute")
+        || n.contains("install")
+        || n.contains("plugin:")
+        || n.contains("tauri")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let plugins_ctx = n.contains("plugins folder")
+        || n.contains("plugin folder")
+        || n.contains("plugins directory")
+        || n.contains("plugin directory")
+        || n.contains("plugins dir")
+        || n.contains("plugin dir")
+        || n.contains("plugins path")
+        || n.contains("plugin path")
+        || n.contains("scripts folder")
+        || n.contains("script folder")
+        || n.contains("scripts directory")
+        || n.contains("script directory")
+        || n.contains("scripts dir")
+        || n.contains("script dir")
+        || n.contains("scripts path")
+        || n.contains("script path")
+        || ((n.contains("plugins") || n.contains("plugin") || n.contains("scripts") || n.contains("script"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !plugins_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "plugins path"
+            | "plugin path"
+            | "plugins folder"
+            | "plugin folder"
+            | "plugins directory"
+            | "plugin directory"
+            | "plugins dir"
+            | "plugin dir"
+            | "scripts path"
+            | "script path"
+            | "scripts folder"
+            | "script folder"
+            | "scripts directory"
+            | "script directory"
+            | "scripts dir"
+            | "script dir"
+            | "where is plugins folder"
+            | "where is the plugins folder"
+            | "where is plugin folder"
+            | "where is the plugin folder"
+            | "where is plugins directory"
+            | "where is the plugins directory"
+            | "where is plugin directory"
+            | "where is the plugin directory"
+            | "where is plugins dir"
+            | "where is the plugins dir"
+            | "where are plugins"
+            | "where do plugins go"
+            | "plugins location"
+            | "plugin location"
+            | "plugins home"
+            | "plugin home"
+            | "where is scripts folder"
+            | "where is the scripts folder"
+            | "where is script folder"
+            | "where is the script folder"
+            | "where is scripts directory"
+            | "where is the scripts directory"
+            | "where is script directory"
+            | "where is the script directory"
+            | "where is scripts dir"
+            | "where is the scripts dir"
+            | "where are scripts"
+            | "where do scripts go"
+            | "scripts location"
+            | "script location"
+            | "scripts home"
+            | "script home"
+    ) || (plugins_ctx && pathish)
+}
+
+/// Zero-LLM plugins/scripts directory path (config only; no list/run).
+/// Registered plugins point at script paths; agent scripts live under `scripts/`.
+pub fn format_plugins_path_gateway() -> String {
+    let dir = crate::config::Config::scripts_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · no run from this ask."
     )
 }
 
@@ -8632,6 +8780,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skills_path_request(content) {
         return Some(format_skills_path_gateway());
     }
+    if looks_like_plugins_path_request(content) {
+        return Some(format_plugins_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8810,6 +8961,7 @@ pub fn format_ops_help_gateway() -> String {
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
+• `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10245,6 +10397,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only skills dir path asks (v0.1.819) — config only; no list/run.
     if looks_like_skills_path_request(question) {
+        return true;
+    }
+    // Read-only plugins/scripts dir path asks (v0.1.820) — config only; no list/run.
+    if looks_like_plugins_path_request(question) {
         return true;
     }
     false
@@ -12508,6 +12664,34 @@ mod tests {
             try_operator_instant_reply("where is the skills folder").expect("skills path instant");
         assert!(reply.contains("Skills dir"));
         assert!(reply.contains("skills") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn plugins_path_request_detected() {
+        assert!(looks_like_plugins_path_request("plugins path"));
+        assert!(looks_like_plugins_path_request("plugin path"));
+        assert!(looks_like_plugins_path_request("plugins folder"));
+        assert!(looks_like_plugins_path_request("where is the plugins folder"));
+        assert!(looks_like_plugins_path_request("plugins directory"));
+        assert!(looks_like_plugins_path_request("where are plugins"));
+        assert!(looks_like_plugins_path_request("where do plugins go"));
+        assert!(looks_like_plugins_path_request("plugins location"));
+        assert!(looks_like_plugins_path_request("scripts path"));
+        assert!(looks_like_plugins_path_request("where is the scripts folder"));
+        assert!(looks_like_plugins_path_request("where are scripts"));
+        assert!(!looks_like_plugins_path_request("/plugins"));
+        assert!(!looks_like_plugins_path_request("list plugins"));
+        assert!(!looks_like_plugins_path_request("plugins catalog"));
+        assert!(!looks_like_plugins_path_request("add a plugin"));
+        assert!(!looks_like_plugins_path_request("run plugin foo"));
+        assert!(!looks_like_plugins_path_request("skills path"));
+        assert!(!looks_like_plugins_path_request("agents path"));
+        assert!(!looks_like_plugins_request("plugins path"));
+        assert!(!looks_like_plugins_request("scripts path"));
+        let reply =
+            try_operator_instant_reply("where is the plugins folder").expect("plugins path instant");
+        assert!(reply.contains("Plugins/scripts dir"));
+        assert!(reply.contains("scripts") || reply.contains(".mac-stats"));
     }
 
     #[test]

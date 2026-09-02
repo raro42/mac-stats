@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.820] - 2026-09-02
+
+### Fixed
+- **Instant lane: plugins/scripts directory path** — `plugins path`, `scripts path`, `where is the plugins folder`, and similar asks return `~/.mac-stats/scripts/` without Ollama (Discord + AI Chat; does not list or run; p50 latency).
+
 ## [0.1.819] - 2026-09-02
 
 ### Fixed
