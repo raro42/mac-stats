@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.812] - 2026-09-02
+
+### Fixed
+- **Instant lane: screenshots path** — `screenshot path`, `where are screenshots`, `screenshot folder`, and similar asks return `~/.mac-stats/screenshots` without Ollama (Discord + AI Chat; does not take, list, or prune; p50 latency).
+
 ## [0.1.811] - 2026-09-02
 
 ### Fixed

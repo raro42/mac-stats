@@ -3236,6 +3236,81 @@ pub fn format_config_path_gateway() -> String {
     )
 }
 
+/// True for short “where are screenshots / screenshot folder…” asks.
+/// Config path only — does not take, list, delete, or attach screenshots.
+pub fn looks_like_screenshots_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal take/list/clean/BROWSER_* screenshot work.
+    if n.contains("take")
+        || n.contains("capture")
+        || n.contains("attach")
+        || n.contains("send")
+        || n.contains("browser")
+        || n.contains("navigate")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("open ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    let shot_ctx = n.contains("screenshot") || n.contains("screenshots");
+    if !shot_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("go");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "screenshot path"
+            | "screenshots path"
+            | "screenshot folder"
+            | "screenshots folder"
+            | "screenshot directory"
+            | "screenshots directory"
+            | "screenshot dir"
+            | "screenshots dir"
+            | "where are screenshots"
+            | "where is screenshot folder"
+            | "where is the screenshot folder"
+            | "where is screenshots folder"
+            | "where is the screenshots folder"
+            | "where do screenshots go"
+            | "where do screenshot go"
+            | "screenshot location"
+            | "screenshots location"
+    ) || (shot_ctx && pathish)
+}
+
+/// Zero-LLM BROWSER_SCREENSHOT save directory (config only; no list/prune).
+pub fn format_screenshots_path_gateway() -> String {
+    let dir = crate::config::Config::screenshots_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Screenshots:** `{display}` · BROWSER_SCREENSHOT saves PNG here · Disk Cleanup can prune old files."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -7893,6 +7968,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
+    if looks_like_screenshots_path_request(content) {
+        return Some(format_screenshots_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8064,6 +8142,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
+• `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9471,6 +9550,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
     if looks_like_config_path_request(question) {
+        return true;
+    }
+    // Read-only screenshots dir path asks (v0.1.812) — config only; no list/take.
+    if looks_like_screenshots_path_request(question) {
         return true;
     }
     false
@@ -11575,6 +11658,26 @@ mod tests {
         let reply = try_operator_instant_reply("where is config").expect("config path instant");
         assert!(reply.contains("Config"));
         assert!(reply.contains("config.json") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn screenshots_path_request_detected() {
+        assert!(looks_like_screenshots_path_request("screenshot path"));
+        assert!(looks_like_screenshots_path_request("screenshots path"));
+        assert!(looks_like_screenshots_path_request("screenshot folder"));
+        assert!(looks_like_screenshots_path_request("where are screenshots"));
+        assert!(looks_like_screenshots_path_request("where do screenshots go"));
+        assert!(looks_like_screenshots_path_request("screenshot directory"));
+        assert!(!looks_like_screenshots_path_request("take a screenshot"));
+        assert!(!looks_like_screenshots_path_request("list screenshots"));
+        assert!(!looks_like_screenshots_path_request("delete screenshots"));
+        assert!(!looks_like_screenshots_path_request("browser screenshot"));
+        assert!(!looks_like_screenshots_path_request("where is config"));
+        assert!(!looks_like_config_path_request("screenshot folder"));
+        let reply =
+            try_operator_instant_reply("where are screenshots").expect("screenshots path instant");
+        assert!(reply.contains("Screenshots"));
+        assert!(reply.contains("screenshots") || reply.contains(".mac-stats"));
     }
 
     #[test]
