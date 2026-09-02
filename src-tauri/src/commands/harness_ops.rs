@@ -3509,6 +3509,126 @@ pub fn format_task_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the notes folder / memory path…” asks.
+/// Config path only — does not list, read, save, scrub, or append memory.
+pub fn looks_like_memory_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal scrub / MEMORY: / dump-saved / curated append.
+    if looks_like_memory_scrub_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("read ")
+        || n.contains("dump")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("saved note")
+        || n.contains("save ")
+        || n.contains("append")
+        || n.contains("scrub")
+        || n.contains("purge")
+        || n.contains("clean")
+        || n.contains("polluted")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("memory:")
+        || n.contains("memory_")
+        || n.contains("note:")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mem_ctx = n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("notes path")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("memory dir")
+        || n.contains("memory path")
+        || n.contains("memory notes")
+        || ((n.contains("notes") || n.contains("memory"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !mem_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    if !pathish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "memory path"
+            | "notes path"
+            | "memory folder"
+            | "notes folder"
+            | "memory directory"
+            | "notes directory"
+            | "memory dir"
+            | "notes dir"
+            | "memory notes path"
+            | "memory notes folder"
+            | "memory notes directory"
+            | "memory notes dir"
+            | "where is memory"
+            | "where is the memory"
+            | "where is memory folder"
+            | "where is the memory folder"
+            | "where is memory directory"
+            | "where is the memory directory"
+            | "where is memory dir"
+            | "where is the memory dir"
+            | "where is notes folder"
+            | "where is the notes folder"
+            | "where is notes directory"
+            | "where is the notes directory"
+            | "where is notes dir"
+            | "where is the notes dir"
+            | "where are notes"
+            | "where do notes go"
+            | "where does memory go"
+            | "memory file path"
+            | "notes file path"
+            | "memory location"
+            | "notes location"
+    ) || (mem_ctx && pathish)
+}
+
+/// Zero-LLM memory notes dir + curated memory.md paths (config only; no list/read/save).
+pub fn format_memory_path_gateway() -> String {
+    let notes = crate::config::Config::memory_notes_dir()
+        .display()
+        .to_string();
+    let curated = crate::config::Config::memory_file_path()
+        .display()
+        .to_string();
+    format!(
+        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -8175,6 +8295,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_task_path_request(content) {
         return Some(format_task_path_gateway());
     }
+    if looks_like_memory_path_request(content) {
+        return Some(format_memory_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -8349,6 +8472,7 @@ pub fn format_ops_help_gateway() -> String {
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
+• `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9768,6 +9892,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only task dir path asks (v0.1.814) — config only; no list/create.
     if looks_like_task_path_request(question) {
+        return true;
+    }
+    // Read-only memory/notes path asks (v0.1.815) — config only; no list/save/scrub.
+    if looks_like_memory_path_request(question) {
         return true;
     }
     false
@@ -11933,6 +12061,29 @@ mod tests {
         let reply = try_operator_instant_reply("where is the task folder").expect("task path instant");
         assert!(reply.contains("Tasks"));
         assert!(reply.contains("task") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn memory_path_request_detected() {
+        assert!(looks_like_memory_path_request("memory path"));
+        assert!(looks_like_memory_path_request("notes path"));
+        assert!(looks_like_memory_path_request("notes folder"));
+        assert!(looks_like_memory_path_request("where are notes"));
+        assert!(looks_like_memory_path_request("where is the notes folder"));
+        assert!(looks_like_memory_path_request("memory directory"));
+        assert!(looks_like_memory_path_request("where do notes go"));
+        assert!(looks_like_memory_path_request("memory notes path"));
+        assert!(!looks_like_memory_path_request("scrub memory"));
+        assert!(!looks_like_memory_path_request("list notes"));
+        assert!(!looks_like_memory_path_request("dump what you saved"));
+        assert!(!looks_like_memory_path_request("MEMORY: save itinerary"));
+        assert!(!looks_like_memory_path_request("what did you save"));
+        assert!(!looks_like_memory_path_request("where is config"));
+        assert!(!looks_like_memory_path_request("task path"));
+        assert!(!looks_like_memory_scrub_request("memory path"));
+        let reply = try_operator_instant_reply("where are notes").expect("memory path instant");
+        assert!(reply.contains("Memory"));
+        assert!(reply.contains("notes") || reply.contains(".mac-stats"));
     }
 
     #[test]

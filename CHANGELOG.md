@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.815] - 2026-09-02
+
+### Fixed
+- **Instant lane: memory / notes path** — `memory path`, `notes path`, `where are notes`, `notes folder`, and similar asks return `~/.mac-stats/agents/notes/` plus curated `memory.md` without Ollama (Discord + AI Chat; does not list, save, or scrub; p50 latency).
+
 ## [0.1.814] - 2026-09-02
 
 ### Fixed
