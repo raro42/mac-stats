@@ -1580,6 +1580,12 @@ pub fn parse_runs_count_kind(content: &str) -> Option<RunsCountKind> {
     if looks_like_schedule_count_request(content) || looks_like_operator_count_request(content) {
         return None;
     }
+    if looks_like_debug_log_count_request(content) {
+        return None;
+    }
+    if n.contains("log") || n.contains("debug") {
+        return None;
+    }
     if n.contains("list")
         || n.contains("show ")
         || n.contains("recent ")
@@ -2754,6 +2760,129 @@ pub fn format_debug_log_gateway(filter: DebugLogListFilter) -> String {
         out = out.chars().take(1790).collect::<String>() + "…";
     }
     out
+}
+
+/// Error/warn counts from the debug.log tail (128 KiB window; UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DebugLogCountSnapshot {
+    pub errors: usize,
+    pub warns: usize,
+}
+
+/// Count ERROR/WARN lines in the debug.log tail — shared by list + count instant lanes.
+pub fn snapshot_debug_log_counts() -> Result<DebugLogCountSnapshot, String> {
+    let tail = crate::commands::logging::read_debug_log(Some(128 * 1024))
+        .map_err(|e| e.to_string())?;
+    let mut errors = 0usize;
+    let mut warns = 0usize;
+    for line in tail.content.lines() {
+        match debug_log_line_kind(line) {
+            "error" => errors += 1,
+            "warn" => warns += 1,
+            _ => {}
+        }
+    }
+    Ok(DebugLogCountSnapshot { errors, warns })
+}
+
+/// Which debug.log count slice to return — count-only asks; not `/logs` list parity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DebugLogCountKind {
+    Error,
+    Warn,
+    Both,
+}
+
+/// Parse count-only debug.log asks — Debug Log glance parity; not list/report asks.
+pub fn parse_debug_log_count_kind(content: &str) -> Option<DebugLogCountKind> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return None;
+    }
+    if n.contains("list")
+        || n.contains("show ")
+        || n.contains("tail")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("clear")
+        || n.contains("rotate")
+        || n.contains("open in")
+        || n.contains("editor")
+        || n.contains(" ticket")
+        || n.contains("redmine")
+    {
+        return None;
+    }
+    if looks_like_debug_log_request(content) && !n.contains("how many") && !n.contains("count") {
+        return None;
+    }
+    let log_ctx = n.contains("log") || n.contains("debug");
+    let is_count = n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.ends_with(" errors")
+        || n.ends_with(" warnings")
+        || n.ends_with(" warns");
+    if !is_count {
+        return None;
+    }
+    let wants_error = n.contains("error") || n.contains("panic");
+    let wants_warn = n.contains("warn") || n.contains("warning");
+    if wants_error && wants_warn {
+        return Some(DebugLogCountKind::Both);
+    }
+    if wants_error {
+        return Some(DebugLogCountKind::Error);
+    }
+    if wants_warn {
+        return Some(DebugLogCountKind::Warn);
+    }
+    if log_ctx {
+        return Some(DebugLogCountKind::Both);
+    }
+    None
+}
+
+/// True for short “how many log errors / warn count…” asks.
+pub fn looks_like_debug_log_count_request(content: &str) -> bool {
+    parse_debug_log_count_kind(content).is_some()
+}
+
+/// Zero-LLM debug.log error/warn counts (tail window; no line dump).
+pub fn format_debug_log_count_gateway(kind: DebugLogCountKind) -> String {
+    let snap = match snapshot_debug_log_counts() {
+        Ok(s) => s,
+        Err(e) => return format!("**Debug Log** — could not read: {e}"),
+    };
+    match kind {
+        DebugLogCountKind::Error => {
+            if snap.errors == 0 {
+                "**Log errors:** **0** in this tail · all clear · `/logs error` for lines."
+                    .to_string()
+            } else {
+                format!(
+                    "**Log errors:** **{}** in this tail · `/logs error` or Debug Log → Error filter.",
+                    snap.errors
+                )
+            }
+        }
+        DebugLogCountKind::Warn => {
+            if snap.warns == 0 {
+                "**Log warnings:** **0** in this tail · all clear · `/logs warn` for lines."
+                    .to_string()
+            } else {
+                format!(
+                    "**Log warnings:** **{}** in this tail · `/logs warn` or Debug Log → Warn filter.",
+                    snap.warns
+                )
+            }
+        }
+        DebugLogCountKind::Both => format!(
+            "**Debug Log:** **{}** error · **{}** warn in this tail · `/logs` for lines · Agent Ops glance parity.",
+            snap.errors, snap.warns
+        ),
+    }
 }
 
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
@@ -7396,6 +7525,11 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_alerts_ready_request(content) {
         return Some(format_alerts_ready_chip());
     }
+    if looks_like_debug_log_count_request(content) {
+        let kind =
+            parse_debug_log_count_kind(content).expect("looks_like_debug_log_count_request implies kind");
+        return Some(format_debug_log_count_gateway(kind));
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -7562,6 +7696,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
+• `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -8949,6 +9084,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only digest age asks (v0.1.806) — cached timestamp, no digester spawn.
     if looks_like_digest_age_request(question) {
+        return true;
+    }
+    // Read-only debug.log error/warn count asks (v0.1.807) — tail counts, no line dump.
+    if looks_like_debug_log_count_request(question) {
         return true;
     }
     false
@@ -10959,6 +11098,41 @@ mod tests {
         assert!(err.to_lowercase().contains("error"), "{err}");
         let warn = format_debug_log_gateway(DebugLogListFilter::Warn);
         assert!(warn.to_lowercase().contains("warn"), "{warn}");
+    }
+
+    #[test]
+    fn debug_log_count_request_detected() {
+        assert_eq!(
+            parse_debug_log_count_kind("how many errors in the log"),
+            Some(DebugLogCountKind::Error)
+        );
+        assert_eq!(
+            parse_debug_log_count_kind("log error count"),
+            Some(DebugLogCountKind::Error)
+        );
+        assert_eq!(
+            parse_debug_log_count_kind("how many warnings in debug log"),
+            Some(DebugLogCountKind::Warn)
+        );
+        assert_eq!(
+            parse_debug_log_count_kind("debug log count"),
+            Some(DebugLogCountKind::Both)
+        );
+        assert_eq!(
+            parse_debug_log_count_kind("how many log errors and warnings"),
+            Some(DebugLogCountKind::Both)
+        );
+        assert!(looks_like_debug_log_count_request("how many errors in the log"));
+        assert!(!looks_like_debug_log_count_request("/logs error"));
+        assert!(!looks_like_debug_log_count_request("any errors"));
+        assert!(!looks_like_debug_log_count_request("show warnings"));
+        assert!(!looks_like_debug_log_count_request("why is there an error"));
+        assert!(!looks_like_debug_log_count_request("how many failed runs"));
+        let err = try_operator_instant_reply("how many errors in the log")
+            .expect("log error count instant");
+        assert!(err.contains("Log errors") || err.contains("error"));
+        let both = try_operator_instant_reply("debug log count").expect("log count instant");
+        assert!(both.contains("Debug Log"));
     }
 
     #[test]

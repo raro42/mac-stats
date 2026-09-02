@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.807] - 2026-09-02
+
+### Fixed
+- **Instant lane: debug log error/warn count** — `how many errors in the log`, `log error count`, `debug log count`, and similar asks return ERROR/WARN totals from the debug.log tail without Ollama or a full line dump (Discord + AI Chat; Debug Log glance parity; p50 latency).
+
 ## [0.1.806] - 2026-09-02
 
 ### Fixed
