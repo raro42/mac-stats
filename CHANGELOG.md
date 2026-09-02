@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.809] - 2026-09-02
+
+### Fixed
+- **Instant lane: debug log path** — `where is the log`, `log file path`, `debug log path`, and similar asks return the debug.log path on disk without Ollama or reading the tail (Discord + AI Chat; p50 latency).
+
 ## [0.1.808] - 2026-09-02
 
 ### Fixed
