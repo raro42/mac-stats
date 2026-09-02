@@ -2,9 +2,13 @@
 
 ## Shipped overnight
 
+**v0.1.805 — Instant lane: digest open read-only**
+
+`digest open`, `open candidates`, and similar short asks now return cached open hints from `latest.json` without re-running the Python digester (Discord + AI Chat). `/digest` still refreshes. Fixes a p50 trap where read-only open checks paid digester spawn cost.
+
 **v0.1.804 — Instant lane: runs count**
 
-Short asks like `how many runs`, `run count`, `how many failed runs`, `failure count`, `how many slow runs`, and lane-specific counts (instant/direct/lite) now return `runs.jsonl` totals without Ollama (Discord + AI Chat). Matches Agent Ops **Runs** overview parity. Cuts p50 direct latency for count-only operator checks.
+Short asks like `how many runs`, `run count`, `how many failed runs`, `failure count`, `how many slow runs`, and lane-specific counts (instant/direct/lite) now return `runs.jsonl` totals without Ollama (Discord + AI Chat). Matches Agent Ops **Runs** overview parity.
 
 **v0.1.803 — Instant lane: operator inventory counts**
 
@@ -25,14 +29,6 @@ Short asks like `next schedule`, `when is the next job`, and `what's the next sc
 **v0.1.799 — Agent Ops Signal health attention glance**
 
 When Signal alerts are not wired (REST API pending), Agent Ops shows an amber attention strip under Slack. Click opens Settings → Credentials and scrolls to the Signal note.
-
-**v0.1.798 — Agent Ops Slack health attention glance** (earlier tick)
-
-Slack Not set/Partial strip under Telegram with Settings webhook focus.
-
-**v0.1.797 — Agent Ops Telegram health attention glance** (earlier tick)
-
-Telegram Not set/Partial strip under Mastodon with Settings focus.
 
 ## Context
 
