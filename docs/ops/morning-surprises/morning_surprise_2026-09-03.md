@@ -1,6 +1,6 @@
 # Morning surprise — 2026-09-03
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review in grace.
+Overnight Track B (20:00–06:00 local). Design review in grace. Digester opened a weather Brave loop mid-night.
 
 ## Shipped
 
@@ -12,11 +12,13 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 | **v0.1.814** (~21:15) | Instant lane: task directory path (`task path`, `where is the task folder`, `task directory` → `~/.mac-stats/task/`; no list/create) |
 | **v0.1.815** (~21:40) | Instant lane: memory / notes path (`memory path`, `notes path`, `where are notes`, `notes folder` → `~/.mac-stats/agents/notes/` + curated `memory.md`; no list/save/scrub) |
 | **v0.1.816** (~22:05) | Instant lane: session directory path (`session path`, `where is the session folder`, `session directory` → `~/.mac-stats/session/`; no list/resume) |
+| **v0.1.817** (~22:30) | Instant lane: agents directory path (`agents path`, `where is the agents folder`, `agents directory` → `~/.mac-stats/agents/`; no list/create) |
+| **v0.1.818** (~22:55) | Weather STT: `Elmasnow` / `el masnow` → El Masnou so Open-Meteo instant beats Brave (~32s digester open) |
 
 ## Tried / notes
 
-- Fuel: standing backlog p50 latency (not quiet).
-- Next: agents / skills path instant lanes, or design-review recapture when grace ends.
+- Fuel: standing backlog p50 path lanes early; digester open weather STT late (not quiet).
+- Next: skills/plugins path instant, or design-review recapture when grace ends.
 
 ## Ratchet
 
@@ -26,3 +28,5 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 - keep @ 9ee368a (v0.1.814)
 - keep @ c6d42f4 (v0.1.815)
 - keep @ 7883631 (v0.1.816)
+- keep @ d5bb684 (v0.1.817)
+- keep @ d5cdad2 (v0.1.818)
