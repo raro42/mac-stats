@@ -1360,6 +1360,203 @@ pub fn format_operator_count_gateway(kind: OperatorCountKind) -> String {
     }
 }
 
+/// Which runs.jsonl count a short ask targets (not full lists or `/insights`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunsCountKind {
+    Total,
+    Failed,
+    Slow,
+    Instant,
+    Direct,
+    Lite,
+}
+
+/// Counts from runs.jsonl for zero-LLM operator count replies.
+#[derive(Debug, Clone, Copy, Default)]
+struct RunsCountSnapshot {
+    total: usize,
+    ok: usize,
+    fail: usize,
+    slow: usize,
+    instant: usize,
+    direct: usize,
+    lite: usize,
+}
+
+fn snapshot_runs_counts(days: Option<u32>) -> RunsCountSnapshot {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    let mut snap = RunsCountSnapshot::default();
+    if !path.is_file() {
+        return snap;
+    }
+    let text = match fs::read_to_string(&path) {
+        Ok(t) => t,
+        Err(_) => return snap,
+    };
+    let window_days = days.map(|d| d.clamp(1, 90));
+    let since = window_days.map(|d| chrono::Utc::now() - chrono::Duration::days(d as i64));
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let v: serde_json::Value = match serde_json::from_str(line) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if let Some(since) = since {
+            let ts = v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .and_then(parse_run_ts);
+            match ts {
+                Some(t) if t >= since => {}
+                Some(_) => continue,
+                None => continue,
+            }
+        }
+        snap.total += 1;
+        let ok = v.get("ok").and_then(|x| x.as_bool()).unwrap_or(true);
+        if ok {
+            snap.ok += 1;
+        } else {
+            snap.fail += 1;
+        }
+        let wall = v.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
+        if wall >= OPS_RUNS_SLOW_MS {
+            snap.slow += 1;
+        }
+        let lane = v
+            .get("lane")
+            .and_then(|x| x.as_str())
+            .unwrap_or("?")
+            .to_lowercase();
+        match lane.as_str() {
+            "instant" => snap.instant += 1,
+            "direct" => snap.direct += 1,
+            "lite" => snap.lite += 1,
+            _ => {}
+        }
+    }
+    snap
+}
+
+/// Parse count-only runs asks — Agent Ops Runs card parity; not list/report asks.
+pub fn parse_runs_count_kind(content: &str) -> Option<RunsCountKind> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 52 {
+        return None;
+    }
+    if looks_like_schedule_count_request(content) || looks_like_operator_count_request(content) {
+        return None;
+    }
+    if n.contains("list")
+        || n.contains("show ")
+        || n.contains("recent ")
+        || n.contains("why")
+        || n.contains("explain")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("report")
+        || n.contains("p50")
+        || n.contains("insights")
+    {
+        return None;
+    }
+    if looks_like_failed_runs_request(content)
+        || looks_like_slow_runs_request(content)
+        || looks_like_instant_runs_request(content)
+        || looks_like_direct_runs_request(content)
+        || looks_like_lite_runs_request(content)
+        || looks_like_insights_request(content)
+    {
+        return None;
+    }
+    let is_count = n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.ends_with(" runs")
+        || n == "runs";
+    if !is_count {
+        return None;
+    }
+    if n.contains("fail") || n.contains("error") {
+        return Some(RunsCountKind::Failed);
+    }
+    if n.contains("slow") {
+        return Some(RunsCountKind::Slow);
+    }
+    if n.contains("instant") {
+        return Some(RunsCountKind::Instant);
+    }
+    if n.contains("direct") {
+        return Some(RunsCountKind::Direct);
+    }
+    if n.contains("lite") {
+        return Some(RunsCountKind::Lite);
+    }
+    if n.contains("run") || n == "runs" {
+        return Some(RunsCountKind::Total);
+    }
+    None
+}
+
+/// True for short “how many runs / failed / slow…” count asks.
+pub fn looks_like_runs_count_request(content: &str) -> bool {
+    parse_runs_count_kind(content).is_some()
+}
+
+/// Zero-LLM runs.jsonl counts (Agent Ops Runs overview parity; not full lists).
+pub fn format_runs_count_gateway(kind: RunsCountKind) -> String {
+    let snap = snapshot_runs_counts(None);
+    match kind {
+        RunsCountKind::Total => {
+            if snap.total == 0 {
+                return "**Runs:** no turns in `runs.jsonl` yet · `/insights` after the first chat turn."
+                    .to_string();
+            }
+            format!(
+                "**Runs:** **{total}** turns · ok **{ok}** · fail **{fail}** · instant **{instant}** · direct **{direct}** · slow **{slow}** (≥{} ms) · `/insights` or Agent Ops → Runs.",
+                OPS_RUNS_SLOW_MS,
+                total = snap.total,
+                ok = snap.ok,
+                fail = snap.fail,
+                instant = snap.instant,
+                direct = snap.direct,
+                slow = snap.slow,
+            )
+        }
+        RunsCountKind::Failed => {
+            if snap.fail == 0 {
+                "**Failed runs:** **0** · all clear · `/failed` or Agent Ops → Runs (Fail filter)."
+                    .to_string()
+            } else {
+                format!(
+                    "**Failed runs:** **{}** of **{}** turns · `/failed` or Agent Ops → Runs (Fail filter).",
+                    snap.fail, snap.total
+                )
+            }
+        }
+        RunsCountKind::Slow => format!(
+            "**Slow runs:** **{}** of **{}** turns (≥{} ms) · `/slow` or Agent Ops → Runs (Slow filter).",
+            snap.slow, snap.total, OPS_RUNS_SLOW_MS
+        ),
+        RunsCountKind::Instant => format!(
+            "**Instant runs:** **{}** of **{}** turns · `/instant` or Agent Ops → Runs (Instant filter).",
+            snap.instant, snap.total
+        ),
+        RunsCountKind::Direct => format!(
+            "**Direct runs:** **{}** of **{}** turns · `/direct` or Agent Ops → Runs (Direct filter).",
+            snap.direct, snap.total
+        ),
+        RunsCountKind::Lite => format!(
+            "**Lite runs:** **{}** of **{}** turns · `/lite` or Agent Ops → Runs (Lite filter).",
+            snap.lite, snap.total
+        ),
+    }
+}
+
 /// Zero-LLM schedule or delivery count (Agent Ops Schedules card parity).
 pub fn format_schedule_count_gateway(content: &str) -> String {
     let n = normalize_operator_command(content);
@@ -7069,6 +7266,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_alerts_ready_request(content) {
         return Some(format_alerts_ready_chip());
     }
+    if looks_like_runs_count_request(content) {
+        let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
+        return Some(format_runs_count_gateway(kind));
+    }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
         let insights = compute_runs_insights_for(80, days);
@@ -10410,6 +10611,51 @@ mod tests {
             .or_else(|| try_operator_instant_reply("how many open candidates"))
             .expect("digest open count instant");
         assert!(digest.contains("Digest") || digest.contains("open"));
+    }
+
+    #[test]
+    fn runs_count_request_detected() {
+        assert_eq!(
+            parse_runs_count_kind("how many runs"),
+            Some(RunsCountKind::Total)
+        );
+        assert_eq!(
+            parse_runs_count_kind("run count"),
+            Some(RunsCountKind::Total)
+        );
+        assert_eq!(
+            parse_runs_count_kind("how many failed runs"),
+            Some(RunsCountKind::Failed)
+        );
+        assert_eq!(
+            parse_runs_count_kind("failure count"),
+            Some(RunsCountKind::Failed)
+        );
+        assert_eq!(
+            parse_runs_count_kind("how many slow runs"),
+            Some(RunsCountKind::Slow)
+        );
+        assert_eq!(
+            parse_runs_count_kind("instant run count"),
+            Some(RunsCountKind::Instant)
+        );
+        assert_eq!(
+            parse_runs_count_kind("how many direct runs"),
+            Some(RunsCountKind::Direct)
+        );
+        assert_eq!(
+            parse_runs_count_kind("lite count"),
+            Some(RunsCountKind::Lite)
+        );
+        assert!(looks_like_runs_count_request("how many runs"));
+        assert!(!looks_like_runs_count_request("failed runs"));
+        assert!(!looks_like_runs_count_request("/insights"));
+        assert!(!looks_like_runs_count_request("why are there so many runs"));
+        let total = try_operator_instant_reply("how many runs").expect("runs count instant");
+        assert!(total.contains("Runs"));
+        let failed = try_operator_instant_reply("how many failed runs")
+            .expect("failed count instant");
+        assert!(failed.contains("Failed"));
     }
 
     #[test]

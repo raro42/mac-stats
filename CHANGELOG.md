@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.804] - 2026-09-02
+
+### Added
+- **Instant lane: runs count** — `how many runs`, `run count`, `how many failed runs`, `slow run count`, and lane-specific counts (instant/direct/lite) return totals from `runs.jsonl` without Ollama (Discord + AI Chat; Agent Ops Runs parity; p50 latency).
+
 ## [0.1.803] - 2026-09-02
 
 ### Added
