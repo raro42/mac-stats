@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.808] - 2026-09-02
+
+### Fixed
+- **Instant lane: debug log file size** — `log file size`, `how big is the log`, `debug log size`, and similar asks return the debug.log file size on disk without Ollama or reading the tail (Discord + AI Chat; p50 latency).
+
 ## [0.1.807] - 2026-09-02
 
 ### Fixed

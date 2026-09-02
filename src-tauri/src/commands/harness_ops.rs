@@ -2885,6 +2885,87 @@ pub fn format_debug_log_count_gateway(kind: DebugLogCountKind) -> String {
     }
 }
 
+/// Total debug.log file size on disk (metadata only; no tail read).
+pub fn snapshot_debug_log_file_bytes() -> Result<u64, String> {
+    let path = crate::config::Config::log_file_path();
+    if !path.exists() {
+        return Ok(0);
+    }
+    std::fs::metadata(&path)
+        .map(|m| m.len())
+        .map_err(|e| format!("Failed to stat log: {e}"))
+}
+
+/// True for short “how big is the log / log file size…” asks.
+pub fn looks_like_debug_log_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if looks_like_debug_log_count_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("error")
+        || n.contains("warn")
+        || n.contains("panic")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("tail")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("clear")
+        || n.contains("rotate")
+    {
+        return false;
+    }
+    let log_ctx = n.contains("log") || n.contains("debug");
+    if !log_ctx {
+        return false;
+    }
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.ends_with(" file")
+    {
+        return true;
+    }
+    matches!(
+        n.as_str(),
+        "how big is the log"
+            | "how big is debug log"
+            | "how big is the debug log"
+            | "how large is the log"
+            | "how large is debug log"
+            | "log file size"
+            | "debug log file size"
+            | "debug.log size"
+    ) || (n.contains("how big") && log_ctx) || (n.contains("how large") && log_ctx)
+}
+
+/// Zero-LLM debug.log file size (stat only; no tail read).
+pub fn format_debug_log_size_gateway() -> String {
+    let bytes = match snapshot_debug_log_file_bytes() {
+        Ok(b) => b,
+        Err(e) => return format!("**Debug Log** — could not stat file: {e}"),
+    };
+    let label = crate::commands::disk_cleanup::format_bytes(bytes);
+    if bytes == 0 {
+        "**Debug Log:** empty or not created yet · `/logs` when lines appear.".to_string()
+    } else {
+        format!(
+            "**Debug Log:** **{label}** on disk · `/logs` for tail · path in Settings → View logs."
+        )
+    }
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -7530,6 +7611,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
             parse_debug_log_count_kind(content).expect("looks_like_debug_log_count_request implies kind");
         return Some(format_debug_log_count_gateway(kind));
     }
+    if looks_like_debug_log_size_request(content) {
+        return Some(format_debug_log_size_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -7697,6 +7781,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
+• `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -9088,6 +9173,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only debug.log error/warn count asks (v0.1.807) — tail counts, no line dump.
     if looks_like_debug_log_count_request(question) {
+        return true;
+    }
+    // Read-only debug.log file size asks (v0.1.808) — stat only, no tail read.
+    if looks_like_debug_log_size_request(question) {
         return true;
     }
     false
@@ -11133,6 +11222,19 @@ mod tests {
         assert!(err.contains("Log errors") || err.contains("error"));
         let both = try_operator_instant_reply("debug log count").expect("log count instant");
         assert!(both.contains("Debug Log"));
+    }
+
+    #[test]
+    fn debug_log_size_request_detected() {
+        assert!(looks_like_debug_log_size_request("log file size"));
+        assert!(looks_like_debug_log_size_request("how big is the log"));
+        assert!(looks_like_debug_log_size_request("debug log size"));
+        assert!(looks_like_debug_log_size_request("how large is debug log"));
+        assert!(!looks_like_debug_log_size_request("how many errors in the log"));
+        assert!(!looks_like_debug_log_size_request("/logs error"));
+        assert!(!looks_like_debug_log_size_request("debug log count"));
+        let size = try_operator_instant_reply("log file size").expect("log size instant");
+        assert!(size.contains("Debug Log") || size.contains("disk"));
     }
 
     #[test]
