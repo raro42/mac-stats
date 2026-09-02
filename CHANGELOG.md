@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.818] - 2026-09-02
+
+### Fixed
+- **Weather STT place: Elmasnow → El Masnou** — voice/typo `Elmasnow` / `el masnow` maps to El Masnou so Open-Meteo instant answers instead of a Brave search loop (~32s digester open).
+
 ## [0.1.817] - 2026-09-02
 
 ### Fixed

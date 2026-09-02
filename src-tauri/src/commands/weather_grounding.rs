@@ -140,16 +140,23 @@ fn canonicalize_known_place(place: &str) -> String {
     if compact == "lmasnou"
         || compact == "elmasnou"
         || compact == "elmasnau"
+        || compact == "elmasnow" // voice STT: "El Masnou" → "Elmasnow"
         || compact == "masnou"
         || n == "l masnou"
         || n == "el masnau"
+        || n == "el masnow"
     {
         return "El Masnou".to_string();
     }
     // STT often appends junk after the place ("elmasnau eu", "l masnou please").
     for tok in n.split_whitespace() {
         let c: String = tok.chars().filter(|ch| ch.is_alphanumeric()).collect();
-        if c == "lmasnou" || c == "elmasnou" || c == "elmasnau" || c == "masnou" {
+        if c == "lmasnou"
+            || c == "elmasnou"
+            || c == "elmasnau"
+            || c == "elmasnow"
+            || c == "masnou"
+        {
             return "El Masnou".to_string();
         }
     }
@@ -701,6 +708,19 @@ mod tests {
     fn extracts_place_in() {
         let p = extract_place("What's the weather like in El Masnou right now?").unwrap();
         assert!(p.to_lowercase().contains("masnou"), "{p}");
+    }
+
+    #[test]
+    fn stt_elmasnow_maps_to_el_masnou() {
+        // Digester open: Brave weather loop when STT writes "Elmasnow" for El Masnou.
+        let q = "Hey Vienna, what's the weather going to be like tomorrow in Elmasnow?";
+        assert!(looks_like_weather_query(q));
+        assert_eq!(extract_place(q).unwrap(), "El Masnou");
+        assert!(can_instant_weather(q));
+        assert_eq!(
+            extract_place("weather in el masnow").unwrap(),
+            "El Masnou"
+        );
     }
 
     #[test]
