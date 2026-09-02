@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.806] - 2026-09-02
+
+### Fixed
+- **Instant lane: digest age read-only** — `digest age`, `how old is the digest`, `when was digest updated`, and similar asks return the cached digest timestamp and open/stale counts from `latest.json` without re-running the Python digester (Discord + AI Chat; p50 latency).
+
 ## [0.1.805] - 2026-09-02
 
 ### Fixed

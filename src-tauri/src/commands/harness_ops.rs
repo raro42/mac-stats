@@ -1043,8 +1043,79 @@ pub fn format_digest_open_gateway() -> String {
     reply
 }
 
-/// Instant digest reply: read-only open uses cache; refresh re-runs digester.
+/// True for read-only digest age/stale asks — cached `latest.json` timestamp only.
+pub fn looks_like_digest_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("refresh")
+        || n.contains("run digester")
+        || n.contains("run digest")
+        || n.contains("rerun")
+        || n.starts_with("update digest")
+        || n.starts_with("refresh digest")
+        || n.contains("why")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    if !n.contains("digest") && !n.contains("digester") {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "digest age"
+            | "digest stale"
+            | "how old is the digest"
+            | "how old is digest"
+            | "when was the digest updated"
+            | "when was digest updated"
+            | "when was the digest generated"
+            | "when was digest generated"
+            | "digest updated"
+            | "digest generated"
+            | "is the digest stale"
+            | "is digest stale"
+    ) || (n.contains("age") && n.contains("digest"))
+        || (n.contains("old") && n.contains("digest"))
+        || ((n.contains("when") || n.contains("updated") || n.contains("generated"))
+            && n.contains("digest"))
+        || (n.contains("stale") && n.contains("digest"))
+}
+
+/// Zero-LLM digest age from cached `latest.json` (no Python digester).
+pub fn format_digest_age_gateway() -> String {
+    let summary = load_digest_summary();
+    if summary.generated_at.is_empty() {
+        return "**Digest:** no cached digest yet · run `/digest` first.".to_string();
+    }
+    let age = age_from_rfc3339(&summary.generated_at);
+    let mut reply = format!(
+        "**Digest:** cached **{age}** ago · **{}** open · **{}** stale",
+        summary.open_count, summary.stale_count,
+    );
+    if summary.turns > 0 {
+        reply.push_str(&format!(" · **{}** turns (7d window)", summary.turns));
+    }
+    reply.push_str("\n_`/digest` to refresh._");
+    reply
+}
+
+/// Instant digest age reply (read-only cache; no digester spawn).
+pub fn try_digest_age_instant_reply(content: &str) -> Option<String> {
+    if looks_like_digest_age_request(content) {
+        Some(format_digest_age_gateway())
+    } else {
+        None
+    }
+}
+
+/// Instant digest reply: read-only open/age use cache; refresh re-runs digester.
 pub fn try_digest_instant_reply(content: &str) -> Option<String> {
+    if looks_like_digest_age_request(content) {
+        return Some(format_digest_age_gateway());
+    }
     if looks_like_digest_open_request(content) {
         return Some(format_digest_open_gateway());
     }
@@ -7500,6 +7571,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `digest open` — cached open candidates (no digester spawn)\n\
+• `digest age` — cached digest timestamp (no digester spawn)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
@@ -8873,6 +8945,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains("explain")
     {
+        return true;
+    }
+    // Read-only digest age asks (v0.1.806) — cached timestamp, no digester spawn.
+    if looks_like_digest_age_request(question) {
         return true;
     }
     false
@@ -10558,6 +10634,23 @@ mod tests {
         assert!(looks_like_digest_request("digest open"));
         let reply = try_digest_instant_reply("digest open").expect("digest open instant");
         assert!(reply.contains("open candidate"), "{reply}");
+        assert!(
+            !reply.to_lowercase().contains("refreshed"),
+            "read-only must not re-run digester: {reply}"
+        );
+    }
+
+    #[test]
+    fn digest_age_is_read_only() {
+        assert!(looks_like_digest_age_request("digest age"));
+        assert!(looks_like_digest_age_request("how old is the digest"));
+        assert!(looks_like_digest_age_request("when was digest updated"));
+        assert!(looks_like_digest_age_request("is digest stale"));
+        assert!(!looks_like_digest_age_request("/digest"));
+        assert!(!looks_like_digest_age_request("refresh digest"));
+        assert!(!looks_like_digest_age_request("update digest"));
+        let reply = try_operator_instant_reply("digest age").expect("digest age instant");
+        assert!(reply.contains("cached"), "{reply}");
         assert!(
             !reply.to_lowercase().contains("refreshed"),
             "read-only must not re-run digester: {reply}"
