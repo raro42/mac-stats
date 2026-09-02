@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.805] - 2026-09-02
+
+### Fixed
+- **Instant lane: digest open read-only** — `digest open`, `open candidates`, and similar asks return cached open hints from `latest.json` without re-running the Python digester (Discord + AI Chat; p50 latency).
+
 ## [0.1.804] - 2026-09-02
 
 ### Added

@@ -974,11 +974,31 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
     Ok(load_digest_summary())
 }
 
-/// True for `/digest` / `run digest` operator asks.
-pub fn looks_like_digest_request(content: &str) -> bool {
+/// True for read-only digest open/candidate asks — cached summary only, no digester spawn.
+pub fn looks_like_digest_open_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    // Long “digest this report…” stays with the agent.
     if n.chars().count() > 48 || n.contains(" this ") || n.contains("research") {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "digest open"
+            | "open digest"
+            | "open candidates"
+            | "digest candidates"
+            | "open digest hints"
+            | "any open candidates"
+            | "show open candidates"
+    )
+}
+
+/// True for `/digest` / `run digest` operator asks that re-run the digester.
+pub fn looks_like_digest_refresh_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 || n.contains(" this ") || n.contains("research") {
+        return false;
+    }
+    if looks_like_digest_open_request(content) {
         return false;
     }
     matches!(
@@ -990,16 +1010,55 @@ pub fn looks_like_digest_request(content: &str) -> bool {
             | "agent digest"
             | "run digester"
             | "refresh digester"
-            |         "update digest"
+            | "update digest"
             | "rerun digest"
-            | "digest open"
-            | "open digest"
-            | "open candidates"
-            | "digest candidates"
-            | "open digest hints"
-            | "any open candidates"
-            | "show open candidates"
     )
+}
+
+/// True for any digest operator ask (refresh or read-only open).
+pub fn looks_like_digest_request(content: &str) -> bool {
+    looks_like_digest_open_request(content) || looks_like_digest_refresh_request(content)
+}
+
+/// Zero-LLM digest open snapshot from cached `latest.json` (no Python digester).
+pub fn format_digest_open_gateway() -> String {
+    let summary = load_digest_summary();
+    if summary.open_count == 0 {
+        return "**Digest:** **0** open candidates · `/digest` for a fresh scan.".to_string();
+    }
+    let mut reply = format!(
+        "**Digest:** **{}** open candidate(s)",
+        summary.open_count
+    );
+    if !summary.open_hints.is_empty() {
+        reply.push_str("\n**Open:** ");
+        reply.push_str(&summary.open_hints.join("; "));
+    }
+    if !summary.generated_at.is_empty() {
+        let age = age_from_rfc3339(&summary.generated_at);
+        reply.push_str(&format!(
+            "\n_Cached {age} ago · `/digest` to refresh._"
+        ));
+    }
+    reply
+}
+
+/// Instant digest reply: read-only open uses cache; refresh re-runs digester.
+pub fn try_digest_instant_reply(content: &str) -> Option<String> {
+    if looks_like_digest_open_request(content) {
+        return Some(format_digest_open_gateway());
+    }
+    if !looks_like_digest_refresh_request(content) {
+        return None;
+    }
+    let line = refresh_agent_digest();
+    let summary = load_digest_summary();
+    let mut reply = line;
+    if summary.open_count > 0 {
+        reply.push_str("\n**Open:** ");
+        reply.push_str(&summary.open_hints.join("; "));
+    }
+    Some(reply)
 }
 
 /// Normalize operator command text (strip @mention / Werner / please / show me).
@@ -7389,14 +7448,7 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
             )
         });
     }
-    if looks_like_digest_request(content) {
-        let line = refresh_agent_digest();
-        let summary = load_digest_summary();
-        let mut reply = line;
-        if summary.open_count > 0 {
-            reply.push_str("\n**Open:** ");
-            reply.push_str(&summary.open_hints.join("; "));
-        }
+    if let Some(reply) = try_digest_instant_reply(content) {
         return Some(reply);
     }
     None
@@ -7447,6 +7499,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
+• `digest open` — cached open candidates (no digester spawn)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
@@ -8806,6 +8859,19 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && (q.contains("talk to") || q.contains("chat with") || q.contains("message "))
         && !q.contains("ticket")
         && !q.contains("issue")
+    {
+        return true;
+    }
+    // Read-only digest open asks (v0.1.805) — cached summary, no digester spawn.
+    if (q == "digest open"
+        || q == "open digest"
+        || q == "open candidates"
+        || q == "digest candidates"
+        || q == "open digest hints"
+        || q == "any open candidates"
+        || q == "show open candidates")
+        && !q.contains("why")
+        && !q.contains("explain")
     {
         return true;
     }
@@ -10474,11 +10540,28 @@ mod tests {
 
     #[test]
     fn digest_request_detected() {
-        assert!(looks_like_digest_request("/digest"));
-        assert!(looks_like_digest_request("refresh digest"));
-        assert!(looks_like_digest_request("run digester"));
-        assert!(looks_like_digest_request("show me digest"));
-        assert!(!looks_like_digest_request("digest this long research report please"));
+        assert!(looks_like_digest_refresh_request("/digest"));
+        assert!(looks_like_digest_refresh_request("refresh digest"));
+        assert!(looks_like_digest_refresh_request("run digester"));
+        assert!(looks_like_digest_refresh_request("show me digest"));
+        assert!(!looks_like_digest_refresh_request("digest this long research report please"));
+        assert!(!looks_like_digest_refresh_request("digest open"));
+    }
+
+    #[test]
+    fn digest_open_is_read_only() {
+        assert!(looks_like_digest_open_request("digest open"));
+        assert!(looks_like_digest_open_request("open candidates"));
+        assert!(looks_like_digest_open_request("any open candidates"));
+        assert!(!looks_like_digest_open_request("/digest"));
+        assert!(!looks_like_digest_open_request("refresh digest"));
+        assert!(looks_like_digest_request("digest open"));
+        let reply = try_digest_instant_reply("digest open").expect("digest open instant");
+        assert!(reply.contains("open candidate"), "{reply}");
+        assert!(
+            !reply.to_lowercase().contains("refreshed"),
+            "read-only must not re-run digester: {reply}"
+        );
     }
 
     #[test]
@@ -11554,9 +11637,10 @@ mod tests {
 
     #[test]
     fn digest_open_candidates_requests() {
-        assert!(looks_like_digest_request("digest open"));
-        assert!(looks_like_digest_request("open candidates"));
-        assert!(looks_like_digest_request("any open candidates"));
+        assert!(looks_like_digest_open_request("digest open"));
+        assert!(looks_like_digest_open_request("open candidates"));
+        assert!(looks_like_digest_open_request("any open candidates"));
+        assert!(!looks_like_digest_refresh_request("digest open"));
         assert!(!looks_like_digest_request("digest this long research report please"));
     }
 

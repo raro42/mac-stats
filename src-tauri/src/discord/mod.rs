@@ -2557,20 +2557,27 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
-    // Operator: refresh digester (latest.md / latest.json) without Ollama.
+    // Operator: digest refresh or read-only open (cached latest.json) without Ollama.
     if crate::commands::harness_ops::looks_like_digest_request(&content) {
-        let _ = new_message.channel_id.broadcast_typing(&ctx).await;
-        let line = tokio::task::spawn_blocking(crate::commands::harness_ops::refresh_agent_digest)
-            .await
-            .unwrap_or_else(|e| format!("Digest refresh join error: {}", e));
-        let summary = crate::commands::harness_ops::load_digest_summary();
-        let mut reply = line;
-        if summary.open_count > 0 {
-            reply.push_str("\n**Open:** ");
-            reply.push_str(&summary.open_hints.join("; "));
+        let needs_refresh =
+            crate::commands::harness_ops::looks_like_digest_refresh_request(&content);
+        if needs_refresh {
+            let _ = new_message.channel_id.broadcast_typing(&ctx).await;
         }
-        if let Err(e) = new_message.channel_id.say(&ctx, reply).await {
-            error!("Discord: failed to send digest: {}", e);
+        let content_owned = content.clone();
+        let reply = if needs_refresh {
+            tokio::task::spawn_blocking(move || {
+                crate::commands::harness_ops::try_digest_instant_reply(&content_owned)
+            })
+            .await
+            .unwrap_or_else(|e| Some(format!("Digest join error: {}", e)))
+        } else {
+            crate::commands::harness_ops::try_digest_instant_reply(&content)
+        };
+        if let Some(reply) = reply {
+            if let Err(e) = new_message.channel_id.say(&ctx, reply).await {
+                error!("Discord: failed to send digest: {}", e);
+            }
         }
         return;
     }
