@@ -2,9 +2,13 @@
 
 ## Shipped overnight
 
+**v0.1.804 — Instant lane: runs count**
+
+Short asks like `how many runs`, `run count`, `how many failed runs`, `failure count`, `how many slow runs`, and lane-specific counts (instant/direct/lite) now return `runs.jsonl` totals without Ollama (Discord + AI Chat). Matches Agent Ops **Runs** overview parity. Cuts p50 direct latency for count-only operator checks.
+
 **v0.1.803 — Instant lane: operator inventory counts**
 
-Short asks like `how many agents`, `how many monitors`, `task count`, `how many sessions`, `skill count`, `how many plugins`, `knowledge count`, and `how many open candidates` now return inventory totals without Ollama (Discord + AI Chat). Matches Agent Ops overview cards. Cuts p50 direct latency for count-only operator checks.
+Short asks like `how many agents`, `how many monitors`, `task count`, `how many sessions`, `skill count`, `how many plugins`, `knowledge count`, and `how many open candidates` now return inventory totals without Ollama (Discord + AI Chat). Matches Agent Ops overview cards.
 
 **v0.1.802 — Instant lane: schedule / delivery count**
 
