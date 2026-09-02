@@ -4207,6 +4207,157 @@ pub fn format_prompts_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the tmp folder / tmp path…” asks.
+/// Config path only — does not list, prune, or open scratch files under `~/.mac-stats/tmp/`.
+pub fn looks_like_tmp_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal temperature / thermal / disk-cleanup / config-home asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("temperature")
+        || n.contains("thermal")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("/tmp")
+        || n.contains("private/tmp")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let tmp_ctx = n.contains("tmp folder")
+        || n.contains("tmp directory")
+        || n.contains("tmp dir")
+        || n.contains("tmp path")
+        || n.contains("temp folder")
+        || n.contains("temp directory")
+        || n.contains("temp dir")
+        || n.contains("temp path")
+        || n.contains("temporary folder")
+        || n.contains("temporary directory")
+        || n.contains("temporary dir")
+        || n.contains("temporary path")
+        || n.contains("scratch folder")
+        || n.contains("scratch directory")
+        || n.contains("scratch dir")
+        || n.contains("scratch path")
+        || n.contains("mac-stats tmp")
+        || n.contains("mac stats tmp")
+        || n == "tmp"
+        || n == "temp dir"
+        || ((n.contains("tmp") || n.contains("temp") || n.contains("temporary") || n.contains("scratch"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !tmp_ctx {
+        return false;
+    }
+    // Bare "temp" alone is too ambiguous (temperature); require pathish + tmp/temp/scratch word,
+    // except for short exact phrases (mac-stats tmp, tmp path, …).
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "tmp path"
+            | "tmp folder"
+            | "tmp directory"
+            | "tmp dir"
+            | "temp path"
+            | "temp folder"
+            | "temp directory"
+            | "temp dir"
+            | "temporary path"
+            | "temporary folder"
+            | "temporary directory"
+            | "temporary dir"
+            | "scratch path"
+            | "scratch folder"
+            | "scratch directory"
+            | "scratch dir"
+            | "where is tmp folder"
+            | "where is the tmp folder"
+            | "where is tmp directory"
+            | "where is the tmp directory"
+            | "where is tmp dir"
+            | "where is the tmp dir"
+            | "where is temp folder"
+            | "where is the temp folder"
+            | "where is temp directory"
+            | "where is the temp directory"
+            | "where is temp dir"
+            | "where is the temp dir"
+            | "where is temporary folder"
+            | "where is the temporary folder"
+            | "where is temporary directory"
+            | "where is the temporary directory"
+            | "where is scratch folder"
+            | "where is the scratch folder"
+            | "where are tmp files"
+            | "where do tmp files go"
+            | "where do temp files go"
+            | "tmp location"
+            | "temp location"
+            | "scratch location"
+            | "tmp home"
+            | "temp home"
+            | "mac-stats tmp"
+            | "mac stats tmp"
+            | "tmp"
+    ) || (tmp_ctx && pathish)
+}
+
+/// Zero-LLM tmp directory path (config only; no list/prune).
+pub fn format_tmp_path_gateway() -> String {
+    let dir = crate::config::Config::tmp_dir();
+    let js = crate::config::Config::tmp_js_dir();
+    let display = dir.display().to_string();
+    let js_display = js.display().to_string();
+    format!(
+        "**Tmp dir:** `{display}` · JS scratch: `{js_display}` · safe to delete contents · app recreates as needed."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -8896,6 +9047,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_prompts_path_request(content) {
         return Some(format_prompts_path_gateway());
     }
+    if looks_like_tmp_path_request(content) {
+        return Some(format_tmp_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9076,6 +9230,7 @@ pub fn format_ops_help_gateway() -> String {
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
+• `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10519,6 +10674,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only prompts dir path asks (v0.1.821) — config only; no open/edit.
     if looks_like_prompts_path_request(question) {
+        return true;
+    }
+    // Read-only tmp dir path asks (v0.1.822) — config only; no list/prune.
+    if looks_like_tmp_path_request(question) {
         return true;
     }
     false
@@ -12834,6 +12993,30 @@ mod tests {
             try_operator_instant_reply("where is the prompts folder").expect("prompts path instant");
         assert!(reply.contains("Prompts dir"));
         assert!(reply.contains("prompts") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn tmp_path_request_detected() {
+        assert!(looks_like_tmp_path_request("tmp path"));
+        assert!(looks_like_tmp_path_request("tmp folder"));
+        assert!(looks_like_tmp_path_request("where is the tmp folder"));
+        assert!(looks_like_tmp_path_request("temp directory"));
+        assert!(looks_like_tmp_path_request("where is the temp folder"));
+        assert!(looks_like_tmp_path_request("scratch path"));
+        assert!(looks_like_tmp_path_request("where do temp files go"));
+        assert!(looks_like_tmp_path_request("mac-stats tmp"));
+        assert!(!looks_like_tmp_path_request("temperature"));
+        assert!(!looks_like_tmp_path_request("cpu temperature"));
+        assert!(!looks_like_tmp_path_request("list tmp"));
+        assert!(!looks_like_tmp_path_request("clean tmp"));
+        assert!(!looks_like_tmp_path_request("prune tmp"));
+        assert!(!looks_like_tmp_path_request("/disk reclaim"));
+        assert!(!looks_like_tmp_path_request("where is /tmp"));
+        assert!(!looks_like_tmp_path_request("prompts path"));
+        assert!(!looks_like_tmp_path_request("where is config"));
+        let reply = try_operator_instant_reply("where is the tmp folder").expect("tmp path instant");
+        assert!(reply.contains("Tmp dir"));
+        assert!(reply.contains("tmp") || reply.contains(".mac-stats"));
     }
 
     #[test]
