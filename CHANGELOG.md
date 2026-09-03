@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.827] - 2026-09-03
+
+### Fixed
+- **Instant lane: browser credentials path** — `browser credentials path`, `where are browser credentials`, `browser-credentials.toml`, and similar asks return `~/.mac-stats/browser-credentials.toml` without Ollama (Discord + AI Chat; does not list or edit secrets; p50 latency).
+
 ## [0.1.826] - 2026-09-03
 
 ### Fixed

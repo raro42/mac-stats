@@ -4776,6 +4776,149 @@ pub fn format_pdfs_path_gateway() -> String {
     )
 }
 
+/// True for short “where is browser-credentials.toml / browser credentials path…” asks.
+/// Config path only — does not list, edit, or dump secrets from `~/.mac-stats/browser-credentials.toml`.
+pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Do not steal sibling path / browser-status / disk-cleanup / secret-edit asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("secret value")
+        || n.contains("dump")
+        || n.contains("password")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let cred_ctx = n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("browser secrets")
+        || n.contains("browser secret")
+        || n.contains("mac-stats credentials")
+        || n.contains("mac stats credentials")
+        || (n.contains("credentials.toml")
+            && (n.contains("browser") || n.contains("path") || n.contains("where")))
+        || (n.contains("credential")
+            && n.contains("browser")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("file")
+                || n.contains("toml")));
+    if !cred_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("toml")
+        || n.contains("browser-credentials");
+    matches!(
+        n.as_str(),
+        "browser credentials path"
+            | "browser credential path"
+            | "browser credentials"
+            | "browser credential"
+            | "browser credentials file"
+            | "browser credential file"
+            | "browser credentials folder"
+            | "browser credentials toml"
+            | "browser-credentials"
+            | "browser-credentials.toml"
+            | "browser-credentials path"
+            | "browser-credentials file"
+            | "where is browser-credentials"
+            | "where is browser-credentials.toml"
+            | "where is the browser credentials"
+            | "where is the browser credentials file"
+            | "where are browser credentials"
+            | "where do browser credentials go"
+            | "cdp credentials path"
+            | "cdp credentials"
+            | "browser secrets path"
+            | "browser secrets file"
+            | "mac-stats credentials"
+            | "mac stats credentials"
+            | "mac-stats credentials path"
+            | "mac stats credentials path"
+    ) || (cred_ctx && pathish)
+}
+
+/// Zero-LLM browser credentials file path (config only; no list/edit/dump secrets).
+pub fn format_browser_credentials_path_gateway() -> String {
+    let path = crate::config::Config::browser_credentials_toml_path();
+    let display = path.display().to_string();
+    format!(
+        "**Browser credentials:** `{display}` · BROWSER_INPUT `<secret>…</secret>` · edit the TOML · `/browser` for CDP status."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9477,6 +9620,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pdfs_path_request(content) {
         return Some(format_pdfs_path_gateway());
     }
+    if looks_like_browser_credentials_path_request(content) {
+        return Some(format_browser_credentials_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9661,6 +9807,7 @@ pub fn format_ops_help_gateway() -> String {
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
+• `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11120,6 +11267,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only PDF exports dir path asks (v0.1.826) — config only; no list/save.
     if looks_like_pdfs_path_request(question) {
+        return true;
+    }
+    // Read-only browser credentials file path asks (v0.1.827) — config only; no list/edit/dump.
+    if looks_like_browser_credentials_path_request(question) {
         return true;
     }
     false
@@ -13538,12 +13689,54 @@ mod tests {
         assert!(!looks_like_pdfs_path_request("traces path"));
         assert!(!looks_like_pdfs_path_request("where is config"));
         assert!(!looks_like_pdfs_path_request("/browser"));
+        assert!(!looks_like_pdfs_path_request("browser credentials path"));
         assert!(!looks_like_uploads_path_request("pdfs path"));
         assert!(!looks_like_traces_path_request("pdfs path"));
         let reply =
             try_operator_instant_reply("where is the pdfs folder").expect("pdfs path instant");
         assert!(reply.contains("PDFs dir"));
         assert!(reply.contains("pdfs") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn browser_credentials_path_request_detected() {
+        assert!(looks_like_browser_credentials_path_request(
+            "browser credentials path"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "browser-credentials.toml"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "where are browser credentials"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "where is browser-credentials.toml"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "browser credentials file"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "cdp credentials path"
+        ));
+        assert!(looks_like_browser_credentials_path_request(
+            "mac-stats credentials path"
+        ));
+        assert!(!looks_like_browser_credentials_path_request("list credentials"));
+        assert!(!looks_like_browser_credentials_path_request("add credentials"));
+        assert!(!looks_like_browser_credentials_path_request("edit credentials"));
+        assert!(!looks_like_browser_credentials_path_request("dump password"));
+        assert!(!looks_like_browser_credentials_path_request("storage state path"));
+        assert!(!looks_like_browser_credentials_path_request("pdfs path"));
+        assert!(!looks_like_browser_credentials_path_request("where is config"));
+        assert!(!looks_like_browser_credentials_path_request("/browser"));
+        assert!(!looks_like_pdfs_path_request("browser credentials path"));
+        assert!(!looks_like_browser_ready_request("browser credentials path"));
+        let reply = try_operator_instant_reply("where are browser credentials")
+            .expect("browser credentials path instant");
+        assert!(reply.contains("Browser credentials"));
+        assert!(
+            reply.contains("browser-credentials.toml") || reply.contains(".mac-stats")
+        );
     }
 
     #[test]
