@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.840] - 2026-09-03
+
+### Fixed
+- **Instant lane: `.config.env` path** — `config.env path`, `where is .config.env`, `config env path`, `secrets env path`, and similar asks return `~/.mac-stats/.config.env` without Ollama (Discord + AI Chat; path only — does not read or list keys; does not steal `where is config` / `config.json`; p50 latency).
+
 ## [0.1.839] - 2026-09-03
 
 ### Fixed

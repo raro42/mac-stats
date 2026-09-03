@@ -298,6 +298,17 @@ impl Config {
         std::env::temp_dir().join("mac-stats-config.json")
     }
 
+    /// Installed-app secrets env file: `$HOME/.mac-stats/.config.env`
+    ///
+    /// Path only for operator instant lane — never log or return file contents.
+    /// Falls back to temp if HOME is missing.
+    pub fn home_config_env_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join(".config.env");
+        }
+        std::env::temp_dir().join("mac-stats-config.env")
+    }
+
     /// Path for persisted list of Keychain credential account names: `$HOME/.mac-stats/credential_accounts.json`.
     /// Used by the security module to list accounts without Keychain attribute enumeration.
     pub fn credential_accounts_file_path() -> PathBuf {

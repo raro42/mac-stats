@@ -3198,6 +3198,12 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("user info.json")
         || n.contains("user info file")
         || n.contains("userinfo")
+        // `.config.env` has its own path lane (v0.1.840) — do not steal.
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
     {
         return false;
     }
@@ -6782,6 +6788,11 @@ pub fn looks_like_user_info_path_request(content: &str) -> bool {
         || n.contains("mac-stats home")
         || n.contains("data directory")
         || n.contains("data dir")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
         || (n.contains("config")
             && !n.contains("user")
             && (n.contains("path") || n.contains("where")))
@@ -6923,6 +6934,181 @@ pub fn format_user_info_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**User info file:** `{display}` · Discord display-name map on disk · does not list or edit users."
+    )
+}
+
+/// True for short “where is .config.env / config.env path…” asks.
+/// Path only — never reads keys or file contents.
+pub fn looks_like_config_env_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("config.json")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("screenshot")
+        || n.contains("runs.jsonl")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity_last")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("delivery awareness")
+        || n.contains("pinned_processes")
+        || n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("userinfo")
+        || n.contains("mac-stats home")
+        || n.contains("data directory")
+        || n.contains("data dir")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "config file path"
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("session path")
+        || n.contains("agents path")
+        || n.contains("skills path")
+        || n.contains("plugins path")
+        || n.contains("prompts path")
+        || n.contains("tmp path")
+        || n.contains("uploads path")
+        || n.contains("traces path")
+        || n.contains("pdfs path")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("show secrets")
+        || n.contains("list secrets")
+        || n.contains("dump secrets")
+        || n.contains("print secrets")
+        || n.contains("read secrets")
+        || n.contains("api key")
+        || n.contains("api-key")
+        || n.contains("token")
+        || n.contains("password")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let env_ctx = n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
+        || n.contains("home config.env")
+        || n.contains("home .config.env")
+        || n.contains("secrets env")
+        || n.contains("secrets file")
+        || (n.contains("config env file")
+            || n.contains("config.env file")
+            || n.contains(".config.env file"));
+    if !env_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains(".env.config")
+        || n.contains("env.config");
+    matches!(
+        n.as_str(),
+        ".config.env"
+            | "config.env"
+            | "config.env path"
+            | "config.env file"
+            | "config env"
+            | "config env path"
+            | "config env file"
+            | "config env file path"
+            | "where is .config.env"
+            | "where is config.env"
+            | "where is the .config.env"
+            | "where is the config.env"
+            | "where is config env"
+            | "where is the config env"
+            | "where is the config env file"
+            | "home .config.env"
+            | "home config.env"
+            | "home config env"
+            | "home config env path"
+            | "secrets env path"
+            | "secrets env file"
+            | "secrets file path"
+            | "where is secrets env"
+            | ".env.config"
+            | "env.config"
+            | "env.config path"
+            | "where is .env.config"
+            | "where is env.config"
+    ) || (env_ctx && pathish)
+}
+
+/// Zero-LLM `.config.env` path (path only; never dumps keys).
+pub fn format_config_env_path_gateway() -> String {
+    let path = crate::config::Config::home_config_env_path();
+    let display = path.display().to_string();
+    format!(
+        "**Secrets env file:** `{display}` · path only · does not read or list keys · sync from repo with `./scripts/sync-home-config-env.sh` · Settings / Keychain for many credentials."
     )
 }
 
@@ -11633,6 +11819,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_debug_log_age_request(content) {
         return Some(format_debug_log_age_gateway());
     }
+    // .config.env before generic config.json / data-home path lane.
+    if looks_like_config_env_path_request(content) {
+        return Some(format_config_env_path_gateway());
+    }
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
@@ -11886,6 +12076,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
+• `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
@@ -13315,6 +13506,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only debug.log age asks (v0.1.810) — mtime only, no tail read.
     if looks_like_debug_log_age_request(question) {
+        return true;
+    }
+    // Read-only .config.env path asks (v0.1.840) — path only; never dumps keys.
+    if looks_like_config_env_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -15527,9 +15722,38 @@ mod tests {
         assert!(!looks_like_config_path_request("change config"));
         assert!(!looks_like_config_path_request("cursor path"));
         assert!(!looks_like_config_path_request("screenshot folder"));
+        assert!(!looks_like_config_path_request("where is .config.env"));
+        assert!(!looks_like_config_path_request("config.env path"));
+        assert!(!looks_like_config_path_request("config env path"));
         let reply = try_operator_instant_reply("where is config").expect("config path instant");
         assert!(reply.contains("Config"));
         assert!(reply.contains("config.json") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn config_env_path_request_detected() {
+        assert!(looks_like_config_env_path_request("config.env path"));
+        assert!(looks_like_config_env_path_request(".config.env"));
+        assert!(looks_like_config_env_path_request("where is .config.env"));
+        assert!(looks_like_config_env_path_request("config env path"));
+        assert!(looks_like_config_env_path_request("where is config.env"));
+        assert!(looks_like_config_env_path_request("secrets env path"));
+        assert!(looks_like_config_env_path_request("home config.env"));
+        assert!(!looks_like_config_env_path_request("where is config"));
+        assert!(!looks_like_config_env_path_request("config path"));
+        assert!(!looks_like_config_env_path_request("config.json"));
+        assert!(!looks_like_config_env_path_request("show secrets"));
+        assert!(!looks_like_config_env_path_request("list secrets"));
+        assert!(!looks_like_config_env_path_request("what is in .config.env"));
+        assert!(!looks_like_config_env_path_request("dump config.env"));
+        assert!(!looks_like_config_env_path_request("user info path"));
+        assert!(!looks_like_user_info_path_request("config.env path"));
+        let reply = try_operator_instant_reply("where is .config.env")
+            .expect("config.env path instant");
+        assert!(reply.contains("Secrets env file"));
+        assert!(reply.contains(".config.env") || reply.contains(".mac-stats"));
+        assert!(!reply.to_lowercase().contains("discord_bot_token"));
+        assert!(!reply.to_lowercase().contains("api_key="));
     }
 
     #[test]
@@ -16312,6 +16536,7 @@ mod tests {
         assert!(!looks_like_user_info_path_request("discord channels path"));
         assert!(!looks_like_user_info_path_request("delivery awareness path"));
         assert!(!looks_like_user_info_path_request("memory path"));
+        assert!(!looks_like_user_info_path_request("config.env path"));
         assert!(!looks_like_config_path_request("user info path"));
         assert!(!looks_like_config_path_request("where is user-info.json"));
         let reply = try_operator_instant_reply("where is user-info.json")
