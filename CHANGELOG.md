@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.829] - 2026-09-03
+
+### Fixed
+- **Instant lane: browser-downloads directory path** — `browser downloads path`, `where are browser downloads`, `browser-downloads`, and similar asks return `~/.mac-stats/browser-downloads/` without Ollama (Discord + AI Chat; does not list, prune, or run BROWSER_DOWNLOAD; does not steal `/downloads` organizer; p50 latency).
+
 ## [0.1.828] - 2026-09-03
 
 ### Fixed

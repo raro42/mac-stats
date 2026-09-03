@@ -5090,6 +5090,165 @@ pub fn format_browser_storage_state_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the browser-downloads folder / browser downloads path…” asks.
+/// Config path only — does not list, prune, or run BROWSER_DOWNLOAD under `~/.mac-stats/browser-downloads/`.
+/// Does not steal `/downloads` organizer Ready, home Downloads folder, or upload/PDF/cookie paths.
+pub fn looks_like_browser_downloads_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / organizer / browser-status / disk-cleanup / download-action asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_downloads_organizer_ready_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if (n.contains("browser_") && !n.contains("browser_download") && !n.contains("browser_downloads"))
+        || n.contains("browser:")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("browser_download:")
+        || n.contains("download file")
+        || n.contains("download this")
+        || n.contains("download the")
+        || n.contains("download from")
+        || n.contains("download url")
+        || n.contains("download http")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let dl_ctx = n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("browser_downloads")
+        || n.contains("browser_download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("mac-stats downloads")
+        || n.contains("mac stats downloads")
+        || (n.contains("downloads")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !dl_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("browser-downloads")
+        || n.contains("browser_downloads");
+    matches!(
+        n.as_str(),
+        "browser downloads path"
+            | "browser download path"
+            | "browser downloads"
+            | "browser download folder"
+            | "browser downloads folder"
+            | "browser downloads directory"
+            | "browser downloads dir"
+            | "browser-downloads"
+            | "browser-downloads path"
+            | "browser-downloads folder"
+            | "browser-downloads directory"
+            | "browser-downloads dir"
+            | "browser_downloads"
+            | "browser_downloads path"
+            | "browser_downloads folder"
+            | "where is browser-downloads"
+            | "where is the browser-downloads"
+            | "where is browser downloads"
+            | "where is the browser downloads"
+            | "where is the browser downloads folder"
+            | "where is the browser downloads directory"
+            | "where are browser downloads"
+            | "where do browser downloads go"
+            | "cdp downloads path"
+            | "cdp downloads folder"
+            | "cdp downloads"
+            | "mac-stats downloads"
+            | "mac stats downloads"
+            | "mac-stats downloads path"
+            | "mac stats downloads path"
+            | "mac-stats downloads folder"
+            | "mac stats downloads folder"
+    ) || (dl_ctx && pathish)
+}
+
+/// Zero-LLM browser downloads directory path (config only; no list/prune/download).
+pub fn format_browser_downloads_path_gateway() -> String {
+    let dir = crate::config::Config::browser_downloads_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9797,6 +9956,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_storage_state_path_request(content) {
         return Some(format_browser_storage_state_path_gateway());
     }
+    if looks_like_browser_downloads_path_request(content) {
+        return Some(format_browser_downloads_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9983,6 +10145,7 @@ pub fn format_ops_help_gateway() -> String {
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
+• `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11450,6 +11613,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
     if looks_like_browser_storage_state_path_request(question) {
+        return true;
+    }
+    // Read-only browser-downloads dir path asks (v0.1.829) — config only; no list/prune/download.
+    if looks_like_browser_downloads_path_request(question) {
         return true;
     }
     false
@@ -13966,6 +14133,53 @@ mod tests {
         assert!(
             reply.contains("browser_storage_state.json") || reply.contains(".mac-stats")
         );
+    }
+
+    #[test]
+    fn browser_downloads_path_request_detected() {
+        assert!(looks_like_browser_downloads_path_request(
+            "browser downloads path"
+        ));
+        assert!(looks_like_browser_downloads_path_request("browser-downloads"));
+        assert!(looks_like_browser_downloads_path_request(
+            "where are browser downloads"
+        ));
+        assert!(looks_like_browser_downloads_path_request(
+            "where is the browser-downloads folder"
+        ));
+        assert!(looks_like_browser_downloads_path_request(
+            "browser downloads folder"
+        ));
+        assert!(looks_like_browser_downloads_path_request("cdp downloads path"));
+        assert!(looks_like_browser_downloads_path_request(
+            "mac-stats downloads path"
+        ));
+        assert!(!looks_like_browser_downloads_path_request("list downloads"));
+        assert!(!looks_like_browser_downloads_path_request("prune downloads"));
+        assert!(!looks_like_browser_downloads_path_request("clean downloads"));
+        assert!(!looks_like_browser_downloads_path_request("BROWSER_DOWNLOAD: 30"));
+        assert!(!looks_like_browser_downloads_path_request("/downloads"));
+        assert!(!looks_like_browser_downloads_path_request("downloads"));
+        assert!(!looks_like_browser_downloads_path_request(
+            "storage state path"
+        ));
+        assert!(!looks_like_browser_downloads_path_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_browser_downloads_path_request("uploads path"));
+        assert!(!looks_like_browser_downloads_path_request("where is config"));
+        assert!(!looks_like_browser_downloads_path_request("/browser"));
+        assert!(!looks_like_downloads_organizer_ready_request(
+            "browser downloads path"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser downloads path"
+        ));
+        assert!(!looks_like_browser_ready_request("browser downloads path"));
+        let reply = try_operator_instant_reply("where are browser downloads")
+            .expect("browser downloads path instant");
+        assert!(reply.contains("Browser downloads"));
+        assert!(reply.contains("browser-downloads") || reply.contains(".mac-stats"));
     }
 
     #[test]
