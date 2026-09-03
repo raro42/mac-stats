@@ -1,26 +1,31 @@
 # Morning surprise — 2026-09-03
 
-Overnight Track B kept shipping path/instant + uptime fixes.
+Overnight Track B (autoresearch) for Ralf.
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.831** | Instant lane: **pinned_processes.json path** (`pinned processes path` / `where is pinned_processes.json` / `pin file path`) → favorites file without Ollama (does not steal `/pinned`) |
-| **v0.1.830** | Instant lane: **cleanup-quarantine directory path** (`cleanup quarantine path` / `where is cleanup-quarantine` / `quarantine folder`) → `~/.mac-stats/cleanup-quarantine/` without Ollama (does not steal `/disk`) |
-| **v0.1.829** | Instant lane: **browser-downloads directory path** (`browser downloads path` / `where are browser downloads` / `browser-downloads`) → `~/.mac-stats/browser-downloads/` without Ollama (does not steal `/downloads` organizer) |
-| **v0.1.828** | Instant lane: **browser storage-state / cookies path** (`storage state path` / `where are browser cookies` / `browser_storage_state.json`) → `~/.mac-stats/browser_storage_state.json` without Ollama |
-| **v0.1.827** | Instant lane: **browser credentials path** (`browser credentials path` / `where are browser credentials` / `browser-credentials.toml`) → `~/.mac-stats/browser-credentials.toml` without Ollama |
-| **v0.1.826** | Instant lane: **PDF exports directory path** (`pdfs path` / `where is the pdfs folder` / `pdf directory`) → `~/.mac-stats/pdfs/` without Ollama |
-| **v0.1.825** | Instant lane: **CDP traces directory path** (`traces path` / `where is the traces folder` / `cdp traces`) → `~/.mac-stats/traces/` without Ollama |
-| **v0.1.824** | Instant lane: **uploads directory path** (`uploads path` / `where is the uploads folder`) → `~/.mac-stats/uploads/` without Ollama |
-| **v0.1.823** | Startup: skip macOS crash-restore modal (`ApplePersistenceIgnoreState`) so Discord starts after LaunchAgent thrash |
+| **v0.1.832** | Instant lane: `schedules.json` path (`schedules path`, `where is schedules.json`, `schedule file path`) — config only; no list/count/create; does not steal `/schedules` |
+| **v0.1.831** | Instant lane: `pinned_processes.json` path |
+| **v0.1.830** | Instant lane: cleanup-quarantine directory path |
+| **v0.1.829** | Instant lane: browser-downloads directory path |
+| **v0.1.828** | Instant lane: browser storage-state / cookies path |
+| **v0.1.827** | Instant lane: browser credentials path |
+| **v0.1.826** | Instant lane: PDF exports directory path |
+| **v0.1.825** | Instant lane: CDP traces directory path |
+| **v0.1.824** | Instant lane: uploads directory path |
+| **v0.1.823** | Startup: skip macOS crash-restore modal |
 | **v0.1.822** | Instant lane: tmp directory path |
-| **v0.1.821** | Instant lane: prompts directory path |
-| **v0.1.820** | Instant lane: plugins/scripts directory path |
 
-## Fuel notes
+## This tick (~20:00)
 
-- Digester open empty (Elmasnow weather already stale/shipped).
-- Design review still in grace; `feature-ai-chat` PNG ~19.6d stale.
-- Next: more p50 path lanes (e.g. history.json / schedules.json), or design-review screenshot when grace ends.
+- Digester open: empty (Elmasnow weather stale/shipped).
+- Design review: grace (`feature-ai-chat` recommended, ~20d).
+- Fuel: standing backlog p50 — schedules.json path instant.
+- Keep @ `341df950`.
+
+## Next
+
+- history.json / monitors.json path lanes, or design-review PNG when grace ends.
+- Digester open / product-owned debug.log errors when present.
