@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.834] - 2026-09-03
+
+### Fixed
+- **Instant lane: history.json path** — `history path`, `where is history.json`, `metrics history file`, and similar asks return `~/.mac-stats/history.json` without Ollama (Discord + AI Chat; does not dump sparkline points or chat history; p50 latency).
+
 ## [0.1.833] - 2026-09-03
 
 ### Fixed

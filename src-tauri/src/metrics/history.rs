@@ -378,10 +378,7 @@ pub struct HistoryQueryResult {
 impl HistoryBuffer {
     /// Save history to disk for persistence across restarts (`~/.mac-stats/history.json`).
     pub fn save_to_disk(&self) -> Result<(), String> {
-        let home =
-            std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;
-        let history_dir = std::path::Path::new(&home).join(".mac-stats");
-        let history_file = history_dir.join("history.json");
+        let history_file = crate::config::Config::history_file_path();
 
         // Serialize all tiers
         let all_points = serde_json::json!({
@@ -403,16 +400,13 @@ impl HistoryBuffer {
 
     /// Load history from `~/.mac-stats/history.json` if it exists.
     pub fn load_from_disk() -> Result<Self, String> {
-        let home =
-            std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;
-        let history_dir = std::path::Path::new(&home).join(".mac-stats");
-        let history_file = history_dir.join("history.json");
+        let history_file = crate::config::Config::history_file_path();
 
         if !history_file.exists() {
             return Ok(Self::new()); // Return empty buffer if file doesn't exist
         }
 
-        let json_str = std::fs::read_to_string(history_file)
+        let json_str = std::fs::read_to_string(&history_file)
             .map_err(|e| format!("Failed to read history file: {}", e))?;
 
         let data: serde_json::Value = serde_json::from_str(&json_str)

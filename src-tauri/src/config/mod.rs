@@ -691,6 +691,14 @@ impl Config {
         std::env::temp_dir().join("mac-stats-schedules.json")
     }
 
+    /// CPU / metrics history buffer on disk: `$HOME/.mac-stats/history.json`.
+    pub fn history_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join("history.json");
+        }
+        std::env::temp_dir().join("mac-stats-history.json")
+    }
+
     /// Ensure the schedules directory exists
     ///
     /// Creates the directory containing the schedules file if it doesn't exist.

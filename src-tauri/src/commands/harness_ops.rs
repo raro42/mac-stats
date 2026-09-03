@@ -5867,6 +5867,149 @@ pub fn format_monitors_path_gateway() -> String {
     )
 }
 
+/// True for short “where is history.json / history path…” asks.
+/// Config path only — does not dump sparkline points or chat/session history.
+pub fn looks_like_history_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path asks or chat/metrics history dumps.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedules_path_request(content)
+        || looks_like_monitors_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("clear ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("chart")
+        || n.contains("sparkline")
+        || n.contains("graph")
+        || n.contains("plot")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("chat")
+        || n.contains("conversation")
+        || n.contains("message")
+        || n.contains("discord")
+        || n.contains("session history")
+        || n.contains("pinned")
+        || n.contains("schedules")
+        || n.contains("monitors")
+        || n.contains("quarantine")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n == "history"
+        || n == "/history"
+        || n == "cpu history"
+        || n == "metrics history"
+        || n == "show history"
+        || n == "clear history"
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let hist_ctx = n.contains("history.json")
+        || n.contains("history_file")
+        || n.contains("metrics history file")
+        || n.contains("cpu history file")
+        || n.contains("history file")
+        || (n.contains("history")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")));
+    if !hist_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("history.json")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "history path"
+            | "history.json"
+            | "history.json path"
+            | "history file"
+            | "history file path"
+            | "history_file"
+            | "metrics history path"
+            | "metrics history file"
+            | "cpu history path"
+            | "cpu history file"
+            | "where is history"
+            | "where is history.json"
+            | "where is the history file"
+            | "where is the metrics history"
+            | "where is metrics history"
+            | "where are metrics stored"
+            | "history json path"
+            | "history json file"
+    ) || (hist_ctx && pathish)
+}
+
+/// Zero-LLM history.json path (config only; no sparkline dump / chat history).
+pub fn format_history_path_gateway() -> String {
+    let path = crate::config::Config::history_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · open the CPU window for live charts · does not dump points or chat history."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -10593,6 +10736,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_monitors_path_request(content) {
         return Some(format_monitors_path_gateway());
     }
+    if looks_like_history_path_request(content) {
+        return Some(format_history_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -10784,6 +10930,7 @@ pub fn format_ops_help_gateway() -> String {
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
+• `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; does not steal chat history)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -12271,6 +12418,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only monitors.json path asks (v0.1.833) — config only; no list/add/check.
     if looks_like_monitors_path_request(question) {
+        return true;
+    }
+    // Read-only history.json path asks (v0.1.834) — config only; no sparkline dump.
+    if looks_like_history_path_request(question) {
         return true;
     }
     false
@@ -14973,6 +15124,30 @@ mod tests {
             .expect("monitors path instant");
         assert!(reply.contains("Monitors file"));
         assert!(reply.contains("monitors") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn history_path_request_detected() {
+        assert!(looks_like_history_path_request("history path"));
+        assert!(looks_like_history_path_request("history.json"));
+        assert!(looks_like_history_path_request("where is history.json"));
+        assert!(looks_like_history_path_request("metrics history file"));
+        assert!(looks_like_history_path_request("where is the history file"));
+        assert!(looks_like_history_path_request("cpu history path"));
+        assert!(!looks_like_history_path_request("history"));
+        assert!(!looks_like_history_path_request("/history"));
+        assert!(!looks_like_history_path_request("show history"));
+        assert!(!looks_like_history_path_request("clear history"));
+        assert!(!looks_like_history_path_request("cpu history"));
+        assert!(!looks_like_history_path_request("chat history"));
+        assert!(!looks_like_history_path_request("conversation history"));
+        assert!(!looks_like_history_path_request("monitors path"));
+        assert!(!looks_like_history_path_request("schedules path"));
+        assert!(!looks_like_history_path_request("where is config"));
+        let reply = try_operator_instant_reply("where is history.json")
+            .expect("history path instant");
+        assert!(reply.contains("History file"));
+        assert!(reply.contains("history") || reply.contains(".mac-stats"));
     }
 
     #[test]
