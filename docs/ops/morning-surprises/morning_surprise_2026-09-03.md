@@ -1,26 +1,28 @@
 # Morning surprise — 2026-09-03
 
-Overnight Track B kept shipping path instant lanes so operator “where is …?” asks stay off Ollama.
+Overnight Track B kept shipping **instant path lanes** (p50 latency) while digester open stayed empty.
 
-## Shipped tonight (keep)
+## Shipped tonight (highlights)
 
 | Version | What |
 |---------|------|
-| **v0.1.839** | Instant lane: `user-info.json` path (`user info path`, `where is user-info.json`, `user-info path`) — config only; no list/edit |
-| **v0.1.838** | Instant lane: `scheduler_delivery_awareness.json` path — does not steal `last delivery` / `/schedules` |
-| **v0.1.837** | Instant lane: `discord_channels.json` path — does not steal `/discord` |
-| **v0.1.836** | Instant lane: `perplexity_last.json` path — does not steal `/perplexity` |
-| **v0.1.835** | Instant lane: `disk_cleanup.json` path — does not steal `/disk` |
-| **v0.1.834** | Instant lane: `history.json` path — metrics sparkline buffer file |
-| **v0.1.833** | Instant lane: `monitors.json` path — does not steal `/monitors` |
-| **v0.1.832** | Instant lane: `schedules.json` path — does not steal `/schedules` |
+| **v0.1.840** | Instant lane: `.config.env` path (`config.env path`, `where is .config.env`, `secrets env path`) — path only, no key dump |
+| **v0.1.839** | Instant lane: `user-info.json` path |
+| **v0.1.838** | Instant lane: `scheduler_delivery_awareness.json` path |
+| **v0.1.837** | Instant lane: `discord_channels.json` path |
 
-## Digester / design review
+## Earlier same night / window
 
-- Digester **open**: empty (Elmasnow weather already stale after **v0.1.818**).
-- Design review: **due=false** (grace); recommended surface still `feature-ai-chat` (~20d PNG).
+Path/home instant lanes continued from **v0.1.832–836** (schedules / monitors / history / disk_cleanup / perplexity_last).
 
-## Note for next night
+## Digester
 
-- Path-detector sibling nesting is getting expensive — prefer string-only excludes for new lanes (as in **v0.1.839**).
-- Next fuel candidates: alerts config path, design-review PNG recapture when grace ends, debug.log product errors.
+Open candidates: **none**. Stale weather (`Elmasnow` → El Masnou) already filtered as shipped.
+
+## Design review
+
+`due=false` (grace). Stale PNGs remain (`feature-ai-chat` ~20d) — recapture when grace ends.
+
+## For Ralf
+
+Ask Werner: `where is .config.env` or `config.env path` — should answer instantly with the home secrets-env path, without dumping keys.
