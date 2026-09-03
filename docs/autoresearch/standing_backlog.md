@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.843** — External / Monitors Filter attention glance (**Filter · Up** / **Filter · Down** / **Filter · Slow** when active; click → All; Down/Slow strip defers; design review / `feature-monitors`).
+
 - **v0.1.842** — Top Processes Filter attention glance (**Filter · Pinned** / **Filter · Hot** when active; click → All; Hot strip defers; design review / `feature-processes`).
 
 - **v0.1.841** — Instant lane: improvements directory path (`improvements path`, `where is the improvements folder`, `autoresearch path`; config only; no list; does not steal overnight improvements asks; p50 latency).

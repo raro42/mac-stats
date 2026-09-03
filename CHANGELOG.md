@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.843] - 2026-09-04
+
+### Added
+- **External / Monitors Filter attention glance** — when **Up**, **Down**, or **Slow** is active, show **Filter · Up** / **Filter · Down** / **Filter · Slow** above the chips (click clears to All; Down/Slow strip defers while a filter is on; Top Processes / AI Chat / Perplexity Filter parity; design review / `feature-monitors`).
+
 ## [0.1.842] - 2026-09-04
 
 ### Added

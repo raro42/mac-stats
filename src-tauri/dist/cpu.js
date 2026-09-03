@@ -6607,13 +6607,24 @@ function initMonitorsSection() {
       attention.hidden = true;
       attention.classList.remove('has-down', 'has-slow');
     }
+    const filterAtt = document.getElementById('monitors-filter-attention-glance');
+    if (filterAtt) {
+      filterAtt.hidden = true;
+      filterAtt.classList.remove(
+        'is-filter',
+        'is-up-filter',
+        'is-down-filter',
+        'is-slow-filter'
+      );
+    }
   };
   applyMonitorsCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'monitors-content',
     getExpanded: () => !monitorsCollapsed,
-    ignoreSelector: '#monitors-menu-btn, #monitors-collapsed-glance, #monitors-attention-glance',
+    ignoreSelector:
+      '#monitors-menu-btn, #monitors-collapsed-glance, #monitors-attention-glance, #monitors-filter-attention-glance',
     onToggle: () => {
       monitorsCollapsed = !monitorsCollapsed;
       saveMonitorsCollapsedState(monitorsCollapsed);
@@ -7289,13 +7300,121 @@ function visibleMonitorItems(monitorsList) {
 /** UP latency ≥ this ms counts as Slow (menu-bar Mon amber / summary slowest parity). */
 const MONITOR_SLOW_MS = 2000;
 
+function monitorsFilterAttentionLabel() {
+  if (monitorsFilterMode === 'up') return 'Up';
+  if (monitorsFilterMode === 'down') return 'Down';
+  if (monitorsFilterMode === 'slow') return 'Slow';
+  return '';
+}
+
+/** Filter attention when Up/Down/Slow is active (Top Processes / AI Chat Filter parity). */
+function ensureMonitorsFilterAttentionGlance() {
+  ensureMonitorsFilterChips();
+  const chips = document.getElementById('monitors-filter-chips');
+  const downSlow = document.getElementById('monitors-attention-glance');
+  const summary = document.getElementById('monitors-summary');
+  const list = document.getElementById('monitors-list');
+  let glance = document.getElementById('monitors-filter-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'monitors-filter-attention-glance';
+    glance.className = 'monitors-filter-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML =
+      '<span id="monitors-filter-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement('beforebegin', glance);
+    } else if (downSlow) {
+      downSlow.insertAdjacentElement('beforebegin', glance);
+    } else if (summary) {
+      summary.insertAdjacentElement('afterend', glance);
+    } else if (list?.parentNode) {
+      list.parentNode.insertBefore(glance, list);
+    } else {
+      return null;
+    }
+    wireMonitorsFilterAttentionGlanceClick(glance);
+  } else if (
+    chips &&
+    glance.nextElementSibling !== chips &&
+    glance.nextElementSibling !== downSlow
+  ) {
+    if (downSlow && downSlow.nextElementSibling === chips) {
+      downSlow.insertAdjacentElement('beforebegin', glance);
+    } else {
+      chips.insertAdjacentElement('beforebegin', glance);
+    }
+  }
+  return glance;
+}
+
+function applyMonitorsFilterAttentionGlanceState(empty) {
+  const glance = ensureMonitorsFilterAttentionGlance();
+  if (!glance) return false;
+  const text = document.getElementById('monitors-filter-attention-glance-text');
+  const filterLabel = monitorsFilterAttentionLabel();
+  if (monitorsCollapsed || empty || !filterLabel) {
+    glance.hidden = true;
+    glance.classList.remove(
+      'is-filter',
+      'is-up-filter',
+      'is-down-filter',
+      'is-slow-filter'
+    );
+    return false;
+  }
+  glance.hidden = false;
+  glance.classList.add('is-filter');
+  glance.classList.toggle('is-up-filter', filterLabel === 'Up');
+  glance.classList.toggle('is-down-filter', filterLabel === 'Down');
+  glance.classList.toggle('is-slow-filter', filterLabel === 'Slow');
+  if (text) text.textContent = `Filter · ${filterLabel}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = `${filterLabel} filter active — click to show All`;
+  glance.setAttribute(
+    'aria-label',
+    `Monitors ${filterLabel} filter — click to clear`
+  );
+  return true;
+}
+
+function activateMonitorsFilterAttentionGlance() {
+  ensureMonitorsSectionExpanded();
+  setMonitorsFilterMode('all');
+  const chip =
+    document.querySelector(
+      '#monitors-filter-chips [data-monitors-filter="all"]'
+    ) || document.getElementById('monitors-filter-chips');
+  chip?.focus?.();
+}
+
+function wireMonitorsFilterAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.monitorsFilterAttentionWired === '1') return;
+  glance.dataset.monitorsFilterAttentionWired = '1';
+  const activate = () => activateMonitorsFilterAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /**
  * Down/Slow attention glance under Monitors summary (Agent Ops Fail/Slow / Hot parity).
  * Visible when the section is open and any listed monitor is DOWN or Slow.
+ * Hidden when Up/Down/Slow filter attention is already active (Filter parity).
  */
 function ensureMonitorsAttentionGlance() {
   ensureMonitorsFilterChips();
   const chips = document.getElementById('monitors-filter-chips');
+  const filterAtt = document.getElementById('monitors-filter-attention-glance');
   const summary = document.getElementById('monitors-summary');
   const list = document.getElementById('monitors-list');
   let glance = document.getElementById('monitors-attention-glance');
@@ -7318,6 +7437,16 @@ function ensureMonitorsAttentionGlance() {
   } else if (chips && glance.nextElementSibling !== chips) {
     chips.insertAdjacentElement('beforebegin', glance);
   }
+  if (
+    filterAtt &&
+    chips &&
+    filterAtt.nextElementSibling !== glance &&
+    filterAtt.nextElementSibling !== chips
+  ) {
+    if (glance.nextElementSibling === chips) {
+      glance.insertAdjacentElement('beforebegin', filterAtt);
+    }
+  }
   return glance;
 }
 
@@ -7325,7 +7454,13 @@ function applyMonitorsAttentionGlanceState(downCount, slowCount, empty) {
   const glance = ensureMonitorsAttentionGlance();
   if (!glance) return;
   const text = document.getElementById('monitors-attention-glance-text');
-  if (monitorsCollapsed || empty || (downCount <= 0 && slowCount <= 0)) {
+  // Filter attention wins when Up/Down/Slow is already active (Top Processes Filter parity).
+  if (
+    monitorsCollapsed ||
+    empty ||
+    (downCount <= 0 && slowCount <= 0) ||
+    monitorsFilterAttentionLabel()
+  ) {
     glance.hidden = true;
     glance.classList.remove('has-down', 'has-slow');
     return;
@@ -7534,6 +7669,7 @@ function applyMonitorsListFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensureMonitorsFilterMissState(monitorsList, false);
+    applyMonitorsFilterAttentionGlanceState(true);
     applyMonitorsAttentionGlanceState(0, 0, true);
     updateMonitorsHeight();
     return;
@@ -7555,6 +7691,7 @@ function applyMonitorsListFilter() {
   ensureMonitorsFilterMissState(monitorsList, visible === 0);
   ensureMonitorsListKbHint(monitorsList, visible > 0);
   syncMonitorsListTabOrder(monitorsList);
+  applyMonitorsFilterAttentionGlanceState(false);
   applyMonitorsAttentionGlanceState(downCount, slowCount, false);
   updateMonitorsHeight();
 }
@@ -9025,9 +9162,12 @@ function updateMonitorsHeight() {
     monitorsList.querySelector('.monitors-filter-miss');
   const chips = document.getElementById('monitors-filter-chips');
   const attention = document.getElementById('monitors-attention-glance');
+  const filterAtt = document.getElementById('monitors-filter-attention-glance');
   const itemHeight = 52; // row + down-meta / error lines
   const summaryHeight = 40;
-  const attentionHeight = attention && !attention.hidden ? 44 : 0;
+  const attentionHeight =
+    (attention && !attention.hidden ? 44 : 0) +
+    (filterAtt && !filterAtt.hidden ? 44 : 0);
   const chipsHeight = chips && !chips.hidden ? 36 : 0;
   const listMargin = 12;
   let openDetailExtra = 0;
@@ -12038,7 +12178,7 @@ function initCollapsibleSections() {
         e.target &&
         e.target.closest &&
         e.target.closest(
-          '#processes-top-glance, #processes-top-gpu-glance, #processes-top-ram-glance'
+          '#processes-top-glance, #processes-top-gpu-glance, #processes-top-ram-glance, #processes-hot-attention-glance, #processes-filter-attention-glance'
         )
       ) {
         return;
