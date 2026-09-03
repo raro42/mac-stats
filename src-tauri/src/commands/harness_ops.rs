@@ -4637,6 +4637,145 @@ pub fn format_traces_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the pdfs folder / pdfs path…” asks.
+/// Config path only — does not list, prune, or run BROWSER_SAVE_PDF under `~/.mac-stats/pdfs/`.
+pub fn looks_like_pdfs_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Do not steal sibling path / browser-status / disk-cleanup / save-PDF asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("save_pdf")
+        || n.contains("save pdf")
+        || n.contains("print pdf")
+        || n.contains("print_pdf")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let pdfs_ctx = n.contains("pdfs folder")
+        || n.contains("pdfs directory")
+        || n.contains("pdfs dir")
+        || n.contains("pdfs path")
+        || n.contains("pdf folder")
+        || n.contains("pdf directory")
+        || n.contains("pdf dir")
+        || n.contains("pdf path")
+        || n.contains("browser pdfs")
+        || n.contains("browser pdf")
+        || n.contains("mac-stats pdfs")
+        || n.contains("mac stats pdfs")
+        || n == "pdfs"
+        || (n.contains("pdf")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !pdfs_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "pdfs path"
+            | "pdf path"
+            | "pdfs folder"
+            | "pdf folder"
+            | "pdfs directory"
+            | "pdf directory"
+            | "pdfs dir"
+            | "pdf dir"
+            | "where is pdfs folder"
+            | "where is the pdfs folder"
+            | "where is pdf folder"
+            | "where is the pdf folder"
+            | "where is pdfs directory"
+            | "where is the pdfs directory"
+            | "where is pdf directory"
+            | "where is the pdf directory"
+            | "where is pdfs dir"
+            | "where is the pdfs dir"
+            | "where are pdfs"
+            | "where do pdfs go"
+            | "where do pdf exports go"
+            | "pdfs location"
+            | "pdf location"
+            | "pdfs home"
+            | "browser pdfs"
+            | "browser pdfs path"
+            | "browser pdfs folder"
+            | "mac-stats pdfs"
+            | "mac stats pdfs"
+            | "pdfs"
+    ) || (pdfs_ctx && pathish)
+}
+
+/// Zero-LLM PDF exports directory path (config only; no list/prune/save).
+pub fn format_pdfs_path_gateway() -> String {
+    let dir = crate::config::Config::pdfs_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**PDFs dir:** `{display}` · BROWSER_SAVE_PDF exports · pruned by retention · `/browser` for CDP status."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9335,6 +9474,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_traces_path_request(content) {
         return Some(format_traces_path_gateway());
     }
+    if looks_like_pdfs_path_request(content) {
+        return Some(format_pdfs_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9518,6 +9660,7 @@ pub fn format_ops_help_gateway() -> String {
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
+• `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -10973,6 +11116,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only CDP traces dir path asks (v0.1.825) — config only; no list/prune.
     if looks_like_traces_path_request(question) {
+        return true;
+    }
+    // Read-only PDF exports dir path asks (v0.1.826) — config only; no list/save.
+    if looks_like_pdfs_path_request(question) {
         return true;
     }
     false
@@ -13360,6 +13507,7 @@ mod tests {
         assert!(!looks_like_traces_path_request("backtrace"));
         assert!(!looks_like_traces_path_request("/disk reclaim"));
         assert!(!looks_like_traces_path_request("uploads path"));
+        assert!(!looks_like_traces_path_request("pdfs path"));
         assert!(!looks_like_traces_path_request("where is config"));
         assert!(!looks_like_traces_path_request("/browser"));
         assert!(!looks_like_uploads_path_request("traces path"));
@@ -13367,6 +13515,35 @@ mod tests {
             try_operator_instant_reply("where is the traces folder").expect("traces path instant");
         assert!(reply.contains("Traces dir"));
         assert!(reply.contains("traces") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn pdfs_path_request_detected() {
+        assert!(looks_like_pdfs_path_request("pdfs path"));
+        assert!(looks_like_pdfs_path_request("pdf path"));
+        assert!(looks_like_pdfs_path_request("pdfs folder"));
+        assert!(looks_like_pdfs_path_request("where is the pdfs folder"));
+        assert!(looks_like_pdfs_path_request("pdfs directory"));
+        assert!(looks_like_pdfs_path_request("where are pdfs"));
+        assert!(looks_like_pdfs_path_request("where do pdfs go"));
+        assert!(looks_like_pdfs_path_request("browser pdfs path"));
+        assert!(looks_like_pdfs_path_request("mac-stats pdfs"));
+        assert!(!looks_like_pdfs_path_request("list pdfs"));
+        assert!(!looks_like_pdfs_path_request("prune pdfs"));
+        assert!(!looks_like_pdfs_path_request("clean pdfs"));
+        assert!(!looks_like_pdfs_path_request("save pdf"));
+        assert!(!looks_like_pdfs_path_request("BROWSER_SAVE_PDF: current"));
+        assert!(!looks_like_pdfs_path_request("/disk reclaim"));
+        assert!(!looks_like_pdfs_path_request("uploads path"));
+        assert!(!looks_like_pdfs_path_request("traces path"));
+        assert!(!looks_like_pdfs_path_request("where is config"));
+        assert!(!looks_like_pdfs_path_request("/browser"));
+        assert!(!looks_like_uploads_path_request("pdfs path"));
+        assert!(!looks_like_traces_path_request("pdfs path"));
+        let reply =
+            try_operator_instant_reply("where is the pdfs folder").expect("pdfs path instant");
+        assert!(reply.contains("PDFs dir"));
+        assert!(reply.contains("pdfs") || reply.contains(".mac-stats"));
     }
 
     #[test]

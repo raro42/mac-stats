@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.826] - 2026-09-03
+
+### Fixed
+- **Instant lane: PDF exports directory path** — `pdfs path`, `where is the pdfs folder`, `pdf directory`, and similar asks return `~/.mac-stats/pdfs/` without Ollama (Discord + AI Chat; does not list or save; p50 latency).
+
 ## [0.1.825] - 2026-09-03
 
 ### Fixed
