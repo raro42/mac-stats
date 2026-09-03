@@ -6120,6 +6120,7 @@ pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
         || n.contains("monitors.json")
         || n.contains("schedules.json")
         || n.contains("pinned_processes")
+        || n.contains("perplexity_last")
         || n.contains("browser-downloads")
         || n.contains("browser downloads")
         || n.contains("screenshot")
@@ -6200,6 +6201,184 @@ pub fn format_disk_cleanup_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `/disk` for live scopes · does not reclaim or clean."
+    )
+}
+
+/// True for short “where is perplexity_last.json / perplexity last path…” asks.
+/// Config path only — does not list Top/Snippet results or run a new search.
+pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path asks or `/perplexity` last-search / key Ready.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedules_path_request(content)
+        || looks_like_monitors_path_request(content)
+        || looks_like_history_path_request(content)
+        || looks_like_disk_cleanup_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("search for")
+        || n.contains("look up")
+        || n.contains("run search")
+        || n.contains("do a search")
+        || n.contains("snippet")
+        || n.contains("top result")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("api key")
+        || n.contains("perplexity key")
+        || n == "/perplexity"
+        || n == "perplexity"
+        || n == "last search"
+        || n == "last perplexity"
+        || n == "perplexity results"
+        || n == "search results"
+        || n == "perplexity search"
+        || n == "/perplexity top"
+        || n == "perplexity top"
+        || n == "/perplexity snippet"
+        || n == "perplexity snippet"
+        || n == "/perplexity key"
+        || n == "perplexity key"
+        || n == "perplexity status"
+        || n == "perplexity ready"
+        || n.contains("disk_cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("pinned_processes")
+        || n.contains("discord_channels")
+        || n.contains("screenshot")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let px_ctx = n.contains("perplexity_last.json")
+        || n.contains("perplexity_last")
+        || n.contains("perplexity-last.json")
+        || n.contains("perplexity-last")
+        || n.contains("perplexity last.json")
+        || n.contains("perplexity last file")
+        || n.contains("perplexity cache")
+        || n.contains("last search file")
+        || n.contains("last search cache")
+        || n.contains("perplexity cache file")
+        || n.contains("perplexity results file")
+        || n.contains("perplexity results path")
+        || (n.contains("perplexity")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("cache")))
+        || (n.contains("last search")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("cache")));
+    if !px_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("perplexity_last.json")
+        || n.contains("json")
+        || n.contains("cache");
+    matches!(
+        n.as_str(),
+        "perplexity last path"
+            | "perplexity_last"
+            | "perplexity_last.json"
+            | "perplexity_last.json path"
+            | "perplexity_last path"
+            | "perplexity_last file"
+            | "perplexity-last path"
+            | "perplexity-last.json"
+            | "perplexity last file"
+            | "perplexity last file path"
+            | "perplexity cache path"
+            | "perplexity cache file"
+            | "perplexity results file"
+            | "perplexity results path"
+            | "last search file"
+            | "last search file path"
+            | "last search path"
+            | "last search cache"
+            | "last search cache path"
+            | "where is perplexity_last"
+            | "where is perplexity_last.json"
+            | "where is the perplexity_last file"
+            | "where is the perplexity last file"
+            | "where is perplexity last.json"
+            | "where is the last search file"
+            | "where is perplexity cache"
+            | "perplexity json path"
+            | "perplexity json file"
+    ) || (px_ctx && pathish)
+}
+
+/// Zero-LLM perplexity_last.json path (config only; no Top/Snippet dump / new search).
+pub fn format_perplexity_last_path_gateway() -> String {
+    let path = crate::config::Config::perplexity_last_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Perplexity last file:** `{display}` · last Perplexity Search cache on disk · `/perplexity` for Top/Snippet · does not search or dump results."
     )
 }
 
@@ -7529,6 +7708,33 @@ pub fn parse_perplexity_list_filter(content: &str) -> PerplexityListFilter {
 pub fn looks_like_perplexity_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
+        return false;
+    }
+    // Path-only asks go to perplexity_last.json instant (inline — avoid calling path detector).
+    if n.contains("perplexity_last.json")
+        || n.contains("perplexity_last")
+        || n.contains("perplexity-last")
+        || n.contains("last search file")
+        || n.contains("last search cache")
+        || n.contains("perplexity cache")
+        || n.contains("perplexity results file")
+        || n.contains("perplexity results path")
+        || (n.contains("perplexity")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("last search")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("cache")))
+    {
         return false;
     }
     if n.contains("why")
@@ -9137,6 +9343,14 @@ pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains(" of ")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("json")
+        || n.contains("perplexity_last")
+        || n.contains("cache file")
         // Live search: "perplexity search for …" (status/key/ready stay in the allow list below).
         || (n.starts_with("perplexity search ")
             && !matches!(
@@ -10935,6 +11149,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_disk_cleanup_path_request(content) {
         return Some(format_disk_cleanup_path_gateway());
     }
+    if looks_like_perplexity_last_path_request(content) {
+        return Some(format_perplexity_last_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -11127,6 +11344,8 @@ pub fn format_ops_help_gateway() -> String {
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; does not steal chat history)\n\
+• `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
+• `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -12622,6 +12841,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only disk_cleanup.json path asks (v0.1.835) — config only; no list/reclaim.
     if looks_like_disk_cleanup_path_request(question) {
+        return true;
+    }
+    // Read-only perplexity_last.json path asks (v0.1.836) — config only; no Top/Snippet dump.
+    if looks_like_perplexity_last_path_request(question) {
         return true;
     }
     false
@@ -15379,6 +15602,37 @@ mod tests {
             .expect("disk cleanup path instant");
         assert!(reply.contains("Disk cleanup file"));
         assert!(reply.contains("disk_cleanup") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn perplexity_last_path_request_detected() {
+        assert!(looks_like_perplexity_last_path_request("perplexity last path"));
+        assert!(looks_like_perplexity_last_path_request("perplexity_last.json"));
+        assert!(looks_like_perplexity_last_path_request(
+            "where is perplexity_last.json"
+        ));
+        assert!(looks_like_perplexity_last_path_request("perplexity last file"));
+        assert!(looks_like_perplexity_last_path_request(
+            "where is the last search file"
+        ));
+        assert!(looks_like_perplexity_last_path_request("last search file path"));
+        assert!(looks_like_perplexity_last_path_request("perplexity cache path"));
+        assert!(!looks_like_perplexity_last_path_request("/perplexity"));
+        assert!(!looks_like_perplexity_last_path_request("perplexity"));
+        assert!(!looks_like_perplexity_last_path_request("last search"));
+        assert!(!looks_like_perplexity_last_path_request("perplexity top"));
+        assert!(!looks_like_perplexity_last_path_request("/perplexity key"));
+        assert!(!looks_like_perplexity_last_path_request("search for weather"));
+        assert!(!looks_like_perplexity_last_path_request("disk cleanup path"));
+        assert!(!looks_like_perplexity_last_path_request("history path"));
+        assert!(!looks_like_perplexity_last_path_request("where is config"));
+        assert!(!looks_like_perplexity_request("perplexity last path"));
+        assert!(!looks_like_perplexity_request("where is perplexity_last.json"));
+        assert!(looks_like_perplexity_request("/perplexity"));
+        let reply = try_operator_instant_reply("where is perplexity_last.json")
+            .expect("perplexity last path instant");
+        assert!(reply.contains("Perplexity last file"));
+        assert!(reply.contains("perplexity_last") || reply.contains(".mac-stats"));
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.836] - 2026-09-03
+
+### Fixed
+- **Instant lane: perplexity_last.json path** — `perplexity last path`, `where is perplexity_last.json`, `last search file`, and similar asks return `~/.mac-stats/perplexity_last.json` without Ollama (Discord + AI Chat; does not dump Top/Snippet or run a search; does not steal `/perplexity`; p50 latency).
+
 ## [0.1.835] - 2026-09-03
 
 ### Fixed
