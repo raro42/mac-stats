@@ -17835,13 +17835,125 @@ function applyDiskCleanupScopeFilter() {
   syncDiskCleanupScopeTabOrder(scopesEl, prefer);
 }
 
+function diskCleanupFilterAttentionLabel() {
+  if (diskCleanupFilterMode === 'reclaim') return 'Reclaim';
+  if (diskCleanupFilterMode === 'big') return 'Big';
+  if (diskCleanupFilterMode === 'clean') return 'Clean';
+  return '';
+}
+
+/** Filter attention when Reclaim/Big/Clean is active (Monitors / Top Processes Filter parity). */
+function ensureDiskCleanupFilterAttentionGlance() {
+  ensureDiskCleanupFilterChips();
+  const chips = document.getElementById('disk-cleanup-filter-chips');
+  const reclaimDue = document.getElementById('disk-cleanup-attention-glance');
+  const list = document.getElementById('disk-cleanup-list');
+  const hint = document.getElementById('disk-cleanup-list-kb-hint');
+  let glance = document.getElementById('disk-cleanup-filter-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'disk-cleanup-filter-attention-glance';
+    glance.className = 'disk-cleanup-filter-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML =
+      '<span id="disk-cleanup-filter-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement('beforebegin', glance);
+    } else if (reclaimDue) {
+      reclaimDue.insertAdjacentElement('beforebegin', glance);
+    } else if (hint) {
+      hint.insertAdjacentElement('beforebegin', glance);
+    } else if (list?.parentNode) {
+      list.parentNode.insertBefore(glance, list);
+    } else {
+      return null;
+    }
+    wireDiskCleanupFilterAttentionGlanceClick(glance);
+  } else if (
+    chips &&
+    glance.nextElementSibling !== chips &&
+    glance.nextElementSibling !== reclaimDue
+  ) {
+    if (reclaimDue && reclaimDue.nextElementSibling === chips) {
+      reclaimDue.insertAdjacentElement('beforebegin', glance);
+    } else {
+      chips.insertAdjacentElement('beforebegin', glance);
+    }
+  }
+  return glance;
+}
+
+function applyDiskCleanupFilterAttentionGlanceState(empty) {
+  const glance = ensureDiskCleanupFilterAttentionGlance();
+  if (!glance) return false;
+  const text = document.getElementById(
+    'disk-cleanup-filter-attention-glance-text'
+  );
+  const filterLabel = diskCleanupFilterAttentionLabel();
+  if (diskCleanupCollapsed || empty || !filterLabel) {
+    glance.hidden = true;
+    glance.classList.remove(
+      'is-filter',
+      'is-reclaim-filter',
+      'is-big-filter',
+      'is-clean-filter'
+    );
+    return false;
+  }
+  glance.hidden = false;
+  glance.classList.add('is-filter');
+  glance.classList.toggle('is-reclaim-filter', filterLabel === 'Reclaim');
+  glance.classList.toggle('is-big-filter', filterLabel === 'Big');
+  glance.classList.toggle('is-clean-filter', filterLabel === 'Clean');
+  if (text) text.textContent = `Filter · ${filterLabel}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = `${filterLabel} filter active — click to show All`;
+  glance.setAttribute(
+    'aria-label',
+    `Disk Cleanup ${filterLabel} filter — click to clear`
+  );
+  return true;
+}
+
+function activateDiskCleanupFilterAttentionGlance() {
+  ensureDiskCleanupSectionExpanded();
+  setDiskCleanupFilterMode('all');
+  const chip =
+    document.querySelector(
+      '#disk-cleanup-filter-chips [data-disk-cleanup-filter="all"]'
+    ) || document.getElementById('disk-cleanup-filter-chips');
+  chip?.focus?.();
+}
+
+function wireDiskCleanupFilterAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.diskCleanupFilterAttentionWired === '1') return;
+  glance.dataset.diskCleanupFilterAttentionWired = '1';
+  const activate = () => activateDiskCleanupFilterAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /**
  * Reclaim/Due attention glance under Disk Cleanup meta (Monitors Down/Slow / Hot parity).
  * Visible when the section is open and any category is reclaimable or a run is due.
+ * Hidden when Reclaim/Big/Clean filter attention is already active (Filter parity).
  */
 function ensureDiskCleanupAttentionGlance() {
   ensureDiskCleanupFilterChips();
   const chips = document.getElementById('disk-cleanup-filter-chips');
+  const filterAtt = document.getElementById(
+    'disk-cleanup-filter-attention-glance'
+  );
   const list = document.getElementById('disk-cleanup-list');
   const hint = document.getElementById('disk-cleanup-list-kb-hint');
   let glance = document.getElementById('disk-cleanup-attention-glance');
@@ -17864,6 +17976,16 @@ function ensureDiskCleanupAttentionGlance() {
   } else if (chips && glance.nextElementSibling !== chips) {
     chips.insertAdjacentElement('beforebegin', glance);
   }
+  if (
+    filterAtt &&
+    chips &&
+    filterAtt.nextElementSibling !== glance &&
+    filterAtt.nextElementSibling !== chips
+  ) {
+    if (glance.nextElementSibling === chips) {
+      glance.insertAdjacentElement('beforebegin', filterAtt);
+    }
+  }
   return glance;
 }
 
@@ -17873,10 +17995,12 @@ function applyDiskCleanupAttentionGlanceState(reclaimCount, bigCount, due, empty
   const text = document.getElementById('disk-cleanup-attention-glance-text');
   const st = window.__diskCleanupGlanceState || {};
   const dueNow = due != null ? !!due : !!st.due;
+  // Filter attention wins when Reclaim/Big/Clean is already active (Monitors Filter parity).
   if (
     diskCleanupCollapsed ||
     empty ||
-    (reclaimCount <= 0 && !dueNow)
+    (reclaimCount <= 0 && !dueNow) ||
+    diskCleanupFilterAttentionLabel()
   ) {
     glance.hidden = true;
     glance.classList.remove('has-big', 'has-reclaim', 'is-due');
@@ -18073,9 +18197,11 @@ function applyDiskCleanupListFilter() {
     !!(window.__diskCleanupGlanceState && window.__diskCleanupGlanceState.due);
   if (trueEmpty || items.length === 0) {
     ensureDiskCleanupFilterMissState(listEl, false);
+    applyDiskCleanupFilterAttentionGlanceState(true);
     applyDiskCleanupAttentionGlanceState(0, 0, due, true);
     return;
   }
+  applyDiskCleanupFilterAttentionGlanceState(false);
   applyDiskCleanupAttentionGlanceState(reclaimCount, bigCount, due, false);
 
   let visible = 0;
@@ -19309,6 +19435,18 @@ function initDiskCleanupSection() {
       attention.hidden = true;
       attention.classList.remove('has-big', 'has-reclaim', 'is-due');
     }
+    const filterAtt = document.getElementById(
+      'disk-cleanup-filter-attention-glance'
+    );
+    if (filterAtt) {
+      filterAtt.hidden = true;
+      filterAtt.classList.remove(
+        'is-filter',
+        'is-reclaim-filter',
+        'is-big-filter',
+        'is-clean-filter'
+      );
+    }
     if (diskCleanupCollapsed) {
       syncDiskCleanupCollapsedGlance();
     }
@@ -19322,7 +19460,7 @@ function initDiskCleanupSection() {
       contentId: 'disk-cleanup-content',
       getExpanded: () => !diskCleanupCollapsed,
       ignoreSelector:
-        '#disk-cleanup-collapsed-glance, #disk-cleanup-attention-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
+        '#disk-cleanup-collapsed-glance, #disk-cleanup-attention-glance, #disk-cleanup-filter-attention-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
       onToggle: () => {
         diskCleanupCollapsed = !diskCleanupCollapsed;
         setSectionCollapsed('disk_cleanup_collapsed', diskCleanupCollapsed);
@@ -19334,7 +19472,7 @@ function initDiskCleanupSection() {
   header.addEventListener('click', (e) => {
     if (
       e.target.closest(
-        '#disk-cleanup-collapsed-glance, #disk-cleanup-attention-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, .disk-cleanup-soft-delete, input, button, label'
+        '#disk-cleanup-collapsed-glance, #disk-cleanup-attention-glance, #disk-cleanup-filter-attention-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, .disk-cleanup-soft-delete, input, button, label'
       )
     ) {
       return;

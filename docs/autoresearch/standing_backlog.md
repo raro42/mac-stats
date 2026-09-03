@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.844** — Disk Cleanup Filter attention glance (**Filter · Reclaim** / **Filter · Big** / **Filter · Clean** when active; click → All; Reclaim/Due strip defers; design review / `feature-disk-cleanup`).
+
 - **v0.1.843** — External / Monitors Filter attention glance (**Filter · Up** / **Filter · Down** / **Filter · Slow** when active; click → All; Down/Slow strip defers; design review / `feature-monitors`).
 
 - **v0.1.842** — Top Processes Filter attention glance (**Filter · Pinned** / **Filter · Hot** when active; click → All; Hot strip defers; design review / `feature-processes`).

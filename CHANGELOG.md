@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.844] - 2026-09-04
+
+### Added
+- **Disk Cleanup Filter attention glance** — when **Reclaim**, **Big**, or **Clean** is active, show **Filter · Reclaim** / **Filter · Big** / **Filter · Clean** above the chips (click clears to All; Reclaim/Due strip defers while a filter is on; Monitors / Top Processes / AI Chat Filter parity; design review / `feature-disk-cleanup`).
+
 ## [0.1.843] - 2026-09-04
 
 ### Added
