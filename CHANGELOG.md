@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.837] - 2026-09-03
+
+### Fixed
+- **Instant lane: discord_channels.json path** — `discord channels path`, `where is discord_channels.json`, `channels.json`, and similar asks return `~/.mac-stats/discord_channels.json` without Ollama (Discord + AI Chat; does not list or edit channels; does not steal `/discord`; p50 latency).
+
 ## [0.1.836] - 2026-09-03
 
 ### Fixed
