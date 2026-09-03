@@ -4919,6 +4919,177 @@ pub fn format_browser_credentials_path_gateway() -> String {
     )
 }
 
+/// True for short “where is browser_storage_state.json / cookies path…” asks.
+/// Config path only — does not list, dump, clear, or edit cookies from the jar.
+pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if (n.contains("browser_") && !n.contains("browser_storage_state"))
+        || n.contains("browser:")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("export")
+        || n.contains("import")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let state_ctx = n.contains("browser_storage_state")
+        || n.contains("browser-storage-state")
+        || n.contains("browser storage state")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || (n.contains("cookies")
+            && (n.contains("browser")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("cookie")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("jar")));
+    if !state_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("json")
+        || n.contains("browser_storage_state")
+        || n.contains("browser-storage-state")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar");
+    matches!(
+        n.as_str(),
+        "storage state path"
+            | "storage state"
+            | "storage_state"
+            | "storage_state path"
+            | "storage_state.json"
+            | "browser storage state"
+            | "browser storage state path"
+            | "browser storage state file"
+            | "browser_storage_state"
+            | "browser_storage_state.json"
+            | "browser_storage_state path"
+            | "browser-storage-state"
+            | "browser-storage-state.json"
+            | "browser-storage-state path"
+            | "where is storage state"
+            | "where is the storage state"
+            | "where is browser_storage_state"
+            | "where is browser_storage_state.json"
+            | "where is the browser storage state"
+            | "where is the browser storage state file"
+            | "where are browser cookies"
+            | "where do browser cookies go"
+            | "browser cookies path"
+            | "browser cookie path"
+            | "browser cookies file"
+            | "browser cookie file"
+            | "browser cookies folder"
+            | "cookie jar path"
+            | "cookies jar path"
+            | "cookie jar"
+            | "cookies path"
+            | "cookie path"
+            | "cdp cookies path"
+            | "cdp cookies"
+            | "mac-stats cookies"
+            | "mac stats cookies"
+            | "mac-stats cookies path"
+            | "mac stats cookies path"
+    ) || (state_ctx && pathish)
+}
+
+/// Zero-LLM browser cookie-jar / storage-state path (config only; no list/dump/clear).
+pub fn format_browser_storage_state_path_gateway() -> String {
+    let path = crate::config::Config::browser_storage_state_json_path();
+    let display = path.display().to_string();
+    format!(
+        "**Browser storage state:** `{display}` · CDP cookie jar · `/browser` for CDP status."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -9623,6 +9794,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_credentials_path_request(content) {
         return Some(format_browser_credentials_path_gateway());
     }
+    if looks_like_browser_storage_state_path_request(content) {
+        return Some(format_browser_storage_state_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -9808,6 +9982,7 @@ pub fn format_ops_help_gateway() -> String {
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
+• `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11271,6 +11446,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser credentials file path asks (v0.1.827) — config only; no list/edit/dump.
     if looks_like_browser_credentials_path_request(question) {
+        return true;
+    }
+    // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
+    if looks_like_browser_storage_state_path_request(question) {
         return true;
     }
     false
@@ -13736,6 +13915,56 @@ mod tests {
         assert!(reply.contains("Browser credentials"));
         assert!(
             reply.contains("browser-credentials.toml") || reply.contains(".mac-stats")
+        );
+    }
+
+    #[test]
+    fn browser_storage_state_path_request_detected() {
+        assert!(looks_like_browser_storage_state_path_request(
+            "storage state path"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "browser_storage_state.json"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "where are browser cookies"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "where is browser_storage_state.json"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "browser cookies path"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "cookie jar path"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "cdp cookies path"
+        ));
+        assert!(looks_like_browser_storage_state_path_request(
+            "mac-stats cookies path"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request("list cookies"));
+        assert!(!looks_like_browser_storage_state_path_request("clear cookies"));
+        assert!(!looks_like_browser_storage_state_path_request("dump cookies"));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "BROWSER_CLEAR_COOKIES"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request("pdfs path"));
+        assert!(!looks_like_browser_storage_state_path_request("where is config"));
+        assert!(!looks_like_browser_storage_state_path_request("/browser"));
+        assert!(!looks_like_browser_credentials_path_request(
+            "storage state path"
+        ));
+        assert!(!looks_like_browser_ready_request("storage state path"));
+        let reply = try_operator_instant_reply("where are browser cookies")
+            .expect("browser storage state path instant");
+        assert!(reply.contains("Browser storage state"));
+        assert!(
+            reply.contains("browser_storage_state.json") || reply.contains(".mac-stats")
         );
     }
 
