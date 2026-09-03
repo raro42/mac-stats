@@ -6,14 +6,16 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.843** | **External / Monitors Filter attention glance** — when Up / Down / Slow is active, **Filter · Up** / **Filter · Down** / **Filter · Slow** above the chips (click → All; Down/Slow strip defers; Top Processes / AI Chat / Perplexity Filter parity). Design review / `feature-monitors`. Screenshot recapture deferred (TCC). |
 | **v0.1.842** | **Top Processes Filter attention glance** — when Pinned or Hot is active, **Filter · Pinned** / **Filter · Hot** above the chips (click → All; Hot strip defers; AI Chat / Perplexity Filter parity). Design review / `feature-processes`. Screenshot recapture deferred (TCC). |
 | **v0.1.841** | Instant lane: **improvements directory path** — `improvements path` / `where is the improvements folder` / `autoresearch path` → `~/.mac-stats/improvements/` without Ollama (no list; does not steal overnight “any improvements…” asks). |
 
 ## Context
 
-- Digester open pointed at design review (`feature-processes` stale ~21d).
-- Design review due=true this tick → Filter attention polish.
+- Digester open empty (Elmasnow weather already stale/shipped).
+- Design review due=true → recommended `feature-monitors` (~20.5d) → Filter attention polish.
 - PNG recapture blocked by Screen Recording TCC (`screencapture -l` / Quartz); polish grace marked.
+- Installed **0.1.843**; Discord Ready (Werner_Amvara).
 
 ## Earlier same night (2026-09-03 evening)
 
@@ -23,4 +25,5 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Next
 
-- credential_accounts.json path, or screenshot when TCC allows.
+- credential_accounts.json / alerts config path instant, or screenshot when TCC allows.
+- Sibling ports (Hermes insights / session UX) when digester stays empty and design-review grace holds.
