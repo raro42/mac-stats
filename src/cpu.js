@@ -1183,11 +1183,123 @@ function ensureProcessesHotAttentionGlance() {
   return glance;
 }
 
+function processesFilterAttentionLabel() {
+  if (processesFilterMode === "pinned") return "Pinned";
+  if (processesFilterMode === "hot") return "Hot";
+  return "";
+}
+
+/** Filter attention when Pinned/Hot is active (AI Chat / Perplexity Filter parity). */
+function ensureProcessesFilterAttentionGlance() {
+  const chips = document.getElementById("processes-filter-chips");
+  const hot = document.getElementById("processes-hot-attention-glance");
+  const ram = document.getElementById("processes-top-ram-glance");
+  const gpu = document.getElementById("processes-top-gpu-glance");
+  const top =
+    document.getElementById("processes-top-glance") ||
+    document.getElementById("processes-header");
+  const list = document.getElementById("process-list");
+  let glance = document.getElementById("processes-filter-attention-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "processes-filter-attention-glance";
+    glance.className = "processes-filter-attention-glance";
+    glance.hidden = true;
+    glance.innerHTML =
+      '<span id="processes-filter-attention-glance-text"></span>';
+    if (chips) {
+      chips.insertAdjacentElement("beforebegin", glance);
+    } else if (hot) {
+      hot.insertAdjacentElement("beforebegin", glance);
+    } else if (ram) {
+      ram.insertAdjacentElement("afterend", glance);
+    } else if (gpu) {
+      gpu.insertAdjacentElement("afterend", glance);
+    } else if (top) {
+      top.insertAdjacentElement("afterend", glance);
+    } else if (list?.parentNode) {
+      list.parentNode.insertBefore(glance, list);
+    } else {
+      return null;
+    }
+    wireProcessesFilterAttentionGlanceClick(glance);
+  } else if (chips && glance.nextElementSibling !== chips && glance.nextElementSibling !== hot) {
+    if (hot && hot.nextElementSibling === chips) {
+      hot.insertAdjacentElement("beforebegin", glance);
+    } else {
+      chips.insertAdjacentElement("beforebegin", glance);
+    }
+  }
+  return glance;
+}
+
+function applyProcessesFilterAttentionGlanceState(empty) {
+  const glance = ensureProcessesFilterAttentionGlance();
+  if (!glance) return false;
+  const text = document.getElementById("processes-filter-attention-glance-text");
+  const filterLabel = processesFilterAttentionLabel();
+  if (empty || !filterLabel) {
+    glance.hidden = true;
+    glance.classList.remove("is-filter", "is-pinned", "is-hot-filter");
+    return false;
+  }
+  glance.hidden = false;
+  glance.classList.add("is-filter");
+  glance.classList.toggle("is-pinned", filterLabel === "Pinned");
+  glance.classList.toggle("is-hot-filter", filterLabel === "Hot");
+  if (text) text.textContent = `Filter · ${filterLabel}`;
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = `${filterLabel} filter active — click to show All`;
+  glance.setAttribute(
+    "aria-label",
+    `Top Processes ${filterLabel} filter — click to clear`
+  );
+  return true;
+}
+
+function activateProcessesFilterAttentionGlance() {
+  if (isProcessesSectionCollapsed()) {
+    if (typeof window.showDetailsProcessesSections === "function") {
+      window.showDetailsProcessesSections();
+    }
+  }
+  setProcessesFilterMode("all");
+  const chip =
+    document.querySelector(
+      '#processes-filter-chips [data-processes-filter="all"]'
+    ) || document.getElementById("processes-filter-chips");
+  chip?.focus?.();
+}
+
+function wireProcessesFilterAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.processesFilterAttentionWired === "1") return;
+  glance.dataset.processesFilterAttentionWired = "1";
+  const activate = () => activateProcessesFilterAttentionGlance();
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 function applyProcessesHotAttentionGlanceState(hotCount, empty) {
   const glance = ensureProcessesHotAttentionGlance();
   if (!glance) return;
   const text = document.getElementById("processes-hot-attention-glance-text");
-  if (isProcessesSectionCollapsed() || empty || hotCount <= 0) {
+  // Filter attention wins when Pinned/Hot is already active (AI Chat Filter parity).
+  if (
+    isProcessesSectionCollapsed() ||
+    empty ||
+    hotCount <= 0 ||
+    processesFilterAttentionLabel()
+  ) {
     glance.hidden = true;
     glance.classList.remove("has-hot");
     return;
@@ -1371,6 +1483,7 @@ function applyProcessesListFilter() {
 
   if (waiting || rows.length === 0) {
     ensureProcessesFilterMissState(processList, false);
+    applyProcessesFilterAttentionGlanceState(true);
     applyProcessesHotAttentionGlanceState(0, true);
     return;
   }
@@ -1391,6 +1504,7 @@ function applyProcessesListFilter() {
 
   ensureProcessesFilterMissState(processList, visible === 0);
   ensureProcessesListKbHint(processList, visible > 0);
+  applyProcessesFilterAttentionGlanceState(false);
   applyProcessesHotAttentionGlanceState(hotCount, false);
 
   const visibleRows = visibleProcessRows(processList);
@@ -11804,6 +11918,11 @@ function initCollapsibleSections() {
       hotAtt.hidden = true;
       hotAtt.classList.remove('has-hot');
     }
+    const filterAtt = document.getElementById('processes-filter-attention-glance');
+    if (filterAtt) {
+      filterAtt.hidden = true;
+      filterAtt.classList.remove('is-filter', 'is-pinned', 'is-hot-filter');
+    }
     // Refresh quiet Waiting glance when list is empty while collapsed.
     const topGlance = document.getElementById('processes-top-glance');
     if (topGlance && !window.__processesTopPid) {
@@ -11919,7 +12038,7 @@ function initCollapsibleSections() {
         e.target &&
         e.target.closest &&
         e.target.closest(
-          '#processes-top-glance, #processes-top-gpu-glance, #processes-top-ram-glance'
+          '#processes-top-glance, #processes-top-gpu-glance, #processes-top-ram-glance, #processes-hot-attention-glance, #processes-filter-attention-glance'
         )
       ) {
         return;

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.842** — Top Processes Filter attention glance (**Filter · Pinned** / **Filter · Hot** when active; click → All; Hot strip defers; design review / `feature-processes`).
+
 - **v0.1.841** — Instant lane: improvements directory path (`improvements path`, `where is the improvements folder`, `autoresearch path`; config only; no list; does not steal overnight improvements asks; p50 latency).
 
 - **v0.1.840** — Instant lane: `.config.env` path (`config.env path`, `where is .config.env`, `config env path`, `secrets env path`; path only; no key dump; does not steal `where is config`; p50 latency).

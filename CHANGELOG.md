@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.842] - 2026-09-04
+
+### Added
+- **Top Processes Filter attention glance** — when **Pinned** or **Hot** is active, show **Filter · Pinned** / **Filter · Hot** above the chips (click clears to All; Hot strip defers while a filter is on; AI Chat / Perplexity Filter parity; design review / `feature-processes`).
+
 ## [0.1.841] - 2026-09-04
 
 ### Fixed
