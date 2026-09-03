@@ -6994,6 +6994,11 @@ pub fn looks_like_config_env_path_request(content: &str) -> bool {
         || n.contains("uploads path")
         || n.contains("traces path")
         || n.contains("pdfs path")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("improvements directory")
+        || n.contains("autoresearch path")
+        || n.contains("autoresearch folder")
     {
         return false;
     }
@@ -7109,6 +7114,208 @@ pub fn format_config_env_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Secrets env file:** `{display}` · path only · does not read or list keys · sync from repo with `./scripts/sync-home-config-env.sh` · Settings / Keychain for many credentials."
+    )
+}
+
+/// True for short “where is the improvements folder / improvements path…” asks.
+/// Path only — does not list digests, open morning surprise, or dump results.tsv.
+/// Does not steal “any improvements from last night?” (overnight content ask).
+pub fn looks_like_improvements_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("screenshot")
+        || n.contains("runs.jsonl")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity_last")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("delivery awareness")
+        || n.contains("pinned_processes")
+        || n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("userinfo")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("mac-stats home")
+        || n.contains("data directory")
+        || n.contains("data dir")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "config file path"
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("session path")
+        || n.contains("agents path")
+        || n.contains("skills path")
+        || n.contains("plugins path")
+        || n.contains("prompts path")
+        || n.contains("tmp path")
+        || n.contains("uploads path")
+        || n.contains("traces path")
+        || n.contains("pdfs path")
+        || n.contains("digest open")
+        || n.contains("digest age")
+        || n.contains("/digest")
+    {
+        return false;
+    }
+    // Do not steal overnight / content “what improved?” asks (fast_lane overnight lane).
+    if n.contains("last night")
+        || n.contains("overnight")
+        || n.contains("coding session")
+        || n.contains("lately")
+        || n.contains("recently")
+        || n.contains("this morning")
+        || n.contains("so far today")
+        || n.contains("what shipped")
+        || n.contains("what changed")
+        || n.contains("what did you")
+        || n.contains("what was done")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("morning surprise")
+        || n.contains("harness loop")
+        || n.contains("improvement loop")
+        || n.contains("how are you")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("workflow")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let imp_ctx = n.contains("improvements folder")
+        || n.contains("improvements directory")
+        || n.contains("improvements dir")
+        || n.contains("improvements path")
+        || n.contains("improvement folder")
+        || n.contains("improvement directory")
+        || n.contains("improvement dir")
+        || n.contains("improvement path")
+        || n.contains("mac-stats improvements")
+        || n.contains("mac stats improvements")
+        || n.contains("autoresearch folder")
+        || n.contains("autoresearch directory")
+        || n.contains("autoresearch path")
+        || n.contains("autoresearch dir")
+        || n == "improvements"
+        || (n.contains("improvement")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !imp_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "improvements path"
+            | "improvement path"
+            | "improvements folder"
+            | "improvement folder"
+            | "improvements directory"
+            | "improvement directory"
+            | "improvements dir"
+            | "improvement dir"
+            | "where is improvements"
+            | "where is the improvements folder"
+            | "where is improvements folder"
+            | "where is the improvements directory"
+            | "where is improvements directory"
+            | "where is the improvements dir"
+            | "where is improvements dir"
+            | "where are improvements"
+            | "where do improvements go"
+            | "improvements location"
+            | "improvement location"
+            | "improvements home"
+            | "mac-stats improvements"
+            | "mac stats improvements"
+            | "autoresearch path"
+            | "autoresearch folder"
+            | "autoresearch directory"
+            | "autoresearch dir"
+            | "where is autoresearch"
+            | "where is the autoresearch folder"
+            | "improvements"
+    ) || (imp_ctx && pathish)
+}
+
+/// Zero-LLM improvements directory path (config only; no list/open digest).
+pub fn format_improvements_path_gateway() -> String {
+    let dir = crate::config::Config::improvements_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files."
     )
 }
 
@@ -11823,6 +12030,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_env_path_request(content) {
         return Some(format_config_env_path_gateway());
     }
+    // Improvements dir before overnight-content asks collide on the word “improvements”.
+    if looks_like_improvements_path_request(content) {
+        return Some(format_improvements_path_gateway());
+    }
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
@@ -12077,6 +12288,7 @@ pub fn format_ops_help_gateway() -> String {
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
+• `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
@@ -13510,6 +13722,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only .config.env path asks (v0.1.840) — path only; never dumps keys.
     if looks_like_config_env_path_request(question) {
+        return true;
+    }
+    // Read-only improvements dir path asks (v0.1.841) — config only; no list/open.
+    if looks_like_improvements_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -15747,6 +15963,7 @@ mod tests {
         assert!(!looks_like_config_env_path_request("what is in .config.env"));
         assert!(!looks_like_config_env_path_request("dump config.env"));
         assert!(!looks_like_config_env_path_request("user info path"));
+        assert!(!looks_like_config_env_path_request("improvements path"));
         assert!(!looks_like_user_info_path_request("config.env path"));
         let reply = try_operator_instant_reply("where is .config.env")
             .expect("config.env path instant");
@@ -15754,6 +15971,37 @@ mod tests {
         assert!(reply.contains(".config.env") || reply.contains(".mac-stats"));
         assert!(!reply.to_lowercase().contains("discord_bot_token"));
         assert!(!reply.to_lowercase().contains("api_key="));
+    }
+
+    #[test]
+    fn improvements_path_request_detected() {
+        assert!(looks_like_improvements_path_request("improvements path"));
+        assert!(looks_like_improvements_path_request("improvement path"));
+        assert!(looks_like_improvements_path_request("improvements folder"));
+        assert!(looks_like_improvements_path_request("where is the improvements folder"));
+        assert!(looks_like_improvements_path_request("improvements directory"));
+        assert!(looks_like_improvements_path_request("where are improvements"));
+        assert!(looks_like_improvements_path_request("where do improvements go"));
+        assert!(looks_like_improvements_path_request("autoresearch path"));
+        assert!(looks_like_improvements_path_request("mac-stats improvements"));
+        assert!(looks_like_improvements_path_request("improvements"));
+        assert!(!looks_like_improvements_path_request("any improvements from last night"));
+        assert!(!looks_like_improvements_path_request(
+            "How are you today? Any improvements from last night coding session?"
+        ));
+        assert!(!looks_like_improvements_path_request("what shipped today"));
+        assert!(!looks_like_improvements_path_request("list improvements"));
+        assert!(!looks_like_improvements_path_request("open morning surprise"));
+        assert!(!looks_like_improvements_path_request("digest open"));
+        assert!(!looks_like_improvements_path_request("config.env path"));
+        assert!(!looks_like_improvements_path_request("where is config"));
+        assert!(!looks_like_config_env_path_request("improvements path"));
+        let reply =
+            try_operator_instant_reply("where is the improvements folder")
+                .expect("improvements path instant");
+        assert!(reply.contains("Improvements dir"));
+        assert!(reply.contains("improvements") || reply.contains(".mac-stats"));
+        assert!(try_operator_instant_reply("any improvements from last night").is_none());
     }
 
     #[test]

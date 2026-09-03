@@ -1681,6 +1681,17 @@ impl Config {
         }
     }
 
+    /// Overnight digester / morning-surprise dir: `$HOME/.mac-stats/improvements/`
+    ///
+    /// Path only for operator instant lane — does not list or open digest files.
+    pub fn improvements_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("improvements")
+        } else {
+            std::env::temp_dir().join("mac-stats-improvements")
+        }
+    }
+
     /// Delete screenshot files whose filename starts with `YYYYMMDD_HHMMSS` when that timestamp is older than this many days.
     /// **`0` disables** age-based pruning. Default: **7**. Config: `config.json` `screenshotPruneMaxAgeDays`.
     /// Env: `MAC_STATS_SCREENSHOT_PRUNE_MAX_AGE_DAYS` (clamped to `0..=3650`).

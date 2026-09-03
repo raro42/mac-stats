@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.841] - 2026-09-04
+
+### Fixed
+- **Instant lane: improvements directory path** — `improvements path`, `where is the improvements folder`, `autoresearch path`, and similar asks return `~/.mac-stats/improvements/` without Ollama (Discord + AI Chat; does not list digests or open morning surprise; does not steal overnight “any improvements…” content asks; p50 latency).
+
 ## [0.1.840] - 2026-09-03
 
 ### Fixed
