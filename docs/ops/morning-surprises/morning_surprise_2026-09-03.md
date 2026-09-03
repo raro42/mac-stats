@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) — ships for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.836** | Instant lane: `perplexity_last.json` path (`perplexity last path`, `where is perplexity_last.json`, `last search file`) — config only; no Top/Snippet dump / new search; does not steal `/perplexity` |
 | **v0.1.835** | Instant lane: `disk_cleanup.json` path (`disk cleanup path`, `where is disk_cleanup.json`, `cleanup file path`) — config only; no list/reclaim/clean; does not steal `/disk` |
 | **v0.1.834** | Instant lane: `history.json` path (`history path`, `where is history.json`, `metrics history file`) — config only; no sparkline dump / chat history |
 | **v0.1.833** | Instant lane: `monitors.json` path (`monitors path`, `where is monitors.json`, `monitor file path`) — config only; no list/add/check; does not steal `/monitors` |
@@ -20,6 +21,6 @@ Overnight autoresearch (Track B) — ships for Ralf.
 
 ## Next fuel
 
-- `discord_channels.json` / `perplexity_last.json` path instant.
+- `discord_channels.json` / alerts config path instant.
 - Design-review screenshot + one polish when due.
 - Product-owned `debug.log` errors when they appear.
