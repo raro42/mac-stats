@@ -11,7 +11,6 @@ use crate::commands::screenshot_lifecycle::parse_screenshot_filename_timestamp;
 use crate::config::Config;
 use crate::mac_stats_info;
 
-const STATE_FILE: &str = "disk_cleanup.json";
 const DEFAULT_INTERVAL_HOURS: u64 = 24;
 const MAX_SCAN_FILES: usize = 50_000;
 
@@ -102,10 +101,7 @@ struct PersistedState {
 }
 
 fn state_path() -> PathBuf {
-    Config::config_file_path()
-        .parent()
-        .map(|p| p.join(STATE_FILE))
-        .unwrap_or_else(|| std::env::temp_dir().join(STATE_FILE))
+    Config::disk_cleanup_file_path()
 }
 
 fn load_state() -> PersistedState {

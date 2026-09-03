@@ -699,6 +699,14 @@ impl Config {
         std::env::temp_dir().join("mac-stats-history.json")
     }
 
+    /// Disk Cleanup scopes / last-run state: `$HOME/.mac-stats/disk_cleanup.json`.
+    pub fn disk_cleanup_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join("disk_cleanup.json");
+        }
+        std::env::temp_dir().join("mac-stats-disk_cleanup.json")
+    }
+
     /// Ensure the schedules directory exists
     ///
     /// Creates the directory containing the schedules file if it doesn't exist.

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.835] - 2026-09-03
+
+### Fixed
+- **Instant lane: disk_cleanup.json path** — `disk cleanup path`, `where is disk_cleanup.json`, `cleanup file path`, and similar asks return `~/.mac-stats/disk_cleanup.json` without Ollama (Discord + AI Chat; does not list, reclaim, or clean; does not steal `/disk`; p50 latency).
+
 ## [0.1.834] - 2026-09-03
 
 ### Fixed

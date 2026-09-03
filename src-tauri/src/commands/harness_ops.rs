@@ -2274,6 +2274,25 @@ pub fn looks_like_disk_cleanup_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
+    // Path-only asks go to disk_cleanup.json instant (inline — do not call path detector;
+    // path → pinned → quarantine → this fn would recurse).
+    if n.contains("disk_cleanup.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("cleanup file")
+        || n.contains("cleanup config")
+        || (n.contains("disk cleanup")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+    {
+        return false;
+    }
     if n.contains("clean now")
         || n.contains("run cleanup")
         || n.contains("run disk")
@@ -3165,6 +3184,10 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("keychain")
         || n.contains("screenshot")
         || n.contains("log")
+        || n.contains("cleanup")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
     {
         return false;
     }
@@ -6007,6 +6030,176 @@ pub fn format_history_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · open the CPU window for live charts · does not dump points or chat history."
+    )
+}
+
+/// True for short “where is disk_cleanup.json / disk cleanup path…” asks.
+/// Config path only — does not list scopes, reclaim, or run `/disk` / clean-now.
+pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path asks. Avoid calling quarantine (it calls disk list → us).
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedules_path_request(content)
+        || looks_like_monitors_path_request(content)
+        || looks_like_history_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("quarantine")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("empty trash")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n == "/disk"
+        || n == "/cleanup"
+        || n == "cleanup"
+        || n == "disk cleanup"
+        || n == "cleanup status"
+        || n == "disk cleanup status"
+        || n == "/disk on"
+        || n == "disk on"
+        || n == "/disk off"
+        || n == "disk off"
+        || n == "/disk reclaim"
+        || n == "disk reclaim"
+        || n == "/disk big"
+        || n == "disk big"
+        || n == "/disk clean"
+        || n == "disk clean"
+        || n == "enabled scopes"
+        || n == "disabled scopes"
+        || n == "cleanup scopes"
+        || n == "what's reclaimable"
+        || n == "whats reclaimable"
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("pinned_processes")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let disk_ctx = n.contains("disk_cleanup.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup.json")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup.json")
+        || n.contains("disk cleanup file")
+        || n.contains("cleanup file")
+        || n.contains("cleanup config")
+        || n.contains("disk cleanup config")
+        || (n.contains("disk cleanup")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("cleanup")
+            && n.contains("json")
+            && (n.contains("path") || n.contains("where") || n.contains("file")));
+    if !disk_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("disk_cleanup.json")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "disk cleanup path"
+            | "disk_cleanup"
+            | "disk_cleanup.json"
+            | "disk_cleanup.json path"
+            | "disk_cleanup path"
+            | "disk_cleanup file"
+            | "disk-cleanup path"
+            | "disk-cleanup.json"
+            | "disk cleanup file"
+            | "disk cleanup file path"
+            | "cleanup file path"
+            | "cleanup config path"
+            | "cleanup config file"
+            | "disk cleanup config path"
+            | "disk cleanup config file"
+            | "where is disk_cleanup"
+            | "where is disk_cleanup.json"
+            | "where is the disk_cleanup file"
+            | "where is the disk cleanup file"
+            | "where is disk cleanup.json"
+            | "where is the cleanup file"
+            | "where is cleanup config"
+            | "where are disk cleanup scopes stored"
+            | "disk cleanup json path"
+            | "disk cleanup json file"
+    ) || (disk_ctx && pathish)
+}
+
+/// Zero-LLM disk_cleanup.json path (config only; no list/reclaim/clean-now).
+pub fn format_disk_cleanup_path_gateway() -> String {
+    let path = crate::config::Config::disk_cleanup_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `/disk` for live scopes · does not reclaim or clean."
     )
 }
 
@@ -10739,6 +10932,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_history_path_request(content) {
         return Some(format_history_path_gateway());
     }
+    if looks_like_disk_cleanup_path_request(content) {
+        return Some(format_disk_cleanup_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -12422,6 +12618,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only history.json path asks (v0.1.834) — config only; no sparkline dump.
     if looks_like_history_path_request(question) {
+        return true;
+    }
+    // Read-only disk_cleanup.json path asks (v0.1.835) — config only; no list/reclaim.
+    if looks_like_disk_cleanup_path_request(question) {
         return true;
     }
     false
@@ -15148,6 +15348,37 @@ mod tests {
             .expect("history path instant");
         assert!(reply.contains("History file"));
         assert!(reply.contains("history") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn disk_cleanup_path_request_detected() {
+        assert!(looks_like_disk_cleanup_path_request("disk cleanup path"));
+        assert!(looks_like_disk_cleanup_path_request("disk_cleanup.json"));
+        assert!(looks_like_disk_cleanup_path_request(
+            "where is disk_cleanup.json"
+        ));
+        assert!(looks_like_disk_cleanup_path_request("disk cleanup file"));
+        assert!(looks_like_disk_cleanup_path_request(
+            "where is the disk cleanup file"
+        ));
+        assert!(looks_like_disk_cleanup_path_request("cleanup file path"));
+        assert!(looks_like_disk_cleanup_path_request("cleanup config path"));
+        assert!(!looks_like_disk_cleanup_path_request("/disk"));
+        assert!(!looks_like_disk_cleanup_path_request("disk cleanup"));
+        assert!(!looks_like_disk_cleanup_path_request("cleanup"));
+        assert!(!looks_like_disk_cleanup_path_request("clean now"));
+        assert!(!looks_like_disk_cleanup_path_request("what's reclaimable"));
+        assert!(!looks_like_disk_cleanup_path_request("cleanup quarantine path"));
+        assert!(!looks_like_disk_cleanup_path_request("history path"));
+        assert!(!looks_like_disk_cleanup_path_request("monitors path"));
+        assert!(!looks_like_disk_cleanup_path_request("where is config"));
+        assert!(!looks_like_disk_cleanup_request("disk cleanup path"));
+        assert!(!looks_like_disk_cleanup_request("where is disk_cleanup.json"));
+        assert!(looks_like_disk_cleanup_request("/disk"));
+        let reply = try_operator_instant_reply("where is disk_cleanup.json")
+            .expect("disk cleanup path instant");
+        assert!(reply.contains("Disk cleanup file"));
+        assert!(reply.contains("disk_cleanup") || reply.contains(".mac-stats"));
     }
 
     #[test]
