@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) — ships for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.834** | Instant lane: `history.json` path (`history path`, `where is history.json`, `metrics history file`) — config only; no sparkline dump / chat history |
 | **v0.1.833** | Instant lane: `monitors.json` path (`monitors path`, `where is monitors.json`, `monitor file path`) — config only; no list/add/check; does not steal `/monitors` |
 | **v0.1.832** | Instant lane: `schedules.json` path (`schedules path`, `where is schedules.json`, `schedule file path`) — config only; no list/count/create; does not steal `/schedules` |
 | **v0.1.831** | Instant lane: `pinned_processes.json` path — config only; does not steal `/pinned` |
@@ -18,6 +19,6 @@ Overnight autoresearch (Track B) — ships for Ralf.
 
 ## Next fuel
 
-- `history.json` path instant (or other config siblings).
+- `disk_cleanup.json` / `discord_channels.json` / `perplexity_last.json` path instant.
 - Design-review screenshot + one polish when due.
 - Product-owned `debug.log` errors when they appear.
