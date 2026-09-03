@@ -2487,6 +2487,16 @@ impl Config {
         Self::tmp_dir().join("js")
     }
 
+    /// Soft-delete quarantine for Disk Cleanup auto runs: `$HOME/.mac-stats/cleanup-quarantine/`
+    /// (avoids macOS Trash / TCC on Downloads). Fallback under system temp if HOME is unset.
+    pub fn cleanup_quarantine_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("cleanup-quarantine")
+        } else {
+            std::env::temp_dir().join("mac-stats-cleanup-quarantine")
+        }
+    }
+
     // --- Embedded defaults (from src-tauri/defaults/, baked in at compile time) ---
     // Add a new default agent: create defaults/agents/agent-<id>/ with agent.json, skill.md, testing.md,
     // then add one line below (default_agent_entry!("<id>")).

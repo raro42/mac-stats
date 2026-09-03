@@ -182,7 +182,7 @@ fn trash_dir() -> PathBuf {
 
 /// Soft-delete target that stays inside `~/.mac-stats` (no macOS Downloads/Trash TCC prompts).
 fn quarantine_dir() -> PathBuf {
-    home_dir().join(".mac-stats").join("cleanup-quarantine")
+    crate::config::Config::cleanup_quarantine_dir()
 }
 
 /// Folders that trigger macOS “access files in …” prompts when scanned or written.

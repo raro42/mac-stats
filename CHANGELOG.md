@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.830] - 2026-09-03
+
+### Fixed
+- **Instant lane: cleanup-quarantine directory path** — `cleanup quarantine path`, `where is cleanup-quarantine`, `quarantine folder`, and similar asks return `~/.mac-stats/cleanup-quarantine/` without Ollama (Discord + AI Chat; does not list, prune, or restore; does not steal `/disk`; p50 latency).
+
 ## [0.1.829] - 2026-09-03
 
 ### Fixed

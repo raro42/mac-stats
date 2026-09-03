@@ -5171,6 +5171,7 @@ pub fn looks_like_browser_downloads_path_request(content: &str) -> bool {
         || n.contains("keychain")
         || n.contains("http://")
         || n.contains("https://")
+        || n.contains("quarantine")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -5246,6 +5247,160 @@ pub fn format_browser_downloads_path_gateway() -> String {
     let display = dir.display().to_string();
     format!(
         "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer."
+    )
+}
+
+/// True for short “where is the cleanup-quarantine folder / quarantine path…” asks.
+/// Config path only — does not list, prune, restore, or run Disk Cleanup `/disk`.
+pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / disk-cleanup list / clean-now asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_disk_cleanup_request(content)
+        || looks_like_downloads_organizer_ready_request(content)
+        || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || (n.contains("delete") && !n.contains("soft delete") && !n.contains("soft-delete"))
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("recover")
+        || n.contains("empty")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("/disk")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let q_ctx = n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("clean-up quarantine")
+        || n.contains("disk quarantine")
+        || n.contains("soft-delete quarantine")
+        || n.contains("soft delete quarantine")
+        || n.contains("mac-stats quarantine")
+        || n.contains("mac stats quarantine")
+        || (n.contains("quarantine")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("cleanup")
+                || n.contains("disk")));
+    if !q_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("cleanup-quarantine");
+    matches!(
+        n.as_str(),
+        "cleanup quarantine path"
+            | "cleanup-quarantine"
+            | "cleanup-quarantine path"
+            | "cleanup-quarantine folder"
+            | "cleanup-quarantine directory"
+            | "cleanup-quarantine dir"
+            | "quarantine path"
+            | "quarantine folder"
+            | "quarantine directory"
+            | "quarantine dir"
+            | "where is cleanup-quarantine"
+            | "where is the cleanup-quarantine"
+            | "where is the cleanup-quarantine folder"
+            | "where is the cleanup quarantine"
+            | "where is the cleanup quarantine folder"
+            | "where is the quarantine folder"
+            | "where is quarantine"
+            | "where is the quarantine"
+            | "where is disk quarantine"
+            | "disk quarantine path"
+            | "disk quarantine folder"
+            | "soft-delete quarantine"
+            | "soft delete quarantine"
+            | "soft-delete quarantine path"
+            | "soft delete quarantine path"
+            | "mac-stats quarantine"
+            | "mac stats quarantine"
+            | "mac-stats quarantine path"
+            | "mac stats quarantine path"
+    ) || (q_ctx && pathish)
+}
+
+/// Zero-LLM Disk Cleanup quarantine directory path (config only; no list/prune/restore).
+pub fn format_cleanup_quarantine_path_gateway() -> String {
+    let dir = crate::config::Config::cleanup_quarantine_dir();
+    let display = dir.display().to_string();
+    format!(
+        "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · does not touch system Trash."
     )
 }
 
@@ -9959,6 +10114,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_downloads_path_request(content) {
         return Some(format_browser_downloads_path_gateway());
     }
+    if looks_like_cleanup_quarantine_path_request(content) {
+        return Some(format_cleanup_quarantine_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -10146,6 +10304,7 @@ pub fn format_ops_help_gateway() -> String {
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
+• `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11617,6 +11776,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser-downloads dir path asks (v0.1.829) — config only; no list/prune/download.
     if looks_like_browser_downloads_path_request(question) {
+        return true;
+    }
+    // Read-only cleanup-quarantine dir path asks (v0.1.830) — config only; no list/prune/restore.
+    if looks_like_cleanup_quarantine_path_request(question) {
         return true;
     }
     false
@@ -14180,6 +14343,48 @@ mod tests {
             .expect("browser downloads path instant");
         assert!(reply.contains("Browser downloads"));
         assert!(reply.contains("browser-downloads") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn cleanup_quarantine_path_request_detected() {
+        assert!(looks_like_cleanup_quarantine_path_request(
+            "cleanup quarantine path"
+        ));
+        assert!(looks_like_cleanup_quarantine_path_request("cleanup-quarantine"));
+        assert!(looks_like_cleanup_quarantine_path_request(
+            "where is the cleanup-quarantine folder"
+        ));
+        assert!(looks_like_cleanup_quarantine_path_request("quarantine path"));
+        assert!(looks_like_cleanup_quarantine_path_request(
+            "where is the quarantine folder"
+        ));
+        assert!(looks_like_cleanup_quarantine_path_request(
+            "disk quarantine path"
+        ));
+        assert!(looks_like_cleanup_quarantine_path_request(
+            "soft-delete quarantine path"
+        ));
+        assert!(!looks_like_cleanup_quarantine_path_request("list quarantine"));
+        assert!(!looks_like_cleanup_quarantine_path_request("prune quarantine"));
+        assert!(!looks_like_cleanup_quarantine_path_request("restore quarantine"));
+        assert!(!looks_like_cleanup_quarantine_path_request("delete quarantine"));
+        assert!(!looks_like_cleanup_quarantine_path_request("clean now"));
+        assert!(!looks_like_cleanup_quarantine_path_request("/disk"));
+        assert!(!looks_like_cleanup_quarantine_path_request("disk cleanup"));
+        assert!(!looks_like_cleanup_quarantine_path_request("cleanup"));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "browser downloads path"
+        ));
+        assert!(!looks_like_cleanup_quarantine_path_request("uploads path"));
+        assert!(!looks_like_cleanup_quarantine_path_request("where is config"));
+        assert!(!looks_like_disk_cleanup_request("cleanup quarantine path"));
+        assert!(!looks_like_browser_downloads_path_request(
+            "cleanup quarantine path"
+        ));
+        let reply = try_operator_instant_reply("where is cleanup-quarantine")
+            .expect("cleanup quarantine path instant");
+        assert!(reply.contains("Cleanup quarantine"));
+        assert!(reply.contains("cleanup-quarantine") || reply.contains(".mac-stats"));
     }
 
     #[test]
