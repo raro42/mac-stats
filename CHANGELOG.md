@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.838] - 2026-09-03
+
+### Fixed
+- **Instant lane: scheduler_delivery_awareness.json path** — `delivery awareness path`, `where is scheduler_delivery_awareness.json`, `awareness file path`, and similar asks return `~/.mac-stats/scheduler_delivery_awareness.json` without Ollama (Discord + AI Chat; does not list deliveries; does not steal `last delivery` / `/schedules`; p50 latency).
+
 ## [0.1.837] - 2026-09-03
 
 ### Fixed

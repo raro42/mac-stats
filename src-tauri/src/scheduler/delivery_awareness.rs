@@ -28,10 +28,7 @@ struct DeliveryAwarenessFile {
 }
 
 fn awareness_path() -> std::path::PathBuf {
-    Config::schedules_file_path()
-        .parent()
-        .map(|p| p.join("scheduler_delivery_awareness.json"))
-        .unwrap_or_else(|| std::env::temp_dir().join("mac-stats-scheduler_delivery_awareness.json"))
+    Config::scheduler_delivery_awareness_file_path()
 }
 
 /// Stable per-run id: schedule label + monotonic wall time in nanoseconds (scheduler runs one task at a time).
@@ -184,10 +181,7 @@ mod tests {
     use std::sync::Mutex;
 
     fn awareness_json_path() -> std::path::PathBuf {
-        Config::schedules_file_path()
-            .parent()
-            .expect("schedules path has parent")
-            .join("scheduler_delivery_awareness.json")
+        Config::scheduler_delivery_awareness_file_path()
     }
 
     static HOME_DELIVERY_AWARENESS_TEST_LOCK: Mutex<()> = Mutex::new(());

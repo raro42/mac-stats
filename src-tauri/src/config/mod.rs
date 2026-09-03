@@ -691,6 +691,16 @@ impl Config {
         std::env::temp_dir().join("mac-stats-schedules.json")
     }
 
+    /// Scheduler Discord delivery awareness log: `$HOME/.mac-stats/scheduler_delivery_awareness.json`.
+    pub fn scheduler_delivery_awareness_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home)
+                .join(".mac-stats")
+                .join("scheduler_delivery_awareness.json");
+        }
+        std::env::temp_dir().join("mac-stats-scheduler_delivery_awareness.json")
+    }
+
     /// CPU / metrics history buffer on disk: `$HOME/.mac-stats/history.json`.
     pub fn history_file_path() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

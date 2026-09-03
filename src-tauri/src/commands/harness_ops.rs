@@ -5672,6 +5672,9 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
         || n == "deliveries"
         || n == "delivery"
         || n == "recent deliveries"
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("awareness.json")
         || n.contains("pinned")
         || n.contains("quarantine")
         || n.contains("browser-downloads")
@@ -6469,6 +6472,8 @@ pub fn looks_like_discord_channels_path_request(content: &str) -> bool {
         || n.contains("monitors.json")
         || n.contains("schedules.json")
         || n.contains("pinned_processes")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
         || n.contains("screenshot")
         || n.contains("http://")
         || n.contains("https://")
@@ -6547,6 +6552,186 @@ pub fn format_discord_channels_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Discord channels file:** `{display}` · per-channel listen / having_fun config · `/discord` for gateway Ready · does not list or edit channels."
+    )
+}
+
+/// True for short “where is scheduler_delivery_awareness.json / delivery awareness path…” asks.
+/// Config path only — does not list deliveries or run `/schedules` / last delivery.
+pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Do not steal sibling path asks or schedules/last-delivery live chips.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedules_path_request(content)
+        || looks_like_monitors_path_request(content)
+        || looks_like_history_path_request(content)
+        || looks_like_disk_cleanup_path_request(content)
+        || looks_like_perplexity_last_path_request(content)
+        || looks_like_discord_channels_path_request(content)
+        || looks_like_schedule_count_request(content)
+        || looks_like_next_schedule_request(content)
+        || looks_like_last_delivery_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("schedule a")
+        || n.contains("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n == "/schedules"
+        || n == "schedules"
+        || n == "/schedules jobs"
+        || n == "schedules jobs"
+        || n == "/schedules deliveries"
+        || n == "schedules deliveries"
+        || n == "/cron"
+        || n == "cron"
+        || n == "/cron list"
+        || n == "cron list"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "my schedules"
+        || n == "my jobs"
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "last delivery"
+        || n == "recent deliveries"
+        || n == "/last delivery"
+        || n.contains("discord_channels")
+        || n.contains("perplexity_last")
+        || n.contains("disk_cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("pinned_processes")
+        || n.contains("screenshot")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let aw_ctx = n.contains("scheduler_delivery_awareness.json")
+        || n.contains("scheduler_delivery_awareness")
+        || n.contains("scheduler-delivery-awareness")
+        || n.contains("delivery_awareness.json")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery-awareness")
+        || n.contains("delivery awareness.json")
+        || n.contains("delivery awareness file")
+        || n.contains("delivery awareness path")
+        || n.contains("scheduler awareness")
+        || n.contains("scheduler delivery awareness")
+        || n.contains("awareness file")
+        || (n.contains("awareness")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("delivery")
+                || n.contains("scheduler")));
+    if !aw_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("scheduler_delivery_awareness.json")
+        || n.contains("json")
+        || n.contains("config");
+    matches!(
+        n.as_str(),
+        "delivery awareness path"
+            | "delivery_awareness"
+            | "delivery_awareness.json"
+            | "delivery_awareness.json path"
+            | "delivery_awareness path"
+            | "delivery_awareness file"
+            | "delivery-awareness path"
+            | "delivery-awareness.json"
+            | "delivery awareness file"
+            | "delivery awareness file path"
+            | "scheduler delivery awareness path"
+            | "scheduler_delivery_awareness"
+            | "scheduler_delivery_awareness.json"
+            | "scheduler_delivery_awareness.json path"
+            | "scheduler_delivery_awareness path"
+            | "scheduler_delivery_awareness file"
+            | "scheduler awareness path"
+            | "scheduler awareness file"
+            | "awareness file path"
+            | "awareness.json"
+            | "awareness.json path"
+            | "where is delivery_awareness"
+            | "where is delivery_awareness.json"
+            | "where is the delivery awareness file"
+            | "where is scheduler_delivery_awareness"
+            | "where is scheduler_delivery_awareness.json"
+            | "where is the scheduler delivery awareness file"
+            | "where is awareness.json"
+            | "delivery awareness json path"
+            | "delivery awareness json file"
+    ) || (aw_ctx && pathish)
+}
+
+/// Zero-LLM scheduler_delivery_awareness.json path (config only; no list / last delivery).
+pub fn format_scheduler_delivery_awareness_path_gateway() -> String {
+    let path = crate::config::Config::scheduler_delivery_awareness_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Delivery awareness file:** `{display}` · scheduler Discord delivery log for chat context · `last delivery` for the newest entry · does not list deliveries."
     )
 }
 
@@ -11263,6 +11448,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_discord_channels_path_request(content) {
         return Some(format_discord_channels_path_gateway());
     }
+    if looks_like_scheduler_delivery_awareness_path_request(content) {
+        return Some(format_scheduler_delivery_awareness_path_gateway());
+    }
     if looks_like_screenshots_path_request(content) {
         return Some(format_screenshots_path_gateway());
     }
@@ -11527,6 +11715,7 @@ pub fn format_ops_help_gateway() -> String {
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; does not steal `/discord`)\n\
+• `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -13030,6 +13219,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only discord_channels.json path asks (v0.1.837) — config only; no list/edit.
     if looks_like_discord_channels_path_request(question) {
+        return true;
+    }
+    // Read-only scheduler_delivery_awareness.json path asks (v0.1.838) — config only; no list.
+    if looks_like_scheduler_delivery_awareness_path_request(question) {
         return true;
     }
     false
@@ -15848,6 +16041,58 @@ mod tests {
             .expect("discord channels path instant");
         assert!(reply.contains("Discord channels file"));
         assert!(reply.contains("discord_channels") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn scheduler_delivery_awareness_path_request_detected() {
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "delivery awareness path"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "scheduler_delivery_awareness.json"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "where is scheduler_delivery_awareness.json"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "delivery awareness file"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "where is the delivery awareness file"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "awareness file path"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_path_request(
+            "scheduler awareness path"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request("/schedules"));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request("schedules"));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request("last delivery"));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "list deliveries"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "schedules path"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "discord channels path"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "where is config"
+        ));
+        assert!(!looks_like_schedules_path_request("delivery awareness path"));
+        assert!(!looks_like_schedules_path_request(
+            "where is scheduler_delivery_awareness.json"
+        ));
+        assert!(!looks_like_last_delivery_request("delivery awareness path"));
+        assert!(looks_like_last_delivery_request("last delivery"));
+        let reply = try_operator_instant_reply("where is scheduler_delivery_awareness.json")
+            .expect("delivery awareness path instant");
+        assert!(reply.contains("Delivery awareness file"));
+        assert!(
+            reply.contains("scheduler_delivery_awareness") || reply.contains(".mac-stats")
+        );
     }
 
     #[test]
