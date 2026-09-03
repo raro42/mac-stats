@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.831] - 2026-09-03
+
+### Fixed
+- **Instant lane: pinned_processes.json path** — `pinned processes path`, `where is pinned_processes.json`, `pin file path`, and similar asks return `~/.mac-stats/pinned_processes.json` without Ollama (Discord + AI Chat; does not list, pin, or unpin; does not steal `/pinned`; p50 latency).
+
 ## [0.1.830] - 2026-09-03
 
 ### Fixed

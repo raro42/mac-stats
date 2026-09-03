@@ -5330,6 +5330,9 @@ pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
         || n.contains("keychain")
         || n.contains("http://")
         || n.contains("https://")
+        || n.contains("pinned_processes")
+        || n.contains("pinned process")
+        || n.contains("pin file")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -5401,6 +5404,159 @@ pub fn format_cleanup_quarantine_path_gateway() -> String {
     let display = dir.display().to_string();
     format!(
         "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · does not touch system Trash."
+    )
+}
+
+/// True for short “where is pinned_processes.json / pinned favorites path…” asks.
+/// Config path only — does not list, pin, unpin, or run `/pinned` / `/processes`.
+pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / Top Processes list / pin-action asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("unpin")
+        || n.contains("pin this")
+        || n.contains("pin that")
+        || n.contains("pin the")
+        || n == "pin"
+        || (n.starts_with("pin ")
+            && !n.contains("pin file")
+            && !n.contains("pins file")
+            && !n.contains("pin path"))
+        || (n.contains(" pin ") && !n.contains("pin file") && !n.contains("pins file"))
+        || n == "/pinned"
+        || n == "pinned"
+        || n == "/processes"
+        || n == "/processes pinned"
+        || n == "processes pinned"
+        || n == "pinned processes"
+        || n == "pinned process"
+        || n == "show pinned"
+        || n == "list pinned"
+        || n == "my pinned"
+        || n == "hot"
+        || n == "/hot"
+        || n.contains("/disk")
+        || n.contains("quarantine")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let pin_ctx = n.contains("pinned_processes")
+        || n.contains("pinned-processes")
+        || n.contains("pinned processes.json")
+        || n.contains("pinned process file")
+        || n.contains("pin file")
+        || n.contains("pins file")
+        || n.contains("favorites file")
+        || n.contains("process favorites file")
+        || n.contains("pinned favorites file")
+        || (n.contains("pinned")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("pin")
+            && n.contains("json")
+            && (n.contains("path") || n.contains("where") || n.contains("file")));
+    if !pin_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("pinned_processes")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "pinned processes path"
+            | "pinned process path"
+            | "pinned_processes"
+            | "pinned_processes.json"
+            | "pinned_processes path"
+            | "pinned_processes file"
+            | "pinned-processes path"
+            | "pinned favorites path"
+            | "pinned favorites file"
+            | "process favorites path"
+            | "process favorites file"
+            | "pin file path"
+            | "pins file path"
+            | "where is pinned_processes"
+            | "where is pinned_processes.json"
+            | "where is the pinned_processes file"
+            | "where is the pinned processes file"
+            | "where are pinned processes stored"
+            | "where are pinned favorites"
+            | "where is the pin file"
+            | "where is the pins file"
+            | "pinned json path"
+            | "pinned json file"
+    ) || (pin_ctx && pathish)
+}
+
+/// Zero-LLM Top Processes pinned favorites file path (config only; no list/pin/unpin).
+pub fn format_pinned_processes_path_gateway() -> String {
+    let path = crate::config::Config::pinned_processes_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Pinned processes file:** `{display}` · Top Processes favorites · `/pinned` for the live list · does not pin or unpin."
     )
 }
 
@@ -5491,6 +5647,10 @@ pub fn parse_processes_list_filter(content: &str) -> ProcessesListFilter {
 pub fn looks_like_processes_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
+        return false;
+    }
+    // Path-only asks go to pinned_processes.json instant (does not steal `/pinned` list).
+    if looks_like_pinned_processes_path_request(content) {
         return false;
     }
     if n.contains("why")
@@ -10117,6 +10277,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_cleanup_quarantine_path_request(content) {
         return Some(format_cleanup_quarantine_path_gateway());
     }
+    if looks_like_pinned_processes_path_request(content) {
+        return Some(format_pinned_processes_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -10305,6 +10468,7 @@ pub fn format_ops_help_gateway() -> String {
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
+• `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11780,6 +11944,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only cleanup-quarantine dir path asks (v0.1.830) — config only; no list/prune/restore.
     if looks_like_cleanup_quarantine_path_request(question) {
+        return true;
+    }
+    // Read-only pinned_processes.json path asks (v0.1.831) — config only; no list/pin/unpin.
+    if looks_like_pinned_processes_path_request(question) {
         return true;
     }
     false
@@ -14385,6 +14553,43 @@ mod tests {
             .expect("cleanup quarantine path instant");
         assert!(reply.contains("Cleanup quarantine"));
         assert!(reply.contains("cleanup-quarantine") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn pinned_processes_path_request_detected() {
+        assert!(looks_like_pinned_processes_path_request(
+            "pinned processes path"
+        ));
+        assert!(looks_like_pinned_processes_path_request(
+            "pinned_processes.json"
+        ));
+        assert!(looks_like_pinned_processes_path_request(
+            "where is pinned_processes.json"
+        ));
+        assert!(looks_like_pinned_processes_path_request("pin file path"));
+        assert!(looks_like_pinned_processes_path_request(
+            "where is the pinned processes file"
+        ));
+        assert!(looks_like_pinned_processes_path_request(
+            "pinned favorites path"
+        ));
+        assert!(!looks_like_pinned_processes_path_request("/pinned"));
+        assert!(!looks_like_pinned_processes_path_request("pinned"));
+        assert!(!looks_like_pinned_processes_path_request("pinned processes"));
+        assert!(!looks_like_pinned_processes_path_request("list pinned"));
+        assert!(!looks_like_pinned_processes_path_request("show pinned"));
+        assert!(!looks_like_pinned_processes_path_request("pin this process"));
+        assert!(!looks_like_pinned_processes_path_request("unpin chrome"));
+        assert!(!looks_like_pinned_processes_path_request("/processes"));
+        assert!(!looks_like_pinned_processes_path_request("cleanup quarantine path"));
+        assert!(!looks_like_pinned_processes_path_request("where is config"));
+        assert!(!looks_like_processes_request("pinned processes path"));
+        assert!(looks_like_processes_request("/pinned"));
+        assert!(looks_like_processes_request("pinned processes"));
+        let reply = try_operator_instant_reply("where is pinned_processes.json")
+            .expect("pinned processes path instant");
+        assert!(reply.contains("Pinned processes"));
+        assert!(reply.contains("pinned_processes") || reply.contains(".mac-stats"));
     }
 
     #[test]
