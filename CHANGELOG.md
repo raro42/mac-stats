@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.832] - 2026-09-03
+
+### Fixed
+- **Instant lane: schedules.json path** — `schedules path`, `where is schedules.json`, `schedule file path`, and similar asks return `~/.mac-stats/schedules.json` without Ollama (Discord + AI Chat; does not list, count, or create jobs; does not steal `/schedules`; p50 latency).
+
 ## [0.1.831] - 2026-09-03
 
 ### Fixed

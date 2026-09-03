@@ -5481,6 +5481,10 @@ pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
         || n.contains("quarantine")
         || n.contains("browser-downloads")
         || n.contains("browser downloads")
+        || n.contains("schedules.json")
+        || n.contains("schedule file")
+        || n.contains("schedules file")
+        || n.contains("schedules path")
         || n.contains("screenshot")
         || n.contains("discord")
         || n.contains("keychain")
@@ -5557,6 +5561,157 @@ pub fn format_pinned_processes_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Pinned processes file:** `{display}` · Top Processes favorites · `/pinned` for the live list · does not pin or unpin."
+    )
+}
+
+/// True for short “where is schedules.json / schedules path…” asks.
+/// Config path only — does not list jobs/deliveries or run `/schedules` / schedule count.
+pub fn looks_like_schedules_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / schedules list / count / next-fire asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedule_count_request(content)
+        || looks_like_next_schedule_request(content)
+        || looks_like_last_delivery_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("schedule a")
+        || n.contains("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n == "/schedules"
+        || n == "schedules"
+        || n == "/schedules jobs"
+        || n == "schedules jobs"
+        || n == "/schedules deliveries"
+        || n == "schedules deliveries"
+        || n == "/cron"
+        || n == "cron"
+        || n == "/cron list"
+        || n == "cron list"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "my schedules"
+        || n == "my jobs"
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "recent deliveries"
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let sched_ctx = n.contains("schedules.json")
+        || n.contains("schedules_file")
+        || n.contains("schedule file")
+        || n.contains("schedules file")
+        || n.contains("cron file")
+        || n.contains("cron.json")
+        || (n.contains("schedules")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("schedule")
+            && n.contains("json")
+            && (n.contains("path") || n.contains("where") || n.contains("file")));
+    if !sched_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("schedules.json")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "schedules path"
+            | "schedule path"
+            | "schedules.json"
+            | "schedules.json path"
+            | "schedules file"
+            | "schedules file path"
+            | "schedule file path"
+            | "schedules_file"
+            | "cron file path"
+            | "cron.json path"
+            | "where is schedules"
+            | "where is schedules.json"
+            | "where is the schedules file"
+            | "where is the schedule file"
+            | "where are schedules stored"
+            | "where is the cron file"
+            | "schedules json path"
+            | "schedules json file"
+    ) || (sched_ctx && pathish)
+}
+
+/// Zero-LLM schedules.json path (config only; no list/count/create).
+pub fn format_schedules_path_gateway() -> String {
+    let path = crate::config::Config::schedules_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Schedules file:** `{display}` · Jobs + deliveries config · `/schedules` for the live list · does not create or remove jobs."
     )
 }
 
@@ -10280,6 +10435,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pinned_processes_path_request(content) {
         return Some(format_pinned_processes_path_gateway());
     }
+    if looks_like_schedules_path_request(content) {
+        return Some(format_schedules_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -10469,6 +10627,7 @@ pub fn format_ops_help_gateway() -> String {
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
+• `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -11948,6 +12107,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only pinned_processes.json path asks (v0.1.831) — config only; no list/pin/unpin.
     if looks_like_pinned_processes_path_request(question) {
+        return true;
+    }
+    // Read-only schedules.json path asks (v0.1.832) — config only; no list/count/create.
+    if looks_like_schedules_path_request(question) {
         return true;
     }
     false
@@ -14583,6 +14746,7 @@ mod tests {
         assert!(!looks_like_pinned_processes_path_request("/processes"));
         assert!(!looks_like_pinned_processes_path_request("cleanup quarantine path"));
         assert!(!looks_like_pinned_processes_path_request("where is config"));
+        assert!(!looks_like_pinned_processes_path_request("schedules path"));
         assert!(!looks_like_processes_request("pinned processes path"));
         assert!(looks_like_processes_request("/pinned"));
         assert!(looks_like_processes_request("pinned processes"));
@@ -14590,6 +14754,35 @@ mod tests {
             .expect("pinned processes path instant");
         assert!(reply.contains("Pinned processes"));
         assert!(reply.contains("pinned_processes") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn schedules_path_request_detected() {
+        assert!(looks_like_schedules_path_request("schedules path"));
+        assert!(looks_like_schedules_path_request("schedules.json"));
+        assert!(looks_like_schedules_path_request(
+            "where is schedules.json"
+        ));
+        assert!(looks_like_schedules_path_request("schedule file path"));
+        assert!(looks_like_schedules_path_request(
+            "where is the schedules file"
+        ));
+        assert!(looks_like_schedules_path_request("cron file path"));
+        assert!(!looks_like_schedules_path_request("/schedules"));
+        assert!(!looks_like_schedules_path_request("schedules"));
+        assert!(!looks_like_schedules_path_request("list schedules"));
+        assert!(!looks_like_schedules_path_request("schedule count"));
+        assert!(!looks_like_schedules_path_request("upcoming jobs"));
+        assert!(!looks_like_schedules_path_request("schedule a task for tomorrow"));
+        assert!(!looks_like_schedules_path_request("pinned processes path"));
+        assert!(!looks_like_schedules_path_request("where is config"));
+        assert!(!looks_like_schedules_request("schedules path"));
+        assert!(!looks_like_schedules_request("where is schedules.json"));
+        assert!(looks_like_schedules_request("/schedules"));
+        let reply = try_operator_instant_reply("where is schedules.json")
+            .expect("schedules path instant");
+        assert!(reply.contains("Schedules file"));
+        assert!(reply.contains("schedules") || reply.contains(".mac-stats"));
     }
 
     #[test]
