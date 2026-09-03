@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.839] - 2026-09-03
+
+### Fixed
+- **Instant lane: user-info.json path** — `user info path`, `where is user-info.json`, `user-info path`, and similar asks return `~/.mac-stats/user-info.json` without Ollama (Discord + AI Chat; does not list or edit users; p50 latency).
+
 ## [0.1.838] - 2026-09-03
 
 ### Fixed

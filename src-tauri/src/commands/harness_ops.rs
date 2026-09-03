@@ -3193,6 +3193,11 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("discord channels")
         || n.contains("discord channel")
         || n.contains("channels.json")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info.json")
+        || n.contains("user info file")
+        || n.contains("userinfo")
     {
         return false;
     }
@@ -6474,6 +6479,8 @@ pub fn looks_like_discord_channels_path_request(content: &str) -> bool {
         || n.contains("pinned_processes")
         || n.contains("delivery_awareness")
         || n.contains("scheduler_delivery")
+        || n.contains("user-info")
+        || n.contains("user_info")
         || n.contains("screenshot")
         || n.contains("http://")
         || n.contains("https://")
@@ -6648,6 +6655,8 @@ pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bo
         || n.contains("monitors.json")
         || n.contains("schedules.json")
         || n.contains("pinned_processes")
+        || n.contains("user-info")
+        || n.contains("user_info")
         || n.contains("screenshot")
         || n.contains("http://")
         || n.contains("https://")
@@ -6732,6 +6741,188 @@ pub fn format_scheduler_delivery_awareness_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Delivery awareness file:** `{display}` · scheduler Discord delivery log for chat context · `last delivery` for the newest entry · does not list deliveries."
+    )
+}
+
+/// True for short “where is user-info.json / user info path…” asks.
+/// Config path only — does not dump display names or edit the file.
+pub fn looks_like_user_info_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("config.json")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("screenshot")
+        || n.contains("runs.jsonl")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity_last")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("delivery awareness")
+        || n.contains("pinned_processes")
+        || n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("mac-stats home")
+        || n.contains("data directory")
+        || n.contains("data dir")
+        || (n.contains("config")
+            && !n.contains("user")
+            && (n.contains("path") || n.contains("where")))
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("session path")
+        || n.contains("agents path")
+        || n.contains("skills path")
+        || n.contains("plugins path")
+        || n.contains("prompts path")
+        || n.contains("tmp path")
+        || n.contains("uploads path")
+        || n.contains("traces path")
+        || n.contains("pdfs path")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("who am")
+        || n.contains("who is")
+        || n.contains("display name")
+        || n.contains("my name")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ui_ctx = n.contains("user-info.json")
+        || n.contains("user_info.json")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("userinfo.json")
+        || n.contains("userinfo")
+        || n.contains("user info.json")
+        || n.contains("user info file")
+        || n.contains("user info path")
+        || n.contains("user-info path")
+        || n.contains("user_info path")
+        || n.contains("user details path")
+        || n.contains("user details file")
+        || (n.contains("user info")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("config")))
+        || (n.contains("user details")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("config")));
+    if !ui_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("user-info.json")
+        || n.contains("user_info.json")
+        || n.contains("json")
+        || n.contains("config");
+    matches!(
+        n.as_str(),
+        "user info path"
+            | "user-info"
+            | "user-info.json"
+            | "user-info.json path"
+            | "user-info path"
+            | "user-info file"
+            | "user_info"
+            | "user_info.json"
+            | "user_info.json path"
+            | "user_info path"
+            | "user_info file"
+            | "userinfo"
+            | "userinfo.json"
+            | "userinfo path"
+            | "user info file"
+            | "user info file path"
+            | "user info json"
+            | "user info json path"
+            | "user info json file"
+            | "where is user-info"
+            | "where is user-info.json"
+            | "where is user_info"
+            | "where is user_info.json"
+            | "where is the user-info file"
+            | "where is the user info file"
+            | "where is user info.json"
+            | "where is userinfo.json"
+            | "user details path"
+            | "user details file"
+            | "user details file path"
+            | "where is the user details file"
+    ) || (ui_ctx && pathish)
+}
+
+/// Zero-LLM user-info.json path (config only; no dump / edit).
+pub fn format_user_info_path_gateway() -> String {
+    let path = crate::config::Config::user_info_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**User info file:** `{display}` · Discord display-name map on disk · does not list or edit users."
     )
 }
 
@@ -11445,6 +11636,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
+    // user-info before nested sibling path detectors (string-only; avoids exponential nest).
+    if looks_like_user_info_path_request(content) {
+        return Some(format_user_info_path_gateway());
+    }
     if looks_like_discord_channels_path_request(content) {
         return Some(format_discord_channels_path_gateway());
     }
@@ -11716,6 +11911,7 @@ pub fn format_ops_help_gateway() -> String {
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; does not steal `/discord`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
+• `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -13215,6 +13411,11 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only perplexity_last.json path asks (v0.1.836) — config only; no Top/Snippet dump.
     if looks_like_perplexity_last_path_request(question) {
+        return true;
+    }
+    // Read-only user-info.json path asks (v0.1.839) — config only; no dump/edit.
+    // Check before nested sibling path detectors (string-only; avoids exponential nest).
+    if looks_like_user_info_path_request(question) {
         return true;
     }
     // Read-only discord_channels.json path asks (v0.1.837) — config only; no list/edit.
@@ -16093,6 +16294,30 @@ mod tests {
         assert!(
             reply.contains("scheduler_delivery_awareness") || reply.contains(".mac-stats")
         );
+    }
+
+    #[test]
+    fn user_info_path_request_detected() {
+        assert!(looks_like_user_info_path_request("user info path"));
+        assert!(looks_like_user_info_path_request("user-info.json"));
+        assert!(looks_like_user_info_path_request("where is user-info.json"));
+        assert!(looks_like_user_info_path_request("user-info path"));
+        assert!(looks_like_user_info_path_request("where is the user info file"));
+        assert!(looks_like_user_info_path_request("user_info.json"));
+        assert!(looks_like_user_info_path_request("user details file path"));
+        assert!(!looks_like_user_info_path_request("who am i"));
+        assert!(!looks_like_user_info_path_request("list users"));
+        assert!(!looks_like_user_info_path_request("display name"));
+        assert!(!looks_like_user_info_path_request("where is config"));
+        assert!(!looks_like_user_info_path_request("discord channels path"));
+        assert!(!looks_like_user_info_path_request("delivery awareness path"));
+        assert!(!looks_like_user_info_path_request("memory path"));
+        assert!(!looks_like_config_path_request("user info path"));
+        assert!(!looks_like_config_path_request("where is user-info.json"));
+        let reply = try_operator_instant_reply("where is user-info.json")
+            .expect("user info path instant");
+        assert!(reply.contains("User info file"));
+        assert!(reply.contains("user-info") || reply.contains(".mac-stats"));
     }
 
     #[test]
