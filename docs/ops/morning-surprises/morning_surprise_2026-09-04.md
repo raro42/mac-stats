@@ -6,13 +6,14 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.842** | **Top Processes Filter attention glance** — when Pinned or Hot is active, **Filter · Pinned** / **Filter · Hot** above the chips (click → All; Hot strip defers; AI Chat / Perplexity Filter parity). Design review / `feature-processes`. Screenshot recapture deferred (TCC). |
 | **v0.1.841** | Instant lane: **improvements directory path** — `improvements path` / `where is the improvements folder` / `autoresearch path` → `~/.mac-stats/improvements/` without Ollama (no list; does not steal overnight “any improvements…” asks). |
 
 ## Context
 
-- Digester open was empty (Elmasnow weather already stale/shipped in digester).
-- Design review still in grace (`feature-ai-chat` ~20d stale PNGs).
-- Fuel: standing backlog p50 latency.
+- Digester open pointed at design review (`feature-processes` stale ~21d).
+- Design review due=true this tick → Filter attention polish.
+- PNG recapture blocked by Screen Recording TCC (`screencapture -l` / Quartz); polish grace marked.
 
 ## Earlier same night (2026-09-03 evening)
 
@@ -22,4 +23,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Next
 
-- credential_accounts.json path, or design-review screenshot when grace ends.
+- credential_accounts.json path, or screenshot when TCC allows.
