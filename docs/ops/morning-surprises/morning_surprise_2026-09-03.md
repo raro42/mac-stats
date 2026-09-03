@@ -6,6 +6,7 @@ Overnight Track B kept shipping path/instant + uptime fixes.
 
 | Version | What |
 |---------|------|
+| **v0.1.830** | Instant lane: **cleanup-quarantine directory path** (`cleanup quarantine path` / `where is cleanup-quarantine` / `quarantine folder`) → `~/.mac-stats/cleanup-quarantine/` without Ollama (does not steal `/disk`) |
 | **v0.1.829** | Instant lane: **browser-downloads directory path** (`browser downloads path` / `where are browser downloads` / `browser-downloads`) → `~/.mac-stats/browser-downloads/` without Ollama (does not steal `/downloads` organizer) |
 | **v0.1.828** | Instant lane: **browser storage-state / cookies path** (`storage state path` / `where are browser cookies` / `browser_storage_state.json`) → `~/.mac-stats/browser_storage_state.json` without Ollama |
 | **v0.1.827** | Instant lane: **browser credentials path** (`browser credentials path` / `where are browser credentials` / `browser-credentials.toml`) → `~/.mac-stats/browser-credentials.toml` without Ollama |
@@ -21,4 +22,4 @@ Overnight Track B kept shipping path/instant + uptime fixes.
 
 - Digester open empty (Elmasnow weather already stale/shipped).
 - Design review still in grace; `feature-ai-chat` PNG ~19.6d stale.
-- Next: more p50 path lanes (e.g. cleanup-quarantine), or design-review screenshot when grace ends.
+- Next: more p50 path lanes (e.g. history.json), or design-review screenshot when grace ends.
