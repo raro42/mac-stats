@@ -2029,6 +2029,10 @@ pub fn looks_like_monitors_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
+    // Path-only asks go to monitors.json instant (does not steal `/monitors` list).
+    if looks_like_monitors_path_request(content) {
+        return false;
+    }
     if n.contains("create")
         || n.contains("add ")
         || n.contains("remove")
@@ -5712,6 +5716,154 @@ pub fn format_schedules_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Schedules file:** `{display}` · Jobs + deliveries config · `/schedules` for the live list · does not create or remove jobs."
+    )
+}
+
+/// True for short “where is monitors.json / monitors path…” asks.
+/// Config path only — does not list sites or run `/monitors` / add/check.
+pub fn looks_like_monitors_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal sibling path / monitors list / add-check asks.
+    if looks_like_config_path_request(content)
+        || looks_like_debug_log_path_request(content)
+        || looks_like_screenshots_path_request(content)
+        || looks_like_runs_path_request(content)
+        || looks_like_task_path_request(content)
+        || looks_like_memory_path_request(content)
+        || looks_like_session_path_request(content)
+        || looks_like_agents_path_request(content)
+        || looks_like_skills_path_request(content)
+        || looks_like_plugins_path_request(content)
+        || looks_like_prompts_path_request(content)
+        || looks_like_tmp_path_request(content)
+        || looks_like_uploads_path_request(content)
+        || looks_like_traces_path_request(content)
+        || looks_like_pdfs_path_request(content)
+        || looks_like_browser_credentials_path_request(content)
+        || looks_like_browser_storage_state_path_request(content)
+        || looks_like_browser_downloads_path_request(content)
+        || looks_like_cleanup_quarantine_path_request(content)
+        || looks_like_pinned_processes_path_request(content)
+        || looks_like_schedules_path_request(content)
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("check ")
+        || n.contains("check now")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n == "/monitors"
+        || n == "monitors"
+        || n == "/monitors up"
+        || n == "monitors up"
+        || n == "/monitors down"
+        || n == "monitors down"
+        || n == "/monitors slow"
+        || n == "monitors slow"
+        || n == "up monitors"
+        || n == "down monitors"
+        || n == "slow monitors"
+        || n == "list monitors"
+        || n == "show monitors"
+        || n == "my monitors"
+        || n == "website monitors"
+        || n == "site monitors"
+        || n.contains("pinned")
+        || n.contains("schedules")
+        || n.contains("quarantine")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mon_ctx = n.contains("monitors.json")
+        || n.contains("monitors_file")
+        || n.contains("monitor file")
+        || n.contains("monitors file")
+        || n.contains("sites file")
+        || n.contains("website monitors file")
+        || (n.contains("monitors")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")))
+        || (n.contains("monitor")
+            && n.contains("json")
+            && (n.contains("path") || n.contains("where") || n.contains("file")));
+    if !mon_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("monitors.json")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "monitors path"
+            | "monitor path"
+            | "monitors.json"
+            | "monitors.json path"
+            | "monitors file"
+            | "monitors file path"
+            | "monitor file path"
+            | "monitors_file"
+            | "sites file path"
+            | "website monitors file"
+            | "where is monitors"
+            | "where is monitors.json"
+            | "where is the monitors file"
+            | "where is the monitor file"
+            | "where are monitors stored"
+            | "where is the sites file"
+            | "monitors json path"
+            | "monitors json file"
+    ) || (mon_ctx && pathish)
+}
+
+/// Zero-LLM monitors.json path (config only; no list/add/check).
+pub fn format_monitors_path_gateway() -> String {
+    let path = crate::config::Config::monitors_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Monitors file:** `{display}` · External / website monitors config · `/monitors` for the live list · does not add or check sites."
     )
 }
 
@@ -10438,6 +10590,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_schedules_path_request(content) {
         return Some(format_schedules_path_gateway());
     }
+    if looks_like_monitors_path_request(content) {
+        return Some(format_monitors_path_gateway());
+    }
     if looks_like_runs_count_request(content) {
         let kind = parse_runs_count_kind(content).expect("looks_like_runs_count_request implies kind");
         return Some(format_runs_count_gateway(kind));
@@ -10628,6 +10783,7 @@ pub fn format_ops_help_gateway() -> String {
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
+• `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -12111,6 +12267,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only schedules.json path asks (v0.1.832) — config only; no list/count/create.
     if looks_like_schedules_path_request(question) {
+        return true;
+    }
+    // Read-only monitors.json path asks (v0.1.833) — config only; no list/add/check.
+    if looks_like_monitors_path_request(question) {
         return true;
     }
     false
@@ -14783,6 +14943,36 @@ mod tests {
             .expect("schedules path instant");
         assert!(reply.contains("Schedules file"));
         assert!(reply.contains("schedules") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn monitors_path_request_detected() {
+        assert!(looks_like_monitors_path_request("monitors path"));
+        assert!(looks_like_monitors_path_request("monitors.json"));
+        assert!(looks_like_monitors_path_request(
+            "where is monitors.json"
+        ));
+        assert!(looks_like_monitors_path_request("monitor file path"));
+        assert!(looks_like_monitors_path_request(
+            "where is the monitors file"
+        ));
+        assert!(looks_like_monitors_path_request("sites file path"));
+        assert!(!looks_like_monitors_path_request("/monitors"));
+        assert!(!looks_like_monitors_path_request("monitors"));
+        assert!(!looks_like_monitors_path_request("list monitors"));
+        assert!(!looks_like_monitors_path_request("monitors down"));
+        assert!(!looks_like_monitors_path_request("add a monitor"));
+        assert!(!looks_like_monitors_path_request("check monitor now"));
+        assert!(!looks_like_monitors_path_request("schedules path"));
+        assert!(!looks_like_monitors_path_request("pinned processes path"));
+        assert!(!looks_like_monitors_path_request("where is config"));
+        assert!(!looks_like_monitors_request("monitors path"));
+        assert!(!looks_like_monitors_request("where is monitors.json"));
+        assert!(looks_like_monitors_request("/monitors"));
+        let reply = try_operator_instant_reply("where is monitors.json")
+            .expect("monitors path instant");
+        assert!(reply.contains("Monitors file"));
+        assert!(reply.contains("monitors") || reply.contains(".mac-stats"));
     }
 
     #[test]

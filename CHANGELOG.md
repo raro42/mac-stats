@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.833] - 2026-09-03
+
+### Fixed
+- **Instant lane: monitors.json path** — `monitors path`, `where is monitors.json`, `monitor file path`, and similar asks return `~/.mac-stats/monitors.json` without Ollama (Discord + AI Chat; does not list, add, or check sites; does not steal `/monitors`; p50 latency).
+
 ## [0.1.832] - 2026-09-03
 
 ### Fixed
