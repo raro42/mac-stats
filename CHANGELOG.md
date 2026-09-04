@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.848] - 2026-09-04
+
+### Fixed
+- **Instant lane: cookie_reject_patterns.md path** — `cookie reject patterns path`, `where is cookie_reject_patterns.md`, `cookie reject path`, `reject patterns path`, and similar asks return `~/.mac-stats/agents/cookie_reject_patterns.md` without Ollama (Discord + AI Chat; path only — does not list or edit patterns; does not steal browser cookies / session-reset / escalation / agents path; p50 latency).
+
 ## [0.1.847] - 2026-09-04
 
 ### Fixed
