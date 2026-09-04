@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.847] - 2026-09-04
+
+### Fixed
+- **Instant lane: session_reset_phrases.md path** — `session reset phrases path`, `where is session_reset_phrases.md`, `reset phrases path`, and similar asks return `~/.mac-stats/agents/session_reset_phrases.md` without Ollama (Discord + AI Chat; path only — does not list phrases or clear a session; does not steal escalation patterns / agents / session dir path; p50 latency).
+
 ## [0.1.846] - 2026-09-04
 
 ### Fixed
