@@ -1,25 +1,25 @@
 # Morning surprise — 2026-09-05
 
-Overnight Track B (mac-stats autoresearch) for Ralf.
+Overnight Track B kept shipping instant-lane path wins for operator latency.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.861** | Instant lane: **before-compaction transcript path** — `before compaction transcript path` / `where is before compaction transcript` / `last_session_before_compaction.jsonl` return the configured or default JSONL path without Ollama (path only; no dump/hook; does not steal before-reset / session reset phrases). |
-| **v0.1.860** | Instant lane: **before-reset transcript path** — `before reset transcript path` / `where is before reset transcript` / `last_session_before_reset.jsonl` return the configured or default JSONL path without Ollama (path only; no dump/hook; does not steal session reset phrases / before-compaction). |
-| **v0.1.859** | Instant lane: **Ori vault path** — `ori vault path` / `where is ori vault` / `ORI_VAULT path` return the configured vault root without Ollama (path only; does not steal `/ori` Ready). |
-| **v0.1.858** | Instant lane: **memory.md path** — curated `agents/memory.md` path without Ollama. |
-| **v0.1.857** | Instant lane: **agent.json path** — per-agent config JSON path without Ollama. |
-| **v0.1.856** | Instant lane: **execution_prompt.md path**. |
-| **v0.1.855** | Instant lane: **planning_prompt.md path**. |
+| **v0.1.863** | Instant lane: **session-memory path** — `session memory path`, `where is session memory`, `session-memory path` → `session/session-memory-<id>-<ts>-<topic>.md` (no Ollama; no list/dump; does not steal session dir / `/sessions`) |
+| **v0.1.862** | Instant lane: Discord channel memory path (`memory-discord-<id>.md`) |
+| **v0.1.861** | Instant lane: before-compaction transcript path |
+| **v0.1.860** | Instant lane: before-reset transcript path |
 
-## Context
+## Why it matters
 
-- Digester open: empty (Elmasnow weather already stale/shipped).
-- Design review: grace (screenshots aged; TCC deferred).
-- Fuel: standing backlog p50 latency path lanes.
+Path-only asks used to fall through to Ollama (or the wrong folder lane). Session-memory files live under `~/.mac-stats/session/` with a fixed name pattern; operators can now get that path in the instant lane.
 
-## Tried / discarded
+## Digester / design review
 
-_None this window (keeps only)._
+- Digester open: empty (Elmasnow weather already filtered as shipped).
+- Design review: grace (due=false); `feature-ai-chat` still aged — screenshot when TCC allows.
+
+## Next
+
+LaunchAgent plist path, Agent Ops filter attention glances, or digester open when present.
