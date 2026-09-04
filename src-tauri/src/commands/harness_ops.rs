@@ -4475,6 +4475,151 @@ pub fn format_launchagent_path_gateway() -> String {
     )
 }
 
+/// True for short “where is results.tsv / autoresearch results path…” asks.
+/// Path only — does not dump keep/discard rows or open the improvements folder.
+/// Does not steal `improvements path` / bare `autoresearch path` (directory lane).
+pub fn looks_like_results_tsv_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("improvements directory")
+        || n.contains("improvement path")
+        || n.contains("improvement folder")
+        || n == "improvements"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "results.tsv"
+            | "results.tsv path"
+            | "results tsv"
+            | "results tsv path"
+            | "results.tsv file"
+            | "results tsv file"
+            | "results.tsv location"
+            | "results tsv location"
+            | "autoresearch results"
+            | "autoresearch results path"
+            | "autoresearch results file"
+            | "autoresearch results.tsv"
+            | "ratchet results"
+            | "ratchet results path"
+            | "ratchet results file"
+            | "ratchet results.tsv"
+            | "keep discard results"
+            | "keep discard results path"
+            | "keep discard log path"
+            | "where is results.tsv"
+            | "where is the results.tsv"
+            | "where is results tsv"
+            | "where is the results tsv"
+            | "where is the results file"
+            | "where is autoresearch results"
+            | "where is the autoresearch results"
+            | "where is the autoresearch results.tsv"
+            | "where is ratchet results"
+            | "where is the ratchet results"
+            | "where is the ratchet results.tsv"
+            | "where is the keep discard log"
+            | "where do results.tsv go"
+            | "where does results.tsv go"
+    ) {
+        return true;
+    }
+    let results_ctx = n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard results")
+        || n.contains("keep discard log")
+        || (n.contains("results")
+            && (n.contains("tsv")
+                || n.contains("ratchet")
+                || n.contains("autoresearch")
+                || n.contains("keep discard")));
+    results_ctx && pathish
+}
+
+/// Zero-LLM autoresearch results.tsv path (config only; no dump/list).
+pub fn format_results_tsv_path_gateway() -> String {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    let display = path.display().to_string();
+    format!(
+        "**Autoresearch results:** `{display}` · keep/discard log · path only · does not dump rows · `improvements path` for the parent folder."
+    )
+}
+
 /// True for short “where is the session folder / session path…” asks.
 /// Config path only — does not list, resume, open, or delete sessions.
 pub fn looks_like_session_path_request(content: &str) -> bool {
@@ -8035,6 +8180,12 @@ pub fn looks_like_improvements_path_request(content: &str) -> bool {
         || n.contains("digest open")
         || n.contains("digest age")
         || n.contains("/digest")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard results")
+        || n.contains("keep discard log")
     {
         return false;
     }
@@ -15990,6 +16141,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
+    // results.tsv before improvements-dir / bare autoresearch path lane.
+    if looks_like_results_tsv_path_request(content) {
+        return Some(format_results_tsv_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -16141,6 +16296,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // LaunchAgent plist paths (path-only; no load/unload).
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
+    }
+    // results.tsv before improvements-dir / bare autoresearch path lane.
+    if looks_like_results_tsv_path_request(content) {
+        return Some(format_results_tsv_path_gateway());
     }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
@@ -16376,6 +16535,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
+• `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
@@ -17895,6 +18055,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv path asks (v0.1.866) — config only; no dump.
+    if looks_like_results_tsv_path_request(question) {
         return true;
     }
     // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
@@ -21170,6 +21334,33 @@ mod tests {
         assert!(reply.contains("LaunchAgents"));
         assert!(reply.contains("com.raro42.mac-stats.plist"));
         assert!(reply.contains("overnight-harness"));
+    }
+
+    #[test]
+    fn results_tsv_path_request_detected() {
+        assert!(looks_like_results_tsv_path_request("results.tsv"));
+        assert!(looks_like_results_tsv_path_request("results.tsv path"));
+        assert!(looks_like_results_tsv_path_request("where is results.tsv"));
+        assert!(looks_like_results_tsv_path_request("where is the results.tsv"));
+        assert!(looks_like_results_tsv_path_request("autoresearch results path"));
+        assert!(looks_like_results_tsv_path_request("ratchet results path"));
+        assert!(looks_like_results_tsv_path_request("keep discard results path"));
+        assert!(looks_like_results_tsv_path_request("where is the ratchet results"));
+        assert!(!looks_like_results_tsv_path_request("improvements path"));
+        assert!(!looks_like_results_tsv_path_request("autoresearch path"));
+        assert!(!looks_like_results_tsv_path_request("any improvements from last night"));
+        assert!(!looks_like_results_tsv_path_request("list results.tsv"));
+        assert!(!looks_like_results_tsv_path_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_path_request("runs path"));
+        assert!(!looks_like_results_tsv_path_request("launchagent path"));
+        assert!(!looks_like_improvements_path_request("results.tsv path"));
+        assert!(!looks_like_improvements_path_request("autoresearch results path"));
+        assert!(looks_like_improvements_path_request("autoresearch path"));
+        let reply =
+            try_operator_instant_reply("results.tsv path").expect("results.tsv path instant");
+        assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
+        assert!(reply.contains("results.tsv"));
+        assert!(reply.contains("improvements path") || reply.contains("does not dump"));
     }
 
     #[test]

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.866** — Instant lane: results.tsv path (`results.tsv path`, `where is results.tsv`, `autoresearch results path`, `ratchet results path`; `~/.mac-stats/improvements/autoresearch/results.tsv`; config only; no dump; does not steal `improvements path` / bare `autoresearch path`; p50 latency).
+
 - **v0.1.865** — Agent Ops Filter attention glance (**Filter · On/Off** / **Live/Files** / **Jobs/Deliveries** / **Discord/Core** / **Instant/Lite/Direct/Slow/Fail** when active; click → All; Runs Fail/Slow strip defers on Fail/Slow Filter; design review / `feature-agent-ops`).
 
 - **v0.1.864** — Instant lane: LaunchAgent plist path (`launchagent path`, `where is launchagent`, `mac-stats.plist`, `harness plist`; `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist; config only; no load/unload; does not steal overnight-improvements / `improvements path`; p50 latency).

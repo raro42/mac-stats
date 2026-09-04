@@ -1692,6 +1692,15 @@ impl Config {
         }
     }
 
+    /// Autoresearch keep/discard log: `$HOME/.mac-stats/improvements/autoresearch/results.tsv`
+    ///
+    /// Path only for operator instant lane — does not dump keep/discard rows.
+    pub fn autoresearch_results_tsv() -> PathBuf {
+        Self::improvements_dir()
+            .join("autoresearch")
+            .join("results.tsv")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

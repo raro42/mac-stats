@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.866] - 2026-09-05
+
+### Fixed
+- **Instant lane: results.tsv path** — `results.tsv path`, `where is results.tsv`, `autoresearch results path`, `ratchet results path`, and similar asks return `~/.mac-stats/improvements/autoresearch/results.tsv` without Ollama (Discord + AI Chat; path only — does not dump keep/discard rows; does not steal `improvements path` / bare `autoresearch path`; p50 latency).
+
 ## [0.1.865] - 2026-09-05
 
 ### Added
