@@ -1,5 +1,11 @@
 # Morning surprise — 2026-09-05
 
+
+## Overnight keep — v0.1.865 (~01:05)
+
+**Agent Ops Filter attention glance** — On/Off · Live/Files · Jobs/Deliveries · Discord/Core · Runs lanes show **Filter · …** above chips; click → All. Fail/Slow strip defers on Runs Fail/Slow Filter. Design-review fuel (`feature-agent-ops`).
+
+
 Overnight Track B kept shipping instant-lane path wins for operator latency.
 
 ## Shipped tonight
