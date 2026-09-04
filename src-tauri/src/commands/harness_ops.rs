@@ -3814,6 +3814,7 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
         || n.contains("prompts")
         || n.contains("soul")
         || n.contains("mood")
+        || n.contains("testing")
         || n.starts_with("agent:")
         || n.contains("agent:")
         || n.chars().any(|c| c.is_ascii_digit())
@@ -8632,6 +8633,189 @@ pub fn format_downloads_organizer_state_path_gateway() -> String {
     )
 }
 
+/// True for short “where is testing.md / testing file path…” asks.
+/// Config path only — does not dump/edit testing prompts or run `agent test`.
+/// Testing is per-agent (`agent-<id>/testing.md`).
+pub fn looks_like_testing_md_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skill file")
+        || n.contains("skills path")
+        || n.contains("skills folder")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("prompts path")
+        || n.contains("plugins path")
+        || n.contains("tmp path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+        || n == "/skills"
+        || n == "skills"
+        || (n.contains("agent test") && !n.contains("agent testing"))
+        || n.contains("run test")
+        || n.contains("run tests")
+        || n.contains("unit test")
+        || n.contains("cargo test")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let testing_ctx = n.contains("testing.md")
+        || n.contains("testing file")
+        || n.contains("testing md")
+        || n == "testing"
+        || n == "where is testing"
+        || n == "where is the testing"
+        || n == "where is testing.md"
+        || n == "where is the testing.md"
+        || n == "where is the testing file"
+        || n == "where is testing file"
+        || (n.contains("testing")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("md")));
+    if !testing_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("testing.md");
+    matches!(
+        n.as_str(),
+        "testing.md"
+            | "testing.md path"
+            | "testing path"
+            | "testing file"
+            | "testing file path"
+            | "testing md"
+            | "testing md path"
+            | "where is testing"
+            | "where is the testing"
+            | "where is testing.md"
+            | "where is the testing.md"
+            | "where is testing file"
+            | "where is the testing file"
+            | "where is the testing.md file"
+            | "agent testing.md"
+            | "agent testing.md path"
+            | "agent testing file"
+            | "agent testing file path"
+            | "agent testing path"
+    ) || (testing_ctx && pathish)
+}
+
+/// Zero-LLM per-agent testing.md path (config only; no dump/edit/run).
+pub fn format_testing_md_path_gateway() -> String {
+    let display = crate::config::Config::testing_file_path_display();
+    format!(
+        "**Testing file:** `{display}` · per-agent test prompts (`mac_stats agent test`) · path only · does not dump or edit testing text · Agent Ops → Agents for content."
+    )
+}
+
 /// True for short “where is skill.md / skill file path…” asks.
 /// Config path only — does not dump/edit skill text or open Agent Ops Agents.
 /// Skill is per-agent (`agent-<id>/skill.md`), not the Hermes `skills/` directory.
@@ -8657,6 +8841,9 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
         || n == "where do skills go"
         || n.contains("soul")
         || n.contains("mood")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
         || n.contains("memory.md")
         || n.contains("memory path")
         || n.contains("notes path")
@@ -8848,6 +9035,9 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
         || n.contains("skill file")
         || n.contains("skills path")
         || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
         || n.contains("memory.md")
         || n.contains("memory path")
         || n.contains("notes path")
@@ -9018,6 +9208,9 @@ pub fn looks_like_soul_path_request(content: &str) -> bool {
         || n.contains("skill file")
         || n.contains("skills path")
         || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
         || n.contains("memory.md")
         || n.contains("memory path")
         || n.contains("notes path")
@@ -13866,6 +14059,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // testing.md before skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
+    if looks_like_testing_md_path_request(content) {
+        return Some(format_testing_md_path_gateway());
+    }
     // skill.md before mood / soul / skills-dir / agents-dir path / /agents catalog (path-only asks).
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
@@ -13947,6 +14144,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // testing.md before skill / mood / soul / agents-dir path lane.
+    if looks_like_testing_md_path_request(content) {
+        return Some(format_testing_md_path_gateway());
     }
     // skill.md before mood / soul / skills-dir / agents-dir path lane.
     if looks_like_skill_md_path_request(content) {
@@ -15678,6 +15879,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only testing.md path asks (v0.1.854) — config only; no dump/edit/run.
+    if looks_like_testing_md_path_request(question) {
         return true;
     }
     // Read-only skill.md path asks (v0.1.853) — config only; no dump/edit.
@@ -18294,6 +18499,38 @@ mod tests {
     }
 
     #[test]
+    fn testing_md_path_request_detected() {
+        assert!(looks_like_testing_md_path_request("testing.md"));
+        assert!(looks_like_testing_md_path_request("where is testing.md"));
+        assert!(looks_like_testing_md_path_request("testing.md path"));
+        assert!(looks_like_testing_md_path_request("testing path"));
+        assert!(looks_like_testing_md_path_request("testing file path"));
+        assert!(looks_like_testing_md_path_request("where is the testing file"));
+        assert!(looks_like_testing_md_path_request("where is testing"));
+        assert!(looks_like_testing_md_path_request("agent testing.md path"));
+        assert!(!looks_like_testing_md_path_request("agents path"));
+        assert!(!looks_like_testing_md_path_request("skill.md path"));
+        assert!(!looks_like_testing_md_path_request("mood path"));
+        assert!(!looks_like_testing_md_path_request("soul path"));
+        assert!(!looks_like_testing_md_path_request("dump testing"));
+        assert!(!looks_like_testing_md_path_request("edit testing.md"));
+        assert!(!looks_like_testing_md_path_request("run tests"));
+        assert!(!looks_like_testing_md_path_request("agent test"));
+        assert!(!looks_like_testing_md_path_request("/agents"));
+        assert!(!looks_like_agents_path_request("testing.md path"));
+        assert!(!looks_like_skill_md_path_request("testing.md path"));
+        assert!(!looks_like_mood_path_request("testing.md path"));
+        assert!(!looks_like_soul_path_request("testing.md path"));
+        let reply =
+            try_operator_instant_reply("where is testing.md").expect("testing.md path instant");
+        assert!(reply.contains("Testing file"));
+        assert!(reply.contains("testing.md") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("per-agent"));
+        assert!(!reply.to_lowercase().contains("agents dir"));
+        assert!(reply.to_lowercase().contains("path only"));
+    }
+
+    #[test]
     fn skill_md_path_request_detected() {
         assert!(looks_like_skill_md_path_request("skill.md"));
         assert!(looks_like_skill_md_path_request("where is skill.md"));
@@ -18308,6 +18545,7 @@ mod tests {
         assert!(!looks_like_skill_md_path_request("agents path"));
         assert!(!looks_like_skill_md_path_request("mood path"));
         assert!(!looks_like_skill_md_path_request("soul path"));
+        assert!(!looks_like_skill_md_path_request("testing.md path"));
         assert!(!looks_like_skill_md_path_request("dump skill"));
         assert!(!looks_like_skill_md_path_request("edit skill.md"));
         assert!(!looks_like_skill_md_path_request("/skills"));

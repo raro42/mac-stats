@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.854] - 2026-09-04
+
+### Fixed
+- **Instant lane: testing.md path** — `testing.md`, `where is testing.md`, `testing path`, `testing file path`, and similar asks return `~/.mac-stats/agents/agent-<id>/testing.md` without Ollama (Discord + AI Chat; path only — per-agent test prompts for `mac_stats agent test`; does not dump or edit testing text; does not steal `/agents` / agents dir / skill / mood / soul path; does not steal `agent test` / `run tests`; p50 latency).
+
 ## [0.1.853] - 2026-09-04
 
 ### Fixed
