@@ -512,6 +512,9 @@ function selectOpsTab(tab) {
             localStorage.setItem('agent_ops_tab', tab);
         } catch (_) {}
     }
+    // Fail/Slow strip defers only while Runs Fail/Slow Filter is showing.
+    applyOpsRunsAttentionGlanceState();
+    refreshOpsPanelFilterAttentionGlances();
 }
 
 function focusActiveOpsFilter() {
@@ -1601,6 +1604,7 @@ function paintOpsSessionKindChips() {
             btn.classList.toggle('has-hits', filesAll.length > 0);
         }
     });
+    applyOpsSessionsFilterAttentionGlanceState();
 }
 
 /** Hide Live or Files blocks when a kind chip narrows the Sessions tab. */
@@ -1721,6 +1725,7 @@ function paintOpsMemoryKindChips() {
             btn.classList.toggle('has-hits', coreN > 0);
         }
     });
+    applyOpsMemoryFilterAttentionGlanceState();
 }
 
 /** Overview Knowledge open → Discord when any else Core (Sessions Live/Files parity). */
@@ -1920,6 +1925,9 @@ function paintOpsRunsLaneChips() {
             btn.classList.toggle('has-hits', failN > 0);
         }
     });
+    applyOpsRunsFilterAttentionGlanceState();
+    // Fail/Slow strip may hide when Fail/Slow Filter is active on Runs.
+    applyOpsRunsAttentionGlanceState();
 }
 
 /** Overview Runs open → Fail when any failed else Slow else Direct else Lite else Instant. */
@@ -1956,8 +1964,237 @@ function preferOpsRunsLaneFromOverview() {
 }
 
 /**
+ * Panel Filter attention glance (Monitors / Top Processes / Disk Cleanup Filter parity).
+ * When a non-All kind/lane chip is active, show Filter · … above the chips; click → All.
+ */
+function ensureOpsPanelFilterAttentionGlance(opts) {
+    const chips = document.getElementById(opts.chipsId);
+    if (!chips) return null;
+    let glance = document.getElementById(opts.glanceId);
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = opts.glanceId;
+        glance.className = 'ops-filter-attention-glance';
+        glance.hidden = true;
+        glance.innerHTML = `<span id="${opts.glanceId}-text"></span>`;
+        chips.insertAdjacentElement('beforebegin', glance);
+        wireOpsPanelFilterAttentionGlanceClick(glance, opts);
+    } else if (glance.nextElementSibling !== chips) {
+        chips.insertAdjacentElement('beforebegin', glance);
+    }
+    return glance;
+}
+
+function applyOpsPanelFilterAttentionGlanceState(opts) {
+    const glance = ensureOpsPanelFilterAttentionGlance(opts);
+    if (!glance) return false;
+    const text = document.getElementById(`${opts.glanceId}-text`);
+    const filterLabel = opts.getLabel();
+    const modClasses = opts.modClasses || [];
+    if (agentOpsCollapsed || !filterLabel) {
+        glance.hidden = true;
+        glance.classList.remove('is-filter', ...modClasses);
+        return false;
+    }
+    glance.hidden = false;
+    glance.classList.add('is-filter');
+    for (const cls of modClasses) {
+        glance.classList.toggle(cls, opts.activeModClass === cls);
+    }
+    if (text) text.textContent = `Filter · ${filterLabel}`;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = `${filterLabel} filter active — click to show All`;
+    glance.setAttribute(
+        'aria-label',
+        `${opts.ariaScope} ${filterLabel} filter — click to clear`
+    );
+    return true;
+}
+
+function wireOpsPanelFilterAttentionGlanceClick(glance, opts) {
+    if (!glance || glance.dataset.opsFilterAttentionWired === '1') return;
+    glance.dataset.opsFilterAttentionWired = '1';
+    const activate = () => {
+        if (agentOpsCollapsed) applyOpsCollapsed(false);
+        if (opts.tab) selectOpsTab(opts.tab);
+        opts.clear();
+        const chip =
+            document.querySelector(
+                `#${opts.chipsId} [${opts.chipAttr}="all"]`
+            ) || document.getElementById(opts.chipsId);
+        chip?.focus?.();
+    };
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
+function opsAgentsFilterAttentionLabel() {
+    if (opsAgentsEnabledFilter === 'on') return 'On';
+    if (opsAgentsEnabledFilter === 'off') return 'Off';
+    return '';
+}
+
+function applyOpsAgentsFilterAttentionGlanceState() {
+    const label = opsAgentsFilterAttentionLabel();
+    return applyOpsPanelFilterAttentionGlanceState({
+        glanceId: 'ops-agents-filter-attention-glance',
+        chipsId: 'ops-agents-enabled-chips',
+        chipAttr: 'data-ops-agents-enabled',
+        tab: 'agents',
+        ariaScope: 'Agents',
+        getLabel: () => label,
+        clear: () => setOpsAgentsEnabledFilter('all'),
+        modClasses: ['is-on-filter', 'is-off-filter'],
+        activeModClass:
+            label === 'On'
+                ? 'is-on-filter'
+                : label === 'Off'
+                  ? 'is-off-filter'
+                  : '',
+    });
+}
+
+function opsSessionsFilterAttentionLabel() {
+    if (opsSessionKindFilter === 'live') return 'Live';
+    if (opsSessionKindFilter === 'files') return 'Files';
+    return '';
+}
+
+function applyOpsSessionsFilterAttentionGlanceState() {
+    const label = opsSessionsFilterAttentionLabel();
+    return applyOpsPanelFilterAttentionGlanceState({
+        glanceId: 'ops-sessions-filter-attention-glance',
+        chipsId: 'ops-session-kind-chips',
+        chipAttr: 'data-ops-session-kind',
+        tab: 'sessions',
+        ariaScope: 'Sessions',
+        getLabel: () => label,
+        clear: () => setOpsSessionKindFilter('all'),
+        modClasses: ['is-live-filter', 'is-files-filter'],
+        activeModClass:
+            label === 'Live'
+                ? 'is-live-filter'
+                : label === 'Files'
+                  ? 'is-files-filter'
+                  : '',
+    });
+}
+
+function opsSchedulesFilterAttentionLabel() {
+    if (opsSchedulesKindFilter === 'jobs') return 'Jobs';
+    if (opsSchedulesKindFilter === 'deliveries') return 'Deliveries';
+    return '';
+}
+
+function applyOpsSchedulesFilterAttentionGlanceState() {
+    const label = opsSchedulesFilterAttentionLabel();
+    return applyOpsPanelFilterAttentionGlanceState({
+        glanceId: 'ops-schedules-filter-attention-glance',
+        chipsId: 'ops-schedules-kind-chips',
+        chipAttr: 'data-ops-schedules-kind',
+        tab: 'schedules',
+        ariaScope: 'Schedules',
+        getLabel: () => label,
+        clear: () => setOpsSchedulesKindFilter('all'),
+        modClasses: ['is-jobs-filter', 'is-deliveries-filter'],
+        activeModClass:
+            label === 'Jobs'
+                ? 'is-jobs-filter'
+                : label === 'Deliveries'
+                  ? 'is-deliveries-filter'
+                  : '',
+    });
+}
+
+function opsMemoryFilterAttentionLabel() {
+    if (opsMemoryKindFilter === 'discord') return 'Discord';
+    if (opsMemoryKindFilter === 'core') return 'Core';
+    return '';
+}
+
+function applyOpsMemoryFilterAttentionGlanceState() {
+    const label = opsMemoryFilterAttentionLabel();
+    return applyOpsPanelFilterAttentionGlanceState({
+        glanceId: 'ops-memory-filter-attention-glance',
+        chipsId: 'ops-memory-kind-chips',
+        chipAttr: 'data-ops-memory-kind',
+        tab: 'memory',
+        ariaScope: 'Knowledge',
+        getLabel: () => label,
+        clear: () => setOpsMemoryKindFilter('all'),
+        modClasses: ['is-discord-filter', 'is-core-filter'],
+        activeModClass:
+            label === 'Discord'
+                ? 'is-discord-filter'
+                : label === 'Core'
+                  ? 'is-core-filter'
+                  : '',
+    });
+}
+
+function opsRunsFilterAttentionLabel() {
+    if (opsRunsLaneFilter === 'instant') return 'Instant';
+    if (opsRunsLaneFilter === 'lite') return 'Lite';
+    if (opsRunsLaneFilter === 'direct') return 'Direct';
+    if (opsRunsLaneFilter === 'slow') return 'Slow';
+    if (opsRunsLaneFilter === 'fail') return 'Fail';
+    return '';
+}
+
+function applyOpsRunsFilterAttentionGlanceState() {
+    const label = opsRunsFilterAttentionLabel();
+    return applyOpsPanelFilterAttentionGlanceState({
+        glanceId: 'ops-runs-filter-attention-glance',
+        chipsId: 'ops-runs-lane-chips',
+        chipAttr: 'data-ops-runs-lane',
+        tab: 'runs',
+        ariaScope: 'Runs',
+        getLabel: () => label,
+        clear: () => setOpsRunsLaneFilter('all'),
+        modClasses: [
+            'is-instant-filter',
+            'is-lite-filter',
+            'is-direct-filter',
+            'is-slow-filter',
+            'is-fail-filter',
+        ],
+        activeModClass:
+            label === 'Instant'
+                ? 'is-instant-filter'
+                : label === 'Lite'
+                  ? 'is-lite-filter'
+                  : label === 'Direct'
+                    ? 'is-direct-filter'
+                    : label === 'Slow'
+                      ? 'is-slow-filter'
+                      : label === 'Fail'
+                        ? 'is-fail-filter'
+                        : '',
+    });
+}
+
+function refreshOpsPanelFilterAttentionGlances() {
+    applyOpsAgentsFilterAttentionGlanceState();
+    applyOpsSessionsFilterAttentionGlanceState();
+    applyOpsSchedulesFilterAttentionGlanceState();
+    applyOpsMemoryFilterAttentionGlanceState();
+    applyOpsRunsFilterAttentionGlanceState();
+}
+
+/**
  * Runs Fail/Slow attention glance under refresh (AI Chat Errors / Debug Log parity).
  * Visible on every Agent Ops tab when recent runs have Fail or Slow hits.
+ * Hidden on the Runs tab when Fail/Slow lane Filter attention is already active.
  */
 function ensureOpsRunsAttentionGlance() {
     ensureOpsRefreshRowPlacement();
@@ -1992,7 +2229,11 @@ function applyOpsRunsAttentionGlanceState() {
     const glance = ensureOpsRunsAttentionGlance();
     if (!glance) return;
     const text = document.getElementById('ops-runs-attention-glance-text');
-    if (agentOpsCollapsed) {
+    // Filter · Fail/Slow on the Runs panel wins (Monitors Filter / Down·Slow parity).
+    const filterWins =
+        opsActiveTab === 'runs' &&
+        (opsRunsLaneFilter === 'fail' || opsRunsLaneFilter === 'slow');
+    if (agentOpsCollapsed || filterWins) {
         glance.hidden = true;
         glance.classList.remove('has-fail', 'has-slow');
         return;
@@ -4023,6 +4264,7 @@ function paintOpsAgentsEnabledChips() {
             btn.classList.toggle('has-hits', offN > 0);
         }
     });
+    applyOpsAgentsFilterAttentionGlanceState();
 }
 
 /** Overview Agents open → On when any enabled, else Off when agents exist (Sessions Live/Files parity). */
@@ -4146,6 +4388,7 @@ function paintOpsSchedulesKindChips() {
             btn.classList.toggle('has-hits', delAll.length > 0);
         }
     });
+    applyOpsSchedulesFilterAttentionGlanceState();
 }
 
 /** Hide Jobs or Deliveries blocks when a kind chip narrows the Schedules tab. */
@@ -9232,6 +9475,7 @@ function escapeHtml(s) {
     applyOpsMastodonAttentionGlanceState();
     applyOpsTelegramAttentionGlanceState();
     applyOpsSlackAttentionGlanceState();
+    refreshOpsPanelFilterAttentionGlances();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);

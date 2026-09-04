@@ -4885,6 +4885,83 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 50%, currentColor);
 }
 
+/* Agent Ops — panel Filter attention glance (Monitors / Top Processes / Disk Cleanup Filter parity) */
+.ops-filter-attention-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.ops-filter-attention-glance[hidden] {
+  display: none !important;
+}
+
+.ops-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.ops-filter-attention-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.ops-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  color: color-mix(in srgb, var(--accent, #007aff) 42%, currentColor);
+}
+
+.ops-filter-attention-glance.is-on-filter,
+.ops-filter-attention-glance.is-live-filter,
+.ops-filter-attention-glance.is-jobs-filter,
+.ops-filter-attention-glance.is-core-filter,
+.ops-filter-attention-glance.is-instant-filter,
+.ops-filter-attention-glance.is-lite-filter,
+.ops-filter-attention-glance.is-direct-filter {
+  border-color: color-mix(in srgb, #30d158 34%, transparent);
+  background: color-mix(in srgb, #30d158 8%, transparent);
+  color: color-mix(in srgb, #30d158 45%, currentColor);
+}
+
+.ops-filter-attention-glance.is-off-filter,
+.ops-filter-attention-glance.is-files-filter,
+.ops-filter-attention-glance.is-deliveries-filter,
+.ops-filter-attention-glance.is-discord-filter {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  color: color-mix(in srgb, var(--accent, #007aff) 45%, currentColor);
+}
+
+.ops-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+}
+
+.ops-filter-attention-glance.is-fail-filter {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
 /* Agent Ops — Digest open attention glance (Fail/Slow / health Digest parity) */
 .ops-digest-attention-glance {
   display: flex;

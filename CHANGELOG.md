@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.865] - 2026-09-05
+
+### Added
+- **Agent Ops Filter attention glance** — when Agents On/Off, Sessions Live/Files, Schedules Jobs/Deliveries, Knowledge Discord/Core, or Runs Instant/Lite/Direct/Slow/Fail is active, show **Filter · …** above the chips; click clears to All (Monitors / Top Processes / Disk Cleanup Filter parity). On the Runs tab, Fail/Slow strip defers while Fail/Slow Filter is active (`feature-agent-ops`).
+
 ## [0.1.864] - 2026-09-05
 
 ### Fixed
