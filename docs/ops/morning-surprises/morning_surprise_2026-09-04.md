@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.853** | Instant lane: **skill.md path** — `skill.md`, `where is skill.md`, `skill file path` → `~/.mac-stats/agents/agent-<id>/skill.md` (per-agent; not Hermes `skills/` folder; path only; Discord + AI Chat; bare `skill path` still means skills dir; p50). |
 | **v0.1.852** | Instant lane: **mood.md path** — `mood path`, `where is mood.md`, `mood file path` → `~/.mac-stats/agents/agent-<id>/mood.md` (per-agent; not shared like soul.md; path only; Discord + AI Chat; p50). |
 | **v0.1.851** | Instant lane: **soul.md path** — shared `~/.mac-stats/agents/soul.md` without Ollama. |
 | **v0.1.850** | Instant lane: **downloads-organizer-state.json path**. |
@@ -18,10 +19,10 @@ Overnight Track B (20:00–06:00) for Ralf.
 ## Context
 
 - Digester **open** stayed empty (Elmasnow weather already stale/shipped).
-- Design review in **grace** (`feature-ai-chat` ~20.6d recommended when TCC allows).
+- Design review in **grace** (`feature-ai-chat` ~20.7d recommended when TCC allows).
 - Fuel: standing backlog p50 path lanes.
-- Latest keep: **v0.1.852** @ `3d4fc76b`.
+- Latest keep: **v0.1.853** @ `23d051ab`.
 
 ## Next
 
-- More path lanes (skill.md per-agent, alerts config, planning/execution prompts) or design-review screenshot when TCC allows.
+- More path lanes (testing.md per-agent, alerts config, planning/execution prompts) or design-review screenshot when TCC allows.
