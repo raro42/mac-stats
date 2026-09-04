@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.845] - 2026-09-04
+
+### Fixed
+- **Instant lane: credential_accounts.json path** — `credential accounts path`, `where is credential_accounts.json`, `keychain accounts path`, and similar asks return `~/.mac-stats/credential_accounts.json` without Ollama (Discord + AI Chat; path only — does not list Keychain accounts or dump secrets; does not steal browser credentials / `browser-credentials.toml`; p50 latency).
+
 ## [0.1.844] - 2026-09-04
 
 ### Added

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.845** — Instant lane: credential_accounts.json path (`credential accounts path`, `where is credential_accounts.json`, `keychain accounts path`; config only; no list/dump; does not steal browser credentials; p50 latency).
+
 - **v0.1.844** — Disk Cleanup Filter attention glance (**Filter · Reclaim** / **Filter · Big** / **Filter · Clean** when active; click → All; Reclaim/Due strip defers; design review / `feature-disk-cleanup`).
 
 - **v0.1.843** — External / Monitors Filter attention glance (**Filter · Up** / **Filter · Down** / **Filter · Slow** when active; click → All; Down/Slow strip defers; design review / `feature-monitors`).

@@ -4885,6 +4885,11 @@ pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
         || n.contains("download")
         || n.contains("discord")
         || n.contains("keychain")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
         || n.contains("http://")
         || n.contains("https://")
         || n.chars().any(|c| c.is_ascii_digit())
@@ -6809,6 +6814,13 @@ pub fn looks_like_user_info_path_request(content: &str) -> bool {
         || n.contains("uploads path")
         || n.contains("traces path")
         || n.contains("pdfs path")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("keychain accounts")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("autoresearch path")
     {
         return false;
     }
@@ -6999,6 +7011,10 @@ pub fn looks_like_config_env_path_request(content: &str) -> bool {
         || n.contains("improvements directory")
         || n.contains("autoresearch path")
         || n.contains("autoresearch folder")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("keychain accounts")
     {
         return false;
     }
@@ -7316,6 +7332,202 @@ pub fn format_improvements_path_gateway() -> String {
     let display = dir.display().to_string();
     format!(
         "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files."
+    )
+}
+
+/// True for short “where is credential_accounts.json / credential accounts path…” asks.
+/// Path only — does not list Keychain account names or dump secrets.
+/// Does not steal `browser credentials` / `browser-credentials.toml` / `/brave` key asks.
+pub fn looks_like_credential_accounts_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("browser secrets")
+        || n.contains("browser secret")
+        || n.contains("credentials.toml")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("screenshot")
+        || n.contains("runs.jsonl")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity_last")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("delivery awareness")
+        || n.contains("pinned_processes")
+        || n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("userinfo")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("improvements directory")
+        || n.contains("autoresearch path")
+        || n.contains("mac-stats home")
+        || n.contains("data directory")
+        || n.contains("data dir")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "config file path"
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("session path")
+        || n.contains("agents path")
+        || n.contains("skills path")
+        || n.contains("plugins path")
+        || n.contains("prompts path")
+        || n.contains("tmp path")
+        || n.contains("uploads path")
+        || n.contains("traces path")
+        || n.contains("pdfs path")
+        || n.contains("mac-stats credentials")
+        || n.contains("mac stats credentials")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("api key")
+        || n.contains("api-key")
+        || n.contains("token")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ca_ctx = n.contains("credential_accounts.json")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
+        || n.contains("keychain account list")
+        || n.contains("accounts.json")
+        || (n.contains("credential account")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("json")));
+    if !ca_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("json")
+        || n.contains("credential_accounts.json")
+        || n.contains("credential_accounts");
+    matches!(
+        n.as_str(),
+        "credential accounts path"
+            | "credential account path"
+            | "credential_accounts"
+            | "credential_accounts.json"
+            | "credential_accounts.json path"
+            | "credential_accounts path"
+            | "credential_accounts file"
+            | "credential-accounts"
+            | "credential-accounts.json"
+            | "credential-accounts path"
+            | "credential accounts"
+            | "credential accounts file"
+            | "credential accounts file path"
+            | "credential accounts json"
+            | "credentials accounts path"
+            | "credentials accounts file"
+            | "keychain accounts path"
+            | "keychain accounts file"
+            | "keychain accounts"
+            | "where is credential_accounts"
+            | "where is credential_accounts.json"
+            | "where is the credential_accounts file"
+            | "where is credential accounts"
+            | "where is the credential accounts file"
+            | "where are credential accounts"
+            | "accounts.json path"
+            | "where is accounts.json"
+    ) || (ca_ctx && pathish)
+}
+
+/// Zero-LLM credential_accounts.json path (config only; no list/dump Keychain accounts).
+pub fn format_credential_accounts_path_gateway() -> String {
+    let path = crate::config::Config::credential_accounts_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Credential accounts file:** `{display}` · Keychain account-name list on disk · does not list accounts or dump secrets · Settings → Credentials."
     )
 }
 
@@ -12034,6 +12246,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_improvements_path_request(content) {
         return Some(format_improvements_path_gateway());
     }
+    // credential_accounts.json before browser-credentials / generic “credentials” path lanes.
+    if looks_like_credential_accounts_path_request(content) {
+        return Some(format_credential_accounts_path_gateway());
+    }
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
@@ -12289,6 +12505,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
+• `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
@@ -13726,6 +13943,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only improvements dir path asks (v0.1.841) — config only; no list/open.
     if looks_like_improvements_path_request(question) {
+        return true;
+    }
+    // Read-only credential_accounts.json path asks (v0.1.845) — config only; no list/dump.
+    if looks_like_credential_accounts_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -16002,6 +16223,55 @@ mod tests {
         assert!(reply.contains("Improvements dir"));
         assert!(reply.contains("improvements") || reply.contains(".mac-stats"));
         assert!(try_operator_instant_reply("any improvements from last night").is_none());
+    }
+
+    #[test]
+    fn credential_accounts_path_request_detected() {
+        assert!(looks_like_credential_accounts_path_request(
+            "credential accounts path"
+        ));
+        assert!(looks_like_credential_accounts_path_request(
+            "credential_accounts.json"
+        ));
+        assert!(looks_like_credential_accounts_path_request(
+            "where is credential_accounts.json"
+        ));
+        assert!(looks_like_credential_accounts_path_request(
+            "credential_accounts path"
+        ));
+        assert!(looks_like_credential_accounts_path_request(
+            "keychain accounts path"
+        ));
+        assert!(looks_like_credential_accounts_path_request(
+            "where is the credential accounts file"
+        ));
+        assert!(!looks_like_credential_accounts_path_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_credential_accounts_path_request(
+            "where are browser credentials"
+        ));
+        assert!(!looks_like_credential_accounts_path_request("list credentials"));
+        assert!(!looks_like_credential_accounts_path_request("dump secrets"));
+        assert!(!looks_like_credential_accounts_path_request("where is config"));
+        assert!(!looks_like_credential_accounts_path_request("config.env path"));
+        assert!(!looks_like_credential_accounts_path_request("improvements path"));
+        assert!(!looks_like_browser_credentials_path_request(
+            "credential accounts path"
+        ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "where is credential_accounts.json"
+        ));
+        assert!(!looks_like_improvements_path_request("credential accounts path"));
+        assert!(!looks_like_config_env_path_request("credential accounts path"));
+        let reply = try_operator_instant_reply("where is credential_accounts.json")
+            .expect("credential_accounts path instant");
+        assert!(reply.contains("Credential accounts file"));
+        assert!(
+            reply.contains("credential_accounts.json") || reply.contains(".mac-stats")
+        );
+        assert!(!reply.to_lowercase().contains("discord_bot_token"));
+        assert!(!reply.to_lowercase().contains("api_key="));
     }
 
     #[test]
