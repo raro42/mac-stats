@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.867] - 2026-09-05
+
+### Added
+
+- **Instant lane: runs.jsonl age** — `runs age`, `how old is runs.jsonl`, `when was runs updated`, and similar asks return last-write age from `runs.jsonl` mtime without Ollama (Discord + AI Chat; stat only — no list/count/prune; does not steal `runs path` / `/insights` / how-many-runs; p50 latency).
+
 ## [0.1.866] - 2026-09-05
 
 ### Fixed
