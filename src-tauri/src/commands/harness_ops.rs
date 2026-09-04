@@ -8623,6 +8623,176 @@ pub fn format_downloads_organizer_state_path_gateway() -> String {
     )
 }
 
+/// True for short “where is soul.md / soul path…” asks.
+/// Config path only — does not dump/edit soul text or open Agent Ops Agents.
+pub fn looks_like_soul_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skills path")
+        || n.contains("skills folder")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("prompts path")
+        || n.contains("plugins path")
+        || n.contains("tmp path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let soul_ctx = n.contains("soul.md")
+        || n.contains("soul file")
+        || n.contains("soul path")
+        || n.contains("souls path")
+        || n == "soul"
+        || n == "where is soul"
+        || n == "where is the soul"
+        || n == "where is soul.md"
+        || n == "where is the soul.md"
+        || n == "where is the soul file"
+        || n == "where is soul file"
+        || (n.contains("soul")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("md")));
+    if !soul_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("soul.md");
+    matches!(
+        n.as_str(),
+        "soul path"
+            | "soul.md"
+            | "soul.md path"
+            | "soul file"
+            | "soul file path"
+            | "soul md"
+            | "soul md path"
+            | "where is soul"
+            | "where is the soul"
+            | "where is soul.md"
+            | "where is the soul.md"
+            | "where is soul file"
+            | "where is the soul file"
+            | "where is the soul.md file"
+            | "soul location"
+            | "soul home"
+    ) || (soul_ctx && pathish)
+}
+
+/// Zero-LLM shared soul.md path (config only; no dump/edit).
+pub fn format_soul_path_gateway() -> String {
+    let path = crate::config::Config::soul_file_path();
+    let display = path.display().to_string();
+    format!(
+        "**Soul file:** `{display}` · shared persona · path only · does not dump or edit soul text · Agent Ops → Agents for content."
+    )
+}
+
 /// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
@@ -13314,6 +13484,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // soul.md before agents-dir path / /agents catalog (path-only asks).
+    if looks_like_soul_path_request(content) {
+        return Some(format_soul_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -13383,6 +13557,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // soul.md before agents-dir path lane.
+    if looks_like_soul_path_request(content) {
+        return Some(format_soul_path_gateway());
     }
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
@@ -15102,6 +15280,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
+    if looks_like_soul_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -17703,6 +17885,33 @@ mod tests {
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
         assert!(!reply.to_lowercase().contains("rules file"));
+    }
+
+    #[test]
+    fn soul_path_request_detected() {
+        assert!(looks_like_soul_path_request("soul path"));
+        assert!(looks_like_soul_path_request("soul.md"));
+        assert!(looks_like_soul_path_request("where is soul.md"));
+        assert!(looks_like_soul_path_request("soul.md path"));
+        assert!(looks_like_soul_path_request("soul file path"));
+        assert!(looks_like_soul_path_request("where is the soul file"));
+        assert!(looks_like_soul_path_request("where is soul"));
+        assert!(!looks_like_soul_path_request("agents path"));
+        assert!(!looks_like_soul_path_request("memory path"));
+        assert!(!looks_like_soul_path_request("mood path"));
+        assert!(!looks_like_soul_path_request("dump soul"));
+        assert!(!looks_like_soul_path_request("edit soul.md"));
+        assert!(!looks_like_soul_path_request("rewrite my soul"));
+        assert!(!looks_like_soul_path_request("/agents"));
+        assert!(!looks_like_soul_path_request("session reset phrases path"));
+        assert!(!looks_like_agents_path_request("soul path"));
+        assert!(!looks_like_agents_path_request("where is soul.md"));
+        assert!(!looks_like_memory_path_request("soul path"));
+        let reply = try_operator_instant_reply("where is soul.md").expect("soul path instant");
+        assert!(reply.contains("Soul file"));
+        assert!(reply.contains("soul.md") || reply.contains(".mac-stats"));
+        assert!(!reply.to_lowercase().contains("agents dir"));
+        assert!(reply.to_lowercase().contains("path only"));
     }
 
     #[test]
