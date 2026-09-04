@@ -8993,6 +8993,180 @@ pub fn format_planning_prompt_path_gateway() -> String {
     )
 }
 
+/// True for short “where is execution_prompt.md / execution prompt path…” asks.
+/// Config path only — does not dump/edit execution text or open the prompts directory list.
+pub fn looks_like_execution_prompt_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("system prompt")
+        || n.contains("prompts path")
+        || n.contains("prompts folder")
+        || n.contains("prompts directory")
+        || n.contains("prompts dir")
+        || n.contains("prompt folder")
+        || n.contains("prompt directory")
+        || n.contains("prompt dir")
+        || n == "prompt path"
+        || n == "prompts path"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skill file")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let execution_ctx = n.contains("execution_prompt.md")
+        || n.contains("execution_prompt")
+        || n.contains("execution prompt")
+        || n.contains("execution file")
+        || n.contains("execution md")
+        || n == "execution"
+        || n == "where is execution"
+        || n == "where is the execution"
+        || n == "where is execution_prompt.md"
+        || n == "where is the execution_prompt.md"
+        || n == "where is the execution prompt"
+        || n == "where is execution prompt"
+        || n == "where is the execution file"
+        || n == "where is execution file"
+        || (n.contains("execution")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("md")
+                || n.contains("prompt")));
+    if !execution_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("execution_prompt.md")
+        || (n.contains("file") && (n.contains("path") || n.contains("where")))
+        || (n.contains("md")
+            && (n.contains("path") || n.contains("where") || n.contains("execution_prompt")));
+    matches!(
+        n.as_str(),
+        "execution_prompt.md"
+            | "execution_prompt.md path"
+            | "execution_prompt path"
+            | "execution prompt path"
+            | "execution prompt file path"
+            | "execution file path"
+            | "execution md path"
+            | "execution path"
+            | "where is execution"
+            | "where is the execution"
+            | "where is execution_prompt.md"
+            | "where is the execution_prompt.md"
+            | "where is execution prompt"
+            | "where is the execution prompt"
+            | "where is execution file"
+            | "where is the execution file"
+            | "where is the execution_prompt.md file"
+            | "where is execution_prompt"
+            | "where is the execution_prompt"
+            | "execution_prompt location"
+            | "execution prompt location"
+    ) || (execution_ctx && pathish)
+}
+
+/// Zero-LLM execution_prompt.md path (config only; no dump/edit).
+pub fn format_execution_prompt_path_gateway() -> String {
+    let display = crate::config::Config::execution_prompt_path()
+        .display()
+        .to_string();
+    format!(
+        "**Execution prompt:** `{display}` · agent-router tools + conversation rules · path only · does not dump or edit prompt text · `prompts path` for the folder."
+    )
+}
+
 /// True for short “where is skill.md / skill file path…” asks.
 /// Config path only — does not dump/edit skill text or open Agent Ops Agents.
 /// Skill is per-agent (`agent-<id>/skill.md`), not the Hermes `skills/` directory.
@@ -14236,6 +14410,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // execution_prompt.md before planning / prompts-dir path / testing / skill (path-only asks).
+    if looks_like_execution_prompt_path_request(content) {
+        return Some(format_execution_prompt_path_gateway());
+    }
     // planning_prompt.md before prompts-dir path / testing / skill (path-only asks).
     if looks_like_planning_prompt_path_request(content) {
         return Some(format_planning_prompt_path_gateway());
@@ -14325,6 +14503,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // execution_prompt.md before planning / prompts-dir / testing / skill path lanes.
+    if looks_like_execution_prompt_path_request(content) {
+        return Some(format_execution_prompt_path_gateway());
     }
     // planning_prompt.md before prompts-dir / testing / skill path lanes.
     if looks_like_planning_prompt_path_request(content) {
@@ -16064,6 +16246,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only execution_prompt.md path asks (v0.1.856) — config only; no dump/edit.
+    if looks_like_execution_prompt_path_request(question) {
         return true;
     }
     // Read-only planning_prompt.md path asks (v0.1.855) — config only; no dump/edit.
@@ -18685,6 +18871,64 @@ mod tests {
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
         assert!(!reply.to_lowercase().contains("rules file"));
+    }
+
+    #[test]
+    fn execution_prompt_path_request_detected() {
+        assert!(looks_like_execution_prompt_path_request("execution_prompt.md"));
+        assert!(looks_like_execution_prompt_path_request(
+            "where is execution_prompt.md"
+        ));
+        assert!(looks_like_execution_prompt_path_request(
+            "execution_prompt.md path"
+        ));
+        assert!(looks_like_execution_prompt_path_request(
+            "execution prompt path"
+        ));
+        assert!(looks_like_execution_prompt_path_request(
+            "execution prompt file path"
+        ));
+        assert!(looks_like_execution_prompt_path_request(
+            "where is the execution prompt"
+        ));
+        assert!(looks_like_execution_prompt_path_request("execution path"));
+        assert!(!looks_like_execution_prompt_path_request("prompts path"));
+        assert!(!looks_like_execution_prompt_path_request("prompt path"));
+        assert!(!looks_like_execution_prompt_path_request(
+            "planning prompt path"
+        ));
+        assert!(!looks_like_execution_prompt_path_request("edit execution prompt"));
+        assert!(!looks_like_execution_prompt_path_request("open execution prompt"));
+        assert!(!looks_like_execution_prompt_path_request("dump execution prompt"));
+        assert!(!looks_like_execution_prompt_path_request("execution prompt"));
+        assert!(!looks_like_execution_prompt_path_request("execution file"));
+        assert!(!looks_like_execution_prompt_path_request("agents path"));
+        assert!(!looks_like_execution_prompt_path_request("testing.md path"));
+        assert!(!looks_like_prompts_path_request("execution prompt path"));
+        assert!(!looks_like_prompts_path_request("execution_prompt.md"));
+        assert!(!looks_like_prompts_path_request(
+            "where is execution_prompt.md"
+        ));
+        assert!(!looks_like_planning_prompt_path_request(
+            "execution prompt path"
+        ));
+        assert!(!looks_like_testing_md_path_request("execution prompt path"));
+        let reply = try_operator_instant_reply("where is execution_prompt.md")
+            .expect("execution_prompt.md path instant");
+        assert!(reply.contains("Execution prompt"));
+        assert!(
+            reply.contains("execution_prompt.md") || reply.contains(".mac-stats")
+        );
+        assert!(reply.to_lowercase().contains("path only"));
+        assert!(!reply.to_lowercase().contains("prompts dir"));
+        // prompts/ directory lane still owns bare "prompts path".
+        let dir_reply =
+            try_operator_instant_reply("prompts path").expect("prompts dir still owns prompts path");
+        assert!(dir_reply.contains("Prompts dir"));
+        // planning lane still owns planning asks.
+        let plan_reply = try_operator_instant_reply("where is planning_prompt.md")
+            .expect("planning_prompt.md path still instant");
+        assert!(plan_reply.contains("Planning prompt"));
     }
 
     #[test]

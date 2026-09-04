@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.856] - 2026-09-04
+
+### Fixed
+- **Instant lane: execution_prompt.md path** — `execution_prompt.md`, `where is execution_prompt.md`, `execution prompt path`, `execution path`, and similar asks return `~/.mac-stats/agents/prompts/execution_prompt.md` without Ollama (Discord + AI Chat; path only — does not dump or edit execution text; does not steal `prompts path` / planning prompt / testing / agents path; bare `execution prompt` still goes to the model; p50 latency).
+
 ## [0.1.855] - 2026-09-04
 
 ### Fixed
