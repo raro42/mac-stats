@@ -14120,6 +14120,7 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
         return false;
     }
     // Tool / memory actions and how-tos stay with pre-route / agent / scrub / MCP.
+    // Vault path-only asks go to looks_like_ori_vault_path_request (not Ready).
     if n.starts_with("mcp:")
         || n.contains("mcp:")
         || n.contains("ori_")
@@ -14157,6 +14158,13 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains(" of ")
+        || ((n.contains("vault") || n.contains("ori-vault") || n.contains("orivault"))
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")))
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -14473,6 +14481,168 @@ pub fn format_ori_ready_chip() -> String {
     };
     format!(
         "**Ori** · {state} · {vault_part} · {orient} · {prefetch} · {capture} · `{bin_short}` · Settings Product"
+    )
+}
+
+/// True for short “where is the Ori vault / ORI_VAULT path…” asks.
+/// Config/env path only — does not list vault, call MCP, or return Ready/Off.
+pub fn looks_like_ori_vault_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n == "/ori"
+        || n == "/mnemos"
+        || n == "/ori-mnemos"
+        || n == "ori"
+        || n == "mnemos"
+        || n == "ori vault"
+        || n == "mnemos vault"
+        || n == "ori status"
+        || n == "ori ready"
+        || n == "ori health"
+        || n == "ori on"
+        || n == "ori off"
+        || n == "ori lifecycle"
+        || n == "mnemos status"
+        || n == "mnemos ready"
+        || (n.contains("ori_")
+            && !n.contains("ori_vault")
+            && !n.starts_with("ori_vault"))
+        || n.contains("mcp:")
+        || n.starts_with("mcp ")
+        || n.contains("memory_append")
+        || n.contains("memory append")
+        || n.contains("scrub memory")
+        || n.contains("agents path")
+        || n.contains("memory path")
+        || n.contains("memory.md")
+        || n.contains("notes path")
+        || n.contains("soul path")
+        || n.contains("session path")
+        || n.contains("improvements path")
+        || n.contains("config path")
+        || n.contains(".config.env")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("query")
+        || n.contains("orient")
+        || n.contains("prefetch")
+        || n.contains("capture")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("turn on")
+        || n.contains("turn off")
+        || n.contains("create")
+        || n.contains("edit")
+        || n.contains("write ")
+        || n.contains("dump")
+        || n.contains("scrub")
+        || n.contains("run ")
+        || n.contains("call ")
+        || n.contains("invoke")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let vault_ctx = n.contains("ori vault")
+        || n.contains("mnemos vault")
+        || n.contains("ori_vault")
+        || n.contains("ori-vault")
+        || n.contains("ori vault path")
+        || n.contains("mnemos vault path")
+        || n.contains("ori_vault path")
+        || n == "ori_vault"
+        || n == "ori-vault"
+        || n == "where is ori vault"
+        || n == "where is the ori vault"
+        || n == "where is mnemos vault"
+        || n == "where is the mnemos vault"
+        || n == "where is ori_vault"
+        || n == "where is orivault"
+        || (n.contains("ori")
+            && n.contains("vault")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")))
+        || (n.contains("mnemos")
+            && n.contains("vault")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")))
+        || ((n.contains("ori_vault") || n.contains("ori-vault") || n.contains("orivault"))
+            && (n.contains("path") || n.contains("where") || n.contains("location")));
+    if !vault_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir");
+    matches!(
+        n.as_str(),
+        "ori vault path"
+            | "ori vault folder"
+            | "ori vault directory"
+            | "ori vault dir"
+            | "ori vault location"
+            | "mnemos vault path"
+            | "mnemos vault folder"
+            | "mnemos vault directory"
+            | "mnemos vault location"
+            | "ori_vault path"
+            | "ori-vault path"
+            | "ori_vault"
+            | "ori-vault"
+            | "where is ori vault"
+            | "where is the ori vault"
+            | "where is mnemos vault"
+            | "where is the mnemos vault"
+            | "where is ori_vault"
+            | "where is the ori_vault"
+            | "where is ori-vault"
+            | "ori vault file path"
+            | "ori vault path location"
+    ) || (vault_ctx && pathish)
+}
+
+/// Zero-LLM Ori vault path (config/env only; no vault list / MCP / Ready chip).
+pub fn format_ori_vault_path_gateway() -> String {
+    use crate::config::Config;
+    let raw = Config::ori_vault_path_raw();
+    if raw.trim().is_empty() {
+        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · path only · does not list vault or call MCP · `/ori` for Ready / Off."
+            .to_string();
+    }
+    let display = match Config::expand_user_path_str(raw.trim()) {
+        Some(p) => p.display().to_string(),
+        None => raw.trim().to_string(),
+    };
+    format!(
+        "**Ori vault:** `{display}` · must contain `.ori` · path only · does not list vault or call MCP · `/ori` for Ready / Off · Settings Product."
     )
 }
 
@@ -14872,6 +15042,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
+    // Ori vault path before `/ori` Ready chip (path-only asks).
+    if looks_like_ori_vault_path_request(content) {
+        return Some(format_ori_vault_path_gateway());
+    }
     if looks_like_ori_ready_request(content) {
         return Some(format_ori_ready_chip());
     }
@@ -15206,6 +15380,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
+• `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; no list/MCP; does not steal `/ori` Ready)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; no transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
@@ -16726,6 +16901,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory.md curated file path asks (v0.1.858) — config only; no dump/edit.
     if looks_like_memory_md_path_request(question) {
+        return true;
+    }
+    // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
+    if looks_like_ori_vault_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -19640,6 +19819,34 @@ mod tests {
     }
 
     #[test]
+    fn ori_vault_path_request_detected() {
+        assert!(looks_like_ori_vault_path_request("ori vault path"));
+        assert!(looks_like_ori_vault_path_request("where is ori vault"));
+        assert!(looks_like_ori_vault_path_request("mnemos vault path"));
+        assert!(looks_like_ori_vault_path_request("ORI_VAULT path"));
+        assert!(looks_like_ori_vault_path_request("where is the ori vault"));
+        assert!(!looks_like_ori_vault_path_request("ori vault"));
+        assert!(!looks_like_ori_vault_path_request("/ori"));
+        assert!(!looks_like_ori_vault_path_request("ori"));
+        assert!(!looks_like_ori_vault_path_request("enable ori"));
+        assert!(!looks_like_ori_vault_path_request("ori_orient"));
+        assert!(!looks_like_ori_vault_path_request("scrub memory"));
+        assert!(!looks_like_ori_ready_request("ori vault path"));
+        assert!(!looks_like_ori_ready_request("where is ori vault"));
+        assert!(looks_like_ori_ready_request("ori vault"));
+        let reply =
+            try_operator_instant_reply("ori vault path").expect("ori vault path instant");
+        assert!(reply.contains("Ori vault"), "{reply}");
+        assert!(reply.to_lowercase().contains("path only"), "{reply}");
+        assert!(reply.contains("not set") || reply.contains('`'), "{reply}");
+        let ready = try_operator_instant_reply("ori vault").expect("ori vault Ready");
+        assert!(
+            ready.contains("Ready") || ready.contains("Partial") || ready.contains("Off"),
+            "{ready}"
+        );
+    }
+
+    #[test]
     fn screenshots_path_request_detected() {
         assert!(looks_like_screenshots_path_request("screenshot path"));
         assert!(looks_like_screenshots_path_request("screenshots path"));
@@ -21079,12 +21286,41 @@ mod tests {
         assert!(looks_like_ori_ready_request("is ori ready"));
         assert!(looks_like_ori_ready_request("how's mnemos"));
         assert!(looks_like_ori_ready_request("ori vault"));
+        assert!(!looks_like_ori_ready_request("ori vault path"));
+        assert!(!looks_like_ori_ready_request("where is ori vault"));
         assert!(!looks_like_ori_ready_request("ori_orient"));
         assert!(!looks_like_ori_ready_request("MCP: ori_query_ranked"));
         assert!(!looks_like_ori_ready_request("enable ori"));
         assert!(!looks_like_ori_ready_request("scrub memory"));
         assert!(!looks_like_ori_ready_request("memory append note"));
         assert!(!looks_like_ori_ready_request("how to use ori"));
+        assert!(looks_like_ori_vault_path_request("ori vault path"));
+        assert!(looks_like_ori_vault_path_request("where is ori vault"));
+        assert!(looks_like_ori_vault_path_request("mnemos vault path"));
+        assert!(looks_like_ori_vault_path_request("ORI_VAULT path"));
+        assert!(!looks_like_ori_vault_path_request("ori vault"));
+        assert!(!looks_like_ori_vault_path_request("/ori"));
+        assert!(!looks_like_ori_vault_path_request("ori"));
+        assert!(!looks_like_ori_vault_path_request("enable ori"));
+        assert!(!looks_like_ori_vault_path_request("ori_orient"));
+        assert!(!looks_like_ori_vault_path_request("scrub memory"));
+        let ori_path =
+            try_operator_instant_reply("ori vault path").expect("ori vault path instant");
+        assert!(ori_path.contains("Ori vault"), "{ori_path}");
+        assert!(ori_path.to_lowercase().contains("path only"), "{ori_path}");
+        assert!(
+            ori_path.contains("not set") || ori_path.contains('`'),
+            "{ori_path}"
+        );
+        // Ready chip still owns bare "ori vault".
+        let ori_vault_ready =
+            try_operator_instant_reply("ori vault").expect("ori vault still Ready");
+        assert!(
+            ori_vault_ready.contains("Ready")
+                || ori_vault_ready.contains("Partial")
+                || ori_vault_ready.contains("Off"),
+            "{ori_vault_ready}"
+        );
         let ori_chip = format_ori_ready_chip();
         assert!(ori_chip.to_lowercase().contains("ori"), "{ori_chip}");
         assert!(

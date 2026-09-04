@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.859] - 2026-09-04
+
+### Fixed
+- **Instant lane: Ori vault path** — `ori vault path`, `where is ori vault`, `mnemos vault path`, `ORI_VAULT path`, and similar asks return the configured Ori vault root (`ORI_VAULT` / `MAC_STATS_ORI_VAULT`) without Ollama (Discord + AI Chat; path only — does not list vault or call MCP; does not steal `/ori` / bare `ori vault` Ready; p50 latency).
+
 ## [0.1.858] - 2026-09-04
 
 ### Fixed

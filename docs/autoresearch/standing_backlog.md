@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.859** — Instant lane: Ori vault path (`ori vault path`, `where is ori vault`, `mnemos vault path`, `ORI_VAULT path`; config/env only; no list/MCP; does not steal `/ori` / bare `ori vault` Ready; p50 latency).
+
 - **v0.1.858** — Instant lane: memory.md path (`memory.md`, `where is memory.md`, `memory.md path`, `curated memory path`, `memory file path`; curated `agents/memory.md` only; config only; no dump/edit; does not steal `memory path` / notes folder / scrub / soul / agents path; p50 latency).
 
 - **v0.1.857** — Instant lane: agent.json path (`agent.json`, `where is agent.json`, `agent.json path`, `agent config path`; per-agent `agent-<id>/agent.json`; config only; no dump/edit; does not steal `agents path` / app `config path` / soul / skill / testing path; p50 latency).
