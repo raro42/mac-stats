@@ -3204,6 +3204,10 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("config env")
         || n.contains(".env.config")
         || n.contains("env.config")
+        // Per-agent agent.json has its own path lane (v0.1.857) — do not steal.
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
     {
         return false;
     }
@@ -3785,6 +3789,15 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
     }
     // Notes / memory / skills / prompts paths stay on their own lanes.
     if looks_like_memory_path_request(content) {
+        return false;
+    }
+    // Per-agent agent.json file path is its own lane (not the agents/ directory).
+    if n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n == "where is agent.json"
+        || n == "where is the agent.json"
+    {
         return false;
     }
     if n.contains("how many")
@@ -8683,6 +8696,8 @@ pub fn looks_like_testing_md_path_request(content: &str) -> bool {
         || n.contains("agents directory")
         || n.contains("agent directory")
         || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("agent config")
         || n.contains("prompts path")
         || n.contains("planning_prompt")
         || n.contains("planning prompt")
@@ -9167,6 +9182,194 @@ pub fn format_execution_prompt_path_gateway() -> String {
     )
 }
 
+/// True for short “where is agent.json / agent config path…” asks.
+/// Config path only — does not dump/edit agent.json or open Agent Ops Agents.
+/// Per-agent (`agent-<id>/agent.json`), not app `config.json` or the agents/ directory.
+pub fn looks_like_agent_json_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("agents directory")
+        || n.contains("agents dir")
+        || n.contains("agents location")
+        || n.contains("agents home")
+        || n == "agent path"
+        || n == "agent folder"
+        || n == "agent directory"
+        || n == "agent dir"
+        || n == "agent location"
+        || n == "agent home"
+        || n == "where are agents"
+        || n == "where do agents go"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skill file")
+        || n.contains("skills path")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("execution_prompt")
+        || n.contains("execution prompt")
+        || n.contains("prompts path")
+        || n.contains("plugins path")
+        || n.contains("tmp path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "config file"
+        || n == "config file path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agent_json_ctx = n.contains("agent.json")
+        || n.contains("agent-json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n == "where is agent.json"
+        || n == "where is the agent.json"
+        || n == "where is the agent config"
+        || n == "where is agent config"
+        || (n.contains("agent")
+            && n.contains("json")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")));
+    if !agent_json_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("agent.json")
+        || n.contains("json");
+    matches!(
+        n.as_str(),
+        "agent.json"
+            | "agent.json path"
+            | "agent.json file"
+            | "agent.json file path"
+            | "agent json path"
+            | "agent json file"
+            | "agent json file path"
+            | "agent config path"
+            | "agent config file"
+            | "agent config file path"
+            | "where is agent.json"
+            | "where is the agent.json"
+            | "where is agent.json file"
+            | "where is the agent.json file"
+            | "where is agent config"
+            | "where is the agent config"
+            | "where is agent config file"
+            | "where is the agent config file"
+            | "agent.json location"
+            | "agent config location"
+    ) || (agent_json_ctx && pathish)
+}
+
+/// Zero-LLM per-agent agent.json path (config only; no dump/edit).
+pub fn format_agent_json_path_gateway() -> String {
+    let display = crate::config::Config::agent_json_file_path_display();
+    format!(
+        "**Agent config:** `{display}` · per-agent name · model · enabled · tool limits · path only · does not dump or edit JSON · Agent Ops → Agents · `agents path` for the folder · `config path` for app config.json."
+    )
+}
+
 /// True for short “where is skill.md / skill file path…” asks.
 /// Config path only — does not dump/edit skill text or open Agent Ops Agents.
 /// Skill is per-agent (`agent-<id>/skill.md`), not the Hermes `skills/` directory.
@@ -9227,6 +9430,8 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
         || n.contains("agents directory")
         || n.contains("agent directory")
         || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("agent config")
         || n.contains("prompts path")
         || n.contains("plugins path")
         || n.contains("tmp path")
@@ -9421,6 +9626,8 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
         || n.contains("agents directory")
         || n.contains("agent directory")
         || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("agent config")
         || n.contains("prompts path")
         || n.contains("plugins path")
         || n.contains("tmp path")
@@ -9594,6 +9801,8 @@ pub fn looks_like_soul_path_request(content: &str) -> bool {
         || n.contains("agents directory")
         || n.contains("agent directory")
         || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("agent config")
         || n.contains("prompts path")
         || n.contains("plugins path")
         || n.contains("tmp path")
@@ -14410,6 +14619,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // agent.json before testing / skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
+    if looks_like_agent_json_path_request(content) {
+        return Some(format_agent_json_path_gateway());
+    }
     // execution_prompt.md before planning / prompts-dir path / testing / skill (path-only asks).
     if looks_like_execution_prompt_path_request(content) {
         return Some(format_execution_prompt_path_gateway());
@@ -14503,6 +14716,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // agent.json before testing / skill / mood / soul / agents-dir path lane.
+    if looks_like_agent_json_path_request(content) {
+        return Some(format_agent_json_path_gateway());
     }
     // execution_prompt.md before planning / prompts-dir / testing / skill path lanes.
     if looks_like_execution_prompt_path_request(content) {
@@ -16246,6 +16463,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only agent.json path asks (v0.1.857) — config only; no dump/edit.
+    if looks_like_agent_json_path_request(question) {
         return true;
     }
     // Read-only execution_prompt.md path asks (v0.1.856) — config only; no dump/edit.
@@ -18929,6 +19150,46 @@ mod tests {
         let plan_reply = try_operator_instant_reply("where is planning_prompt.md")
             .expect("planning_prompt.md path still instant");
         assert!(plan_reply.contains("Planning prompt"));
+    }
+
+    #[test]
+    fn agent_json_path_request_detected() {
+        assert!(looks_like_agent_json_path_request("agent.json"));
+        assert!(looks_like_agent_json_path_request("where is agent.json"));
+        assert!(looks_like_agent_json_path_request("agent.json path"));
+        assert!(looks_like_agent_json_path_request("agent config path"));
+        assert!(looks_like_agent_json_path_request("agent.json file path"));
+        assert!(looks_like_agent_json_path_request(
+            "where is the agent config"
+        ));
+        assert!(!looks_like_agent_json_path_request("agents path"));
+        assert!(!looks_like_agent_json_path_request("agent path"));
+        assert!(!looks_like_agent_json_path_request("config path"));
+        assert!(!looks_like_agent_json_path_request("config.json"));
+        assert!(!looks_like_agent_json_path_request("edit agent.json"));
+        assert!(!looks_like_agent_json_path_request("dump agent.json"));
+        assert!(!looks_like_agent_json_path_request("open agent.json"));
+        assert!(!looks_like_agent_json_path_request("soul path"));
+        assert!(!looks_like_agent_json_path_request("testing.md path"));
+        assert!(!looks_like_agents_path_request("agent.json"));
+        assert!(!looks_like_agents_path_request("agent.json path"));
+        assert!(!looks_like_agents_path_request("agent config path"));
+        assert!(!looks_like_config_path_request("agent.json path"));
+        assert!(!looks_like_config_path_request("agent config path"));
+        assert!(!looks_like_testing_md_path_request("agent.json path"));
+        let reply =
+            try_operator_instant_reply("where is agent.json").expect("agent.json path instant");
+        assert!(reply.contains("Agent config"));
+        assert!(reply.contains("agent.json") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("path only"));
+        // agents/ directory lane still owns bare "agents path".
+        let dir_reply =
+            try_operator_instant_reply("agents path").expect("agents dir still owns agents path");
+        assert!(dir_reply.contains("Agents dir"));
+        // app config.json lane still owns "config path".
+        let cfg_reply =
+            try_operator_instant_reply("config path").expect("config path still instant");
+        assert!(cfg_reply.to_lowercase().contains("config") || cfg_reply.contains("config.json"));
     }
 
     #[test]

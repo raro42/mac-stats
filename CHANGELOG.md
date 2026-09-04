@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.857] - 2026-09-04
+
+### Fixed
+- **Instant lane: agent.json path** — `agent.json`, `where is agent.json`, `agent.json path`, `agent config path`, and similar asks return `~/.mac-stats/agents/agent-<id>/agent.json` without Ollama (Discord + AI Chat; path only — per-agent name · model · enabled · tool limits; does not dump or edit JSON; does not steal `agents path` / app `config path` / soul / skill / testing path; p50 latency).
+
 ## [0.1.856] - 2026-09-04
 
 ### Fixed

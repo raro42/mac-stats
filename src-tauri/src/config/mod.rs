@@ -1969,6 +1969,16 @@ impl Config {
             .to_string()
     }
 
+    /// Display path for per-agent config: `$HOME/.mac-stats/agents/agent-<id>/agent.json`
+    /// Name, model, enabled, and tool limits live here — not the app `config.json`.
+    pub fn agent_json_file_path_display() -> String {
+        Self::agents_dir()
+            .join("agent-<id>")
+            .join("agent.json")
+            .display()
+            .to_string()
+    }
+
     /// Path to shared (global) memory: `$HOME/.mac-stats/agents/memory.md`
     /// Loaded into every agent's prompt. Contains lessons learned across all sessions.
     pub fn memory_file_path() -> PathBuf {
