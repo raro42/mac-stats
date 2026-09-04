@@ -4298,6 +4298,183 @@ pub fn format_session_memory_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the LaunchAgent / mac-stats.plist / harness plist…” asks.
+/// Config path only — does not load, unload, install, or edit plists.
+/// Does not steal overnight-improvements content asks or generic “improvements path”.
+pub fn looks_like_launchagent_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("improvements directory")
+        || n.contains("autoresearch path")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("what improved")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("coding session")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("session path")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("agents path")
+        || n.contains("memory path")
+        || n.contains("notes path")
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("install")
+        || n.contains("bootstrap")
+        || n.contains("kickstart")
+        || n.contains("bootout")
+        || n.contains("unload")
+        || n.contains("reload")
+        || n.contains("load ")
+        || n.starts_with("load ")
+        || n.contains("launchctl")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("dump")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("plist");
+    if matches!(
+        n.as_str(),
+        "launchagent path"
+            | "launch agent path"
+            | "launch-agent path"
+            | "launch_agent path"
+            | "launchagent plist"
+            | "launch agent plist"
+            | "launchagent file"
+            | "launch agent file"
+            | "launchagent location"
+            | "launch agent location"
+            | "plist path"
+            | "mac-stats plist"
+            | "mac stats plist"
+            | "mac-stats.plist"
+            | "mac_stats.plist"
+            | "com.raro42.mac-stats.plist"
+            | "com.raro42.mac-stats-overnight-harness.plist"
+            | "overnight harness plist"
+            | "overnight-harness plist"
+            | "harness plist"
+            | "harness launchagent"
+            | "harness launch agent"
+            | "harness launchagent path"
+            | "harness launch agent path"
+            | "overnight harness launchagent"
+            | "overnight harness launch agent"
+            | "where is launchagent"
+            | "where is the launchagent"
+            | "where is launch agent"
+            | "where is the launch agent"
+            | "where is the launchagent plist"
+            | "where is the launch agent plist"
+            | "where is mac-stats.plist"
+            | "where is the mac-stats plist"
+            | "where is the plist"
+            | "where are launchagents"
+            | "where are launch agents"
+            | "where do launchagents go"
+            | "where do launch agents go"
+    ) {
+        return true;
+    }
+    let la_ctx = n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains("launch-agent")
+        || n.contains("launch_agent")
+        || n.contains("com.raro42.mac-stats.plist")
+        || n.contains("com.raro42.mac-stats-overnight-harness.plist")
+        || n.contains("mac-stats.plist")
+        || n.contains("mac_stats.plist")
+        || n.contains("overnight-harness.plist")
+        || n.contains("overnight harness plist")
+        || n.contains("harness plist")
+        || n.contains("harness launchagent")
+        || n.contains("harness launch agent")
+        || (n.contains("plist")
+            && (n.contains("mac-stats")
+                || n.contains("mac stats")
+                || n.contains("keepalive")
+                || n.contains("keep alive")
+                || n.contains("launchd")
+                || n.contains("harness")
+                || n.contains("overnight")
+                || n.contains("launchagent")
+                || n.contains("launch agent")));
+    la_ctx && pathish
+}
+
+/// Zero-LLM LaunchAgent plist paths (config only; no load/unload/edit).
+pub fn format_launchagent_path_gateway() -> String {
+    let app = crate::config::Config::mac_stats_launch_agent_plist()
+        .display()
+        .to_string();
+    let harness = crate::config::Config::overnight_harness_launch_agent_plist()
+        .display()
+        .to_string();
+    format!(
+        "**LaunchAgents:** `{app}` · app KeepAlive · overnight harness: `{harness}` · path only · does not load or unload."
+    )
+}
+
 /// True for short “where is the session folder / session path…” asks.
 /// Config path only — does not list, resume, open, or delete sessions.
 pub fn looks_like_session_path_request(content: &str) -> bool {
@@ -15809,6 +15986,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_memory_path_request(content) {
         return Some(format_session_memory_path_gateway());
     }
+    // LaunchAgent plist paths before overnight-improvements content asks (path-only).
+    if looks_like_launchagent_path_request(content) {
+        return Some(format_launchagent_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -15956,6 +16137,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // Session-memory-*.md path before notes-folder / session-dir path.
     if looks_like_session_memory_path_request(content) {
         return Some(format_session_memory_path_gateway());
+    }
+    // LaunchAgent plist paths (path-only; no load/unload).
+    if looks_like_launchagent_path_request(content) {
+        return Some(format_launchagent_path_gateway());
     }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
@@ -16200,6 +16385,7 @@ pub fn format_ops_help_gateway() -> String {
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
+• `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
@@ -17705,6 +17891,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session-memory-*.md path asks (v0.1.863) — config only; no list/dump.
     if looks_like_session_memory_path_request(question) {
+        return true;
+    }
+    // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
+    if looks_like_launchagent_path_request(question) {
         return true;
     }
     // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
@@ -20954,6 +21144,32 @@ mod tests {
             .expect("session memory path instant");
         assert!(reply.contains("Session memory"));
         assert!(reply.contains("session-memory") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn launchagent_path_request_detected() {
+        assert!(looks_like_launchagent_path_request("launchagent path"));
+        assert!(looks_like_launchagent_path_request("launch agent path"));
+        assert!(looks_like_launchagent_path_request("where is launchagent"));
+        assert!(looks_like_launchagent_path_request("where is the launch agent"));
+        assert!(looks_like_launchagent_path_request("mac-stats.plist"));
+        assert!(looks_like_launchagent_path_request("com.raro42.mac-stats.plist"));
+        assert!(looks_like_launchagent_path_request("harness plist"));
+        assert!(looks_like_launchagent_path_request("overnight harness plist"));
+        assert!(looks_like_launchagent_path_request("where is the launchagent plist"));
+        assert!(!looks_like_launchagent_path_request("improvements path"));
+        assert!(!looks_like_launchagent_path_request("any improvements from last night"));
+        assert!(!looks_like_launchagent_path_request("install launchagent"));
+        assert!(!looks_like_launchagent_path_request("launchctl unload"));
+        assert!(!looks_like_launchagent_path_request("load the launchagent"));
+        assert!(!looks_like_launchagent_path_request("session path"));
+        assert!(!looks_like_launchagent_path_request("config path"));
+        assert!(!looks_like_improvements_path_request("launchagent path"));
+        let reply =
+            try_operator_instant_reply("launchagent path").expect("launchagent path instant");
+        assert!(reply.contains("LaunchAgents"));
+        assert!(reply.contains("com.raro42.mac-stats.plist"));
+        assert!(reply.contains("overnight-harness"));
     }
 
     #[test]

@@ -1692,6 +1692,26 @@ impl Config {
         }
     }
 
+    /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
+    pub fn launch_agents_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join("Library").join("LaunchAgents")
+        } else {
+            std::env::temp_dir().join("LaunchAgents")
+        }
+    }
+
+    /// App KeepAlive plist: `~/Library/LaunchAgents/com.raro42.mac-stats.plist`.
+    pub fn mac_stats_launch_agent_plist() -> PathBuf {
+        Self::launch_agents_dir().join("com.raro42.mac-stats.plist")
+    }
+
+    /// Overnight harness KeepAlive plist:
+    /// `~/Library/LaunchAgents/com.raro42.mac-stats-overnight-harness.plist`.
+    pub fn overnight_harness_launch_agent_plist() -> PathBuf {
+        Self::launch_agents_dir().join("com.raro42.mac-stats-overnight-harness.plist")
+    }
+
     /// Delete screenshot files whose filename starts with `YYYYMMDD_HHMMSS` when that timestamp is older than this many days.
     /// **`0` disables** age-based pruning. Default: **7**. Config: `config.json` `screenshotPruneMaxAgeDays`.
     /// Env: `MAC_STATS_SCREENSHOT_PRUNE_MAX_AGE_DAYS` (clamped to `0..=3650`).

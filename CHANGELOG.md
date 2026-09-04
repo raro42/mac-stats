@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.864] - 2026-09-05
+
+### Fixed
+- **Instant lane: LaunchAgent plist path** — `launchagent path`, `where is launchagent`, `mac-stats.plist`, `harness plist`, and similar asks return `~/Library/LaunchAgents/com.raro42.mac-stats.plist` plus the overnight harness plist without Ollama (Discord + AI Chat; path only — does not load or unload; does not steal overnight-improvements asks / `improvements path`; p50 latency).
+
 ## [0.1.863] - 2026-09-05
 
 ### Fixed
