@@ -1,29 +1,27 @@
 # Morning surprise — 2026-09-04
 
-Overnight autoresearch (Track B) for Ralf.
+Overnight Track B (20:00–06:00) for Ralf.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.851** | Instant lane: **soul.md path** — `soul path` / `where is soul.md` / `soul file path` return `~/.mac-stats/agents/soul.md` without Ollama (path only; no dump/edit; does not steal `/agents` / agents dir / memory / mood). |
-| **v0.1.850** | Instant lane: downloads-organizer-state.json path |
-| **v0.1.849** | Instant lane: downloads-organizer-rules.md path |
-| **v0.1.848** | Instant lane: cookie_reject_patterns.md path |
-| **v0.1.847** | Instant lane: session_reset_phrases.md path |
-| **v0.1.846** | Instant lane: escalation_patterns.md path |
-| **v0.1.845** | Instant lane: credential_accounts.json path |
-| **v0.1.844** | Disk Cleanup Filter attention glance |
-| **v0.1.843** | Monitors Filter attention glance |
-| **v0.1.842** | Top Processes Filter attention glance |
+| **v0.1.852** | Instant lane: **mood.md path** — `mood path`, `where is mood.md`, `mood file path` → `~/.mac-stats/agents/agent-<id>/mood.md` (per-agent; not shared like soul.md; path only; Discord + AI Chat; p50). |
+| **v0.1.851** | Instant lane: **soul.md path** — shared `~/.mac-stats/agents/soul.md` without Ollama. |
+| **v0.1.850** | Instant lane: **downloads-organizer-state.json path**. |
+| **v0.1.849** | Instant lane: **downloads-organizer-rules.md path**. |
+| **v0.1.848** | Instant lane: **cookie_reject_patterns.md path**. |
+| **v0.1.847** | Instant lane: **session_reset_phrases.md path**. |
+| **v0.1.846** | Instant lane: **escalation_patterns.md path**. |
+| **v0.1.845** | Instant lane: **credential_accounts.json path**. |
 
-## Digester / fuel
+## Context
 
-- Digester **open**: empty (Elmasnow weather already stale/shipped).
-- Design review: due=false (grace); recommended `feature-ai-chat`.
-- Fuel this tick: standing backlog p50 — soul.md path instant.
-- `debug.log`: no ERROR/WARN/panic clusters in 180m window.
+- Digester **open** stayed empty (Elmasnow weather already stale/shipped).
+- Design review in **grace** (`feature-ai-chat` ~20.6d recommended when TCC allows).
+- Fuel: standing backlog p50 path lanes.
+- Latest keep: **v0.1.852** @ `3d4fc76b`.
 
-## Tried / next
+## Next
 
-- Next: mood.md path, alerts config path, or design-review screenshot when TCC allows.
+- More path lanes (skill.md per-agent, alerts config, planning/execution prompts) or design-review screenshot when TCC allows.
