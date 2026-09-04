@@ -3563,6 +3563,19 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
+    // Dedicated memory.md file lane (v0.1.858) — do not steal curated-file asks.
+    if n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n == "memory file"
+        || n == "memory file path"
+        || n == "where is memory file"
+        || n == "where is the memory file"
+        || n == "memory md"
+        || n == "memory md path"
+    {
+        return false;
+    }
     // Do not steal scrub / MEMORY: / dump-saved / curated append.
     if looks_like_memory_scrub_request(content) {
         return false;
@@ -3672,7 +3685,212 @@ pub fn format_memory_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean."
+        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `memory.md path` for curated file only."
+    )
+}
+
+/// True for short “where is memory.md / memory file path…” asks.
+/// Config path only — does not dump/edit curated memory or open notes.
+/// Shared curated file (`agents/memory.md`), not the notes/ folder or Discord channel memories.
+pub fn looks_like_memory_md_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("notes location")
+        || n == "memory path"
+        || n == "memory folder"
+        || n == "memory directory"
+        || n == "memory dir"
+        || n == "memory notes path"
+        || n == "memory notes folder"
+        || n == "where are notes"
+        || n == "where do notes go"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skill file")
+        || n.contains("skills path")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("execution_prompt")
+        || n.contains("execution prompt")
+        || n.contains("prompts path")
+        || n.contains("plugins path")
+        || n.contains("tmp path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+        || n == "/ori"
+        || n == "ori"
+        || n == "mnemos"
+    {
+        return false;
+    }
+    if looks_like_memory_scrub_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("saved note")
+        || n.contains("save ")
+        || n.contains("memory:")
+        || n.contains("memory_")
+        || n.contains("note:")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mem_md_ctx = n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("memory file")
+        || n == "memory md"
+        || n == "memory md path"
+        || n == "where is memory.md"
+        || n == "where is the memory.md"
+        || n == "where is memory file"
+        || n == "where is the memory file"
+        || (n.contains("memory")
+            && n.contains("md")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")));
+    if !mem_md_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("memory.md");
+    matches!(
+        n.as_str(),
+        "memory.md"
+            | "memory.md path"
+            | "memory.md file"
+            | "memory.md file path"
+            | "memory md"
+            | "memory md path"
+            | "memory file"
+            | "memory file path"
+            | "curated memory path"
+            | "curated memory file"
+            | "curated memory file path"
+            | "where is memory.md"
+            | "where is the memory.md"
+            | "where is memory.md file"
+            | "where is the memory.md file"
+            | "where is memory file"
+            | "where is the memory file"
+            | "where is curated memory"
+            | "where is the curated memory"
+            | "memory.md location"
+            | "curated memory location"
+    ) || (mem_md_ctx && pathish)
+}
+
+/// Zero-LLM curated memory.md path (config only; no dump/edit/scrub).
+pub fn format_memory_md_path_gateway() -> String {
+    let display = crate::config::Config::memory_file_path()
+        .display()
+        .to_string();
+    format!(
+        "**Curated memory:** `{display}` · shared lessons across agents · path only · does not dump or edit · `memory path` / `notes path` for the notes folder · `scrub memory` to clean."
     )
 }
 
@@ -14647,6 +14865,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
     }
+    // memory.md curated file before notes-folder memory path (path-only asks).
+    if looks_like_memory_md_path_request(content) {
+        return Some(format_memory_md_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -14745,6 +14967,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
     }
+    // memory.md curated file before notes-folder memory path lane.
+    if looks_like_memory_md_path_request(content) {
+        return Some(format_memory_md_path_gateway());
+    }
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
@@ -14766,6 +14992,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_task_path_request(content) {
         return Some(format_task_path_gateway());
+    }
+    // memory.md curated file before notes-folder combo path.
+    if looks_like_memory_md_path_request(content) {
+        return Some(format_memory_md_path_gateway());
     }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
@@ -15006,6 +15236,7 @@ pub fn format_ops_help_gateway() -> String {
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
+• `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
@@ -16491,6 +16722,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
     if looks_like_soul_path_request(question) {
+        return true;
+    }
+    // Read-only memory.md curated file path asks (v0.1.858) — config only; no dump/edit.
+    if looks_like_memory_md_path_request(question) {
         return true;
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
@@ -19368,6 +19603,40 @@ mod tests {
         assert!(reply.contains("soul.md") || reply.contains(".mac-stats"));
         assert!(!reply.to_lowercase().contains("agents dir"));
         assert!(reply.to_lowercase().contains("path only"));
+    }
+
+    #[test]
+    fn memory_md_path_request_detected() {
+        assert!(looks_like_memory_md_path_request("memory.md"));
+        assert!(looks_like_memory_md_path_request("where is memory.md"));
+        assert!(looks_like_memory_md_path_request("memory.md path"));
+        assert!(looks_like_memory_md_path_request("memory file path"));
+        assert!(looks_like_memory_md_path_request("curated memory path"));
+        assert!(looks_like_memory_md_path_request("where is the memory file"));
+        assert!(!looks_like_memory_md_path_request("memory path"));
+        assert!(!looks_like_memory_md_path_request("notes path"));
+        assert!(!looks_like_memory_md_path_request("notes folder"));
+        assert!(!looks_like_memory_md_path_request("scrub memory"));
+        assert!(!looks_like_memory_md_path_request("dump memory"));
+        assert!(!looks_like_memory_md_path_request("edit memory.md"));
+        assert!(!looks_like_memory_md_path_request("soul path"));
+        assert!(!looks_like_memory_md_path_request("agents path"));
+        assert!(!looks_like_memory_path_request("memory.md"));
+        assert!(!looks_like_memory_path_request("where is memory.md"));
+        assert!(!looks_like_memory_path_request("memory.md path"));
+        assert!(!looks_like_soul_path_request("memory.md path"));
+        assert!(!looks_like_agents_path_request("memory.md path"));
+        let reply =
+            try_operator_instant_reply("where is memory.md").expect("memory.md path instant");
+        assert!(reply.contains("Curated memory"));
+        assert!(reply.contains("memory.md") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("path only"));
+        assert!(!reply.to_lowercase().contains("notes `"));
+        // notes/folder lane still owns bare "memory path".
+        let dir_reply =
+            try_operator_instant_reply("memory path").expect("memory path still instant");
+        assert!(dir_reply.contains("Memory"));
+        assert!(dir_reply.contains("notes") || dir_reply.contains("memory.md"));
     }
 
     #[test]

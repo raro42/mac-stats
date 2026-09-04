@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.858] - 2026-09-04
+
+### Fixed
+- **Instant lane: memory.md path** — `memory.md`, `where is memory.md`, `memory.md path`, `curated memory path`, `memory file path`, and similar asks return `~/.mac-stats/agents/memory.md` without Ollama (Discord + AI Chat; path only — curated shared lessons; does not dump or edit; does not steal `memory path` / `notes path` / scrub / soul / agents path; p50 latency).
+
 ## [0.1.857] - 2026-09-04
 
 ### Fixed
