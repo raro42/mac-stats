@@ -6,6 +6,7 @@ Overnight Track B kept shipping instant-lane path wins for operator latency.
 
 | Version | What |
 |---------|------|
+| **v0.1.864** | Instant lane: **LaunchAgent plist path** — `launchagent path`, `where is launchagent`, `mac-stats.plist`, `harness plist` → `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (no Ollama; no load/unload; does not steal overnight-improvements asks) |
 | **v0.1.863** | Instant lane: **session-memory path** — `session memory path`, `where is session memory`, `session-memory path` → `session/session-memory-<id>-<ts>-<topic>.md` (no Ollama; no list/dump; does not steal session dir / `/sessions`) |
 | **v0.1.862** | Instant lane: Discord channel memory path (`memory-discord-<id>.md`) |
 | **v0.1.861** | Instant lane: before-compaction transcript path |
@@ -13,7 +14,7 @@ Overnight Track B kept shipping instant-lane path wins for operator latency.
 
 ## Why it matters
 
-Path-only asks used to fall through to Ollama (or the wrong folder lane). Session-memory files live under `~/.mac-stats/session/` with a fixed name pattern; operators can now get that path in the instant lane.
+Path-only asks used to fall through to Ollama (or the wrong folder lane). Operators can now get KeepAlive LaunchAgent plist paths and session-memory file patterns in the instant lane.
 
 ## Digester / design review
 
@@ -22,4 +23,4 @@ Path-only asks used to fall through to Ollama (or the wrong folder lane). Sessio
 
 ## Next
 
-LaunchAgent plist path, Agent Ops filter attention glances, or digester open when present.
+Non-path operator latency wins, Agent Ops filter attention glances, or digester open when present.
