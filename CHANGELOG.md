@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.863] - 2026-09-05
+
+### Fixed
+- **Instant lane: session-memory path** — `session memory path`, `where is session memory`, `session-memory path`, and similar asks return `session/session-memory-<id>-<timestamp>-<topic>.md` without Ollama (Discord + AI Chat; path only — does not list or dump; does not steal `session path` / `/sessions` / discord memory / notes folder; p50 latency).
+
 ## [0.1.862] - 2026-09-04
 
 ### Fixed

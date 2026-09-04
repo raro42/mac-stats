@@ -3565,6 +3565,7 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
     }
     // Dedicated memory.md file lane (v0.1.858) — do not steal curated-file asks.
     // Dedicated Discord channel memory lane (v0.1.862) — do not steal memory-discord path asks.
+    // Dedicated session-memory file lane (v0.1.863) — do not steal session-memory-*.md path asks.
     if n.contains("memory.md")
         || n.contains("memory-md")
         || n.contains("curated memory")
@@ -3575,6 +3576,9 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
         || n.contains("channel memory")
         || n.contains("channel memories")
         || n.contains("discord channel memory")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
         || n == "memory file"
         || n == "memory file path"
         || n == "where is memory file"
@@ -4102,6 +4106,198 @@ pub fn format_discord_memory_path_gateway() -> String {
     )
 }
 
+/// True for short “where is session memory / session-memory path…” asks.
+/// Config path only — does not list, dump, resume, or prune session-memory-*.md files.
+/// Does not steal `session path` (directory) or `/sessions` Live/Files.
+pub fn looks_like_session_memory_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact `/sessions` catalog asks stay on the Live/Files lane.
+    if matches!(
+        n.as_str(),
+        "/sessions"
+            | "/sessions live"
+            | "/sessions files"
+            | "sessions"
+            | "live sessions"
+            | "session files"
+            | "list sessions"
+            | "sessions list"
+            | "sessions live"
+            | "sessions files"
+    ) {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("session reset")
+        || n.contains("session-reset")
+        || n.contains("session_reset")
+        || n.contains("reset phrases")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n == "memory path"
+        || n == "memory folder"
+        || n == "memory directory"
+        || n == "memory dir"
+        || n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n == "session path"
+        || n == "sessions path"
+        || n == "session folder"
+        || n == "sessions folder"
+        || n == "session directory"
+        || n == "sessions directory"
+        || n == "session dir"
+        || n == "sessions dir"
+        || n == "where is session folder"
+        || n == "where is the session folder"
+        || n == "where is sessions folder"
+        || n == "where is the sessions folder"
+        || n == "where is session directory"
+        || n == "where is the session directory"
+        || n == "where are sessions"
+        || n == "where do sessions go"
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("agents directory")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("resume")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("compact")
+        || n.contains("reset")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("saved note")
+        || n.contains("save ")
+        || n.contains("memory:")
+        || n.contains("note:")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let sm_ctx = n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("sessionmemory")
+        || n.contains("session memory")
+        || (n.contains("session")
+            && n.contains("memory")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("file")
+                || n.contains("md")));
+    if !sm_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("session-memory")
+        || n.contains("session_memory");
+    matches!(
+        n.as_str(),
+        "session memory path"
+            | "session-memory path"
+            | "session_memory path"
+            | "session memory file"
+            | "session memory file path"
+            | "session-memory file"
+            | "session-memory file path"
+            | "session memory folder"
+            | "session memory location"
+            | "session-memory"
+            | "session-memory.md"
+            | "where is session memory"
+            | "where is the session memory"
+            | "where is session memory file"
+            | "where is the session memory file"
+            | "where are session memory files"
+            | "where is session-memory"
+            | "where is the session-memory"
+            | "where is session-memory.md"
+            | "where are session-memory files"
+            | "where do session memories go"
+            | "where do session-memory files go"
+    ) || (sm_ctx && pathish)
+}
+
+/// Zero-LLM session-memory file path pattern (config only; no list/dump/prune).
+pub fn format_session_memory_path_gateway() -> String {
+    let dir = crate::config::Config::session_dir().display().to_string();
+    format!(
+        "**Session memory files:** `{dir}/session-memory-<id>-<timestamp>-<topic>.md` · under session/ · path only · does not list or dump · `session path` for the folder · `/sessions` for Live/Files."
+    )
+}
+
 /// True for short “where is the session folder / session path…” asks.
 /// Config path only — does not list, resume, open, or delete sessions.
 pub fn looks_like_session_path_request(content: &str) -> bool {
@@ -4111,6 +4307,13 @@ pub fn looks_like_session_path_request(content: &str) -> bool {
     }
     // Do not steal `/sessions` Live/Files catalog or inventory counts.
     if looks_like_sessions_request(content) {
+        return false;
+    }
+    // Dedicated session-memory-*.md file lane (v0.1.863) — directory asks stay here.
+    if n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+    {
         return false;
     }
     if n.contains("how many")
@@ -15602,6 +15805,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_discord_memory_path_request(content) {
         return Some(format_discord_memory_path_gateway());
     }
+    // Session-memory-*.md path before notes-folder / session-dir path (path-only asks).
+    if looks_like_session_memory_path_request(content) {
+        return Some(format_session_memory_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -15745,6 +15952,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // Discord channel memory path before notes-folder / Knowledge list.
     if looks_like_discord_memory_path_request(content) {
         return Some(format_discord_memory_path_gateway());
+    }
+    // Session-memory-*.md path before notes-folder / session-dir path.
+    if looks_like_session_memory_path_request(content) {
+        return Some(format_session_memory_path_gateway());
     }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
@@ -15988,6 +16199,7 @@ pub fn format_ops_help_gateway() -> String {
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
+• `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
@@ -17489,6 +17701,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only Discord channel memory path asks (v0.1.862) — config only; no list/dump.
     if looks_like_discord_memory_path_request(question) {
+        return true;
+    }
+    // Read-only session-memory-*.md path asks (v0.1.863) — config only; no list/dump.
+    if looks_like_session_memory_path_request(question) {
         return true;
     }
     // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
@@ -20688,11 +20904,56 @@ mod tests {
         assert!(!looks_like_session_path_request("resume this session"));
         assert!(!looks_like_session_path_request("where is config"));
         assert!(!looks_like_session_path_request("memory path"));
+        assert!(!looks_like_session_path_request("session memory path"));
+        assert!(!looks_like_session_path_request("session-memory path"));
         assert!(!looks_like_sessions_request("session path"));
         let reply =
             try_operator_instant_reply("where is the session folder").expect("session path instant");
         assert!(reply.contains("Sessions"));
         assert!(reply.contains("session") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn session_memory_path_request_detected() {
+        assert!(looks_like_session_memory_path_request("session memory path"));
+        assert!(looks_like_session_memory_path_request("session-memory path"));
+        assert!(looks_like_session_memory_path_request("session_memory path"));
+        assert!(looks_like_session_memory_path_request(
+            "where is session memory"
+        ));
+        assert!(looks_like_session_memory_path_request(
+            "where is the session memory"
+        ));
+        assert!(looks_like_session_memory_path_request(
+            "where is session-memory"
+        ));
+        assert!(looks_like_session_memory_path_request(
+            "session memory file path"
+        ));
+        assert!(looks_like_session_memory_path_request(
+            "where are session-memory files"
+        ));
+        assert!(!looks_like_session_memory_path_request("session path"));
+        assert!(!looks_like_session_memory_path_request("session folder"));
+        assert!(!looks_like_session_memory_path_request("/sessions"));
+        assert!(!looks_like_session_memory_path_request("list sessions"));
+        assert!(!looks_like_session_memory_path_request("dump session memory"));
+        assert!(!looks_like_session_memory_path_request("list session memory"));
+        assert!(!looks_like_session_memory_path_request("discord memory path"));
+        assert!(!looks_like_session_memory_path_request("memory.md path"));
+        assert!(!looks_like_session_memory_path_request("memory path"));
+        assert!(!looks_like_session_memory_path_request(
+            "session reset phrases path"
+        ));
+        assert!(!looks_like_session_memory_path_request(
+            "before reset transcript path"
+        ));
+        assert!(!looks_like_memory_path_request("session memory path"));
+        assert!(!looks_like_session_path_request("session memory path"));
+        let reply = try_operator_instant_reply("session memory path")
+            .expect("session memory path instant");
+        assert!(reply.contains("Session memory"));
+        assert!(reply.contains("session-memory") || reply.contains(".mac-stats"));
     }
 
     #[test]

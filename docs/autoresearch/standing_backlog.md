@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.863** — Instant lane: session-memory path (`session memory path`, `where is session memory`, `session-memory path`; `session/session-memory-<id>-<ts>-<topic>.md`; config only; no list/dump; does not steal `session path` / `/sessions` / discord memory / notes folder; p50 latency).
+
 - **v0.1.862** — Instant lane: Discord channel memory path (`discord memory path`, `where is discord memory`, `memory-discord path`, `channel memory path`; agents/`memory-discord-<channelId>.md`; config only; no list/dump; does not steal bare `discord memory` / `/knowledge discord` / `memory.md` / notes folder; p50 latency).
 
 - **v0.1.861** — Instant lane: before-compaction transcript path (`before compaction transcript path`, `where is before compaction transcript`, `last_session_before_compaction.jsonl`; config/env or default under agents/; no dump/hook; does not steal before-reset / session reset phrases / session dir; p50 latency).
