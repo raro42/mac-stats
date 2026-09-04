@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.855] - 2026-09-04
+
+### Fixed
+- **Instant lane: planning_prompt.md path** — `planning_prompt.md`, `where is planning_prompt.md`, `planning prompt path`, `planning path`, and similar asks return `~/.mac-stats/agents/prompts/planning_prompt.md` without Ollama (Discord + AI Chat; path only — does not dump or edit planning text; does not steal `prompts path` / execution prompt / testing / agents path; bare `planning prompt` still goes to the model; p50 latency).
+
 ## [0.1.854] - 2026-09-04
 
 ### Fixed

@@ -4190,6 +4190,8 @@ pub fn looks_like_prompts_path_request(content: &str) -> bool {
         || n.contains("update ")
         || n.contains("planning prompt")
         || n.contains("execution prompt")
+        || n.contains("planning_prompt")
+        || n.contains("execution_prompt")
         || n.contains("system prompt")
         || n.chars().any(|c| c.is_ascii_digit())
     {
@@ -8682,6 +8684,10 @@ pub fn looks_like_testing_md_path_request(content: &str) -> bool {
         || n.contains("agent directory")
         || n.contains("agents dir")
         || n.contains("prompts path")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("execution_prompt")
+        || n.contains("execution prompt")
         || n.contains("plugins path")
         || n.contains("tmp path")
         || n.contains("config.json")
@@ -8813,6 +8819,177 @@ pub fn format_testing_md_path_gateway() -> String {
     let display = crate::config::Config::testing_file_path_display();
     format!(
         "**Testing file:** `{display}` · per-agent test prompts (`mac_stats agent test`) · path only · does not dump or edit testing text · Agent Ops → Agents for content."
+    )
+}
+
+/// True for short “where is planning_prompt.md / planning prompt path…” asks.
+/// Config path only — does not dump/edit planning text or open the prompts directory list.
+pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("execution_prompt")
+        || n.contains("execution prompt")
+        || n.contains("system prompt")
+        || n.contains("prompts path")
+        || n.contains("prompts folder")
+        || n.contains("prompts directory")
+        || n.contains("prompts dir")
+        || n.contains("prompt folder")
+        || n.contains("prompt directory")
+        || n.contains("prompt dir")
+        || n == "prompt path"
+        || n == "prompts path"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skill file")
+        || n.contains("testing.md")
+        || n.contains("testing path")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent.json")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let planning_ctx = n.contains("planning_prompt.md")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("planning file")
+        || n.contains("planning md")
+        || n == "planning"
+        || n == "where is planning"
+        || n == "where is the planning"
+        || n == "where is planning_prompt.md"
+        || n == "where is the planning_prompt.md"
+        || n == "where is the planning prompt"
+        || n == "where is planning prompt"
+        || n == "where is the planning file"
+        || n == "where is planning file"
+        || (n.contains("planning")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("md")
+                || n.contains("prompt")));
+    if !planning_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("planning_prompt.md")
+        || (n.contains("file") && (n.contains("path") || n.contains("where")))
+        || (n.contains("md") && (n.contains("path") || n.contains("where") || n.contains("planning_prompt")));
+    matches!(
+        n.as_str(),
+        "planning_prompt.md"
+            | "planning_prompt.md path"
+            | "planning_prompt path"
+            | "planning prompt path"
+            | "planning prompt file path"
+            | "planning file path"
+            | "planning md path"
+            | "planning path"
+            | "where is planning"
+            | "where is the planning"
+            | "where is planning_prompt.md"
+            | "where is the planning_prompt.md"
+            | "where is planning prompt"
+            | "where is the planning prompt"
+            | "where is planning file"
+            | "where is the planning file"
+            | "where is the planning_prompt.md file"
+            | "where is planning_prompt"
+            | "where is the planning_prompt"
+            | "planning_prompt location"
+            | "planning prompt location"
+    ) || (planning_ctx && pathish)
+}
+
+/// Zero-LLM planning_prompt.md path (config only; no dump/edit).
+pub fn format_planning_prompt_path_gateway() -> String {
+    let display = crate::config::Config::planning_prompt_path().display().to_string();
+    format!(
+        "**Planning prompt:** `{display}` · agent-router planning step · path only · does not dump or edit prompt text · `prompts path` for the folder."
     )
 }
 
@@ -14059,6 +14236,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // planning_prompt.md before prompts-dir path / testing / skill (path-only asks).
+    if looks_like_planning_prompt_path_request(content) {
+        return Some(format_planning_prompt_path_gateway());
+    }
     // testing.md before skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_testing_md_path_request(content) {
         return Some(format_testing_md_path_gateway());
@@ -14144,6 +14325,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // planning_prompt.md before prompts-dir / testing / skill path lanes.
+    if looks_like_planning_prompt_path_request(content) {
+        return Some(format_planning_prompt_path_gateway());
     }
     // testing.md before skill / mood / soul / agents-dir path lane.
     if looks_like_testing_md_path_request(content) {
@@ -15879,6 +16064,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only planning_prompt.md path asks (v0.1.855) — config only; no dump/edit.
+    if looks_like_planning_prompt_path_request(question) {
         return true;
     }
     // Read-only testing.md path asks (v0.1.854) — config only; no dump/edit/run.
@@ -18496,6 +18685,57 @@ mod tests {
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
         assert!(!reply.to_lowercase().contains("rules file"));
+    }
+
+    #[test]
+    fn planning_prompt_path_request_detected() {
+        assert!(looks_like_planning_prompt_path_request("planning_prompt.md"));
+        assert!(looks_like_planning_prompt_path_request(
+            "where is planning_prompt.md"
+        ));
+        assert!(looks_like_planning_prompt_path_request(
+            "planning_prompt.md path"
+        ));
+        assert!(looks_like_planning_prompt_path_request(
+            "planning prompt path"
+        ));
+        assert!(looks_like_planning_prompt_path_request(
+            "planning prompt file path"
+        ));
+        assert!(looks_like_planning_prompt_path_request(
+            "where is the planning prompt"
+        ));
+        assert!(looks_like_planning_prompt_path_request("planning path"));
+        assert!(!looks_like_planning_prompt_path_request("prompts path"));
+        assert!(!looks_like_planning_prompt_path_request("prompt path"));
+        assert!(!looks_like_planning_prompt_path_request(
+            "execution prompt path"
+        ));
+        assert!(!looks_like_planning_prompt_path_request("edit planning prompt"));
+        assert!(!looks_like_planning_prompt_path_request("open planning prompt"));
+        assert!(!looks_like_planning_prompt_path_request("dump planning prompt"));
+        assert!(!looks_like_planning_prompt_path_request("planning prompt"));
+        assert!(!looks_like_planning_prompt_path_request("planning file"));
+        assert!(!looks_like_planning_prompt_path_request("agents path"));
+        assert!(!looks_like_planning_prompt_path_request("testing.md path"));
+        assert!(!looks_like_prompts_path_request("planning prompt path"));
+        assert!(!looks_like_prompts_path_request("planning_prompt.md"));
+        assert!(!looks_like_prompts_path_request(
+            "where is planning_prompt.md"
+        ));
+        assert!(!looks_like_testing_md_path_request("planning prompt path"));
+        let reply = try_operator_instant_reply("where is planning_prompt.md")
+            .expect("planning_prompt.md path instant");
+        assert!(reply.contains("Planning prompt"));
+        assert!(
+            reply.contains("planning_prompt.md") || reply.contains(".mac-stats")
+        );
+        assert!(reply.to_lowercase().contains("path only"));
+        assert!(!reply.to_lowercase().contains("prompts dir"));
+        // prompts/ directory lane still owns bare "prompts path".
+        let dir_reply =
+            try_operator_instant_reply("prompts path").expect("prompts dir still owns prompts path");
+        assert!(dir_reply.contains("Prompts dir"));
     }
 
     #[test]
