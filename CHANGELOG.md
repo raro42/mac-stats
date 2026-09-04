@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.861] - 2026-09-04
+
+### Fixed
+- **Instant lane: before-compaction transcript path** — `before compaction transcript path`, `where is before compaction transcript`, `last_session_before_compaction.jsonl`, and similar asks return the configured or default before-compaction JSONL path without Ollama (Discord + AI Chat; path only — does not dump JSONL or run the hook; does not steal before-reset / session reset phrases / session dir; p50 latency).
+
 ## [0.1.860] - 2026-09-04
 
 ### Fixed

@@ -2122,6 +2122,11 @@ impl Config {
             .to_string()
     }
 
+    /// Default JSONL path for optional **before-compaction** export when a hook is set but no custom path is configured.
+    pub fn default_before_compaction_transcript_path() -> PathBuf {
+        Self::agents_dir().join("last_session_before_compaction.jsonl")
+    }
+
     /// Raw path for **before-compaction** JSONL transcript. Env `MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH` overrides `config.json` **`beforeCompactionTranscriptPath`**.
     pub fn before_compaction_transcript_path_raw() -> String {
         if let Ok(s) = std::env::var("MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH") {
@@ -2151,6 +2156,16 @@ impl Config {
             return None;
         }
         Self::expand_user_path_str(&raw)
+    }
+
+    /// Path shown for before-compaction transcript asks: configured path, else default under `agents/`.
+    pub fn before_compaction_transcript_path_display() -> String {
+        if let Some(p) = Self::before_compaction_transcript_path_resolved() {
+            return p.display().to_string();
+        }
+        Self::default_before_compaction_transcript_path()
+            .display()
+            .to_string()
     }
 
     /// Optional shell for **before-compaction** (non-blocking). Env `MAC_STATS_BEFORE_COMPACTION_HOOK` overrides **`beforeCompactionHook`**. Transcript path is **`$1`**.

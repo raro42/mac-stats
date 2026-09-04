@@ -8363,6 +8363,178 @@ pub fn format_before_reset_transcript_path_gateway() -> String {
     )
 }
 
+/// True for short “where is the before-compaction transcript / last_session_before_compaction.jsonl…” asks.
+/// Config/env path only — does not dump JSONL, run the hook, or compact a session.
+pub fn looks_like_before_compaction_transcript_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 96 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("beforereset")
+        || n.contains("last_session_before_reset")
+        || n.contains("session_reset_phrases")
+        || n.contains("session-reset-phrases")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("agents path")
+        || n.contains("memory path")
+        || n.contains("memory.md")
+        || n.contains("notes path")
+        || n.contains("soul path")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n == "where is config"
+        || n == "config path"
+        || n == "session path"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("export")
+        || n.contains("write ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clear session")
+        || n.contains("new session")
+        || n.contains("trigger")
+        || n.contains("run hook")
+        || n.contains("run the hook")
+        || n.contains("run compaction")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let bc_ctx = n.contains("last_session_before_compaction")
+        || n.contains("last-session-before-compaction")
+        || n.contains("beforecompactiontranscript")
+        || n.contains("before_compaction_transcript")
+        || n.contains("before-compaction-transcript")
+        || n.contains("before compaction transcript")
+        || n.contains("before-compaction transcript")
+        || n.contains("before_compaction transcript")
+        || n.contains("before compaction jsonl")
+        || n.contains("before-compaction jsonl")
+        || n.contains("before_compaction jsonl")
+        || n.contains("beforecompactiontranscriptpath")
+        || n.contains("mac_stats_before_compaction_transcript")
+        || (n.contains("before compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")))
+        || (n.contains("before-compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")))
+        || (n.contains("before_compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")));
+    if !bc_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("jsonl")
+        || n.contains("transcript")
+        || n.contains("last_session_before_compaction");
+    matches!(
+        n.as_str(),
+        "before compaction transcript path"
+            | "before-compaction transcript path"
+            | "before_compaction transcript path"
+            | "before compaction transcript"
+            | "before-compaction transcript"
+            | "before_compaction transcript"
+            | "before compaction transcript file"
+            | "before-compaction transcript file"
+            | "before compaction jsonl path"
+            | "before-compaction jsonl path"
+            | "before_compaction jsonl path"
+            | "before compaction transcript location"
+            | "before-compaction transcript location"
+            | "last_session_before_compaction"
+            | "last_session_before_compaction.jsonl"
+            | "last_session_before_compaction path"
+            | "last_session_before_compaction.jsonl path"
+            | "where is before compaction transcript"
+            | "where is the before compaction transcript"
+            | "where is before-compaction transcript"
+            | "where is the before-compaction transcript"
+            | "where is before_compaction transcript"
+            | "where is last_session_before_compaction"
+            | "where is last_session_before_compaction.jsonl"
+            | "where is the before compaction transcript file"
+            | "beforecompactiontranscriptpath"
+            | "before compaction transcript path location"
+    ) || (bc_ctx && pathish)
+}
+
+/// Zero-LLM before-compaction transcript path (config/env only; no dump / no hook / no compact).
+pub fn format_before_compaction_transcript_path_gateway() -> String {
+    use crate::config::Config;
+    let display = Config::before_compaction_transcript_path_display();
+    let custom = !Config::before_compaction_transcript_path_raw().trim().is_empty();
+    let note = if custom {
+        "configured path"
+    } else {
+        "default when a before-compaction hook runs (set `beforeCompactionTranscriptPath` / `MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH` to override)"
+    };
+    format!(
+        "**Before-compaction transcript:** `{display}` · {note} · path only · does not dump JSONL or run compaction · `before reset transcript path` for the reset export."
+    )
+}
+
 /// True for short “where is cookie_reject_patterns.md / cookie reject patterns path…” asks.
 /// Config path only — does not list patterns or edit the reject list.
 pub fn looks_like_cookie_reject_patterns_path_request(content: &str) -> bool {
@@ -15276,6 +15448,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_escalation_patterns_path_request(content) {
         return Some(format_escalation_patterns_path_gateway());
     }
+    // before-compaction transcript before before-reset / session_reset_phrases / session-dir path lanes.
+    if looks_like_before_compaction_transcript_path_request(content) {
+        return Some(format_before_compaction_transcript_path_gateway());
+    }
     // before-reset transcript before session_reset_phrases / session-dir path lanes.
     if looks_like_before_reset_transcript_path_request(content) {
         return Some(format_before_reset_transcript_path_gateway());
@@ -17036,6 +17212,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only escalation_patterns.md path asks (v0.1.846) — config only; no list/append.
     if looks_like_escalation_patterns_path_request(question) {
+        return true;
+    }
+    // Read-only before-compaction transcript path asks (v0.1.861) — config/env only; no dump/hook.
+    if looks_like_before_compaction_transcript_path_request(question) {
         return true;
     }
     // Read-only before-reset transcript path asks (v0.1.860) — config/env only; no dump/hook.
@@ -19558,6 +19738,54 @@ mod tests {
         assert!(reply.contains("Before-reset transcript"), "{reply}");
         assert!(
             reply.contains("last_session_before_reset") || reply.contains(".mac-stats"),
+            "{reply}"
+        );
+        assert!(reply.to_lowercase().contains("path only"), "{reply}");
+    }
+
+    #[test]
+    fn before_compaction_transcript_path_request_detected() {
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "before compaction transcript path"
+        ));
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "before-compaction transcript path"
+        ));
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "where is before compaction transcript"
+        ));
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "last_session_before_compaction.jsonl"
+        ));
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "where is last_session_before_compaction.jsonl"
+        ));
+        assert!(looks_like_before_compaction_transcript_path_request(
+            "before_compaction transcript path"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "before reset transcript path"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "session reset phrases path"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "session path"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "dump before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "export before compaction transcript"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "before compaction transcript path"
+        ));
+        let reply = try_operator_instant_reply("before compaction transcript path")
+            .expect("before-compaction transcript path instant");
+        assert!(reply.contains("Before-compaction transcript"), "{reply}");
+        assert!(
+            reply.contains("last_session_before_compaction") || reply.contains(".mac-stats"),
             "{reply}"
         );
         assert!(reply.to_lowercase().contains("path only"), "{reply}");

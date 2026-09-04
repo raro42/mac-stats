@@ -69,7 +69,7 @@ pub fn emit_mac_stats_compaction_event(
 }
 
 fn default_before_compaction_transcript_path() -> PathBuf {
-    Config::agents_dir().join("last_session_before_compaction.jsonl")
+    Config::default_before_compaction_transcript_path()
 }
 
 /// Before compaction: optional JSONL transcript + optional shell hook (background). No-op if neither configured.
