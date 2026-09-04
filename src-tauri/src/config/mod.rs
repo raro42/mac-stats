@@ -2112,6 +2112,16 @@ impl Config {
         Self::expand_user_path_str(&raw)
     }
 
+    /// Path shown for before-reset transcript asks: configured path, else default under `agents/`.
+    pub fn before_reset_transcript_path_display() -> String {
+        if let Some(p) = Self::before_reset_transcript_path_resolved() {
+            return p.display().to_string();
+        }
+        Self::default_before_reset_transcript_path()
+            .display()
+            .to_string()
+    }
+
     /// Raw path for **before-compaction** JSONL transcript. Env `MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH` overrides `config.json` **`beforeCompactionTranscriptPath`**.
     pub fn before_compaction_transcript_path_raw() -> String {
         if let Ok(s) = std::env::var("MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH") {

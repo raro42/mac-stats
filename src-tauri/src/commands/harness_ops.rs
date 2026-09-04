@@ -8040,6 +8040,14 @@ pub fn looks_like_session_reset_phrases_path_request(content: &str) -> bool {
         || n.contains("session folder")
         || n.contains("session directory")
         || n.contains("session dir")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("last_session_before_reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("last_session_before_compaction")
         || n.contains("agents path")
         || n.contains("agent path")
         || n.contains("agents folder")
@@ -8181,6 +8189,177 @@ pub fn format_session_reset_phrases_path_gateway() -> String {
     let display = path.display().to_string();
     format!(
         "**Session reset phrases file:** `{display}` · phrases that clear a Discord session · path only · does not list or trigger a reset."
+    )
+}
+
+/// True for short “where is the before-reset transcript / last_session_before_reset.jsonl…” asks.
+/// Config/env path only — does not dump JSONL, run the hook, or clear a session.
+pub fn looks_like_before_reset_transcript_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("beforecompaction")
+        || n.contains("last_session_before_compaction")
+        || n.contains("session_reset_phrases")
+        || n.contains("session-reset-phrases")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("agents path")
+        || n.contains("memory path")
+        || n.contains("memory.md")
+        || n.contains("notes path")
+        || n.contains("soul path")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n == "where is config"
+        || n == "config path"
+        || n == "session path"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("count")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("export")
+        || n.contains("write ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clear session")
+        || n.contains("new session")
+        || n.contains("trigger")
+        || n.contains("run hook")
+        || n.contains("run the hook")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let br_ctx = n.contains("last_session_before_reset")
+        || n.contains("last-session-before-reset")
+        || n.contains("beforeresettranscript")
+        || n.contains("before_reset_transcript")
+        || n.contains("before-reset-transcript")
+        || n.contains("before reset transcript")
+        || n.contains("before-reset transcript")
+        || n.contains("before_reset transcript")
+        || n.contains("before reset jsonl")
+        || n.contains("before-reset jsonl")
+        || n.contains("before_reset jsonl")
+        || n.contains("beforeresettranscriptpath")
+        || n.contains("mac_stats_before_reset_transcript")
+        || (n.contains("before reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")))
+        || (n.contains("before-reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")))
+        || (n.contains("before_reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("file")));
+    if !br_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("jsonl")
+        || n.contains("transcript")
+        || n.contains("last_session_before_reset");
+    matches!(
+        n.as_str(),
+        "before reset transcript path"
+            | "before-reset transcript path"
+            | "before_reset transcript path"
+            | "before reset transcript"
+            | "before-reset transcript"
+            | "before_reset transcript"
+            | "before reset transcript file"
+            | "before-reset transcript file"
+            | "before reset jsonl path"
+            | "before-reset jsonl path"
+            | "before_reset jsonl path"
+            | "before reset transcript location"
+            | "before-reset transcript location"
+            | "last_session_before_reset"
+            | "last_session_before_reset.jsonl"
+            | "last_session_before_reset path"
+            | "last_session_before_reset.jsonl path"
+            | "where is before reset transcript"
+            | "where is the before reset transcript"
+            | "where is before-reset transcript"
+            | "where is the before-reset transcript"
+            | "where is before_reset transcript"
+            | "where is last_session_before_reset"
+            | "where is last_session_before_reset.jsonl"
+            | "where is the before reset transcript file"
+            | "beforeresettranscriptpath"
+            | "before reset transcript path location"
+    ) || (br_ctx && pathish)
+}
+
+/// Zero-LLM before-reset transcript path (config/env only; no dump / no hook / no session clear).
+pub fn format_before_reset_transcript_path_gateway() -> String {
+    use crate::config::Config;
+    let display = Config::before_reset_transcript_path_display();
+    let custom = !Config::before_reset_transcript_path_raw().trim().is_empty();
+    let note = if custom {
+        "configured path"
+    } else {
+        "default when a before-reset hook runs (set `beforeResetTranscriptPath` / `MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH` to override)"
+    };
+    format!(
+        "**Before-reset transcript:** `{display}` · {note} · path only · does not dump JSONL or trigger reset · `session reset phrases path` for the phrases file · `before compaction transcript path` for compaction export."
     )
 }
 
@@ -15097,6 +15276,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_escalation_patterns_path_request(content) {
         return Some(format_escalation_patterns_path_gateway());
     }
+    // before-reset transcript before session_reset_phrases / session-dir path lanes.
+    if looks_like_before_reset_transcript_path_request(content) {
+        return Some(format_before_reset_transcript_path_gateway());
+    }
     // session_reset_phrases.md before agents-dir / generic session path lanes.
     if looks_like_session_reset_phrases_path_request(content) {
         return Some(format_session_reset_phrases_path_gateway());
@@ -16853,6 +17036,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only escalation_patterns.md path asks (v0.1.846) — config only; no list/append.
     if looks_like_escalation_patterns_path_request(question) {
+        return true;
+    }
+    // Read-only before-reset transcript path asks (v0.1.860) — config/env only; no dump/hook.
+    if looks_like_before_reset_transcript_path_request(question) {
         return true;
     }
     // Read-only session_reset_phrases.md path asks (v0.1.847) — config only; no list/clear.
@@ -19310,6 +19497,12 @@ mod tests {
         assert!(!looks_like_session_reset_phrases_path_request("new session"));
         assert!(!looks_like_session_reset_phrases_path_request("agents path"));
         assert!(!looks_like_session_reset_phrases_path_request("session path"));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "before reset transcript path"
+        ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "last_session_before_reset.jsonl"
+        ));
         assert!(!looks_like_escalation_patterns_path_request(
             "session reset phrases path"
         ));
@@ -19321,6 +19514,53 @@ mod tests {
             reply.contains("session_reset_phrases.md") || reply.contains(".mac-stats")
         );
         assert!(!reply.to_lowercase().contains("escalation"));
+    }
+
+    #[test]
+    fn before_reset_transcript_path_request_detected() {
+        assert!(looks_like_before_reset_transcript_path_request(
+            "before reset transcript path"
+        ));
+        assert!(looks_like_before_reset_transcript_path_request(
+            "before-reset transcript path"
+        ));
+        assert!(looks_like_before_reset_transcript_path_request(
+            "where is before reset transcript"
+        ));
+        assert!(looks_like_before_reset_transcript_path_request(
+            "last_session_before_reset.jsonl"
+        ));
+        assert!(looks_like_before_reset_transcript_path_request(
+            "where is last_session_before_reset.jsonl"
+        ));
+        assert!(looks_like_before_reset_transcript_path_request(
+            "before_reset transcript path"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "session reset phrases path"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "before compaction transcript path"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request("session path"));
+        assert!(!looks_like_before_reset_transcript_path_request("clear session"));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "dump before reset transcript"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "export before reset transcript"
+        ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "before reset transcript path"
+        ));
+        let reply = try_operator_instant_reply("before reset transcript path")
+            .expect("before-reset transcript path instant");
+        assert!(reply.contains("Before-reset transcript"), "{reply}");
+        assert!(
+            reply.contains("last_session_before_reset") || reply.contains(".mac-stats"),
+            "{reply}"
+        );
+        assert!(reply.to_lowercase().contains("path only"), "{reply}");
     }
 
     #[test]

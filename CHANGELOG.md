@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.860] - 2026-09-04
+
+### Fixed
+- **Instant lane: before-reset transcript path** — `before reset transcript path`, `where is before reset transcript`, `last_session_before_reset.jsonl`, and similar asks return the configured or default before-reset JSONL path without Ollama (Discord + AI Chat; path only — does not dump JSONL or run the hook; does not steal `session reset phrases path` / before-compaction / session dir; p50 latency).
+
 ## [0.1.859] - 2026-09-04
 
 ### Fixed
