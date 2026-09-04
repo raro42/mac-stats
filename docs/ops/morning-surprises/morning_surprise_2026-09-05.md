@@ -4,24 +4,20 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
-- **v0.1.858** — Instant lane: **memory.md path**. Asks like `where is memory.md` / `memory.md path` / `curated memory path` / `memory file path` return `~/.mac-stats/agents/memory.md` without Ollama (Discord + AI Chat). Path only — curated shared lessons; no dump/edit. Does not steal `memory path` / notes folder / scrub / soul / agents path.
+| Version | What |
+|---------|------|
+| **v0.1.859** | Instant lane: **Ori vault path** — `ori vault path` / `where is ori vault` / `ORI_VAULT path` return the configured vault root without Ollama (path only; does not steal `/ori` Ready). |
+| **v0.1.858** | Instant lane: **memory.md path** — curated `agents/memory.md` path without Ollama. |
+| **v0.1.857** | Instant lane: **agent.json path** — per-agent config JSON path without Ollama. |
+| **v0.1.856** | Instant lane: **execution_prompt.md path**. |
+| **v0.1.855** | Instant lane: **planning_prompt.md path**. |
 
-- **v0.1.857** — Instant lane: **agent.json path**. Asks like `where is agent.json` / `agent.json path` / `agent config path` return `~/.mac-stats/agents/agent-<id>/agent.json` without Ollama (Discord + AI Chat). Path only — no dump/edit. Does not steal `agents path`, app `config path`, soul, skill, or testing path.
+## Context
 
-- **v0.1.856** — Instant lane: **execution_prompt.md path**. Asks like `where is execution_prompt.md` / `execution prompt path` / `execution path` return `~/.mac-stats/agents/prompts/execution_prompt.md` without Ollama (Discord + AI Chat). Path only — no dump/edit. Does not steal `prompts path`, planning prompt, testing.md, or agents dir. Bare `execution prompt` still goes to the model.
+- Digester open: empty (Elmasnow weather already stale/shipped).
+- Design review: grace (screenshots aged; TCC deferred).
+- Fuel: standing backlog p50 latency path lanes.
 
-- **v0.1.855** — Instant lane: **planning_prompt.md path**. Asks like `where is planning_prompt.md` / `planning prompt path` / `planning path` return `~/.mac-stats/agents/prompts/planning_prompt.md` without Ollama (Discord + AI Chat). Path only — no dump/edit. Does not steal `prompts path`, execution prompt, testing.md, or agents dir. Bare `planning prompt` still goes to the model.
+## Tried / discarded
 
-## Earlier same night (already on main before these ticks)
-
-- **v0.1.854** — Instant lane: testing.md path (per-agent).
-
-## Tried / context
-
-- Digester open empty; design review grace (`feature-ai-chat` aged).
-- Fuel: standing backlog p50 latency (memory.md after agent.json lane).
-
-## Next fuel
-
-- Ori vault path, before-reset transcript path, or other remaining config files.
-- Design review PNG when TCC allows.
+_None this window (keeps only)._
