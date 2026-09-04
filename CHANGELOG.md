@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.862] - 2026-09-04
+
+### Fixed
+- **Instant lane: Discord channel memory path** — `discord memory path`, `where is discord memory`, `memory-discord path`, `channel memory path`, and similar asks return `agents/memory-discord-<channelId>.md` without Ollama (Discord + AI Chat; path only — does not list or dump; does not steal bare `discord memory` / `/knowledge discord` / `memory.md` / notes folder; p50 latency).
+
 ## [0.1.861] - 2026-09-04
 
 ### Fixed

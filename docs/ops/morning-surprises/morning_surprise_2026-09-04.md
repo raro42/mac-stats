@@ -1,28 +1,22 @@
 # Morning surprise — 2026-09-04
 
-Overnight Track B (20:00–06:00) for Ralf.
+Overnight Track B kept shipping instant-lane path wins (digester open empty; design review in grace).
 
-## Shipped
+## Shipped tonight (keep)
 
 | Version | What |
 |---------|------|
-| **v0.1.853** | Instant lane: **skill.md path** — `skill.md`, `where is skill.md`, `skill file path` → `~/.mac-stats/agents/agent-<id>/skill.md` (per-agent; not Hermes `skills/` folder; path only; Discord + AI Chat; bare `skill path` still means skills dir; p50). |
-| **v0.1.852** | Instant lane: **mood.md path** — `mood path`, `where is mood.md`, `mood file path` → `~/.mac-stats/agents/agent-<id>/mood.md` (per-agent; not shared like soul.md; path only; Discord + AI Chat; p50). |
-| **v0.1.851** | Instant lane: **soul.md path** — shared `~/.mac-stats/agents/soul.md` without Ollama. |
-| **v0.1.850** | Instant lane: **downloads-organizer-state.json path**. |
-| **v0.1.849** | Instant lane: **downloads-organizer-rules.md path**. |
-| **v0.1.848** | Instant lane: **cookie_reject_patterns.md path**. |
-| **v0.1.847** | Instant lane: **session_reset_phrases.md path**. |
-| **v0.1.846** | Instant lane: **escalation_patterns.md path**. |
-| **v0.1.845** | Instant lane: **credential_accounts.json path**. |
+| **v0.1.862** | Instant lane: Discord channel memory path (`discord memory path` / `memory-discord path`) — path only; no steal of `/knowledge discord` |
+| **v0.1.861** | Instant lane: before-compaction transcript path |
+| **v0.1.860** | Instant lane: before-reset transcript path |
+| **v0.1.859** | Instant lane: Ori vault path |
 
-## Context
+## Also tried / context
 
-- Digester **open** stayed empty (Elmasnow weather already stale/shipped).
-- Design review in **grace** (`feature-ai-chat` ~20.7d recommended when TCC allows).
-- Fuel: standing backlog p50 path lanes.
-- Latest keep: **v0.1.853** @ `23d051ab`.
+- Digester Slowest still shows stale Elmasnow Brave weather (already filtered as shipped).
+- Design review PNGs aged (~21–23d); TCC capture deferred; polish-without-capture grace active.
+- Debug log: no ERROR/WARN clusters in 180m window.
 
-## Next
+## Fitness
 
-- More path lanes (testing.md per-agent, alerts config, planning/execution prompts) or design-review screenshot when TCC allows.
+Operators can ask where Discord channel memory files live without a 10s+ Ollama round-trip, and without landing on the notes-folder path.

@@ -3564,9 +3564,17 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
         return false;
     }
     // Dedicated memory.md file lane (v0.1.858) — do not steal curated-file asks.
+    // Dedicated Discord channel memory lane (v0.1.862) — do not steal memory-discord path asks.
     if n.contains("memory.md")
         || n.contains("memory-md")
         || n.contains("curated memory")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
         || n == "memory file"
         || n == "memory file path"
         || n == "where is memory file"
@@ -3711,6 +3719,13 @@ pub fn looks_like_memory_md_path_request(content: &str) -> bool {
         || n == "memory notes folder"
         || n == "where are notes"
         || n == "where do notes go"
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
         || n.contains("soul")
         || n.contains("mood")
         || n.contains("skill.md")
@@ -3890,7 +3905,200 @@ pub fn format_memory_md_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Curated memory:** `{display}` · shared lessons across agents · path only · does not dump or edit · `memory path` / `notes path` for the notes folder · `scrub memory` to clean."
+        "**Curated memory:** `{display}` · shared lessons across agents · path only · does not dump or edit · `memory path` / `notes path` for the notes folder · `discord memory path` for channel files · `scrub memory` to clean."
+    )
+}
+
+/// True for short “where is discord memory / memory-discord path…” asks.
+/// Config path only — does not list Knowledge files or dump channel notes.
+/// Does not steal bare `discord memory` / `/knowledge discord` (list lane).
+pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact Knowledge Discord list asks (no path cue) stay on `/knowledge discord`.
+    if matches!(
+        n.as_str(),
+        "discord memory"
+            | "discord memories"
+            | "channel memory"
+            | "channel memories"
+            | "/knowledge"
+            | "/knowledge discord"
+            | "knowledge discord"
+            | "discord knowledge"
+            | "knowledge"
+            | "list knowledge"
+            | "knowledge list"
+            | "knowledge files"
+            | "knowledge file"
+    ) {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n == "memory path"
+        || n == "memory folder"
+        || n == "memory directory"
+        || n == "memory dir"
+        || n == "notes path"
+        || n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("channels.json")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("agents directory")
+        || n.contains("soul path")
+        || n.contains("mood path")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "/discord"
+        || n == "discord"
+        || n == "discord ready"
+        || n == "discord status"
+        || n == "where is config"
+        || n == "config path"
+    {
+        return false;
+    }
+    if looks_like_memory_scrub_request(content) {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("saved note")
+        || n.contains("save ")
+        || n.contains("memory:")
+        || n.contains("note:")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let dm_ctx = n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("memorydiscord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("discord-channel-memory")
+        || (n.contains("discord")
+            && n.contains("memory")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("file")
+                || n.contains("md")));
+    if !dm_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord");
+    matches!(
+        n.as_str(),
+        "discord memory path"
+            | "discord memories path"
+            | "discord memory file"
+            | "discord memory file path"
+            | "discord memory folder"
+            | "discord memory location"
+            | "channel memory path"
+            | "channel memories path"
+            | "channel memory file"
+            | "channel memory file path"
+            | "discord channel memory path"
+            | "discord channel memory file"
+            | "memory-discord path"
+            | "memory_discord path"
+            | "memory-discord"
+            | "memory-discord.md"
+            | "memory-discord file"
+            | "memory-discord file path"
+            | "where is discord memory"
+            | "where is the discord memory"
+            | "where is discord memory file"
+            | "where is the discord memory file"
+            | "where are discord memory files"
+            | "where is channel memory"
+            | "where is the channel memory"
+            | "where is memory-discord"
+            | "where is the memory-discord"
+            | "where is memory-discord.md"
+            | "where are memory-discord files"
+    ) || (dm_ctx && pathish)
+}
+
+/// Zero-LLM Discord channel memory path (config only; no list/dump/scrub).
+pub fn format_discord_memory_path_gateway() -> String {
+    let agents = crate::config::Config::agents_dir().display().to_string();
+    format!(
+        "**Discord channel memory:** `{agents}/memory-discord-<channelId>.md` · under agents/ · path only · does not list or dump · `/knowledge discord` to list · `memory.md path` for curated · `memory path` for notes."
     )
 }
 
@@ -15390,6 +15598,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
     }
+    // Discord channel memory path before notes-folder / Knowledge list (path-only asks).
+    if looks_like_discord_memory_path_request(content) {
+        return Some(format_discord_memory_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -15529,6 +15741,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // memory.md curated file before notes-folder combo path.
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
+    }
+    // Discord channel memory path before notes-folder / Knowledge list.
+    if looks_like_discord_memory_path_request(content) {
+        return Some(format_discord_memory_path_gateway());
     }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
@@ -15771,6 +15987,7 @@ pub fn format_ops_help_gateway() -> String {
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
+• `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
@@ -17268,6 +17485,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory.md curated file path asks (v0.1.858) — config only; no dump/edit.
     if looks_like_memory_md_path_request(question) {
+        return true;
+    }
+    // Read-only Discord channel memory path asks (v0.1.862) — config only; no list/dump.
+    if looks_like_discord_memory_path_request(question) {
         return true;
     }
     // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
@@ -20284,6 +20505,58 @@ mod tests {
             try_operator_instant_reply("memory path").expect("memory path still instant");
         assert!(dir_reply.contains("Memory"));
         assert!(dir_reply.contains("notes") || dir_reply.contains("memory.md"));
+    }
+
+    #[test]
+    fn discord_memory_path_request_detected() {
+        assert!(looks_like_discord_memory_path_request("discord memory path"));
+        assert!(looks_like_discord_memory_path_request(
+            "where is discord memory"
+        ));
+        assert!(looks_like_discord_memory_path_request("memory-discord path"));
+        assert!(looks_like_discord_memory_path_request(
+            "where is memory-discord"
+        ));
+        assert!(looks_like_discord_memory_path_request(
+            "channel memory path"
+        ));
+        assert!(looks_like_discord_memory_path_request(
+            "discord channel memory path"
+        ));
+        assert!(looks_like_discord_memory_path_request(
+            "where are discord memory files"
+        ));
+        assert!(!looks_like_discord_memory_path_request("discord memory"));
+        assert!(!looks_like_discord_memory_path_request("channel memory"));
+        assert!(!looks_like_discord_memory_path_request("/knowledge discord"));
+        assert!(!looks_like_discord_memory_path_request("list discord memory"));
+        assert!(!looks_like_discord_memory_path_request("dump discord memory"));
+        assert!(!looks_like_discord_memory_path_request("memory.md path"));
+        assert!(!looks_like_discord_memory_path_request("memory path"));
+        assert!(!looks_like_discord_memory_path_request("discord channels path"));
+        assert!(!looks_like_memory_path_request("discord memory path"));
+        assert!(!looks_like_memory_path_request("where is discord memory"));
+        assert!(!looks_like_memory_md_path_request("discord memory path"));
+        assert!(!looks_like_knowledge_request("discord memory path"));
+        assert!(looks_like_knowledge_request("discord memory"));
+        let reply = try_operator_instant_reply("where is discord memory")
+            .expect("discord memory path instant");
+        assert!(reply.contains("Discord channel memory"), "{reply}");
+        assert!(
+            reply.contains("memory-discord") || reply.contains(".mac-stats"),
+            "{reply}"
+        );
+        assert!(reply.to_lowercase().contains("path only"), "{reply}");
+        // Knowledge list still owns bare "discord memory".
+        let list_reply =
+            try_operator_instant_reply("discord memory").expect("discord memory list still instant");
+        assert!(
+            list_reply.to_lowercase().contains("knowledge")
+                || list_reply.contains("Discord")
+                || list_reply.contains("memory-discord"),
+            "{list_reply}"
+        );
+        assert!(!list_reply.contains("path only"), "{list_reply}");
     }
 
     #[test]
