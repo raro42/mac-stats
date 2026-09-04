@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.849] - 2026-09-04
+
+### Fixed
+- **Instant lane: downloads-organizer-rules.md path** — `downloads organizer rules path`, `where is downloads-organizer-rules.md`, `organizer rules path`, and similar asks return `~/.mac-stats/agents/downloads-organizer-rules.md` without Ollama (Discord + AI Chat; path only — does not list rules or run organize-now; does not steal `/downloads` Ready / browser-downloads / agents path; p50 latency).
+
 ## [0.1.848] - 2026-09-04
 
 ### Fixed
