@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.852] - 2026-09-04
+
+### Fixed
+- **Instant lane: mood.md path** — `mood path`, `where is mood.md`, `mood file path`, and similar asks return `~/.mac-stats/agents/agent-<id>/mood.md` without Ollama (Discord + AI Chat; path only — per-agent mood, not shared like soul.md; does not dump or edit mood text; does not steal `/agents` / agents dir / soul / memory path; p50 latency).
+
 ## [0.1.851] - 2026-09-04
 
 ### Fixed

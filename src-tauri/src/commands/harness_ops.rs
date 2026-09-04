@@ -8623,6 +8623,176 @@ pub fn format_downloads_organizer_state_path_gateway() -> String {
     )
 }
 
+/// True for short “where is mood.md / mood path…” asks.
+/// Config path only — does not dump/edit mood text or open Agent Ops Agents.
+/// Mood is per-agent (`agent-<id>/mood.md`), not a shared file like soul.md.
+pub fn looks_like_mood_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
+    if n.contains("soul")
+        || n.contains("skill.md")
+        || n.contains("skill path")
+        || n.contains("skills path")
+        || n.contains("skills folder")
+        || n.contains("memory.md")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("notes folder")
+        || n.contains("session path")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("prompts path")
+        || n.contains("plugins path")
+        || n.contains("tmp path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements path")
+        || n.contains("mac-stats home")
+        || n == "where is config"
+        || n == "where is the config"
+        || n == "config path"
+        || n == "/agents"
+        || n == "agents"
+        || n == "agents on"
+        || n == "agents off"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("dump")
+        || n.contains("clear")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mood_ctx = n.contains("mood.md")
+        || n.contains("mood file")
+        || n.contains("mood path")
+        || n.contains("moods path")
+        || n == "mood"
+        || n == "where is mood"
+        || n == "where is the mood"
+        || n == "where is mood.md"
+        || n == "where is the mood.md"
+        || n == "where is the mood file"
+        || n == "where is mood file"
+        || (n.contains("mood")
+            && (n.contains("path")
+                || n.contains("where")
+                || n.contains("location")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("file")
+                || n.contains("md")));
+    if !mood_ctx {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file")
+        || n.contains("md")
+        || n.contains("mood.md");
+    matches!(
+        n.as_str(),
+        "mood path"
+            | "mood.md"
+            | "mood.md path"
+            | "mood file"
+            | "mood file path"
+            | "mood md"
+            | "mood md path"
+            | "where is mood"
+            | "where is the mood"
+            | "where is mood.md"
+            | "where is the mood.md"
+            | "where is mood file"
+            | "where is the mood file"
+            | "where is the mood.md file"
+            | "mood location"
+            | "mood home"
+    ) || (mood_ctx && pathish)
+}
+
+/// Zero-LLM per-agent mood.md path (config only; no dump/edit).
+pub fn format_mood_path_gateway() -> String {
+    let display = crate::config::Config::mood_file_path_display();
+    format!(
+        "**Mood file:** `{display}` · per-agent mood (not shared like soul.md) · path only · does not dump or edit mood text · Agent Ops → Agents for content."
+    )
+}
+
 /// True for short “where is soul.md / soul path…” asks.
 /// Config path only — does not dump/edit soul text or open Agent Ops Agents.
 pub fn looks_like_soul_path_request(content: &str) -> bool {
@@ -13484,6 +13654,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // mood.md before soul / agents-dir path / /agents catalog (path-only asks).
+    if looks_like_mood_path_request(content) {
+        return Some(format_mood_path_gateway());
+    }
     // soul.md before agents-dir path / /agents catalog (path-only asks).
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
@@ -13557,6 +13731,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // mood.md before soul / agents-dir path lane.
+    if looks_like_mood_path_request(content) {
+        return Some(format_mood_path_gateway());
     }
     // soul.md before agents-dir path lane.
     if looks_like_soul_path_request(content) {
@@ -15280,6 +15458,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only mood.md path asks (v0.1.852) — config only; no dump/edit.
+    if looks_like_mood_path_request(question) {
         return true;
     }
     // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
@@ -17885,6 +18067,35 @@ mod tests {
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
         assert!(!reply.to_lowercase().contains("rules file"));
+    }
+
+    #[test]
+    fn mood_path_request_detected() {
+        assert!(looks_like_mood_path_request("mood path"));
+        assert!(looks_like_mood_path_request("mood.md"));
+        assert!(looks_like_mood_path_request("where is mood.md"));
+        assert!(looks_like_mood_path_request("mood.md path"));
+        assert!(looks_like_mood_path_request("mood file path"));
+        assert!(looks_like_mood_path_request("where is the mood file"));
+        assert!(looks_like_mood_path_request("where is mood"));
+        assert!(!looks_like_mood_path_request("agents path"));
+        assert!(!looks_like_mood_path_request("memory path"));
+        assert!(!looks_like_mood_path_request("soul path"));
+        assert!(!looks_like_mood_path_request("dump mood"));
+        assert!(!looks_like_mood_path_request("edit mood.md"));
+        assert!(!looks_like_mood_path_request("rewrite my mood"));
+        assert!(!looks_like_mood_path_request("/agents"));
+        assert!(!looks_like_mood_path_request("session reset phrases path"));
+        assert!(!looks_like_agents_path_request("mood path"));
+        assert!(!looks_like_agents_path_request("where is mood.md"));
+        assert!(!looks_like_soul_path_request("mood path"));
+        assert!(!looks_like_memory_path_request("mood path"));
+        let reply = try_operator_instant_reply("where is mood.md").expect("mood path instant");
+        assert!(reply.contains("Mood file"));
+        assert!(reply.contains("mood.md") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("per-agent"));
+        assert!(!reply.to_lowercase().contains("agents dir"));
+        assert!(reply.to_lowercase().contains("path only"));
     }
 
     #[test]
