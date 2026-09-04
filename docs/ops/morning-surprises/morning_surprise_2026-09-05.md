@@ -4,6 +4,8 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
+- **v0.1.858** — Instant lane: **memory.md path**. Asks like `where is memory.md` / `memory.md path` / `curated memory path` / `memory file path` return `~/.mac-stats/agents/memory.md` without Ollama (Discord + AI Chat). Path only — curated shared lessons; no dump/edit. Does not steal `memory path` / notes folder / scrub / soul / agents path.
+
 - **v0.1.857** — Instant lane: **agent.json path**. Asks like `where is agent.json` / `agent.json path` / `agent config path` return `~/.mac-stats/agents/agent-<id>/agent.json` without Ollama (Discord + AI Chat). Path only — no dump/edit. Does not steal `agents path`, app `config path`, soul, skill, or testing path.
 
 - **v0.1.856** — Instant lane: **execution_prompt.md path**. Asks like `where is execution_prompt.md` / `execution prompt path` / `execution path` return `~/.mac-stats/agents/prompts/execution_prompt.md` without Ollama (Discord + AI Chat). Path only — no dump/edit. Does not steal `prompts path`, planning prompt, testing.md, or agents dir. Bare `execution prompt` still goes to the model.
@@ -17,9 +19,9 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 ## Tried / context
 
 - Digester open empty; design review grace (`feature-ai-chat` aged).
-- Fuel: standing backlog p50 latency (agent.json after execution_prompt lane).
+- Fuel: standing backlog p50 latency (memory.md after agent.json lane).
 
 ## Next fuel
 
-- Alerts config path, or other remaining config files.
+- Ori vault path, before-reset transcript path, or other remaining config files.
 - Design review PNG when TCC allows.
