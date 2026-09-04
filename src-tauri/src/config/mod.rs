@@ -1949,6 +1949,16 @@ impl Config {
             .to_string()
     }
 
+    /// Display path for per-agent skill files: `$HOME/.mac-stats/agents/agent-<id>/skill.md`
+    /// Skill is not the Hermes `skills/` directory; each agent has its own `skill.md`.
+    pub fn skill_file_path_display() -> String {
+        Self::agents_dir()
+            .join("agent-<id>")
+            .join("skill.md")
+            .display()
+            .to_string()
+    }
+
     /// Path to shared (global) memory: `$HOME/.mac-stats/agents/memory.md`
     /// Loaded into every agent's prompt. Contains lessons learned across all sessions.
     pub fn memory_file_path() -> PathBuf {

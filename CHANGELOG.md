@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.853] - 2026-09-04
+
+### Fixed
+- **Instant lane: skill.md path** — `skill.md`, `where is skill.md`, `skill file path`, and similar asks return `~/.mac-stats/agents/agent-<id>/skill.md` without Ollama (Discord + AI Chat; path only — per-agent skill, not the Hermes `skills/` folder; does not dump or edit skill text; does not steal `/skills` / skills dir / mood / soul / agents path; bare `skill path` still means the skills directory; p50 latency).
+
 ## [0.1.852] - 2026-09-04
 
 ### Fixed
