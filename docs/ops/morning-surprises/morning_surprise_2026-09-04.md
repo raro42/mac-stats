@@ -1,27 +1,29 @@
 # Morning surprise — 2026-09-04
 
-Overnight Track B ratchet (surprise Ralf). Digester open stayed empty; design review stayed in grace. Fuel was standing-backlog p50 latency.
+Overnight autoresearch (Track B) for Ralf.
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.850** | Instant lane: `downloads-organizer-state.json` path (`downloads organizer state path`, `where is downloads-organizer-state.json`, `organizer state path`) — path only, no dump/run; does not steal `/downloads` Ready / rules / browser-downloads |
-| **v0.1.849** | Instant lane: `downloads-organizer-rules.md` path |
-| **v0.1.848** | Instant lane: `cookie_reject_patterns.md` path |
-| **v0.1.847** | Instant lane: `session_reset_phrases.md` path |
-| **v0.1.846** | Instant lane: `escalation_patterns.md` path |
-| **v0.1.845** | Instant lane: `credential_accounts.json` path |
+| **v0.1.851** | Instant lane: **soul.md path** — `soul path` / `where is soul.md` / `soul file path` return `~/.mac-stats/agents/soul.md` without Ollama (path only; no dump/edit; does not steal `/agents` / agents dir / memory / mood). |
+| **v0.1.850** | Instant lane: downloads-organizer-state.json path |
+| **v0.1.849** | Instant lane: downloads-organizer-rules.md path |
+| **v0.1.848** | Instant lane: cookie_reject_patterns.md path |
+| **v0.1.847** | Instant lane: session_reset_phrases.md path |
+| **v0.1.846** | Instant lane: escalation_patterns.md path |
+| **v0.1.845** | Instant lane: credential_accounts.json path |
+| **v0.1.844** | Disk Cleanup Filter attention glance |
+| **v0.1.843** | Monitors Filter attention glance |
+| **v0.1.842** | Top Processes Filter attention glance |
 
-## This tick (~04:25)
+## Digester / fuel
 
-- Digester: open empty (Elmasnow Brave weather still stale/shipped).
-- Design review: `due=false` (grace); recommended surface still `feature-ai-chat` (~20.6d).
-- Experiment: **keep** @ `281c153d` — v0.1.850 state-file path instant.
-- Install + LaunchAgent kickstart: app at **0.1.850**.
+- Digester **open**: empty (Elmasnow weather already stale/shipped).
+- Design review: due=false (grace); recommended `feature-ai-chat`.
+- Fuel this tick: standing backlog p50 — soul.md path instant.
+- `debug.log`: no ERROR/WARN/panic clusters in 180m window.
 
-## Next fuel
+## Tried / next
 
-- Digester open / product `debug.log` errors when present.
-- More p50 path lanes (alerts config, remaining agent files) or design-review screenshot when TCC allows.
-- Sibling ports (Hermes insights / session UX) when they clearly fit.
+- Next: mood.md path, alerts config path, or design-review screenshot when TCC allows.
