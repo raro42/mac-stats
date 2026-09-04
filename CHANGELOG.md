@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.846] - 2026-09-04
+
+### Fixed
+- **Instant lane: escalation_patterns.md path** — `escalation patterns path`, `where is escalation_patterns.md`, `escalation file path`, and similar asks return `~/.mac-stats/agents/escalation_patterns.md` without Ollama (Discord + AI Chat; path only — does not list or append phrases; does not steal session-reset phrases / agents path; p50 latency).
+
 ## [0.1.845] - 2026-09-04
 
 ### Fixed
