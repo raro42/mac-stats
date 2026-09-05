@@ -6062,6 +6062,205 @@ pub fn format_agents_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are skills / skills size…” asks.
+/// Recursive file-byte sum under skills dir — no list dump / path / catalog lanes.
+pub fn looks_like_skills_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/skills")
+        || n.contains("skill.md")
+        || n.contains("skill file")
+        || n.contains("skill md")
+        || n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let skills_ctx = n.contains("skills folder")
+        || n.contains("skill folder")
+        || n.contains("skills directory")
+        || n.contains("skill directory")
+        || n.contains("skills dir")
+        || n.contains("skill dir")
+        || n.contains("skills size")
+        || n.contains("skill size")
+        || n.contains("mac-stats skills")
+        || n.contains("mac stats skills")
+        || n == "skills"
+        || n == "skill"
+        || ((n.contains("skills") || n.contains("skill"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !skills_ctx {
+        return false;
+    }
+    // Bare “skills” / path-only asks stay on the path lane.
+    if n == "skills"
+        || n == "skill"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "skills size"
+            | "skill size"
+            | "skills folder size"
+            | "skill folder size"
+            | "skills directory size"
+            | "skill directory size"
+            | "skills dir size"
+            | "skill dir size"
+            | "how big are skills"
+            | "how big is skills"
+            | "how big is the skills folder"
+            | "how big is skills folder"
+            | "how big is the skill folder"
+            | "how big is skill folder"
+            | "how big is the skills directory"
+            | "how big is the skill directory"
+            | "how large is the skills folder"
+            | "how large are skills"
+            | "how large is skills"
+            | "skills bytes"
+            | "skill bytes"
+            | "mac-stats skills size"
+            | "mac stats skills size"
+    ) || (n.contains("size") && skills_ctx)
+        || (n.contains("big") && skills_ctx)
+        || (n.contains("large") && skills_ctx)
+        || (n.contains("bytes") && skills_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && skills_ctx)
+}
+
+/// Zero-LLM skills directory size (recursive file bytes; no list dump).
+pub fn format_skills_size_gateway() -> String {
+    let dir = crate::config::Config::skills_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Skills:** not created yet · app recreates under skills/ · `skills path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Skills** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Skills:** **{label}** on disk ({files} files) · `/skills` for catalog · `skills path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the skills folder / skills path…” asks.
 /// Config path only — does not list catalog, run SKILL:, or manage skills.
 pub fn looks_like_skills_path_request(content: &str) -> bool {
@@ -6082,6 +6281,17 @@ pub fn looks_like_skills_path_request(content: &str) -> bool {
         || n.contains("skill md")
         || n == "where is skill"
         || n == "where is the skill"
+    {
+        return false;
+    }
+    // Size/big/large asks use the skills size lane (v0.1.881).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -6178,7 +6388,7 @@ pub fn format_skills_path_gateway() -> String {
     let dir = crate::config::Config::skills_dir();
     let display = dir.display().to_string();
     format!(
-        "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run."
+        "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for disk use."
     )
 }
 
@@ -18703,6 +18913,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_agents_path_request(content) {
         return Some(format_agents_path_gateway());
     }
+    // Skills dir size before path (recursive bytes; no list); path before catalog.
+    if looks_like_skills_size_request(content) {
+        return Some(format_skills_size_gateway());
+    }
     if looks_like_skills_path_request(content) {
         return Some(format_skills_path_gateway());
     }
@@ -18967,8 +19181,9 @@ pub fn format_ops_help_gateway() -> String {
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
+• `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
-• `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
+• `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` for disk use)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
@@ -20554,6 +20769,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only agents dir path asks (v0.1.817) — config only; no list/create.
     if looks_like_agents_path_request(question) {
+        return true;
+    }
+    // Read-only skills dir size asks (v0.1.881) — recursive file bytes; no list dump.
+    if looks_like_skills_size_request(question) {
         return true;
     }
     // Read-only skills dir path asks (v0.1.819) — config only; no list/run.
@@ -24203,11 +24422,50 @@ mod tests {
         assert!(!looks_like_skills_path_request("skill file path"));
         assert!(!looks_like_skills_path_request("agents path"));
         assert!(!looks_like_skills_path_request("memory path"));
+        assert!(!looks_like_skills_path_request("skills size"));
+        assert!(!looks_like_skills_path_request("how big are skills"));
         assert!(!looks_like_skills_request("skills path"));
         let reply =
             try_operator_instant_reply("where is the skills folder").expect("skills path instant");
         assert!(reply.contains("Skills dir"));
         assert!(reply.contains("skills") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("skills size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn skills_size_request_detected() {
+        assert!(looks_like_skills_size_request("skills size"));
+        assert!(looks_like_skills_size_request("skill size"));
+        assert!(looks_like_skills_size_request("skills folder size"));
+        assert!(looks_like_skills_size_request("skills directory size"));
+        assert!(looks_like_skills_size_request("skills dir size"));
+        assert!(looks_like_skills_size_request("how big are skills"));
+        assert!(looks_like_skills_size_request("how big is the skills folder"));
+        assert!(looks_like_skills_size_request("how large is the skills folder"));
+        assert!(looks_like_skills_size_request("mac-stats skills size"));
+        assert!(!looks_like_skills_size_request("skills path"));
+        assert!(!looks_like_skills_size_request("where is the skills folder"));
+        assert!(!looks_like_skills_size_request("skills"));
+        assert!(!looks_like_skills_size_request("list skills"));
+        assert!(!looks_like_skills_size_request("/skills"));
+        assert!(!looks_like_skills_size_request("skill.md"));
+        assert!(!looks_like_skills_size_request("SKILL: summarize"));
+        assert!(!looks_like_skills_size_request("agents size"));
+        assert!(!looks_like_skills_size_request("tmp size"));
+        assert!(!looks_like_skills_size_request("plugins size"));
+        assert!(!looks_like_skills_path_request("skills size"));
+        assert!(!looks_like_agents_size_request("skills size"));
+        assert!(!looks_like_tmp_size_request("skills size"));
+        let reply =
+            try_operator_instant_reply("how big are skills").expect("skills size instant");
+        assert!(reply.contains("Skills"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("skills path") || reply.contains("folder"));
     }
 
     #[test]

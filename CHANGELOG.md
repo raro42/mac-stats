@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.881] - 2026-09-05
+
+### Added
+
+- **Instant lane: skills directory size** — `skills size`, `how big are skills`, `skills folder size`, and similar asks return recursive on-disk size under the Hermes skills folder without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `skills path` / `/skills` catalog / skill.md / `SKILL:`; p50 latency).
+
 ## [0.1.880] - 2026-09-05
 
 ### Added
