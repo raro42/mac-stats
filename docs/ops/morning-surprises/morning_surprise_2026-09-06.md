@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.889** | Instant lane: `config size` / `config.json size` / `how big is config` — on-disk size of app `config.json` (stat only; no dump; does not steal `config path` / `.config.env`). |
 | **v0.1.888** | Instant lane: `review logs` / `check logs` / `look at logs` / `read logs` → existing `/logs` Debug Log tail (no Ollama / Brave; digester Slowest had a ~40s Brave waste on bare `Review logs`). |
 | **v0.1.887** | Instant lane: notes / memory folder size (`notes size`, `how big are notes`, `memory folder size`) — recursive bytes under `~/.mac-stats/agents/notes/`; rejects bare `memory size` (RAM). |
 | **v0.1.886** | Instant lane: cleanup-quarantine directory size. |
@@ -15,18 +16,16 @@ Overnight autoresearch (Track B) for Ralf.
 ## Context
 
 - Digester open stayed empty (weather candidate already stale/shipped).
-- Slowest fuel: bare `Review logs` (lite + BRAVE_SEARCH ~40s) missed `/logs`.
 - Design review in grace (`feature-ai-chat` recommended when TCC allows).
-- Fuel: digester Slowest → standing backlog p50 latency.
+- Fuel: standing backlog p50 latency (config.json size after path lane).
 
 ## Try it
 
 ```text
-Review logs
-check logs
-look at the logs
-read logs
-/logs error
+config size
+config.json size
+how big is config
+config path
 ```
 
-Also still: `notes size` / `how big are notes`. Path lane: `memory path` / `notes path`. Bare `memory size` is not the notes-size lane (RAM).
+Also still: `Review logs` / `notes size`. Bare `memory size` is not the notes-size lane (RAM).
