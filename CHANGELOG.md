@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.884] - 2026-09-05
+
+### Added
+
+- **Instant lane: session directory size** — `session size`, `how big are sessions`, `session folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/session/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `session path` / `/sessions` Live/Files / session-memory path; p50 latency).
+
 ## [0.1.883] - 2026-09-05
 
 ### Added

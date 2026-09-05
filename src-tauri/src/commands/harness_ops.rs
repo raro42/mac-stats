@@ -5631,6 +5631,220 @@ pub fn format_results_tsv_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is the session folder / session size…” asks.
+/// Recursive file-byte sum under session dir — no list dump / path / Live/Files lanes.
+pub fn looks_like_session_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("resume")
+        || n.contains("compact")
+        || n.contains("reset")
+        || n.contains("/sessions")
+        || n.contains("sessions live")
+        || n.contains("sessions files")
+        || n.contains("live sessions")
+        || n.contains("session files")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("reset phrases")
+        || n.contains("session:")
+        || n.contains("session_")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let session_ctx = n.contains("session folder")
+        || n.contains("sessions folder")
+        || n.contains("session directory")
+        || n.contains("sessions directory")
+        || n.contains("session dir")
+        || n.contains("sessions dir")
+        || n.contains("session size")
+        || n.contains("sessions size")
+        || n.contains("mac-stats session")
+        || n.contains("mac stats session")
+        || n.contains("mac-stats sessions")
+        || n.contains("mac stats sessions")
+        || n == "session"
+        || n == "sessions"
+        || ((n.contains("session") || n.contains("sessions"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !session_ctx {
+        return false;
+    }
+    // Bare “session(s)” / path-only asks stay on the path lane.
+    if n == "session"
+        || n == "sessions"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "session size"
+            | "sessions size"
+            | "session folder size"
+            | "sessions folder size"
+            | "session directory size"
+            | "sessions directory size"
+            | "session dir size"
+            | "sessions dir size"
+            | "how big are sessions"
+            | "how big is sessions"
+            | "how big is session"
+            | "how big is the session folder"
+            | "how big is session folder"
+            | "how big is the sessions folder"
+            | "how big is sessions folder"
+            | "how big is the session directory"
+            | "how big is the sessions directory"
+            | "how large is the session folder"
+            | "how large are sessions"
+            | "how large is sessions"
+            | "session bytes"
+            | "sessions bytes"
+            | "mac-stats session size"
+            | "mac stats session size"
+            | "mac-stats sessions size"
+            | "mac stats sessions size"
+    ) || (n.contains("size") && session_ctx)
+        || (n.contains("big") && session_ctx)
+        || (n.contains("large") && session_ctx)
+        || (n.contains("bytes") && session_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && session_ctx)
+}
+
+/// Zero-LLM session directory size (recursive file bytes; no list dump).
+pub fn format_session_size_gateway() -> String {
+    let dir = crate::config::Config::session_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Sessions:** not created yet · app recreates under `~/.mac-stats/session/` · `session path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Sessions** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Sessions:** empty · `session path` for the folder · `/sessions` for Live/Files · Agent Ops → Sessions."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Sessions:** **{label}** on disk ({files} files) · `/sessions` for Live/Files · `session path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the session folder / session path…” asks.
 /// Config path only — does not list, resume, open, or delete sessions.
 pub fn looks_like_session_path_request(content: &str) -> bool {
@@ -5646,6 +5860,17 @@ pub fn looks_like_session_path_request(content: &str) -> bool {
     if n.contains("session memory")
         || n.contains("session-memory")
         || n.contains("session_memory")
+    {
+        return false;
+    }
+    // Size/big/large asks use the session size lane (v0.1.884).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -5734,7 +5959,7 @@ pub fn format_session_path_gateway() -> String {
     let dir = crate::config::Config::session_dir();
     let display = dir.display().to_string();
     format!(
-        "**Sessions:** `{display}` · `/sessions` for Live/Files · Agent Ops → Sessions."
+        "**Sessions:** `{display}` · `/sessions` for Live/Files · `session size` for disk use · Agent Ops → Sessions."
     )
 }
 
@@ -19359,6 +19584,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
     }
+    // Session dir size before path (recursive bytes; no list); path before Live/Files catalog.
+    if looks_like_session_size_request(content) {
+        return Some(format_session_size_gateway());
+    }
     if looks_like_session_path_request(content) {
         return Some(format_session_path_gateway());
     }
@@ -19643,7 +19872,8 @@ pub fn format_ops_help_gateway() -> String {
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
-• `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
+• `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
+• `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
@@ -21223,6 +21453,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory/notes path asks (v0.1.815) — config only; no list/save/scrub.
     if looks_like_memory_path_request(question) {
+        return true;
+    }
+    // Read-only session dir size asks (v0.1.884) — recursive file bytes; no list dump.
+    if looks_like_session_size_request(question) {
         return true;
     }
     // Read-only session dir path asks (v0.1.816) — config only; no list/resume.
@@ -24642,11 +24876,49 @@ mod tests {
         assert!(!looks_like_session_path_request("memory path"));
         assert!(!looks_like_session_path_request("session memory path"));
         assert!(!looks_like_session_path_request("session-memory path"));
+        assert!(!looks_like_session_path_request("session size"));
+        assert!(!looks_like_session_path_request("how big are sessions"));
         assert!(!looks_like_sessions_request("session path"));
         let reply =
             try_operator_instant_reply("where is the session folder").expect("session path instant");
         assert!(reply.contains("Sessions"));
         assert!(reply.contains("session") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("session size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn session_size_request_detected() {
+        assert!(looks_like_session_size_request("session size"));
+        assert!(looks_like_session_size_request("sessions size"));
+        assert!(looks_like_session_size_request("session folder size"));
+        assert!(looks_like_session_size_request("session directory size"));
+        assert!(looks_like_session_size_request("session dir size"));
+        assert!(looks_like_session_size_request("how big are sessions"));
+        assert!(looks_like_session_size_request("how big is the session folder"));
+        assert!(looks_like_session_size_request("how large is the session folder"));
+        assert!(looks_like_session_size_request("mac-stats session size"));
+        assert!(!looks_like_session_size_request("session path"));
+        assert!(!looks_like_session_size_request("where is the session folder"));
+        assert!(!looks_like_session_size_request("session"));
+        assert!(!looks_like_session_size_request("list sessions"));
+        assert!(!looks_like_session_size_request("/sessions"));
+        assert!(!looks_like_session_size_request("session memory path"));
+        assert!(!looks_like_session_size_request("session-memory path"));
+        assert!(!looks_like_session_size_request("agents size"));
+        assert!(!looks_like_session_size_request("prompts size"));
+        assert!(!looks_like_session_size_request("task size"));
+        assert!(!looks_like_session_path_request("session size"));
+        assert!(!looks_like_agents_size_request("session size"));
+        assert!(!looks_like_prompts_size_request("session size"));
+        let reply =
+            try_operator_instant_reply("how big are sessions").expect("session size instant");
+        assert!(reply.contains("Sessions"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
     }
 
     #[test]
