@@ -10525,6 +10525,7 @@ pub fn format_pinned_processes_path_gateway() -> String {
 
 /// True for short “where is schedules.json / schedules path…” asks.
 /// Config path only — does not list jobs/deliveries or run `/schedules` / schedule count.
+/// Size asks use the schedules.json size lane (v0.1.890).
 pub fn looks_like_schedules_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10575,6 +10576,13 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("schedule a")
         || n.contains("schedule me")
         || n.contains(" for tomorrow")
@@ -10673,8 +10681,196 @@ pub fn format_schedules_path_gateway() -> String {
     let path = crate::config::Config::schedules_file_path();
     let display = path.display().to_string();
     format!(
-        "**Schedules file:** `{display}` · Jobs + deliveries config · `/schedules` for the live list · does not create or remove jobs."
+        "**Schedules file:** `{display}` · Jobs + deliveries config · `schedules size` for on-disk bytes · `/schedules` for the live list · does not create or remove jobs."
     )
+}
+
+/// True for short “how big is schedules.json / schedules size…” asks.
+/// Stat only on `schedules.json` — does not steal path / `/schedules` / count / create.
+pub fn looks_like_schedules_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("schedule a")
+        || n.contains("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("awareness.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/schedules"
+        || n == "schedules"
+        || n == "/schedules jobs"
+        || n == "schedules jobs"
+        || n == "/schedules deliveries"
+        || n == "schedules deliveries"
+        || n == "/cron"
+        || n == "cron"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "my schedules"
+        || n == "my jobs"
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "recent deliveries"
+    {
+        return false;
+    }
+    let sched_ctx = n.contains("schedules.json")
+        || n.contains("schedules json")
+        || n.contains("schedule file")
+        || n.contains("schedules file")
+        || n.contains("cron file")
+        || n.contains("cron.json")
+        || n == "schedules size"
+        || n == "schedule size"
+        || n == "how big is schedules"
+        || n == "how big is the schedules"
+        || n == "how large is schedules"
+        || n == "how large is the schedules"
+        || n == "mac-stats schedules size"
+        || n == "mac stats schedules size"
+        || (n.contains("schedules")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")))
+        || (n.contains("schedule")
+            && n.contains("json")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")));
+    if !sched_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "schedules size"
+            | "schedule size"
+            | "schedules file size"
+            | "schedule file size"
+            | "schedules.json size"
+            | "schedules json size"
+            | "cron file size"
+            | "cron.json size"
+            | "mac-stats schedules size"
+            | "mac stats schedules size"
+            | "how big is schedules"
+            | "how big is the schedules"
+            | "how big is schedules.json"
+            | "how big is the schedules.json"
+            | "how big is the schedules file"
+            | "how big is the schedule file"
+            | "how large is schedules"
+            | "how large is the schedules"
+            | "how large is schedules.json"
+            | "schedules bytes"
+            | "schedules.json bytes"
+            | "schedules file bytes"
+    ) || (sched_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM schedules.json file size (stat only; no dump/list/create).
+pub fn format_schedules_size_gateway() -> String {
+    let path = crate::config::Config::schedules_file_path();
+    if !path.exists() {
+        return "**Schedules:** no `schedules.json` yet · app will create it when you add a job · `schedules path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Schedules:** empty `schedules.json` · `schedules path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Schedules:** **{label}** on disk · jobs + deliveries JSON · `schedules path` for the file · `/schedules` for the live list."
+            )
+        }
+        Err(e) => format!("**Schedules** — could not stat `schedules.json`: {e}"),
+    }
 }
 
 /// True for short “where is monitors.json / monitors path…” asks.
@@ -20568,6 +20764,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pinned_processes_path_request(content) {
         return Some(format_pinned_processes_path_gateway());
     }
+    // schedules.json size before path (stat only; no dump).
+    if looks_like_schedules_size_request(content) {
+        return Some(format_schedules_size_gateway());
+    }
     if looks_like_schedules_path_request(content) {
         return Some(format_schedules_path_gateway());
     }
@@ -20802,7 +21002,8 @@ pub fn format_ops_help_gateway() -> String {
 • `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
-• `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
+• `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `/schedules`)\n\
+• `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` for on-disk bytes; does not steal `/schedules`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; does not steal chat history)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
@@ -22481,6 +22682,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only pinned_processes.json path asks (v0.1.831) — config only; no list/pin/unpin.
     if looks_like_pinned_processes_path_request(question) {
+        return true;
+    }
+    // Read-only schedules.json size asks (v0.1.890) — stat only; no dump/list/create.
+    if looks_like_schedules_size_request(question) {
         return true;
     }
     // Read-only schedules.json path asks (v0.1.832) — config only; no list/count/create.
@@ -27072,6 +27277,9 @@ mod tests {
         assert!(!looks_like_schedules_path_request("schedule a task for tomorrow"));
         assert!(!looks_like_schedules_path_request("pinned processes path"));
         assert!(!looks_like_schedules_path_request("where is config"));
+        assert!(!looks_like_schedules_path_request("schedules size"));
+        assert!(!looks_like_schedules_path_request("schedules.json size"));
+        assert!(!looks_like_schedules_path_request("how big is schedules"));
         assert!(!looks_like_schedules_request("schedules path"));
         assert!(!looks_like_schedules_request("where is schedules.json"));
         assert!(looks_like_schedules_request("/schedules"));
@@ -27079,6 +27287,40 @@ mod tests {
             .expect("schedules path instant");
         assert!(reply.contains("Schedules file"));
         assert!(reply.contains("schedules") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("schedules size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn schedules_size_request_detected() {
+        assert!(looks_like_schedules_size_request("schedules size"));
+        assert!(looks_like_schedules_size_request("schedules.json size"));
+        assert!(looks_like_schedules_size_request("schedules file size"));
+        assert!(looks_like_schedules_size_request("how big is schedules"));
+        assert!(looks_like_schedules_size_request("how big is schedules.json"));
+        assert!(looks_like_schedules_size_request("how large is the schedules"));
+        assert!(looks_like_schedules_size_request("mac-stats schedules size"));
+        assert!(!looks_like_schedules_size_request("schedules path"));
+        assert!(!looks_like_schedules_size_request("where is schedules.json"));
+        assert!(!looks_like_schedules_size_request("schedules.json"));
+        assert!(!looks_like_schedules_size_request("/schedules"));
+        assert!(!looks_like_schedules_size_request("schedule count"));
+        assert!(!looks_like_schedules_size_request("list schedules"));
+        assert!(!looks_like_schedules_size_request("config size"));
+        assert!(!looks_like_schedules_size_request("monitors.json size"));
+        assert!(!looks_like_schedules_path_request("schedules size"));
+        assert!(!looks_like_config_size_request("schedules size"));
+        let reply =
+            try_operator_instant_reply("how big is schedules").expect("schedules size instant");
+        assert!(
+            reply.contains("Schedules")
+                && (reply.contains("on disk")
+                    || reply.contains("empty")
+                    || reply.contains("no `schedules.json`")),
+            "{reply}"
+        );
     }
 
     #[test]

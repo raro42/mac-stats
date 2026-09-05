@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.890] - 2026-09-06
+
+### Added
+
+- **Instant lane: schedules.json size** — `schedules size`, `schedules.json size`, `how big is schedules`, and close variants return on-disk size of `schedules.json` without Ollama (Discord + AI Chat; stat only — no dump/list/create; does not steal `schedules path` / `/schedules` / schedule count; p50 latency).
+
 ## [0.1.889] - 2026-09-06
 
 ### Added
