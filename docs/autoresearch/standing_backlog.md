@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.868** — Instant lane: results.tsv age (`results.tsv age`, `how old is results.tsv`, `when was results.tsv updated`, `results.tsv last modified`; mtime only; no dump; does not steal `results.tsv path` / `improvements path`; p50 latency).
+
 - **v0.1.867** — Instant lane: runs.jsonl age (`runs age`, `how old is runs.jsonl`, `when was runs updated`, `runs.jsonl last modified`; mtime only; no list/count; does not steal `runs path` / `/insights` / how-many-runs; p50 latency).
 
 - **v0.1.866** — Instant lane: results.tsv path (`results.tsv path`, `where is results.tsv`, `autoresearch results path`, `ratchet results path`; `~/.mac-stats/improvements/autoresearch/results.tsv`; config only; no dump; does not steal `improvements path` / bare `autoresearch path`; p50 latency).

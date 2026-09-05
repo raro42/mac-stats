@@ -4598,12 +4598,167 @@ pub fn format_launchagent_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is results.tsv / results.tsv age…” asks.
+/// Mtime only — does not dump keep/discard rows or steal the path lane.
+pub fn looks_like_results_tsv_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Do not steal path / dump / improvements-dir / overnight asks.
+    // Path steal is keyword-only (no looks_like_results_tsv_path_request) to avoid mutual recursion.
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let results_ctx = n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results file")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard results")
+        || n.contains("keep discard log")
+        || (n.contains("results")
+            && (n.contains("tsv")
+                || n.contains("ratchet")
+                || n.contains("autoresearch")
+                || n.contains("keep discard")
+                || n.contains("file")));
+    if !results_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "results.tsv age"
+            | "results tsv age"
+            | "results age"
+            | "autoresearch results age"
+            | "ratchet results age"
+            | "keep discard results age"
+            | "keep discard log age"
+            | "how old is results.tsv"
+            | "how old is the results.tsv"
+            | "how old is results tsv"
+            | "how old is the results tsv"
+            | "how old is the results file"
+            | "how old is autoresearch results"
+            | "how old is the autoresearch results"
+            | "how old is ratchet results"
+            | "how old is the ratchet results"
+            | "how old is the keep discard log"
+            | "when was results.tsv updated"
+            | "when was the results.tsv updated"
+            | "when was results updated"
+            | "when was the results file updated"
+            | "when was autoresearch results updated"
+            | "when was ratchet results updated"
+            | "results.tsv last modified"
+            | "results last modified"
+            | "results file last modified"
+            | "autoresearch results last modified"
+            | "ratchet results last modified"
+            | "is results.tsv stale"
+            | "is the results file stale"
+            | "is autoresearch results stale"
+            | "is ratchet results stale"
+    ) || (n.contains("age") && results_ctx)
+        || (n.contains("old") && results_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified")) && results_ctx)
+        || (n.contains("stale") && results_ctx)
+}
+
+/// Zero-LLM autoresearch results.tsv age from file mtime (stat only; no dump/list).
+pub fn format_results_tsv_age_gateway() -> String {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return "**Autoresearch results:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Autoresearch results:** last write **{age}** ago · keep/discard log · `results.tsv path` for the file · `improvements path` for the parent folder."
+            )
+        }
+        Err(e) => format!("**Autoresearch results** — could not stat `results.tsv`: {e}"),
+    }
+}
+
 /// True for short “where is results.tsv / autoresearch results path…” asks.
 /// Path only — does not dump keep/discard rows or open the improvements folder.
 /// Does not steal `improvements path` / bare `autoresearch path` (directory lane).
 pub fn looks_like_results_tsv_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
+        return false;
+    }
+    // Age check is keyword-only here to avoid mutual recursion with looks_like_results_tsv_age_request.
+    if n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
         return false;
     }
     // String-only sibling excludes (do not nest looks_like_* — exponential).
@@ -16264,7 +16419,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv before improvements-dir / bare autoresearch path lane.
+    // results.tsv age before path (mtime; no dump); path before improvements-dir.
+    if looks_like_results_tsv_age_request(content) {
+        return Some(format_results_tsv_age_gateway());
+    }
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
@@ -16424,7 +16582,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv before improvements-dir / bare autoresearch path lane.
+    // results.tsv age before path (mtime; no dump); path before improvements-dir.
+    if looks_like_results_tsv_age_request(content) {
+        return Some(format_results_tsv_age_gateway());
+    }
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
@@ -16663,6 +16824,7 @@ pub fn format_ops_help_gateway() -> String {
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
+• `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
@@ -18183,6 +18345,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv age asks (v0.1.868) — mtime only; no dump.
+    if looks_like_results_tsv_age_request(question) {
         return true;
     }
     // Read-only results.tsv path asks (v0.1.866) — config only; no dump.
@@ -21509,6 +21675,8 @@ mod tests {
         assert!(!looks_like_results_tsv_path_request("dump results.tsv"));
         assert!(!looks_like_results_tsv_path_request("runs path"));
         assert!(!looks_like_results_tsv_path_request("launchagent path"));
+        assert!(!looks_like_results_tsv_path_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_path_request("how old is results.tsv"));
         assert!(!looks_like_improvements_path_request("results.tsv path"));
         assert!(!looks_like_improvements_path_request("autoresearch results path"));
         assert!(looks_like_improvements_path_request("autoresearch path"));
@@ -21517,6 +21685,31 @@ mod tests {
         assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
         assert!(reply.contains("results.tsv"));
         assert!(reply.contains("improvements path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn results_tsv_age_request_detected() {
+        assert!(looks_like_results_tsv_age_request("results.tsv age"));
+        assert!(looks_like_results_tsv_age_request("results tsv age"));
+        assert!(looks_like_results_tsv_age_request("how old is results.tsv"));
+        assert!(looks_like_results_tsv_age_request("how old is the results file"));
+        assert!(looks_like_results_tsv_age_request("when was results.tsv updated"));
+        assert!(looks_like_results_tsv_age_request("results.tsv last modified"));
+        assert!(looks_like_results_tsv_age_request("is results.tsv stale"));
+        assert!(looks_like_results_tsv_age_request("autoresearch results age"));
+        assert!(looks_like_results_tsv_age_request("ratchet results age"));
+        assert!(!looks_like_results_tsv_age_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_age_request("where is results.tsv"));
+        assert!(!looks_like_results_tsv_age_request("list results.tsv"));
+        assert!(!looks_like_results_tsv_age_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_age_request("improvements path"));
+        assert!(!looks_like_results_tsv_age_request("runs age"));
+        assert!(!looks_like_results_tsv_age_request("log age"));
+        assert!(!looks_like_results_tsv_path_request("how old is results.tsv"));
+        let reply =
+            try_operator_instant_reply("how old is results.tsv").expect("results.tsv age instant");
+        assert!(reply.contains("Autoresearch results"));
+        assert!(reply.contains("ago") || reply.contains("no `results.tsv`"));
     }
 
     #[test]

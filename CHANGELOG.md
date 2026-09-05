@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.868] - 2026-09-05
+
+### Added
+
+- **Instant lane: results.tsv age** — `results.tsv age`, `how old is results.tsv`, `when was results.tsv updated`, and similar asks return last-write age from `results.tsv` mtime without Ollama (Discord + AI Chat; stat only — no dump of keep/discard rows; does not steal `results.tsv path` / `improvements path`; p50 latency).
+
 ## [0.1.867] - 2026-09-05
 
 ### Added
