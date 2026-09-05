@@ -6890,6 +6890,189 @@ pub fn format_uploads_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are traces / traces size…” asks.
+/// Recursive file-byte sum under CDP traces dir — no list dump / path / prune lanes.
+pub fn looks_like_traces_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("stacktrace")
+        || n.contains("stack trace")
+        || n.contains("backtrace")
+        || n.contains("back trace")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("improvements")
+        || n.contains("pdf")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let traces_ctx = n.contains("traces folder")
+        || n.contains("traces directory")
+        || n.contains("traces dir")
+        || n.contains("traces size")
+        || n.contains("trace folder")
+        || n.contains("trace directory")
+        || n.contains("trace dir")
+        || n.contains("trace size")
+        || n.contains("cdp traces")
+        || n.contains("cdp trace")
+        || n.contains("browser traces")
+        || n.contains("browser trace")
+        || n.contains("mac-stats traces")
+        || n.contains("mac stats traces")
+        || n == "traces"
+        || n == "trace"
+        || ((n.contains("trace"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !traces_ctx {
+        return false;
+    }
+    // Bare “traces” / path-only asks stay on the path lane.
+    if n == "traces"
+        || n == "trace"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "traces size"
+            | "trace size"
+            | "traces folder size"
+            | "trace folder size"
+            | "traces directory size"
+            | "trace directory size"
+            | "traces dir size"
+            | "trace dir size"
+            | "how big are traces"
+            | "how big is traces"
+            | "how big is the traces folder"
+            | "how big is traces folder"
+            | "how big is the trace folder"
+            | "how big is trace folder"
+            | "how big is the traces directory"
+            | "how big is the trace directory"
+            | "how large is the traces folder"
+            | "how large is the trace folder"
+            | "how large are traces"
+            | "traces bytes"
+            | "trace bytes"
+            | "traces folder bytes"
+            | "trace folder bytes"
+            | "cdp traces size"
+            | "cdp trace size"
+            | "browser traces size"
+            | "browser trace size"
+    ) || (n.contains("size") && traces_ctx)
+        || (n.contains("big") && traces_ctx)
+        || (n.contains("large") && traces_ctx)
+        || (n.contains("bytes") && traces_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && traces_ctx)
+}
+
+/// Zero-LLM CDP traces directory size (recursive file bytes; no list dump).
+pub fn format_traces_size_gateway() -> String {
+    let dir = crate::config::Config::browser_cdp_traces_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Traces:** not created yet · app recreates under `~/.mac-stats/traces/` · `traces path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Traces** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Traces:** empty · `traces path` for the folder · CDP `*_cdp_trace.json` · `/browser` for CDP status."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Traces:** **{label}** on disk ({files} files) · CDP · `traces path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the traces folder / traces path…” asks.
 /// Config path only — does not list, prune, or open CDP trace JSON under `~/.mac-stats/traces/`.
 pub fn looks_like_traces_path_request(content: &str) -> bool {
@@ -6921,6 +7104,13 @@ pub fn looks_like_traces_path_request(content: &str) -> bool {
         || n.contains("back trace")
         || n.contains("browser_")
         || n.contains("browser:")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -7031,7 +7221,7 @@ pub fn format_traces_path_gateway() -> String {
     let dir = crate::config::Config::browser_cdp_traces_dir();
     let display = dir.display().to_string();
     format!(
-        "**Traces dir:** `{display}` · CDP `*_cdp_trace.json` · pruned by retention · `/browser` for CDP status."
+        "**Traces dir:** `{display}` · CDP `*_cdp_trace.json` · pruned by retention · `/browser` for CDP status · `traces size` for disk use."
     )
 }
 
@@ -17948,6 +18138,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_uploads_path_request(content) {
         return Some(format_uploads_path_gateway());
     }
+    // Traces dir size before path (recursive bytes; no list); path before prune/list.
+    if looks_like_traces_size_request(content) {
+        return Some(format_traces_size_gateway());
+    }
     if looks_like_traces_path_request(content) {
         return Some(format_traces_path_gateway());
     }
@@ -18184,6 +18378,7 @@ pub fn format_ops_help_gateway() -> String {
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
 • `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
+• `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / prune)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
@@ -19784,6 +19979,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only uploads dir path asks (v0.1.824) — config only; no list/upload.
     if looks_like_uploads_path_request(question) {
+        return true;
+    }
+    // Read-only CDP traces dir size asks (v0.1.877) — recursive file bytes; no list dump.
+    if looks_like_traces_size_request(question) {
         return true;
     }
     // Read-only CDP traces dir path asks (v0.1.825) — config only; no list/prune.
@@ -23556,11 +23755,50 @@ mod tests {
         assert!(!looks_like_traces_path_request("pdfs path"));
         assert!(!looks_like_traces_path_request("where is config"));
         assert!(!looks_like_traces_path_request("/browser"));
+        assert!(!looks_like_traces_path_request("traces size"));
+        assert!(!looks_like_traces_path_request("how big are traces"));
         assert!(!looks_like_uploads_path_request("traces path"));
         let reply =
             try_operator_instant_reply("where is the traces folder").expect("traces path instant");
         assert!(reply.contains("Traces dir"));
         assert!(reply.contains("traces") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("traces size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn traces_size_request_detected() {
+        assert!(looks_like_traces_size_request("traces size"));
+        assert!(looks_like_traces_size_request("trace size"));
+        assert!(looks_like_traces_size_request("traces folder size"));
+        assert!(looks_like_traces_size_request("trace folder size"));
+        assert!(looks_like_traces_size_request("traces dir size"));
+        assert!(looks_like_traces_size_request("how big are traces"));
+        assert!(looks_like_traces_size_request("how big is the traces folder"));
+        assert!(looks_like_traces_size_request("how large is the trace folder"));
+        assert!(looks_like_traces_size_request("cdp traces size"));
+        assert!(looks_like_traces_size_request("browser traces size"));
+        assert!(!looks_like_traces_size_request("traces path"));
+        assert!(!looks_like_traces_size_request("where is the traces folder"));
+        assert!(!looks_like_traces_size_request("traces"));
+        assert!(!looks_like_traces_size_request("list traces"));
+        assert!(!looks_like_traces_size_request("clean traces"));
+        assert!(!looks_like_traces_size_request("stack trace"));
+        assert!(!looks_like_traces_size_request("tmp size"));
+        assert!(!looks_like_traces_size_request("uploads size"));
+        assert!(!looks_like_traces_size_request("screenshots size"));
+        assert!(!looks_like_traces_path_request("traces size"));
+        assert!(!looks_like_uploads_size_request("traces size"));
+        assert!(!looks_like_tmp_size_request("traces size"));
+        let reply =
+            try_operator_instant_reply("how big is the traces folder").expect("traces size instant");
+        assert!(reply.contains("Traces"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("traces path") || reply.contains("folder"));
     }
 
     #[test]
