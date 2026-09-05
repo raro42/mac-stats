@@ -5738,6 +5738,200 @@ pub fn format_session_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are agents / agents size…” asks.
+/// Recursive file-byte sum under agents dir — no list dump / path / On-Off lanes.
+pub fn looks_like_agents_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/agents")
+        || n.contains("agents on")
+        || n.contains("agents off")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n.contains("skill")
+        || n.contains("skills")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.starts_with("agent:")
+        || n.contains("agent:")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agents_ctx = n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent dir")
+        || n.contains("agents size")
+        || n.contains("agent size")
+        || n.contains("mac-stats agents")
+        || n.contains("mac stats agents")
+        || n == "agents"
+        || n == "agent"
+        || ((n.contains("agents") || n.contains("agent"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !agents_ctx {
+        return false;
+    }
+    // Bare “agents” / path-only asks stay on the path lane.
+    if n == "agents"
+        || n == "agent"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "agents size"
+            | "agent size"
+            | "agents folder size"
+            | "agent folder size"
+            | "agents directory size"
+            | "agent directory size"
+            | "agents dir size"
+            | "agent dir size"
+            | "how big are agents"
+            | "how big is agents"
+            | "how big is the agents folder"
+            | "how big is agents folder"
+            | "how big is the agent folder"
+            | "how big is agent folder"
+            | "how big is the agents directory"
+            | "how big is the agent directory"
+            | "how large is the agents folder"
+            | "how large are agents"
+            | "how large is agents"
+            | "agents bytes"
+            | "agent bytes"
+            | "mac-stats agents size"
+            | "mac stats agents size"
+    ) || (n.contains("size") && agents_ctx)
+        || (n.contains("big") && agents_ctx)
+        || (n.contains("large") && agents_ctx)
+        || (n.contains("bytes") && agents_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && agents_ctx)
+}
+
+/// Zero-LLM agents directory size (recursive file bytes; no list dump).
+pub fn format_agents_size_gateway() -> String {
+    let dir = crate::config::Config::agents_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Agents:** not created yet · app recreates under `~/.mac-stats/agents/` · `agents path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Agents** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Agents:** empty · `agents path` for the folder · `/agents` for On/Off · Agent Ops → Agents."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Agents:** **{label}** on disk ({files} files) · `/agents` for On/Off · `agents path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the agents folder / agents path…” asks.
 /// Config path only — does not list On/Off, create, edit, or enable agents.
 pub fn looks_like_agents_path_request(content: &str) -> bool {
@@ -5762,7 +5956,14 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
     {
         return false;
     }
-    if n.contains("how many")
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
         || n.contains("list")
@@ -5857,7 +6058,7 @@ pub fn format_agents_path_gateway() -> String {
     let dir = crate::config::Config::agents_dir();
     let display = dir.display().to_string();
     format!(
-        "**Agents dir:** `{display}` · `/agents` for On/Off · Agent Ops → Agents."
+        "**Agents dir:** `{display}` · `/agents` for On/Off · Agent Ops → Agents · `agents size` for disk use."
     )
 }
 
@@ -18495,6 +18696,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_path_request(content) {
         return Some(format_session_path_gateway());
     }
+    // Agents dir size before path (recursive bytes; no list); path before On/Off catalog.
+    if looks_like_agents_size_request(content) {
+        return Some(format_agents_size_gateway());
+    }
     if looks_like_agents_path_request(content) {
         return Some(format_agents_path_gateway());
     }
@@ -18761,6 +18966,7 @@ pub fn format_ops_help_gateway() -> String {
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
+• `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
@@ -20340,6 +20546,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session dir path asks (v0.1.816) — config only; no list/resume.
     if looks_like_session_path_request(question) {
+        return true;
+    }
+    // Read-only agents dir size asks (v0.1.880) — recursive file bytes; no list dump.
+    if looks_like_agents_size_request(question) {
         return true;
     }
     // Read-only agents dir path asks (v0.1.817) — config only; no list/create.
@@ -23925,11 +24135,52 @@ mod tests {
         assert!(!looks_like_agents_path_request("notes folder"));
         assert!(!looks_like_agents_path_request("skills path"));
         assert!(!looks_like_agents_path_request("session path"));
+        assert!(!looks_like_agents_path_request("agents size"));
+        assert!(!looks_like_agents_path_request("how big are agents"));
         assert!(!looks_like_agents_request("agents path"));
         let reply =
             try_operator_instant_reply("where is the agents folder").expect("agents path instant");
         assert!(reply.contains("Agents dir"));
         assert!(reply.contains("agents") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("agents size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn agents_size_request_detected() {
+        assert!(looks_like_agents_size_request("agents size"));
+        assert!(looks_like_agents_size_request("agent size"));
+        assert!(looks_like_agents_size_request("agents folder size"));
+        assert!(looks_like_agents_size_request("agents directory size"));
+        assert!(looks_like_agents_size_request("agents dir size"));
+        assert!(looks_like_agents_size_request("how big are agents"));
+        assert!(looks_like_agents_size_request("how big is the agents folder"));
+        assert!(looks_like_agents_size_request("how large is the agents folder"));
+        assert!(looks_like_agents_size_request("mac-stats agents size"));
+        assert!(!looks_like_agents_size_request("agents path"));
+        assert!(!looks_like_agents_size_request("where is the agents folder"));
+        assert!(!looks_like_agents_size_request("agents"));
+        assert!(!looks_like_agents_size_request("list agents"));
+        assert!(!looks_like_agents_size_request("/agents"));
+        assert!(!looks_like_agents_size_request("agents on"));
+        assert!(!looks_like_agents_size_request("skills size"));
+        assert!(!looks_like_agents_size_request("tmp size"));
+        assert!(!looks_like_agents_size_request("uploads size"));
+        assert!(!looks_like_agents_size_request("pdfs size"));
+        assert!(!looks_like_agents_size_request("agent.json"));
+        assert!(!looks_like_agents_path_request("agents size"));
+        assert!(!looks_like_tmp_size_request("agents size"));
+        assert!(!looks_like_uploads_size_request("agents size"));
+        assert!(!looks_like_pdfs_size_request("agents size"));
+        let reply =
+            try_operator_instant_reply("how big are agents").expect("agents size instant");
+        assert!(reply.contains("Agents"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("agents path") || reply.contains("folder"));
     }
 
     #[test]
