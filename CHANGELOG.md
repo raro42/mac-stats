@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.871] - 2026-09-05
+
+### Added
+
+- **Instant lane: digest file size** — `digest size`, `how big is the digest`, `latest.json size`, and similar asks return on-disk size from digester `latest.json` metadata without Ollama (Discord + AI Chat; stat only — no digester spawn / open dump; does not steal `digest age` / `digest open` / `/digest` refresh; p50 latency).
+
 ## [0.1.870] - 2026-09-05
 
 ### Added

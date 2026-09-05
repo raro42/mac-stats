@@ -1001,6 +1001,20 @@ pub fn looks_like_digest_refresh_request(content: &str) -> bool {
     if looks_like_digest_open_request(content) {
         return false;
     }
+    // Do not steal read-only size/age (keyword-only; no nested looks_like_*).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("path")
+        || n.contains("where")
+    {
+        return false;
+    }
     matches!(
         n.as_str(),
         "digest"
@@ -1057,6 +1071,23 @@ pub fn looks_like_digest_age_request(content: &str) -> bool {
         || n.starts_with("refresh digest")
         || n.contains("why")
         || n.contains("explain")
+        // Keyword-only size steal (no nested looks_like_* — exponential).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("open candidate")
+        || n.contains("digest open")
+        || n.contains("open digest")
     {
         return false;
     }
@@ -1102,6 +1133,124 @@ pub fn format_digest_age_gateway() -> String {
     reply
 }
 
+/// True for short “how big is the digest / digest size…” asks.
+/// Stat only on `latest.json` — does not refresh, dump open hints, or steal age/open.
+pub fn looks_like_digest_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("generated")
+        || n.contains("refresh")
+        || n.contains("run digester")
+        || n.contains("run digest")
+        || n.contains("rerun")
+        || n.starts_with("update digest")
+        || n.starts_with("refresh digest")
+        || n.contains("open candidate")
+        || n.contains("digest open")
+        || n.contains("open digest")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results size")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    if !n.contains("digest") && !n.contains("digester") && !n.contains("latest.json") {
+        return false;
+    }
+    let digest_ctx = n.contains("digest")
+        || n.contains("digester")
+        || n.contains("latest.json")
+        || n.contains("latest json");
+    if !digest_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "digest size"
+            | "digest file size"
+            | "digester size"
+            | "latest.json size"
+            | "latest json size"
+            | "how big is the digest"
+            | "how big is digest"
+            | "how big is the digester"
+            | "how big is digester"
+            | "how big is latest.json"
+            | "how big is the digest file"
+            | "how large is the digest"
+            | "how large is digest"
+            | "how large is latest.json"
+            | "digest bytes"
+            | "digest file bytes"
+            | "latest.json bytes"
+    ) || (n.contains("size") && digest_ctx)
+        || (n.contains("big") && digest_ctx)
+        || (n.contains("large") && digest_ctx)
+        || (n.contains("bytes") && digest_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && digest_ctx)
+}
+
+/// Zero-LLM digest `latest.json` file size (stat only; no digester spawn / open dump).
+pub fn format_digest_size_gateway() -> String {
+    let path = digest_json_path();
+    if !path.exists() {
+        return "**Digest:** no `latest.json` yet · run `/digest` first · `digest age` after a refresh."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Digest:** empty `latest.json` · `/digest` to refresh · `digest age` for cache age."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Digest:** **{label}** on disk (`latest.json`) · `digest age` for cache age · `digest open` for candidates · `/digest` to refresh."
+            )
+        }
+        Err(e) => format!("**Digest** — could not stat `latest.json`: {e}"),
+    }
+}
+
 /// Instant digest age reply (read-only cache; no digester spawn).
 pub fn try_digest_age_instant_reply(content: &str) -> Option<String> {
     if looks_like_digest_age_request(content) {
@@ -1111,8 +1260,12 @@ pub fn try_digest_age_instant_reply(content: &str) -> Option<String> {
     }
 }
 
-/// Instant digest reply: read-only open/age use cache; refresh re-runs digester.
+/// Instant digest reply: read-only size/open/age use cache; refresh re-runs digester.
 pub fn try_digest_instant_reply(content: &str) -> Option<String> {
+    // Size before age/open (stat only; no digester spawn).
+    if looks_like_digest_size_request(content) {
+        return Some(format_digest_size_gateway());
+    }
     if looks_like_digest_age_request(content) {
         return Some(format_digest_age_gateway());
     }
@@ -3381,6 +3534,10 @@ pub fn looks_like_runs_size_request(content: &str) -> bool {
         || n.contains("results.tsv")
         || n.contains("results tsv")
         || n.contains("results size")
+        || n.contains("digest size")
+        || n.contains("how big is the digest")
+        || n.contains("how big is digest")
+        || n.contains("latest.json size")
         || n.contains("debug.log")
         || n.contains("debug log")
         || ((n.contains("debug log") || n.contains("debug.log") || n.starts_with("log "))
@@ -4766,6 +4923,10 @@ pub fn looks_like_results_tsv_size_request(content: &str) -> bool {
         || n.contains("log size")
         || n.contains("log file size")
         || n.contains("digest age")
+        || n.contains("digest size")
+        || n.contains("how big is the digest")
+        || n.contains("how big is digest")
+        || n.contains("latest.json size")
         || n.contains("how many")
         || n.contains("number of")
         || n == "count"
@@ -17167,6 +17328,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/digest` — refresh digester (latest.md/json)\n\
 • `digest open` — cached open candidates (no digester spawn)\n\
 • `digest age` — cached digest timestamp (no digester spawn)\n\
+• `digest size` · `how big is the digest` · `latest.json size` — digest `latest.json` size on disk (stat only; no digester spawn)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
@@ -18540,6 +18702,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains("explain")
     {
+        return true;
+    }
+    // Read-only digest size asks (v0.1.871) — latest.json stat only, no digester spawn.
+    if looks_like_digest_size_request(question) {
         return true;
     }
     // Read-only digest age asks (v0.1.806) — cached timestamp, no digester spawn.
@@ -20479,8 +20645,45 @@ mod tests {
         assert!(!looks_like_digest_age_request("/digest"));
         assert!(!looks_like_digest_age_request("refresh digest"));
         assert!(!looks_like_digest_age_request("update digest"));
+        assert!(!looks_like_digest_age_request("digest size"));
+        assert!(!looks_like_digest_age_request("how big is the digest"));
         let reply = try_operator_instant_reply("digest age").expect("digest age instant");
         assert!(reply.contains("cached"), "{reply}");
+        assert!(
+            !reply.to_lowercase().contains("refreshed"),
+            "read-only must not re-run digester: {reply}"
+        );
+    }
+
+    #[test]
+    fn digest_size_request_detected() {
+        assert!(looks_like_digest_size_request("digest size"));
+        assert!(looks_like_digest_size_request("digest file size"));
+        assert!(looks_like_digest_size_request("how big is the digest"));
+        assert!(looks_like_digest_size_request("how big is digest"));
+        assert!(looks_like_digest_size_request("how large is the digest"));
+        assert!(looks_like_digest_size_request("latest.json size"));
+        assert!(looks_like_digest_size_request("how big is latest.json"));
+        assert!(!looks_like_digest_size_request("digest age"));
+        assert!(!looks_like_digest_size_request("how old is the digest"));
+        assert!(!looks_like_digest_size_request("digest open"));
+        assert!(!looks_like_digest_size_request("/digest"));
+        assert!(!looks_like_digest_size_request("refresh digest"));
+        assert!(!looks_like_digest_size_request("results.tsv size"));
+        assert!(!looks_like_digest_size_request("runs size"));
+        assert!(!looks_like_digest_size_request("log file size"));
+        assert!(!looks_like_digest_size_request("improvements path"));
+        assert!(!looks_like_digest_age_request("digest size"));
+        assert!(!looks_like_digest_refresh_request("digest size"));
+        assert!(!looks_like_digest_refresh_request("how big is the digest"));
+        let reply = try_operator_instant_reply("how big is the digest").expect("digest size instant");
+        assert!(reply.contains("Digest"), "{reply}");
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("no `latest.json`"),
+            "{reply}"
+        );
         assert!(
             !reply.to_lowercase().contains("refreshed"),
             "read-only must not re-run digester: {reply}"
@@ -21823,6 +22026,8 @@ mod tests {
         assert!(!looks_like_runs_size_request("list runs"));
         assert!(!looks_like_runs_size_request("log file size"));
         assert!(!looks_like_runs_size_request("results.tsv size"));
+        assert!(!looks_like_runs_size_request("digest size"));
+        assert!(!looks_like_runs_size_request("how big is the digest"));
         assert!(!looks_like_runs_path_request("how big is runs.jsonl"));
         assert!(!looks_like_runs_age_request("runs size"));
         let reply = try_operator_instant_reply("how big is runs.jsonl").expect("runs size instant");
@@ -22047,6 +22252,8 @@ mod tests {
         assert!(!looks_like_results_tsv_size_request("improvements path"));
         assert!(!looks_like_results_tsv_size_request("log file size"));
         assert!(!looks_like_results_tsv_size_request("runs age"));
+        assert!(!looks_like_results_tsv_size_request("digest size"));
+        assert!(!looks_like_results_tsv_size_request("how big is the digest"));
         assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
         assert!(!looks_like_results_tsv_age_request("results.tsv size"));
         let reply =
