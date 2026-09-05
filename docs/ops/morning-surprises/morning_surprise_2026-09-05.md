@@ -1,36 +1,29 @@
 # Morning surprise — 2026-09-05
 
-Overnight Track B kept shipping **instant-lane** size/age/path operators so Discord/AI Chat skips Ollama for operator housekeeping.
+Overnight Track B (autoresearch) shipped **instant directory-size lanes** so operators can ask disk use without waking Ollama.
 
-## Shipped tonight (highlights)
+## Shipped tonight (keep)
 
 | Version | What |
 |---------|------|
-| **v0.1.875** | Instant: **tmp directory size** (`tmp size`, `how big is tmp`, `tmp folder size`, …) — recursive file bytes under `~/.mac-stats/tmp/`; no list dump; does not steal path/prune/temperature |
-| **v0.1.874** | Instant: **screenshots directory size** (`screenshots size`, `how big are screenshots`, …) — recursive under BROWSER_SCREENSHOT dir |
-| **v0.1.873** | Instant: **improvements directory size** — recursive under `~/.mac-stats/improvements/` |
-| **v0.1.872** | Instant: **digest.md / latest.md size** — `latest.md` stat only |
-| **v0.1.871** | Instant: **digest file size** — `latest.json` stat only |
-| **v0.1.870** | Instant: **runs.jsonl size** |
-| **v0.1.869** | Instant: **results.tsv size** |
-| **v0.1.868** | Instant: **results.tsv age** |
-| **v0.1.867** | Instant: **runs.jsonl age** |
-| **v0.1.866** | Instant: **results.tsv path** |
-| **v0.1.865** | Agent Ops Filter attention glance (On/Off · Live/Files · Jobs/Deliveries · Discord/Core · Runs lanes) |
+| **v0.1.876** | Instant lane: **uploads** directory size (`uploads size`, `how big are uploads`, …) — recursive bytes under `~/.mac-stats/uploads/` |
+| **v0.1.875** | Instant lane: **tmp** directory size |
+| **v0.1.874** | Instant lane: **screenshots** directory size |
+| **v0.1.873** | Instant lane: **improvements** directory size |
+| **v0.1.872** | Instant lane: **digest.md / latest.md** file size |
+| **v0.1.871** | Instant lane: **digest** (`latest.json`) file size |
+| **v0.1.870** | Instant lane: **runs.jsonl** size |
+| **v0.1.869** | Instant lane: **results.tsv** size |
+| **v0.1.868** | Instant lane: **results.tsv** age |
+| **v0.1.867** | Instant lane: **runs.jsonl** age |
 
-## Tick notes (~05:35)
+## Digester / design review
 
-- Digester **open** empty; design review **due=false** (grace; screens aged).
-- Fuel: standing backlog p50 latency → tmp dir size (after screenshots size).
-- Debug log scan: no ERROR/WARN clusters in window.
-- Shared helper: `dir_total_bytes` (improvements + screenshots + tmp).
+- Digester **open** empty (Elmasnow weather already filtered as shipped).
+- Design review **due=false** (grace); stale PNGs still aged (`feature-ai-chat` ~21.7d) — screenshot polish deferred (TCC).
+- No ERROR/WARN clusters in the recent debug.log window.
 
-## Try it
+## Next night fuel
 
-```text
-tmp size
-how big is tmp
-tmp folder size
-tmp path
-screenshots size
-```
+- Dir sizes still open: traces / pdfs / agents / session / task / cleanup-quarantine.
+- Or a design-review polish when screenshot capture works.
