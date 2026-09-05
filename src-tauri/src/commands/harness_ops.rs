@@ -6392,6 +6392,242 @@ pub fn format_skills_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are plugins / plugins size…” asks.
+/// Recursive file-byte sum under scripts/plugins dir — no list dump / path / On-Off lanes.
+pub fn looks_like_plugins_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/plugins")
+        || n.contains("plugins on")
+        || n.contains("plugins off")
+        || n.contains("run plugin")
+        || n.contains("execute")
+        || n.contains("install")
+        || n.contains("plugin:")
+        || n.contains("tauri")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let plugins_ctx = n.contains("plugins folder")
+        || n.contains("plugin folder")
+        || n.contains("plugins directory")
+        || n.contains("plugin directory")
+        || n.contains("plugins dir")
+        || n.contains("plugin dir")
+        || n.contains("plugins size")
+        || n.contains("plugin size")
+        || n.contains("scripts folder")
+        || n.contains("script folder")
+        || n.contains("scripts directory")
+        || n.contains("script directory")
+        || n.contains("scripts dir")
+        || n.contains("script dir")
+        || n.contains("scripts size")
+        || n.contains("script size")
+        || n.contains("mac-stats plugins")
+        || n.contains("mac stats plugins")
+        || n.contains("mac-stats scripts")
+        || n.contains("mac stats scripts")
+        || n == "plugins"
+        || n == "plugin"
+        || n == "scripts"
+        || n == "script"
+        || ((n.contains("plugins") || n.contains("plugin") || n.contains("scripts") || n.contains("script"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !plugins_ctx {
+        return false;
+    }
+    // Bare “plugins” / path-only asks stay on the path lane.
+    if n == "plugins"
+        || n == "plugin"
+        || n == "scripts"
+        || n == "script"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "plugins size"
+            | "plugin size"
+            | "plugins folder size"
+            | "plugin folder size"
+            | "plugins directory size"
+            | "plugin directory size"
+            | "plugins dir size"
+            | "plugin dir size"
+            | "scripts size"
+            | "script size"
+            | "scripts folder size"
+            | "script folder size"
+            | "scripts directory size"
+            | "script directory size"
+            | "scripts dir size"
+            | "script dir size"
+            | "how big are plugins"
+            | "how big is plugins"
+            | "how big is the plugins folder"
+            | "how big is plugins folder"
+            | "how big is the plugin folder"
+            | "how big is plugin folder"
+            | "how big is the plugins directory"
+            | "how big is the plugin directory"
+            | "how large is the plugins folder"
+            | "how large are plugins"
+            | "how large is plugins"
+            | "how big are scripts"
+            | "how big is scripts"
+            | "how big is the scripts folder"
+            | "how big is scripts folder"
+            | "how big is the script folder"
+            | "how big is script folder"
+            | "how big is the scripts directory"
+            | "how big is the script directory"
+            | "how large is the scripts folder"
+            | "how large are scripts"
+            | "how large is scripts"
+            | "plugins bytes"
+            | "plugin bytes"
+            | "scripts bytes"
+            | "script bytes"
+            | "mac-stats plugins size"
+            | "mac stats plugins size"
+            | "mac-stats scripts size"
+            | "mac stats scripts size"
+    ) || (n.contains("size") && plugins_ctx)
+        || (n.contains("big") && plugins_ctx)
+        || (n.contains("large") && plugins_ctx)
+        || (n.contains("bytes") && plugins_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && plugins_ctx)
+}
+
+/// Zero-LLM plugins/scripts directory size (recursive file bytes; no list dump).
+pub fn format_plugins_size_gateway() -> String {
+    let dir = crate::config::Config::scripts_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Plugins/scripts:** not created yet · app recreates under scripts/ · `plugins path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Plugins/scripts** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Plugins/scripts:** empty · `plugins path` for the folder · `/plugins` for On/Off · no run from this ask."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Plugins/scripts:** **{label}** on disk ({files} files) · `/plugins` for On/Off · `plugins path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the plugins/scripts folder / plugins path…” asks.
 /// Config path only — does not list On/Off, run, add, or remove plugins.
 pub fn looks_like_plugins_path_request(content: &str) -> bool {
@@ -6406,6 +6642,17 @@ pub fn looks_like_plugins_path_request(content: &str) -> bool {
     if looks_like_skills_path_request(content)
         || looks_like_agents_path_request(content)
         || looks_like_memory_path_request(content)
+    {
+        return false;
+    }
+    // Size/big/large asks use the plugins size lane (v0.1.882).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -6534,7 +6781,7 @@ pub fn format_plugins_path_gateway() -> String {
     let dir = crate::config::Config::scripts_dir();
     let display = dir.display().to_string();
     format!(
-        "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · no run from this ask."
+        "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · `plugins size` for disk use · no run from this ask."
     )
 }
 
@@ -18920,6 +19167,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skills_path_request(content) {
         return Some(format_skills_path_gateway());
     }
+    // Plugins/scripts dir size before path (recursive bytes; no list); path before On/Off.
+    if looks_like_plugins_size_request(content) {
+        return Some(format_plugins_size_gateway());
+    }
     if looks_like_plugins_path_request(content) {
         return Some(format_plugins_path_gateway());
     }
@@ -19182,9 +19433,10 @@ pub fn format_ops_help_gateway() -> String {
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills`)\n\
+• `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` for disk use)\n\
-• `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
+• `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
@@ -20777,6 +21029,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only skills dir path asks (v0.1.819) — config only; no list/run.
     if looks_like_skills_path_request(question) {
+        return true;
+    }
+    // Read-only plugins/scripts dir size asks (v0.1.882) — recursive file bytes; no list dump.
+    if looks_like_plugins_size_request(question) {
         return true;
     }
     // Read-only plugins/scripts dir path asks (v0.1.820) — config only; no list/run.
@@ -24488,12 +24744,52 @@ mod tests {
         assert!(!looks_like_plugins_path_request("run plugin foo"));
         assert!(!looks_like_plugins_path_request("skills path"));
         assert!(!looks_like_plugins_path_request("agents path"));
+        assert!(!looks_like_plugins_path_request("plugins size"));
         assert!(!looks_like_plugins_request("plugins path"));
         assert!(!looks_like_plugins_request("scripts path"));
         let reply =
             try_operator_instant_reply("where is the plugins folder").expect("plugins path instant");
         assert!(reply.contains("Plugins/scripts dir"));
         assert!(reply.contains("scripts") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("plugins size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn plugins_size_request_detected() {
+        assert!(looks_like_plugins_size_request("plugins size"));
+        assert!(looks_like_plugins_size_request("plugin size"));
+        assert!(looks_like_plugins_size_request("plugins folder size"));
+        assert!(looks_like_plugins_size_request("plugins directory size"));
+        assert!(looks_like_plugins_size_request("plugins dir size"));
+        assert!(looks_like_plugins_size_request("scripts size"));
+        assert!(looks_like_plugins_size_request("scripts folder size"));
+        assert!(looks_like_plugins_size_request("how big are plugins"));
+        assert!(looks_like_plugins_size_request("how big is the plugins folder"));
+        assert!(looks_like_plugins_size_request("how large is the scripts folder"));
+        assert!(looks_like_plugins_size_request("mac-stats plugins size"));
+        assert!(!looks_like_plugins_size_request("plugins path"));
+        assert!(!looks_like_plugins_size_request("where is the plugins folder"));
+        assert!(!looks_like_plugins_size_request("plugins"));
+        assert!(!looks_like_plugins_size_request("list plugins"));
+        assert!(!looks_like_plugins_size_request("/plugins"));
+        assert!(!looks_like_plugins_size_request("run plugin foo"));
+        assert!(!looks_like_plugins_size_request("skills size"));
+        assert!(!looks_like_plugins_size_request("agents size"));
+        assert!(!looks_like_plugins_size_request("tmp size"));
+        assert!(!looks_like_plugins_path_request("plugins size"));
+        assert!(!looks_like_skills_size_request("plugins size"));
+        assert!(!looks_like_agents_size_request("plugins size"));
+        assert!(!looks_like_tmp_size_request("plugins size"));
+        let reply =
+            try_operator_instant_reply("how big are plugins").expect("plugins size instant");
+        assert!(reply.contains("Plugins/scripts"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("plugins path") || reply.contains("folder"));
     }
 
     #[test]

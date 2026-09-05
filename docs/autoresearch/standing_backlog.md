@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.882** — Instant lane: plugins/scripts directory size (`plugins size`, `scripts size`, `how big are plugins`, `plugins folder size`; recursive file bytes under `~/.mac-stats/scripts/`; no list dump; does not steal `plugins path` / `/plugins` On/Off; p50 latency).
+
 - **v0.1.881** — Instant lane: skills directory size (`skills size`, `how big are skills`, `skills folder size`; recursive file bytes under Hermes skills dir; no list dump; does not steal `skills path` / `/skills` / skill.md / `SKILL:`; p50 latency).
 
 - **v0.1.880** — Instant lane: agents directory size (`agents size`, `how big are agents`, `agents folder size`; recursive file bytes under `~/.mac-stats/agents/`; no list dump; does not steal `agents path` / `/agents` / agent.json; p50 latency).

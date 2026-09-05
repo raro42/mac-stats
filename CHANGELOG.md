@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.882] - 2026-09-05
+
+### Added
+
+- **Instant lane: plugins/scripts directory size** — `plugins size`, `scripts size`, `how big are plugins`, `plugins folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/scripts/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `plugins path` / `/plugins` On/Off / run; p50 latency).
+
 ## [0.1.881] - 2026-09-05
 
 ### Added
