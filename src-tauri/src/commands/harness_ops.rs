@@ -4598,6 +4598,148 @@ pub fn format_launchagent_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is results.tsv / results.tsv size…” asks.
+/// Stat only — does not dump keep/discard rows or steal path/age lanes.
+pub fn looks_like_results_tsv_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("runs size")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("digest age")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let results_ctx = n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results file")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard results")
+        || n.contains("keep discard log")
+        || (n.contains("results")
+            && (n.contains("tsv")
+                || n.contains("ratchet")
+                || n.contains("autoresearch")
+                || n.contains("keep discard")
+                || n.contains("file")));
+    if !results_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "results.tsv size"
+            | "results tsv size"
+            | "results size"
+            | "results file size"
+            | "autoresearch results size"
+            | "ratchet results size"
+            | "keep discard results size"
+            | "keep discard log size"
+            | "how big is results.tsv"
+            | "how big is the results.tsv"
+            | "how big is results tsv"
+            | "how big is the results tsv"
+            | "how big is the results file"
+            | "how big is autoresearch results"
+            | "how big is the autoresearch results"
+            | "how big is ratchet results"
+            | "how big is the ratchet results"
+            | "how large is results.tsv"
+            | "how large is the results file"
+            | "how large is autoresearch results"
+            | "results.tsv bytes"
+            | "results file bytes"
+    ) || (n.contains("size") && results_ctx)
+        || (n.contains("big") && results_ctx)
+        || (n.contains("large") && results_ctx)
+        || (n.contains("bytes") && results_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && results_ctx)
+}
+
+/// Zero-LLM autoresearch results.tsv file size (stat only; no dump/list).
+pub fn format_results_tsv_size_gateway() -> String {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return "**Autoresearch results:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Autoresearch results:** empty `results.tsv` · `results.tsv path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Autoresearch results:** **{label}** on disk · keep/discard log · `results.tsv path` for the file · `results.tsv age` for last write."
+            )
+        }
+        Err(e) => format!("**Autoresearch results** — could not stat `results.tsv`: {e}"),
+    }
+}
+
 /// True for short “how old is results.tsv / results.tsv age…” asks.
 /// Mtime only — does not dump keep/discard rows or steal the path lane.
 pub fn looks_like_results_tsv_age_request(content: &str) -> bool {
@@ -4605,14 +4747,21 @@ pub fn looks_like_results_tsv_age_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
-    // Do not steal path / dump / improvements-dir / overnight asks.
-    // Path steal is keyword-only (no looks_like_results_tsv_path_request) to avoid mutual recursion.
+    // Do not steal path / size / dump / improvements-dir / overnight asks.
+    // Path/size steal is keyword-only (no looks_like_* nesting) to avoid mutual recursion.
     if n.contains("path")
         || n.contains("where")
         || n.contains("location")
         || n.contains("folder")
         || n.contains("directory")
         || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("improvements path")
         || n.contains("improvements folder")
         || n.contains("morning surprise")
@@ -4750,10 +4899,17 @@ pub fn looks_like_results_tsv_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
-    // Age check is keyword-only here to avoid mutual recursion with looks_like_results_tsv_age_request.
+    // Age/size checks are keyword-only here to avoid mutual recursion with sibling detectors.
     if n.contains("age")
         || n.contains("how old")
         || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
             && !n.contains("path")
             && !n.contains("where")
@@ -16419,7 +16575,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv age before path (mtime; no dump); path before improvements-dir.
+    // results.tsv size before age/path (stat only; no dump); path before improvements-dir.
+    if looks_like_results_tsv_size_request(content) {
+        return Some(format_results_tsv_size_gateway());
+    }
     if looks_like_results_tsv_age_request(content) {
         return Some(format_results_tsv_age_gateway());
     }
@@ -16582,7 +16741,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv age before path (mtime; no dump); path before improvements-dir.
+    // results.tsv size before age/path (stat only; no dump); path before improvements-dir.
+    if looks_like_results_tsv_size_request(content) {
+        return Some(format_results_tsv_size_gateway());
+    }
     if looks_like_results_tsv_age_request(content) {
         return Some(format_results_tsv_age_gateway());
     }
@@ -16824,6 +16986,7 @@ pub fn format_ops_help_gateway() -> String {
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
+• `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
@@ -18345,6 +18508,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv size asks (v0.1.869) — stat only; no dump.
+    if looks_like_results_tsv_size_request(question) {
         return true;
     }
     // Read-only results.tsv age asks (v0.1.868) — mtime only; no dump.
@@ -21677,6 +21844,8 @@ mod tests {
         assert!(!looks_like_results_tsv_path_request("launchagent path"));
         assert!(!looks_like_results_tsv_path_request("results.tsv age"));
         assert!(!looks_like_results_tsv_path_request("how old is results.tsv"));
+        assert!(!looks_like_results_tsv_path_request("results.tsv size"));
+        assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
         assert!(!looks_like_improvements_path_request("results.tsv path"));
         assert!(!looks_like_improvements_path_request("autoresearch results path"));
         assert!(looks_like_improvements_path_request("autoresearch path"));
@@ -21685,6 +21854,36 @@ mod tests {
         assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
         assert!(reply.contains("results.tsv"));
         assert!(reply.contains("improvements path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn results_tsv_size_request_detected() {
+        assert!(looks_like_results_tsv_size_request("results.tsv size"));
+        assert!(looks_like_results_tsv_size_request("results tsv size"));
+        assert!(looks_like_results_tsv_size_request("how big is results.tsv"));
+        assert!(looks_like_results_tsv_size_request("how big is the results file"));
+        assert!(looks_like_results_tsv_size_request("results file size"));
+        assert!(looks_like_results_tsv_size_request("how large is autoresearch results"));
+        assert!(looks_like_results_tsv_size_request("ratchet results size"));
+        assert!(!looks_like_results_tsv_size_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_size_request("where is results.tsv"));
+        assert!(!looks_like_results_tsv_size_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_size_request("how old is results.tsv"));
+        assert!(!looks_like_results_tsv_size_request("list results.tsv"));
+        assert!(!looks_like_results_tsv_size_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_size_request("improvements path"));
+        assert!(!looks_like_results_tsv_size_request("log file size"));
+        assert!(!looks_like_results_tsv_size_request("runs age"));
+        assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
+        assert!(!looks_like_results_tsv_age_request("results.tsv size"));
+        let reply =
+            try_operator_instant_reply("how big is results.tsv").expect("results.tsv size instant");
+        assert!(reply.contains("Autoresearch results"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("no `results.tsv`")
+        );
     }
 
     #[test]
@@ -21700,6 +21899,8 @@ mod tests {
         assert!(looks_like_results_tsv_age_request("ratchet results age"));
         assert!(!looks_like_results_tsv_age_request("results.tsv path"));
         assert!(!looks_like_results_tsv_age_request("where is results.tsv"));
+        assert!(!looks_like_results_tsv_age_request("results.tsv size"));
+        assert!(!looks_like_results_tsv_age_request("how big is results.tsv"));
         assert!(!looks_like_results_tsv_age_request("list results.tsv"));
         assert!(!looks_like_results_tsv_age_request("dump results.tsv"));
         assert!(!looks_like_results_tsv_age_request("improvements path"));

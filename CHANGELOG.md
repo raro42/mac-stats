@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.868] - 2026-09-05
+## [0.1.869] - 2026-09-05
+
+### Added
+
+- **Instant lane: results.tsv size** — `results.tsv size`, `how big is results.tsv`, `results file size`, and similar asks return on-disk size from `results.tsv` metadata without Ollama (Discord + AI Chat; stat only — no dump of keep/discard rows; does not steal `results.tsv path` / `results.tsv age` / `improvements path`; p50 latency).
+
 
 ### Added
 
