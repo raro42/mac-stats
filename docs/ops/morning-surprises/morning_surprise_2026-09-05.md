@@ -1,31 +1,25 @@
 # Morning surprise — 2026-09-05
 
-Overnight Track B (autoresearch) for Ralf.
+Overnight Track B (mac-stats product ratchet). Digester **open** stayed empty (Elmasnow weather already shipped). Design review stayed in grace (stale PNGs; TCC defer). Debug.log clean in the scan window.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.872** | Instant lane: **digest.md file size** — `digest.md size`, `latest.md size`, `how big is digest.md` return on-disk size from digester `latest.md` without Ollama (stat only; no digester spawn; does not steal `digest size` / `latest.json`) |
-| **v0.1.871** | Instant lane: **digest file size** — `digest size`, `how big is the digest`, `latest.json size` return on-disk size from digester `latest.json` without Ollama (stat only; no digester spawn / open dump; does not steal `digest age` / `digest open` / `/digest`) |
-| **v0.1.870** | Instant lane: **runs.jsonl size** — `runs size`, `how big is runs.jsonl` (stat only; no list/count) |
-| **v0.1.869** | Instant lane: **results.tsv size** — `results.tsv size`, `how big is results.tsv` (stat only; no dump) |
-| **v0.1.868** | Instant lane: **results.tsv age** — mtime only |
-| **v0.1.867** | Instant lane: **runs.jsonl age** — mtime only |
-| **v0.1.866** | Instant lane: **results.tsv path** |
-| **v0.1.865** | Agent Ops Filter attention glance |
+| **v0.1.873** | Instant lane: **improvements directory size** (`improvements size`, `how big is the improvements folder`, …) — recursive file bytes under `~/.mac-stats/improvements/`; no list dump; does not steal path / overnight asks |
+| **v0.1.872** | Instant lane: **digest.md / latest.md size** — digester markdown size (stat only; no digester spawn) |
+| **v0.1.871** | Instant lane: **digest / latest.json size** — digester JSON size (stat only) |
+| **v0.1.870** | Instant lane: **runs.jsonl size** |
+| **v0.1.869** | Instant lane: **results.tsv size** |
+| **v0.1.868** | Instant lane: **results.tsv age** |
+| **v0.1.867** | Instant lane: **runs.jsonl age** |
 
-## This tick (~04:15)
+## Why it matters
 
-- Digester **open** empty (Elmasnow weather already stale/shipped).
-- Design review **due=false** (grace; `feature-ai-chat` still aged).
-- Fuel: standing backlog p50 — digest `latest.md` size after `latest.json` size.
-- Ratchet **keep** @ `3a94566a`.
+Operator “how big is …?” asks for harness artifacts stay on the **instant** lane. That cuts p50 direct latency when Discord/AI Chat only needs a size chip, not a model turn.
 
-## Tried / notes
+## Next
 
-- No discard this tick.
-- Debug.log: no ERROR/WARN clusters in the scan window.
-- Next fuel: improvements dir size, or design-review screenshot when TCC allows.
-
-_Generated for digester / instant “what shipped overnight” asks._
+- Digester open / product `debug.log` errors when they appear
+- Design-review screenshot recapture when TCC allows (`feature-ai-chat` recommended)
+- More p50 instant gaps or Hermes insights port

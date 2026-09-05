@@ -9115,6 +9115,13 @@ pub fn looks_like_improvements_path_request(content: &str) -> bool {
         || n.contains("workflow")
         || n.contains("http://")
         || n.contains("https://")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -9184,12 +9191,211 @@ pub fn looks_like_improvements_path_request(content: &str) -> bool {
     ) || (imp_ctx && pathish)
 }
 
+/// True for short “how big is the improvements folder / improvements size…” asks.
+/// Recursive file-byte sum under `~/.mac-stats/improvements/` — no list dump / path lane.
+/// Does not steal overnight content asks or `improvements path` / results.tsv / digest size.
+pub fn looks_like_improvements_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results size")
+        || n.contains("results file")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("digest age")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("latest.json")
+        || n.contains("how big is the digest")
+        || n.contains("how big is digest")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("overnight")
+        || n.contains("coding session")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let imp_ctx = n.contains("improvements")
+        || n.contains("improvement")
+        || n.contains("autoresearch folder")
+        || n.contains("autoresearch directory")
+        || n.contains("autoresearch dir")
+        || ((n.contains("autoresearch") || n.contains("auto research"))
+            && (n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")));
+    if !imp_ctx {
+        return false;
+    }
+    // Bare “improvements” / path-only asks stay on the path lane.
+    if n == "improvements"
+        || n == "improvement"
+        || n == "autoresearch"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "improvements size"
+            | "improvement size"
+            | "improvements folder size"
+            | "improvements directory size"
+            | "improvements dir size"
+            | "improvement folder size"
+            | "improvement directory size"
+            | "improvement dir size"
+            | "how big is improvements"
+            | "how big is the improvements folder"
+            | "how big is improvements folder"
+            | "how big is the improvements directory"
+            | "how big is improvements directory"
+            | "how big is the improvements dir"
+            | "how big is improvements dir"
+            | "how large is improvements"
+            | "how large is the improvements folder"
+            | "how large is the improvements directory"
+            | "how large is the improvements dir"
+            | "improvements bytes"
+            | "improvements folder bytes"
+            | "autoresearch size"
+            | "autoresearch folder size"
+            | "autoresearch directory size"
+            | "autoresearch dir size"
+            | "how big is autoresearch"
+            | "how big is the autoresearch folder"
+            | "how large is autoresearch"
+    ) || (n.contains("size") && imp_ctx)
+        || (n.contains("big") && imp_ctx)
+        || (n.contains("large") && imp_ctx)
+        || (n.contains("bytes") && imp_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && imp_ctx)
+}
+
+/// Sum file bytes under `dir` (recursive). Caps at `max_entries` visited files+dirs.
+fn improvements_dir_total_bytes(dir: &std::path::Path, max_entries: usize) -> Result<(u64, usize), String> {
+    if !dir.exists() {
+        return Err("missing".to_string());
+    }
+    let mut total = 0u64;
+    let mut files = 0usize;
+    let mut visited = 0usize;
+    let mut stack = vec![dir.to_path_buf()];
+    while let Some(cur) = stack.pop() {
+        let rd = match std::fs::read_dir(&cur) {
+            Ok(rd) => rd,
+            Err(e) => return Err(e.to_string()),
+        };
+        for ent in rd.flatten() {
+            visited = visited.saturating_add(1);
+            if visited > max_entries {
+                return Ok((total, files));
+            }
+            let Ok(meta) = ent.metadata() else {
+                continue;
+            };
+            if meta.is_dir() {
+                stack.push(ent.path());
+            } else if meta.is_file() {
+                total = total.saturating_add(meta.len());
+                files = files.saturating_add(1);
+            }
+        }
+    }
+    Ok((total, files))
+}
+
+/// Zero-LLM improvements directory size (recursive file bytes; no list dump).
+pub fn format_improvements_size_gateway() -> String {
+    let dir = crate::config::Config::improvements_dir();
+    match improvements_dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Improvements dir:** not created yet · digester / overnight harness writes here · `improvements path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Improvements dir** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Improvements dir:** empty · `improvements path` for the folder · digester writes `latest.md` here."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Improvements dir:** **{label}** on disk ({files} files) · digester · morning surprise · results.tsv · `improvements path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// Zero-LLM improvements directory path (config only; no list/open digest).
 pub fn format_improvements_path_gateway() -> String {
     let dir = crate::config::Config::improvements_dir();
     let display = dir.display().to_string();
     format!(
-        "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files."
+        "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files · `improvements size` for disk use."
     )
 }
 
@@ -17068,6 +17274,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_env_path_request(content) {
         return Some(format_config_env_path_gateway());
     }
+    // Improvements dir size before path (recursive bytes; no list); path before overnight-content asks.
+    if looks_like_improvements_size_request(content) {
+        return Some(format_improvements_size_gateway());
+    }
     // Improvements dir before overnight-content asks collide on the word “improvements”.
     if looks_like_improvements_path_request(content) {
         return Some(format_improvements_path_gateway());
@@ -17426,6 +17636,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
+• `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path`)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
@@ -18880,6 +19091,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only .config.env path asks (v0.1.840) — path only; never dumps keys.
     if looks_like_config_env_path_request(question) {
+        return true;
+    }
+    // Read-only improvements dir size asks (v0.1.873) — recursive file bytes; no list dump.
+    if looks_like_improvements_size_request(question) {
         return true;
     }
     // Read-only improvements dir path asks (v0.1.841) — config only; no list/open.
@@ -21328,6 +21543,8 @@ mod tests {
         assert!(!looks_like_improvements_path_request("digest open"));
         assert!(!looks_like_improvements_path_request("config.env path"));
         assert!(!looks_like_improvements_path_request("where is config"));
+        assert!(!looks_like_improvements_path_request("improvements size"));
+        assert!(!looks_like_improvements_path_request("how big is the improvements folder"));
         assert!(!looks_like_config_env_path_request("improvements path"));
         let reply =
             try_operator_instant_reply("where is the improvements folder")
@@ -21335,6 +21552,40 @@ mod tests {
         assert!(reply.contains("Improvements dir"));
         assert!(reply.contains("improvements") || reply.contains(".mac-stats"));
         assert!(try_operator_instant_reply("any improvements from last night").is_none());
+    }
+
+    #[test]
+    fn improvements_size_request_detected() {
+        assert!(looks_like_improvements_size_request("improvements size"));
+        assert!(looks_like_improvements_size_request("improvements folder size"));
+        assert!(looks_like_improvements_size_request("improvements dir size"));
+        assert!(looks_like_improvements_size_request("improvements directory size"));
+        assert!(looks_like_improvements_size_request("how big is the improvements folder"));
+        assert!(looks_like_improvements_size_request("how big is improvements"));
+        assert!(looks_like_improvements_size_request("how large is the improvements directory"));
+        assert!(looks_like_improvements_size_request("autoresearch folder size"));
+        assert!(looks_like_improvements_size_request("how big is the autoresearch folder"));
+        assert!(!looks_like_improvements_size_request("improvements path"));
+        assert!(!looks_like_improvements_size_request("where is the improvements folder"));
+        assert!(!looks_like_improvements_size_request("improvements"));
+        assert!(!looks_like_improvements_size_request("any improvements from last night"));
+        assert!(!looks_like_improvements_size_request("results.tsv size"));
+        assert!(!looks_like_improvements_size_request("digest size"));
+        assert!(!looks_like_improvements_size_request("digest.md size"));
+        assert!(!looks_like_improvements_size_request("runs size"));
+        assert!(!looks_like_improvements_size_request("list improvements"));
+        assert!(!looks_like_improvements_path_request("improvements size"));
+        assert!(!looks_like_results_tsv_size_request("improvements size"));
+        let reply = try_operator_instant_reply("how big is the improvements folder")
+            .expect("improvements size instant");
+        assert!(reply.contains("Improvements dir"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(!reply.to_lowercase().contains("latest.md\n"));
     }
 
     #[test]

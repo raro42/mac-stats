@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.873] - 2026-09-05
+
+### Added
+
+- **Instant lane: improvements directory size** — `improvements size`, `how big is the improvements folder`, `improvements dir size`, and similar asks return recursive on-disk size under `~/.mac-stats/improvements/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `improvements path` / overnight improvements asks / `results.tsv size` / digest size; p50 latency).
+
 ## [0.1.872] - 2026-09-05
 
 ### Added
