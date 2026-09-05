@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.883] - 2026-09-05
+
+### Added
+
+- **Instant lane: prompts directory size** — `prompts size`, `how big are prompts`, `prompts folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/agents/prompts/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `prompts path` / planning·execution file paths / system prompt; p50 latency).
+
 ## [0.1.882] - 2026-09-05
 
 ### Added

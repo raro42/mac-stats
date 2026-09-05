@@ -6785,6 +6785,204 @@ pub fn format_plugins_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are prompts / prompts size…” asks.
+/// Recursive file-byte sum under prompts dir — no list dump / path / planning·execution file lanes.
+pub fn looks_like_prompts_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("rewrite")
+        || n.contains("change ")
+        || n.contains("update ")
+        || n.contains("planning prompt")
+        || n.contains("execution prompt")
+        || n.contains("planning_prompt")
+        || n.contains("execution_prompt")
+        || n.contains("system prompt")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let prompts_ctx = n.contains("prompts folder")
+        || n.contains("prompt folder")
+        || n.contains("prompts directory")
+        || n.contains("prompt directory")
+        || n.contains("prompts dir")
+        || n.contains("prompt dir")
+        || n.contains("prompts size")
+        || n.contains("prompt size")
+        || n.contains("mac-stats prompts")
+        || n.contains("mac stats prompts")
+        || n == "prompts"
+        || n == "prompt"
+        || ((n.contains("prompts") || n.contains("prompt"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !prompts_ctx {
+        return false;
+    }
+    // Bare “prompts” / path-only asks stay on the path lane.
+    if n == "prompts"
+        || n == "prompt"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "prompts size"
+            | "prompt size"
+            | "prompts folder size"
+            | "prompt folder size"
+            | "prompts directory size"
+            | "prompt directory size"
+            | "prompts dir size"
+            | "prompt dir size"
+            | "how big are prompts"
+            | "how big is prompts"
+            | "how big is the prompts folder"
+            | "how big is prompts folder"
+            | "how big is the prompt folder"
+            | "how big is prompt folder"
+            | "how big is the prompts directory"
+            | "how big is the prompt directory"
+            | "how large is the prompts folder"
+            | "how large are prompts"
+            | "how large is prompts"
+            | "prompts bytes"
+            | "prompt bytes"
+            | "mac-stats prompts size"
+            | "mac stats prompts size"
+    ) || (n.contains("size") && prompts_ctx)
+        || (n.contains("big") && prompts_ctx)
+        || (n.contains("large") && prompts_ctx)
+        || (n.contains("bytes") && prompts_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && prompts_ctx)
+}
+
+/// Zero-LLM prompts directory size (recursive file bytes; no list dump).
+pub fn format_prompts_size_gateway() -> String {
+    let dir = crate::config::Config::prompts_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Prompts:** not created yet · app recreates under agents/prompts/ · `prompts path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Prompts** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Prompts:** empty · `prompts path` for the folder · planning + execution `.md` · no dump from this ask."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Prompts:** **{label}** on disk ({files} files) · `prompts path` for the folder · planning + execution `.md` · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the prompts folder / prompts path…” asks.
 /// Config path only — does not open, edit, or list planning/execution prompt files.
 pub fn looks_like_prompts_path_request(content: &str) -> bool {
@@ -6796,6 +6994,17 @@ pub fn looks_like_prompts_path_request(content: &str) -> bool {
         || looks_like_skills_path_request(content)
         || looks_like_memory_path_request(content)
         || looks_like_plugins_path_request(content)
+    {
+        return false;
+    }
+    // Size/big/large asks use the prompts size lane (v0.1.883).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -6891,7 +7100,7 @@ pub fn format_prompts_path_gateway() -> String {
     let dir = crate::config::Config::prompts_dir();
     let display = dir.display().to_string();
     format!(
-        "**Prompts dir:** `{display}` · planning + execution `.md` · edit files on disk · `/agents` for soul/skill."
+        "**Prompts dir:** `{display}` · planning + execution `.md` · `prompts size` for disk use · edit files on disk · `/agents` for soul/skill."
     )
 }
 
@@ -19174,6 +19383,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_plugins_path_request(content) {
         return Some(format_plugins_path_gateway());
     }
+    // Prompts dir size before path (recursive bytes; no list); path before planning/execution files.
+    if looks_like_prompts_size_request(content) {
+        return Some(format_prompts_size_gateway());
+    }
     if looks_like_prompts_path_request(content) {
         return Some(format_prompts_path_gateway());
     }
@@ -19434,10 +19647,11 @@ pub fn format_ops_help_gateway() -> String {
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
+• `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` for disk use)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
-• `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
+• `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` for disk use)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
 • `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
@@ -21037,6 +21251,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only plugins/scripts dir path asks (v0.1.820) — config only; no list/run.
     if looks_like_plugins_path_request(question) {
+        return true;
+    }
+    // Read-only prompts dir size asks (v0.1.883) — recursive file bytes; no list dump.
+    if looks_like_prompts_size_request(question) {
         return true;
     }
     // Read-only prompts dir path asks (v0.1.821) — config only; no open/edit.
@@ -24808,12 +25026,52 @@ mod tests {
         assert!(!looks_like_prompts_path_request("system prompt"));
         assert!(!looks_like_prompts_path_request("agents path"));
         assert!(!looks_like_prompts_path_request("skills path"));
+        assert!(!looks_like_prompts_path_request("prompts size"));
+        assert!(!looks_like_prompts_path_request("how big are prompts"));
         assert!(!looks_like_agents_path_request("prompts path"));
         assert!(!looks_like_agents_path_request("where is the prompts folder"));
         let reply =
             try_operator_instant_reply("where is the prompts folder").expect("prompts path instant");
         assert!(reply.contains("Prompts dir"));
         assert!(reply.contains("prompts") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("prompts size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn prompts_size_request_detected() {
+        assert!(looks_like_prompts_size_request("prompts size"));
+        assert!(looks_like_prompts_size_request("prompt size"));
+        assert!(looks_like_prompts_size_request("prompts folder size"));
+        assert!(looks_like_prompts_size_request("prompts directory size"));
+        assert!(looks_like_prompts_size_request("prompts dir size"));
+        assert!(looks_like_prompts_size_request("how big are prompts"));
+        assert!(looks_like_prompts_size_request("how big is the prompts folder"));
+        assert!(looks_like_prompts_size_request("how large is the prompts folder"));
+        assert!(looks_like_prompts_size_request("mac-stats prompts size"));
+        assert!(!looks_like_prompts_size_request("prompts path"));
+        assert!(!looks_like_prompts_size_request("where is the prompts folder"));
+        assert!(!looks_like_prompts_size_request("prompts"));
+        assert!(!looks_like_prompts_size_request("list prompts"));
+        assert!(!looks_like_prompts_size_request("planning prompt path"));
+        assert!(!looks_like_prompts_size_request("execution prompt path"));
+        assert!(!looks_like_prompts_size_request("system prompt"));
+        assert!(!looks_like_prompts_size_request("plugins size"));
+        assert!(!looks_like_prompts_size_request("skills size"));
+        assert!(!looks_like_prompts_size_request("agents size"));
+        assert!(!looks_like_prompts_path_request("prompts size"));
+        assert!(!looks_like_plugins_size_request("prompts size"));
+        assert!(!looks_like_skills_size_request("prompts size"));
+        assert!(!looks_like_agents_size_request("prompts size"));
+        let reply =
+            try_operator_instant_reply("how big are prompts").expect("prompts size instant");
+        assert!(
+            reply.contains("Prompts:")
+                || reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("prompts path") || reply.contains("folder"));
     }
 
     #[test]
