@@ -3584,7 +3584,7 @@ pub fn looks_like_screenshots_path_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
-    // Do not steal take/list/clean/BROWSER_* screenshot work.
+    // Do not steal take/list/clean/BROWSER_* screenshot work or size asks.
     if n.contains("take")
         || n.contains("capture")
         || n.contains("attach")
@@ -3604,6 +3604,13 @@ pub fn looks_like_screenshots_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -3648,8 +3655,141 @@ pub fn format_screenshots_path_gateway() -> String {
     let dir = crate::config::Config::screenshots_dir();
     let display = dir.display().to_string();
     format!(
-        "**Screenshots:** `{display}` · BROWSER_SCREENSHOT saves PNG here · Disk Cleanup can prune old files."
+        "**Screenshots:** `{display}` · BROWSER_SCREENSHOT saves PNG here · Disk Cleanup can prune old files · `screenshots size` for disk use."
     )
+}
+
+/// True for short “how big are screenshots / screenshots size…” asks.
+/// Recursive file-byte sum under screenshots dir — no list dump / path / take lanes.
+pub fn looks_like_screenshots_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("take")
+        || n.contains("capture")
+        || n.contains("attach")
+        || n.contains("send")
+        || n.contains("browser")
+        || n.contains("navigate")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let shot_ctx = n.contains("screenshot") || n.contains("screenshots");
+    if !shot_ctx {
+        return false;
+    }
+    // Bare “screenshot(s)” / path-only asks stay on the path lane.
+    if n == "screenshot"
+        || n == "screenshots"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "screenshots size"
+            | "screenshot size"
+            | "screenshots folder size"
+            | "screenshot folder size"
+            | "screenshots directory size"
+            | "screenshot directory size"
+            | "screenshots dir size"
+            | "screenshot dir size"
+            | "how big are screenshots"
+            | "how big is screenshots"
+            | "how big is the screenshots folder"
+            | "how big is screenshots folder"
+            | "how big is the screenshot folder"
+            | "how big is screenshot folder"
+            | "how big is the screenshots directory"
+            | "how big is the screenshot directory"
+            | "how large are screenshots"
+            | "how large is the screenshots folder"
+            | "how large is the screenshot folder"
+            | "screenshots bytes"
+            | "screenshot bytes"
+            | "screenshots folder bytes"
+    ) || (n.contains("size") && shot_ctx)
+        || (n.contains("big") && shot_ctx)
+        || (n.contains("large") && shot_ctx)
+        || (n.contains("bytes") && shot_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && shot_ctx)
+}
+
+/// Zero-LLM screenshots directory size (recursive file bytes; no list dump).
+pub fn format_screenshots_size_gateway() -> String {
+    let dir = crate::config::Config::screenshots_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Screenshots:** not created yet · BROWSER_SCREENSHOT writes PNG here · `screenshot path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Screenshots** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Screenshots:** empty · `screenshot path` for the folder · BROWSER_SCREENSHOT saves PNG here."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Screenshots:** **{label}** on disk ({files} files) · BROWSER_SCREENSHOT · `screenshot path` for the folder · does not list names."
+            )
+        }
+    }
 }
 
 /// True for short “how big is runs.jsonl / runs size…” asks.
@@ -9231,6 +9371,8 @@ pub fn looks_like_improvements_size_request(content: &str) -> bool {
         || n.contains("latest.json")
         || n.contains("how big is the digest")
         || n.contains("how big is digest")
+        || n.contains("screenshot")
+        || n.contains("screenshots")
         || n.contains("morning surprise")
         || n.contains("what shipped")
         || n.contains("any improvements")
@@ -9336,7 +9478,7 @@ pub fn looks_like_improvements_size_request(content: &str) -> bool {
 }
 
 /// Sum file bytes under `dir` (recursive). Caps at `max_entries` visited files+dirs.
-fn improvements_dir_total_bytes(dir: &std::path::Path, max_entries: usize) -> Result<(u64, usize), String> {
+fn dir_total_bytes(dir: &std::path::Path, max_entries: usize) -> Result<(u64, usize), String> {
     if !dir.exists() {
         return Err("missing".to_string());
     }
@@ -9371,7 +9513,7 @@ fn improvements_dir_total_bytes(dir: &std::path::Path, max_entries: usize) -> Re
 /// Zero-LLM improvements directory size (recursive file bytes; no list dump).
 pub fn format_improvements_size_gateway() -> String {
     let dir = crate::config::Config::improvements_dir();
-    match improvements_dir_total_bytes(&dir, 8_000) {
+    match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
             "**Improvements dir:** not created yet · digester / overnight harness writes here · `improvements path` for the folder."
                 .to_string()
@@ -17359,6 +17501,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_scheduler_delivery_awareness_path_request(content) {
         return Some(format_scheduler_delivery_awareness_path_gateway());
     }
+    // Screenshots dir size before path (recursive bytes; no list); path before take/list.
+    if looks_like_screenshots_size_request(content) {
+        return Some(format_screenshots_size_gateway());
+    }
     if looks_like_screenshots_path_request(content) {
         return Some(format_screenshots_path_gateway());
     }
@@ -17643,6 +17789,7 @@ pub fn format_ops_help_gateway() -> String {
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
+• `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / take/list)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `runs size` · `how big is runs.jsonl` · `runs file size` — runs.jsonl size on disk (stat only; no list/count)\n\
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
@@ -19195,6 +19342,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
     if looks_like_config_path_request(question) {
+        return true;
+    }
+    // Read-only screenshots dir size asks (v0.1.874) — recursive file bytes; no list dump.
+    if looks_like_screenshots_size_request(question) {
         return true;
     }
     // Read-only screenshots dir path asks (v0.1.812) — config only; no list/take.
@@ -22417,11 +22568,45 @@ mod tests {
         assert!(!looks_like_screenshots_path_request("delete screenshots"));
         assert!(!looks_like_screenshots_path_request("browser screenshot"));
         assert!(!looks_like_screenshots_path_request("where is config"));
+        assert!(!looks_like_screenshots_path_request("screenshots size"));
+        assert!(!looks_like_screenshots_path_request("how big are screenshots"));
         assert!(!looks_like_config_path_request("screenshot folder"));
         let reply =
             try_operator_instant_reply("where are screenshots").expect("screenshots path instant");
         assert!(reply.contains("Screenshots"));
         assert!(reply.contains("screenshots") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("screenshots size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn screenshots_size_request_detected() {
+        assert!(looks_like_screenshots_size_request("screenshots size"));
+        assert!(looks_like_screenshots_size_request("screenshot size"));
+        assert!(looks_like_screenshots_size_request("screenshots folder size"));
+        assert!(looks_like_screenshots_size_request("screenshot folder size"));
+        assert!(looks_like_screenshots_size_request("screenshots dir size"));
+        assert!(looks_like_screenshots_size_request("how big are screenshots"));
+        assert!(looks_like_screenshots_size_request("how big is the screenshots folder"));
+        assert!(looks_like_screenshots_size_request("how large is the screenshot folder"));
+        assert!(!looks_like_screenshots_size_request("screenshot path"));
+        assert!(!looks_like_screenshots_size_request("where are screenshots"));
+        assert!(!looks_like_screenshots_size_request("screenshots"));
+        assert!(!looks_like_screenshots_size_request("take a screenshot"));
+        assert!(!looks_like_screenshots_size_request("list screenshots"));
+        assert!(!looks_like_screenshots_size_request("improvements size"));
+        assert!(!looks_like_screenshots_size_request("runs size"));
+        assert!(!looks_like_screenshots_path_request("screenshots size"));
+        assert!(!looks_like_improvements_size_request("screenshots size"));
+        let reply = try_operator_instant_reply("how big are screenshots")
+            .expect("screenshots size instant");
+        assert!(reply.contains("Screenshots"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("screenshot path") || reply.contains("folder"));
     }
 
     #[test]

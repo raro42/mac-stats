@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.874** — Instant lane: screenshots directory size (`screenshots size`, `how big are screenshots`, `screenshots folder size`; recursive file bytes under BROWSER_SCREENSHOT dir; no list dump; does not steal `screenshot path` / take/list; p50 latency).
+
 - **v0.1.873** — Instant lane: improvements directory size (`improvements size`, `how big is the improvements folder`, `improvements dir size`, `how large is the improvements directory`; recursive file bytes under `~/.mac-stats/improvements/`; no list dump; does not steal `improvements path` / overnight improvements asks / `results.tsv size` / digest size; p50 latency).
 
 - **v0.1.872** — Instant lane: digest.md file size (`digest.md size`, `latest.md size`, `how big is digest.md`, `how big is latest.md`; `~/.mac-stats/improvements/latest.md` stat only; no digester spawn / open dump; does not steal `digest size` / `latest.json size` / `digest age` / `digest open` / `/digest`; p50 latency).

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.874] - 2026-09-05
+
+### Added
+
+- **Instant lane: screenshots directory size** — `screenshots size`, `how big are screenshots`, `screenshots folder size`, and similar asks return recursive on-disk size under the BROWSER_SCREENSHOT save dir without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `screenshot path` / take/list/prune; p50 latency).
+
 ## [0.1.873] - 2026-09-05
 
 ### Added
