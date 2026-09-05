@@ -6261,6 +6261,13 @@ pub fn looks_like_tmp_path_request(content: &str) -> bool {
     }
     if n.contains("temperature")
         || n.contains("thermal")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -6384,8 +6391,187 @@ pub fn format_tmp_path_gateway() -> String {
     let display = dir.display().to_string();
     let js_display = js.display().to_string();
     format!(
-        "**Tmp dir:** `{display}` · JS scratch: `{js_display}` · safe to delete contents · app recreates as needed."
+        "**Tmp dir:** `{display}` · JS scratch: `{js_display}` · safe to delete contents · app recreates as needed · `tmp size` for disk use."
     )
+}
+
+/// True for short “how big is tmp / tmp size…” asks.
+/// Recursive file-byte sum under tmp dir — no list dump / path / prune lanes.
+pub fn looks_like_tmp_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("temperature")
+        || n.contains("thermal")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("/tmp")
+        || n.contains("private/tmp")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("screenshot")
+        || n.contains("improvements")
+        || n.contains("uploads")
+        || n.contains("traces")
+        || n.contains("pdfs")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let tmp_ctx = n.contains("tmp folder")
+        || n.contains("tmp directory")
+        || n.contains("tmp dir")
+        || n.contains("tmp size")
+        || n.contains("temp folder")
+        || n.contains("temp directory")
+        || n.contains("temp dir")
+        || n.contains("temp size")
+        || n.contains("temporary folder")
+        || n.contains("temporary directory")
+        || n.contains("temporary dir")
+        || n.contains("temporary size")
+        || n.contains("scratch folder")
+        || n.contains("scratch directory")
+        || n.contains("scratch dir")
+        || n.contains("scratch size")
+        || n.contains("mac-stats tmp")
+        || n.contains("mac stats tmp")
+        || n == "tmp"
+        || n == "temp"
+        || ((n.contains("tmp") || n.contains("temp") || n.contains("temporary") || n.contains("scratch"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !tmp_ctx {
+        return false;
+    }
+    // Bare “tmp” / “temp” / path-only asks stay on the path lane.
+    if n == "tmp"
+        || n == "temp"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "tmp size"
+            | "temp size"
+            | "temporary size"
+            | "scratch size"
+            | "tmp folder size"
+            | "temp folder size"
+            | "temporary folder size"
+            | "scratch folder size"
+            | "tmp directory size"
+            | "temp directory size"
+            | "temporary directory size"
+            | "scratch directory size"
+            | "tmp dir size"
+            | "temp dir size"
+            | "how big is tmp"
+            | "how big is temp"
+            | "how big is the tmp folder"
+            | "how big is tmp folder"
+            | "how big is the temp folder"
+            | "how big is temp folder"
+            | "how big is the tmp directory"
+            | "how big is the temp directory"
+            | "how big is the temporary folder"
+            | "how big is the scratch folder"
+            | "how large is the tmp folder"
+            | "how large is the temp folder"
+            | "how large is tmp"
+            | "tmp bytes"
+            | "temp bytes"
+            | "tmp folder bytes"
+            | "temp folder bytes"
+    ) || (n.contains("size") && tmp_ctx)
+        || (n.contains("big") && tmp_ctx)
+        || (n.contains("large") && tmp_ctx)
+        || (n.contains("bytes") && tmp_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && tmp_ctx)
+}
+
+/// Zero-LLM tmp directory size (recursive file bytes; no list dump).
+pub fn format_tmp_size_gateway() -> String {
+    let dir = crate::config::Config::tmp_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Tmp:** not created yet · app recreates under `~/.mac-stats/tmp/` · `tmp path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Tmp** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Tmp:** empty · `tmp path` for the folder · safe to delete contents · app recreates as needed."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Tmp:** **{label}** on disk ({files} files) · scratch · `tmp path` for the folder · does not list names."
+            )
+        }
+    }
 }
 
 /// True for short “where is the uploads folder / uploads path…” asks.
@@ -17566,6 +17752,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_prompts_path_request(content) {
         return Some(format_prompts_path_gateway());
     }
+    // Tmp dir size before path (recursive bytes; no list); path before prune/clean.
+    if looks_like_tmp_size_request(content) {
+        return Some(format_tmp_size_gateway());
+    }
     if looks_like_tmp_path_request(content) {
         return Some(format_tmp_path_gateway());
     }
@@ -17805,6 +17995,7 @@ pub fn format_ops_help_gateway() -> String {
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
+• `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
@@ -19390,6 +19581,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only prompts dir path asks (v0.1.821) — config only; no open/edit.
     if looks_like_prompts_path_request(question) {
+        return true;
+    }
+    // Read-only tmp dir size asks (v0.1.875) — recursive file bytes; no list dump.
+    if looks_like_tmp_size_request(question) {
         return true;
     }
     // Read-only tmp dir path asks (v0.1.822) — config only; no list/prune.
@@ -23044,9 +23239,45 @@ mod tests {
         assert!(!looks_like_tmp_path_request("where is /tmp"));
         assert!(!looks_like_tmp_path_request("prompts path"));
         assert!(!looks_like_tmp_path_request("where is config"));
+        assert!(!looks_like_tmp_path_request("tmp size"));
+        assert!(!looks_like_tmp_path_request("how big is the tmp folder"));
         let reply = try_operator_instant_reply("where is the tmp folder").expect("tmp path instant");
         assert!(reply.contains("Tmp dir"));
         assert!(reply.contains("tmp") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("tmp size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn tmp_size_request_detected() {
+        assert!(looks_like_tmp_size_request("tmp size"));
+        assert!(looks_like_tmp_size_request("temp size"));
+        assert!(looks_like_tmp_size_request("tmp folder size"));
+        assert!(looks_like_tmp_size_request("temp folder size"));
+        assert!(looks_like_tmp_size_request("tmp dir size"));
+        assert!(looks_like_tmp_size_request("how big is tmp"));
+        assert!(looks_like_tmp_size_request("how big is the tmp folder"));
+        assert!(looks_like_tmp_size_request("how large is the temp folder"));
+        assert!(looks_like_tmp_size_request("scratch folder size"));
+        assert!(!looks_like_tmp_size_request("tmp path"));
+        assert!(!looks_like_tmp_size_request("where is the tmp folder"));
+        assert!(!looks_like_tmp_size_request("tmp"));
+        assert!(!looks_like_tmp_size_request("temperature"));
+        assert!(!looks_like_tmp_size_request("list tmp"));
+        assert!(!looks_like_tmp_size_request("clean tmp"));
+        assert!(!looks_like_tmp_size_request("screenshots size"));
+        assert!(!looks_like_tmp_size_request("improvements size"));
+        assert!(!looks_like_tmp_size_request("uploads size"));
+        assert!(!looks_like_tmp_path_request("tmp size"));
+        assert!(!looks_like_screenshots_size_request("tmp size"));
+        let reply = try_operator_instant_reply("how big is the tmp folder").expect("tmp size instant");
+        assert!(reply.contains("Tmp"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("tmp path") || reply.contains("folder"));
     }
 
     #[test]
