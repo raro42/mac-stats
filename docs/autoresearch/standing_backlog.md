@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.870** — Instant lane: runs.jsonl size (`runs size`, `how big is runs.jsonl`, `runs file size`, `how large is runs.jsonl`; stat only; no list/count/prune; does not steal `runs path` / `runs age` / `/insights`; p50 latency).
+
 - **v0.1.869** — Instant lane: results.tsv size (`results.tsv size`, `how big is results.tsv`, `results file size`, `how large is autoresearch results`; stat only; no dump; does not steal `results.tsv path` / `results.tsv age` / `improvements path`; p50 latency).
 
 - **v0.1.868** — Instant lane: results.tsv age (`results.tsv age`, `how old is results.tsv`, `when was results.tsv updated`, `results.tsv last modified`; mtime only; no dump; does not steal `results.tsv path` / `improvements path`; p50 latency).

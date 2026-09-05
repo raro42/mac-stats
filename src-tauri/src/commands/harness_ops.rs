@@ -3358,6 +3358,129 @@ pub fn format_screenshots_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is runs.jsonl / runs size…” asks.
+/// Stat only — does not list, count, prune, or steal path/age lanes.
+pub fn looks_like_runs_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results size")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || ((n.contains("debug log") || n.contains("debug.log") || n.starts_with("log "))
+            && (n.contains("age") || n.contains("size")))
+        || n == "log age"
+        || n == "log size"
+        || n == "log file size"
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("insights")
+        || n.contains("failed")
+        || n.contains("slow")
+        || n.contains("instant")
+        || n.contains("direct")
+        || n.contains("lite")
+        || n.contains("prune")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("open ")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("dump")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+    {
+        return false;
+    }
+    let runs_ctx = n.contains("runs.jsonl")
+        || n.contains("runs jsonl")
+        || n.contains("run log")
+        || n.contains("runs file")
+        || n.contains("runs log")
+        || ((n.contains("runs") || n == "run")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !runs_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "runs size"
+            | "runs.jsonl size"
+            | "runs jsonl size"
+            | "run log size"
+            | "runs log size"
+            | "runs file size"
+            | "how big is runs.jsonl"
+            | "how big is the runs.jsonl"
+            | "how big is runs jsonl"
+            | "how big is the runs file"
+            | "how big is runs file"
+            | "how big is the run log"
+            | "how big is run log"
+            | "how big are runs"
+            | "how large is runs.jsonl"
+            | "how large is the runs file"
+            | "how large is runs"
+            | "runs.jsonl bytes"
+            | "runs file bytes"
+            | "run log bytes"
+    ) || (n.contains("size") && runs_ctx)
+        || (n.contains("big") && runs_ctx)
+        || (n.contains("large") && runs_ctx)
+        || (n.contains("bytes") && runs_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && runs_ctx)
+}
+
+/// Zero-LLM runs.jsonl file size (stat only; no list/count/prune).
+pub fn format_runs_size_gateway() -> String {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    if !path.exists() {
+        return "**Runs:** no `runs.jsonl` yet · `/insights` after the first chat turn · `runs path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Runs:** empty `runs.jsonl` · `runs path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Runs:** **{label}** on disk · `/insights` or Agent Ops → Runs · `runs path` for the file · `runs age` for last write."
+            )
+        }
+        Err(e) => format!("**Runs** — could not stat `runs.jsonl`: {e}"),
+    }
+}
+
 /// True for short “how old is runs.jsonl / runs age…” asks.
 /// Mtime only — does not list, count, prune, or open insights.
 pub fn looks_like_runs_age_request(content: &str) -> bool {
@@ -3365,8 +3488,8 @@ pub fn looks_like_runs_age_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
-    // Do not steal path / count / list / insights / failed / slow / lane dumps.
-    // Path steal is keyword-only (no looks_like_runs_path_request) to avoid mutual recursion.
+    // Do not steal path / size / count / list / insights / failed / slow / lane dumps.
+    // Path/size steal is keyword-only (no looks_like_runs_* nesting) to avoid mutual recursion.
     if looks_like_runs_count_request(content)
         || looks_like_insights_request(content)
         || looks_like_failed_runs_request(content)
@@ -3401,6 +3524,10 @@ pub fn looks_like_runs_age_request(content: &str) -> bool {
         || n.contains("folder")
         || n.contains("directory")
         || n.contains("dir")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains("bytes")
     {
         return false;
     }
@@ -3480,11 +3607,15 @@ pub fn looks_like_runs_path_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
-    // Do not steal age / count / list / insights / failed / slow / lane dumps.
-    // Age check is keyword-only here to avoid mutual recursion with looks_like_runs_age_request.
+    // Do not steal age / size / count / list / insights / failed / slow / lane dumps.
+    // Age/size check is keyword-only here to avoid mutual recursion with looks_like_runs_* .
     if n.contains("age")
         || n.contains("how old")
         || n.contains("stale")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains("bytes")
         || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
             && !n.contains("path")
             && !n.contains("where")
@@ -16715,6 +16846,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_screenshots_path_request(content) {
         return Some(format_screenshots_path_gateway());
     }
+    // runs.jsonl size before age/path (stat only; no list/count).
+    if looks_like_runs_size_request(content) {
+        return Some(format_runs_size_gateway());
+    }
     // runs.jsonl age before path (mtime; no list/count).
     if looks_like_runs_age_request(content) {
         return Some(format_runs_age_gateway());
@@ -16992,6 +17127,7 @@ pub fn format_ops_help_gateway() -> String {
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
+• `runs size` · `how big is runs.jsonl` · `runs file size` — runs.jsonl size on disk (stat only; no list/count)\n\
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
@@ -18532,6 +18668,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only screenshots dir path asks (v0.1.812) — config only; no list/take.
     if looks_like_screenshots_path_request(question) {
+        return true;
+    }
+    // Read-only runs.jsonl size asks (v0.1.870) — stat only; no list/count.
+    if looks_like_runs_size_request(question) {
         return true;
     }
     // Read-only runs.jsonl age asks (v0.1.867) — mtime only; no list/count.
@@ -21658,9 +21798,40 @@ mod tests {
         assert!(!looks_like_runs_path_request("screenshot path"));
         assert!(!looks_like_runs_path_request("runs age"));
         assert!(!looks_like_runs_path_request("how old is runs.jsonl"));
+        assert!(!looks_like_runs_path_request("runs size"));
+        assert!(!looks_like_runs_path_request("how big is runs.jsonl"));
         let reply = try_operator_instant_reply("where is runs.jsonl").expect("runs path instant");
         assert!(reply.contains("Runs"));
         assert!(reply.contains("runs.jsonl") || reply.contains(".mac-stats"));
+    }
+
+    #[test]
+    fn runs_size_request_detected() {
+        assert!(looks_like_runs_size_request("runs size"));
+        assert!(looks_like_runs_size_request("runs.jsonl size"));
+        assert!(looks_like_runs_size_request("how big is runs.jsonl"));
+        assert!(looks_like_runs_size_request("how big is the runs file"));
+        assert!(looks_like_runs_size_request("runs file size"));
+        assert!(looks_like_runs_size_request("how large is runs.jsonl"));
+        assert!(looks_like_runs_size_request("run log size"));
+        assert!(!looks_like_runs_size_request("runs path"));
+        assert!(!looks_like_runs_size_request("where is runs.jsonl"));
+        assert!(!looks_like_runs_size_request("runs age"));
+        assert!(!looks_like_runs_size_request("how old is runs.jsonl"));
+        assert!(!looks_like_runs_size_request("how many runs"));
+        assert!(!looks_like_runs_size_request("/insights"));
+        assert!(!looks_like_runs_size_request("list runs"));
+        assert!(!looks_like_runs_size_request("log file size"));
+        assert!(!looks_like_runs_size_request("results.tsv size"));
+        assert!(!looks_like_runs_path_request("how big is runs.jsonl"));
+        assert!(!looks_like_runs_age_request("runs size"));
+        let reply = try_operator_instant_reply("how big is runs.jsonl").expect("runs size instant");
+        assert!(reply.contains("Runs"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("no `runs.jsonl`")
+        );
     }
 
     #[test]
@@ -21679,6 +21850,8 @@ mod tests {
         assert!(!looks_like_runs_age_request("/failed"));
         assert!(!looks_like_runs_age_request("list runs"));
         assert!(!looks_like_runs_age_request("log age"));
+        assert!(!looks_like_runs_age_request("runs size"));
+        assert!(!looks_like_runs_age_request("how big is runs.jsonl"));
         assert!(!looks_like_runs_path_request("how old is runs.jsonl"));
         let reply = try_operator_instant_reply("how old is runs.jsonl").expect("runs age instant");
         assert!(reply.contains("Runs"));

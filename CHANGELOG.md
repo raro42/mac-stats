@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.870] - 2026-09-05
+
+### Added
+
+- **Instant lane: runs.jsonl size** — `runs size`, `how big is runs.jsonl`, `runs file size`, and similar asks return on-disk size from `runs.jsonl` metadata without Ollama (Discord + AI Chat; stat only — no list/count/prune; does not steal `runs path` / `runs age` / `/insights`; p50 latency).
+
 ## [0.1.869] - 2026-09-05
 
 ### Added
