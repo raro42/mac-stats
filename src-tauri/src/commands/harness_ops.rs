@@ -7874,6 +7874,196 @@ pub fn format_browser_storage_state_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are browser downloads / browser-downloads size…” asks.
+/// Recursive file-byte sum under browser-downloads dir — no list dump / path / download / organizer lanes.
+pub fn looks_like_browser_downloads_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("browser_download:")
+        || n.contains("download file")
+        || n.contains("download this")
+        || n.contains("download the")
+        || n.contains("download from")
+        || n.contains("download url")
+        || n.contains("download http")
+        || (n.contains("browser_")
+            && !n.contains("browser_download")
+            && !n.contains("browser_downloads"))
+        || n.contains("browser:")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("improvements")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let dl_ctx = n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("browser_downloads")
+        || n.contains("browser_download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("mac-stats downloads")
+        || n.contains("mac stats downloads")
+        || (n.contains("downloads")
+            && (n.contains("browser")
+                || n.contains("cdp")
+                || n.contains("mac-stats")
+                || n.contains("mac stats"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !dl_ctx {
+        return false;
+    }
+    // Bare folder labels stay on the path lane.
+    if n == "browser-downloads"
+        || n == "browser_downloads"
+        || n == "browser downloads"
+        || n == "cdp downloads"
+        || n == "mac-stats downloads"
+        || n == "mac stats downloads"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "browser downloads size"
+            | "browser download size"
+            | "browser-downloads size"
+            | "browser_downloads size"
+            | "browser downloads folder size"
+            | "browser download folder size"
+            | "browser-downloads folder size"
+            | "browser downloads directory size"
+            | "browser-downloads directory size"
+            | "browser downloads dir size"
+            | "browser-downloads dir size"
+            | "how big are browser downloads"
+            | "how big is browser downloads"
+            | "how big is the browser downloads folder"
+            | "how big is browser downloads folder"
+            | "how big is the browser-downloads folder"
+            | "how big is browser-downloads"
+            | "how large is the browser downloads folder"
+            | "how large are browser downloads"
+            | "browser downloads bytes"
+            | "browser-downloads bytes"
+            | "cdp downloads size"
+            | "cdp download size"
+            | "mac-stats downloads size"
+            | "mac stats downloads size"
+    ) || (n.contains("size") && dl_ctx)
+        || (n.contains("big") && dl_ctx)
+        || (n.contains("large") && dl_ctx)
+        || (n.contains("bytes") && dl_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && dl_ctx)
+}
+
+/// Zero-LLM browser downloads directory size (recursive file bytes; no list dump).
+pub fn format_browser_downloads_size_gateway() -> String {
+    let dir = crate::config::Config::browser_downloads_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Browser downloads:** not created yet · app recreates under `~/.mac-stats/browser-downloads/` · `browser downloads path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Browser downloads** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Browser downloads:** empty · `browser downloads path` for the folder · BROWSER_DOWNLOAD artifacts · `/browser` for CDP status."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Browser downloads:** **{label}** on disk ({files} files) · BROWSER_DOWNLOAD · `browser downloads path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the browser-downloads folder / browser downloads path…” asks.
 /// Config path only — does not list, prune, or run BROWSER_DOWNLOAD under `~/.mac-stats/browser-downloads/`.
 /// Does not steal `/downloads` organizer Ready, home Downloads folder, or upload/PDF/cookie paths.
@@ -7907,6 +8097,13 @@ pub fn looks_like_browser_downloads_path_request(content: &str) -> bool {
     }
     if (n.contains("browser_") && !n.contains("browser_download") && !n.contains("browser_downloads"))
         || n.contains("browser:")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -8030,7 +8227,7 @@ pub fn format_browser_downloads_path_gateway() -> String {
     let dir = crate::config::Config::browser_downloads_dir();
     let display = dir.display().to_string();
     format!(
-        "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer."
+        "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer · `browser downloads size` for disk use."
     )
 }
 
@@ -18344,6 +18541,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_storage_state_path_request(content) {
         return Some(format_browser_storage_state_path_gateway());
     }
+    // Browser-downloads dir size before path (recursive bytes; no list); path before download/list.
+    if looks_like_browser_downloads_size_request(content) {
+        return Some(format_browser_downloads_size_gateway());
+    }
     if looks_like_browser_downloads_path_request(content) {
         return Some(format_browser_downloads_path_gateway());
     }
@@ -18574,6 +18775,7 @@ pub fn format_ops_help_gateway() -> String {
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
+• `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `/downloads`)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
@@ -20194,6 +20396,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
     if looks_like_browser_storage_state_path_request(question) {
+        return true;
+    }
+    // Read-only browser-downloads dir size asks (v0.1.879) — recursive file bytes; no list dump.
+    if looks_like_browser_downloads_size_request(question) {
         return true;
     }
     // Read-only browser-downloads dir path asks (v0.1.829) — config only; no list/prune/download.
@@ -24192,6 +24398,10 @@ mod tests {
         assert!(!looks_like_browser_downloads_path_request("uploads path"));
         assert!(!looks_like_browser_downloads_path_request("where is config"));
         assert!(!looks_like_browser_downloads_path_request("/browser"));
+        assert!(!looks_like_browser_downloads_path_request("browser downloads size"));
+        assert!(!looks_like_browser_downloads_path_request(
+            "how big are browser downloads"
+        ));
         assert!(!looks_like_downloads_organizer_ready_request(
             "browser downloads path"
         ));
@@ -24203,6 +24413,75 @@ mod tests {
             .expect("browser downloads path instant");
         assert!(reply.contains("Browser downloads"));
         assert!(reply.contains("browser-downloads") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("browser downloads size") || reply.contains("disk use")
+        );
+    }
+
+    #[test]
+    fn browser_downloads_size_request_detected() {
+        assert!(looks_like_browser_downloads_size_request(
+            "browser downloads size"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "browser-downloads size"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "browser downloads folder size"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "browser-downloads folder size"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "browser downloads dir size"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "how big are browser downloads"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "how big is the browser downloads folder"
+        ));
+        assert!(looks_like_browser_downloads_size_request(
+            "how large is the browser-downloads folder"
+        ));
+        assert!(looks_like_browser_downloads_size_request("cdp downloads size"));
+        assert!(looks_like_browser_downloads_size_request(
+            "mac-stats downloads size"
+        ));
+        assert!(!looks_like_browser_downloads_size_request(
+            "browser downloads path"
+        ));
+        assert!(!looks_like_browser_downloads_size_request(
+            "where are browser downloads"
+        ));
+        assert!(!looks_like_browser_downloads_size_request("browser-downloads"));
+        assert!(!looks_like_browser_downloads_size_request("list downloads"));
+        assert!(!looks_like_browser_downloads_size_request("clean downloads"));
+        assert!(!looks_like_browser_downloads_size_request("/downloads"));
+        assert!(!looks_like_browser_downloads_size_request("downloads"));
+        assert!(!looks_like_browser_downloads_size_request("uploads size"));
+        assert!(!looks_like_browser_downloads_size_request("pdfs size"));
+        assert!(!looks_like_browser_downloads_size_request("tmp size"));
+        assert!(!looks_like_browser_downloads_path_request(
+            "browser downloads size"
+        ));
+        assert!(!looks_like_uploads_size_request("browser downloads size"));
+        assert!(!looks_like_pdfs_size_request("browser downloads size"));
+        assert!(!looks_like_downloads_organizer_ready_request(
+            "browser downloads size"
+        ));
+        let reply = try_operator_instant_reply("how big are browser downloads")
+            .expect("browser downloads size instant");
+        assert!(reply.contains("Browser downloads"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(
+            reply.to_lowercase().contains("browser downloads path") || reply.contains("folder")
+        );
     }
 
     #[test]
