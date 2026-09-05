@@ -14,12 +14,14 @@ Overnight Track B (20:00–06:00 local, night of 2026-09-05 → morning 2026-09-
 | **v0.1.882** | Instant lane: plugins/scripts directory size (`plugins size`, `scripts size`, `how big are plugins`) — recursive bytes under `~/.mac-stats/scripts/`; does not steal `plugins path` / `/plugins` |
 | **v0.1.883** | Instant lane: prompts directory size (`prompts size`, `how big are prompts`, `prompts folder size`) — recursive bytes under `~/.mac-stats/agents/prompts/`; does not steal `prompts path` / planning·execution file paths |
 | **v0.1.884** | Instant lane: session directory size (`session size`, `how big are sessions`, `session folder size`) — recursive bytes under `~/.mac-stats/session/`; does not steal `session path` / `/sessions` / session-memory |
+| **v0.1.885** | Instant lane: task directory size (`task size`, `how big are tasks`, `task folder size`) — recursive bytes under `~/.mac-stats/task/`; does not steal `task path` / `/tasks` / `TASK_CREATE:` |
+| **v0.1.886** | Instant lane: cleanup-quarantine directory size (`cleanup quarantine size`, `how big is quarantine`, `quarantine folder size`) — recursive bytes under `~/.mac-stats/cleanup-quarantine/`; does not steal path / `/disk` |
 
 ## Fuel
 
 - Digester open: empty (Elmasnow weather already stale/shipped).
 - Design review: due=false (grace); stale PNGs still aged (`feature-ai-chat` recommended).
-- Experiment this tick (~23:05): standing backlog p50 — session dir size after prompts (**v0.1.883**).
+- Experiment this tick (~00:09): standing backlog p50 — cleanup-quarantine dir size after task (**v0.1.885**).
 
 ## Ratchet
 
@@ -31,7 +33,9 @@ Overnight Track B (20:00–06:00 local, night of 2026-09-05 → morning 2026-09-
 - keep @ `f7725dd` — v0.1.882 plugins/scripts dir size
 - keep @ `1af31cf` — v0.1.883 prompts dir size
 - keep @ `85fff1d` — v0.1.884 session dir size
+- keep @ `da2a651` — v0.1.885 task dir size
+- keep @ `107ec1c` — v0.1.886 cleanup-quarantine dir size
 
 ## Next
 
-- task / cleanup-quarantine dir sizes, or design-review polish when TCC allows.
+- notes/memory dir size, or design-review polish when TCC allows.
