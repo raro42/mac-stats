@@ -4146,6 +4146,213 @@ pub fn format_runs_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is the task folder / task size…” asks.
+/// Recursive file-byte sum under task dir — no list dump / path / Active list lanes.
+pub fn looks_like_task_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("append")
+        || n.contains("assign")
+        || n.contains("status")
+        || n.contains("close")
+        || n.contains("finish")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/tasks")
+        || n.contains("task:")
+        || n.contains("task_")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedule")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let task_ctx = n.contains("task folder")
+        || n.contains("tasks folder")
+        || n.contains("task directory")
+        || n.contains("tasks directory")
+        || n.contains("task dir")
+        || n.contains("tasks dir")
+        || n.contains("task size")
+        || n.contains("tasks size")
+        || n.contains("mac-stats task")
+        || n.contains("mac stats task")
+        || n.contains("mac-stats tasks")
+        || n.contains("mac stats tasks")
+        || n == "task"
+        || n == "tasks"
+        || ((n.contains("task") || n.contains("tasks"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !task_ctx {
+        return false;
+    }
+    // Bare “task(s)” / path-only asks stay on the path lane.
+    if n == "task"
+        || n == "tasks"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "task size"
+            | "tasks size"
+            | "task folder size"
+            | "tasks folder size"
+            | "task directory size"
+            | "tasks directory size"
+            | "task dir size"
+            | "tasks dir size"
+            | "how big are tasks"
+            | "how big is tasks"
+            | "how big is task"
+            | "how big is the task folder"
+            | "how big is task folder"
+            | "how big is the tasks folder"
+            | "how big is tasks folder"
+            | "how big is the task directory"
+            | "how big is the tasks directory"
+            | "how large is the task folder"
+            | "how large are tasks"
+            | "how large is tasks"
+            | "task bytes"
+            | "tasks bytes"
+            | "mac-stats task size"
+            | "mac stats task size"
+            | "mac-stats tasks size"
+            | "mac stats tasks size"
+    ) || (n.contains("size") && task_ctx)
+        || (n.contains("big") && task_ctx)
+        || (n.contains("large") && task_ctx)
+        || (n.contains("bytes") && task_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && task_ctx)
+}
+
+/// Zero-LLM task directory size (recursive file bytes; no list dump).
+pub fn format_task_size_gateway() -> String {
+    let dir = crate::config::Config::task_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Tasks:** not created yet · app recreates under `~/.mac-stats/task/` · `task path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Tasks** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Tasks:** empty · `task path` for the folder · `/tasks` for Active list · `TASK_CREATE:` to add one."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Tasks:** **{label}** on disk ({files} files) · `/tasks` for Active list · `task path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the task folder / task path…” asks.
 /// Config path only — does not list, create, show, or change tasks.
 pub fn looks_like_task_path_request(content: &str) -> bool {
@@ -4155,6 +4362,17 @@ pub fn looks_like_task_path_request(content: &str) -> bool {
     }
     // Do not steal `/tasks` catalog, create/show/append, or inventory counts.
     if looks_like_tasks_request(content) {
+        return false;
+    }
+    // Size/big/large asks use the task size lane (v0.1.885).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+    {
         return false;
     }
     if n.contains("how many")
@@ -4246,7 +4464,7 @@ pub fn format_task_path_gateway() -> String {
     let dir = crate::config::Config::task_dir();
     let display = dir.display().to_string();
     format!(
-        "**Tasks:** `{display}` · `/tasks` for Active list · `TASK_CREATE:` to add one."
+        "**Tasks:** `{display}` · `/tasks` for Active list · `task size` for disk use · `TASK_CREATE:` to add one."
     )
 }
 
@@ -19552,6 +19770,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_runs_path_request(content) {
         return Some(format_runs_path_gateway());
     }
+    // Task dir size before path (recursive bytes; no list); path before Active catalog.
+    if looks_like_task_size_request(content) {
+        return Some(format_task_size_gateway());
+    }
     if looks_like_task_path_request(content) {
         return Some(format_task_path_gateway());
     }
@@ -19866,7 +20088,8 @@ pub fn format_ops_help_gateway() -> String {
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `runs size` · `how big is runs.jsonl` · `runs file size` — runs.jsonl size on disk (stat only; no list/count)\n\
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
-• `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create)\n\
+• `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `/tasks`)\n\
+• `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` for disk use)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
@@ -21445,6 +21668,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only runs.jsonl path asks (v0.1.813) — config only; no list/count.
     if looks_like_runs_path_request(question) {
+        return true;
+    }
+    // Read-only task dir size asks (v0.1.885) — recursive file bytes; no list dump.
+    if looks_like_task_size_request(question) {
         return true;
     }
     // Read-only task dir path asks (v0.1.814) — config only; no list/create.
@@ -24828,10 +25055,46 @@ mod tests {
         assert!(!looks_like_task_path_request("TASK_CREATE: demo"));
         assert!(!looks_like_task_path_request("where is config"));
         assert!(!looks_like_task_path_request("runs path"));
+        assert!(!looks_like_task_path_request("task size"));
+        assert!(!looks_like_task_path_request("how big are tasks"));
         assert!(!looks_like_tasks_request("task path"));
         let reply = try_operator_instant_reply("where is the task folder").expect("task path instant");
         assert!(reply.contains("Tasks"));
         assert!(reply.contains("task") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("task size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn task_size_request_detected() {
+        assert!(looks_like_task_size_request("task size"));
+        assert!(looks_like_task_size_request("tasks size"));
+        assert!(looks_like_task_size_request("task folder size"));
+        assert!(looks_like_task_size_request("task directory size"));
+        assert!(looks_like_task_size_request("task dir size"));
+        assert!(looks_like_task_size_request("how big are tasks"));
+        assert!(looks_like_task_size_request("how big is the task folder"));
+        assert!(looks_like_task_size_request("how large is the task folder"));
+        assert!(looks_like_task_size_request("mac-stats task size"));
+        assert!(!looks_like_task_size_request("task path"));
+        assert!(!looks_like_task_size_request("where is the task folder"));
+        assert!(!looks_like_task_size_request("task"));
+        assert!(!looks_like_task_size_request("list tasks"));
+        assert!(!looks_like_task_size_request("/tasks"));
+        assert!(!looks_like_task_size_request("TASK_CREATE: demo"));
+        assert!(!looks_like_task_size_request("session size"));
+        assert!(!looks_like_task_size_request("agents size"));
+        assert!(!looks_like_task_size_request("prompts size"));
+        assert!(!looks_like_task_path_request("task size"));
+        assert!(!looks_like_session_size_request("task size"));
+        assert!(!looks_like_agents_size_request("task size"));
+        let reply = try_operator_instant_reply("how big are tasks").expect("task size instant");
+        assert!(reply.contains("Tasks"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
     }
 
     #[test]

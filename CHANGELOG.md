@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.885] - 2026-09-05
+
+### Added
+
+- **Instant lane: task directory size** — `task size`, `how big are tasks`, `task folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/task/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `task path` / `/tasks` Active list / `TASK_CREATE:`; p50 latency).
+
 ## [0.1.884] - 2026-09-05
 
 ### Added
