@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.887] - 2026-09-05
+
+### Added
+
+- **Instant lane: notes / memory folder size** — `notes size`, `how big are notes`, `memory folder size`, `notes folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/agents/notes/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `memory path` / `notes path` / scrub / save; rejects bare `memory size` so RAM asks stay free; p50 latency).
+
 ## [0.1.886] - 2026-09-05
 
 ### Added

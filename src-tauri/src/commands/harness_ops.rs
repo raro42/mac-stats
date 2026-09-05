@@ -4468,6 +4468,259 @@ pub fn format_task_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are notes / memory folder size…” asks.
+/// Recursive file-byte sum under notes dir — no list dump / path / scrub / RAM lanes.
+/// Rejects bare `memory size` (RAM ambiguity); prefer `notes size` / `memory folder size`.
+pub fn looks_like_memory_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("purge")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("append")
+        || n.contains("save ")
+        || n.contains("saved note")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("memory:")
+        || n.contains("memory_")
+        || n.contains("note:")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        // RAM / system memory — do not steal `/ram` or “how big is memory” usage asks.
+        || n.contains("/ram")
+        || n.contains("ram ")
+        || n.starts_with("ram")
+        || n.contains(" rss")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ssd")
+        || n.contains("battery")
+        || n.contains("heat")
+        || n.contains("thermal")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Bare “memory size” / “how big is memory” stay off this lane (RAM ambiguity).
+    if n == "memory size"
+        || n == "memory"
+        || n == "how big is memory"
+        || n == "how big is the memory"
+        || n == "how large is memory"
+        || n == "how large is the memory"
+        || n == "memory bytes"
+    {
+        return false;
+    }
+    let notes_ctx = n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("notes size")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("memory dir")
+        || n.contains("memory notes")
+        || n.contains("mac-stats notes")
+        || n.contains("mac stats notes")
+        || n.contains("mac-stats memory folder")
+        || n.contains("mac stats memory folder")
+        || ((n.contains("notes") || n.contains("memory notes") || n.contains("memory folder")
+            || n.contains("memory directory")
+            || n.contains("memory dir"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !notes_ctx {
+        return false;
+    }
+    // Path-only / bare folder labels stay on the path lane.
+    if n == "notes"
+        || n == "memory folder"
+        || n == "memory directory"
+        || n == "memory dir"
+        || n == "notes folder"
+        || n == "notes directory"
+        || n == "notes dir"
+        || n == "memory notes"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "notes size"
+            | "notes folder size"
+            | "notes directory size"
+            | "notes dir size"
+            | "memory folder size"
+            | "memory directory size"
+            | "memory dir size"
+            | "memory notes size"
+            | "memory notes folder size"
+            | "memory notes directory size"
+            | "memory notes dir size"
+            | "how big are notes"
+            | "how big is notes"
+            | "how big is the notes folder"
+            | "how big is notes folder"
+            | "how big is the notes directory"
+            | "how big is the memory folder"
+            | "how big is memory folder"
+            | "how big is the memory directory"
+            | "how big is memory directory"
+            | "how big is the memory dir"
+            | "how large are notes"
+            | "how large is the notes folder"
+            | "how large is the memory folder"
+            | "notes bytes"
+            | "memory folder bytes"
+            | "memory notes bytes"
+            | "mac-stats notes size"
+            | "mac stats notes size"
+            | "mac-stats memory folder size"
+            | "mac stats memory folder size"
+    ) || (n.contains("size") && notes_ctx)
+        || (n.contains("big") && notes_ctx)
+        || (n.contains("large") && notes_ctx)
+        || (n.contains("bytes") && notes_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && notes_ctx)
+}
+
+/// Zero-LLM memory notes directory size (recursive file bytes; no list dump).
+pub fn format_memory_size_gateway() -> String {
+    let dir = crate::config::Config::memory_notes_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Notes:** not created yet · app recreates under `~/.mac-stats/agents/notes/` · `memory path` / `notes path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Notes** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Notes:** empty · `memory path` / `notes path` for the folder · `MEMORY: save <slug>` to add · does not list names."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Notes:** **{label}** on disk ({files} files) · `memory path` / `notes path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the notes folder / memory path…” asks.
 /// Config path only — does not list, read, save, scrub, or append memory.
 pub fn looks_like_memory_path_request(content: &str) -> bool {
@@ -4497,6 +4750,17 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
         || n == "where is the memory file"
         || n == "memory md"
         || n == "memory md path"
+    {
+        return false;
+    }
+    // Size/big/large asks use the notes/memory folder size lane (v0.1.887).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -4609,7 +4873,7 @@ pub fn format_memory_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `memory.md path` for curated file only."
+        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `notes size` for disk use · `memory.md path` for curated file only."
     )
 }
 
@@ -20024,6 +20288,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
+    // Notes/memory folder size before path (recursive bytes; no list); path before scrub/save.
+    if looks_like_memory_size_request(content) {
+        return Some(format_memory_size_gateway());
+    }
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
     }
@@ -20315,7 +20583,8 @@ pub fn format_ops_help_gateway() -> String {
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
 • `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `/tasks`)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` for disk use)\n\
-• `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save)\n\
+• `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / scrub / bare `memory size` RAM)\n\
+• `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` for disk use)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
@@ -21902,6 +22171,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only task dir path asks (v0.1.814) — config only; no list/create.
     if looks_like_task_path_request(question) {
+        return true;
+    }
+    // Read-only notes/memory folder size asks (v0.1.887) — recursive file bytes; no list dump.
+    if looks_like_memory_size_request(question) {
         return true;
     }
     // Read-only memory/notes path asks (v0.1.815) — config only; no list/save/scrub.
@@ -25328,6 +25601,52 @@ mod tests {
     }
 
     #[test]
+    fn memory_size_request_detected() {
+        assert!(looks_like_memory_size_request("notes size"));
+        assert!(looks_like_memory_size_request("notes folder size"));
+        assert!(looks_like_memory_size_request("notes directory size"));
+        assert!(looks_like_memory_size_request("notes dir size"));
+        assert!(looks_like_memory_size_request("memory folder size"));
+        assert!(looks_like_memory_size_request("memory directory size"));
+        assert!(looks_like_memory_size_request("memory dir size"));
+        assert!(looks_like_memory_size_request("memory notes size"));
+        assert!(looks_like_memory_size_request("how big are notes"));
+        assert!(looks_like_memory_size_request("how big is the notes folder"));
+        assert!(looks_like_memory_size_request("how big is the memory folder"));
+        assert!(looks_like_memory_size_request("how large is the notes folder"));
+        assert!(looks_like_memory_size_request("mac-stats notes size"));
+        // RAM / path / sibling lanes
+        assert!(!looks_like_memory_size_request("memory size"));
+        assert!(!looks_like_memory_size_request("how big is memory"));
+        assert!(!looks_like_memory_size_request("memory path"));
+        assert!(!looks_like_memory_size_request("notes path"));
+        assert!(!looks_like_memory_size_request("where are notes"));
+        assert!(!looks_like_memory_size_request("notes folder"));
+        assert!(!looks_like_memory_size_request("list notes"));
+        assert!(!looks_like_memory_size_request("scrub memory"));
+        assert!(!looks_like_memory_size_request("MEMORY: save itinerary"));
+        assert!(!looks_like_memory_size_request("memory.md path"));
+        assert!(!looks_like_memory_size_request("discord memory path"));
+        assert!(!looks_like_memory_size_request("session memory path"));
+        assert!(!looks_like_memory_size_request("/ram"));
+        assert!(!looks_like_memory_size_request("task size"));
+        assert!(!looks_like_memory_size_request("session size"));
+        assert!(!looks_like_memory_size_request("agents size"));
+        assert!(!looks_like_memory_path_request("notes size"));
+        assert!(!looks_like_memory_path_request("how big are notes"));
+        assert!(!looks_like_memory_path_request("memory folder size"));
+        assert!(!looks_like_task_size_request("notes size"));
+        let reply = try_operator_instant_reply("how big are notes").expect("notes size instant");
+        assert!(reply.contains("Notes"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+    }
+
+    #[test]
     fn memory_path_request_detected() {
         assert!(looks_like_memory_path_request("memory path"));
         assert!(looks_like_memory_path_request("notes path"));
@@ -25344,10 +25663,15 @@ mod tests {
         assert!(!looks_like_memory_path_request("what did you save"));
         assert!(!looks_like_memory_path_request("where is config"));
         assert!(!looks_like_memory_path_request("task path"));
+        assert!(!looks_like_memory_path_request("notes size"));
+        assert!(!looks_like_memory_path_request("how big are notes"));
         assert!(!looks_like_memory_scrub_request("memory path"));
         let reply = try_operator_instant_reply("where are notes").expect("memory path instant");
         assert!(reply.contains("Memory"));
         assert!(reply.contains("notes") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("notes size") || reply.contains("disk use")
+        );
     }
 
     #[test]
