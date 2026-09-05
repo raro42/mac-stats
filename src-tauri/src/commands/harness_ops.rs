@@ -6574,6 +6574,181 @@ pub fn format_tmp_size_gateway() -> String {
     }
 }
 
+/// True for short “how big are uploads / uploads size…” asks.
+/// Recursive file-byte sum under uploads dir — no list dump / path / upload lanes.
+pub fn looks_like_uploads_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("improvements")
+        || n.contains("traces")
+        || n.contains("pdf")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let upload_ctx = n.contains("uploads folder")
+        || n.contains("uploads directory")
+        || n.contains("uploads dir")
+        || n.contains("uploads size")
+        || n.contains("upload folder")
+        || n.contains("upload directory")
+        || n.contains("upload dir")
+        || n.contains("upload size")
+        || n.contains("browser uploads")
+        || n.contains("browser upload")
+        || n.contains("mac-stats uploads")
+        || n.contains("mac stats uploads")
+        || n == "uploads"
+        || n == "upload"
+        || ((n.contains("upload"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !upload_ctx {
+        return false;
+    }
+    // Bare “uploads” / path-only asks stay on the path lane.
+    if n == "uploads"
+        || n == "upload"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "uploads size"
+            | "upload size"
+            | "uploads folder size"
+            | "upload folder size"
+            | "uploads directory size"
+            | "upload directory size"
+            | "uploads dir size"
+            | "upload dir size"
+            | "how big are uploads"
+            | "how big is uploads"
+            | "how big is the uploads folder"
+            | "how big is uploads folder"
+            | "how big is the upload folder"
+            | "how big is upload folder"
+            | "how big is the uploads directory"
+            | "how big is the upload directory"
+            | "how large is the uploads folder"
+            | "how large is the upload folder"
+            | "how large are uploads"
+            | "uploads bytes"
+            | "upload bytes"
+            | "uploads folder bytes"
+            | "upload folder bytes"
+            | "browser uploads size"
+            | "browser upload size"
+    ) || (n.contains("size") && upload_ctx)
+        || (n.contains("big") && upload_ctx)
+        || (n.contains("large") && upload_ctx)
+        || (n.contains("bytes") && upload_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && upload_ctx)
+}
+
+/// Zero-LLM uploads directory size (recursive file bytes; no list dump).
+pub fn format_uploads_size_gateway() -> String {
+    let dir = crate::config::Config::browser_uploads_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Uploads:** not created yet · app recreates under `~/.mac-stats/uploads/` · `uploads path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Uploads** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Uploads:** empty · `uploads path` for the folder · BROWSER_UPLOAD roots · `/browser` for CDP status."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Uploads:** **{label}** on disk ({files} files) · BROWSER_UPLOAD · `uploads path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the uploads folder / uploads path…” asks.
 /// Config path only — does not list, upload, or open files under `~/.mac-stats/uploads/`.
 pub fn looks_like_uploads_path_request(content: &str) -> bool {
@@ -6600,6 +6775,13 @@ pub fn looks_like_uploads_path_request(content: &str) -> bool {
     }
     if n.contains("browser_")
         || n.contains("browser:")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -6704,7 +6886,7 @@ pub fn format_uploads_path_gateway() -> String {
     let dir = crate::config::Config::browser_uploads_dir();
     let display = dir.display().to_string();
     format!(
-        "**Uploads dir:** `{display}` · BROWSER_UPLOAD roots · put files here · `/browser` for CDP status."
+        "**Uploads dir:** `{display}` · BROWSER_UPLOAD roots · put files here · `/browser` for CDP status · `uploads size` for disk use."
     )
 }
 
@@ -17759,6 +17941,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_tmp_path_request(content) {
         return Some(format_tmp_path_gateway());
     }
+    // Uploads dir size before path (recursive bytes; no list); path before upload/list.
+    if looks_like_uploads_size_request(content) {
+        return Some(format_uploads_size_gateway());
+    }
     if looks_like_uploads_path_request(content) {
         return Some(format_uploads_path_gateway());
     }
@@ -17996,6 +18182,7 @@ pub fn format_ops_help_gateway() -> String {
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
+• `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
@@ -19589,6 +19776,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only tmp dir path asks (v0.1.822) — config only; no list/prune.
     if looks_like_tmp_path_request(question) {
+        return true;
+    }
+    // Read-only uploads dir size asks (v0.1.876) — recursive file bytes; no list dump.
+    if looks_like_uploads_size_request(question) {
         return true;
     }
     // Read-only uploads dir path asks (v0.1.824) — config only; no list/upload.
@@ -23300,11 +23491,47 @@ mod tests {
         assert!(!looks_like_uploads_path_request("tmp path"));
         assert!(!looks_like_uploads_path_request("where is config"));
         assert!(!looks_like_uploads_path_request("/browser"));
+        assert!(!looks_like_uploads_path_request("uploads size"));
+        assert!(!looks_like_uploads_path_request("how big are uploads"));
         assert!(!looks_like_tmp_path_request("uploads path"));
         let reply =
             try_operator_instant_reply("where is the uploads folder").expect("uploads path instant");
         assert!(reply.contains("Uploads dir"));
         assert!(reply.contains("uploads") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("uploads size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn uploads_size_request_detected() {
+        assert!(looks_like_uploads_size_request("uploads size"));
+        assert!(looks_like_uploads_size_request("upload size"));
+        assert!(looks_like_uploads_size_request("uploads folder size"));
+        assert!(looks_like_uploads_size_request("upload folder size"));
+        assert!(looks_like_uploads_size_request("uploads dir size"));
+        assert!(looks_like_uploads_size_request("how big are uploads"));
+        assert!(looks_like_uploads_size_request("how big is the uploads folder"));
+        assert!(looks_like_uploads_size_request("how large is the upload folder"));
+        assert!(looks_like_uploads_size_request("browser uploads size"));
+        assert!(!looks_like_uploads_size_request("uploads path"));
+        assert!(!looks_like_uploads_size_request("where is the uploads folder"));
+        assert!(!looks_like_uploads_size_request("uploads"));
+        assert!(!looks_like_uploads_size_request("list uploads"));
+        assert!(!looks_like_uploads_size_request("clean uploads"));
+        assert!(!looks_like_uploads_size_request("tmp size"));
+        assert!(!looks_like_uploads_size_request("screenshots size"));
+        assert!(!looks_like_uploads_size_request("improvements size"));
+        assert!(!looks_like_uploads_path_request("uploads size"));
+        assert!(!looks_like_tmp_size_request("uploads size"));
+        let reply =
+            try_operator_instant_reply("how big is the uploads folder").expect("uploads size instant");
+        assert!(reply.contains("Uploads"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("uploads path") || reply.contains("folder"));
     }
 
     #[test]
