@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.889] - 2026-09-06
+
+### Added
+
+- **Instant lane: config.json size** — `config size`, `config.json size`, `how big is config`, and close variants return on-disk size of app `config.json` without Ollama (Discord + AI Chat; stat only — no dump/edit; does not steal `config path` / `.config.env` / `agent.json`; p50 latency).
+
 ## [0.1.888] - 2026-09-06
 
 ### Fixed

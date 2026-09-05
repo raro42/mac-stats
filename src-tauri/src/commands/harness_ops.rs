@@ -3518,6 +3518,11 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("agent.json")
         || n.contains("agent config")
         || n.contains("agent-config")
+        // Size asks use the config.json size lane (v0.1.889).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
     {
         return false;
     }
@@ -3589,8 +3594,170 @@ pub fn format_config_path_gateway() -> String {
         .unwrap_or_else(|| "~/.mac-stats".into());
     let config_display = config.display().to_string();
     format!(
-        "**Config:** `{config_display}` · data home `{home}` · Settings for credentials · `/logs` for debug.log."
+        "**Config:** `{config_display}` · data home `{home}` · Settings for credentials · `config size` for on-disk bytes · `/logs` for debug.log."
     )
+}
+
+/// True for short “how big is config.json / config size…” asks.
+/// Stat only on app `config.json` — does not steal path / `.config.env` / agent.json / edit.
+pub fn looks_like_config_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
+        || n.contains("secrets env")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("configure")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+    {
+        return false;
+    }
+    let config_ctx = n.contains("config.json")
+        || n.contains("config json")
+        || n == "config size"
+        || n == "config file size"
+        || n == "how big is config"
+        || n == "how big is the config"
+        || n == "how large is config"
+        || n == "how large is the config"
+        || n == "mac-stats config size"
+        || n == "mac stats config size"
+        || n == "how big is mac-stats config"
+        || n == "how big is mac stats config"
+        || (n.contains("config")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !config_ctx {
+        return false;
+    }
+    // Require an explicit size cue (avoid bare "config.json").
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "config size"
+            | "config file size"
+            | "config.json size"
+            | "config json size"
+            | "mac-stats config size"
+            | "mac stats config size"
+            | "how big is config"
+            | "how big is the config"
+            | "how big is config.json"
+            | "how big is the config.json"
+            | "how big is mac-stats config"
+            | "how big is mac stats config"
+            | "how large is config"
+            | "how large is the config"
+            | "how large is config.json"
+            | "config bytes"
+            | "config.json bytes"
+            | "config file bytes"
+    ) || (n.contains("config")
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM app config.json file size (stat only; no dump/edit).
+pub fn format_config_size_gateway() -> String {
+    let path = crate::config::Config::config_file_path();
+    if !path.exists() {
+        return "**Config:** no `config.json` yet · app will create it on first save · `config path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Config:** empty `config.json` · `config path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Config:** **{label}** on disk · app settings JSON · `config path` for the file · Settings for credentials."
+            )
+        }
+        Err(e) => format!("**Config** — could not stat `config.json`: {e}"),
+    }
 }
 
 /// True for short “where are screenshots / screenshot folder…” asks.
@@ -20168,6 +20335,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_env_path_request(content) {
         return Some(format_config_env_path_gateway());
     }
+    // config.json size before path (stat only; no dump).
+    if looks_like_config_size_request(content) {
+        return Some(format_config_size_gateway());
+    }
     // Improvements dir size before path (recursive bytes; no list); path before overnight-content asks.
     if looks_like_improvements_size_request(content) {
         return Some(format_improvements_size_gateway());
@@ -20584,6 +20755,7 @@ pub fn format_ops_help_gateway() -> String {
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
+• `config size` · `config.json size` · `how big is config` — config.json file size on disk (stat only; no dump; does not steal `config path` / `.config.env`)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
 • `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path`)\n\
@@ -22065,6 +22237,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only .config.env path asks (v0.1.840) — path only; never dumps keys.
     if looks_like_config_env_path_request(question) {
+        return true;
+    }
+    // Read-only config.json size asks (v0.1.889) — stat only; no dump/edit.
+    if looks_like_config_size_request(question) {
         return true;
     }
     // Read-only improvements dir size asks (v0.1.873) — recursive file bytes; no list dump.
@@ -24538,6 +24714,44 @@ mod tests {
         let reply = try_operator_instant_reply("where is config").expect("config path instant");
         assert!(reply.contains("Config"));
         assert!(reply.contains("config.json") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("config size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn config_size_request_detected() {
+        assert!(looks_like_config_size_request("config size"));
+        assert!(looks_like_config_size_request("config.json size"));
+        assert!(looks_like_config_size_request("config file size"));
+        assert!(looks_like_config_size_request("how big is config"));
+        assert!(looks_like_config_size_request("how big is config.json"));
+        assert!(looks_like_config_size_request("how large is the config"));
+        assert!(looks_like_config_size_request("mac-stats config size"));
+        assert!(!looks_like_config_size_request("config path"));
+        assert!(!looks_like_config_size_request("where is config"));
+        assert!(!looks_like_config_size_request("config.json"));
+        assert!(!looks_like_config_size_request("config.env path"));
+        assert!(!looks_like_config_size_request("where is .config.env"));
+        assert!(!looks_like_config_size_request("agent.json size"));
+        assert!(!looks_like_config_size_request("edit config"));
+        assert!(!looks_like_config_size_request("configure ollama"));
+        assert!(!looks_like_config_size_request("digest size"));
+        assert!(!looks_like_config_size_request("improvements size"));
+        assert!(!looks_like_config_path_request("config size"));
+        assert!(!looks_like_config_path_request("how big is config"));
+        assert!(!looks_like_config_env_path_request("config size"));
+        let reply = try_operator_instant_reply("how big is config").expect("config size instant");
+        assert!(reply.contains("Config"));
+        assert!(
+            reply.to_lowercase().contains("on disk")
+                || reply.contains("config.json")
+                || reply.contains("empty"),
+            "{reply}"
+        );
+        assert!(!reply.to_lowercase().contains("discord_bot_token"));
+        assert!(!reply.to_lowercase().contains("api_key"));
     }
 
     #[test]

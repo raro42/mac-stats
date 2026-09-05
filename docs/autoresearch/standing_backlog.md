@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.889** — Instant lane: config.json size (`config size`, `config.json size`, `how big is config`; stat only; no dump; does not steal `config path` / `.config.env` / `agent.json`; p50 latency).
+
 - **v0.1.888** — Instant lane: `review logs` / `check logs` / `look at logs` / `read logs` (and close variants) → existing `/logs` Debug Log tail (no Ollama / Brave; digester Slowest 40s Brave waste; does not steal fix/explain/clear; p50 latency).
 
 - **v0.1.887** — Instant lane: notes / memory folder size (`notes size`, `how big are notes`, `memory folder size`, `notes folder size`; recursive file bytes under `~/.mac-stats/agents/notes/`; no list dump; does not steal `memory path` / `notes path` / scrub / save; rejects bare `memory size` (RAM); p50 latency).
