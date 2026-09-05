@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.878] - 2026-09-05
+
+### Added
+
+- **Instant lane: PDF exports directory size** — `pdfs size`, `how big are pdfs`, `pdfs folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/pdfs/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `pdfs path` / save/list; p50 latency).
+
 ## [0.1.877] - 2026-09-05
 
 ### Added

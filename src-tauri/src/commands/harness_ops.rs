@@ -7225,6 +7225,185 @@ pub fn format_traces_path_gateway() -> String {
     )
 }
 
+/// True for short “how big are pdfs / pdfs size…” asks.
+/// Recursive file-byte sum under PDF exports dir — no list dump / path / save lanes.
+pub fn looks_like_pdfs_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("save_pdf")
+        || n.contains("save pdf")
+        || n.contains("print pdf")
+        || n.contains("print_pdf")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("improvements")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log size")
+        || n.contains("log file size")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pdfs_ctx = n.contains("pdfs folder")
+        || n.contains("pdfs directory")
+        || n.contains("pdfs dir")
+        || n.contains("pdfs size")
+        || n.contains("pdf folder")
+        || n.contains("pdf directory")
+        || n.contains("pdf dir")
+        || n.contains("pdf size")
+        || n.contains("browser pdfs")
+        || n.contains("browser pdf")
+        || n.contains("mac-stats pdfs")
+        || n.contains("mac stats pdfs")
+        || n == "pdfs"
+        || n == "pdf"
+        || ((n.contains("pdf"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !pdfs_ctx {
+        return false;
+    }
+    // Bare “pdfs” / path-only asks stay on the path lane.
+    if n == "pdfs"
+        || n == "pdf"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "pdfs size"
+            | "pdf size"
+            | "pdfs folder size"
+            | "pdf folder size"
+            | "pdfs directory size"
+            | "pdf directory size"
+            | "pdfs dir size"
+            | "pdf dir size"
+            | "how big are pdfs"
+            | "how big is pdfs"
+            | "how big is the pdfs folder"
+            | "how big is pdfs folder"
+            | "how big is the pdf folder"
+            | "how big is pdf folder"
+            | "how big is the pdfs directory"
+            | "how big is the pdf directory"
+            | "how large is the pdfs folder"
+            | "how large is the pdf folder"
+            | "how large are pdfs"
+            | "pdfs bytes"
+            | "pdf bytes"
+            | "pdfs folder bytes"
+            | "pdf folder bytes"
+            | "browser pdfs size"
+            | "browser pdf size"
+    ) || (n.contains("size") && pdfs_ctx)
+        || (n.contains("big") && pdfs_ctx)
+        || (n.contains("large") && pdfs_ctx)
+        || (n.contains("bytes") && pdfs_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && pdfs_ctx)
+}
+
+/// Zero-LLM PDF exports directory size (recursive file bytes; no list dump).
+pub fn format_pdfs_size_gateway() -> String {
+    let dir = crate::config::Config::pdfs_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**PDFs:** not created yet · app recreates under `~/.mac-stats/pdfs/` · `pdfs path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**PDFs** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**PDFs:** empty · `pdfs path` for the folder · BROWSER_SAVE_PDF exports · `/browser` for CDP status."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**PDFs:** **{label}** on disk ({files} files) · exports · `pdfs path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the pdfs folder / pdfs path…” asks.
 /// Config path only — does not list, prune, or run BROWSER_SAVE_PDF under `~/.mac-stats/pdfs/`.
 pub fn looks_like_pdfs_path_request(content: &str) -> bool {
@@ -7257,6 +7436,13 @@ pub fn looks_like_pdfs_path_request(content: &str) -> bool {
         || n.contains("save pdf")
         || n.contains("print pdf")
         || n.contains("print_pdf")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -7360,7 +7546,7 @@ pub fn format_pdfs_path_gateway() -> String {
     let dir = crate::config::Config::pdfs_dir();
     let display = dir.display().to_string();
     format!(
-        "**PDFs dir:** `{display}` · BROWSER_SAVE_PDF exports · pruned by retention · `/browser` for CDP status."
+        "**PDFs dir:** `{display}` · BROWSER_SAVE_PDF exports · pruned by retention · `/browser` for CDP status · `pdfs size` for disk use."
     )
 }
 
@@ -18145,6 +18331,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_traces_path_request(content) {
         return Some(format_traces_path_gateway());
     }
+    // PDFs dir size before path (recursive bytes; no list); path before save/list.
+    if looks_like_pdfs_size_request(content) {
+        return Some(format_pdfs_size_gateway());
+    }
     if looks_like_pdfs_path_request(content) {
         return Some(format_pdfs_path_gateway());
     }
@@ -18380,6 +18570,7 @@ pub fn format_ops_help_gateway() -> String {
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / prune)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
+• `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
@@ -19987,6 +20178,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only CDP traces dir path asks (v0.1.825) — config only; no list/prune.
     if looks_like_traces_path_request(question) {
+        return true;
+    }
+    // Read-only PDF exports dir size asks (v0.1.878) — recursive file bytes; no list dump.
+    if looks_like_pdfs_size_request(question) {
         return true;
     }
     // Read-only PDF exports dir path asks (v0.1.826) — config only; no list/save.
@@ -23786,9 +23981,11 @@ mod tests {
         assert!(!looks_like_traces_size_request("tmp size"));
         assert!(!looks_like_traces_size_request("uploads size"));
         assert!(!looks_like_traces_size_request("screenshots size"));
+        assert!(!looks_like_traces_size_request("pdfs size"));
         assert!(!looks_like_traces_path_request("traces size"));
         assert!(!looks_like_uploads_size_request("traces size"));
         assert!(!looks_like_tmp_size_request("traces size"));
+        assert!(!looks_like_pdfs_size_request("traces size"));
         let reply =
             try_operator_instant_reply("how big is the traces folder").expect("traces size instant");
         assert!(reply.contains("Traces"));
@@ -23823,12 +24020,51 @@ mod tests {
         assert!(!looks_like_pdfs_path_request("where is config"));
         assert!(!looks_like_pdfs_path_request("/browser"));
         assert!(!looks_like_pdfs_path_request("browser credentials path"));
+        assert!(!looks_like_pdfs_path_request("pdfs size"));
         assert!(!looks_like_uploads_path_request("pdfs path"));
         assert!(!looks_like_traces_path_request("pdfs path"));
         let reply =
             try_operator_instant_reply("where is the pdfs folder").expect("pdfs path instant");
         assert!(reply.contains("PDFs dir"));
         assert!(reply.contains("pdfs") || reply.contains(".mac-stats"));
+        assert!(reply.to_lowercase().contains("pdfs size") || reply.contains("disk use"));
+    }
+
+    #[test]
+    fn pdfs_size_request_detected() {
+        assert!(looks_like_pdfs_size_request("pdfs size"));
+        assert!(looks_like_pdfs_size_request("pdf size"));
+        assert!(looks_like_pdfs_size_request("pdfs folder size"));
+        assert!(looks_like_pdfs_size_request("pdf folder size"));
+        assert!(looks_like_pdfs_size_request("pdfs dir size"));
+        assert!(looks_like_pdfs_size_request("how big are pdfs"));
+        assert!(looks_like_pdfs_size_request("how big is the pdfs folder"));
+        assert!(looks_like_pdfs_size_request("how large is the pdf folder"));
+        assert!(looks_like_pdfs_size_request("browser pdfs size"));
+        assert!(!looks_like_pdfs_size_request("pdfs path"));
+        assert!(!looks_like_pdfs_size_request("where is the pdfs folder"));
+        assert!(!looks_like_pdfs_size_request("pdfs"));
+        assert!(!looks_like_pdfs_size_request("list pdfs"));
+        assert!(!looks_like_pdfs_size_request("clean pdfs"));
+        assert!(!looks_like_pdfs_size_request("save pdf"));
+        assert!(!looks_like_pdfs_size_request("tmp size"));
+        assert!(!looks_like_pdfs_size_request("uploads size"));
+        assert!(!looks_like_pdfs_size_request("traces size"));
+        assert!(!looks_like_pdfs_size_request("screenshots size"));
+        assert!(!looks_like_pdfs_path_request("pdfs size"));
+        assert!(!looks_like_uploads_size_request("pdfs size"));
+        assert!(!looks_like_traces_size_request("pdfs size"));
+        assert!(!looks_like_tmp_size_request("pdfs size"));
+        let reply =
+            try_operator_instant_reply("how big is the pdfs folder").expect("pdfs size instant");
+        assert!(reply.contains("PDFs"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
+        assert!(reply.to_lowercase().contains("pdfs path") || reply.contains("folder"));
     }
 
     #[test]
