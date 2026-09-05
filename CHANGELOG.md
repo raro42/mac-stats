@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.888] - 2026-09-06
+
+### Fixed
+
+- **Instant lane: `review logs` / `check logs`** — short “review logs”, “check the logs”, “look at logs”, “read logs” (and close variants) now hit the existing `/logs` Debug Log tail without Ollama or Brave Search (Discord + AI Chat; digester Slowest had a 40s Brave waste on bare `Review logs`; does not steal fix/explain/clear-log asks; p50 latency).
+
 ## [0.1.887] - 2026-09-05
 
 ### Added

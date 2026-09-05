@@ -2926,6 +2926,22 @@ pub fn looks_like_debug_log_request(content: &str) -> bool {
             | "debug logs"
             | "show logs"
             | "list logs"
+            | "review logs"
+            | "review log"
+            | "review the logs"
+            | "review the log"
+            | "check logs"
+            | "check log"
+            | "check the logs"
+            | "check the log"
+            | "look at logs"
+            | "look at the logs"
+            | "look at log"
+            | "look at the log"
+            | "read logs"
+            | "read the logs"
+            | "read log"
+            | "read the log"
             | "log tail"
             | "logs tail"
             | "tail logs"
@@ -20562,7 +20578,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
-• `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
+• `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
@@ -21198,13 +21214,23 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/logs` Error/Warn operator asks (v0.1.711).
+    // `/logs` Error/Warn operator asks (v0.1.711); review/check NL (v0.1.888).
     if (q.contains("/logs")
         || q.contains("/log")
         || q.contains("debug log")
         || q.contains("debug logs")
         || q.contains("show logs")
         || q.contains("list logs")
+        || q.contains("review logs")
+        || q.contains("review log")
+        || q.contains("review the logs")
+        || q.contains("check logs")
+        || q.contains("check log")
+        || q.contains("check the logs")
+        || q.contains("look at logs")
+        || q.contains("look at the logs")
+        || q.contains("read logs")
+        || q.contains("read the logs")
         || q.contains("log tail")
         || q.contains("tail logs")
         || q.contains("any errors")
@@ -24361,13 +24387,29 @@ mod tests {
         assert!(looks_like_debug_log_request("any errors"));
         assert!(looks_like_debug_log_request("show warnings"));
         assert!(looks_like_debug_log_request("what's wrong"));
+        assert!(looks_like_debug_log_request("Review logs"));
+        assert!(looks_like_debug_log_request("review the logs"));
+        assert!(looks_like_debug_log_request("check logs"));
+        assert!(looks_like_debug_log_request("check the log"));
+        assert!(looks_like_debug_log_request("look at the logs"));
+        assert!(looks_like_debug_log_request("read logs"));
         assert!(!looks_like_debug_log_request("why is there an error"));
         assert!(!looks_like_debug_log_request("fix the error"));
         assert!(!looks_like_debug_log_request("explain the warning"));
         assert!(!looks_like_debug_log_request("clear log"));
+        assert!(!looks_like_debug_log_request("review logs for redmine"));
         assert_eq!(
             parse_debug_log_list_filter("/logs"),
             DebugLogListFilter::All
+        );
+        assert_eq!(
+            parse_debug_log_list_filter("Review logs"),
+            DebugLogListFilter::All
+        );
+        let review = try_operator_instant_reply("Review logs").expect("review logs instant");
+        assert!(
+            review.to_lowercase().contains("debug log"),
+            "{review}"
         );
         assert_eq!(
             parse_debug_log_list_filter("/logs error"),
