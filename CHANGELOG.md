@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.886] - 2026-09-05
+
+### Added
+
+- **Instant lane: cleanup-quarantine directory size** — `cleanup quarantine size`, `how big is quarantine`, `quarantine folder size`, and similar asks return recursive on-disk size under `~/.mac-stats/cleanup-quarantine/` without Ollama (Discord + AI Chat; file-byte sum only — no list dump; does not steal `cleanup quarantine path` / `/disk` Clean now / list/prune/restore; p50 latency).
+
 ## [0.1.885] - 2026-09-05
 
 ### Added

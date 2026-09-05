@@ -9541,6 +9541,216 @@ pub fn format_browser_downloads_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is cleanup-quarantine / quarantine size…” asks.
+/// Recursive file-byte sum under quarantine dir — no list dump / path / `/disk` lanes.
+pub fn looks_like_cleanup_quarantine_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || (n.contains("delete") && !n.contains("soft delete") && !n.contains("soft-delete"))
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("recover")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser_download")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("improvements")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("pinned_processes")
+        || n.contains("pinned process")
+        || n.contains("pin file")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let q_ctx = n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("clean-up quarantine")
+        || n.contains("disk quarantine")
+        || n.contains("soft-delete quarantine")
+        || n.contains("soft delete quarantine")
+        || n.contains("mac-stats quarantine")
+        || n.contains("mac stats quarantine")
+        || (n.contains("quarantine")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("cleanup")
+                || n.contains("disk")));
+    if !q_ctx {
+        return false;
+    }
+    // Bare folder labels stay on the path lane.
+    if n == "cleanup-quarantine"
+        || n == "cleanup quarantine"
+        || n == "quarantine"
+        || n == "disk quarantine"
+        || n == "soft-delete quarantine"
+        || n == "soft delete quarantine"
+        || n == "mac-stats quarantine"
+        || n == "mac stats quarantine"
+        || (!n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes")
+            && !n.contains(" mb")
+            && !n.contains(" kb")
+            && !n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "cleanup quarantine size"
+            | "cleanup-quarantine size"
+            | "cleanup quarantine folder size"
+            | "cleanup-quarantine folder size"
+            | "cleanup quarantine directory size"
+            | "cleanup-quarantine directory size"
+            | "cleanup quarantine dir size"
+            | "cleanup-quarantine dir size"
+            | "quarantine size"
+            | "quarantine folder size"
+            | "quarantine directory size"
+            | "quarantine dir size"
+            | "how big is quarantine"
+            | "how big is the quarantine"
+            | "how big is the quarantine folder"
+            | "how big is quarantine folder"
+            | "how big is cleanup-quarantine"
+            | "how big is the cleanup-quarantine"
+            | "how big is the cleanup quarantine"
+            | "how big is the cleanup quarantine folder"
+            | "how big is cleanup quarantine"
+            | "how large is the quarantine folder"
+            | "how large is quarantine"
+            | "how large is cleanup-quarantine"
+            | "disk quarantine size"
+            | "soft-delete quarantine size"
+            | "soft delete quarantine size"
+            | "mac-stats quarantine size"
+            | "mac stats quarantine size"
+            | "quarantine bytes"
+            | "cleanup quarantine bytes"
+            | "cleanup-quarantine bytes"
+    ) || (n.contains("size") && q_ctx)
+        || (n.contains("big") && q_ctx)
+        || (n.contains("large") && q_ctx)
+        || (n.contains("bytes") && q_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && q_ctx)
+}
+
+/// Zero-LLM Disk Cleanup quarantine directory size (recursive file bytes; no list dump).
+pub fn format_cleanup_quarantine_size_gateway() -> String {
+    let dir = crate::config::Config::cleanup_quarantine_dir();
+    match dir_total_bytes(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Cleanup quarantine:** not created yet · app recreates under `~/.mac-stats/cleanup-quarantine/` · `cleanup quarantine path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Cleanup quarantine** — could not scan: {e}"),
+        Ok((0, 0)) => {
+            "**Cleanup quarantine:** empty · `cleanup quarantine path` for the folder · `/disk` for scopes · soft-delete only."
+                .to_string()
+        }
+        Ok((bytes, files)) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Cleanup quarantine:** **{label}** on disk ({files} files) · soft-delete · `cleanup quarantine path` for the folder · does not list names."
+            )
+        }
+    }
+}
+
 /// True for short “where is the cleanup-quarantine folder / quarantine path…” asks.
 /// Config path only — does not list, prune, restore, or run Disk Cleanup `/disk`.
 pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
@@ -9570,6 +9780,17 @@ pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
         || looks_like_disk_cleanup_request(content)
         || looks_like_downloads_organizer_ready_request(content)
         || looks_like_browser_ready_request(content)
+    {
+        return false;
+    }
+    // Size/big/large asks use the cleanup quarantine size lane (v0.1.886).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -9694,7 +9915,7 @@ pub fn format_cleanup_quarantine_path_gateway() -> String {
     let dir = crate::config::Config::cleanup_quarantine_dir();
     let display = dir.display().to_string();
     format!(
-        "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · does not touch system Trash."
+        "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · `cleanup quarantine size` for disk use · does not touch system Trash."
     )
 }
 
@@ -19882,6 +20103,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_downloads_path_request(content) {
         return Some(format_browser_downloads_path_gateway());
     }
+    // Cleanup-quarantine dir size before path (recursive bytes; no list); path before /disk.
+    if looks_like_cleanup_quarantine_size_request(content) {
+        return Some(format_cleanup_quarantine_size_gateway());
+    }
     if looks_like_cleanup_quarantine_path_request(content) {
         return Some(format_cleanup_quarantine_path_gateway());
     }
@@ -20117,7 +20342,8 @@ pub fn format_ops_help_gateway() -> String {
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
 • `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `/downloads`)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
-• `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; does not steal `/disk`)\n\
+• `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
+• `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; does not steal `/schedules`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
@@ -21768,6 +21994,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser-downloads dir path asks (v0.1.829) — config only; no list/prune/download.
     if looks_like_browser_downloads_path_request(question) {
+        return true;
+    }
+    // Read-only cleanup-quarantine dir size asks (v0.1.886) — recursive file bytes; no list dump.
+    if looks_like_cleanup_quarantine_size_request(question) {
         return true;
     }
     // Read-only cleanup-quarantine dir path asks (v0.1.830) — config only; no list/prune/restore.
@@ -26114,6 +26344,12 @@ mod tests {
         ));
         assert!(!looks_like_cleanup_quarantine_path_request("uploads path"));
         assert!(!looks_like_cleanup_quarantine_path_request("where is config"));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "cleanup quarantine size"
+        ));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "how big is quarantine"
+        ));
         assert!(!looks_like_disk_cleanup_request("cleanup quarantine path"));
         assert!(!looks_like_browser_downloads_path_request(
             "cleanup quarantine path"
@@ -26122,6 +26358,80 @@ mod tests {
             .expect("cleanup quarantine path instant");
         assert!(reply.contains("Cleanup quarantine"));
         assert!(reply.contains("cleanup-quarantine") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("cleanup quarantine size") || reply.contains("disk use")
+        );
+    }
+
+    #[test]
+    fn cleanup_quarantine_size_request_detected() {
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "cleanup quarantine size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "cleanup-quarantine size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "cleanup quarantine folder size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "quarantine size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "quarantine folder size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "how big is quarantine"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "how big is the quarantine folder"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "how big is cleanup-quarantine"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "how large is the quarantine folder"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "disk quarantine size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "soft-delete quarantine size"
+        ));
+        assert!(looks_like_cleanup_quarantine_size_request(
+            "mac-stats quarantine size"
+        ));
+        assert!(!looks_like_cleanup_quarantine_size_request(
+            "cleanup quarantine path"
+        ));
+        assert!(!looks_like_cleanup_quarantine_size_request(
+            "where is the quarantine folder"
+        ));
+        assert!(!looks_like_cleanup_quarantine_size_request("cleanup-quarantine"));
+        assert!(!looks_like_cleanup_quarantine_size_request("list quarantine"));
+        assert!(!looks_like_cleanup_quarantine_size_request("prune quarantine"));
+        assert!(!looks_like_cleanup_quarantine_size_request("restore quarantine"));
+        assert!(!looks_like_cleanup_quarantine_size_request("clean now"));
+        assert!(!looks_like_cleanup_quarantine_size_request("/disk"));
+        assert!(!looks_like_cleanup_quarantine_size_request("disk cleanup"));
+        assert!(!looks_like_cleanup_quarantine_size_request("browser downloads size"));
+        assert!(!looks_like_cleanup_quarantine_size_request("tmp size"));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "cleanup quarantine size"
+        ));
+        assert!(!looks_like_browser_downloads_size_request(
+            "cleanup quarantine size"
+        ));
+        assert!(!looks_like_tmp_size_request("cleanup quarantine size"));
+        let reply = try_operator_instant_reply("how big is quarantine")
+            .expect("cleanup quarantine size instant");
+        assert!(reply.contains("Cleanup quarantine"));
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not scan")
+        );
     }
 
     #[test]
