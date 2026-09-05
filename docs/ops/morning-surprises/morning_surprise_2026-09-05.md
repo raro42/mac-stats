@@ -6,7 +6,8 @@ Overnight Track B kept shipping **instant-lane** size/age/path operators so Disc
 
 | Version | What |
 |---------|------|
-| **v0.1.874** | Instant: **screenshots directory size** (`screenshots size`, `how big are screenshots`, …) — recursive file bytes under BROWSER_SCREENSHOT dir; no list dump; does not steal path/take/list |
+| **v0.1.875** | Instant: **tmp directory size** (`tmp size`, `how big is tmp`, `tmp folder size`, …) — recursive file bytes under `~/.mac-stats/tmp/`; no list dump; does not steal path/prune/temperature |
+| **v0.1.874** | Instant: **screenshots directory size** (`screenshots size`, `how big are screenshots`, …) — recursive under BROWSER_SCREENSHOT dir |
 | **v0.1.873** | Instant: **improvements directory size** — recursive under `~/.mac-stats/improvements/` |
 | **v0.1.872** | Instant: **digest.md / latest.md size** — `latest.md` stat only |
 | **v0.1.871** | Instant: **digest file size** — `latest.json` stat only |
@@ -17,18 +18,19 @@ Overnight Track B kept shipping **instant-lane** size/age/path operators so Disc
 | **v0.1.866** | Instant: **results.tsv path** |
 | **v0.1.865** | Agent Ops Filter attention glance (On/Off · Live/Files · Jobs/Deliveries · Discord/Core · Runs lanes) |
 
-## Tick notes (~05:15)
+## Tick notes (~05:35)
 
 - Digester **open** empty; design review **due=false** (grace; screens aged).
-- Fuel: standing backlog p50 latency → screenshots dir size.
+- Fuel: standing backlog p50 latency → tmp dir size (after screenshots size).
 - Debug log scan: no ERROR/WARN clusters in window.
-- Shared helper: `dir_total_bytes` (improvements + screenshots).
+- Shared helper: `dir_total_bytes` (improvements + screenshots + tmp).
 
 ## Try it
 
 ```text
+tmp size
+how big is tmp
+tmp folder size
+tmp path
 screenshots size
-how big are screenshots
-screenshots folder size
-screenshot path
 ```
