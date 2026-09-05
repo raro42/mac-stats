@@ -13,12 +13,13 @@ Overnight Track B (20:00–06:00 local, night of 2026-09-05 → morning 2026-09-
 | **v0.1.881** | Instant lane: skills directory size (`skills size`, `how big are skills`, `skills folder size`) — Hermes skills dir; does not steal `skills path` / `/skills` / skill.md |
 | **v0.1.882** | Instant lane: plugins/scripts directory size (`plugins size`, `scripts size`, `how big are plugins`) — recursive bytes under `~/.mac-stats/scripts/`; does not steal `plugins path` / `/plugins` |
 | **v0.1.883** | Instant lane: prompts directory size (`prompts size`, `how big are prompts`, `prompts folder size`) — recursive bytes under `~/.mac-stats/agents/prompts/`; does not steal `prompts path` / planning·execution file paths |
+| **v0.1.884** | Instant lane: session directory size (`session size`, `how big are sessions`, `session folder size`) — recursive bytes under `~/.mac-stats/session/`; does not steal `session path` / `/sessions` / session-memory |
 
 ## Fuel
 
 - Digester open: empty (Elmasnow weather already stale/shipped).
 - Design review: due=false (grace); stale PNGs still aged (`feature-ai-chat` recommended).
-- Experiment this tick (~22:40): standing backlog p50 — prompts dir size after plugins/scripts (**v0.1.882**).
+- Experiment this tick (~23:05): standing backlog p50 — session dir size after prompts (**v0.1.883**).
 
 ## Ratchet
 
@@ -29,7 +30,8 @@ Overnight Track B (20:00–06:00 local, night of 2026-09-05 → morning 2026-09-
 - keep @ `3edb482` — v0.1.881 skills dir size
 - keep @ `f7725dd` — v0.1.882 plugins/scripts dir size
 - keep @ `1af31cf` — v0.1.883 prompts dir size
+- keep @ `85fff1d` — v0.1.884 session dir size
 
 ## Next
 
-- session / task / cleanup-quarantine dir sizes, or design-review polish when TCC allows.
+- task / cleanup-quarantine dir sizes, or design-review polish when TCC allows.
