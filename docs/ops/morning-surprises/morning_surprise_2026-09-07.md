@@ -1,29 +1,25 @@
 # Morning surprise — 2026-09-07
 
-Overnight Track B (20:00–06:00 local). Keeps so far: **v0.1.899**, **v0.1.900**, **v0.1.901**.
+Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.901** | Instant lane: `soul.md` size (`soul size`, `soul.md size`, `how big is soul`, `soul file size`) — on-disk bytes only; no dump; does not steal `soul path` / mood / agents |
-| **v0.1.900** | Instant lane: `.config.env` size (`config.env size`, `.config.env size`, `how big is .config.env`, `secrets env size`) — on-disk bytes only; no key dump; does not steal `config.env path` / `config size` / `config.json` |
-| **v0.1.899** | Instant lane: `credential_accounts.json` size (`credential accounts size`, `credential_accounts.json size`, `how big is credential accounts`, `keychain accounts size`) — on-disk bytes only; no Keychain dump; does not steal path / browser credentials |
+| **v0.1.902** | Instant lane: **mood.md size** (`mood size`, `mood.md size`, `how big is mood`, `mood file size`) — on-disk bytes across per-agent `mood.md` (stat only; no dump) |
+| **v0.1.901** | Instant lane: **soul.md size** |
+| **v0.1.900** | Instant lane: **`.config.env` size** |
+| **v0.1.899** | Instant lane: **credential_accounts.json size** |
+| **v0.1.898** | Instant lane: **user-info.json size** |
 
 ## Context
 
-- Digester **open** empty (Review logs / Elmasnow weather already shipped or stale).
-- Design review **due=false** (grace); screens still aged.
-- Fuel: standing backlog p50 size lane after path lanes.
+- Digester **open** stayed empty (stale Elmasnow weather + Review logs already filtered).
+- Design review still in **grace** (`feature-ai-chat` ~23d aged; TCC screenshot deferred).
+- Fuel: standing backlog p50 latency — path lanes without matching size asks.
 
-## Earlier same calendar day (pre-window / prior night)
+## Next fuel
 
-- **v0.1.898** — user-info.json size
-- **v0.1.897** — scheduler_delivery_awareness.json size
-- **v0.1.896** — perplexity_last.json size
-- …size/path instant series through the early morning.
-
-## Next
-
-- mood.md / agent.json / escalation_patterns.md size
-- Design-review PNG refresh when TCC allows
+- skill.md / agent.json / escalation_patterns.md size (or next high-value file size)
+- Design review screenshot when TCC allows
+- Digester open / debug.log product errors when present
