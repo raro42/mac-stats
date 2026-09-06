@@ -17370,6 +17370,7 @@ pub fn format_skill_md_path_gateway() -> String {
 /// True for short “where is mood.md / mood path…” asks.
 /// Config path only — does not dump/edit mood text or open Agent Ops Agents.
 /// Mood is per-agent (`agent-<id>/mood.md`), not a shared file like soul.md.
+/// Size asks use the mood.md size lane (v0.1.902).
 pub fn looks_like_mood_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17474,6 +17475,14 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the mood.md size lane (v0.1.902).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("http://")
@@ -17539,8 +17548,231 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
 pub fn format_mood_path_gateway() -> String {
     let display = crate::config::Config::mood_file_path_display();
     format!(
-        "**Mood file:** `{display}` · per-agent mood (not shared like soul.md) · path only · does not dump or edit mood text · Agent Ops → Agents for content."
+        "**Mood file:** `{display}` · per-agent mood (not shared like soul.md) · path only · `mood size` for on-disk bytes · does not dump or edit mood text · Agent Ops → Agents for content."
     )
+}
+
+/// True for short “how big is mood.md / mood size…” asks.
+/// Stat only on per-agent `mood.md` files — does not steal path / soul / agents / dump.
+pub fn looks_like_mood_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("soul")
+        || n.contains("skill.md")
+        || n.contains("skill size")
+        || n.contains("skill file")
+        || n.contains("skills size")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing size")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory size")
+        || n.contains("memory folder")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts size")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mood_ctx = n.contains("mood.md")
+        || n.contains("mood file")
+        || n.contains("mood size")
+        || n.contains("mood md")
+        || n == "mood"
+        || n == "how big is mood"
+        || n == "how big is the mood"
+        || n == "how large is mood"
+        || n == "how large is the mood"
+        || (n.contains("mood")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("md")));
+    if !mood_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "mood size"
+            | "mood.md size"
+            | "mood file size"
+            | "mood md size"
+            | "mood.md file size"
+            | "mood bytes"
+            | "mood.md bytes"
+            | "mood file bytes"
+            | "how big is mood"
+            | "how big is the mood"
+            | "how big is mood.md"
+            | "how big is the mood.md"
+            | "how big is mood file"
+            | "how big is the mood file"
+            | "how big is the mood.md file"
+            | "how large is mood"
+            | "how large is the mood"
+            | "how large is mood.md"
+            | "how large is the mood.md"
+            | "mac-stats mood size"
+            | "mac stats mood size"
+    ) || (mood_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM per-agent mood.md file size (stat only; no dump/edit).
+/// Sums on-disk bytes of every `agents/agent-*/mood.md` that exists.
+pub fn format_mood_size_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut total: u64 = 0;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let mood = entry.path().join("mood.md");
+            if let Ok(meta) = std::fs::metadata(&mood) {
+                if meta.is_file() {
+                    total = total.saturating_add(meta.len());
+                    count = count.saturating_add(1);
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Mood file:** no `mood.md` yet · `mood path` for the file pattern · Agent Ops → Agents for content."
+            .to_string();
+    }
+    let label = crate::commands::disk_cleanup::format_bytes(total);
+    if count == 1 {
+        format!(
+            "**Mood file:** **{label}** on disk · 1 per-agent `mood.md` · `mood path` for the file · does not dump mood text."
+        )
+    } else {
+        format!(
+            "**Mood file:** **{label}** on disk · {count} per-agent `mood.md` files · `mood path` for the pattern · does not dump mood text."
+        )
+    }
 }
 
 /// True for short “how big is soul.md / soul size…” asks.
@@ -22823,6 +23055,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
     }
+    // mood.md size before path (stat only; no dump).
+    if looks_like_mood_size_request(content) {
+        return Some(format_mood_size_gateway());
+    }
     // mood.md before soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_mood_path_request(content) {
         return Some(format_mood_path_gateway());
@@ -22978,6 +23214,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // skill.md before mood / soul / skills-dir / agents-dir path lane.
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
+    }
+    // mood.md size before path (stat only; no dump).
+    if looks_like_mood_size_request(content) {
+        return Some(format_mood_size_gateway());
     }
     // mood.md before soul / agents-dir path lane.
     if looks_like_mood_path_request(content) {
@@ -23398,6 +23638,8 @@ pub fn format_ops_help_gateway() -> String {
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
 • `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / mood / agents)\n\
 • `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` for on-disk bytes; does not steal `/agents`)\n\
+• `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / soul / agents)\n\
+• `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` for on-disk bytes; does not steal `/agents`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
@@ -24942,6 +25184,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only skill.md path asks (v0.1.853) — config only; no dump/edit.
     if looks_like_skill_md_path_request(question) {
+        return true;
+    }
+    // Read-only mood.md size asks (v0.1.902) — stat only; no dump/edit.
+    if looks_like_mood_size_request(question) {
         return true;
     }
     // Read-only mood.md path asks (v0.1.852) — config only; no dump/edit.
@@ -28308,6 +28554,8 @@ mod tests {
         assert!(!looks_like_mood_path_request("rewrite my mood"));
         assert!(!looks_like_mood_path_request("/agents"));
         assert!(!looks_like_mood_path_request("session reset phrases path"));
+        assert!(!looks_like_mood_path_request("mood size"));
+        assert!(!looks_like_mood_path_request("how big is mood.md"));
         assert!(!looks_like_agents_path_request("mood path"));
         assert!(!looks_like_agents_path_request("where is mood.md"));
         assert!(!looks_like_soul_path_request("mood path"));
@@ -28318,6 +28566,44 @@ mod tests {
         assert!(reply.to_lowercase().contains("per-agent"));
         assert!(!reply.to_lowercase().contains("agents dir"));
         assert!(reply.to_lowercase().contains("path only"));
+    }
+
+    #[test]
+    fn mood_size_request_detected() {
+        assert!(looks_like_mood_size_request("mood size"));
+        assert!(looks_like_mood_size_request("mood.md size"));
+        assert!(looks_like_mood_size_request("mood file size"));
+        assert!(looks_like_mood_size_request("how big is mood"));
+        assert!(looks_like_mood_size_request("how big is mood.md"));
+        assert!(looks_like_mood_size_request("how big is the mood file"));
+        assert!(looks_like_mood_size_request("how large is mood.md"));
+        assert!(!looks_like_mood_size_request("mood path"));
+        assert!(!looks_like_mood_size_request("where is mood.md"));
+        assert!(!looks_like_mood_size_request("dump mood"));
+        assert!(!looks_like_mood_size_request("edit mood.md"));
+        assert!(!looks_like_mood_size_request("soul size"));
+        assert!(!looks_like_mood_size_request("agents size"));
+        assert!(!looks_like_mood_size_request("memory.md size"));
+        assert!(!looks_like_mood_size_request("notes size"));
+        assert!(!looks_like_mood_path_request("mood size"));
+        assert!(!looks_like_mood_path_request("how big is mood"));
+        assert!(!looks_like_soul_size_request("mood size"));
+        let reply = try_operator_instant_reply("mood size").expect("mood size instant");
+        assert!(
+            reply.contains("Mood file") || reply.to_lowercase().contains("mood"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how big is mood.md").is_some(),
+            "how big is mood.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("mood path")
+                .expect("mood path")
+                .to_lowercase()
+                .contains("path only"),
+            "mood path must stay on path lane"
+        );
     }
 
     #[test]

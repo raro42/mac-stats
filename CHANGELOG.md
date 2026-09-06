@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.902] - 2026-09-06
+
+### Added
+
+- **Instant lane: mood.md size** — `mood size`, `mood.md size`, `how big is mood`, `mood file size`, and close variants return on-disk size of per-agent `mood.md` files without Ollama (Discord + AI Chat; stat only — no dump; does not steal `mood path` / soul / agents; p50 latency).
+
 ## [0.1.901] - 2026-09-06
 
 ### Added
