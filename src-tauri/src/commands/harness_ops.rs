@@ -17723,6 +17723,7 @@ pub fn format_execution_prompt_path_gateway() -> String {
 /// True for short “where is agent.json / agent config path…” asks.
 /// Config path only — does not dump/edit agent.json or open Agent Ops Agents.
 /// Per-agent (`agent-<id>/agent.json`), not app `config.json` or the agents/ directory.
+/// Size asks use the agent.json size lane (v0.1.907).
 pub fn looks_like_agent_json_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17839,6 +17840,14 @@ pub fn looks_like_agent_json_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the agent.json size lane (v0.1.907).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run ")
@@ -17904,8 +17913,252 @@ pub fn looks_like_agent_json_path_request(content: &str) -> bool {
 pub fn format_agent_json_path_gateway() -> String {
     let display = crate::config::Config::agent_json_file_path_display();
     format!(
-        "**Agent config:** `{display}` · per-agent name · model · enabled · tool limits · path only · does not dump or edit JSON · Agent Ops → Agents · `agents path` for the folder · `config path` for app config.json."
+        "**Agent config:** `{display}` · per-agent name · model · enabled · tool limits · path only · `agent.json size` for on-disk bytes · does not dump or edit JSON · Agent Ops → Agents · `agents path` for the folder · `config path` for app config.json."
     )
+}
+
+/// True for short “how big is agent.json / agent config size…” asks.
+/// Stat only on per-agent `agent.json` files — does not steal path / agents size / config.json / dump.
+pub fn looks_like_agent_json_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        // Folder size lane owns `agents size` / bare `agent size`.
+        || n == "agents size"
+        || n == "agent size"
+        || n == "agents bytes"
+        || n == "agent bytes"
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents directory")
+        || n.contains("agents dir")
+        || n.contains("how big are agents")
+        || n.contains("how large are agents")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill file")
+        || n.contains("skill size")
+        || n.contains("skills size")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing size")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory size")
+        || n.contains("memory folder")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("prompts size")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n == "config size"
+        || n == "config.json size"
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agent_json_ctx = n.contains("agent.json")
+        || n.contains("agent-json")
+        || n.contains("agent json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n == "how big is agent.json"
+        || n == "how big is the agent.json"
+        || n == "how large is agent.json"
+        || n == "how large is the agent.json"
+        || n == "how big is agent config"
+        || n == "how big is the agent config"
+        || n == "how large is agent config"
+        || n == "how large is the agent config"
+        || (n.contains("agent")
+            && n.contains("json")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !agent_json_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "agent.json size"
+            | "agent json size"
+            | "agent.json file size"
+            | "agent json file size"
+            | "agent config size"
+            | "agent-config size"
+            | "agent.json bytes"
+            | "agent json bytes"
+            | "agent config bytes"
+            | "how big is agent.json"
+            | "how big is the agent.json"
+            | "how big is agent.json file"
+            | "how big is the agent.json file"
+            | "how big is agent config"
+            | "how big is the agent config"
+            | "how big is agent config file"
+            | "how big is the agent config file"
+            | "how large is agent.json"
+            | "how large is the agent.json"
+            | "how large is agent config"
+            | "how large is the agent config"
+            | "mac-stats agent.json size"
+            | "mac stats agent.json size"
+            | "mac-stats agent config size"
+            | "mac stats agent config size"
+    ) || (agent_json_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM per-agent agent.json file size (stat only; no dump/edit).
+/// Sums on-disk bytes of every `agents/agent-*/agent.json` that exists.
+pub fn format_agent_json_size_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut total: u64 = 0;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let agent_json = entry.path().join("agent.json");
+            if let Ok(meta) = std::fs::metadata(&agent_json) {
+                if meta.is_file() {
+                    total = total.saturating_add(meta.len());
+                    count = count.saturating_add(1);
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Agent config:** no `agent.json` yet · `agent.json path` for the file pattern · Agent Ops → Agents for content · does not dump JSON."
+            .to_string();
+    }
+    let label = crate::commands::disk_cleanup::format_bytes(total);
+    if count == 1 {
+        format!(
+            "**Agent config:** **{label}** on disk · 1 per-agent `agent.json` · `agent.json path` for the file · does not dump JSON."
+        )
+    } else {
+        format!(
+            "**Agent config:** **{label}** on disk · {count} per-agent `agent.json` files · `agent.json path` for the pattern · does not dump JSON."
+        )
+    }
 }
 
 /// True for short “where is skill.md / skill file path…” asks.
@@ -24030,6 +24283,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
+    // agent.json size before path (stat only; no dump).
+    if looks_like_agent_json_size_request(content) {
+        return Some(format_agent_json_size_gateway());
+    }
     // agent.json before testing / skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_agent_json_path_request(content) {
         return Some(format_agent_json_path_gateway());
@@ -24205,6 +24462,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // downloads-organizer-rules.md before agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
+    }
+    // agent.json size before path (stat only; no dump).
+    if looks_like_agent_json_size_request(content) {
+        return Some(format_agent_json_size_gateway());
     }
     // agent.json before testing / skill / mood / soul / agents-dir path lane.
     if looks_like_agent_json_path_request(content) {
@@ -24671,6 +24932,8 @@ pub fn format_ops_help_gateway() -> String {
 • `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` for on-disk bytes; does not steal `/skills`)\n\
 • `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / run tests / `/agents`)\n\
 • `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` for on-disk bytes; does not steal `/agents`)\n\
+• `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agents size` / `config.json`)\n\
+• `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` for on-disk bytes; does not steal `agents path` / `config path`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
@@ -26199,6 +26462,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-rules.md path asks (v0.1.849) — config only; no list/run.
     if looks_like_downloads_organizer_rules_path_request(question) {
+        return true;
+    }
+    // Read-only agent.json size asks (v0.1.907) — stat only; no dump/edit.
+    if looks_like_agent_json_size_request(question) {
         return true;
     }
     // Read-only agent.json path asks (v0.1.857) — config only; no dump/edit.
@@ -29528,6 +29795,9 @@ mod tests {
         assert!(!looks_like_agent_json_path_request("open agent.json"));
         assert!(!looks_like_agent_json_path_request("soul path"));
         assert!(!looks_like_agent_json_path_request("testing.md path"));
+        assert!(!looks_like_agent_json_path_request("agent.json size"));
+        assert!(!looks_like_agent_json_path_request("how big is agent.json"));
+        assert!(!looks_like_agent_json_path_request("agent config size"));
         assert!(!looks_like_agents_path_request("agent.json"));
         assert!(!looks_like_agents_path_request("agent.json path"));
         assert!(!looks_like_agents_path_request("agent config path"));
@@ -29547,6 +29817,64 @@ mod tests {
         let cfg_reply =
             try_operator_instant_reply("config path").expect("config path still instant");
         assert!(cfg_reply.to_lowercase().contains("config") || cfg_reply.contains("config.json"));
+    }
+
+    #[test]
+    fn agent_json_size_request_detected() {
+        assert!(looks_like_agent_json_size_request("agent.json size"));
+        assert!(looks_like_agent_json_size_request("agent json size"));
+        assert!(looks_like_agent_json_size_request("agent config size"));
+        assert!(looks_like_agent_json_size_request("agent.json file size"));
+        assert!(looks_like_agent_json_size_request("how big is agent.json"));
+        assert!(looks_like_agent_json_size_request("how big is agent config"));
+        assert!(looks_like_agent_json_size_request("how large is agent.json"));
+        assert!(looks_like_agent_json_size_request(
+            "mac-stats agent.json size"
+        ));
+        assert!(!looks_like_agent_json_size_request("agent.json path"));
+        assert!(!looks_like_agent_json_size_request("where is agent.json"));
+        assert!(!looks_like_agent_json_size_request("dump agent.json"));
+        assert!(!looks_like_agent_json_size_request("edit agent.json"));
+        assert!(!looks_like_agent_json_size_request("agents size"));
+        assert!(!looks_like_agent_json_size_request("agent size"));
+        assert!(!looks_like_agent_json_size_request("how big are agents"));
+        assert!(!looks_like_agent_json_size_request("config.json size"));
+        assert!(!looks_like_agent_json_size_request("config size"));
+        assert!(!looks_like_agent_json_size_request("testing.md size"));
+        assert!(!looks_like_agent_json_size_request("soul size"));
+        assert!(!looks_like_agents_size_request("agent.json size"));
+        assert!(!looks_like_agents_size_request("agent config size"));
+        assert!(!looks_like_config_size_request("agent.json size"));
+        assert!(!looks_like_agent_json_path_request("agent.json size"));
+        let reply = try_operator_instant_reply("agent.json size").expect("agent.json size instant");
+        assert!(
+            reply.contains("Agent config") || reply.to_lowercase().contains("agent"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how big is agent.json").is_some(),
+            "how big is agent.json should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent config size").is_some(),
+            "agent config size should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent.json path")
+                .expect("agent.json path")
+                .to_lowercase()
+                .contains("path only"),
+            "agent.json path must stay on path lane"
+        );
+        // Folder size lane still owns bare agents size / agent size.
+        assert!(
+            try_operator_instant_reply("agents size").is_some(),
+            "agents size should stay instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent size").is_some(),
+            "agent size should stay on agents folder size lane"
+        );
     }
 
     #[test]

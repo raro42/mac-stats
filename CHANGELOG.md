@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.907] - 2026-09-06
+
+### Added
+
+- **Instant lane: agent.json size** — `agent.json size`, `agent config size`, `how big is agent.json`, and close variants return on-disk size of per-agent `agent.json` files without Ollama (Discord + AI Chat; stat only — no dump; does not steal `agent.json path` / `agents size` / `config.json`; p50 latency).
+
 ## [0.1.906] - 2026-09-06
 
 ### Added
