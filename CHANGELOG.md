@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+
+## [0.1.906] - 2026-09-06
+
+### Added
+
+- **Instant lane: execution_prompt.md size** — `execution size`, `execution_prompt.md size`, `how big is execution_prompt.md`, `execution prompt size`, and close variants return on-disk size of `agents/prompts/execution_prompt.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `execution_prompt.md path` / `prompts size`; p50 latency).
+
 ## [0.1.905] - 2026-09-06
 
 ### Added
