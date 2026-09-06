@@ -1,32 +1,22 @@
 # Morning surprise — 2026-09-06
 
-Overnight autoresearch (Track B) for Ralf.
+Overnight Track B kept shipping operator instant lanes (p50). Digester open stayed empty; design review stayed in grace.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.890** | Instant lane: `schedules size` / `schedules.json size` / `how big is schedules` — on-disk size of `schedules.json` (stat only; no dump; does not steal `schedules path` / `/schedules`). |
-| **v0.1.889** | Instant lane: `config size` / `config.json size` / `how big is config` — on-disk size of app `config.json` (stat only; no dump; does not steal `config path` / `.config.env`). |
-| **v0.1.888** | Instant lane: `review logs` / `check logs` / `look at logs` / `read logs` → existing `/logs` Debug Log tail (no Ollama / Brave; digester Slowest had a ~40s Brave waste on bare `Review logs`). |
-| **v0.1.887** | Instant lane: notes / memory folder size (`notes size`, `how big are notes`, `memory folder size`) — recursive bytes under `~/.mac-stats/agents/notes/`; rejects bare `memory size` (RAM). |
-| **v0.1.886** | Instant lane: cleanup-quarantine directory size. |
-| **v0.1.885** | Instant lane: task directory size. |
-| **v0.1.884** | Instant lane: session directory size. |
+| **v0.1.888** | `review logs` / `check logs` → `/logs` instant (no Brave waste) |
+| **v0.1.889** | `config.json` size instant |
+| **v0.1.890** | `schedules.json` size instant |
+| **v0.1.891** | `monitors.json` size instant |
 
-## Context
+## Tried / notes
 
-- Digester open stayed empty (weather candidate already stale/shipped).
-- Design review in grace (`feature-ai-chat` recommended when TCC allows).
-- Fuel: standing backlog p50 latency (config.json size after path lane).
+- Digester Slowest still lists historical `Review logs` + Elmasnow weather — already shipped / filtered.
+- Design review due=false (grace); feature screens aged but TCC/screenshot deferred.
+- Next fuel: `history.json` / `disk_cleanup.json` size, or design-review polish when due.
 
-## Try it
+## Fitness
 
-```text
-config size
-config.json size
-how big is config
-config path
-```
-
-Also still: `Review logs` / `notes size`. Bare `memory size` is not the notes-size lane (RAM).
+Operators get on-disk size for monitors config without waiting on Ollama — same pattern as config + schedules.
