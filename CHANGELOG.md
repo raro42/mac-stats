@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.909] - 2026-09-07
+
+### Added
+
+- **Instant lane: escalation_patterns.md size** — `escalation size`, `escalation_patterns.md size`, `how big is escalation patterns`, `escalation patterns size`, and close variants return on-disk size of `agents/escalation_patterns.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `escalation patterns path` / session-reset / cookie reject; p50 latency).
+
 ## [0.1.908] - 2026-09-07
 
 ### Added

@@ -15222,8 +15222,215 @@ pub fn format_credential_accounts_path_gateway() -> String {
     )
 }
 
+/// True for short “escalation_patterns.md size / how big is escalation patterns…” asks.
+/// Stat only — does not list/append phrases or steal the path lane.
+pub fn looks_like_escalation_patterns_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("trigger")
+        || n.contains("escalate now")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let esc_ctx = n.contains("escalation_patterns.md")
+        || n.contains("escalation_patterns")
+        || n.contains("escalation-patterns")
+        || n.contains("escalation patterns")
+        || n.contains("escalation pattern")
+        || n.contains("escalation phrases")
+        || n.contains("escalation phrase")
+        || n.contains("escalation file")
+        || n.contains("escalation size")
+        || n == "how big is escalation"
+        || n == "how big is the escalation"
+        || n == "how large is escalation"
+        || n == "how large is the escalation"
+        || (n.contains("escalation")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("md")));
+    if !esc_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "escalation size"
+            | "escalation patterns size"
+            | "escalation pattern size"
+            | "escalation_patterns size"
+            | "escalation_patterns.md size"
+            | "escalation_patterns file size"
+            | "escalation-patterns size"
+            | "escalation-patterns.md size"
+            | "escalation file size"
+            | "escalation phrases size"
+            | "escalation phrase size"
+            | "escalation.md size"
+            | "escalation bytes"
+            | "escalation_patterns.md bytes"
+            | "escalation patterns bytes"
+            | "how big is escalation"
+            | "how big is the escalation"
+            | "how big is escalation_patterns.md"
+            | "how big is the escalation_patterns.md"
+            | "how big is escalation patterns"
+            | "how big is the escalation patterns"
+            | "how big is escalation patterns file"
+            | "how big is the escalation patterns file"
+            | "how big is the escalation file"
+            | "how large is escalation"
+            | "how large is the escalation"
+            | "how large is escalation_patterns.md"
+            | "how large is escalation patterns"
+            | "mac-stats escalation size"
+            | "mac stats escalation size"
+            | "mac-stats escalation_patterns.md size"
+            | "mac stats escalation_patterns.md size"
+    ) || (esc_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM escalation_patterns.md file size (stat only; no dump/list phrases).
+pub fn format_escalation_patterns_size_gateway() -> String {
+    let path = crate::config::Config::escalation_patterns_path();
+    if !path.exists() {
+        return "**Escalation patterns:** no `escalation_patterns.md` yet · `escalation patterns path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Escalation patterns:** empty `escalation_patterns.md` · `escalation patterns path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Escalation patterns:** **{label}** on disk · phrases that raise escalation mode · `escalation patterns path` for the file · does not list phrases."
+            )
+        }
+        Err(e) => format!("**Escalation patterns** — could not stat `escalation_patterns.md`: {e}"),
+    }
+}
+
 /// True for short “where is escalation_patterns.md / escalation patterns path…” asks.
 /// Config path only — does not list phrases, append, or edit the file.
+/// Size asks use the escalation_patterns.md size lane (v0.1.909).
 pub fn looks_like_escalation_patterns_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -15346,6 +15553,14 @@ pub fn looks_like_escalation_patterns_path_request(content: &str) -> bool {
         || n.contains(" about ")
         || n.contains("trigger")
         || n.contains("escalate now")
+        // Size asks use the escalation_patterns.md size lane (v0.1.909).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("http://")
         || n.contains("https://")
         || n.chars().any(|c| c.is_ascii_digit())
@@ -15416,7 +15631,7 @@ pub fn format_escalation_patterns_path_gateway() -> String {
     let path = crate::config::Config::escalation_patterns_path();
     let display = path.display().to_string();
     format!(
-        "**Escalation patterns file:** `{display}` · phrases that raise escalation mode · path only · does not list or edit phrases."
+        "**Escalation patterns file:** `{display}` · phrases that raise escalation mode · path only · `escalation patterns size` for on-disk bytes · does not list or edit phrases."
     )
 }
 
@@ -24660,6 +24875,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_credential_accounts_path_request(content) {
         return Some(format_credential_accounts_path_gateway());
     }
+    // escalation_patterns.md size before path (stat only; no dump).
+    if looks_like_escalation_patterns_size_request(content) {
+        return Some(format_escalation_patterns_size_gateway());
+    }
     // escalation_patterns.md before agents-dir / session-reset path lanes.
     if looks_like_escalation_patterns_path_request(content) {
         return Some(format_escalation_patterns_path_gateway());
@@ -25146,6 +25365,8 @@ pub fn format_ops_help_gateway() -> String {
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` for on-disk bytes; does not steal browser credentials)\n\
+• `escalation size` · `escalation_patterns.md size` · `how big is escalation patterns` · `escalation patterns size` — escalation_patterns.md file size on disk (stat only; no dump; does not steal `escalation patterns path` / session-reset / cookie reject)\n\
+• `escalation patterns path` · `where is escalation_patterns.md` · `escalation file path` — escalation phrases file (config only; no list/append; `escalation patterns size` for on-disk bytes; does not steal session-reset)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / take/list)\n\
@@ -26668,6 +26889,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only credential_accounts.json path asks (v0.1.845) — config only; no list/dump.
     if looks_like_credential_accounts_path_request(question) {
+        return true;
+    }
+    // Read-only escalation_patterns.md size asks (v0.1.909) — stat only; no dump/list.
+    if looks_like_escalation_patterns_size_request(question) {
         return true;
     }
     // Read-only escalation_patterns.md path asks (v0.1.846) — config only; no list/append.
@@ -29526,6 +29751,12 @@ mod tests {
         assert!(!looks_like_escalation_patterns_path_request("append escalation phrase"));
         assert!(!looks_like_escalation_patterns_path_request("agents path"));
         assert!(!looks_like_escalation_patterns_path_request("credential accounts path"));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "escalation_patterns.md size"
+        ));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "how big is escalation patterns"
+        ));
         assert!(!looks_like_agents_path_request("escalation patterns path"));
         assert!(!looks_like_credential_accounts_path_request(
             "escalation patterns path"
@@ -29536,7 +29767,54 @@ mod tests {
         assert!(
             reply.contains("escalation_patterns.md") || reply.contains(".mac-stats")
         );
+        assert!(reply.contains("escalation patterns size") || reply.contains("on-disk"));
         assert!(!reply.to_lowercase().contains("session_reset"));
+    }
+
+    #[test]
+    fn escalation_patterns_size_request_detected() {
+        assert!(looks_like_escalation_patterns_size_request("escalation size"));
+        assert!(looks_like_escalation_patterns_size_request(
+            "escalation_patterns.md size"
+        ));
+        assert!(looks_like_escalation_patterns_size_request(
+            "escalation patterns size"
+        ));
+        assert!(looks_like_escalation_patterns_size_request(
+            "how big is escalation patterns"
+        ));
+        assert!(looks_like_escalation_patterns_size_request(
+            "how big is escalation_patterns.md"
+        ));
+        assert!(looks_like_escalation_patterns_size_request(
+            "how large is the escalation file"
+        ));
+        assert!(!looks_like_escalation_patterns_size_request(
+            "escalation patterns path"
+        ));
+        assert!(!looks_like_escalation_patterns_size_request(
+            "where is escalation_patterns.md"
+        ));
+        assert!(!looks_like_escalation_patterns_size_request("list escalation patterns"));
+        assert!(!looks_like_escalation_patterns_size_request("append escalation phrase"));
+        assert!(!looks_like_escalation_patterns_size_request("session reset phrases size"));
+        assert!(!looks_like_escalation_patterns_size_request("cookie reject patterns size"));
+        assert!(!looks_like_escalation_patterns_size_request("soul size"));
+        assert!(!looks_like_escalation_patterns_size_request("agents size"));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "escalation_patterns.md size"
+        ));
+        assert!(!looks_like_soul_size_request("escalation patterns size"));
+        let reply = try_operator_instant_reply("escalation_patterns.md size")
+            .expect("escalation_patterns size instant");
+        assert!(
+            reply.contains("Escalation patterns")
+                && (reply.contains("on disk")
+                    || reply.contains("no `escalation_patterns.md`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Escalation patterns file:"));
     }
 
     #[test]
