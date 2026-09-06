@@ -12154,8 +12154,233 @@ pub fn format_disk_cleanup_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is perplexity_last.json / perplexity last size…” asks.
+/// Stat only on `perplexity_last.json` — does not steal path / `/perplexity` / Top/Snippet.
+pub fn looks_like_perplexity_last_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("search for")
+        || n.contains("look up")
+        || n.contains("run search")
+        || n.contains("do a search")
+        || n.contains("snippet")
+        || n.contains("top result")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("api key")
+        || n.contains("perplexity key")
+        || n == "/perplexity"
+        || n == "perplexity"
+        || n == "last search"
+        || n == "last perplexity"
+        || n == "perplexity results"
+        || n == "search results"
+        || n == "perplexity search"
+        || n == "/perplexity top"
+        || n == "perplexity top"
+        || n == "/perplexity snippet"
+        || n == "perplexity snippet"
+        || n == "/perplexity key"
+        || n == "perplexity key"
+        || n == "perplexity status"
+        || n == "perplexity ready"
+        || n == "perplexity size"
+        || n == "how big is perplexity"
+        || n == "how large is perplexity"
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("pinned_processes")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let px_ctx = n.contains("perplexity_last.json")
+        || n.contains("perplexity_last")
+        || n.contains("perplexity-last.json")
+        || n.contains("perplexity-last")
+        || n.contains("perplexity last.json")
+        || n.contains("perplexity last file")
+        || n.contains("perplexity cache")
+        || n.contains("last search file")
+        || n.contains("last search cache")
+        || n.contains("perplexity cache file")
+        || n.contains("perplexity results file")
+        || n == "perplexity last size"
+        || n == "how big is perplexity last"
+        || n == "how big is the perplexity last"
+        || n == "how large is perplexity last"
+        || n == "mac-stats perplexity last size"
+        || n == "mac stats perplexity last size"
+        || (n.contains("perplexity")
+            && (n.contains("last") || n.contains("cache") || n.contains("json") || n.contains("file"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")))
+        || (n.contains("last search")
+            && (n.contains("file") || n.contains("json") || n.contains("cache"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !px_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "perplexity last size"
+            | "perplexity_last.json size"
+            | "perplexity_last size"
+            | "perplexity_last file size"
+            | "perplexity-last size"
+            | "perplexity-last.json size"
+            | "perplexity last file size"
+            | "perplexity last json size"
+            | "perplexity cache size"
+            | "perplexity cache file size"
+            | "perplexity results file size"
+            | "last search file size"
+            | "last search cache size"
+            | "mac-stats perplexity last size"
+            | "mac stats perplexity last size"
+            | "how big is perplexity last"
+            | "how big is the perplexity last"
+            | "how big is perplexity_last.json"
+            | "how big is the perplexity_last.json"
+            | "how big is the perplexity last file"
+            | "how big is perplexity cache"
+            | "how big is the perplexity cache"
+            | "how big is last search file"
+            | "how big is the last search file"
+            | "how large is perplexity last"
+            | "how large is the perplexity last"
+            | "how large is perplexity_last.json"
+            | "perplexity last bytes"
+            | "perplexity_last.json bytes"
+            | "last search file bytes"
+    ) || (px_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM perplexity_last.json file size (stat only; no Top/Snippet dump / `/perplexity`).
+pub fn format_perplexity_last_size_gateway() -> String {
+    let path = crate::config::Config::perplexity_last_file_path();
+    if !path.exists() {
+        return "**Perplexity last:** no `perplexity_last.json` yet · app writes it after a successful Perplexity Search · `perplexity last path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Perplexity last:** empty `perplexity_last.json` · `perplexity last path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Perplexity last:** **{label}** on disk · last Perplexity Search cache · `perplexity last path` for the file · `/perplexity` for Top/Snippet."
+            )
+        }
+        Err(e) => format!("**Perplexity last** — could not stat `perplexity_last.json`: {e}"),
+    }
+}
+
 /// True for short “where is perplexity_last.json / perplexity last path…” asks.
 /// Config path only — does not list Top/Snippet results or run a new search.
+/// Size asks use the perplexity_last.json size lane (v0.1.896).
 pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -12214,6 +12439,13 @@ pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -12328,7 +12560,7 @@ pub fn format_perplexity_last_path_gateway() -> String {
     let path = crate::config::Config::perplexity_last_file_path();
     let display = path.display().to_string();
     format!(
-        "**Perplexity last file:** `{display}` · last Perplexity Search cache on disk · `/perplexity` for Top/Snippet · does not search or dump results."
+        "**Perplexity last file:** `{display}` · last Perplexity Search cache on disk · `perplexity last size` for on-disk bytes · `/perplexity` for Top/Snippet · does not search or dump results."
     )
 }
 
@@ -17931,7 +18163,7 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
-    // Path-only asks go to perplexity_last.json instant (inline — avoid calling path detector).
+    // Path/size asks go to perplexity_last.json instant (inline — avoid calling path/size detectors).
     if n.contains("perplexity_last.json")
         || n.contains("perplexity_last")
         || n.contains("perplexity-last")
@@ -17940,6 +18172,7 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
         || n.contains("perplexity cache")
         || n.contains("perplexity results file")
         || n.contains("perplexity results path")
+        || n.contains("perplexity last size")
         || (n.contains("perplexity")
             && (n.contains("path")
                 || n.contains("where")
@@ -17948,13 +18181,20 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
                 || n.contains("directory")
                 || n.contains("dir")
                 || n.contains("file")
-                || n.contains("json")))
+                || n.contains("json")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")))
         || (n.contains("last search")
             && (n.contains("path")
                 || n.contains("where")
                 || n.contains("file")
                 || n.contains("json")
-                || n.contains("cache")))
+                || n.contains("cache")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")))
     {
         return false;
     }
@@ -21833,6 +22073,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_disk_cleanup_path_request(content) {
         return Some(format_disk_cleanup_path_gateway());
     }
+    // perplexity_last.json size before path (stat only; no dump).
+    if looks_like_perplexity_last_size_request(content) {
+        return Some(format_perplexity_last_size_gateway());
+    }
     if looks_like_perplexity_last_path_request(content) {
         return Some(format_perplexity_last_path_gateway());
     }
@@ -22065,6 +22309,7 @@ pub fn format_ops_help_gateway() -> String {
 • `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` for on-disk bytes; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
+• `perplexity last size` · `perplexity_last.json size` · `how big is perplexity last` — perplexity_last.json file size on disk (stat only; no dump; does not steal `perplexity last path` / `/perplexity`)\n\
 • `discord channels size` · `discord_channels.json size` · `how big is discord channels` — discord_channels.json file size on disk (stat only; no dump; does not steal `discord channels path` / `/discord`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; `discord channels size` for on-disk bytes; does not steal `/discord`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
@@ -23776,6 +24021,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only disk_cleanup.json path asks (v0.1.835) — config only; no list/reclaim.
     if looks_like_disk_cleanup_path_request(question) {
+        return true;
+    }
+    // Read-only perplexity_last.json size asks (v0.1.896) — stat only; no dump/Top/Snippet.
+    if looks_like_perplexity_last_size_request(question) {
         return true;
     }
     // Read-only perplexity_last.json path asks (v0.1.836) — config only; no Top/Snippet dump.
@@ -28714,6 +28963,13 @@ mod tests {
         assert!(!looks_like_perplexity_last_path_request("disk cleanup path"));
         assert!(!looks_like_perplexity_last_path_request("history path"));
         assert!(!looks_like_perplexity_last_path_request("where is config"));
+        assert!(!looks_like_perplexity_last_path_request("perplexity last size"));
+        assert!(!looks_like_perplexity_last_path_request(
+            "perplexity_last.json size"
+        ));
+        assert!(!looks_like_perplexity_last_path_request(
+            "how big is perplexity last"
+        ));
         assert!(!looks_like_perplexity_request("perplexity last path"));
         assert!(!looks_like_perplexity_request("where is perplexity_last.json"));
         assert!(looks_like_perplexity_request("/perplexity"));
@@ -28721,6 +28977,55 @@ mod tests {
             .expect("perplexity last path instant");
         assert!(reply.contains("Perplexity last file"));
         assert!(reply.contains("perplexity_last") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("perplexity last size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn perplexity_last_size_request_detected() {
+        assert!(looks_like_perplexity_last_size_request("perplexity last size"));
+        assert!(looks_like_perplexity_last_size_request(
+            "perplexity_last.json size"
+        ));
+        assert!(looks_like_perplexity_last_size_request("perplexity_last size"));
+        assert!(looks_like_perplexity_last_size_request(
+            "how big is perplexity last"
+        ));
+        assert!(looks_like_perplexity_last_size_request(
+            "how big is perplexity_last.json"
+        ));
+        assert!(looks_like_perplexity_last_size_request("perplexity cache size"));
+        assert!(looks_like_perplexity_last_size_request(
+            "last search file size"
+        ));
+        assert!(looks_like_perplexity_last_size_request(
+            "how big is the last search file"
+        ));
+        assert!(!looks_like_perplexity_last_size_request("perplexity last path"));
+        assert!(!looks_like_perplexity_last_size_request(
+            "where is perplexity_last.json"
+        ));
+        assert!(!looks_like_perplexity_last_size_request("/perplexity"));
+        assert!(!looks_like_perplexity_last_size_request("perplexity"));
+        assert!(!looks_like_perplexity_last_size_request("perplexity size"));
+        assert!(!looks_like_perplexity_last_size_request("how big is perplexity"));
+        assert!(!looks_like_perplexity_last_size_request("last search"));
+        assert!(!looks_like_perplexity_last_size_request("perplexity top"));
+        assert!(!looks_like_perplexity_last_size_request("discord channels size"));
+        assert!(!looks_like_perplexity_last_size_request("history size"));
+        assert!(!looks_like_perplexity_request("perplexity last size"));
+        assert!(!looks_like_perplexity_request("perplexity_last.json size"));
+        let reply = try_operator_instant_reply("perplexity_last.json size")
+            .expect("perplexity last size instant");
+        assert!(
+            reply.contains("Perplexity last")
+                && (reply.contains("on disk")
+                    || reply.contains("no `perplexity_last.json`")
+                    || reply.contains("empty `perplexity_last.json`")),
+            "{reply}"
+        );
     }
 
     #[test]

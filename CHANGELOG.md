@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.896] - 2026-09-06
+
+### Added
+
+- **Instant lane: perplexity_last.json size** — `perplexity last size`, `perplexity_last.json size`, `how big is perplexity last`, `last search file size`, and close variants return on-disk size of `perplexity_last.json` without Ollama (Discord + AI Chat; stat only — no dump/Top/Snippet; does not steal `perplexity last path` / `/perplexity`; p50 latency).
+
 ## [0.1.895] - 2026-09-06
 
 ### Added
