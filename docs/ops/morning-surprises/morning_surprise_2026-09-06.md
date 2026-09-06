@@ -6,6 +6,7 @@ Overnight Track B (autoresearch) kept shipping instant-lane file-size reads so o
 
 | Version | What |
 | --- | --- |
+| **v0.1.893** | Instant: `disk_cleanup.json` size (`disk cleanup size` / `how big is disk cleanup` / `cleanup file size`) |
 | **v0.1.892** | Instant: `history.json` size (`history size` / `how big is history` / `metrics history size`) |
 | **v0.1.891** | Instant: `monitors.json` size |
 | **v0.1.890** | Instant: `schedules.json` size |
@@ -17,6 +18,6 @@ Overnight Track B (autoresearch) kept shipping instant-lane file-size reads so o
 - Digester **open** stayed empty (Elmasnow weather + Review logs already stale/shipped).
 - Design review **due=false** (grace); AI Chat / Agent Ops feature PNGs still aged — screenshot polish deferred until TCC allows.
 - Debug log: no ERROR/WARN/panic clusters in the 3h scan window.
-- Next fuel: `disk_cleanup.json` size / `pinned_processes.json` size, or a design-review polish when screenshots work.
+- Next fuel: `pinned_processes.json` size / `discord_channels.json` size / `perplexity_last.json` size, or a design-review polish when screenshots work.
 
 Ralf: p50 path continues — size lanes mirror the path lanes already shipped for the same files.
