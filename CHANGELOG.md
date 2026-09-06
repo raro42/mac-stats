@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.903] - 2026-09-06
+
+### Added
+
+- **Instant lane: skill.md size** — `skill.md size`, `skill file size`, `how big is skill.md`, and close variants return on-disk size of per-agent `skill.md` files without Ollama (Discord + AI Chat; stat only — no dump; does not steal `skill.md path` / bare `skill size` / `skills size` / `/skills`; p50 latency).
+
 ## [0.1.902] - 2026-09-06
 
 ### Added

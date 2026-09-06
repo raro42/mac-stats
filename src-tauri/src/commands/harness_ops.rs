@@ -17164,6 +17164,7 @@ pub fn format_agent_json_path_gateway() -> String {
 /// True for short “where is skill.md / skill file path…” asks.
 /// Config path only — does not dump/edit skill text or open Agent Ops Agents.
 /// Skill is per-agent (`agent-<id>/skill.md`), not the Hermes `skills/` directory.
+/// Size asks use the skill.md size lane (v0.1.903).
 pub fn looks_like_skill_md_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17285,6 +17286,14 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the skill.md size lane (v0.1.903).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run skill")
@@ -17363,8 +17372,247 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
 pub fn format_skill_md_path_gateway() -> String {
     let display = crate::config::Config::skill_file_path_display();
     format!(
-        "**Skill file:** `{display}` · per-agent skill (not the Hermes skills/ folder) · path only · does not dump or edit skill text · Agent Ops → Agents for content · `/skills` for catalog."
+        "**Skill file:** `{display}` · per-agent skill (not the Hermes skills/ folder) · path only · `skill.md size` for on-disk bytes · does not dump or edit skill text · Agent Ops → Agents for content · `/skills` for catalog."
     )
+}
+
+/// True for short “how big is skill.md / skill file size…” asks.
+/// Stat only on per-agent `skill.md` files — does not steal path / skills dir / mood / soul / dump.
+/// Bare `skill size` / `skills size` stay on the skills-directory size lane (v0.1.881).
+pub fn looks_like_skill_md_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("/skills")
+        // Bare skills-dir size stays on skills size lane.
+        || n == "skill size"
+        || n == "skills size"
+        || n == "skill bytes"
+        || n == "skills bytes"
+        || n.contains("skills size")
+        || n.contains("skills folder")
+        || n.contains("skills directory")
+        || n.contains("skills dir")
+        || n.contains("how big are skills")
+        || n.contains("how large are skills")
+        || n.contains("how big is skills")
+        || n.contains("how large is skills")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing.md")
+        || n.contains("testing size")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory size")
+        || n.contains("memory folder")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts size")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Require skill.md / skill file context — not bare "skill size" (skills dir).
+    let skill_md_ctx = n.contains("skill.md")
+        || n.contains("skill file")
+        || n.contains("skill md")
+        || n.contains("agent skill.md")
+        || n.contains("agent skill file")
+        || n == "how big is skill.md"
+        || n == "how big is the skill.md"
+        || n == "how big is skill file"
+        || n == "how big is the skill file"
+        || n == "how large is skill.md"
+        || n == "how large is the skill.md"
+        || n == "how large is skill file"
+        || n == "how large is the skill file";
+    if !skill_md_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "skill.md size"
+            | "skill file size"
+            | "skill md size"
+            | "skill.md file size"
+            | "skill.md bytes"
+            | "skill file bytes"
+            | "skill md bytes"
+            | "how big is skill.md"
+            | "how big is the skill.md"
+            | "how big is skill file"
+            | "how big is the skill file"
+            | "how big is the skill.md file"
+            | "how large is skill.md"
+            | "how large is the skill.md"
+            | "how large is skill file"
+            | "how large is the skill file"
+            | "agent skill.md size"
+            | "agent skill file size"
+            | "mac-stats skill.md size"
+            | "mac stats skill.md size"
+    ) || (skill_md_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM per-agent skill.md file size (stat only; no dump/edit).
+/// Sums on-disk bytes of every `agents/agent-*/skill.md` that exists.
+pub fn format_skill_md_size_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut total: u64 = 0;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let skill = entry.path().join("skill.md");
+            if let Ok(meta) = std::fs::metadata(&skill) {
+                if meta.is_file() {
+                    total = total.saturating_add(meta.len());
+                    count = count.saturating_add(1);
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Skill file:** no `skill.md` yet · `skill.md path` for the file pattern · Agent Ops → Agents for content · `skills size` for the Hermes skills/ folder."
+            .to_string();
+    }
+    let label = crate::commands::disk_cleanup::format_bytes(total);
+    if count == 1 {
+        format!(
+            "**Skill file:** **{label}** on disk · 1 per-agent `skill.md` · `skill.md path` for the file · does not dump skill text · `skills size` for Hermes skills/."
+        )
+    } else {
+        format!(
+            "**Skill file:** **{label}** on disk · {count} per-agent `skill.md` files · `skill.md path` for the pattern · does not dump skill text · `skills size` for Hermes skills/."
+        )
+    }
 }
 
 /// True for short “where is mood.md / mood path…” asks.
@@ -23051,6 +23299,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_testing_md_path_request(content) {
         return Some(format_testing_md_path_gateway());
     }
+    // skill.md size before path (stat only; no dump).
+    if looks_like_skill_md_size_request(content) {
+        return Some(format_skill_md_size_gateway());
+    }
     // skill.md before mood / soul / skills-dir / agents-dir path / /agents catalog (path-only asks).
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
@@ -23210,6 +23462,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // testing.md before skill / mood / soul / agents-dir path lane.
     if looks_like_testing_md_path_request(content) {
         return Some(format_testing_md_path_gateway());
+    }
+    // skill.md size before path (stat only; no dump).
+    if looks_like_skill_md_size_request(content) {
+        return Some(format_skill_md_size_gateway());
     }
     // skill.md before mood / soul / skills-dir / agents-dir path lane.
     if looks_like_skill_md_path_request(content) {
@@ -23640,13 +23896,15 @@ pub fn format_ops_help_gateway() -> String {
 • `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` for on-disk bytes; does not steal `/agents`)\n\
 • `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / soul / agents)\n\
 • `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` for on-disk bytes; does not steal `/agents`)\n\
+• `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skills size` / `/skills`)\n\
+• `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` for on-disk bytes; does not steal `/skills`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
-• `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills`)\n\
+• `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills` / `skill.md size`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
 • `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
@@ -25180,6 +25438,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only testing.md path asks (v0.1.854) — config only; no dump/edit/run.
     if looks_like_testing_md_path_request(question) {
+        return true;
+    }
+    // Read-only skill.md size asks (v0.1.903) — stat only; no dump/edit.
+    if looks_like_skill_md_size_request(question) {
         return true;
     }
     // Read-only skill.md path asks (v0.1.853) — config only; no dump/edit.
@@ -28518,6 +28780,9 @@ mod tests {
         assert!(!looks_like_skill_md_path_request("edit skill.md"));
         assert!(!looks_like_skill_md_path_request("/skills"));
         assert!(!looks_like_skill_md_path_request("SKILL: summarize"));
+        assert!(!looks_like_skill_md_path_request("skill.md size"));
+        assert!(!looks_like_skill_md_path_request("how big is skill.md"));
+        assert!(!looks_like_skill_md_path_request("skill file size"));
         assert!(!looks_like_skills_path_request("skill.md"));
         assert!(!looks_like_skills_path_request("where is skill.md"));
         assert!(!looks_like_skills_path_request("skill file path"));
@@ -28535,6 +28800,54 @@ mod tests {
         let dir_reply =
             try_operator_instant_reply("skill path").expect("skills dir still owns skill path");
         assert!(dir_reply.contains("Skills dir"));
+    }
+
+    #[test]
+    fn skill_md_size_request_detected() {
+        assert!(looks_like_skill_md_size_request("skill.md size"));
+        assert!(looks_like_skill_md_size_request("skill file size"));
+        assert!(looks_like_skill_md_size_request("skill md size"));
+        assert!(looks_like_skill_md_size_request("how big is skill.md"));
+        assert!(looks_like_skill_md_size_request("how big is the skill file"));
+        assert!(looks_like_skill_md_size_request("how large is skill.md"));
+        assert!(looks_like_skill_md_size_request("agent skill.md size"));
+        assert!(!looks_like_skill_md_size_request("skill.md path"));
+        assert!(!looks_like_skill_md_size_request("where is skill.md"));
+        assert!(!looks_like_skill_md_size_request("dump skill.md"));
+        assert!(!looks_like_skill_md_size_request("edit skill.md"));
+        // Bare skill size stays on Hermes skills/ directory size lane.
+        assert!(!looks_like_skill_md_size_request("skill size"));
+        assert!(!looks_like_skill_md_size_request("skills size"));
+        assert!(!looks_like_skill_md_size_request("how big are skills"));
+        assert!(!looks_like_skill_md_size_request("mood size"));
+        assert!(!looks_like_skill_md_size_request("soul size"));
+        assert!(!looks_like_skill_md_size_request("agents size"));
+        assert!(!looks_like_skill_md_path_request("skill.md size"));
+        assert!(!looks_like_skill_md_path_request("how big is skill.md"));
+        assert!(!looks_like_skills_size_request("skill.md size"));
+        assert!(!looks_like_skills_size_request("skill file size"));
+        assert!(!looks_like_mood_size_request("skill.md size"));
+        let reply = try_operator_instant_reply("skill.md size").expect("skill.md size instant");
+        assert!(
+            reply.contains("Skill file") || reply.to_lowercase().contains("skill"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how big is skill.md").is_some(),
+            "how big is skill.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("skill.md path")
+                .expect("skill.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "skill.md path must stay on path lane"
+        );
+        let skills_dir = try_operator_instant_reply("skill size").expect("skills dir size");
+        assert!(
+            skills_dir.contains("Skills dir") || skills_dir.to_lowercase().contains("skills"),
+            "bare skill size must stay on skills dir size: {skills_dir}"
+        );
     }
 
     #[test]
