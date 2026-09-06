@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-07
 
-Overnight Track B (20:00–06:00 local). Keeps so far: **v0.1.899**, **v0.1.900**.
+Overnight Track B (20:00–06:00 local). Keeps so far: **v0.1.899**, **v0.1.900**, **v0.1.901**.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.901** | Instant lane: `soul.md` size (`soul size`, `soul.md size`, `how big is soul`, `soul file size`) — on-disk bytes only; no dump; does not steal `soul path` / mood / agents |
 | **v0.1.900** | Instant lane: `.config.env` size (`config.env size`, `.config.env size`, `how big is .config.env`, `secrets env size`) — on-disk bytes only; no key dump; does not steal `config.env path` / `config size` / `config.json` |
 | **v0.1.899** | Instant lane: `credential_accounts.json` size (`credential accounts size`, `credential_accounts.json size`, `how big is credential accounts`, `keychain accounts size`) — on-disk bytes only; no Keychain dump; does not steal path / browser credentials |
 
@@ -24,5 +25,5 @@ Overnight Track B (20:00–06:00 local). Keeps so far: **v0.1.899**, **v0.1.900*
 
 ## Next
 
-- soul.md / agent.json / escalation_patterns.md size
+- mood.md / agent.json / escalation_patterns.md size
 - Design-review PNG refresh when TCC allows
