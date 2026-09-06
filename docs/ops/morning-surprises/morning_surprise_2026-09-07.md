@@ -1,11 +1,17 @@
 # Morning surprise — 2026-09-07
 
+
+## Overnight keep — v0.1.905 (~22:45)
+
+**Instant lane: planning_prompt.md size** — `planning size` / `planning_prompt.md size` / `how big is planning_prompt.md` / `planning prompt size` return on-disk bytes of `agents/prompts/planning_prompt.md` without Ollama (stat only; no dump; does not steal path / `prompts size`).
+
 Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.905** | Instant lane: **planning_prompt.md size** (`planning size`, `planning_prompt.md size`, `how big is planning_prompt.md`, `planning prompt size`) — on-disk bytes of shared planning prompt (stat only; no dump; does not steal path / `prompts size`) |
 | **v0.1.904** | Instant lane: **testing.md size** (`testing size`, `testing.md size`, `how big is testing.md`, `testing file size`) — on-disk bytes across per-agent `testing.md` (stat only; no dump; does not steal path / run tests) |
 | **v0.1.903** | Instant lane: **skill.md size** (`skill.md size`, `skill file size`, `how big is skill.md`) — on-disk bytes across per-agent `skill.md` (stat only; no dump; bare `skill size` stays Hermes skills/) |
 | **v0.1.902** | Instant lane: **mood.md size** |
@@ -22,6 +28,6 @@ Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes
 
 ## Next fuel
 
-- agent.json / planning_prompt.md / execution_prompt.md / escalation_patterns.md size
+- agent.json / execution_prompt.md / escalation_patterns.md / memory.md size
 - Design review screenshot when TCC allows
 - Digester open / debug.log product errors when present
