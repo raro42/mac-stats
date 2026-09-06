@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.908] - 2026-09-07
+
+### Added
+
+- **Instant lane: memory.md size** — `memory.md size`, `curated memory size`, `how big is memory.md`, `memory file size`, and close variants return on-disk size of curated `agents/memory.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `memory.md path` / `notes size` / bare `memory size` RAM; p50 latency).
+
 ## [0.1.907] - 2026-09-06
 
 ### Added

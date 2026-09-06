@@ -5056,13 +5056,226 @@ pub fn format_memory_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `notes size` for disk use · `memory.md path` for curated file only."
+        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `notes size` for disk use · `memory.md path` for curated file only · `memory.md size` for curated bytes."
     )
+}
+
+/// True for short “memory.md size / how big is memory.md…” asks.
+/// Stat only — does not dump/edit curated memory or open notes folder.
+/// Does not steal `memory.md path` / `notes size` / bare `memory size` (RAM).
+pub fn looks_like_memory_md_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("memory dir")
+        || n.contains("memory notes")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/ram")
+        || n.contains("ram ")
+        || n.starts_with("ram")
+        || n.contains(" rss")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("update ")
+        || n.contains("write ")
+        || n.contains("save ")
+        || n.contains("saved note")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("memory:")
+        || n.contains("memory_")
+        || n.contains("note:")
+        || n.contains("scrub")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Bare “memory size” / “how big is memory” stay off this lane (RAM ambiguity).
+    if n == "memory size"
+        || n == "memory"
+        || n == "how big is memory"
+        || n == "how big is the memory"
+        || n == "how large is memory"
+        || n == "how large is the memory"
+        || n == "memory bytes"
+    {
+        return false;
+    }
+    let mem_md_ctx = n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("memory file")
+        || n.contains("memory md")
+        || n == "how big is memory.md"
+        || n == "how big is the memory.md"
+        || n == "how large is memory.md"
+        || n == "how large is the memory.md"
+        || (n.contains("memory")
+            && n.contains("md")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")));
+    if !mem_md_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "memory.md size"
+            | "memory md size"
+            | "memory file size"
+            | "memory.md file size"
+            | "curated memory size"
+            | "curated memory file size"
+            | "memory.md bytes"
+            | "memory file bytes"
+            | "curated memory bytes"
+            | "how big is memory.md"
+            | "how big is the memory.md"
+            | "how big is memory file"
+            | "how big is the memory file"
+            | "how big is the memory.md file"
+            | "how big is curated memory"
+            | "how big is the curated memory"
+            | "how large is memory.md"
+            | "how large is the memory.md"
+            | "how large is curated memory"
+            | "mac-stats memory.md size"
+            | "mac stats memory.md size"
+            | "mac-stats curated memory size"
+            | "mac stats curated memory size"
+    ) || (mem_md_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM curated memory.md file size (stat only; no dump/edit).
+pub fn format_memory_md_size_gateway() -> String {
+    let path = crate::config::Config::memory_file_path();
+    if !path.exists() {
+        return "**Curated memory:** no `memory.md` yet · `memory.md path` for the file · `notes size` for the notes folder."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Curated memory:** empty `memory.md` · `memory.md path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Curated memory:** **{label}** on disk · shared lessons · `memory.md path` for the file · does not dump memory text."
+            )
+        }
+        Err(e) => format!("**Curated memory** — could not stat `memory.md`: {e}"),
+    }
 }
 
 /// True for short “where is memory.md / memory file path…” asks.
 /// Config path only — does not dump/edit curated memory or open notes.
 /// Shared curated file (`agents/memory.md`), not the notes/ folder or Discord channel memories.
+/// Size asks use the memory.md size lane (v0.1.908).
 pub fn looks_like_memory_md_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -5200,6 +5413,14 @@ pub fn looks_like_memory_md_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the memory.md size lane (v0.1.908).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("http://")
@@ -5268,7 +5489,7 @@ pub fn format_memory_md_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Curated memory:** `{display}` · shared lessons across agents · path only · does not dump or edit · `memory path` / `notes path` for the notes folder · `discord memory path` for channel files · `scrub memory` to clean."
+        "**Curated memory:** `{display}` · shared lessons across agents · path only · `memory.md size` for on-disk bytes · does not dump or edit · `memory path` / `notes path` for the notes folder · `discord memory path` for channel files · `scrub memory` to clean."
     )
 }
 
@@ -24339,6 +24560,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
     }
+    // memory.md size before path (stat only; no dump).
+    if looks_like_memory_md_size_request(content) {
+        return Some(format_memory_md_size_gateway());
+    }
     // memory.md curated file before notes-folder memory path (path-only asks).
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
@@ -24519,6 +24744,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
     }
+    // memory.md size before path (stat only; no dump).
+    if looks_like_memory_md_size_request(content) {
+        return Some(format_memory_md_size_gateway());
+    }
     // memory.md curated file before notes-folder memory path lane.
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
@@ -24572,6 +24801,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_task_path_request(content) {
         return Some(format_task_path_gateway());
+    }
+    // memory.md size before path (stat only; no dump).
+    if looks_like_memory_md_size_request(content) {
+        return Some(format_memory_md_size_gateway());
     }
     // memory.md curated file before notes-folder combo path.
     if looks_like_memory_md_path_request(content) {
@@ -24923,7 +25156,8 @@ pub fn format_ops_help_gateway() -> String {
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` for disk use)\n\
 • `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / scrub / bare `memory size` RAM)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` for disk use)\n\
-• `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
+• `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `notes size` / bare `memory size`)\n\
+• `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; `memory.md size` for on-disk bytes; does not steal `memory path` / notes folder)\n\
 • `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / mood / agents)\n\
 • `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` for on-disk bytes; does not steal `/agents`)\n\
 • `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / soul / agents)\n\
@@ -26518,6 +26752,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
     if looks_like_soul_path_request(question) {
+        return true;
+    }
+    // Read-only memory.md size asks (v0.1.908) — stat only; no dump/edit.
+    if looks_like_memory_md_size_request(question) {
         return true;
     }
     // Read-only memory.md curated file path asks (v0.1.858) — config only; no dump/edit.
@@ -30311,6 +30549,52 @@ mod tests {
     }
 
     #[test]
+    fn memory_md_size_request_detected() {
+        assert!(looks_like_memory_md_size_request("memory.md size"));
+        assert!(looks_like_memory_md_size_request("memory md size"));
+        assert!(looks_like_memory_md_size_request("memory file size"));
+        assert!(looks_like_memory_md_size_request("curated memory size"));
+        assert!(looks_like_memory_md_size_request("how big is memory.md"));
+        assert!(looks_like_memory_md_size_request("how big is the memory file"));
+        assert!(looks_like_memory_md_size_request("how large is curated memory"));
+        assert!(looks_like_memory_md_size_request(
+            "mac-stats memory.md size"
+        ));
+        assert!(!looks_like_memory_md_size_request("memory.md path"));
+        assert!(!looks_like_memory_md_size_request("where is memory.md"));
+        assert!(!looks_like_memory_md_size_request("dump memory.md"));
+        assert!(!looks_like_memory_md_size_request("edit memory.md"));
+        assert!(!looks_like_memory_md_size_request("notes size"));
+        assert!(!looks_like_memory_md_size_request("memory folder size"));
+        assert!(!looks_like_memory_md_size_request("memory size"));
+        assert!(!looks_like_memory_md_size_request("how big is memory"));
+        assert!(!looks_like_memory_md_size_request("soul size"));
+        assert!(!looks_like_memory_md_size_request("agents size"));
+        assert!(!looks_like_memory_md_path_request("memory.md size"));
+        assert!(!looks_like_memory_md_path_request("how big is memory.md"));
+        assert!(!looks_like_memory_size_request("memory.md size"));
+        assert!(!looks_like_soul_size_request("memory.md size"));
+        let reply =
+            try_operator_instant_reply("memory.md size").expect("memory.md size instant");
+        assert!(
+            reply.contains("Curated memory") || reply.to_lowercase().contains("memory"),
+            "unexpected reply: {reply}"
+        );
+        assert!(!reply.to_lowercase().contains("path only"));
+        assert!(
+            try_operator_instant_reply("how big is memory.md").is_some(),
+            "how big is memory.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("memory.md path")
+                .expect("memory.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "memory.md path must stay on path lane"
+        );
+    }
+
+    #[test]
     fn memory_md_path_request_detected() {
         assert!(looks_like_memory_md_path_request("memory.md"));
         assert!(looks_like_memory_md_path_request("where is memory.md"));
@@ -30326,6 +30610,8 @@ mod tests {
         assert!(!looks_like_memory_md_path_request("edit memory.md"));
         assert!(!looks_like_memory_md_path_request("soul path"));
         assert!(!looks_like_memory_md_path_request("agents path"));
+        assert!(!looks_like_memory_md_path_request("memory.md size"));
+        assert!(!looks_like_memory_md_path_request("how big is memory.md"));
         assert!(!looks_like_memory_path_request("memory.md"));
         assert!(!looks_like_memory_path_request("where is memory.md"));
         assert!(!looks_like_memory_path_request("memory.md path"));
@@ -30642,6 +30928,8 @@ mod tests {
         assert!(!looks_like_memory_size_request("scrub memory"));
         assert!(!looks_like_memory_size_request("MEMORY: save itinerary"));
         assert!(!looks_like_memory_size_request("memory.md path"));
+        assert!(!looks_like_memory_size_request("memory.md size"));
+        assert!(!looks_like_memory_size_request("how big is memory.md"));
         assert!(!looks_like_memory_size_request("discord memory path"));
         assert!(!looks_like_memory_size_request("session memory path"));
         assert!(!looks_like_memory_size_request("/ram"));
