@@ -16883,8 +16883,246 @@ pub fn format_testing_md_size_gateway() -> String {
     }
 }
 
+/// True for short “how big is planning_prompt.md / planning prompt size…” asks.
+/// Stat only — does not dump/edit planning text or steal `prompts size` / path.
+pub fn looks_like_planning_prompt_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("execution")
+        || n.contains("system prompt")
+        || n.contains("prompts size")
+        || n.contains("prompts folder")
+        || n.contains("prompts path")
+        || n == "prompt size"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill size")
+        || n.contains("skill file")
+        || n.contains("skills size")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing size")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory size")
+        || n.contains("memory folder")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let planning_ctx = n.contains("planning_prompt.md")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("planning file")
+        || n.contains("planning md")
+        || n == "planning size"
+        || n == "planning bytes"
+        || n == "how big is planning"
+        || n == "how big is the planning"
+        || n == "how large is planning"
+        || n == "how large is the planning"
+        || n == "how big is planning.md"
+        || n == "how big is the planning.md"
+        || n == "how big is planning file"
+        || n == "how big is the planning file"
+        || n == "how large is planning.md"
+        || n == "how large is the planning.md"
+        || n == "how large is planning file"
+        || n == "how large is the planning file"
+        || (n.contains("planning")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !planning_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "planning size"
+            | "planning_prompt.md size"
+            | "planning_prompt size"
+            | "planning prompt size"
+            | "planning file size"
+            | "planning md size"
+            | "planning_prompt.md file size"
+            | "planning prompt file size"
+            | "planning_prompt.md bytes"
+            | "planning prompt bytes"
+            | "planning file bytes"
+            | "planning md bytes"
+            | "planning bytes"
+            | "how big is planning"
+            | "how big is the planning"
+            | "how big is planning_prompt.md"
+            | "how big is the planning_prompt.md"
+            | "how big is planning prompt"
+            | "how big is the planning prompt"
+            | "how big is planning file"
+            | "how big is the planning file"
+            | "how big is the planning_prompt.md file"
+            | "how large is planning"
+            | "how large is the planning"
+            | "how large is planning_prompt.md"
+            | "how large is the planning_prompt.md"
+            | "how large is planning prompt"
+            | "how large is the planning prompt"
+            | "how large is planning file"
+            | "how large is the planning file"
+            | "mac-stats planning_prompt.md size"
+            | "mac stats planning_prompt.md size"
+            | "mac-stats planning size"
+            | "mac stats planning size"
+    ) || (planning_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM planning_prompt.md file size (stat only; no dump/edit).
+pub fn format_planning_prompt_size_gateway() -> String {
+    let path = crate::config::Config::planning_prompt_path();
+    if !path.exists() {
+        return "**Planning prompt:** no `planning_prompt.md` yet · `planning_prompt.md path` for the file · `prompts path` for the folder."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Planning prompt:** empty `planning_prompt.md` · `planning_prompt.md path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Planning prompt:** **{label}** on disk · agent-router planning step · `planning_prompt.md path` for the file · does not dump prompt text."
+            )
+        }
+        Err(e) => format!("**Planning prompt** — could not stat `planning_prompt.md`: {e}"),
+    }
+}
+
 /// True for short “where is planning_prompt.md / planning prompt path…” asks.
 /// Config path only — does not dump/edit planning text or open the prompts directory list.
+/// Size asks use the planning_prompt.md size lane (v0.1.905).
 pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -16974,6 +17212,14 @@ pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the planning_prompt.md size lane (v0.1.905).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run ")
@@ -17050,7 +17296,7 @@ pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
 pub fn format_planning_prompt_path_gateway() -> String {
     let display = crate::config::Config::planning_prompt_path().display().to_string();
     format!(
-        "**Planning prompt:** `{display}` · agent-router planning step · path only · does not dump or edit prompt text · `prompts path` for the folder."
+        "**Planning prompt:** `{display}` · agent-router planning step · path only · `planning_prompt.md size` for on-disk bytes · does not dump or edit prompt text · `prompts path` for the folder."
     )
 }
 
@@ -23546,6 +23792,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_execution_prompt_path_request(content) {
         return Some(format_execution_prompt_path_gateway());
     }
+    // planning_prompt.md size before path (stat only; no dump).
+    if looks_like_planning_prompt_size_request(content) {
+        return Some(format_planning_prompt_size_gateway());
+    }
     // planning_prompt.md before prompts-dir path / testing / skill (path-only asks).
     if looks_like_planning_prompt_path_request(content) {
         return Some(format_planning_prompt_path_gateway());
@@ -23713,6 +23963,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // execution_prompt.md before planning / prompts-dir / testing / skill path lanes.
     if looks_like_execution_prompt_path_request(content) {
         return Some(format_execution_prompt_path_gateway());
+    }
+    // planning_prompt.md size before path (stat only; no dump).
+    if looks_like_planning_prompt_size_request(content) {
+        return Some(format_planning_prompt_size_gateway());
     }
     // planning_prompt.md before prompts-dir / testing / skill path lanes.
     if looks_like_planning_prompt_path_request(content) {
@@ -24172,6 +24426,8 @@ pub fn format_ops_help_gateway() -> String {
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills` / `skill.md size`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
 • `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
+• `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `prompts size`)\n\
+• `planning_prompt.md` · `where is planning_prompt.md` · `planning prompt path` · `planning path` — `agents/prompts/planning_prompt.md` (config only; no dump/edit; `planning_prompt.md size` for on-disk bytes; does not steal `prompts path`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` for disk use)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
@@ -25695,6 +25951,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only execution_prompt.md path asks (v0.1.856) — config only; no dump/edit.
     if looks_like_execution_prompt_path_request(question) {
+        return true;
+    }
+    // Read-only planning_prompt.md size asks (v0.1.905) — stat only; no dump/edit.
+    if looks_like_planning_prompt_size_request(question) {
         return true;
     }
     // Read-only planning_prompt.md path asks (v0.1.855) — config only; no dump/edit.
@@ -28970,6 +29230,10 @@ mod tests {
         assert!(!looks_like_planning_prompt_path_request(
             "execution prompt path"
         ));
+        assert!(!looks_like_planning_prompt_path_request(
+            "planning_prompt.md size"
+        ));
+        assert!(!looks_like_planning_prompt_path_request("how big is planning"));
         assert!(!looks_like_planning_prompt_path_request("edit planning prompt"));
         assert!(!looks_like_planning_prompt_path_request("open planning prompt"));
         assert!(!looks_like_planning_prompt_path_request("dump planning prompt"));
@@ -28995,6 +29259,76 @@ mod tests {
         let dir_reply =
             try_operator_instant_reply("prompts path").expect("prompts dir still owns prompts path");
         assert!(dir_reply.contains("Prompts dir"));
+    }
+
+    #[test]
+    fn planning_prompt_size_request_detected() {
+        assert!(looks_like_planning_prompt_size_request("planning size"));
+        assert!(looks_like_planning_prompt_size_request(
+            "planning_prompt.md size"
+        ));
+        assert!(looks_like_planning_prompt_size_request(
+            "planning prompt size"
+        ));
+        assert!(looks_like_planning_prompt_size_request("planning file size"));
+        assert!(looks_like_planning_prompt_size_request(
+            "how big is planning_prompt.md"
+        ));
+        assert!(looks_like_planning_prompt_size_request("how big is planning"));
+        assert!(looks_like_planning_prompt_size_request(
+            "how big is the planning prompt"
+        ));
+        assert!(looks_like_planning_prompt_size_request(
+            "how large is planning_prompt.md"
+        ));
+        assert!(!looks_like_planning_prompt_size_request(
+            "planning_prompt.md path"
+        ));
+        assert!(!looks_like_planning_prompt_size_request(
+            "where is planning_prompt.md"
+        ));
+        assert!(!looks_like_planning_prompt_size_request(
+            "dump planning prompt"
+        ));
+        assert!(!looks_like_planning_prompt_size_request(
+            "edit planning prompt"
+        ));
+        assert!(!looks_like_planning_prompt_size_request("prompts size"));
+        assert!(!looks_like_planning_prompt_size_request("prompt size"));
+        assert!(!looks_like_planning_prompt_size_request(
+            "execution prompt size"
+        ));
+        assert!(!looks_like_planning_prompt_size_request("testing.md size"));
+        assert!(!looks_like_planning_prompt_size_request("soul size"));
+        assert!(!looks_like_planning_prompt_path_request(
+            "planning_prompt.md size"
+        ));
+        assert!(!looks_like_planning_prompt_path_request(
+            "how big is planning_prompt.md"
+        ));
+        assert!(!looks_like_prompts_size_request("planning_prompt.md size"));
+        assert!(!looks_like_prompts_size_request("planning size"));
+        let reply = try_operator_instant_reply("planning_prompt.md size")
+            .expect("planning_prompt.md size instant");
+        assert!(
+            reply.contains("Planning prompt") || reply.to_lowercase().contains("planning"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how big is planning_prompt.md").is_some(),
+            "how big is planning_prompt.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("planning size").is_some(),
+            "planning size should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("planning_prompt.md path")
+                .expect("planning_prompt.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "planning_prompt.md path must stay on path lane"
+        );
     }
 
     #[test]

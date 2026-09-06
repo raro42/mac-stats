@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.905] - 2026-09-06
+
+### Added
+
+- **Instant lane: planning_prompt.md size** — `planning size`, `planning_prompt.md size`, `how big is planning_prompt.md`, `planning prompt size`, and close variants return on-disk size of `agents/prompts/planning_prompt.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `planning_prompt.md path` / `prompts size`; p50 latency).
+
 ## [0.1.904] - 2026-09-06
 
 ### Added
