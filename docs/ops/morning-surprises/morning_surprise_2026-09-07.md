@@ -1,26 +1,27 @@
 # Morning surprise — 2026-09-07
 
-Overnight Track B (mac-stats autoresearch) for Ralf.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review in grace.
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.907** | Instant lane: `agent.json` size (`agent.json size`, `agent config size`, `how big is agent.json`, …) — per-agent stat only; no dump; does not steal path / `agents size` / `config.json` |
-| **v0.1.906** | Instant lane: `execution_prompt.md` size (`execution size`, `how big is execution_prompt.md`, …) — stat only; no dump; does not steal path / `prompts size` |
-| **v0.1.905** | Instant lane: `planning_prompt.md` size |
-| **v0.1.904** | Instant lane: `testing.md` size |
-| **v0.1.903** | Instant lane: `skill.md` size |
-| **v0.1.902** | Instant lane: `mood.md` size |
-| **v0.1.901** | Instant lane: `soul.md` size |
+| **v0.1.908** | Instant lane: curated `memory.md` size (`memory.md size` / `curated memory size` / `how big is memory.md`) — on-disk bytes, no Ollama; does not steal path / notes folder / bare RAM `memory size`. |
 
-## Tick notes (~23:40)
+## Earlier same night (already on main)
 
-- Digester **open** empty (stale Elmasnow weather; Review logs already instant).
-- Design review **due=false** (grace); screens still aged.
-- Fuel: standing backlog p50 → agent.json size (mirrors testing.md / per-agent files).
-- Ratchet: keep after verify @ f7338376.
+| Version | What |
+|---------|------|
+| v0.1.907 | agent.json size instant |
+| v0.1.906 | execution_prompt.md size instant |
+| v0.1.905 | planning_prompt.md size instant |
 
-## Try it
+## Tried / deferred
 
-In Discord or AI Chat: `agent.json size` or `how big is agent.json`.
+- Digester open: empty (stale Elmasnow weather; `Review logs` already instant).
+- Design review screenshots: grace active (TCC); `feature-ai-chat` still aged.
+
+## Next fuel
+
+- escalation_patterns.md / session_reset_phrases.md / cookie_reject_patterns.md size lanes
+- Design review when TCC allows
