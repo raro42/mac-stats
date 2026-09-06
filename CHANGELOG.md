@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.901] - 2026-09-06
+
+### Added
+
+- **Instant lane: soul.md size** — `soul size`, `soul.md size`, `how big is soul`, `soul file size`, and close variants return on-disk size of shared `agents/soul.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `soul path` / mood / agents; p50 latency).
+
 ## [0.1.900] - 2026-09-06
 
 ### Added

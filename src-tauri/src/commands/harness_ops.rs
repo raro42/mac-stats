@@ -17543,8 +17543,215 @@ pub fn format_mood_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is soul.md / soul size…” asks.
+/// Stat only on shared `soul.md` — does not steal path / mood / agents / dump.
+pub fn looks_like_soul_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill size")
+        || n.contains("skill file")
+        || n.contains("skills size")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing size")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory size")
+        || n.contains("memory folder")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts size")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let soul_ctx = n.contains("soul.md")
+        || n.contains("soul file")
+        || n.contains("soul size")
+        || n.contains("soul md")
+        || n == "soul"
+        || n == "how big is soul"
+        || n == "how big is the soul"
+        || n == "how large is soul"
+        || n == "how large is the soul"
+        || (n.contains("soul")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("md")));
+    if !soul_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "soul size"
+            | "soul.md size"
+            | "soul file size"
+            | "soul md size"
+            | "soul.md file size"
+            | "soul bytes"
+            | "soul.md bytes"
+            | "soul file bytes"
+            | "how big is soul"
+            | "how big is the soul"
+            | "how big is soul.md"
+            | "how big is the soul.md"
+            | "how big is soul file"
+            | "how big is the soul file"
+            | "how big is the soul.md file"
+            | "how large is soul"
+            | "how large is the soul"
+            | "how large is soul.md"
+            | "how large is the soul.md"
+            | "mac-stats soul size"
+            | "mac stats soul size"
+    ) || (soul_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM shared soul.md file size (stat only; no dump/edit).
+pub fn format_soul_size_gateway() -> String {
+    let path = crate::config::Config::soul_file_path();
+    if !path.exists() {
+        return "**Soul file:** no `soul.md` yet · `soul path` for the file · Agent Ops → Agents for content."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Soul file:** empty `soul.md` · `soul path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Soul file:** **{label}** on disk · shared persona · `soul path` for the file · does not dump soul text."
+            )
+        }
+        Err(e) => format!("**Soul file** — could not stat `soul.md`: {e}"),
+    }
+}
+
 /// True for short “where is soul.md / soul path…” asks.
 /// Config path only — does not dump/edit soul text or open Agent Ops Agents.
+/// Size asks use the soul.md size lane (v0.1.901).
 pub fn looks_like_soul_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17649,6 +17856,14 @@ pub fn looks_like_soul_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the soul.md size lane (v0.1.901).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("http://")
@@ -17715,7 +17930,7 @@ pub fn format_soul_path_gateway() -> String {
     let path = crate::config::Config::soul_file_path();
     let display = path.display().to_string();
     format!(
-        "**Soul file:** `{display}` · shared persona · path only · does not dump or edit soul text · Agent Ops → Agents for content."
+        "**Soul file:** `{display}` · shared persona · path only · `soul size` for on-disk bytes · does not dump or edit soul text · Agent Ops → Agents for content."
     )
 }
 
@@ -22612,6 +22827,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_mood_path_request(content) {
         return Some(format_mood_path_gateway());
     }
+    // soul.md size before path (stat only; no dump).
+    if looks_like_soul_size_request(content) {
+        return Some(format_soul_size_gateway());
+    }
     // soul.md before agents-dir path / /agents catalog (path-only asks).
     if looks_like_soul_path_request(content) {
         return Some(format_soul_path_gateway());
@@ -22763,6 +22982,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // mood.md before soul / agents-dir path lane.
     if looks_like_mood_path_request(content) {
         return Some(format_mood_path_gateway());
+    }
+    // soul.md size before path (stat only; no dump).
+    if looks_like_soul_size_request(content) {
+        return Some(format_soul_size_gateway());
     }
     // soul.md before agents-dir path lane.
     if looks_like_soul_path_request(content) {
@@ -23173,6 +23396,8 @@ pub fn format_ops_help_gateway() -> String {
 • `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / scrub / bare `memory size` RAM)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` for disk use)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; does not steal `memory path` / notes folder)\n\
+• `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / mood / agents)\n\
+• `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` for on-disk bytes; does not steal `/agents`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
@@ -24721,6 +24946,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only mood.md path asks (v0.1.852) — config only; no dump/edit.
     if looks_like_mood_path_request(question) {
+        return true;
+    }
+    // Read-only soul.md size asks (v0.1.901) — stat only; no dump/edit.
+    if looks_like_soul_size_request(question) {
         return true;
     }
     // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
@@ -28108,6 +28337,8 @@ mod tests {
         assert!(!looks_like_soul_path_request("rewrite my soul"));
         assert!(!looks_like_soul_path_request("/agents"));
         assert!(!looks_like_soul_path_request("session reset phrases path"));
+        assert!(!looks_like_soul_path_request("soul size"));
+        assert!(!looks_like_soul_path_request("how big is soul.md"));
         assert!(!looks_like_agents_path_request("soul path"));
         assert!(!looks_like_agents_path_request("where is soul.md"));
         assert!(!looks_like_memory_path_request("soul path"));
@@ -28116,6 +28347,44 @@ mod tests {
         assert!(reply.contains("soul.md") || reply.contains(".mac-stats"));
         assert!(!reply.to_lowercase().contains("agents dir"));
         assert!(reply.to_lowercase().contains("path only"));
+    }
+
+    #[test]
+    fn soul_size_request_detected() {
+        assert!(looks_like_soul_size_request("soul size"));
+        assert!(looks_like_soul_size_request("soul.md size"));
+        assert!(looks_like_soul_size_request("soul file size"));
+        assert!(looks_like_soul_size_request("how big is soul"));
+        assert!(looks_like_soul_size_request("how big is soul.md"));
+        assert!(looks_like_soul_size_request("how big is the soul file"));
+        assert!(looks_like_soul_size_request("how large is soul.md"));
+        assert!(!looks_like_soul_size_request("soul path"));
+        assert!(!looks_like_soul_size_request("where is soul.md"));
+        assert!(!looks_like_soul_size_request("dump soul"));
+        assert!(!looks_like_soul_size_request("edit soul.md"));
+        assert!(!looks_like_soul_size_request("mood size"));
+        assert!(!looks_like_soul_size_request("agents size"));
+        assert!(!looks_like_soul_size_request("memory.md size"));
+        assert!(!looks_like_soul_size_request("notes size"));
+        assert!(!looks_like_soul_path_request("soul size"));
+        assert!(!looks_like_soul_path_request("how big is soul"));
+        let reply = try_operator_instant_reply("soul size").expect("soul size instant");
+        assert!(
+            reply.contains("Soul file") || reply.to_lowercase().contains("soul"),
+            "unexpected reply: {reply}"
+        );
+        assert!(!reply.to_lowercase().contains("you have opinions"));
+        assert!(
+            try_operator_instant_reply("how big is soul.md").is_some(),
+            "how big is soul.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("soul path")
+                .expect("soul path")
+                .to_lowercase()
+                .contains("path only"),
+            "soul path must stay on path lane"
+        );
     }
 
     #[test]
