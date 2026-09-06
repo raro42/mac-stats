@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.900] - 2026-09-06
+
+### Added
+
+- **Instant lane: `.config.env` size** — `config.env size`, `.config.env size`, `how big is .config.env`, `secrets env size`, and close variants return on-disk size of `~/.mac-stats/.config.env` without Ollama (Discord + AI Chat; stat only — no key dump; does not steal `config.env path` / `config size` / `config.json`; p50 latency).
+
 ## [0.1.899] - 2026-09-06
 
 ### Added
