@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.891] - 2026-09-06
+
+### Added
+
+- **Instant lane: monitors.json size** — `monitors size`, `monitors.json size`, `how big is monitors`, and close variants return on-disk size of `monitors.json` without Ollama (Discord + AI Chat; stat only — no dump/list/add/check; does not steal `monitors path` / `/monitors`; p50 latency).
+
 ## [0.1.890] - 2026-09-06
 
 ### Added

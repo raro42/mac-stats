@@ -2323,8 +2323,8 @@ pub fn looks_like_monitors_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
-    // Path-only asks go to monitors.json instant (does not steal `/monitors` list).
-    if looks_like_monitors_path_request(content) {
+    // Size/path-only asks go to monitors.json instant (does not steal `/monitors` list).
+    if looks_like_monitors_size_request(content) || looks_like_monitors_path_request(content) {
         return false;
     }
     if n.contains("create")
@@ -10873,8 +10873,192 @@ pub fn format_schedules_size_gateway() -> String {
     }
 }
 
+/// True for short “how big is monitors.json / monitors size…” asks.
+/// Stat only on `monitors.json` — does not steal path / `/monitors` / add/check.
+pub fn looks_like_monitors_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("check ")
+        || n.contains("check now")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedules.json")
+        || n.contains("history.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/monitors"
+        || n == "monitors"
+        || n == "/monitors up"
+        || n == "monitors up"
+        || n == "/monitors down"
+        || n == "monitors down"
+        || n == "/monitors slow"
+        || n == "monitors slow"
+        || n == "up monitors"
+        || n == "down monitors"
+        || n == "slow monitors"
+        || n == "list monitors"
+        || n == "show monitors"
+        || n == "my monitors"
+        || n == "website monitors"
+        || n == "site monitors"
+    {
+        return false;
+    }
+    let mon_ctx = n.contains("monitors.json")
+        || n.contains("monitors json")
+        || n.contains("monitor file")
+        || n.contains("monitors file")
+        || n.contains("sites file")
+        || n == "monitors size"
+        || n == "monitor size"
+        || n == "how big is monitors"
+        || n == "how big is the monitors"
+        || n == "how large is monitors"
+        || n == "how large is the monitors"
+        || n == "mac-stats monitors size"
+        || n == "mac stats monitors size"
+        || (n.contains("monitors")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")))
+        || (n.contains("monitor")
+            && n.contains("json")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")));
+    if !mon_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "monitors size"
+            | "monitor size"
+            | "monitors file size"
+            | "monitor file size"
+            | "monitors.json size"
+            | "monitors json size"
+            | "sites file size"
+            | "mac-stats monitors size"
+            | "mac stats monitors size"
+            | "how big is monitors"
+            | "how big is the monitors"
+            | "how big is monitors.json"
+            | "how big is the monitors.json"
+            | "how big is the monitors file"
+            | "how big is the monitor file"
+            | "how large is monitors"
+            | "how large is the monitors"
+            | "how large is monitors.json"
+            | "monitors bytes"
+            | "monitors.json bytes"
+            | "monitors file bytes"
+    ) || (mon_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM monitors.json file size (stat only; no dump/list/add/check).
+pub fn format_monitors_size_gateway() -> String {
+    let path = crate::config::Config::monitors_file_path();
+    if !path.exists() {
+        return "**Monitors:** no `monitors.json` yet · app will create it when you add a site · `monitors path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Monitors:** empty `monitors.json` · `monitors path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Monitors:** **{label}** on disk · website monitors JSON · `monitors path` for the file · `/monitors` for the live list."
+            )
+        }
+        Err(e) => format!("**Monitors** — could not stat `monitors.json`: {e}"),
+    }
+}
+
 /// True for short “where is monitors.json / monitors path…” asks.
 /// Config path only — does not list sites or run `/monitors` / add/check.
+/// Size asks use the monitors.json size lane (v0.1.891).
 pub fn looks_like_monitors_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10923,6 +11107,13 @@ pub fn looks_like_monitors_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("check ")
         || n.contains("check now")
         || n.contains(" for ")
@@ -11017,7 +11208,7 @@ pub fn format_monitors_path_gateway() -> String {
     let path = crate::config::Config::monitors_file_path();
     let display = path.display().to_string();
     format!(
-        "**Monitors file:** `{display}` · External / website monitors config · `/monitors` for the live list · does not add or check sites."
+        "**Monitors file:** `{display}` · External / website monitors config · `monitors size` for on-disk bytes · `/monitors` for the live list · does not add or check sites."
     )
 }
 
@@ -20771,6 +20962,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_schedules_path_request(content) {
         return Some(format_schedules_path_gateway());
     }
+    // monitors.json size before path (stat only; no dump).
+    if looks_like_monitors_size_request(content) {
+        return Some(format_monitors_size_gateway());
+    }
     if looks_like_monitors_path_request(content) {
         return Some(format_monitors_path_gateway());
     }
@@ -21004,7 +21199,8 @@ pub fn format_ops_help_gateway() -> String {
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
 • `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `/schedules`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` for on-disk bytes; does not steal `/schedules`)\n\
-• `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; does not steal `/monitors`)\n\
+• `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `/monitors`)\n\
+• `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` for on-disk bytes; does not steal `/monitors`)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; does not steal chat history)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
@@ -22690,6 +22886,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only schedules.json path asks (v0.1.832) — config only; no list/count/create.
     if looks_like_schedules_path_request(question) {
+        return true;
+    }
+    // Read-only monitors.json size asks (v0.1.891) — stat only; no dump/list/add/check.
+    if looks_like_monitors_size_request(question) {
         return true;
     }
     // Read-only monitors.json path asks (v0.1.833) — config only; no list/add/check.
@@ -27344,6 +27544,9 @@ mod tests {
         assert!(!looks_like_monitors_path_request("schedules path"));
         assert!(!looks_like_monitors_path_request("pinned processes path"));
         assert!(!looks_like_monitors_path_request("where is config"));
+        assert!(!looks_like_monitors_path_request("monitors size"));
+        assert!(!looks_like_monitors_path_request("monitors.json size"));
+        assert!(!looks_like_monitors_path_request("how big is monitors"));
         assert!(!looks_like_monitors_request("monitors path"));
         assert!(!looks_like_monitors_request("where is monitors.json"));
         assert!(looks_like_monitors_request("/monitors"));
@@ -27351,6 +27554,41 @@ mod tests {
             .expect("monitors path instant");
         assert!(reply.contains("Monitors file"));
         assert!(reply.contains("monitors") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("monitors size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn monitors_size_request_detected() {
+        assert!(looks_like_monitors_size_request("monitors size"));
+        assert!(looks_like_monitors_size_request("monitors.json size"));
+        assert!(looks_like_monitors_size_request("monitors file size"));
+        assert!(looks_like_monitors_size_request("how big is monitors"));
+        assert!(looks_like_monitors_size_request("how big is monitors.json"));
+        assert!(looks_like_monitors_size_request("how large is the monitors"));
+        assert!(looks_like_monitors_size_request("mac-stats monitors size"));
+        assert!(!looks_like_monitors_size_request("monitors path"));
+        assert!(!looks_like_monitors_size_request("where is monitors.json"));
+        assert!(!looks_like_monitors_size_request("monitors.json"));
+        assert!(!looks_like_monitors_size_request("/monitors"));
+        assert!(!looks_like_monitors_size_request("list monitors"));
+        assert!(!looks_like_monitors_size_request("monitors down"));
+        assert!(!looks_like_monitors_size_request("schedules size"));
+        assert!(!looks_like_monitors_size_request("config size"));
+        assert!(!looks_like_monitors_path_request("monitors size"));
+        assert!(!looks_like_schedules_size_request("monitors.json size"));
+        assert!(!looks_like_monitors_request("monitors size"));
+        let reply =
+            try_operator_instant_reply("how big is monitors").expect("monitors size instant");
+        assert!(
+            reply.contains("Monitors")
+                && (reply.contains("on disk")
+                    || reply.contains("empty")
+                    || reply.contains("no `monitors.json`")),
+            "{reply}"
+        );
     }
 
     #[test]
