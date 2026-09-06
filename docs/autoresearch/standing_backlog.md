@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.893** — Instant lane: disk_cleanup.json size (`disk cleanup size`, `disk_cleanup.json size`, `how big is disk cleanup`, `cleanup file size`; stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine; p50 latency).
+
 - **v0.1.892** — Instant lane: history.json size (`history size`, `history.json size`, `how big is history`, `metrics history size`; stat only; no dump; does not steal `history path` / chat history; p50 latency).
 
 - **v0.1.891** — Instant lane: monitors.json size (`monitors size`, `monitors.json size`, `how big is monitors`; stat only; no dump; does not steal `monitors path` / `/monitors` / add/check; p50 latency).

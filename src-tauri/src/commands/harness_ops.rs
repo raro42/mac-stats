@@ -11541,8 +11541,219 @@ pub fn format_history_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is disk_cleanup.json / disk cleanup size…” asks.
+/// Stat only on `disk_cleanup.json` — does not steal path / `/disk` / quarantine size.
+pub fn looks_like_disk_cleanup_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("empty trash")
+        || n.contains("ssd")
+        || n.contains("disk usage")
+        || n.contains("disk free")
+        || n.contains("free space")
+        || n.contains("free disk")
+        || n.contains("how full")
+        || n.contains("percent")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("quarantine")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("pinned")
+        || n.contains("perplexity")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n == "/disk"
+        || n == "/cleanup"
+        || n == "cleanup"
+        || n == "disk cleanup"
+        || n == "cleanup status"
+        || n == "disk cleanup status"
+        || n == "/disk on"
+        || n == "disk on"
+        || n == "/disk off"
+        || n == "disk off"
+        || n == "/disk reclaim"
+        || n == "disk reclaim"
+        || n == "/disk big"
+        || n == "disk big"
+        || n == "/disk clean"
+        || n == "disk clean"
+        || n == "enabled scopes"
+        || n == "disabled scopes"
+        || n == "cleanup scopes"
+        || n == "what's reclaimable"
+        || n == "whats reclaimable"
+        || n == "disk size"
+        || n == "how big is disk"
+        || n == "how big is the disk"
+    {
+        return false;
+    }
+    let disk_ctx = n.contains("disk_cleanup.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup.json")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup.json")
+        || n.contains("disk cleanup file")
+        || n.contains("cleanup file")
+        || n.contains("cleanup config")
+        || n.contains("disk cleanup config")
+        || n == "disk cleanup size"
+        || n == "how big is disk cleanup"
+        || n == "how big is the disk cleanup"
+        || n == "how large is disk cleanup"
+        || n == "how large is the disk cleanup"
+        || n == "mac-stats disk cleanup size"
+        || n == "mac stats disk cleanup size"
+        || (n.contains("disk cleanup")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !disk_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "disk cleanup size"
+            | "disk cleanup file size"
+            | "disk_cleanup.json size"
+            | "disk_cleanup size"
+            | "disk_cleanup file size"
+            | "disk-cleanup size"
+            | "disk-cleanup.json size"
+            | "disk cleanup json size"
+            | "cleanup file size"
+            | "cleanup config size"
+            | "disk cleanup config size"
+            | "mac-stats disk cleanup size"
+            | "mac stats disk cleanup size"
+            | "how big is disk cleanup"
+            | "how big is the disk cleanup"
+            | "how big is disk_cleanup.json"
+            | "how big is the disk_cleanup.json"
+            | "how big is the disk cleanup file"
+            | "how big is cleanup file"
+            | "how big is the cleanup file"
+            | "how large is disk cleanup"
+            | "how large is the disk cleanup"
+            | "how large is disk_cleanup.json"
+            | "disk cleanup bytes"
+            | "disk_cleanup.json bytes"
+            | "cleanup file bytes"
+    ) || (disk_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM disk_cleanup.json file size (stat only; no list/reclaim/clean-now).
+pub fn format_disk_cleanup_size_gateway() -> String {
+    let path = crate::config::Config::disk_cleanup_file_path();
+    if !path.exists() {
+        return "**Disk cleanup:** no `disk_cleanup.json` yet · app writes it after Disk Cleanup runs · `disk cleanup path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Disk cleanup:** empty `disk_cleanup.json` · `disk cleanup path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Disk cleanup:** **{label}** on disk · scopes + last-run state · `disk cleanup path` for the file · `/disk` for live scopes."
+            )
+        }
+        Err(e) => format!("**Disk cleanup** — could not stat `disk_cleanup.json`: {e}"),
+    }
+}
+
 /// True for short “where is disk_cleanup.json / disk cleanup path…” asks.
 /// Config path only — does not list scopes, reclaim, or run `/disk` / clean-now.
+/// Size asks use the disk_cleanup.json size lane (v0.1.893).
 pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -11599,6 +11810,13 @@ pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -11708,7 +11926,7 @@ pub fn format_disk_cleanup_path_gateway() -> String {
     let path = crate::config::Config::disk_cleanup_file_path();
     let display = path.display().to_string();
     format!(
-        "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `/disk` for live scopes · does not reclaim or clean."
+        "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `disk cleanup size` for on-disk bytes · `/disk` for live scopes · does not reclaim or clean."
     )
 }
 
@@ -21162,6 +21380,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_history_path_request(content) {
         return Some(format_history_path_gateway());
     }
+    // disk_cleanup.json size before path (stat only; no dump).
+    if looks_like_disk_cleanup_size_request(content) {
+        return Some(format_disk_cleanup_size_gateway());
+    }
     if looks_like_disk_cleanup_path_request(content) {
         return Some(format_disk_cleanup_path_gateway());
     }
@@ -21393,7 +21615,8 @@ pub fn format_ops_help_gateway() -> String {
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` for on-disk bytes; does not steal `/monitors`)\n\
 • `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / chat history)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` for on-disk bytes; does not steal chat history)\n\
-• `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
+• `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
+• `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` for on-disk bytes; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; does not steal `/discord`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
@@ -23093,6 +23316,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only history.json path asks (v0.1.834) — config only; no sparkline dump.
     if looks_like_history_path_request(question) {
+        return true;
+    }
+    // Read-only disk_cleanup.json size asks (v0.1.893) — stat only; no dump/list/reclaim.
+    if looks_like_disk_cleanup_size_request(question) {
         return true;
     }
     // Read-only disk_cleanup.json path asks (v0.1.835) — config only; no list/reclaim.
@@ -27872,6 +28099,9 @@ mod tests {
         assert!(!looks_like_disk_cleanup_path_request("history path"));
         assert!(!looks_like_disk_cleanup_path_request("monitors path"));
         assert!(!looks_like_disk_cleanup_path_request("where is config"));
+        assert!(!looks_like_disk_cleanup_path_request("disk cleanup size"));
+        assert!(!looks_like_disk_cleanup_path_request("disk_cleanup.json size"));
+        assert!(!looks_like_disk_cleanup_path_request("how big is disk cleanup"));
         assert!(!looks_like_disk_cleanup_request("disk cleanup path"));
         assert!(!looks_like_disk_cleanup_request("where is disk_cleanup.json"));
         assert!(looks_like_disk_cleanup_request("/disk"));
@@ -27879,6 +28109,56 @@ mod tests {
             .expect("disk cleanup path instant");
         assert!(reply.contains("Disk cleanup file"));
         assert!(reply.contains("disk_cleanup") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("disk cleanup size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn disk_cleanup_size_request_detected() {
+        assert!(looks_like_disk_cleanup_size_request("disk cleanup size"));
+        assert!(looks_like_disk_cleanup_size_request("disk_cleanup.json size"));
+        assert!(looks_like_disk_cleanup_size_request("disk_cleanup size"));
+        assert!(looks_like_disk_cleanup_size_request("disk cleanup file size"));
+        assert!(looks_like_disk_cleanup_size_request("cleanup file size"));
+        assert!(looks_like_disk_cleanup_size_request("cleanup config size"));
+        assert!(looks_like_disk_cleanup_size_request("how big is disk cleanup"));
+        assert!(looks_like_disk_cleanup_size_request(
+            "how big is disk_cleanup.json"
+        ));
+        assert!(looks_like_disk_cleanup_size_request(
+            "how large is the disk cleanup"
+        ));
+        assert!(looks_like_disk_cleanup_size_request(
+            "mac-stats disk cleanup size"
+        ));
+        assert!(!looks_like_disk_cleanup_size_request("disk cleanup path"));
+        assert!(!looks_like_disk_cleanup_size_request(
+            "where is disk_cleanup.json"
+        ));
+        assert!(!looks_like_disk_cleanup_size_request("disk_cleanup.json"));
+        assert!(!looks_like_disk_cleanup_size_request("/disk"));
+        assert!(!looks_like_disk_cleanup_size_request("disk cleanup"));
+        assert!(!looks_like_disk_cleanup_size_request("what's reclaimable"));
+        assert!(!looks_like_disk_cleanup_size_request(
+            "cleanup quarantine size"
+        ));
+        assert!(!looks_like_disk_cleanup_size_request("how big is quarantine"));
+        assert!(!looks_like_disk_cleanup_size_request("history size"));
+        assert!(!looks_like_disk_cleanup_size_request("monitors size"));
+        assert!(!looks_like_disk_cleanup_size_request("disk size"));
+        assert!(!looks_like_disk_cleanup_path_request("disk cleanup size"));
+        assert!(!looks_like_history_size_request("disk_cleanup.json size"));
+        let reply = try_operator_instant_reply("how big is disk cleanup")
+            .expect("disk cleanup size instant");
+        assert!(
+            reply.contains("Disk cleanup")
+                && (reply.contains("on disk")
+                    || reply.contains("empty")
+                    || reply.contains("no `disk_cleanup.json`")),
+            "{reply}"
+        );
     }
 
     #[test]

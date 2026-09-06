@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.893] - 2026-09-06
+
+### Added
+
+- **Instant lane: disk_cleanup.json size** — `disk cleanup size`, `disk_cleanup.json size`, `how big is disk cleanup`, `cleanup file size`, and close variants return on-disk size of `disk_cleanup.json` without Ollama (Discord + AI Chat; stat only — no dump/list/reclaim; does not steal `disk cleanup path` / `/disk` / quarantine size; p50 latency).
+
 ## [0.1.892] - 2026-09-06
 
 ### Added
