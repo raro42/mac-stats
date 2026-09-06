@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.910] - 2026-09-07
+
+### Added
+
+- **Instant lane: session_reset_phrases.md size** — `session reset size`, `session_reset_phrases.md size`, `how big is session reset phrases`, `session reset phrases size`, and close variants return on-disk size of `agents/session_reset_phrases.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `session reset phrases path` / escalation / cookie reject; p50 latency).
+
 ## [0.1.909] - 2026-09-07
 
 ### Added
