@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.911] - 2026-09-07
+
+### Added
+
+- **Instant lane: cookie_reject_patterns.md size** — `cookie reject size`, `cookie_reject_patterns.md size`, `how big is cookie reject patterns`, `cookie reject patterns size`, and close variants return on-disk size of `agents/cookie_reject_patterns.md` without Ollama (Discord + AI Chat; stat only — no dump; does not steal `cookie reject patterns path` / session-reset / escalation; p50 latency).
+
 ## [0.1.910] - 2026-09-07
 
 ### Added

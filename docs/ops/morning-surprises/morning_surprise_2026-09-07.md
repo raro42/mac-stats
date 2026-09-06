@@ -1,29 +1,22 @@
 # Morning surprise — 2026-09-07
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review in grace.
+Overnight Track B kept shipping p50 instant file-size lanes while digester open stayed empty.
 
-## Shipped
-
-| Version | What |
-|---------|------|
-| **v0.1.910** | Instant lane: `session_reset_phrases.md` size (`session reset size` / `session_reset_phrases.md size` / `how big is session reset phrases`) — on-disk bytes, no Ollama; does not steal path / escalation / cookie reject. |
-| **v0.1.909** | Instant lane: `escalation_patterns.md` size (`escalation size` / `escalation_patterns.md size` / `how big is escalation patterns`) — on-disk bytes, no Ollama; does not steal path / session-reset / cookie reject. |
-| **v0.1.908** | Instant lane: curated `memory.md` size (`memory.md size` / `curated memory size` / `how big is memory.md`) — on-disk bytes, no Ollama; does not steal path / notes folder / bare RAM `memory size`. |
-
-## Earlier same night (already on main)
+## Shipped tonight (so far)
 
 | Version | What |
 |---------|------|
-| v0.1.907 | agent.json size instant |
-| v0.1.906 | execution_prompt.md size instant |
-| v0.1.905 | planning_prompt.md size instant |
+| **v0.1.911** | Instant: `cookie_reject_patterns.md` size (`cookie reject size` / `how big is cookie reject patterns`; no dump; path lane untouched) |
+| **v0.1.910** | Instant: `session_reset_phrases.md` size |
+| **v0.1.909** | Instant: `escalation_patterns.md` size |
+| **v0.1.908** | Instant: curated `memory.md` size |
+| **v0.1.907** | Instant: per-agent `agent.json` size |
 
-## Tried / deferred
+## Digester / design review
 
 - Digester open: empty (stale Elmasnow weather; `Review logs` already instant).
-- Design review screenshots: grace active (TCC); `feature-ai-chat` still aged.
+- Design review: grace (not due); recommended surface still `feature-ai-chat` (~23.5d).
 
-## Next fuel
+## Why it matters
 
-- cookie_reject_patterns.md / downloads-organizer-rules.md size lanes
-- Design review when TCC allows
+Operators can ask how big the cookie-banner reject list file is without waking Ollama or Brave — same pattern as escalation / session-reset size lanes.
