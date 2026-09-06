@@ -1,22 +1,22 @@
 # Morning surprise — 2026-09-06
 
-Overnight Track B kept shipping operator instant lanes (p50). Digester open stayed empty; design review stayed in grace.
+Overnight Track B (autoresearch) kept shipping instant-lane file-size reads so operators skip Ollama for “how big is …” config stats.
 
 ## Shipped tonight
 
 | Version | What |
-|---------|------|
-| **v0.1.888** | `review logs` / `check logs` → `/logs` instant (no Brave waste) |
-| **v0.1.889** | `config.json` size instant |
-| **v0.1.890** | `schedules.json` size instant |
-| **v0.1.891** | `monitors.json` size instant |
+| --- | --- |
+| **v0.1.892** | Instant: `history.json` size (`history size` / `how big is history` / `metrics history size`) |
+| **v0.1.891** | Instant: `monitors.json` size |
+| **v0.1.890** | Instant: `schedules.json` size |
+| **v0.1.889** | Instant: `config.json` size |
+| **v0.1.888** | Instant: `review logs` / `check logs` → `/logs` (cuts digester Slowest Brave waste) |
 
-## Tried / notes
+## Context
 
-- Digester Slowest still lists historical `Review logs` + Elmasnow weather — already shipped / filtered.
-- Design review due=false (grace); feature screens aged but TCC/screenshot deferred.
-- Next fuel: `history.json` / `disk_cleanup.json` size, or design-review polish when due.
+- Digester **open** stayed empty (Elmasnow weather + Review logs already stale/shipped).
+- Design review **due=false** (grace); AI Chat / Agent Ops feature PNGs still aged — screenshot polish deferred until TCC allows.
+- Debug log: no ERROR/WARN/panic clusters in the 3h scan window.
+- Next fuel: `disk_cleanup.json` size / `pinned_processes.json` size, or a design-review polish when screenshots work.
 
-## Fitness
-
-Operators get on-disk size for monitors config without waiting on Ollama — same pattern as config + schedules.
+Ralf: p50 path continues — size lanes mirror the path lanes already shipped for the same files.
