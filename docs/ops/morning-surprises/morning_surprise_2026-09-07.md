@@ -6,7 +6,8 @@ Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes
 
 | Version | What |
 |---------|------|
-| **v0.1.902** | Instant lane: **mood.md size** (`mood size`, `mood.md size`, `how big is mood`, `mood file size`) — on-disk bytes across per-agent `mood.md` (stat only; no dump) |
+| **v0.1.903** | Instant lane: **skill.md size** (`skill.md size`, `skill file size`, `how big is skill.md`) — on-disk bytes across per-agent `skill.md` (stat only; no dump; bare `skill size` stays Hermes skills/) |
+| **v0.1.902** | Instant lane: **mood.md size** |
 | **v0.1.901** | Instant lane: **soul.md size** |
 | **v0.1.900** | Instant lane: **`.config.env` size** |
 | **v0.1.899** | Instant lane: **credential_accounts.json size** |
@@ -20,6 +21,6 @@ Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes
 
 ## Next fuel
 
-- skill.md / agent.json / escalation_patterns.md size (or next high-value file size)
+- testing.md / agent.json / escalation_patterns.md size (or next high-value file size)
 - Design review screenshot when TCC allows
 - Digester open / debug.log product errors when present
