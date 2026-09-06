@@ -1,33 +1,25 @@
 # Morning surprise — 2026-09-07
 
+Overnight Track B (mac-stats autoresearch) for Ralf.
 
-## Overnight keep — v0.1.905 (~22:45)
-
-**Instant lane: planning_prompt.md size** — `planning size` / `planning_prompt.md size` / `how big is planning_prompt.md` / `planning prompt size` return on-disk bytes of `agents/prompts/planning_prompt.md` without Ollama (stat only; no dump; does not steal path / `prompts size`).
-
-Overnight Track B (20:00–06:00 local) shipped more operator instant-size lanes.
-
-## Shipped
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.905** | Instant lane: **planning_prompt.md size** (`planning size`, `planning_prompt.md size`, `how big is planning_prompt.md`, `planning prompt size`) — on-disk bytes of shared planning prompt (stat only; no dump; does not steal path / `prompts size`) |
-| **v0.1.904** | Instant lane: **testing.md size** (`testing size`, `testing.md size`, `how big is testing.md`, `testing file size`) — on-disk bytes across per-agent `testing.md` (stat only; no dump; does not steal path / run tests) |
-| **v0.1.903** | Instant lane: **skill.md size** (`skill.md size`, `skill file size`, `how big is skill.md`) — on-disk bytes across per-agent `skill.md` (stat only; no dump; bare `skill size` stays Hermes skills/) |
-| **v0.1.902** | Instant lane: **mood.md size** |
-| **v0.1.901** | Instant lane: **soul.md size** |
-| **v0.1.900** | Instant lane: **`.config.env` size** |
-| **v0.1.899** | Instant lane: **credential_accounts.json size** |
-| **v0.1.898** | Instant lane: **user-info.json size** |
+| **v0.1.906** | Instant lane: `execution_prompt.md` size (`execution size`, `how big is execution_prompt.md`, …) — stat only; no dump; does not steal path / `prompts size` |
+| **v0.1.905** | Instant lane: `planning_prompt.md` size |
+| **v0.1.904** | Instant lane: `testing.md` size |
+| **v0.1.903** | Instant lane: `skill.md` size |
+| **v0.1.902** | Instant lane: `mood.md` size |
+| **v0.1.901** | Instant lane: `soul.md` size |
 
-## Context
+## Tick notes (~23:10)
 
-- Digester **open** stayed empty (stale Elmasnow weather + Review logs already filtered).
-- Design review still in **grace** (`feature-ai-chat` ~23d aged; TCC screenshot deferred).
-- Fuel: standing backlog p50 latency — path lanes without matching size asks.
+- Digester **open** empty (stale Elmasnow weather; Review logs already instant).
+- Design review **due=false** (grace); screens still aged.
+- Fuel: standing backlog p50 → execution_prompt.md size (mirrors planning).
+- Ratchet: keep after verify.
 
-## Next fuel
+## Try it
 
-- agent.json / execution_prompt.md / escalation_patterns.md / memory.md size
-- Design review screenshot when TCC allows
-- Digester open / debug.log product errors when present
+In Discord or AI Chat: `execution size` or `how big is execution_prompt.md`.
