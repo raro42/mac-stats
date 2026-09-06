@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 
 | Version | What |
 |---------|------|
+| **v0.1.910** | Instant lane: `session_reset_phrases.md` size (`session reset size` / `session_reset_phrases.md size` / `how big is session reset phrases`) — on-disk bytes, no Ollama; does not steal path / escalation / cookie reject. |
 | **v0.1.909** | Instant lane: `escalation_patterns.md` size (`escalation size` / `escalation_patterns.md size` / `how big is escalation patterns`) — on-disk bytes, no Ollama; does not steal path / session-reset / cookie reject. |
 | **v0.1.908** | Instant lane: curated `memory.md` size (`memory.md size` / `curated memory size` / `how big is memory.md`) — on-disk bytes, no Ollama; does not steal path / notes folder / bare RAM `memory size`. |
 
@@ -24,5 +25,5 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 
 ## Next fuel
 
-- session_reset_phrases.md / cookie_reject_patterns.md size lanes
+- cookie_reject_patterns.md / downloads-organizer-rules.md size lanes
 - Design review when TCC allows
