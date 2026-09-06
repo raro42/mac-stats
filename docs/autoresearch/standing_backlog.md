@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.899** — Instant lane: credential_accounts.json size (`credential accounts size`, `credential_accounts.json size`, `how big is credential accounts`, `keychain accounts size`; stat only; no dump; does not steal `credential accounts path` / browser credentials; p50 latency).
+
 - **v0.1.898** — Instant lane: user-info.json size (`user info size`, `user-info.json size`, `how big is user info`, `user details size`; stat only; no dump; does not steal `user info path` / who-am-i; p50 latency).
 
 - **v0.1.897** — Instant lane: scheduler_delivery_awareness.json size (`delivery awareness size`, `scheduler_delivery_awareness.json size`, `how big is delivery awareness`, `awareness file size`; stat only; no dump; does not steal `delivery awareness path` / `last delivery` / `/schedules`; p50 latency).

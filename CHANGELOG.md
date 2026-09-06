@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.899] - 2026-09-06
+
+### Added
+
+- **Instant lane: credential_accounts.json size** — `credential accounts size`, `credential_accounts.json size`, `how big is credential accounts`, `keychain accounts size`, and close variants return on-disk size of `credential_accounts.json` without Ollama (Discord + AI Chat; stat only — no dump/list; does not steal `credential accounts path` / browser credentials; p50 latency).
+
 ## [0.1.898] - 2026-09-06
 
 ### Added

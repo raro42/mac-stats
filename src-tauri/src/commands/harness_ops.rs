@@ -14367,9 +14367,223 @@ pub fn format_improvements_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is credential_accounts.json / credential accounts size…” asks.
+/// Stat only on `credential_accounts.json` — does not steal path / browser credentials / Keychain dumps.
+pub fn looks_like_credential_accounts_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("api key")
+        || n.contains("api-key")
+        || n.contains("token")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("browser secrets")
+        || n.contains("browser secret")
+        || n.contains("credentials.toml")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("userinfo")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("pinned_processes")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ca_ctx = n.contains("credential_accounts.json")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
+        || n.contains("keychain account list")
+        || n.contains("accounts.json")
+        || n.contains("credential accounts size")
+        || n.contains("credential_accounts size")
+        || n.contains("keychain accounts size")
+        || (n.contains("credential account")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("json")));
+    if !ca_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "credential accounts size"
+            | "credential account size"
+            | "credential_accounts size"
+            | "credential_accounts.json size"
+            | "credential_accounts file size"
+            | "credential-accounts size"
+            | "credential-accounts.json size"
+            | "credentials accounts size"
+            | "keychain accounts size"
+            | "keychain accounts file size"
+            | "accounts.json size"
+            | "accounts.json file size"
+            | "mac-stats credential accounts size"
+            | "mac stats credential accounts size"
+            | "how big is credential accounts"
+            | "how big is the credential accounts"
+            | "how big is credential_accounts.json"
+            | "how big is the credential_accounts.json"
+            | "how big is credential-accounts.json"
+            | "how big is the credential accounts file"
+            | "how big is accounts.json"
+            | "how big is the accounts.json"
+            | "how large is credential accounts"
+            | "how large is the credential accounts"
+            | "how large is credential_accounts.json"
+            | "credential accounts bytes"
+            | "credential_accounts.json bytes"
+            | "keychain accounts bytes"
+            | "accounts.json bytes"
+    ) || (ca_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM credential_accounts.json file size (stat only; no dump / list / Keychain secrets).
+pub fn format_credential_accounts_size_gateway() -> String {
+    let path = crate::config::Config::credential_accounts_file_path();
+    if !path.exists() {
+        return "**Credential accounts:** no `credential_accounts.json` yet · app writes Keychain account names · `credential accounts path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Credential accounts:** empty `credential_accounts.json` · `credential accounts path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Credential accounts:** **{label}** on disk · Keychain account-name list · `credential accounts path` for the file."
+            )
+        }
+        Err(e) => format!("**Credential accounts** — could not stat `credential_accounts.json`: {e}"),
+    }
+}
+
 /// True for short “where is credential_accounts.json / credential accounts path…” asks.
 /// Path only — does not list Keychain account names or dump secrets.
 /// Does not steal `browser credentials` / `browser-credentials.toml` / `/brave` key asks.
+/// Size asks use the credential_accounts.json size lane (v0.1.899).
 pub fn looks_like_credential_accounts_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -14477,6 +14691,14 @@ pub fn looks_like_credential_accounts_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the credential_accounts.json size lane (v0.1.899).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -14559,7 +14781,7 @@ pub fn format_credential_accounts_path_gateway() -> String {
     let path = crate::config::Config::credential_accounts_file_path();
     let display = path.display().to_string();
     format!(
-        "**Credential accounts file:** `{display}` · Keychain account-name list on disk · does not list accounts or dump secrets · Settings → Credentials."
+        "**Credential accounts file:** `{display}` · Keychain account-name list on disk · `credential accounts size` for on-disk bytes · does not list accounts or dump secrets · Settings → Credentials."
     )
 }
 
@@ -22262,6 +22484,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_improvements_path_request(content) {
         return Some(format_improvements_path_gateway());
     }
+    // credential_accounts.json size before path (stat only; no dump).
+    if looks_like_credential_accounts_size_request(content) {
+        return Some(format_credential_accounts_size_gateway());
+    }
     // credential_accounts.json before browser-credentials / generic “credentials” path lanes.
     if looks_like_credential_accounts_path_request(content) {
         return Some(format_credential_accounts_path_gateway());
@@ -22713,7 +22939,8 @@ pub fn format_ops_help_gateway() -> String {
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
-• `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; does not steal browser credentials)\n\
+• `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / browser credentials)\n\
+• `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` for on-disk bytes; does not steal browser credentials)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / take/list)\n\
@@ -24209,6 +24436,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only improvements dir path asks (v0.1.841) — config only; no list/open.
     if looks_like_improvements_path_request(question) {
+        return true;
+    }
+    // Read-only credential_accounts.json size asks (v0.1.899) — stat only; no dump/list.
+    if looks_like_credential_accounts_size_request(question) {
         return true;
     }
     // Read-only credential_accounts.json path asks (v0.1.845) — config only; no list/dump.
@@ -26875,6 +27106,12 @@ mod tests {
         assert!(!looks_like_credential_accounts_path_request("where is config"));
         assert!(!looks_like_credential_accounts_path_request("config.env path"));
         assert!(!looks_like_credential_accounts_path_request("improvements path"));
+        assert!(!looks_like_credential_accounts_path_request(
+            "credential accounts size"
+        ));
+        assert!(!looks_like_credential_accounts_path_request(
+            "how big is credential_accounts.json"
+        ));
         assert!(!looks_like_browser_credentials_path_request(
             "credential accounts path"
         ));
@@ -26889,8 +27126,69 @@ mod tests {
         assert!(
             reply.contains("credential_accounts.json") || reply.contains(".mac-stats")
         );
+        assert!(
+            reply.to_lowercase().contains("credential accounts size")
+                || reply.contains("on-disk"),
+            "{reply}"
+        );
         assert!(!reply.to_lowercase().contains("discord_bot_token"));
         assert!(!reply.to_lowercase().contains("api_key="));
+    }
+
+    #[test]
+    fn credential_accounts_size_request_detected() {
+        assert!(looks_like_credential_accounts_size_request(
+            "credential accounts size"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "credential_accounts.json size"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "credential_accounts size"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "how big is credential accounts"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "how big is credential_accounts.json"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "keychain accounts size"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "accounts.json size"
+        ));
+        assert!(looks_like_credential_accounts_size_request(
+            "how big is the credential accounts file"
+        ));
+        assert!(!looks_like_credential_accounts_size_request(
+            "credential accounts path"
+        ));
+        assert!(!looks_like_credential_accounts_size_request(
+            "where is credential_accounts.json"
+        ));
+        assert!(!looks_like_credential_accounts_size_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_credential_accounts_size_request("list credentials"));
+        assert!(!looks_like_credential_accounts_size_request("dump secrets"));
+        assert!(!looks_like_credential_accounts_size_request("user info size"));
+        assert!(!looks_like_credential_accounts_size_request(
+            "discord channels size"
+        ));
+        assert!(!looks_like_credential_accounts_path_request(
+            "credential accounts size"
+        ));
+        let reply = try_operator_instant_reply("credential accounts size")
+            .expect("credential accounts size instant");
+        assert!(
+            reply.contains("Credential accounts")
+                && (reply.contains("on disk")
+                    || reply.contains("no `credential_accounts.json`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Credential accounts file:"));
     }
 
     #[test]
