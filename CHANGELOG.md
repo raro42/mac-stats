@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.904] - 2026-09-06
+
+### Added
+
+- **Instant lane: testing.md size** — `testing size`, `testing.md size`, `how big is testing.md`, `testing file size`, and close variants return on-disk size of per-agent `testing.md` files without Ollama (Discord + AI Chat; stat only — no dump; does not steal `testing.md path` / run tests / `/agents`; p50 latency).
+
 ## [0.1.903] - 2026-09-06
 
 ### Added
