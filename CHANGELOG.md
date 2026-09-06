@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.892] - 2026-09-06
+
+### Added
+
+- **Instant lane: history.json size** — `history size`, `history.json size`, `how big is history`, `metrics history size`, and close variants return on-disk size of `history.json` without Ollama (Discord + AI Chat; stat only — no dump/sparkline/chat history; does not steal `history path`; p50 latency).
+
 ## [0.1.891] - 2026-09-06
 
 ### Added

@@ -11212,8 +11212,187 @@ pub fn format_monitors_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is history.json / history size…” asks.
+/// Stat only on `history.json` — does not steal path / sparkline dump / chat history.
+pub fn looks_like_history_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clear ")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("chart")
+        || n.contains("sparkline")
+        || n.contains("graph")
+        || n.contains("plot")
+        || n.contains("chat")
+        || n.contains("conversation")
+        || n.contains("message")
+        || n.contains("discord")
+        || n.contains("session history")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "history"
+        || n == "/history"
+        || n == "cpu history"
+        || n == "metrics history"
+        || n == "show history"
+        || n == "clear history"
+    {
+        return false;
+    }
+    let hist_ctx = n.contains("history.json")
+        || n.contains("history json")
+        || n.contains("history file")
+        || n.contains("metrics history")
+        || n.contains("cpu history")
+        || n == "history size"
+        || n == "how big is history"
+        || n == "how big is the history"
+        || n == "how large is history"
+        || n == "how large is the history"
+        || n == "mac-stats history size"
+        || n == "mac stats history size"
+        || (n.contains("history")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !hist_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "history size"
+            | "history file size"
+            | "history.json size"
+            | "history json size"
+            | "metrics history size"
+            | "cpu history size"
+            | "metrics history file size"
+            | "cpu history file size"
+            | "mac-stats history size"
+            | "mac stats history size"
+            | "how big is history"
+            | "how big is the history"
+            | "how big is history.json"
+            | "how big is the history.json"
+            | "how big is the history file"
+            | "how big is metrics history"
+            | "how big is the metrics history"
+            | "how large is history"
+            | "how large is the history"
+            | "how large is history.json"
+            | "history bytes"
+            | "history.json bytes"
+            | "history file bytes"
+    ) || (hist_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM history.json file size (stat only; no dump/sparkline/chat history).
+pub fn format_history_size_gateway() -> String {
+    let path = crate::config::Config::history_file_path();
+    if !path.exists() {
+        return "**History:** no `history.json` yet · app writes it after metrics warm-up · `history path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**History:** empty `history.json` · `history path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**History:** **{label}** on disk · CPU / metrics sparkline buffer · `history path` for the file · open the CPU window for live charts."
+            )
+        }
+        Err(e) => format!("**History** — could not stat `history.json`: {e}"),
+    }
+}
+
 /// True for short “where is history.json / history path…” asks.
 /// Config path only — does not dump sparkline points or chat/session history.
+/// Size asks use the history.json size lane (v0.1.892).
 pub fn looks_like_history_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -11264,6 +11443,13 @@ pub fn looks_like_history_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("chart")
         || n.contains("sparkline")
         || n.contains("graph")
@@ -11351,7 +11537,7 @@ pub fn format_history_path_gateway() -> String {
     let path = crate::config::Config::history_file_path();
     let display = path.display().to_string();
     format!(
-        "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · open the CPU window for live charts · does not dump points or chat history."
+        "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · `history size` for on-disk bytes · open the CPU window for live charts · does not dump points or chat history."
     )
 }
 
@@ -20969,6 +21155,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_monitors_path_request(content) {
         return Some(format_monitors_path_gateway());
     }
+    // history.json size before path (stat only; no dump).
+    if looks_like_history_size_request(content) {
+        return Some(format_history_size_gateway());
+    }
     if looks_like_history_path_request(content) {
         return Some(format_history_path_gateway());
     }
@@ -21201,7 +21391,8 @@ pub fn format_ops_help_gateway() -> String {
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` for on-disk bytes; does not steal `/schedules`)\n\
 • `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `/monitors`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` for on-disk bytes; does not steal `/monitors`)\n\
-• `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; does not steal chat history)\n\
+• `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / chat history)\n\
+• `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` for on-disk bytes; does not steal chat history)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; does not steal `/discord`)\n\
@@ -22894,6 +23085,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only monitors.json path asks (v0.1.833) — config only; no list/add/check.
     if looks_like_monitors_path_request(question) {
+        return true;
+    }
+    // Read-only history.json size asks (v0.1.892) — stat only; no dump/sparkline/chat history.
+    if looks_like_history_size_request(question) {
         return true;
     }
     // Read-only history.json path asks (v0.1.834) — config only; no sparkline dump.
@@ -27609,10 +27804,50 @@ mod tests {
         assert!(!looks_like_history_path_request("monitors path"));
         assert!(!looks_like_history_path_request("schedules path"));
         assert!(!looks_like_history_path_request("where is config"));
+        assert!(!looks_like_history_path_request("history size"));
+        assert!(!looks_like_history_path_request("history.json size"));
+        assert!(!looks_like_history_path_request("how big is history"));
         let reply = try_operator_instant_reply("where is history.json")
             .expect("history path instant");
         assert!(reply.contains("History file"));
         assert!(reply.contains("history") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("history size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn history_size_request_detected() {
+        assert!(looks_like_history_size_request("history size"));
+        assert!(looks_like_history_size_request("history.json size"));
+        assert!(looks_like_history_size_request("history file size"));
+        assert!(looks_like_history_size_request("how big is history"));
+        assert!(looks_like_history_size_request("how big is history.json"));
+        assert!(looks_like_history_size_request("how large is the history"));
+        assert!(looks_like_history_size_request("metrics history size"));
+        assert!(looks_like_history_size_request("cpu history size"));
+        assert!(looks_like_history_size_request("mac-stats history size"));
+        assert!(!looks_like_history_size_request("history path"));
+        assert!(!looks_like_history_size_request("where is history.json"));
+        assert!(!looks_like_history_size_request("history.json"));
+        assert!(!looks_like_history_size_request("/history"));
+        assert!(!looks_like_history_size_request("show history"));
+        assert!(!looks_like_history_size_request("chat history"));
+        assert!(!looks_like_history_size_request("conversation history size"));
+        assert!(!looks_like_history_size_request("monitors size"));
+        assert!(!looks_like_history_size_request("schedules size"));
+        assert!(!looks_like_history_path_request("history size"));
+        assert!(!looks_like_monitors_size_request("history.json size"));
+        let reply =
+            try_operator_instant_reply("how big is history").expect("history size instant");
+        assert!(
+            reply.contains("History")
+                && (reply.contains("on disk")
+                    || reply.contains("empty")
+                    || reply.contains("no `history.json`")),
+            "{reply}"
+        );
     }
 
     #[test]
