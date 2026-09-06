@@ -12332,8 +12332,215 @@ pub fn format_perplexity_last_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is discord_channels.json / discord channels size…” asks.
+/// Stat only on `discord_channels.json` — does not steal path / `/discord` / list-edit.
+pub fn looks_like_discord_channels_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("post")
+        || n.contains("send")
+        || n.contains("message")
+        || n.contains("reconnect")
+        || n.contains("having fun")
+        || n.contains("idle thought")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("token")
+        || n == "/discord"
+        || n == "discord"
+        || n == "discord status"
+        || n == "discord gateway"
+        || n == "discord ready"
+        || n == "discord offline"
+        || n == "is discord ready"
+        || n == "how's discord"
+        || n == "hows discord"
+        || n == "discord size"
+        || n == "how big is discord"
+        || n == "how large is discord"
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("pinned_processes")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ch_ctx = n.contains("discord_channels.json")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels.json")
+        || n.contains("discord-channels")
+        || n.contains("discord channels.json")
+        || n.contains("discord channels file")
+        || n.contains("discord channel file")
+        || n.contains("discord channels config")
+        || n.contains("discord channel config")
+        || n.contains("channels.json")
+        || n == "discord channels size"
+        || n == "how big is discord channels"
+        || n == "how big is the discord channels"
+        || n == "how large is discord channels"
+        || n == "mac-stats discord channels size"
+        || n == "mac stats discord channels size"
+        || (n.contains("discord")
+            && n.contains("channel")
+            && (n.contains("json") || n.contains("file") || n.contains("config") || n.contains("channels"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !ch_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "discord channels size"
+            | "discord channel size"
+            | "discord_channels.json size"
+            | "discord_channels size"
+            | "discord_channels file size"
+            | "discord-channels size"
+            | "discord-channels.json size"
+            | "discord channels file size"
+            | "discord channels json size"
+            | "discord channel file size"
+            | "discord channels config size"
+            | "discord channel config size"
+            | "channels.json size"
+            | "channels file size"
+            | "mac-stats discord channels size"
+            | "mac stats discord channels size"
+            | "how big is discord channels"
+            | "how big is the discord channels"
+            | "how big is discord_channels.json"
+            | "how big is the discord_channels.json"
+            | "how big is the discord channels file"
+            | "how big is channels.json"
+            | "how big is the channels.json"
+            | "how large is discord channels"
+            | "how large is the discord channels"
+            | "how large is discord_channels.json"
+            | "discord channels bytes"
+            | "discord_channels.json bytes"
+            | "channels.json bytes"
+    ) || (ch_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM discord_channels.json file size (stat only; no list/edit / `/discord`).
+pub fn format_discord_channels_size_gateway() -> String {
+    let path = crate::config::Config::discord_channels_path();
+    if !path.exists() {
+        return "**Discord channels:** no `discord_channels.json` yet · app writes it after Discord channel config saves · `discord channels path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Discord channels:** empty `discord_channels.json` · `discord channels path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Discord channels:** **{label}** on disk · per-channel listen / having_fun config · `discord channels path` for the file · `/discord` for gateway Ready."
+            )
+        }
+        Err(e) => format!("**Discord channels** — could not stat `discord_channels.json`: {e}"),
+    }
+}
+
 /// True for short “where is discord_channels.json / discord channels path…” asks.
 /// Config path only — does not list channels, edit having_fun, or run `/discord`.
+/// Size asks use the discord_channels.json size lane (v0.1.895).
 pub fn looks_like_discord_channels_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -12393,6 +12600,13 @@ pub fn looks_like_discord_channels_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -12495,7 +12709,7 @@ pub fn format_discord_channels_path_gateway() -> String {
     let path = crate::config::Config::discord_channels_path();
     let display = path.display().to_string();
     format!(
-        "**Discord channels file:** `{display}` · per-channel listen / having_fun config · `/discord` for gateway Ready · does not list or edit channels."
+        "**Discord channels file:** `{display}` · per-channel listen / having_fun config · `discord channels size` for on-disk bytes · `/discord` for gateway Ready · does not list or edit channels."
     )
 }
 
@@ -21433,6 +21647,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_user_info_path_request(content) {
         return Some(format_user_info_path_gateway());
     }
+    // discord_channels.json size before path (stat only; no dump).
+    if looks_like_discord_channels_size_request(content) {
+        return Some(format_discord_channels_size_gateway());
+    }
     if looks_like_discord_channels_path_request(content) {
         return Some(format_discord_channels_path_gateway());
     }
@@ -21847,7 +22065,8 @@ pub fn format_ops_help_gateway() -> String {
 • `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` for on-disk bytes; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
-• `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; does not steal `/discord`)\n\
+• `discord channels size` · `discord_channels.json size` · `how big is discord channels` — discord_channels.json file size on disk (stat only; no dump; does not steal `discord channels path` / `/discord`)\n\
+• `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; `discord channels size` for on-disk bytes; does not steal `/discord`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
@@ -23566,6 +23785,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     // Read-only user-info.json path asks (v0.1.839) — config only; no dump/edit.
     // Check before nested sibling path detectors (string-only; avoids exponential nest).
     if looks_like_user_info_path_request(question) {
+        return true;
+    }
+    // Read-only discord_channels.json size asks (v0.1.895) — stat only; no dump/list/edit.
+    if looks_like_discord_channels_size_request(question) {
         return true;
     }
     // Read-only discord_channels.json path asks (v0.1.837) — config only; no list/edit.
@@ -28521,6 +28744,13 @@ mod tests {
         assert!(!looks_like_discord_channels_path_request("perplexity last path"));
         assert!(!looks_like_discord_channels_path_request("disk cleanup path"));
         assert!(!looks_like_discord_channels_path_request("where is config"));
+        assert!(!looks_like_discord_channels_path_request("discord channels size"));
+        assert!(!looks_like_discord_channels_path_request(
+            "discord_channels.json size"
+        ));
+        assert!(!looks_like_discord_channels_path_request(
+            "how big is discord channels"
+        ));
         assert!(!looks_like_discord_gateway_request("discord channels path"));
         assert!(!looks_like_discord_gateway_request("where is discord_channels.json"));
         assert!(looks_like_discord_gateway_request("/discord"));
@@ -28528,6 +28758,71 @@ mod tests {
             .expect("discord channels path instant");
         assert!(reply.contains("Discord channels file"));
         assert!(reply.contains("discord_channels") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("discord channels size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn discord_channels_size_request_detected() {
+        assert!(looks_like_discord_channels_size_request(
+            "discord channels size"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "discord_channels.json size"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "discord_channels size"
+        ));
+        assert!(looks_like_discord_channels_size_request("channels.json size"));
+        assert!(looks_like_discord_channels_size_request(
+            "how big is discord channels"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "how big is discord_channels.json"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "how large is the discord channels"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "mac-stats discord channels size"
+        ));
+        assert!(looks_like_discord_channels_size_request(
+            "discord channels file size"
+        ));
+        assert!(!looks_like_discord_channels_size_request(
+            "discord channels path"
+        ));
+        assert!(!looks_like_discord_channels_size_request(
+            "where is discord_channels.json"
+        ));
+        assert!(!looks_like_discord_channels_size_request(
+            "discord_channels.json"
+        ));
+        assert!(!looks_like_discord_channels_size_request("/discord"));
+        assert!(!looks_like_discord_channels_size_request("discord"));
+        assert!(!looks_like_discord_channels_size_request("discord size"));
+        assert!(!looks_like_discord_channels_size_request("how big is discord"));
+        assert!(!looks_like_discord_channels_size_request("list discord channels"));
+        assert!(!looks_like_discord_channels_size_request("history size"));
+        assert!(!looks_like_discord_channels_size_request(
+            "pinned processes size"
+        ));
+        assert!(!looks_like_discord_gateway_request("discord channels size"));
+        assert!(!looks_like_discord_gateway_request(
+            "discord_channels.json size"
+        ));
+        let reply = try_operator_instant_reply("discord channels size")
+            .expect("discord channels size instant");
+        assert!(
+            reply.contains("Discord channels")
+                && (reply.contains("on disk")
+                    || reply.contains("no `discord_channels.json`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Discord channels file:"));
     }
 
     #[test]

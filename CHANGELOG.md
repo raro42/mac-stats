@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.895] - 2026-09-06
+
+### Added
+
+- **Instant lane: discord_channels.json size** — `discord channels size`, `discord_channels.json size`, `how big is discord channels`, `channels.json size`, and close variants return on-disk size of `discord_channels.json` without Ollama (Discord + AI Chat; stat only — no dump/list/edit; does not steal `discord channels path` / `/discord`; p50 latency).
+
 ## [0.1.894] - 2026-09-06
 
 ### Added
