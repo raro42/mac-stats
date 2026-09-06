@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.894] - 2026-09-06
+
+### Added
+
+- **Instant lane: pinned_processes.json size** — `pinned processes size`, `pinned_processes.json size`, `how big is pinned processes`, `pin file size`, and close variants return on-disk size of `pinned_processes.json` without Ollama (Discord + AI Chat; stat only — no dump/list/pin; does not steal `pinned processes path` / `/pinned`; p50 latency).
+
 ## [0.1.893] - 2026-09-06
 
 ### Added

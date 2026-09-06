@@ -10366,8 +10366,225 @@ pub fn format_cleanup_quarantine_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is pinned_processes.json / pinned processes size…” asks.
+/// Stat only on `pinned_processes.json` — does not steal path / `/pinned` / pin-unpin.
+pub fn looks_like_pinned_processes_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("unpin")
+        || n.contains("pin this")
+        || n.contains("pin that")
+        || n.contains("pin the")
+        || n == "pin"
+        || (n.starts_with("pin ")
+            && !n.contains("pin file")
+            && !n.contains("pins file")
+            && !n.contains("pin size"))
+        || (n.contains(" pin ") && !n.contains("pin file") && !n.contains("pins file"))
+        || n == "/pinned"
+        || n == "pinned"
+        || n == "/processes"
+        || n == "/processes pinned"
+        || n == "processes pinned"
+        || n == "pinned processes"
+        || n == "pinned process"
+        || n == "show pinned"
+        || n == "list pinned"
+        || n == "my pinned"
+        || n == "hot"
+        || n == "/hot"
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("quarantine")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("/disk")
+        || n == "process size"
+        || n == "how big is process"
+        || n == "how big is the process"
+        || n == "how big is pinned"
+        || n == "how large is pinned"
+        || n == "pinned size"
+    {
+        return false;
+    }
+    let pin_ctx = n.contains("pinned_processes")
+        || n.contains("pinned-processes")
+        || n.contains("pinned processes.json")
+        || n.contains("pinned process file")
+        || n.contains("pin file")
+        || n.contains("pins file")
+        || n.contains("favorites file")
+        || n.contains("process favorites file")
+        || n.contains("pinned favorites file")
+        || n.contains("pinned favorites")
+        || n == "pinned processes size"
+        || n == "how big is pinned processes"
+        || n == "how big is the pinned processes"
+        || n == "how large is pinned processes"
+        || n == "mac-stats pinned processes size"
+        || n == "mac stats pinned processes size"
+        || (n.contains("pinned")
+            && (n.contains("json") || n.contains("file") || n.contains("processes") || n.contains("favorites"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")))
+        || (n.contains("pin")
+            && n.contains("json")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")));
+    if !pin_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "pinned processes size"
+            | "pinned process size"
+            | "pinned_processes.json size"
+            | "pinned_processes size"
+            | "pinned_processes file size"
+            | "pinned-processes size"
+            | "pinned-processes.json size"
+            | "pinned processes file size"
+            | "pinned processes json size"
+            | "pin file size"
+            | "pins file size"
+            | "pinned favorites size"
+            | "pinned favorites file size"
+            | "process favorites size"
+            | "process favorites file size"
+            | "mac-stats pinned processes size"
+            | "mac stats pinned processes size"
+            | "how big is pinned processes"
+            | "how big is the pinned processes"
+            | "how big is pinned_processes.json"
+            | "how big is the pinned_processes.json"
+            | "how big is the pinned processes file"
+            | "how big is pin file"
+            | "how big is the pin file"
+            | "how big is pinned favorites"
+            | "how large is pinned processes"
+            | "how large is the pinned processes"
+            | "how large is pinned_processes.json"
+            | "pinned processes bytes"
+            | "pinned_processes.json bytes"
+            | "pin file bytes"
+    ) || (pin_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM pinned_processes.json file size (stat only; no list/pin/unpin).
+pub fn format_pinned_processes_size_gateway() -> String {
+    let path = crate::config::Config::pinned_processes_file_path();
+    if !path.exists() {
+        return "**Pinned processes:** no `pinned_processes.json` yet · app writes it after you pin a process · `pinned processes path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Pinned processes:** empty `pinned_processes.json` · `pinned processes path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Pinned processes:** **{label}** on disk · Top Processes favorites · `pinned processes path` for the file · `/pinned` for the live list."
+            )
+        }
+        Err(e) => format!("**Pinned processes** — could not stat `pinned_processes.json`: {e}"),
+    }
+}
+
 /// True for short “where is pinned_processes.json / pinned favorites path…” asks.
 /// Config path only — does not list, pin, unpin, or run `/pinned` / `/processes`.
+/// Size asks use the pinned_processes.json size lane (v0.1.894).
 pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -10414,6 +10631,13 @@ pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains("unpin")
         || n.contains("pin this")
         || n.contains("pin that")
@@ -10519,7 +10743,7 @@ pub fn format_pinned_processes_path_gateway() -> String {
     let path = crate::config::Config::pinned_processes_file_path();
     let display = path.display().to_string();
     format!(
-        "**Pinned processes file:** `{display}` · Top Processes favorites · `/pinned` for the live list · does not pin or unpin."
+        "**Pinned processes file:** `{display}` · Top Processes favorites · `pinned processes size` for on-disk bytes · `/pinned` for the live list · does not pin or unpin."
     )
 }
 
@@ -21356,6 +21580,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_cleanup_quarantine_path_request(content) {
         return Some(format_cleanup_quarantine_path_gateway());
     }
+    // pinned_processes.json size before path (stat only; no dump).
+    if looks_like_pinned_processes_size_request(content) {
+        return Some(format_pinned_processes_size_gateway());
+    }
     if looks_like_pinned_processes_path_request(content) {
         return Some(format_pinned_processes_path_gateway());
     }
@@ -21608,7 +21836,8 @@ pub fn format_ops_help_gateway() -> String {
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
-• `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; does not steal `/pinned`)\n\
+• `pinned processes size` · `pinned_processes.json size` · `how big is pinned processes` — pinned_processes.json file size on disk (stat only; no dump; does not steal `pinned processes path` / `/pinned`)\n\
+• `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; `pinned processes size` for on-disk bytes; does not steal `/pinned`)\n\
 • `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `/schedules`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` for on-disk bytes; does not steal `/schedules`)\n\
 • `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `/monitors`)\n\
@@ -23288,6 +23517,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only cleanup-quarantine dir path asks (v0.1.830) — config only; no list/prune/restore.
     if looks_like_cleanup_quarantine_path_request(question) {
+        return true;
+    }
+    // Read-only pinned_processes.json size asks (v0.1.894) — stat only; no dump/list/pin.
+    if looks_like_pinned_processes_size_request(question) {
         return true;
     }
     // Read-only pinned_processes.json path asks (v0.1.831) — config only; no list/pin/unpin.
@@ -27870,6 +28103,13 @@ mod tests {
         assert!(!looks_like_pinned_processes_path_request("cleanup quarantine path"));
         assert!(!looks_like_pinned_processes_path_request("where is config"));
         assert!(!looks_like_pinned_processes_path_request("schedules path"));
+        assert!(!looks_like_pinned_processes_path_request("pinned processes size"));
+        assert!(!looks_like_pinned_processes_path_request(
+            "pinned_processes.json size"
+        ));
+        assert!(!looks_like_pinned_processes_path_request(
+            "how big is pinned processes"
+        ));
         assert!(!looks_like_processes_request("pinned processes path"));
         assert!(looks_like_processes_request("/pinned"));
         assert!(looks_like_processes_request("pinned processes"));
@@ -27877,6 +28117,74 @@ mod tests {
             .expect("pinned processes path instant");
         assert!(reply.contains("Pinned processes"));
         assert!(reply.contains("pinned_processes") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("pinned processes size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn pinned_processes_size_request_detected() {
+        assert!(looks_like_pinned_processes_size_request(
+            "pinned processes size"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "pinned_processes.json size"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "pinned_processes size"
+        ));
+        assert!(looks_like_pinned_processes_size_request("pin file size"));
+        assert!(looks_like_pinned_processes_size_request(
+            "how big is pinned processes"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "how big is pinned_processes.json"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "how large is the pinned processes"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "mac-stats pinned processes size"
+        ));
+        assert!(looks_like_pinned_processes_size_request(
+            "pinned favorites size"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "pinned processes path"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "where is pinned_processes.json"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "pinned_processes.json"
+        ));
+        assert!(!looks_like_pinned_processes_size_request("/pinned"));
+        assert!(!looks_like_pinned_processes_size_request("pinned"));
+        assert!(!looks_like_pinned_processes_size_request("pinned processes"));
+        assert!(!looks_like_pinned_processes_size_request("list pinned"));
+        assert!(!looks_like_pinned_processes_size_request("how big is pinned"));
+        assert!(!looks_like_pinned_processes_size_request("pinned size"));
+        assert!(!looks_like_pinned_processes_size_request("history size"));
+        assert!(!looks_like_pinned_processes_size_request(
+            "disk cleanup size"
+        ));
+        assert!(!looks_like_pinned_processes_path_request(
+            "pinned processes size"
+        ));
+        assert!(!looks_like_history_size_request(
+            "pinned_processes.json size"
+        ));
+        let reply = try_operator_instant_reply("how big is pinned processes")
+            .expect("pinned processes size instant");
+        assert!(
+            reply.contains("Pinned processes")
+                && (reply.contains("on disk")
+                    || reply.contains("empty")
+                    || reply.contains("no `pinned_processes.json`")
+                    || reply.contains("could not stat")),
+            "{reply}"
+        );
     }
 
     #[test]
