@@ -13357,8 +13357,216 @@ pub fn format_scheduler_delivery_awareness_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is user-info.json / user info size…” asks.
+/// Stat only on `user-info.json` — does not steal path / who-am-i / display-name dumps.
+pub fn looks_like_user_info_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("who am")
+        || n.contains("who is")
+        || n.contains("display name")
+        || n.contains("my name")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("monitors.json")
+        || n.contains("schedules.json")
+        || n.contains("config.json")
+        || n.contains("pinned_processes")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ui_ctx = n.contains("user-info.json")
+        || n.contains("user_info.json")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("userinfo.json")
+        || n.contains("userinfo")
+        || n.contains("user info.json")
+        || n.contains("user info file")
+        || n.contains("user info size")
+        || n.contains("user-info size")
+        || n.contains("user_info size")
+        || n.contains("user details size")
+        || n.contains("user details file")
+        || n == "user info size"
+        || n == "how big is user info"
+        || n == "how big is the user info"
+        || n == "how large is user info"
+        || n == "mac-stats user info size"
+        || n == "mac stats user info size"
+        || (n.contains("user info")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")))
+        || (n.contains("user details")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !ui_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "user info size"
+            | "user-info size"
+            | "user-info.json size"
+            | "user-info file size"
+            | "user_info size"
+            | "user_info.json size"
+            | "user_info file size"
+            | "userinfo size"
+            | "userinfo.json size"
+            | "user info file size"
+            | "user info json size"
+            | "user details size"
+            | "user details file size"
+            | "mac-stats user info size"
+            | "mac stats user info size"
+            | "how big is user info"
+            | "how big is the user info"
+            | "how big is user-info.json"
+            | "how big is the user-info.json"
+            | "how big is user_info.json"
+            | "how big is the user_info.json"
+            | "how big is the user info file"
+            | "how big is userinfo.json"
+            | "how large is user info"
+            | "how large is the user info"
+            | "how large is user-info.json"
+            | "user info bytes"
+            | "user-info.json bytes"
+            | "user_info.json bytes"
+            | "user details file bytes"
+    ) || (ui_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM user-info.json file size (stat only; no dump / edit / who-am-i).
+pub fn format_user_info_size_gateway() -> String {
+    let path = crate::config::Config::user_info_file_path();
+    if !path.exists() {
+        return "**User info:** no `user-info.json` yet · app writes display names from Discord · `user info path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**User info:** empty `user-info.json` · `user info path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**User info:** **{label}** on disk · Discord display-name map · `user info path` for the file."
+            )
+        }
+        Err(e) => format!("**User info** — could not stat `user-info.json`: {e}"),
+    }
+}
+
 /// True for short “where is user-info.json / user info path…” asks.
 /// Config path only — does not dump display names or edit the file.
+/// Size asks use the user-info.json size lane (v0.1.898).
 pub fn looks_like_user_info_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -13451,6 +13659,14 @@ pub fn looks_like_user_info_path_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("fix")
         || n.contains("explain")
+        // Size asks use the user-info.json size lane (v0.1.898).
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -13547,7 +13763,7 @@ pub fn format_user_info_path_gateway() -> String {
     let path = crate::config::Config::user_info_file_path();
     let display = path.display().to_string();
     format!(
-        "**User info file:** `{display}` · Discord display-name map on disk · does not list or edit users."
+        "**User info file:** `{display}` · Discord display-name map on disk · `user info size` for on-disk bytes · does not list or edit users."
     )
 }
 
@@ -22113,6 +22329,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
+    // user-info.json size before path (stat only; no dump).
+    if looks_like_user_info_size_request(content) {
+        return Some(format_user_info_size_gateway());
+    }
     // user-info before nested sibling path detectors (string-only; avoids exponential nest).
     if looks_like_user_info_path_request(content) {
         return Some(format_user_info_path_gateway());
@@ -22548,7 +22768,8 @@ pub fn format_ops_help_gateway() -> String {
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; `discord channels size` for on-disk bytes; does not steal `/discord`)\n\
 • `delivery awareness size` · `scheduler_delivery_awareness.json size` · `how big is delivery awareness` — scheduler_delivery_awareness.json file size on disk (stat only; no dump; does not steal `delivery awareness path` / `last delivery` / `/schedules`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
-• `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit)\n\
+• `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / who-am-i)\n\
+• `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` for on-disk bytes)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -24264,6 +24485,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only perplexity_last.json path asks (v0.1.836) — config only; no Top/Snippet dump.
     if looks_like_perplexity_last_path_request(question) {
+        return true;
+    }
+    // Read-only user-info.json size asks (v0.1.898) — stat only; no dump/edit.
+    if looks_like_user_info_size_request(question) {
         return true;
     }
     // Read-only user-info.json path asks (v0.1.839) — config only; no dump/edit.
@@ -29508,12 +29733,51 @@ mod tests {
         assert!(!looks_like_user_info_path_request("delivery awareness path"));
         assert!(!looks_like_user_info_path_request("memory path"));
         assert!(!looks_like_user_info_path_request("config.env path"));
+        assert!(!looks_like_user_info_path_request("user info size"));
+        assert!(!looks_like_user_info_path_request("user-info.json size"));
+        assert!(!looks_like_user_info_path_request("how big is user info"));
         assert!(!looks_like_config_path_request("user info path"));
         assert!(!looks_like_config_path_request("where is user-info.json"));
         let reply = try_operator_instant_reply("where is user-info.json")
             .expect("user info path instant");
         assert!(reply.contains("User info file"));
         assert!(reply.contains("user-info") || reply.contains(".mac-stats"));
+        assert!(
+            reply.to_lowercase().contains("user info size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn user_info_size_request_detected() {
+        assert!(looks_like_user_info_size_request("user info size"));
+        assert!(looks_like_user_info_size_request("user-info.json size"));
+        assert!(looks_like_user_info_size_request("user_info.json size"));
+        assert!(looks_like_user_info_size_request("how big is user info"));
+        assert!(looks_like_user_info_size_request("how big is user-info.json"));
+        assert!(looks_like_user_info_size_request("user-info file size"));
+        assert!(looks_like_user_info_size_request("how big is the user info file"));
+        assert!(looks_like_user_info_size_request("user details size"));
+        assert!(!looks_like_user_info_size_request("user info path"));
+        assert!(!looks_like_user_info_size_request("where is user-info.json"));
+        assert!(!looks_like_user_info_size_request("who am i"));
+        assert!(!looks_like_user_info_size_request("list users"));
+        assert!(!looks_like_user_info_size_request("display name"));
+        assert!(!looks_like_user_info_size_request("user size"));
+        assert!(!looks_like_user_info_size_request("how big is user"));
+        assert!(!looks_like_user_info_size_request("discord channels size"));
+        assert!(!looks_like_user_info_size_request("delivery awareness size"));
+        assert!(!looks_like_user_info_size_request("history size"));
+        assert!(!looks_like_user_info_path_request("user info size"));
+        let reply = try_operator_instant_reply("user info size").expect("user info size instant");
+        assert!(
+            reply.contains("User info")
+                && (reply.contains("on disk")
+                    || reply.contains("no `user-info.json`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("User info file:"));
     }
 
     #[test]

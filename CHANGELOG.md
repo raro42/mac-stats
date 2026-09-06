@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.898] - 2026-09-06
+
+### Added
+
+- **Instant lane: user-info.json size** — `user info size`, `user-info.json size`, `how big is user info`, `user details size`, and close variants return on-disk size of `user-info.json` without Ollama (Discord + AI Chat; stat only — no dump/list; does not steal `user info path` / who-am-i; p50 latency).
+
 ## [0.1.897] - 2026-09-06
 
 ### Added
