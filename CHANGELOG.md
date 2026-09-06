@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.897] - 2026-09-06
+
+### Added
+
+- **Instant lane: scheduler_delivery_awareness.json size** — `delivery awareness size`, `scheduler_delivery_awareness.json size`, `how big is delivery awareness`, `awareness file size`, and close variants return on-disk size of `scheduler_delivery_awareness.json` without Ollama (Discord + AI Chat; stat only — no dump/list; does not steal `delivery awareness path` / `last delivery` / `/schedules`; p50 latency).
+
 ## [0.1.896] - 2026-09-06
 
 ### Added
