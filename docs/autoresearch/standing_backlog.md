@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.918** — Instant lane: Discord channel memory size (`discord memory size`, `memory-discord size`, `how big is discord memory`, `channel memory size`; sum `memory-discord-*.md`; stat only; no dump; does not steal path / `/knowledge discord` / `memory.md size`; p50 latency).
+
 - **v0.1.917** — Instant lane: LaunchAgent plist size (`launchagent size`, `launchagent plist size`, `how big is the launchagent`, `mac-stats.plist size`, `harness plist size`; app KeepAlive + overnight harness; stat only; no dump; does not steal `launchagent path` / load/unload; p50 latency).
 
 - **v0.1.916** — Instant lane: browser-credentials.toml size (`browser credentials size`, `browser-credentials.toml size`, `how big are browser credentials`, `browser credentials file size`; stat only; no dump; does not steal `browser credentials path` / storage state / credential accounts; p50 latency).
