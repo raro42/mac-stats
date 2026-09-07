@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.914] - 2026-09-07
+
+### Added
+
+- **History sparkline Hot attention glance** — when any history chart hits menu-bar amber (CPU ≥50%, GPU ≥15%, Freq ≥3.5 GHz, Temp ≥70°C), a **Hot · CPU · Temp** amber strip appears above the sparklines (power-strip / Details Hot parity; rings keep pulse-only under the gauges). Click or Enter opens the first hot chart and its ring; hot charts also get a soft amber wash. Design review / `feature-cpu-metrics`.
+
 ## [0.1.913] - 2026-09-07
 
 ### Added

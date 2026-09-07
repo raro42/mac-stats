@@ -3681,6 +3681,155 @@ function removeRingsFilterChips() {
   document.querySelectorAll('.rings-filter-miss').forEach((el) => el.remove());
 }
 
+/** History Hot attention labels (menu-bar amber / `/rings hot` parity). */
+const HISTORY_HOT_ORDER = ['cpu', 'gpu', 'freq', 'temp'];
+const HISTORY_HOT_LABELS = {
+  cpu: 'CPU',
+  gpu: 'GPU',
+  freq: 'Freq',
+  temp: 'Temp',
+};
+
+/**
+ * Hot attention glance above history sparklines (power-strip / Details Hot parity).
+ * Lives on the history section — not under the gauges — so rings keep the pulse-only cue.
+ */
+function ensureHistoryHotAttentionGlance() {
+  const section = getHistorySparklineSection();
+  if (!section) return null;
+  let glance = document.getElementById('history-hot-attention-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'history-hot-attention-glance';
+    glance.className = 'history-hot-attention-glance';
+    glance.hidden = true;
+    glance.innerHTML =
+      '<span id="history-hot-attention-glance-text"></span>';
+    const firstChart = section.querySelector('.history-chart-container');
+    const controls = document.getElementById('history-controls');
+    if (firstChart) {
+      firstChart.insertAdjacentElement('beforebegin', glance);
+    } else if (controls) {
+      controls.insertAdjacentElement('afterend', glance);
+    } else {
+      section.insertAdjacentElement('afterbegin', glance);
+    }
+    wireHistoryHotAttentionGlanceClick(glance);
+  } else {
+    const firstChart = section.querySelector('.history-chart-container');
+    if (firstChart && glance.nextElementSibling !== firstChart) {
+      firstChart.insertAdjacentElement('beforebegin', glance);
+    }
+  }
+  return glance;
+}
+
+function applyHistoryHotAttentionGlanceState(hotKeys) {
+  const glance = ensureHistoryHotAttentionGlance();
+  if (!glance) return;
+  const text = document.getElementById('history-hot-attention-glance-text');
+  const keys = Array.isArray(hotKeys) ? hotKeys.filter(Boolean) : [];
+  window._historyHotKeys = keys;
+  if (keys.length <= 0) {
+    glance.hidden = true;
+    glance.classList.remove('has-hot');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add('has-hot');
+  const parts = keys.map((k) => HISTORY_HOT_LABELS[k] || k);
+  const label = parts.join(' · ');
+  if (text) text.textContent = `Hot · ${label}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title =
+    'Open the first hot history chart (CPU≥50% · GPU≥15% · Freq≥3.5 GHz · Temp≥70°C)';
+  glance.setAttribute(
+    'aria-label',
+    `History hot: ${label} — click to open the first hot chart`
+  );
+}
+
+function activateHistoryHotAttentionGlance() {
+  const keys = Array.isArray(window._historyHotKeys)
+    ? window._historyHotKeys
+    : [];
+  const first = keys[0];
+  const glance = document.getElementById('history-hot-attention-glance');
+  glance?.classList.add('is-hot-attention-flash');
+  window.setTimeout(
+    () => glance?.classList.remove('is-hot-attention-flash'),
+    900
+  );
+  if (!first) {
+    glance?.focus?.();
+    return;
+  }
+  const chart = historyChartContainerForRingKey(first);
+  if (chart) {
+    if (typeof chart.scrollIntoView === 'function') {
+      chart.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    chart.classList.add('is-hot-attention-flash');
+    window.setTimeout(
+      () => chart.classList.remove('is-hot-attention-flash'),
+      900
+    );
+    refreshHistorySparklineRovingTabindex(chart);
+    if (typeof chart.focus === 'function') chart.focus();
+    activateHistorySparkline(chart);
+    return;
+  }
+  glance?.focus?.();
+}
+
+function wireHistoryHotAttentionGlanceClick(glance) {
+  if (!glance || glance.dataset.historyHotAttentionWired === '1') return;
+  glance.dataset.historyHotAttentionWired = '1';
+  const activate = () => activateHistoryHotAttentionGlance();
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    const down = e.key === 'ArrowDown' || e.key === 'j';
+    const up = e.key === 'ArrowUp' || e.key === 'k';
+    if (down) {
+      const chips = getHistorySparklineChips();
+      if (!chips.length) return;
+      e.preventDefault();
+      e.stopPropagation();
+      refreshHistorySparklineRovingTabindex(chips[0]);
+      chips[0].focus();
+      return;
+    }
+    if (up) {
+      if (tryChainSparklineToRingLastDirect()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+}
+
+/** Last ring gauge focus (skip history Hot glance). */
+function tryChainSparklineToRingLastDirect() {
+  const chips = getRingGaugeChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshRingGaugeRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
 /** Apply menu-bar amber hot washes on ring cards + matching history charts. */
 function updateRingHotStates(data) {
   removeRingsFilterChips();
@@ -3724,6 +3873,15 @@ function updateRingHotStates(data) {
       chart.hidden = false;
     }
   }
+  // GPU history may exist without a ring card entry in some themes — still mark it.
+  const gpuChart = historyChartContainerForRingKey('gpu');
+  if (gpuChart && !getRingMetricCardEntries().some((e) => e.key === 'gpu')) {
+    const hot = !!hotByKey.gpu;
+    gpuChart.classList.toggle('is-hot', hot);
+    gpuChart.dataset.ringsHot = hot ? '1' : '0';
+  }
+  const hotKeys = HISTORY_HOT_ORDER.filter((k) => hotByKey[k]);
+  applyHistoryHotAttentionGlanceState(hotKeys);
   refreshRingGaugeRovingTabindex();
   refreshHistorySparklineRovingTabindex();
 }
@@ -20110,6 +20268,11 @@ function tryChainRingGaugeToHeaderSettings() {
 }
 
 function tryChainRingGaugeToSparklineFirst() {
+  const glance = document.getElementById('history-hot-attention-glance');
+  if (glance && !glance.hidden) {
+    glance.focus();
+    return true;
+  }
   const chips = getHistorySparklineChips();
   if (!chips.length) return false;
   refreshHistorySparklineRovingTabindex(chips[0]);
