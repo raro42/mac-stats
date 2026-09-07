@@ -12037,7 +12037,7 @@ pub fn format_cleanup_quarantine_path_gateway() -> String {
 }
 
 /// True for short “how big is pinned_processes.json / pinned processes size…” asks.
-/// Stat only on `pinned_processes.json` — does not steal path / `/pinned` / pin-unpin.
+/// Stat only on `pinned_processes.json` — does not steal path / age / `/pinned` / pin-unpin.
 pub fn looks_like_pinned_processes_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
@@ -12240,12 +12240,238 @@ pub fn format_pinned_processes_size_gateway() -> String {
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Pinned processes:** empty `pinned_processes.json` · `pinned processes path` for the file.".to_string()
+            "**Pinned processes:** empty `pinned_processes.json` · `pinned processes path` for the file · `pinned processes age` for last write.".to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Pinned processes:** **{label}** on disk · Top Processes favorites · `pinned processes path` for the file · `/pinned` for the live list."
+                "**Pinned processes:** **{label}** on disk · Top Processes favorites · `pinned processes path` for the file · `pinned processes age` for last write · `/pinned` for the live list."
+            )
+        }
+        Err(e) => format!("**Pinned processes** — could not stat `pinned_processes.json`: {e}"),
+    }
+}
+
+/// True for short “how old is pinned_processes.json / pinned processes age…” asks.
+/// Mtime only — does not steal path / size / `/pinned` / pin-unpin.
+pub fn looks_like_pinned_processes_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("unpin")
+        || n.contains("pin this")
+        || n.contains("pin that")
+        || n.contains("pin the")
+        || n == "pin"
+        || (n.starts_with("pin ")
+            && !n.contains("pin file")
+            && !n.contains("pins file")
+            && !n.contains("pin age"))
+        || (n.contains(" pin ") && !n.contains("pin file") && !n.contains("pins file"))
+        || n == "/pinned"
+        || n == "pinned"
+        || n == "/processes"
+        || n == "/processes pinned"
+        || n == "processes pinned"
+        || n == "pinned processes"
+        || n == "pinned process"
+        || n == "show pinned"
+        || n == "list pinned"
+        || n == "my pinned"
+        || n == "hot"
+        || n == "/hot"
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("quarantine")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("monitor age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("schedule age")
+        || n.contains("config.json")
+        || n.contains("config age")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("perplexity")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("/disk")
+        || n == "process age"
+        || n == "how old is process"
+        || n == "how old is the process"
+        || n == "how old is pinned"
+        || n == "pinned age"
+    {
+        return false;
+    }
+    let pin_ctx = n.contains("pinned_processes")
+        || n.contains("pinned-processes")
+        || n.contains("pinned processes.json")
+        || n.contains("pinned process file")
+        || n.contains("pin file")
+        || n.contains("pins file")
+        || n.contains("favorites file")
+        || n.contains("process favorites file")
+        || n.contains("pinned favorites file")
+        || n.contains("pinned favorites")
+        || n == "pinned processes age"
+        || n == "how old is pinned processes"
+        || n == "how old is the pinned processes"
+        || n == "when was pinned processes updated"
+        || n == "when was the pinned processes updated"
+        || n == "mac-stats pinned processes age"
+        || n == "mac stats pinned processes age"
+        || n == "is pinned processes stale"
+        || n == "is the pinned processes stale"
+        || (n.contains("pinned")
+            && (n.contains("json")
+                || n.contains("file")
+                || n.contains("processes")
+                || n.contains("favorites"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("pin")
+            && n.contains("json")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !pin_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "pinned processes age"
+            | "pinned process age"
+            | "pinned_processes.json age"
+            | "pinned_processes age"
+            | "pinned_processes file age"
+            | "pinned-processes age"
+            | "pinned-processes.json age"
+            | "pinned processes file age"
+            | "pinned processes json age"
+            | "pin file age"
+            | "pins file age"
+            | "pinned favorites age"
+            | "pinned favorites file age"
+            | "process favorites age"
+            | "process favorites file age"
+            | "mac-stats pinned processes age"
+            | "mac stats pinned processes age"
+            | "how old is pinned processes"
+            | "how old is the pinned processes"
+            | "how old is pinned_processes.json"
+            | "how old is the pinned_processes.json"
+            | "how old is the pinned processes file"
+            | "how old is pin file"
+            | "how old is the pin file"
+            | "how old is pinned favorites"
+            | "when was pinned processes updated"
+            | "when was the pinned processes updated"
+            | "when was pinned_processes.json updated"
+            | "when was the pinned_processes.json updated"
+            | "pinned processes last modified"
+            | "pinned_processes.json last modified"
+            | "pin file last modified"
+            | "is pinned processes stale"
+            | "is the pinned processes stale"
+            | "is pinned_processes.json stale"
+            | "is the pinned_processes.json stale"
+    ) || (pin_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM pinned_processes.json age from file mtime (stat only; no list/pin/unpin).
+pub fn format_pinned_processes_age_gateway() -> String {
+    let path = crate::config::Config::pinned_processes_file_path();
+    if !path.exists() {
+        return "**Pinned processes:** no `pinned_processes.json` yet · app writes it after you pin a process · `pinned processes path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Pinned processes:** last write **{age}** ago · Top Processes favorites · `pinned processes path` for the file · `pinned processes size` for on-disk bytes · `/pinned` for the live list."
             )
         }
         Err(e) => format!("**Pinned processes** — could not stat `pinned_processes.json`: {e}"),
@@ -12255,6 +12481,7 @@ pub fn format_pinned_processes_size_gateway() -> String {
 /// True for short “where is pinned_processes.json / pinned favorites path…” asks.
 /// Config path only — does not list, pin, unpin, or run `/pinned` / `/processes`.
 /// Size asks use the pinned_processes.json size lane (v0.1.894).
+/// Age asks use the pinned_processes.json age lane (v0.1.929).
 pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -12308,6 +12535,13 @@ pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the pinned_processes.json age lane (v0.1.929) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("unpin")
         || n.contains("pin this")
         || n.contains("pin that")
@@ -12413,7 +12647,7 @@ pub fn format_pinned_processes_path_gateway() -> String {
     let path = crate::config::Config::pinned_processes_file_path();
     let display = path.display().to_string();
     format!(
-        "**Pinned processes file:** `{display}` · Top Processes favorites · `pinned processes size` for on-disk bytes · `/pinned` for the live list · does not pin or unpin."
+        "**Pinned processes file:** `{display}` · Top Processes favorites · `pinned processes size` / `pinned processes age` for bytes / mtime · `/pinned` for the live list · does not pin or unpin."
     )
 }
 
@@ -29182,9 +29416,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_cleanup_quarantine_path_request(content) {
         return Some(format_cleanup_quarantine_path_gateway());
     }
-    // pinned_processes.json size before path (stat only; no dump).
+    // pinned_processes.json size before age/path (stat only; no dump).
     if looks_like_pinned_processes_size_request(content) {
         return Some(format_pinned_processes_size_gateway());
+    }
+    // pinned_processes.json age before path (mtime only; no dump).
+    if looks_like_pinned_processes_age_request(content) {
+        return Some(format_pinned_processes_age_gateway());
     }
     if looks_like_pinned_processes_path_request(content) {
         return Some(format_pinned_processes_path_gateway());
@@ -29495,8 +29733,9 @@ pub fn format_ops_help_gateway() -> String {
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
-• `pinned processes size` · `pinned_processes.json size` · `how big is pinned processes` — pinned_processes.json file size on disk (stat only; no dump; does not steal `pinned processes path` / `/pinned`)\n\
-• `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; `pinned processes size` for on-disk bytes; does not steal `/pinned`)\n\
+• `pinned processes size` · `pinned_processes.json size` · `how big is pinned processes` — pinned_processes.json file size on disk (stat only; no dump; does not steal `pinned processes path` / `pinned processes age` / `/pinned`)\n\
+• `pinned processes age` · `pinned_processes.json age` · `how old is pinned processes` · `when was pinned processes updated` — pinned_processes.json last write age (mtime; no dump; does not steal `pinned processes path` / `pinned processes size` / `/pinned`)\n\
+• `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; `pinned processes size` / `pinned processes age` for bytes / mtime; does not steal `/pinned`)\n\
 • `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `schedules age` / `/schedules`)\n\
 • `schedules age` · `schedules.json age` · `how old is schedules` · `when was schedules updated` — schedules.json last write age (mtime; no dump; does not steal `schedules path` / `schedules size` / `/schedules`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` / `schedules age` for bytes / mtime; does not steal `/schedules`)\n\
@@ -31284,6 +31523,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only pinned_processes.json size asks (v0.1.894) — stat only; no dump/list/pin.
     if looks_like_pinned_processes_size_request(question) {
+        return true;
+    }
+    // Read-only pinned_processes.json age asks (v0.1.929) — mtime only; no dump/list/pin.
+    if looks_like_pinned_processes_age_request(question) {
         return true;
     }
     // Read-only pinned_processes.json path asks (v0.1.831) — config only; no list/pin/unpin.
@@ -37373,6 +37616,13 @@ mod tests {
         assert!(!looks_like_pinned_processes_path_request(
             "how big is pinned processes"
         ));
+        assert!(!looks_like_pinned_processes_path_request("pinned processes age"));
+        assert!(!looks_like_pinned_processes_path_request(
+            "pinned_processes.json age"
+        ));
+        assert!(!looks_like_pinned_processes_path_request(
+            "how old is pinned processes"
+        ));
         assert!(!looks_like_processes_request("pinned processes path"));
         assert!(looks_like_processes_request("/pinned"));
         assert!(looks_like_processes_request("pinned processes"));
@@ -37382,6 +37632,97 @@ mod tests {
         assert!(reply.contains("pinned_processes") || reply.contains(".mac-stats"));
         assert!(
             reply.to_lowercase().contains("pinned processes size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn pinned_processes_age_request_detected() {
+        assert!(looks_like_pinned_processes_age_request("pinned processes age"));
+        assert!(looks_like_pinned_processes_age_request(
+            "pinned_processes.json age"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "pinned_processes age"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "pinned processes file age"
+        ));
+        assert!(looks_like_pinned_processes_age_request("pin file age"));
+        assert!(looks_like_pinned_processes_age_request(
+            "pinned favorites age"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "how old is pinned processes"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "how old is pinned_processes.json"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "when was pinned processes updated"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "when was pinned_processes.json updated"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "pinned_processes.json last modified"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "is pinned processes stale"
+        ));
+        assert!(looks_like_pinned_processes_age_request(
+            "mac-stats pinned processes age"
+        ));
+        assert!(!looks_like_pinned_processes_age_request(
+            "pinned processes path"
+        ));
+        assert!(!looks_like_pinned_processes_age_request(
+            "where is pinned_processes.json"
+        ));
+        assert!(!looks_like_pinned_processes_age_request(
+            "pinned processes size"
+        ));
+        assert!(!looks_like_pinned_processes_age_request(
+            "how big is pinned processes"
+        ));
+        assert!(!looks_like_pinned_processes_age_request(
+            "pinned_processes.json"
+        ));
+        assert!(!looks_like_pinned_processes_age_request("/pinned"));
+        assert!(!looks_like_pinned_processes_age_request("pinned"));
+        assert!(!looks_like_pinned_processes_age_request("pinned processes"));
+        assert!(!looks_like_pinned_processes_age_request("list pinned"));
+        assert!(!looks_like_pinned_processes_age_request("how old is pinned"));
+        assert!(!looks_like_pinned_processes_age_request("pinned age"));
+        assert!(!looks_like_pinned_processes_age_request("history age"));
+        assert!(!looks_like_pinned_processes_age_request(
+            "disk cleanup age"
+        ));
+        assert!(!looks_like_pinned_processes_path_request(
+            "pinned processes age"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "pinned processes age"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "how old is pinned processes"
+        ));
+        assert!(!looks_like_history_age_request("pinned processes age"));
+        assert!(!looks_like_history_age_request(
+            "how old is pinned processes"
+        ));
+        assert!(!looks_like_disk_cleanup_age_request(
+            "pinned processes age"
+        ));
+        assert!(!looks_like_monitors_age_request("pinned processes age"));
+        assert!(!looks_like_schedules_age_request("pinned processes age"));
+        assert!(!looks_like_processes_request("pinned processes age"));
+        assert!(!looks_like_processes_request("how old is pinned processes"));
+        let reply = try_operator_instant_reply("how old is pinned processes")
+            .expect("pinned processes age instant");
+        assert!(reply.contains("Pinned processes"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `pinned_processes.json`"),
             "{reply}"
         );
     }
@@ -37431,6 +37772,12 @@ mod tests {
         assert!(!looks_like_pinned_processes_size_request("history size"));
         assert!(!looks_like_pinned_processes_size_request(
             "disk cleanup size"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "pinned processes age"
+        ));
+        assert!(!looks_like_pinned_processes_size_request(
+            "how old is pinned processes"
         ));
         assert!(!looks_like_pinned_processes_path_request(
             "pinned processes size"

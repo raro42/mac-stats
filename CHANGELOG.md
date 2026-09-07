@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.929] - 2026-09-07
+
+### Added
+
+- **Instant lane: pinned_processes.json age** — `pinned processes age`, `pinned_processes.json age`, `how old is pinned processes`, `when was pinned processes updated`, and close variants return the last-write age of `pinned_processes.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `pinned processes path` / `pinned processes size` / `/pinned`; p50 latency).
+
 ## [0.1.928] - 2026-09-07
 
 ### Added
