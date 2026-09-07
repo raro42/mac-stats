@@ -2323,8 +2323,11 @@ pub fn looks_like_monitors_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
-    // Size/path-only asks go to monitors.json instant (does not steal `/monitors` list).
-    if looks_like_monitors_size_request(content) || looks_like_monitors_path_request(content) {
+    // Size/age/path-only asks go to monitors.json instant (does not steal `/monitors` list).
+    if looks_like_monitors_size_request(content)
+        || looks_like_monitors_age_request(content)
+        || looks_like_monitors_path_request(content)
+    {
         return false;
     }
     if n.contains("create")
@@ -12964,6 +12967,195 @@ pub fn format_schedules_age_gateway() -> String {
     }
 }
 
+/// True for short “how old is monitors.json / monitors age…” asks.
+/// Mtime only on `monitors.json` — does not steal path / size / `/monitors` / add/check.
+pub fn looks_like_monitors_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("check ")
+        || n.contains("check now")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedules.json")
+        || n.contains("history.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("config age")
+        || n.contains("schedules age")
+        || n.contains("schedule age")
+        || n == "/monitors"
+        || n == "monitors"
+        || n == "/monitors up"
+        || n == "monitors up"
+        || n == "/monitors down"
+        || n == "monitors down"
+        || n == "/monitors slow"
+        || n == "monitors slow"
+        || n == "up monitors"
+        || n == "down monitors"
+        || n == "slow monitors"
+        || n == "list monitors"
+        || n == "show monitors"
+        || n == "my monitors"
+        || n == "website monitors"
+        || n == "site monitors"
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let mon_ctx = n.contains("monitors.json")
+        || n.contains("monitors json")
+        || n.contains("monitor file")
+        || n.contains("monitors file")
+        || n.contains("sites file")
+        || n == "monitors age"
+        || n == "monitor age"
+        || n == "how old is monitors"
+        || n == "how old is the monitors"
+        || n == "when was monitors updated"
+        || n == "when was the monitors updated"
+        || n == "mac-stats monitors age"
+        || n == "mac stats monitors age"
+        || n == "is monitors stale"
+        || n == "is the monitors stale"
+        || (n.contains("monitors")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("monitor")
+            && n.contains("json")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !mon_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "monitors age"
+            | "monitor age"
+            | "monitors file age"
+            | "monitor file age"
+            | "monitors.json age"
+            | "monitors json age"
+            | "sites file age"
+            | "mac-stats monitors age"
+            | "mac stats monitors age"
+            | "how old is monitors"
+            | "how old is the monitors"
+            | "how old is monitors.json"
+            | "how old is the monitors.json"
+            | "how old is the monitors file"
+            | "how old is the monitor file"
+            | "when was monitors updated"
+            | "when was the monitors updated"
+            | "when was monitors.json updated"
+            | "when was the monitors.json updated"
+            | "monitors last modified"
+            | "monitors.json last modified"
+            | "monitors file last modified"
+            | "is monitors stale"
+            | "is the monitors stale"
+            | "is monitors.json stale"
+            | "is the monitors.json stale"
+    ) || (mon_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM monitors.json age from file mtime (stat only; no dump/list/add/check).
+pub fn format_monitors_age_gateway() -> String {
+    let path = crate::config::Config::monitors_file_path();
+    if !path.exists() {
+        return "**Monitors:** no `monitors.json` yet · app will create it when you add a site · `monitors path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Monitors:** last write **{age}** ago · External / website monitors JSON · `monitors path` for the file · `monitors size` for on-disk bytes · `/monitors` for the live list."
+            )
+        }
+        Err(e) => format!("**Monitors** — could not stat `monitors.json`: {e}"),
+    }
+}
+
 /// True for short “how big is monitors.json / monitors size…” asks.
 /// Stat only on `monitors.json` — does not steal path / `/monitors` / add/check.
 pub fn looks_like_monitors_size_request(content: &str) -> bool {
@@ -13131,16 +13323,16 @@ pub fn looks_like_monitors_size_request(content: &str) -> bool {
 pub fn format_monitors_size_gateway() -> String {
     let path = crate::config::Config::monitors_file_path();
     if !path.exists() {
-        return "**Monitors:** no `monitors.json` yet · app will create it when you add a site · `monitors path` for the file.".to_string();
+        return "**Monitors:** no `monitors.json` yet · app will create it when you add a site · `monitors path` for the file · `monitors age` after first save.".to_string();
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Monitors:** empty `monitors.json` · `monitors path` for the file.".to_string()
+            "**Monitors:** empty `monitors.json` · `monitors path` for the file · `monitors age` for last write.".to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Monitors:** **{label}** on disk · website monitors JSON · `monitors path` for the file · `/monitors` for the live list."
+                "**Monitors:** **{label}** on disk · website monitors JSON · `monitors path` for the file · `monitors age` for last write · `/monitors` for the live list."
             )
         }
         Err(e) => format!("**Monitors** — could not stat `monitors.json`: {e}"),
@@ -13150,6 +13342,7 @@ pub fn format_monitors_size_gateway() -> String {
 /// True for short “where is monitors.json / monitors path…” asks.
 /// Config path only — does not list sites or run `/monitors` / add/check.
 /// Size asks use the monitors.json size lane (v0.1.891).
+/// Age asks use the monitors.json age lane (v0.1.926) — keyword-only (no nest).
 pub fn looks_like_monitors_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -13205,6 +13398,12 @@ pub fn looks_like_monitors_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("check ")
         || n.contains("check now")
         || n.contains(" for ")
@@ -13299,7 +13498,7 @@ pub fn format_monitors_path_gateway() -> String {
     let path = crate::config::Config::monitors_file_path();
     let display = path.display().to_string();
     format!(
-        "**Monitors file:** `{display}` · External / website monitors config · `monitors size` for on-disk bytes · `/monitors` for the live list · does not add or check sites."
+        "**Monitors file:** `{display}` · External / website monitors config · `monitors size` / `monitors age` for bytes / mtime · `/monitors` for the live list · does not add or check sites."
     )
 }
 
@@ -28589,9 +28788,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_schedules_path_request(content) {
         return Some(format_schedules_path_gateway());
     }
-    // monitors.json size before path (stat only; no dump).
+    // monitors.json size before age/path (stat only; no dump).
     if looks_like_monitors_size_request(content) {
         return Some(format_monitors_size_gateway());
+    }
+    // monitors.json age before path (mtime only; no dump).
+    if looks_like_monitors_age_request(content) {
+        return Some(format_monitors_age_gateway());
     }
     if looks_like_monitors_path_request(content) {
         return Some(format_monitors_path_gateway());
@@ -28877,8 +29080,9 @@ pub fn format_ops_help_gateway() -> String {
 • `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `schedules age` / `/schedules`)\n\
 • `schedules age` · `schedules.json age` · `how old is schedules` · `when was schedules updated` — schedules.json last write age (mtime; no dump; does not steal `schedules path` / `schedules size` / `/schedules`)\n\
 • `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` / `schedules age` for bytes / mtime; does not steal `/schedules`)\n\
-• `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `/monitors`)\n\
-• `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` for on-disk bytes; does not steal `/monitors`)\n\
+• `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `monitors age` / `/monitors`)\n\
+• `monitors age` · `monitors.json age` · `how old is monitors` · `when was monitors updated` — monitors.json last write age (mtime; no dump; does not steal `monitors path` / `monitors size` / `/monitors`)\n\
+• `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` / `monitors age` for bytes / mtime; does not steal `/monitors`)\n\
 • `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / chat history)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` for on-disk bytes; does not steal chat history)\n\
 • `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
@@ -30678,6 +30882,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only monitors.json size asks (v0.1.891) — stat only; no dump/list/add/check.
     if looks_like_monitors_size_request(question) {
+        return true;
+    }
+    // Read-only monitors.json age asks (v0.1.926) — mtime only; no dump/list/add/check.
+    if looks_like_monitors_age_request(question) {
         return true;
     }
     // Read-only monitors.json path asks (v0.1.833) — config only; no list/add/check.
@@ -33006,6 +33214,8 @@ mod tests {
         assert!(!looks_like_config_age_request("runs age"));
         assert!(!looks_like_config_age_request("schedules age"));
         assert!(!looks_like_config_age_request("how old is schedules"));
+        assert!(!looks_like_config_age_request("monitors age"));
+        assert!(!looks_like_config_age_request("how old is monitors"));
         assert!(!looks_like_config_path_request("config age"));
         assert!(!looks_like_config_path_request("how old is config"));
         assert!(!looks_like_config_size_request("config age"));
@@ -36918,11 +37128,58 @@ mod tests {
         assert!(!looks_like_schedules_size_request("how old is schedules"));
         assert!(!looks_like_config_age_request("schedules age"));
         assert!(!looks_like_config_age_request("how old is schedules"));
+        assert!(!looks_like_config_age_request("monitors age"));
+        assert!(!looks_like_config_age_request("how old is monitors"));
         let reply =
             try_operator_instant_reply("how old is schedules").expect("schedules age instant");
         assert!(reply.contains("Schedules"));
         assert!(
             reply.contains("ago") || reply.contains("no `schedules.json`"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn monitors_age_request_detected() {
+        assert!(looks_like_monitors_age_request("monitors age"));
+        assert!(looks_like_monitors_age_request("monitors.json age"));
+        assert!(looks_like_monitors_age_request("monitors file age"));
+        assert!(looks_like_monitors_age_request("how old is monitors"));
+        assert!(looks_like_monitors_age_request("how old is monitors.json"));
+        assert!(looks_like_monitors_age_request("when was monitors updated"));
+        assert!(looks_like_monitors_age_request(
+            "when was monitors.json updated"
+        ));
+        assert!(looks_like_monitors_age_request(
+            "monitors.json last modified"
+        ));
+        assert!(looks_like_monitors_age_request("is monitors stale"));
+        assert!(looks_like_monitors_age_request("mac-stats monitors age"));
+        assert!(!looks_like_monitors_age_request("monitors path"));
+        assert!(!looks_like_monitors_age_request("where is monitors.json"));
+        assert!(!looks_like_monitors_age_request("monitors size"));
+        assert!(!looks_like_monitors_age_request("how big is monitors"));
+        assert!(!looks_like_monitors_age_request("monitors.json"));
+        assert!(!looks_like_monitors_age_request("/monitors"));
+        assert!(!looks_like_monitors_age_request("list monitors"));
+        assert!(!looks_like_monitors_age_request("monitors down"));
+        assert!(!looks_like_monitors_age_request("schedules age"));
+        assert!(!looks_like_monitors_age_request("how old is schedules"));
+        assert!(!looks_like_monitors_age_request("config age"));
+        assert!(!looks_like_monitors_age_request("history.json age"));
+        assert!(!looks_like_monitors_path_request("monitors age"));
+        assert!(!looks_like_monitors_path_request("how old is monitors"));
+        assert!(!looks_like_monitors_size_request("monitors age"));
+        assert!(!looks_like_monitors_size_request("how old is monitors"));
+        assert!(!looks_like_schedules_age_request("monitors age"));
+        assert!(!looks_like_schedules_age_request("how old is monitors"));
+        assert!(!looks_like_monitors_request("monitors age"));
+        assert!(!looks_like_monitors_request("how old is monitors"));
+        let reply =
+            try_operator_instant_reply("how old is monitors").expect("monitors age instant");
+        assert!(reply.contains("Monitors"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `monitors.json`"),
             "{reply}"
         );
     }
@@ -36951,6 +37208,8 @@ mod tests {
         assert!(!looks_like_monitors_path_request("monitors size"));
         assert!(!looks_like_monitors_path_request("monitors.json size"));
         assert!(!looks_like_monitors_path_request("how big is monitors"));
+        assert!(!looks_like_monitors_path_request("monitors age"));
+        assert!(!looks_like_monitors_path_request("how old is monitors"));
         assert!(!looks_like_monitors_request("monitors path"));
         assert!(!looks_like_monitors_request("where is monitors.json"));
         assert!(looks_like_monitors_request("/monitors"));

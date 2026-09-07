@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.926] - 2026-09-07
+
+### Added
+
+- **Instant lane: monitors.json age** — `monitors age`, `monitors.json age`, `how old is monitors`, `when was monitors updated`, and close variants return the last-write age of `monitors.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `monitors path` / `monitors size` / `/monitors`; p50 latency).
+
 ## [0.1.925] - 2026-09-07
 
 ### Added
