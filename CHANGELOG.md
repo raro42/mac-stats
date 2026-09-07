@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.922] - 2026-09-07
+
+### Added
+
+- **Instant lane: before-compaction transcript size** — `before compaction transcript size`, `before-compaction transcript size`, `how big is before compaction transcript`, `last_session_before_compaction.jsonl size`, and close variants return on-disk bytes of the before-compaction JSONL without Ollama (Discord + AI Chat; stat only — no dump; does not steal `before compaction transcript path` / before-reset / session reset phrases; p50 latency).
+
 ## [0.1.921] - 2026-09-07
 
 ### Added
