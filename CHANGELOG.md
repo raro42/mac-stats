@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.925] - 2026-09-07
+
+### Added
+
+- **Instant lane: schedules.json age** — `schedules age`, `schedules.json age`, `how old is schedules`, `when was schedules updated`, and close variants return the last-write age of `schedules.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `schedules path` / `schedules size` / `/schedules`; p50 latency).
+
 ## [0.1.924] - 2026-09-07
 
 ### Added

@@ -12416,7 +12416,7 @@ pub fn format_pinned_processes_path_gateway() -> String {
 
 /// True for short “where is schedules.json / schedules path…” asks.
 /// Config path only — does not list jobs/deliveries or run `/schedules` / schedule count.
-/// Size asks use the schedules.json size lane (v0.1.890).
+/// Size asks use the schedules.json size lane (v0.1.890); age uses the age lane (v0.1.925).
 pub fn looks_like_schedules_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -12474,6 +12474,12 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("schedule a")
         || n.contains("schedule me")
         || n.contains(" for tomorrow")
@@ -12572,7 +12578,7 @@ pub fn format_schedules_path_gateway() -> String {
     let path = crate::config::Config::schedules_file_path();
     let display = path.display().to_string();
     format!(
-        "**Schedules file:** `{display}` · Jobs + deliveries config · `schedules size` for on-disk bytes · `/schedules` for the live list · does not create or remove jobs."
+        "**Schedules file:** `{display}` · Jobs + deliveries config · `schedules size` for on-disk bytes · `schedules age` for last write · `/schedules` for the live list · does not create or remove jobs."
     )
 }
 
@@ -12748,16 +12754,210 @@ pub fn looks_like_schedules_size_request(content: &str) -> bool {
 pub fn format_schedules_size_gateway() -> String {
     let path = crate::config::Config::schedules_file_path();
     if !path.exists() {
-        return "**Schedules:** no `schedules.json` yet · app will create it when you add a job · `schedules path` for the file.".to_string();
+        return "**Schedules:** no `schedules.json` yet · app will create it when you add a job · `schedules path` for the file · `schedules age` after first save.".to_string();
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Schedules:** empty `schedules.json` · `schedules path` for the file.".to_string()
+            "**Schedules:** empty `schedules.json` · `schedules path` for the file · `schedules age` for last write.".to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Schedules:** **{label}** on disk · jobs + deliveries JSON · `schedules path` for the file · `/schedules` for the live list."
+                "**Schedules:** **{label}** on disk · jobs + deliveries JSON · `schedules path` for the file · `schedules age` for last write · `/schedules` for the live list."
+            )
+        }
+        Err(e) => format!("**Schedules** — could not stat `schedules.json`: {e}"),
+    }
+}
+
+/// True for short “schedules age / how old is schedules.json…” asks.
+/// Mtime only on `schedules.json` — does not steal path / size / `/schedules` / count / create.
+pub fn looks_like_schedules_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("schedule a")
+        || n.contains("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("next")
+        || n.contains("upcoming")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("awareness.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("config age")
+        || n == "/schedules"
+        || n == "schedules"
+        || n == "/schedules jobs"
+        || n == "schedules jobs"
+        || n == "/schedules deliveries"
+        || n == "schedules deliveries"
+        || n == "/cron"
+        || n == "cron"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "my schedules"
+        || n == "my jobs"
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "recent deliveries"
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let sched_ctx = n.contains("schedules.json")
+        || n.contains("schedules json")
+        || n.contains("schedule file")
+        || n.contains("schedules file")
+        || n.contains("cron file")
+        || n.contains("cron.json")
+        || n == "schedules age"
+        || n == "schedule age"
+        || n == "how old is schedules"
+        || n == "how old is the schedules"
+        || n == "when was schedules updated"
+        || n == "when was the schedules updated"
+        || n == "mac-stats schedules age"
+        || n == "mac stats schedules age"
+        || n == "is schedules stale"
+        || n == "is the schedules stale"
+        || (n.contains("schedules")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("schedule")
+            && n.contains("json")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !sched_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "schedules age"
+            | "schedule age"
+            | "schedules file age"
+            | "schedule file age"
+            | "schedules.json age"
+            | "schedules json age"
+            | "cron file age"
+            | "cron.json age"
+            | "mac-stats schedules age"
+            | "mac stats schedules age"
+            | "how old is schedules"
+            | "how old is the schedules"
+            | "how old is schedules.json"
+            | "how old is the schedules.json"
+            | "how old is the schedules file"
+            | "how old is the schedule file"
+            | "when was schedules updated"
+            | "when was the schedules updated"
+            | "when was schedules.json updated"
+            | "when was the schedules.json updated"
+            | "schedules last modified"
+            | "schedules.json last modified"
+            | "schedules file last modified"
+            | "is schedules stale"
+            | "is the schedules stale"
+            | "is schedules.json stale"
+            | "is the schedules.json stale"
+    ) || (sched_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM schedules.json age from file mtime (stat only; no dump/list/create).
+pub fn format_schedules_age_gateway() -> String {
+    let path = crate::config::Config::schedules_file_path();
+    if !path.exists() {
+        return "**Schedules:** no `schedules.json` yet · app will create it when you add a job · `schedules path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Schedules:** last write **{age}** ago · jobs + deliveries JSON · `schedules path` for the file · `schedules size` for on-disk bytes · `/schedules` for the live list."
             )
         }
         Err(e) => format!("**Schedules** — could not stat `schedules.json`: {e}"),
@@ -28378,9 +28578,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pinned_processes_path_request(content) {
         return Some(format_pinned_processes_path_gateway());
     }
-    // schedules.json size before path (stat only; no dump).
+    // schedules.json size before age/path (stat only; no dump).
     if looks_like_schedules_size_request(content) {
         return Some(format_schedules_size_gateway());
+    }
+    // schedules.json age before path (mtime only; no dump).
+    if looks_like_schedules_age_request(content) {
+        return Some(format_schedules_age_gateway());
     }
     if looks_like_schedules_path_request(content) {
         return Some(format_schedules_path_gateway());
@@ -28670,8 +28874,9 @@ pub fn format_ops_help_gateway() -> String {
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
 • `pinned processes size` · `pinned_processes.json size` · `how big is pinned processes` — pinned_processes.json file size on disk (stat only; no dump; does not steal `pinned processes path` / `/pinned`)\n\
 • `pinned processes path` · `where is pinned_processes.json` · `pin file path` — Top Processes favorites file (config only; no list/pin; `pinned processes size` for on-disk bytes; does not steal `/pinned`)\n\
-• `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `/schedules`)\n\
-• `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` for on-disk bytes; does not steal `/schedules`)\n\
+• `schedules size` · `schedules.json size` · `how big is schedules` — schedules.json file size on disk (stat only; no dump; does not steal `schedules path` / `schedules age` / `/schedules`)\n\
+• `schedules age` · `schedules.json age` · `how old is schedules` · `when was schedules updated` — schedules.json last write age (mtime; no dump; does not steal `schedules path` / `schedules size` / `/schedules`)\n\
+• `schedules path` · `where is schedules.json` · `schedule file path` — Jobs/deliveries config file (config only; no list/create; `schedules size` / `schedules age` for bytes / mtime; does not steal `/schedules`)\n\
 • `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `/monitors`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` for on-disk bytes; does not steal `/monitors`)\n\
 • `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / chat history)\n\
@@ -30461,6 +30666,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only schedules.json size asks (v0.1.890) — stat only; no dump/list/create.
     if looks_like_schedules_size_request(question) {
+        return true;
+    }
+    // Read-only schedules.json age asks (v0.1.925) — mtime only; no dump/list/create.
+    if looks_like_schedules_age_request(question) {
         return true;
     }
     // Read-only schedules.json path asks (v0.1.832) — config only; no list/count/create.
@@ -32795,6 +33004,8 @@ mod tests {
         assert!(!looks_like_config_age_request("digest age"));
         assert!(!looks_like_config_age_request("log age"));
         assert!(!looks_like_config_age_request("runs age"));
+        assert!(!looks_like_config_age_request("schedules age"));
+        assert!(!looks_like_config_age_request("how old is schedules"));
         assert!(!looks_like_config_path_request("config age"));
         assert!(!looks_like_config_path_request("how old is config"));
         assert!(!looks_like_config_size_request("config age"));
@@ -36630,7 +36841,9 @@ mod tests {
         assert!(reply.contains("Schedules file"));
         assert!(reply.contains("schedules") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("schedules size") || reply.contains("on-disk"),
+            reply.to_lowercase().contains("schedules size")
+                || reply.to_lowercase().contains("schedules age")
+                || reply.contains("on-disk"),
             "{reply}"
         );
     }
@@ -36652,6 +36865,8 @@ mod tests {
         assert!(!looks_like_schedules_size_request("list schedules"));
         assert!(!looks_like_schedules_size_request("config size"));
         assert!(!looks_like_schedules_size_request("monitors.json size"));
+        assert!(!looks_like_schedules_size_request("schedules age"));
+        assert!(!looks_like_schedules_size_request("how old is schedules"));
         assert!(!looks_like_schedules_path_request("schedules size"));
         assert!(!looks_like_config_size_request("schedules size"));
         let reply =
@@ -36661,6 +36876,53 @@ mod tests {
                 && (reply.contains("on disk")
                     || reply.contains("empty")
                     || reply.contains("no `schedules.json`")),
+            "{reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("schedules age") || reply.contains("last write"),
+            "size reply should mention age lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn schedules_age_request_detected() {
+        assert!(looks_like_schedules_age_request("schedules age"));
+        assert!(looks_like_schedules_age_request("schedules.json age"));
+        assert!(looks_like_schedules_age_request("schedules file age"));
+        assert!(looks_like_schedules_age_request("how old is schedules"));
+        assert!(looks_like_schedules_age_request("how old is schedules.json"));
+        assert!(looks_like_schedules_age_request("when was schedules updated"));
+        assert!(looks_like_schedules_age_request(
+            "when was schedules.json updated"
+        ));
+        assert!(looks_like_schedules_age_request(
+            "schedules.json last modified"
+        ));
+        assert!(looks_like_schedules_age_request("is schedules stale"));
+        assert!(looks_like_schedules_age_request("mac-stats schedules age"));
+        assert!(!looks_like_schedules_age_request("schedules path"));
+        assert!(!looks_like_schedules_age_request("where is schedules.json"));
+        assert!(!looks_like_schedules_age_request("schedules size"));
+        assert!(!looks_like_schedules_age_request("how big is schedules"));
+        assert!(!looks_like_schedules_age_request("schedules.json"));
+        assert!(!looks_like_schedules_age_request("/schedules"));
+        assert!(!looks_like_schedules_age_request("schedule count"));
+        assert!(!looks_like_schedules_age_request("list schedules"));
+        assert!(!looks_like_schedules_age_request("config age"));
+        assert!(!looks_like_schedules_age_request("how old is config"));
+        assert!(!looks_like_schedules_age_request("monitors.json age"));
+        assert!(!looks_like_schedules_age_request("next schedule"));
+        assert!(!looks_like_schedules_path_request("schedules age"));
+        assert!(!looks_like_schedules_path_request("how old is schedules"));
+        assert!(!looks_like_schedules_size_request("schedules age"));
+        assert!(!looks_like_schedules_size_request("how old is schedules"));
+        assert!(!looks_like_config_age_request("schedules age"));
+        assert!(!looks_like_config_age_request("how old is schedules"));
+        let reply =
+            try_operator_instant_reply("how old is schedules").expect("schedules age instant");
+        assert!(reply.contains("Schedules"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `schedules.json`"),
             "{reply}"
         );
     }
