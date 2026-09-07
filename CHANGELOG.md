@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.917] - 2026-09-07
+
+### Added
+
+- **Instant lane: LaunchAgent plist size** — `launchagent size`, `launchagent plist size`, `how big is the launchagent`, `mac-stats.plist size`, `harness plist size`, and close variants return on-disk sizes of the app KeepAlive and overnight-harness plists without Ollama (Discord + AI Chat; stat only — no dump; does not steal `launchagent path` / load/unload; p50 latency).
+
 ## [0.1.916] - 2026-09-07
 
 ### Added
