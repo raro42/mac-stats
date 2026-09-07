@@ -16870,8 +16870,250 @@ pub fn format_cookie_reject_patterns_path_gateway() -> String {
     )
 }
 
+/// True for short “downloads-organizer-rules.md size / how big is organizer rules…” asks.
+/// Stat only — does not list rules, run organize-now, or steal the path lane.
+pub fn looks_like_downloads_organizer_rules_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run organizer")
+        || n.contains("run downloads")
+        || n.contains("organize now")
+        || n.contains("organize my")
+        || n.contains("clean now")
+        || n.contains("/disk")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer-state")
+        || n.contains("downloads organizer state")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("state.json")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/downloads"
+        || n == "/organizer"
+        || n == "downloads"
+        || n == "organizer"
+        || n == "downloads status"
+        || n == "organizer status"
+        || n == "downloads ready"
+        || n == "organizer ready"
+        || n == "downloads organizer"
+        || n == "downloads organizer status"
+        || n == "downloads organizer ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let rules_ctx = n.contains("downloads-organizer-rules.md")
+        || n.contains("downloads-organizer-rules")
+        || n.contains("downloads_organizer_rules")
+        || n.contains("downloads organizer rules")
+        || n.contains("downloads organizer rule")
+        || n.contains("organizer-rules.md")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer rule")
+        || n.contains("organizer rules size")
+        || n == "how big is organizer rules"
+        || n == "how big is the organizer rules"
+        || n == "how large is organizer rules"
+        || n == "how large is the organizer rules"
+        || (n.contains("rules")
+            && (n.contains("downloads-organizer")
+                || n.contains("downloads organizer")
+                || n.contains("organizer"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("md")));
+    if !rules_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "organizer rules size"
+            | "organizer rule size"
+            | "downloads organizer rules size"
+            | "downloads organizer rule size"
+            | "downloads-organizer-rules size"
+            | "downloads-organizer-rules.md size"
+            | "downloads-organizer-rules file size"
+            | "downloads_organizer_rules size"
+            | "downloads_organizer_rules.md size"
+            | "organizer-rules size"
+            | "organizer-rules.md size"
+            | "organizer rules file size"
+            | "organizer rules bytes"
+            | "downloads-organizer-rules.md bytes"
+            | "how big is organizer rules"
+            | "how big is the organizer rules"
+            | "how big is downloads-organizer-rules.md"
+            | "how big is the downloads-organizer-rules.md"
+            | "how big is downloads organizer rules"
+            | "how big is the downloads organizer rules"
+            | "how big is downloads organizer rules file"
+            | "how big is the downloads organizer rules file"
+            | "how big is the organizer rules file"
+            | "how large is organizer rules"
+            | "how large is the organizer rules"
+            | "how large is downloads-organizer-rules.md"
+            | "how large is downloads organizer rules"
+            | "mac-stats organizer rules size"
+            | "mac stats organizer rules size"
+            | "mac-stats downloads-organizer-rules.md size"
+            | "mac stats downloads-organizer-rules.md size"
+    ) || (rules_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM downloads-organizer-rules.md file size (stat only; no dump/list rules).
+pub fn format_downloads_organizer_rules_size_gateway() -> String {
+    let path = crate::config::Config::downloads_organizer_rules_path();
+    if !path.exists() {
+        return "**Downloads organizer rules:** no `downloads-organizer-rules.md` yet · `downloads organizer rules path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Downloads organizer rules:** empty `downloads-organizer-rules.md` · `downloads organizer rules path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Downloads organizer rules:** **{label}** on disk · folder sort rules · `downloads organizer rules path` for the file · does not list rules or run organize-now."
+            )
+        }
+        Err(e) => {
+            format!(
+                "**Downloads organizer rules** — could not stat `downloads-organizer-rules.md`: {e}"
+            )
+        }
+    }
+}
+
 /// True for short “where is downloads-organizer-rules.md / downloads organizer rules path…” asks.
 /// Config path only — does not list rules, run organize-now, or return organizer Ready status.
+/// Size asks use the downloads-organizer-rules.md size lane (v0.1.912).
 pub fn looks_like_downloads_organizer_rules_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -16974,6 +17216,14 @@ pub fn looks_like_downloads_organizer_rules_path_request(content: &str) -> bool 
         || n == "downloads organizer"
         || n == "downloads organizer status"
         || n == "downloads organizer ready"
+        // Size asks use the downloads-organizer-rules.md size lane (v0.1.912).
+        || n.contains("size")
+        || n.contains("bytes")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
     {
         return false;
     }
@@ -17102,7 +17352,7 @@ pub fn format_downloads_organizer_rules_path_gateway() -> String {
     let path = crate::config::Config::downloads_organizer_rules_path();
     let display = path.display().to_string();
     format!(
-        "**Downloads organizer rules file:** `{display}` · folder sort rules · path only · does not list rules or run organize-now."
+        "**Downloads organizer rules file:** `{display}` · folder sort rules · path only · `downloads organizer rules size` for on-disk bytes · does not list rules or run organize-now."
     )
 }
 
@@ -25174,6 +25424,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_compact_ready_request(content) {
         return Some(format_compact_ready_chip());
     }
+    // downloads-organizer-rules.md size before path (stat only; no dump).
+    if looks_like_downloads_organizer_rules_size_request(content) {
+        return Some(format_downloads_organizer_rules_size_gateway());
+    }
     // downloads-organizer-state.json before rules / /downloads Ready (path-only asks).
     if looks_like_downloads_organizer_state_path_request(content) {
         return Some(format_downloads_organizer_state_path_gateway());
@@ -25369,6 +25623,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // cookie_reject_patterns.md before browser cookies / agents-dir path lanes.
     if looks_like_cookie_reject_patterns_path_request(content) {
         return Some(format_cookie_reject_patterns_path_gateway());
+    }
+    // downloads-organizer-rules.md size before path (stat only; no dump).
+    if looks_like_downloads_organizer_rules_size_request(content) {
+        return Some(format_downloads_organizer_rules_size_gateway());
     }
     // downloads-organizer-state.json before rules / agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_state_path_request(content) {
@@ -25842,7 +26100,8 @@ pub fn format_ops_help_gateway() -> String {
 • `session reset phrases path` · `where is session_reset_phrases.md` · `reset phrases path` — session reset phrases file (config only; no list/clear; `session reset phrases size` for on-disk bytes; does not steal escalation)\n\
 • `cookie reject size` · `cookie_reject_patterns.md size` · `how big is cookie reject patterns` · `cookie reject patterns size` — cookie_reject_patterns.md file size on disk (stat only; no dump; does not steal `cookie reject patterns path` / session-reset / escalation)\n\
 • `cookie reject patterns path` · `where is cookie_reject_patterns.md` · `cookie reject path` · `reject patterns path` — cookie reject patterns file (config only; no list/edit; `cookie reject patterns size` for on-disk bytes; does not steal browser cookies)\n\
-• `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; does not steal `/downloads`)\n\
+• `organizer rules size` · `downloads-organizer-rules.md size` · `how big is downloads organizer rules` · `downloads organizer rules size` — downloads-organizer-rules.md file size on disk (stat only; no dump; does not steal `downloads organizer rules path` / organizer state / `/downloads`)\n\
+• `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; `downloads organizer rules size` for on-disk bytes; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
 • `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / take/list)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
@@ -27396,6 +27655,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only cookie_reject_patterns.md path asks (v0.1.848) — config only; no list/edit.
     if looks_like_cookie_reject_patterns_path_request(question) {
+        return true;
+    }
+    // Read-only downloads-organizer-rules.md size asks (v0.1.912) — stat only; no dump/list.
+    if looks_like_downloads_organizer_rules_size_request(question) {
         return true;
     }
     // Read-only downloads-organizer-state.json path asks (v0.1.850) — config only; no dump/run.
@@ -30676,6 +30939,12 @@ mod tests {
             "run organizer"
         ));
         assert!(!looks_like_downloads_organizer_rules_path_request("agents path"));
+        assert!(!looks_like_downloads_organizer_rules_path_request(
+            "downloads-organizer-rules.md size"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_path_request(
+            "how big is downloads organizer rules"
+        ));
         assert!(!looks_like_downloads_organizer_ready_request(
             "downloads organizer rules path"
         ));
@@ -30694,8 +30963,68 @@ mod tests {
         assert!(
             reply.contains("downloads-organizer-rules.md") || reply.contains(".mac-stats")
         );
+        assert!(
+            reply.contains("downloads organizer rules size") || reply.contains("on-disk")
+        );
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
+    }
+
+    #[test]
+    fn downloads_organizer_rules_size_request_detected() {
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "organizer rules size"
+        ));
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "downloads-organizer-rules.md size"
+        ));
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "downloads organizer rules size"
+        ));
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "how big is downloads organizer rules"
+        ));
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "how big is downloads-organizer-rules.md"
+        ));
+        assert!(looks_like_downloads_organizer_rules_size_request(
+            "how large is the organizer rules file"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request(
+            "downloads organizer rules path"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request(
+            "where is downloads-organizer-rules.md"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request(
+            "list downloads organizer rules"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request(
+            "downloads organizer state size"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request(
+            "cookie reject patterns size"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_size_request("/downloads"));
+        assert!(!looks_like_downloads_organizer_rules_path_request(
+            "downloads-organizer-rules.md size"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_size_request(
+            "downloads organizer rules size"
+        ));
+        assert!(!looks_like_downloads_organizer_ready_request(
+            "organizer rules size"
+        ));
+        let reply = try_operator_instant_reply("downloads-organizer-rules.md size")
+            .expect("downloads-organizer-rules size instant");
+        assert!(
+            reply.contains("Downloads organizer rules")
+                && (reply.contains("on disk")
+                    || reply.contains("no `downloads-organizer-rules.md`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Downloads organizer rules file:"));
     }
 
     #[test]
