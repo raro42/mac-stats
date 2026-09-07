@@ -6,7 +6,8 @@ Overnight Track B (20:00–06:00 local, starting 2026-09-07).
 
 | Version | What |
 |---------|------|
-| **v0.1.927** | Instant lane: `history.json` age (`history age` / how old / when updated) — mtime only, no Ollama |
+| **v0.1.928** | Instant lane: `disk_cleanup.json` age (`disk cleanup age` / how old / when updated) — mtime only, no Ollama |
+| **v0.1.927** | Instant lane: `history.json` age |
 | **v0.1.926** | Instant lane: `monitors.json` age |
 | **v0.1.925** | Instant lane: `schedules.json` age |
 | **v0.1.924** | Instant lane: `config.json` age |
@@ -19,12 +20,12 @@ Overnight Track B (20:00–06:00 local, starting 2026-09-07).
 ## Tried / context
 
 - Digester **open** stayed empty (stale Elmasnow weather; `Review logs` already instant).
-- Design review **due=false** (grace); CPU metrics PNG ~0.8d.
+- Design review **due=false** (grace); CPU metrics PNG ~0.85d.
 - Fuel stayed on standing-backlog **p50 file age** lanes after path/size coverage.
-- ~22:54 tick: history.json age keep @ b60a3962; install/kickstart 0.1.927.
+- ~23:22 tick: disk_cleanup.json age keep @ eafa2e7e; install/kickstart 0.1.928.
 
 ## Still open
 
-- disk_cleanup.json / pinned_processes.json age (and other JSON age siblings)
+- pinned_processes.json / discord_channels.json age (and other JSON age siblings)
 - Design-review screenshot refresh when TCC allows (agent-ops / ai-chat / processes)
 - Sibling Hermes insights / session UX ports
