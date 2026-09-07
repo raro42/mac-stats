@@ -14021,8 +14021,223 @@ pub fn format_history_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is disk_cleanup.json / disk cleanup age…” asks.
+/// mtime only on `disk_cleanup.json` — does not steal path / size / `/disk` / quarantine.
+pub fn looks_like_disk_cleanup_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("empty trash")
+        || n.contains("ssd")
+        || n.contains("disk usage")
+        || n.contains("disk free")
+        || n.contains("free space")
+        || n.contains("free disk")
+        || n.contains("how full")
+        || n.contains("percent")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("quarantine")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("monitor age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("schedule age")
+        || n.contains("config.json")
+        || n.contains("config age")
+        || n.contains("pinned")
+        || n.contains("perplexity")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n == "/disk"
+        || n == "/cleanup"
+        || n == "cleanup"
+        || n == "disk cleanup"
+        || n == "cleanup status"
+        || n == "disk cleanup status"
+        || n == "/disk on"
+        || n == "disk on"
+        || n == "/disk off"
+        || n == "disk off"
+        || n == "/disk reclaim"
+        || n == "disk reclaim"
+        || n == "/disk big"
+        || n == "disk big"
+        || n == "/disk clean"
+        || n == "disk clean"
+        || n == "enabled scopes"
+        || n == "disabled scopes"
+        || n == "cleanup scopes"
+        || n == "what's reclaimable"
+        || n == "whats reclaimable"
+        || n == "disk age"
+        || n == "how old is disk"
+        || n == "how old is the disk"
+    {
+        return false;
+    }
+    let disk_ctx = n.contains("disk_cleanup.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup.json")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup.json")
+        || n.contains("disk cleanup file")
+        || n.contains("cleanup file")
+        || n.contains("cleanup config")
+        || n.contains("disk cleanup config")
+        || n == "disk cleanup age"
+        || n == "how old is disk cleanup"
+        || n == "how old is the disk cleanup"
+        || n == "when was disk cleanup updated"
+        || n == "when was the disk cleanup updated"
+        || n == "mac-stats disk cleanup age"
+        || n == "mac stats disk cleanup age"
+        || n == "is disk cleanup stale"
+        || n == "is the disk cleanup stale"
+        || (n.contains("disk cleanup")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !disk_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "disk cleanup age"
+            | "disk cleanup file age"
+            | "disk_cleanup.json age"
+            | "disk_cleanup age"
+            | "disk_cleanup file age"
+            | "disk-cleanup age"
+            | "disk-cleanup.json age"
+            | "disk cleanup json age"
+            | "cleanup file age"
+            | "cleanup config age"
+            | "disk cleanup config age"
+            | "mac-stats disk cleanup age"
+            | "mac stats disk cleanup age"
+            | "how old is disk cleanup"
+            | "how old is the disk cleanup"
+            | "how old is disk_cleanup.json"
+            | "how old is the disk_cleanup.json"
+            | "how old is the disk cleanup file"
+            | "how old is cleanup file"
+            | "how old is the cleanup file"
+            | "when was disk cleanup updated"
+            | "when was the disk cleanup updated"
+            | "when was disk_cleanup.json updated"
+            | "when was the disk_cleanup.json updated"
+            | "disk cleanup last modified"
+            | "disk_cleanup.json last modified"
+            | "cleanup file last modified"
+            | "is disk cleanup stale"
+            | "is the disk cleanup stale"
+            | "is disk_cleanup.json stale"
+            | "is the disk_cleanup.json stale"
+    ) || (disk_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM disk_cleanup.json age from file mtime (stat only; no list/reclaim/clean-now).
+pub fn format_disk_cleanup_age_gateway() -> String {
+    let path = crate::config::Config::disk_cleanup_file_path();
+    if !path.exists() {
+        return "**Disk cleanup:** no `disk_cleanup.json` yet · app writes it after Disk Cleanup runs · `disk cleanup path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Disk cleanup:** last write **{age}** ago · scopes + last-run state · `disk cleanup path` for the file · `disk cleanup size` for on-disk bytes · `/disk` for live scopes."
+            )
+        }
+        Err(e) => format!("**Disk cleanup** — could not stat `disk_cleanup.json`: {e}"),
+    }
+}
+
 /// True for short “how big is disk_cleanup.json / disk cleanup size…” asks.
-/// Stat only on `disk_cleanup.json` — does not steal path / `/disk` / quarantine size.
+/// Stat only on `disk_cleanup.json` — does not steal path / age / `/disk` / quarantine size.
 pub fn looks_like_disk_cleanup_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
@@ -14224,7 +14439,7 @@ pub fn format_disk_cleanup_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Disk cleanup:** **{label}** on disk · scopes + last-run state · `disk cleanup path` for the file · `/disk` for live scopes."
+                "**Disk cleanup:** **{label}** on disk · scopes + last-run state · `disk cleanup path` for the file · `disk cleanup age` for mtime · `/disk` for live scopes."
             )
         }
         Err(e) => format!("**Disk cleanup** — could not stat `disk_cleanup.json`: {e}"),
@@ -14234,6 +14449,7 @@ pub fn format_disk_cleanup_size_gateway() -> String {
 /// True for short “where is disk_cleanup.json / disk cleanup path…” asks.
 /// Config path only — does not list scopes, reclaim, or run `/disk` / clean-now.
 /// Size asks use the disk_cleanup.json size lane (v0.1.893).
+/// Age asks use the disk_cleanup.json age lane (v0.1.928).
 pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -14297,6 +14513,12 @@ pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -14406,7 +14628,7 @@ pub fn format_disk_cleanup_path_gateway() -> String {
     let path = crate::config::Config::disk_cleanup_file_path();
     let display = path.display().to_string();
     format!(
-        "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `disk cleanup size` for on-disk bytes · `/disk` for live scopes · does not reclaim or clean."
+        "**Disk cleanup file:** `{display}` · Disk Cleanup scopes + last-run state · `disk cleanup size` / `disk cleanup age` for bytes / mtime · `/disk` for live scopes · does not reclaim or clean."
     )
 }
 
@@ -29000,9 +29222,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_history_path_request(content) {
         return Some(format_history_path_gateway());
     }
-    // disk_cleanup.json size before path (stat only; no dump).
+    // disk_cleanup.json size before age/path (stat only; no dump).
     if looks_like_disk_cleanup_size_request(content) {
         return Some(format_disk_cleanup_size_gateway());
+    }
+    // disk_cleanup.json age before path (mtime only; no dump).
+    if looks_like_disk_cleanup_age_request(content) {
+        return Some(format_disk_cleanup_age_gateway());
     }
     if looks_like_disk_cleanup_path_request(content) {
         return Some(format_disk_cleanup_path_gateway());
@@ -29280,8 +29506,9 @@ pub fn format_ops_help_gateway() -> String {
 • `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / `history age` / chat history)\n\
 • `history age` · `history.json age` · `how old is history` · `when was history updated` — history.json last write age (mtime; no dump; does not steal `history path` / `history size` / chat history)\n\
 • `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` / `history age` for bytes / mtime; does not steal chat history)\n\
-• `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
-• `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` for on-disk bytes; does not steal `/disk`)\n\
+• `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `disk cleanup age` / `/disk` / quarantine)\n\
+• `disk cleanup age` · `disk_cleanup.json age` · `how old is disk cleanup` · `when was disk cleanup updated` — disk_cleanup.json last write age (mtime; no dump; does not steal `disk cleanup path` / `disk cleanup size` / `/disk`)\n\
+• `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` / `disk cleanup age` for bytes / mtime; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
 • `perplexity last size` · `perplexity_last.json size` · `how big is perplexity last` — perplexity_last.json file size on disk (stat only; no dump; does not steal `perplexity last path` / `/perplexity`)\n\
 • `discord channels size` · `discord_channels.json size` · `how big is discord channels` — discord_channels.json file size on disk (stat only; no dump; does not steal `discord channels path` / `/discord`)\n\
@@ -31101,6 +31328,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only disk_cleanup.json size asks (v0.1.893) — stat only; no dump/list/reclaim.
     if looks_like_disk_cleanup_size_request(question) {
+        return true;
+    }
+    // Read-only disk_cleanup.json age asks (v0.1.928) — mtime only; no dump/list/reclaim.
+    if looks_like_disk_cleanup_age_request(question) {
         return true;
     }
     // Read-only disk_cleanup.json path asks (v0.1.835) — config only; no list/reclaim.
@@ -37516,6 +37747,8 @@ mod tests {
         assert!(!looks_like_history_age_request("how old is monitors"));
         assert!(!looks_like_history_age_request("schedules age"));
         assert!(!looks_like_history_age_request("config age"));
+        assert!(!looks_like_history_age_request("disk cleanup age"));
+        assert!(!looks_like_history_age_request("how old is disk cleanup"));
         assert!(!looks_like_history_path_request("history age"));
         assert!(!looks_like_history_path_request("how old is history"));
         assert!(!looks_like_history_size_request("history age"));
@@ -37593,6 +37826,9 @@ mod tests {
         assert!(!looks_like_disk_cleanup_path_request("disk cleanup size"));
         assert!(!looks_like_disk_cleanup_path_request("disk_cleanup.json size"));
         assert!(!looks_like_disk_cleanup_path_request("how big is disk cleanup"));
+        assert!(!looks_like_disk_cleanup_path_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_path_request("disk_cleanup.json age"));
+        assert!(!looks_like_disk_cleanup_path_request("how old is disk cleanup"));
         assert!(!looks_like_disk_cleanup_request("disk cleanup path"));
         assert!(!looks_like_disk_cleanup_request("where is disk_cleanup.json"));
         assert!(looks_like_disk_cleanup_request("/disk"));
@@ -37602,6 +37838,65 @@ mod tests {
         assert!(reply.contains("disk_cleanup") || reply.contains(".mac-stats"));
         assert!(
             reply.to_lowercase().contains("disk cleanup size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn disk_cleanup_age_request_detected() {
+        assert!(looks_like_disk_cleanup_age_request("disk cleanup age"));
+        assert!(looks_like_disk_cleanup_age_request("disk_cleanup.json age"));
+        assert!(looks_like_disk_cleanup_age_request("disk_cleanup age"));
+        assert!(looks_like_disk_cleanup_age_request("disk cleanup file age"));
+        assert!(looks_like_disk_cleanup_age_request("cleanup file age"));
+        assert!(looks_like_disk_cleanup_age_request("cleanup config age"));
+        assert!(looks_like_disk_cleanup_age_request("how old is disk cleanup"));
+        assert!(looks_like_disk_cleanup_age_request(
+            "how old is disk_cleanup.json"
+        ));
+        assert!(looks_like_disk_cleanup_age_request(
+            "when was disk cleanup updated"
+        ));
+        assert!(looks_like_disk_cleanup_age_request(
+            "when was disk_cleanup.json updated"
+        ));
+        assert!(looks_like_disk_cleanup_age_request(
+            "disk_cleanup.json last modified"
+        ));
+        assert!(looks_like_disk_cleanup_age_request("is disk cleanup stale"));
+        assert!(looks_like_disk_cleanup_age_request(
+            "mac-stats disk cleanup age"
+        ));
+        assert!(!looks_like_disk_cleanup_age_request("disk cleanup path"));
+        assert!(!looks_like_disk_cleanup_age_request(
+            "where is disk_cleanup.json"
+        ));
+        assert!(!looks_like_disk_cleanup_age_request("disk cleanup size"));
+        assert!(!looks_like_disk_cleanup_age_request("how big is disk cleanup"));
+        assert!(!looks_like_disk_cleanup_age_request("disk_cleanup.json"));
+        assert!(!looks_like_disk_cleanup_age_request("/disk"));
+        assert!(!looks_like_disk_cleanup_age_request("disk cleanup"));
+        assert!(!looks_like_disk_cleanup_age_request("what's reclaimable"));
+        assert!(!looks_like_disk_cleanup_age_request("cleanup quarantine age"));
+        assert!(!looks_like_disk_cleanup_age_request("history age"));
+        assert!(!looks_like_disk_cleanup_age_request("how old is history"));
+        assert!(!looks_like_disk_cleanup_age_request("monitors age"));
+        assert!(!looks_like_disk_cleanup_age_request("disk age"));
+        assert!(!looks_like_disk_cleanup_path_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_path_request("how old is disk cleanup"));
+        assert!(!looks_like_disk_cleanup_size_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_size_request("how old is disk cleanup"));
+        assert!(!looks_like_history_age_request("disk cleanup age"));
+        assert!(!looks_like_history_age_request("how old is disk cleanup"));
+        assert!(!looks_like_monitors_age_request("disk cleanup age"));
+        assert!(!looks_like_schedules_age_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_request("how old is disk cleanup"));
+        let reply = try_operator_instant_reply("how old is disk cleanup")
+            .expect("disk cleanup age instant");
+        assert!(reply.contains("Disk cleanup"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `disk_cleanup.json`"),
             "{reply}"
         );
     }
@@ -37639,6 +37934,8 @@ mod tests {
         assert!(!looks_like_disk_cleanup_size_request("history size"));
         assert!(!looks_like_disk_cleanup_size_request("monitors size"));
         assert!(!looks_like_disk_cleanup_size_request("disk size"));
+        assert!(!looks_like_disk_cleanup_size_request("disk cleanup age"));
+        assert!(!looks_like_disk_cleanup_size_request("how old is disk cleanup"));
         assert!(!looks_like_disk_cleanup_path_request("disk cleanup size"));
         assert!(!looks_like_history_size_request("disk_cleanup.json size"));
         let reply = try_operator_instant_reply("how big is disk cleanup")

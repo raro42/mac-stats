@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.928] - 2026-09-07
+
+### Added
+
+- **Instant lane: disk_cleanup.json age** — `disk cleanup age`, `disk_cleanup.json age`, `how old is disk cleanup`, `when was disk cleanup updated`, and close variants return the last-write age of `disk_cleanup.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `disk cleanup path` / `disk cleanup size` / `/disk`; p50 latency).
+
 ## [0.1.927] - 2026-09-07
 
 ### Added
