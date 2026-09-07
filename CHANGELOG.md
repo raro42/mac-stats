@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.916] - 2026-09-07
+
+### Added
+
+- **Instant lane: browser-credentials.toml size** — `browser credentials size`, `browser-credentials.toml size`, `how big are browser credentials`, `browser credentials file size`, and close variants return on-disk size of the BROWSER_INPUT secrets TOML without Ollama (Discord + AI Chat; stat only — no dump; does not steal `browser credentials path` / storage state / credential accounts; p50 latency).
+
 ## [0.1.915] - 2026-09-07
 
 ### Added

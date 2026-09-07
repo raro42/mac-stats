@@ -9530,13 +9530,22 @@ pub fn format_pdfs_path_gateway() -> String {
 
 /// True for short “where is browser-credentials.toml / browser credentials path…” asks.
 /// Config path only — does not list, edit, or dump secrets from `~/.mac-stats/browser-credentials.toml`.
+/// Size asks use the browser-credentials.toml size lane (v0.1.916).
 pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
         return false;
     }
-    // Do not steal sibling path / browser-status / disk-cleanup / secret-edit asks.
-    if looks_like_config_path_request(content)
+    // Do not steal sibling path / browser-status / disk-cleanup / secret-edit / size asks.
+    // Size asks use the browser-credentials.toml size lane (v0.1.916).
+    if n.contains("size")
+        || n.contains("bytes")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || looks_like_config_path_request(content)
         || looks_like_debug_log_path_request(content)
         || looks_like_screenshots_path_request(content)
         || looks_like_runs_path_request(content)
@@ -9672,8 +9681,257 @@ pub fn format_browser_credentials_path_gateway() -> String {
     let path = crate::config::Config::browser_credentials_toml_path();
     let display = path.display().to_string();
     format!(
-        "**Browser credentials:** `{display}` · BROWSER_INPUT `<secret>…</secret>` · edit the TOML · `/browser` for CDP status."
+        "**Browser credentials:** `{display}` · BROWSER_INPUT `<secret>…</secret>` · edit the TOML · `browser credentials size` for on-disk bytes · `/browser` for CDP status."
     )
+}
+
+/// True for short “how big is browser-credentials.toml / browser credentials size…” asks.
+/// Stat only — does not dump secrets, edit the TOML, or return path / `/browser` Ready.
+pub fn looks_like_browser_credentials_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || (n.contains("updated")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || (n.contains("modified")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("export")
+        || n.contains("import")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
+        || n.contains("keychain")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("discord")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/browser"
+        || n == "/cdp"
+        || n == "browser"
+        || n == "cdp"
+        || n == "browser status"
+        || n == "cdp status"
+        || n == "browser ready"
+        || n == "cdp ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let cred_ctx = n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("browser secrets")
+        || n.contains("browser secret")
+        || n.contains("mac-stats credentials")
+        || n.contains("mac stats credentials")
+        || n.contains("credentials.toml")
+        || (n.contains("credentials")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("toml")))
+        || (n.contains("credential")
+            && (n.contains("browser") || n.contains("cdp"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("toml")));
+    if !cred_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "browser credentials size"
+            | "browser credential size"
+            | "browser-credentials size"
+            | "browser-credentials.toml size"
+            | "browser credentials file size"
+            | "browser credential file size"
+            | "browser credentials toml size"
+            | "credentials.toml size"
+            | "cdp credentials size"
+            | "cdp credential size"
+            | "browser secrets size"
+            | "browser secret size"
+            | "how big is browser credentials"
+            | "how big is the browser credentials"
+            | "how big is browser-credentials"
+            | "how big is browser-credentials.toml"
+            | "how big is the browser-credentials.toml"
+            | "how big is browser credentials file"
+            | "how big is the browser credentials file"
+            | "how big are browser credentials"
+            | "how large is browser credentials"
+            | "how large is the browser credentials"
+            | "how large is browser-credentials.toml"
+            | "how large are browser credentials"
+            | "mac-stats credentials size"
+            | "mac stats credentials size"
+            | "mac-stats browser-credentials.toml size"
+            | "mac stats browser-credentials.toml size"
+            | "mac-stats browser credentials size"
+            | "mac stats browser credentials size"
+    ) || (cred_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM browser-credentials.toml file size (stat only; no dump/list/edit secrets).
+pub fn format_browser_credentials_size_gateway() -> String {
+    let path = crate::config::Config::browser_credentials_toml_path();
+    if !path.exists() {
+        return "**Browser credentials:** no `browser-credentials.toml` yet · `browser credentials path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Browser credentials:** empty `browser-credentials.toml` · `browser credentials path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Browser credentials:** **{label}** on disk · BROWSER_INPUT secrets TOML · `browser credentials path` for the file · does not dump secrets or edit the file."
+            )
+        }
+        Err(e) => {
+            format!("**Browser credentials** — could not stat `browser-credentials.toml`: {e}")
+        }
+    }
 }
 
 /// True for short “how big is browser_storage_state.json / storage state size…” asks.
@@ -26383,6 +26641,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pdfs_path_request(content) {
         return Some(format_pdfs_path_gateway());
     }
+    // browser-credentials.toml size before path (stat only; no dump).
+    if looks_like_browser_credentials_size_request(content) {
+        return Some(format_browser_credentials_size_gateway());
+    }
     if looks_like_browser_credentials_path_request(content) {
         return Some(format_browser_credentials_path_gateway());
     }
@@ -26687,7 +26949,8 @@ pub fn format_ops_help_gateway() -> String {
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
-• `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
+• `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / storage state / credential accounts)\n\
+• `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` for on-disk bytes)\n\
 • `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` for on-disk bytes)\n\
 • `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `/downloads`)\n\
@@ -28415,6 +28678,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only PDF exports dir path asks (v0.1.826) — config only; no list/save.
     if looks_like_pdfs_path_request(question) {
+        return true;
+    }
+    // Read-only browser-credentials.toml size asks (v0.1.916) — stat only; no dump/edit.
+    if looks_like_browser_credentials_size_request(question) {
         return true;
     }
     // Read-only browser credentials file path asks (v0.1.827) — config only; no list/edit/dump.
@@ -33591,6 +33858,15 @@ mod tests {
         assert!(!looks_like_browser_credentials_path_request("pdfs path"));
         assert!(!looks_like_browser_credentials_path_request("where is config"));
         assert!(!looks_like_browser_credentials_path_request("/browser"));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser-credentials.toml size"
+        ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "how big are browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser credentials size"
+        ));
         assert!(!looks_like_pdfs_path_request("browser credentials path"));
         assert!(!looks_like_browser_ready_request("browser credentials path"));
         let reply = try_operator_instant_reply("where are browser credentials")
@@ -33599,6 +33875,73 @@ mod tests {
         assert!(
             reply.contains("browser-credentials.toml") || reply.contains(".mac-stats")
         );
+    }
+
+    #[test]
+    fn browser_credentials_size_request_detected() {
+        assert!(looks_like_browser_credentials_size_request(
+            "browser credentials size"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "browser-credentials.toml size"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "how big are browser credentials"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "how big is browser-credentials.toml"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "browser credentials file size"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "cdp credentials size"
+        ));
+        assert!(looks_like_browser_credentials_size_request(
+            "mac-stats credentials size"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "where are browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "dump browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "edit credentials"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "credential accounts size"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "storage state size"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "browser cookies size"
+        ));
+        assert!(!looks_like_browser_credentials_size_request("/browser"));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser-credentials.toml size"
+        ));
+        assert!(!looks_like_credential_accounts_size_request(
+            "browser credentials size"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "browser credentials size"
+        ));
+        assert!(!looks_like_browser_ready_request("browser credentials size"));
+        let reply = try_operator_instant_reply("browser-credentials.toml size")
+            .expect("browser credentials size instant");
+        assert!(
+            reply.contains("Browser credentials")
+                && (reply.contains("on disk")
+                    || reply.contains("no `browser-credentials.toml`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Browser credentials: `"));
     }
 
     #[test]
