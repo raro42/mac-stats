@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.920] - 2026-09-07
+
+### Added
+
+- **Instant lane: session-memory size** — `session memory size`, `session-memory size`, `how big is session memory`, and close variants return on-disk bytes of `session-memory-*.md` under session/ without Ollama (Discord + AI Chat; stat only — no dump; does not steal `session memory path` / `session size` / `/sessions`; p50 latency).
+
 ## [0.1.919] - 2026-09-07
 
 ### Changed
