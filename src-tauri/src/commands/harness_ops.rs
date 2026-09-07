@@ -16807,7 +16807,11 @@ pub fn looks_like_user_info_size_request(content: &str) -> bool {
         || n.contains("list")
         || n.contains("show ")
         || n.contains("dump")
-        || n.contains("tail")
+        // Avoid bare `tail` — it matches inside `details`.
+        || n.contains(" tail")
+        || n.starts_with("tail ")
+        || n == "tail"
+        || n.ends_with(" tail")
         || n.contains("read ")
         || n.contains("print ")
         || n.contains("cat ")
@@ -16977,7 +16981,226 @@ pub fn format_user_info_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**User info:** **{label}** on disk · Discord display-name map · `user info path` for the file."
+                "**User info:** **{label}** on disk · Discord display-name map · `user info path` for the file · `user info age` for last write."
+            )
+        }
+        Err(e) => format!("**User info** — could not stat `user-info.json`: {e}"),
+    }
+}
+
+/// True for short “how old is user-info.json / user info age…” asks.
+/// Mtime only — does not steal path / size / who-am-i / display-name dumps.
+pub fn looks_like_user_info_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        // Avoid bare `tail` — it matches inside `details`.
+        || n.contains(" tail")
+        || n.starts_with("tail ")
+        || n == "tail"
+        || n.ends_with(" tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("who am")
+        || n.contains("who is")
+        || n.contains("display name")
+        || n.contains("my name")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("config.json")
+        || n.contains("config age")
+        || n.contains("pinned_processes")
+        || n.contains("pinned processes")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let ui_ctx = n.contains("user-info.json")
+        || n.contains("user_info.json")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("userinfo.json")
+        || n.contains("userinfo")
+        || n.contains("user info.json")
+        || n.contains("user info file")
+        || n.contains("user info age")
+        || n.contains("user-info age")
+        || n.contains("user_info age")
+        || n.contains("user details age")
+        || n.contains("user details file")
+        || n == "user info age"
+        || n == "how old is user info"
+        || n == "how old is the user info"
+        || n == "when was user info updated"
+        || n == "when was the user info updated"
+        || n == "mac-stats user info age"
+        || n == "mac stats user info age"
+        || n == "is user info stale"
+        || n == "is the user info stale"
+        || (n.contains("user info")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("user details")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !ui_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "user info age"
+            | "user-info age"
+            | "user-info.json age"
+            | "user-info file age"
+            | "user_info age"
+            | "user_info.json age"
+            | "user_info file age"
+            | "userinfo age"
+            | "userinfo.json age"
+            | "user info file age"
+            | "user info json age"
+            | "user details age"
+            | "user details file age"
+            | "mac-stats user info age"
+            | "mac stats user info age"
+            | "how old is user info"
+            | "how old is the user info"
+            | "how old is user-info.json"
+            | "how old is the user-info.json"
+            | "how old is user_info.json"
+            | "how old is the user_info.json"
+            | "how old is the user info file"
+            | "how old is userinfo.json"
+            | "when was user info updated"
+            | "when was the user info updated"
+            | "when was user-info.json updated"
+            | "when was the user-info.json updated"
+            | "when was user_info.json updated"
+            | "when was the user_info.json updated"
+            | "user info last modified"
+            | "user-info.json last modified"
+            | "user_info.json last modified"
+            | "user details last modified"
+            | "is user info stale"
+            | "is the user info stale"
+            | "is user-info.json stale"
+            | "is the user-info.json stale"
+            | "is user_info.json stale"
+            | "is the user_info.json stale"
+    ) || (ui_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM user-info.json age from file mtime (stat only; no dump / edit / who-am-i).
+pub fn format_user_info_age_gateway() -> String {
+    let path = crate::config::Config::user_info_file_path();
+    if !path.exists() {
+        return "**User info:** no `user-info.json` yet · app writes display names from Discord · `user info path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**User info:** last write **{age}** ago · Discord display-name map · `user info path` for the file · `user info size` for on-disk bytes."
             )
         }
         Err(e) => format!("**User info** — could not stat `user-info.json`: {e}"),
@@ -16987,6 +17210,7 @@ pub fn format_user_info_size_gateway() -> String {
 /// True for short “where is user-info.json / user info path…” asks.
 /// Config path only — does not dump display names or edit the file.
 /// Size asks use the user-info.json size lane (v0.1.898).
+/// Age asks use the user-info.json age lane (v0.1.933).
 pub fn looks_like_user_info_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17087,6 +17311,13 @@ pub fn looks_like_user_info_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the user-info.json age lane (v0.1.933) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -17183,7 +17414,7 @@ pub fn format_user_info_path_gateway() -> String {
     let path = crate::config::Config::user_info_file_path();
     let display = path.display().to_string();
     format!(
-        "**User info file:** `{display}` · Discord display-name map on disk · `user info size` for on-disk bytes · does not list or edit users."
+        "**User info file:** `{display}` · Discord display-name map on disk · `user info size` / `user info age` for bytes / mtime · does not list or edit users."
     )
 }
 
@@ -29951,9 +30182,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_path_request(content) {
         return Some(format_config_path_gateway());
     }
-    // user-info.json size before path (stat only; no dump).
+    // user-info.json size before age/path (stat only; no dump).
     if looks_like_user_info_size_request(content) {
         return Some(format_user_info_size_gateway());
+    }
+    // user-info.json age before path (mtime only; no dump).
+    if looks_like_user_info_age_request(content) {
+        return Some(format_user_info_age_gateway());
     }
     // user-info before nested sibling path detectors (string-only; avoids exponential nest).
     if looks_like_user_info_path_request(content) {
@@ -30487,8 +30722,9 @@ pub fn format_ops_help_gateway() -> String {
 • `delivery awareness size` · `scheduler_delivery_awareness.json size` · `how big is delivery awareness` — scheduler_delivery_awareness.json file size on disk (stat only; no dump; does not steal `delivery awareness path` / `delivery awareness age` / `last delivery` / `/schedules`)\n\
 • `delivery awareness age` · `scheduler_delivery_awareness.json age` · `how old is delivery awareness` · `when was delivery awareness updated` — scheduler_delivery_awareness.json last write age (mtime; no dump; does not steal `delivery awareness path` / `delivery awareness size` / `last delivery` / `/schedules`)\n\
 • `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; `delivery awareness size` / `delivery awareness age` for bytes / mtime; does not steal `last delivery` / `/schedules`)\n\
-• `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / who-am-i)\n\
-• `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` for on-disk bytes)\n\
+• `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / `user info age` / who-am-i)\n\
+• `user info age` · `user-info.json age` · `how old is user info` · `when was user info updated` — user-info.json last write age (mtime; no dump; does not steal `user info path` / `user info size` / who-am-i)\n\
+• `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
@@ -32328,6 +32564,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only user-info.json size asks (v0.1.898) — stat only; no dump/edit.
     if looks_like_user_info_size_request(question) {
+        return true;
+    }
+    // Read-only user-info.json age asks (v0.1.933) — mtime only; no dump/edit.
+    if looks_like_user_info_age_request(question) {
         return true;
     }
     // Read-only user-info.json path asks (v0.1.839) — config only; no dump/edit.
@@ -39693,6 +39933,8 @@ mod tests {
         assert!(!looks_like_user_info_path_request("user info size"));
         assert!(!looks_like_user_info_path_request("user-info.json size"));
         assert!(!looks_like_user_info_path_request("how big is user info"));
+        assert!(!looks_like_user_info_path_request("user info age"));
+        assert!(!looks_like_user_info_path_request("how old is user info"));
         assert!(!looks_like_config_path_request("user info path"));
         assert!(!looks_like_config_path_request("where is user-info.json"));
         let reply = try_operator_instant_reply("where is user-info.json")
@@ -39700,7 +39942,9 @@ mod tests {
         assert!(reply.contains("User info file"));
         assert!(reply.contains("user-info") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("user info size") || reply.contains("on-disk"),
+            reply.to_lowercase().contains("user info size")
+                || reply.to_lowercase().contains("user info age")
+                || reply.contains("on-disk"),
             "{reply}"
         );
     }
@@ -39725,6 +39969,7 @@ mod tests {
         assert!(!looks_like_user_info_size_request("discord channels size"));
         assert!(!looks_like_user_info_size_request("delivery awareness size"));
         assert!(!looks_like_user_info_size_request("history size"));
+        assert!(!looks_like_user_info_size_request("user info age"));
         assert!(!looks_like_user_info_path_request("user info size"));
         let reply = try_operator_instant_reply("user info size").expect("user info size instant");
         assert!(
@@ -39735,6 +39980,57 @@ mod tests {
             "{reply}"
         );
         assert!(!reply.contains("User info file:"));
+    }
+
+    #[test]
+    fn user_info_age_request_detected() {
+        assert!(looks_like_user_info_age_request("user info age"));
+        assert!(looks_like_user_info_age_request("user-info.json age"));
+        assert!(looks_like_user_info_age_request("user_info age"));
+        assert!(looks_like_user_info_age_request("how old is user info"));
+        assert!(looks_like_user_info_age_request("how old is user-info.json"));
+        assert!(looks_like_user_info_age_request(
+            "when was user info updated"
+        ));
+        assert!(looks_like_user_info_age_request(
+            "when was the user-info.json updated"
+        ));
+        assert!(looks_like_user_info_age_request("user details age"));
+        assert!(looks_like_user_info_age_request("mac-stats user info age"));
+        assert!(looks_like_user_info_age_request("is user info stale"));
+        assert!(!looks_like_user_info_age_request("user info path"));
+        assert!(!looks_like_user_info_age_request("where is user-info.json"));
+        assert!(!looks_like_user_info_age_request("user info size"));
+        assert!(!looks_like_user_info_age_request("how big is user info"));
+        assert!(!looks_like_user_info_age_request("who am i"));
+        assert!(!looks_like_user_info_age_request("list users"));
+        assert!(!looks_like_user_info_age_request("display name"));
+        assert!(!looks_like_user_info_age_request("user age"));
+        assert!(!looks_like_user_info_age_request("how old is user"));
+        assert!(!looks_like_user_info_age_request("discord channels age"));
+        assert!(!looks_like_user_info_age_request("delivery awareness age"));
+        assert!(!looks_like_user_info_age_request("history age"));
+        assert!(!looks_like_user_info_path_request("user info age"));
+        assert!(!looks_like_user_info_size_request("user info age"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "user info age"
+        ));
+        assert!(!looks_like_history_age_request("user info age"));
+        let reply = try_operator_instant_reply("user info age").expect("user info age instant");
+        assert!(
+            reply.contains("User info")
+                && (reply.contains("last write")
+                    || reply.contains("no `user-info.json`")
+                    || reply.to_lowercase().contains("user info age")),
+            "{reply}"
+        );
+        assert!(!reply.contains("User info file:"));
+        assert!(
+            reply.to_lowercase().contains("user info path")
+                || reply.to_lowercase().contains("user info size")
+                || reply.contains("no `user-info.json`"),
+            "{reply}"
+        );
     }
 
     #[test]

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.933] - 2026-09-08
+
+### Added
+
+- **Instant lane: user-info.json age** — `user info age`, `user-info.json age`, `how old is user info`, `when was user info updated`, and close variants return the last-write age of `user-info.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `user info path` / `user info size` / who-am-i; p50 latency).
+
 ## [0.1.932] - 2026-09-08
 
 ### Added
