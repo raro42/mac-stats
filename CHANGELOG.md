@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.927] - 2026-09-07
+
+### Added
+
+- **Instant lane: history.json age** — `history age`, `history.json age`, `how old is history`, `when was history updated`, and close variants return the last-write age of `history.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `history path` / `history size` / chat history; p50 latency).
+
 ## [0.1.926] - 2026-09-07
 
 ### Added

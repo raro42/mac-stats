@@ -13044,6 +13044,7 @@ pub fn looks_like_monitors_age_request(content: &str) -> bool {
         || n.contains("config age")
         || n.contains("schedules age")
         || n.contains("schedule age")
+        || n.contains("history age")
         || n == "/monitors"
         || n == "monitors"
         || n == "/monitors up"
@@ -13502,8 +13503,190 @@ pub fn format_monitors_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is history.json / history age…” asks.
+/// mtime only on `history.json` — does not steal path / size / sparkline dump / chat history.
+pub fn looks_like_history_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clear ")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("chart")
+        || n.contains("sparkline")
+        || n.contains("graph")
+        || n.contains("plot")
+        || n.contains("chat")
+        || n.contains("conversation")
+        || n.contains("message")
+        || n.contains("discord")
+        || n.contains("session history")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("config.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("pinned")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("config age")
+        || n.contains("schedules age")
+        || n.contains("schedule age")
+        || n.contains("monitors age")
+        || n.contains("monitor age")
+        || n == "history"
+        || n == "/history"
+        || n == "cpu history"
+        || n == "metrics history"
+        || n == "show history"
+        || n == "clear history"
+    {
+        return false;
+    }
+    let hist_ctx = n.contains("history.json")
+        || n.contains("history json")
+        || n.contains("history file")
+        || n.contains("metrics history")
+        || n.contains("cpu history")
+        || n == "history age"
+        || n == "how old is history"
+        || n == "how old is the history"
+        || n == "when was history updated"
+        || n == "when was the history updated"
+        || n == "mac-stats history age"
+        || n == "mac stats history age"
+        || n == "is history stale"
+        || n == "is the history stale"
+        || (n.contains("history")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !hist_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "history age"
+            | "history file age"
+            | "history.json age"
+            | "history json age"
+            | "metrics history age"
+            | "cpu history age"
+            | "metrics history file age"
+            | "cpu history file age"
+            | "mac-stats history age"
+            | "mac stats history age"
+            | "how old is history"
+            | "how old is the history"
+            | "how old is history.json"
+            | "how old is the history.json"
+            | "how old is the history file"
+            | "how old is metrics history"
+            | "how old is the metrics history"
+            | "when was history updated"
+            | "when was the history updated"
+            | "when was history.json updated"
+            | "when was the history.json updated"
+            | "history last modified"
+            | "history.json last modified"
+            | "history file last modified"
+            | "is history stale"
+            | "is the history stale"
+            | "is history.json stale"
+            | "is the history.json stale"
+    ) || (hist_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM history.json age from file mtime (stat only; no dump/sparkline/chat history).
+pub fn format_history_age_gateway() -> String {
+    let path = crate::config::Config::history_file_path();
+    if !path.exists() {
+        return "**History:** no `history.json` yet · app writes it after metrics warm-up · `history path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**History:** last write **{age}** ago · CPU / metrics sparkline buffer · `history path` for the file · `history size` for on-disk bytes · open the CPU window for live charts."
+            )
+        }
+        Err(e) => format!("**History** — could not stat `history.json`: {e}"),
+    }
+}
+
 /// True for short “how big is history.json / history size…” asks.
-/// Stat only on `history.json` — does not steal path / sparkline dump / chat history.
+/// Stat only on `history.json` — does not steal path / age / sparkline dump / chat history.
 pub fn looks_like_history_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -13673,7 +13856,7 @@ pub fn format_history_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**History:** **{label}** on disk · CPU / metrics sparkline buffer · `history path` for the file · open the CPU window for live charts."
+                "**History:** **{label}** on disk · CPU / metrics sparkline buffer · `history path` for the file · `history age` for mtime · open the CPU window for live charts."
             )
         }
         Err(e) => format!("**History** — could not stat `history.json`: {e}"),
@@ -13683,6 +13866,7 @@ pub fn format_history_size_gateway() -> String {
 /// True for short “where is history.json / history path…” asks.
 /// Config path only — does not dump sparkline points or chat/session history.
 /// Size asks use the history.json size lane (v0.1.892).
+/// Age asks use the history.json age lane (v0.1.927).
 pub fn looks_like_history_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -13740,6 +13924,12 @@ pub fn looks_like_history_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("chart")
         || n.contains("sparkline")
         || n.contains("graph")
@@ -13827,7 +14017,7 @@ pub fn format_history_path_gateway() -> String {
     let path = crate::config::Config::history_file_path();
     let display = path.display().to_string();
     format!(
-        "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · `history size` for on-disk bytes · open the CPU window for live charts · does not dump points or chat history."
+        "**History file:** `{display}` · CPU / metrics sparkline buffer on disk · `history size` / `history age` for bytes / mtime · open the CPU window for live charts · does not dump points or chat history."
     )
 }
 
@@ -28799,9 +28989,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_monitors_path_request(content) {
         return Some(format_monitors_path_gateway());
     }
-    // history.json size before path (stat only; no dump).
+    // history.json size before age/path (stat only; no dump).
     if looks_like_history_size_request(content) {
         return Some(format_history_size_gateway());
+    }
+    // history.json age before path (mtime only; no dump).
+    if looks_like_history_age_request(content) {
+        return Some(format_history_age_gateway());
     }
     if looks_like_history_path_request(content) {
         return Some(format_history_path_gateway());
@@ -29083,8 +29277,9 @@ pub fn format_ops_help_gateway() -> String {
 • `monitors size` · `monitors.json size` · `how big is monitors` — monitors.json file size on disk (stat only; no dump; does not steal `monitors path` / `monitors age` / `/monitors`)\n\
 • `monitors age` · `monitors.json age` · `how old is monitors` · `when was monitors updated` — monitors.json last write age (mtime; no dump; does not steal `monitors path` / `monitors size` / `/monitors`)\n\
 • `monitors path` · `where is monitors.json` · `monitor file path` — External / website monitors config file (config only; no list/add/check; `monitors size` / `monitors age` for bytes / mtime; does not steal `/monitors`)\n\
-• `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / chat history)\n\
-• `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` for on-disk bytes; does not steal chat history)\n\
+• `history size` · `history.json size` · `how big is history` — history.json file size on disk (stat only; no dump; does not steal `history path` / `history age` / chat history)\n\
+• `history age` · `history.json age` · `how old is history` · `when was history updated` — history.json last write age (mtime; no dump; does not steal `history path` / `history size` / chat history)\n\
+• `history path` · `where is history.json` · `metrics history file` — CPU / metrics sparkline buffer file (config only; no dump/charts; `history size` / `history age` for bytes / mtime; does not steal chat history)\n\
 • `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `/disk` / quarantine)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` for on-disk bytes; does not steal `/disk`)\n\
 • `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
@@ -30894,6 +31089,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only history.json size asks (v0.1.892) — stat only; no dump/sparkline/chat history.
     if looks_like_history_size_request(question) {
+        return true;
+    }
+    // Read-only history.json age asks (v0.1.927) — mtime only; no dump/sparkline/chat history.
+    if looks_like_history_age_request(question) {
         return true;
     }
     // Read-only history.json path asks (v0.1.834) — config only; no sparkline dump.
@@ -37275,12 +37474,61 @@ mod tests {
         assert!(!looks_like_history_path_request("history size"));
         assert!(!looks_like_history_path_request("history.json size"));
         assert!(!looks_like_history_path_request("how big is history"));
+        assert!(!looks_like_history_path_request("history age"));
+        assert!(!looks_like_history_path_request("history.json age"));
+        assert!(!looks_like_history_path_request("how old is history"));
         let reply = try_operator_instant_reply("where is history.json")
             .expect("history path instant");
         assert!(reply.contains("History file"));
         assert!(reply.contains("history") || reply.contains(".mac-stats"));
         assert!(
             reply.to_lowercase().contains("history size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn history_age_request_detected() {
+        assert!(looks_like_history_age_request("history age"));
+        assert!(looks_like_history_age_request("history.json age"));
+        assert!(looks_like_history_age_request("history file age"));
+        assert!(looks_like_history_age_request("how old is history"));
+        assert!(looks_like_history_age_request("how old is history.json"));
+        assert!(looks_like_history_age_request("when was history updated"));
+        assert!(looks_like_history_age_request(
+            "when was history.json updated"
+        ));
+        assert!(looks_like_history_age_request("history.json last modified"));
+        assert!(looks_like_history_age_request("is history stale"));
+        assert!(looks_like_history_age_request("metrics history age"));
+        assert!(looks_like_history_age_request("cpu history age"));
+        assert!(looks_like_history_age_request("mac-stats history age"));
+        assert!(!looks_like_history_age_request("history path"));
+        assert!(!looks_like_history_age_request("where is history.json"));
+        assert!(!looks_like_history_age_request("history size"));
+        assert!(!looks_like_history_age_request("how big is history"));
+        assert!(!looks_like_history_age_request("history.json"));
+        assert!(!looks_like_history_age_request("/history"));
+        assert!(!looks_like_history_age_request("show history"));
+        assert!(!looks_like_history_age_request("chat history"));
+        assert!(!looks_like_history_age_request("conversation history"));
+        assert!(!looks_like_history_age_request("monitors age"));
+        assert!(!looks_like_history_age_request("how old is monitors"));
+        assert!(!looks_like_history_age_request("schedules age"));
+        assert!(!looks_like_history_age_request("config age"));
+        assert!(!looks_like_history_path_request("history age"));
+        assert!(!looks_like_history_path_request("how old is history"));
+        assert!(!looks_like_history_size_request("history age"));
+        assert!(!looks_like_history_size_request("how old is history"));
+        assert!(!looks_like_monitors_age_request("history age"));
+        assert!(!looks_like_monitors_age_request("how old is history"));
+        assert!(!looks_like_schedules_age_request("history age"));
+        assert!(!looks_like_schedules_age_request("how old is history"));
+        let reply =
+            try_operator_instant_reply("how old is history").expect("history age instant");
+        assert!(reply.contains("History"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `history.json`"),
             "{reply}"
         );
     }
@@ -37305,6 +37553,8 @@ mod tests {
         assert!(!looks_like_history_size_request("conversation history size"));
         assert!(!looks_like_history_size_request("monitors size"));
         assert!(!looks_like_history_size_request("schedules size"));
+        assert!(!looks_like_history_size_request("history age"));
+        assert!(!looks_like_history_size_request("how old is history"));
         assert!(!looks_like_history_path_request("history size"));
         assert!(!looks_like_monitors_size_request("history.json size"));
         let reply =
