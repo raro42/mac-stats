@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.921] - 2026-09-07
+
+### Added
+
+- **Instant lane: before-reset transcript size** — `before reset transcript size`, `before-reset transcript size`, `how big is before reset transcript`, `last_session_before_reset.jsonl size`, and close variants return on-disk bytes of the before-reset JSONL without Ollama (Discord + AI Chat; stat only — no dump; does not steal `before reset transcript path` / before-compaction / session reset phrases; p50 latency).
+
 ## [0.1.920] - 2026-09-07
 
 ### Added

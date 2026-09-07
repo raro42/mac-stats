@@ -17362,11 +17362,261 @@ pub fn format_session_reset_phrases_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is the before-reset transcript / last_session_before_reset.jsonl size…” asks.
+/// Stat only — does not dump JSONL, run the hook, or clear a session.
+/// Does not steal `before reset transcript path` / before-compaction / session reset phrases.
+pub fn looks_like_before_reset_transcript_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 96 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || (n.contains("updated")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || (n.contains("modified")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("export")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("trigger")
+        || n.contains("run hook")
+        || n.contains("run the hook")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("beforecompaction")
+        || n.contains("last_session_before_compaction")
+        || n.contains("session_reset_phrases")
+        || n.contains("session-reset-phrases")
+        || n.contains("session reset")
+        || n.contains("session-reset")
+        || n.contains("session_reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("discord memory")
+        || n.contains("memory.md")
+        || n.contains("notes size")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let br_ctx = n.contains("last_session_before_reset")
+        || n.contains("last-session-before-reset")
+        || n.contains("beforeresettranscript")
+        || n.contains("before_reset_transcript")
+        || n.contains("before-reset-transcript")
+        || n.contains("before reset transcript")
+        || n.contains("before-reset transcript")
+        || n.contains("before_reset transcript")
+        || n.contains("before reset jsonl")
+        || n.contains("before-reset jsonl")
+        || n.contains("before_reset jsonl")
+        || n.contains("mac_stats_before_reset_transcript")
+        || (n.contains("before reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")))
+        || (n.contains("before-reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")))
+        || (n.contains("before_reset")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")));
+    if !br_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "before reset transcript size"
+            | "before-reset transcript size"
+            | "before_reset transcript size"
+            | "before reset transcript file size"
+            | "before-reset transcript file size"
+            | "before_reset transcript file size"
+            | "before reset jsonl size"
+            | "before-reset jsonl size"
+            | "before_reset jsonl size"
+            | "last_session_before_reset size"
+            | "last_session_before_reset.jsonl size"
+            | "last_session_before_reset file size"
+            | "how big is before reset transcript"
+            | "how big is the before reset transcript"
+            | "how big is before-reset transcript"
+            | "how big is the before-reset transcript"
+            | "how big is before_reset transcript"
+            | "how big is last_session_before_reset"
+            | "how big is last_session_before_reset.jsonl"
+            | "how large is before reset transcript"
+            | "how large is the before reset transcript"
+            | "how large is before-reset transcript"
+            | "how large is last_session_before_reset.jsonl"
+            | "mac-stats before reset transcript size"
+            | "mac stats before reset transcript size"
+    ) || (br_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM before-reset transcript file size (stat only; no dump / no hook / no session clear).
+pub fn format_before_reset_transcript_size_gateway() -> String {
+    use crate::config::Config;
+    let path = if let Some(p) = Config::before_reset_transcript_path_resolved() {
+        p
+    } else {
+        Config::default_before_reset_transcript_path()
+    };
+    if !path.exists() {
+        return "**Before-reset transcript:** no file yet · `before reset transcript path` for the location · written when a before-reset hook runs · does not dump JSONL."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Before-reset transcript:** empty file · `before reset transcript path` for the location · does not dump JSONL."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Before-reset transcript:** **{label}** on disk · `before reset transcript path` for the location · does not dump JSONL or trigger reset."
+            )
+        }
+        Err(_) => {
+            "**Before-reset transcript:** could not read size · `before reset transcript path` for the location."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “where is the before-reset transcript / last_session_before_reset.jsonl…” asks.
 /// Config/env path only — does not dump JSONL, run the hook, or clear a session.
+/// Size asks use the before-reset transcript size lane (v0.1.921).
 pub fn looks_like_before_reset_transcript_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 88 {
+        return false;
+    }
+    // Size asks use the before-reset transcript size lane (v0.1.921).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+    {
         return false;
     }
     // String-only sibling excludes (do not nest looks_like_* — exponential).
@@ -17529,7 +17779,7 @@ pub fn format_before_reset_transcript_path_gateway() -> String {
         "default when a before-reset hook runs (set `beforeResetTranscriptPath` / `MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH` to override)"
     };
     format!(
-        "**Before-reset transcript:** `{display}` · {note} · path only · does not dump JSONL or trigger reset · `session reset phrases path` for the phrases file · `before compaction transcript path` for compaction export."
+        "**Before-reset transcript:** `{display}` · {note} · path only · `before reset transcript size` for on-disk bytes · does not dump JSONL or trigger reset · `session reset phrases path` for the phrases file · `before compaction transcript path` for compaction export."
     )
 }
 
@@ -27144,6 +27394,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_before_compaction_transcript_path_request(content) {
         return Some(format_before_compaction_transcript_path_gateway());
     }
+    // before-reset transcript size before path (stat only; no dump/hook).
+    if looks_like_before_reset_transcript_size_request(content) {
+        return Some(format_before_reset_transcript_size_gateway());
+    }
     // before-reset transcript before session_reset_phrases / session-dir path lanes.
     if looks_like_before_reset_transcript_path_request(content) {
         return Some(format_before_reset_transcript_path_gateway());
@@ -27658,6 +27912,8 @@ pub fn format_ops_help_gateway() -> String {
 • `escalation patterns path` · `where is escalation_patterns.md` · `escalation file path` — escalation phrases file (config only; no list/append; `escalation patterns size` for on-disk bytes; does not steal session-reset)\n\
 • `session reset size` · `session_reset_phrases.md size` · `how big is session reset phrases` · `session reset phrases size` — session_reset_phrases.md file size on disk (stat only; no dump; does not steal `session reset phrases path` / escalation / cookie reject)\n\
 • `session reset phrases path` · `where is session_reset_phrases.md` · `reset phrases path` — session reset phrases file (config only; no list/clear; `session reset phrases size` for on-disk bytes; does not steal escalation)\n\
+• `before reset transcript size` · `before-reset transcript size` · `how big is before reset transcript` · `last_session_before_reset.jsonl size` — before-reset transcript size on disk (stat only; no dump; does not steal `before reset transcript path` / before-compaction / session reset phrases)\n\
+• `before reset transcript path` · `where is before reset transcript` · `last_session_before_reset.jsonl` — before-reset JSONL path (config/env only; no dump/hook; `before reset transcript size` for on-disk bytes; does not steal before-compaction)\n\
 • `cookie reject size` · `cookie_reject_patterns.md size` · `how big is cookie reject patterns` · `cookie reject patterns size` — cookie_reject_patterns.md file size on disk (stat only; no dump; does not steal `cookie reject patterns path` / session-reset / escalation)\n\
 • `cookie reject patterns path` · `where is cookie_reject_patterns.md` · `cookie reject path` · `reject patterns path` — cookie reject patterns file (config only; no list/edit; `cookie reject patterns size` for on-disk bytes; does not steal browser cookies)\n\
 • `organizer rules size` · `downloads-organizer-rules.md size` · `how big is downloads organizer rules` · `downloads organizer rules size` — downloads-organizer-rules.md file size on disk (stat only; no dump; does not steal `downloads organizer rules path` / organizer state / `/downloads`)\n\
@@ -29202,6 +29458,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only before-compaction transcript path asks (v0.1.861) — config/env only; no dump/hook.
     if looks_like_before_compaction_transcript_path_request(question) {
+        return true;
+    }
+    // Read-only before-reset transcript size asks (v0.1.921) — stat only; no dump/hook.
+    if looks_like_before_reset_transcript_size_request(question) {
         return true;
     }
     // Read-only before-reset transcript path asks (v0.1.860) — config/env only; no dump/hook.
@@ -32304,6 +32564,12 @@ mod tests {
         assert!(!looks_like_before_reset_transcript_path_request(
             "export before reset transcript"
         ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "before reset transcript size"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "how big is before reset transcript"
+        ));
         assert!(!looks_like_session_reset_phrases_path_request(
             "before reset transcript path"
         ));
@@ -32315,6 +32581,80 @@ mod tests {
             "{reply}"
         );
         assert!(reply.to_lowercase().contains("path only"), "{reply}");
+        assert!(
+            reply.contains("before reset transcript size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn before_reset_transcript_size_request_detected() {
+        assert!(looks_like_before_reset_transcript_size_request(
+            "before reset transcript size"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "before-reset transcript size"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "before_reset transcript size"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "last_session_before_reset.jsonl size"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "how big is before reset transcript"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "how big is the before-reset transcript"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "how large is last_session_before_reset.jsonl"
+        ));
+        assert!(looks_like_before_reset_transcript_size_request(
+            "before reset jsonl size"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "before reset transcript path"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "where is before reset transcript"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "before compaction transcript size"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "session reset phrases size"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "dump before reset transcript"
+        ));
+        assert!(!looks_like_before_reset_transcript_size_request(
+            "export before reset transcript"
+        ));
+        assert!(!looks_like_before_reset_transcript_path_request(
+            "before reset transcript size"
+        ));
+        assert!(!looks_like_session_reset_phrases_size_request(
+            "before reset transcript size"
+        ));
+        let reply = try_operator_instant_reply("before reset transcript size")
+            .expect("before-reset transcript size instant");
+        assert!(reply.contains("Before-reset transcript"), "{reply}");
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("no file yet")
+                || reply.contains("empty")
+                || reply.contains("B")
+                || reply.contains("bytes")
+                || reply.contains("KB")
+                || reply.contains("kB")
+                || reply.contains("MB"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("before reset transcript path") || reply.contains("does not"),
+            "{reply}"
+        );
     }
 
     #[test]
