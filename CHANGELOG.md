@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.923] - 2026-09-07
+
+### Added
+
+- **Instant lane: Ori vault size** — `ori vault size`, `how big is ori vault`, `mnemos vault size`, `ori_vault size`, and close variants return on-disk bytes of the configured Ori vault folder without Ollama (Discord + AI Chat; recursive file bytes — no list/MCP; does not steal `ori vault path` / `/ori` Ready; p50 latency).
+
 ## [0.1.922] - 2026-09-07
 
 ### Added
