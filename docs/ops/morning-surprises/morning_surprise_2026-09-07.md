@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product keeps for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.919** | Agent Ops Overview Live idle calm (Discord Ready + empty → ok wash + warm empty copy; not amber warn; design review / `feature-agent-ops`) |
 | **v0.1.918** | Instant lane: Discord channel memory size (`discord memory size` / `memory-discord size` / `how big is discord memory`; sum `memory-discord-*.md`; stat only) |
 | **v0.1.917** | Instant lane: LaunchAgent plist size (`launchagent size` / `how big is the launchagent` / `mac-stats.plist size` / `harness plist size`; app KeepAlive + overnight harness; stat only) |
 | **v0.1.916** | Instant lane: `browser-credentials.toml` size (`browser credentials size` / `how big are browser credentials`; stat only; no secret dump) |
@@ -17,6 +18,6 @@ Overnight Track B (20:00–06:00) shipped product keeps for Ralf.
 
 ## Notes
 
-- Digester open stayed empty after filters (Elmasnow weather stale; Review logs already instant).
-- Design review grace after cpu-metrics recapture; next stale screens: Agent Ops / AI Chat when due.
-- Next fuel: session-memory / before-reset transcript / Ori vault sizes, or sibling Hermes insights / session UX.
+- Digester open pointed at stale `feature-agent-ops.png` (~26d); design review due=true → Overview Live idle polish.
+- Debug log: single-instance busy WARN only (expected KeepAlive thrash).
+- Next fuel: session-memory / before-reset / Ori vault sizes, or sibling Hermes insights / session UX; recapture Agent Ops PNG if TCC blocked this tick.

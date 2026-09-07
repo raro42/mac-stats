@@ -20307,12 +20307,12 @@ function tryChainRingGaugeToDetailsFirst() {
 }
 
 function tryChainSparklineToRingLast() {
-  const chips = getRingGaugeChips();
-  if (!chips.length) return false;
-  const target = chips[chips.length - 1];
-  refreshRingGaugeRovingTabindex(target);
-  target.focus();
-  return true;
+  const glance = document.getElementById('history-hot-attention-glance');
+  if (glance && !glance.hidden) {
+    glance.focus();
+    return true;
+  }
+  return tryChainSparklineToRingLastDirect();
 }
 
 function tryChainSparklineToPowerStripFirst() {

@@ -6041,11 +6041,15 @@ function setOverviewLiveStatus(rows, insights) {
         return;
     }
     if (!live.length) {
-        card.classList.add('ops-health-warn');
-        card.title =
-            stage === 'connected' || readyMatch
-                ? 'No live sessions — gateway ready'
-                : 'No live sessions';
+        // Idle + Discord Ready is calm — not amber “warn” (false alarm when nothing is wrong).
+        const ready = stage === 'connected' || readyMatch;
+        if (ready) {
+            card.classList.add('ops-health-ok');
+            card.title = 'Waiting · gateway ready · no live chats yet';
+        } else {
+            card.classList.add('ops-health-warn');
+            card.title = 'No live sessions';
+        }
         return;
     }
     card.classList.add('ops-health-ok');
@@ -6062,8 +6066,13 @@ function renderOverviewLive(rows, insights) {
     setOverviewLiveStatus(rows, insights);
     if (!rows || !rows.length) {
         paintOpsOverviewHeadCount('ops-overview-live', '0', { zero: true });
+        const dg = insights?.discord_gateway || '';
+        const ready =
+            /last Ready/i.test(dg) || /stage=connected/i.test(dg);
         body.innerHTML = opsOverviewEmptyHtml(
-          'No live sessions — chats appear here while agents run',
+          ready
+            ? 'Nothing live yet — chats show up here while agents run'
+            : 'Nothing live yet — check Discord Ready, then come back',
           'sessions',
           'Open Sessions'
         );

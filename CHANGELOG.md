@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.919] - 2026-09-07
 
+### Changed
+
+- **Agent Ops Overview Live idle** — empty Live card with Discord Ready uses calm ok wash + warmer copy (`Nothing live yet — chats show up here while agents run`) instead of amber warn; disconnected / reconnect noise still warn/bad (design review / `feature-agent-ops`).
 
 ## [0.1.918] - 2026-09-07
 
