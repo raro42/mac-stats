@@ -6,6 +6,7 @@ Overnight Track B kept shipping p50 instant file-size lanes while digester open 
 
 | Version | What |
 |---------|------|
+| **v0.1.912** | Instant: downloads-organizer-rules.md size (`organizer rules size` / `how big is downloads organizer rules`; no dump; path / state / `/downloads` untouched) |
 | **v0.1.911** | Instant: `cookie_reject_patterns.md` size (`cookie reject size` / `how big is cookie reject patterns`; no dump; path lane untouched) |
 | **v0.1.910** | Instant: `session_reset_phrases.md` size |
 | **v0.1.909** | Instant: `escalation_patterns.md` size |
@@ -19,4 +20,4 @@ Overnight Track B kept shipping p50 instant file-size lanes while digester open 
 
 ## Why it matters
 
-Operators can ask how big the cookie-banner reject list file is without waking Ollama or Brave — same pattern as escalation / session-reset size lanes.
+Operators can ask how big the downloads organizer rules file is without waking Ollama or Brave — same pattern as cookie-reject / session-reset size lanes.
