@@ -15083,7 +15083,237 @@ pub fn format_perplexity_last_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Perplexity last:** **{label}** on disk · last Perplexity Search cache · `perplexity last path` for the file · `/perplexity` for Top/Snippet."
+                "**Perplexity last:** **{label}** on disk · last Perplexity Search cache · `perplexity last path` for the file · `perplexity last age` for last write · `/perplexity` for Top/Snippet."
+            )
+        }
+        Err(e) => format!("**Perplexity last** — could not stat `perplexity_last.json`: {e}"),
+    }
+}
+
+/// True for short “how old is perplexity_last.json / perplexity last age…” asks.
+/// Mtime only — does not steal path / size / `/perplexity` / Top/Snippet dump.
+pub fn looks_like_perplexity_last_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("search for")
+        || n.contains("look up")
+        || n.contains("run search")
+        || n.contains("do a search")
+        || n.contains("snippet")
+        || n.contains("top result")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n.contains("api key")
+        || n.contains("perplexity key")
+        || n == "/perplexity"
+        || n == "perplexity"
+        || n == "last search"
+        || n == "last perplexity"
+        || n == "perplexity results"
+        || n == "search results"
+        || n == "perplexity search"
+        || n == "/perplexity top"
+        || n == "perplexity top"
+        || n == "/perplexity snippet"
+        || n == "perplexity snippet"
+        || n == "/perplexity key"
+        || n == "perplexity key"
+        || n == "perplexity status"
+        || n == "perplexity ready"
+        || n == "perplexity age"
+        || n == "how old is perplexity"
+        || n == "how old is the perplexity"
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("config.json")
+        || n.contains("config age")
+        || n.contains("pinned_processes")
+        || n.contains("pinned processes")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("delivery awareness")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let px_ctx = n.contains("perplexity_last.json")
+        || n.contains("perplexity_last")
+        || n.contains("perplexity-last.json")
+        || n.contains("perplexity-last")
+        || n.contains("perplexity last.json")
+        || n.contains("perplexity last file")
+        || n.contains("perplexity cache")
+        || n.contains("last search file")
+        || n.contains("last search cache")
+        || n.contains("perplexity cache file")
+        || n.contains("perplexity results file")
+        || n == "perplexity last age"
+        || n == "how old is perplexity last"
+        || n == "how old is the perplexity last"
+        || n == "when was perplexity last updated"
+        || n == "when was the perplexity last updated"
+        || n == "mac-stats perplexity last age"
+        || n == "mac stats perplexity last age"
+        || n == "is perplexity last stale"
+        || n == "is the perplexity last stale"
+        || (n.contains("perplexity")
+            && (n.contains("last") || n.contains("cache") || n.contains("json") || n.contains("file"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("last search")
+            && (n.contains("file") || n.contains("json") || n.contains("cache"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !px_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "perplexity last age"
+            | "perplexity_last.json age"
+            | "perplexity_last age"
+            | "perplexity_last file age"
+            | "perplexity-last age"
+            | "perplexity-last.json age"
+            | "perplexity last file age"
+            | "perplexity last json age"
+            | "perplexity cache age"
+            | "perplexity cache file age"
+            | "perplexity results file age"
+            | "last search file age"
+            | "last search cache age"
+            | "mac-stats perplexity last age"
+            | "mac stats perplexity last age"
+            | "how old is perplexity last"
+            | "how old is the perplexity last"
+            | "how old is perplexity_last.json"
+            | "how old is the perplexity_last.json"
+            | "how old is the perplexity last file"
+            | "how old is perplexity cache"
+            | "how old is the perplexity cache"
+            | "how old is last search file"
+            | "how old is the last search file"
+            | "when was perplexity last updated"
+            | "when was the perplexity last updated"
+            | "when was perplexity_last.json updated"
+            | "when was the perplexity_last.json updated"
+            | "perplexity last last modified"
+            | "perplexity_last.json last modified"
+            | "last search file last modified"
+            | "is perplexity last stale"
+            | "is the perplexity last stale"
+            | "is perplexity_last.json stale"
+            | "is the perplexity_last.json stale"
+    ) || (px_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM perplexity_last.json age from file mtime (stat only; no Top/Snippet dump / `/perplexity`).
+pub fn format_perplexity_last_age_gateway() -> String {
+    let path = crate::config::Config::perplexity_last_file_path();
+    if !path.exists() {
+        return "**Perplexity last:** no `perplexity_last.json` yet · app writes it after a successful Perplexity Search · `perplexity last path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Perplexity last:** last write **{age}** ago · last Perplexity Search cache · `perplexity last path` for the file · `perplexity last size` for on-disk bytes · `/perplexity` for Top/Snippet."
             )
         }
         Err(e) => format!("**Perplexity last** — could not stat `perplexity_last.json`: {e}"),
@@ -15093,6 +15323,7 @@ pub fn format_perplexity_last_size_gateway() -> String {
 /// True for short “where is perplexity_last.json / perplexity last path…” asks.
 /// Config path only — does not list Top/Snippet results or run a new search.
 /// Size asks use the perplexity_last.json size lane (v0.1.896).
+/// Age asks use the perplexity_last.json age lane (v0.1.931).
 pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -15158,6 +15389,13 @@ pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the perplexity_last.json age lane (v0.1.931) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -15272,7 +15510,7 @@ pub fn format_perplexity_last_path_gateway() -> String {
     let path = crate::config::Config::perplexity_last_file_path();
     let display = path.display().to_string();
     format!(
-        "**Perplexity last file:** `{display}` · last Perplexity Search cache on disk · `perplexity last size` for on-disk bytes · `/perplexity` for Top/Snippet · does not search or dump results."
+        "**Perplexity last file:** `{display}` · last Perplexity Search cache on disk · `perplexity last size` / `perplexity last age` for bytes / mtime · `/perplexity` for Top/Snippet · does not search or dump results."
     )
 }
 
@@ -25358,7 +25596,7 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
     if n.chars().count() > 48 {
         return false;
     }
-    // Path/size asks go to perplexity_last.json instant (inline — avoid calling path/size detectors).
+    // Path/size/age asks go to perplexity_last.json instant (inline — avoid calling path/size/age detectors).
     if n.contains("perplexity_last.json")
         || n.contains("perplexity_last")
         || n.contains("perplexity-last")
@@ -25368,6 +25606,7 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
         || n.contains("perplexity results file")
         || n.contains("perplexity results path")
         || n.contains("perplexity last size")
+        || n.contains("perplexity last age")
         || (n.contains("perplexity")
             && (n.contains("path")
                 || n.contains("where")
@@ -25380,7 +25619,13 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
                 || n.contains("size")
                 || n.contains("big")
                 || n.contains("large")
-                || n.contains("bytes")))
+                || n.contains("bytes")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
         || (n.contains("last search")
             && (n.contains("path")
                 || n.contains("where")
@@ -25389,7 +25634,10 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
                 || n.contains("cache")
                 || n.contains("size")
                 || n.contains("big")
-                || n.contains("large")))
+                || n.contains("large")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")))
     {
         return false;
     }
@@ -29702,9 +29950,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_disk_cleanup_path_request(content) {
         return Some(format_disk_cleanup_path_gateway());
     }
-    // perplexity_last.json size before path (stat only; no dump).
+    // perplexity_last.json size before age/path (stat only; no dump).
     if looks_like_perplexity_last_size_request(content) {
         return Some(format_perplexity_last_size_gateway());
+    }
+    // perplexity_last.json age before path (mtime only; no dump).
+    if looks_like_perplexity_last_age_request(content) {
+        return Some(format_perplexity_last_age_gateway());
     }
     if looks_like_perplexity_last_path_request(content) {
         return Some(format_perplexity_last_path_gateway());
@@ -29979,8 +30231,9 @@ pub fn format_ops_help_gateway() -> String {
 • `disk cleanup size` · `disk_cleanup.json size` · `how big is disk cleanup` — disk_cleanup.json file size on disk (stat only; no dump; does not steal `disk cleanup path` / `disk cleanup age` / `/disk` / quarantine)\n\
 • `disk cleanup age` · `disk_cleanup.json age` · `how old is disk cleanup` · `when was disk cleanup updated` — disk_cleanup.json last write age (mtime; no dump; does not steal `disk cleanup path` / `disk cleanup size` / `/disk`)\n\
 • `disk cleanup path` · `where is disk_cleanup.json` · `cleanup file path` — Disk Cleanup scopes file (config only; no list/reclaim; `disk cleanup size` / `disk cleanup age` for bytes / mtime; does not steal `/disk`)\n\
-• `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; does not steal `/perplexity`)\n\
-• `perplexity last size` · `perplexity_last.json size` · `how big is perplexity last` — perplexity_last.json file size on disk (stat only; no dump; does not steal `perplexity last path` / `/perplexity`)\n\
+• `perplexity last size` · `perplexity_last.json size` · `how big is perplexity last` — perplexity_last.json file size on disk (stat only; no dump; does not steal `perplexity last path` / `perplexity last age` / `/perplexity`)\n\
+• `perplexity last age` · `perplexity_last.json age` · `how old is perplexity last` · `when was perplexity last updated` — perplexity_last.json last write age (mtime; no dump; does not steal `perplexity last path` / `perplexity last size` / `/perplexity`)\n\
+• `perplexity last path` · `where is perplexity_last.json` · `last search file` — last Perplexity Search cache file (config only; no Top/Snippet dump; `perplexity last size` / `perplexity last age` for bytes / mtime; does not steal `/perplexity`)\n\
 • `discord channels size` · `discord_channels.json size` · `how big is discord channels` — discord_channels.json file size on disk (stat only; no dump; does not steal `discord channels path` / `discord channels age` / `/discord`)\n\
 • `discord channels age` · `discord_channels.json age` · `how old is discord channels` · `when was discord channels updated` — discord_channels.json last write age (mtime; no dump; does not steal `discord channels path` / `discord channels size` / `/discord`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; `discord channels size` / `discord channels age` for bytes / mtime; does not steal `/discord`)\n\
@@ -31815,6 +32068,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only perplexity_last.json size asks (v0.1.896) — stat only; no dump/Top/Snippet.
     if looks_like_perplexity_last_size_request(question) {
+        return true;
+    }
+    // Read-only perplexity_last.json age asks (v0.1.931) — mtime only; no dump/Top/Snippet.
+    if looks_like_perplexity_last_age_request(question) {
         return true;
     }
     // Read-only perplexity_last.json path asks (v0.1.836) — config only; no Top/Snippet dump.
@@ -38561,6 +38818,13 @@ mod tests {
         assert!(!looks_like_perplexity_last_path_request(
             "how big is perplexity last"
         ));
+        assert!(!looks_like_perplexity_last_path_request("perplexity last age"));
+        assert!(!looks_like_perplexity_last_path_request(
+            "perplexity_last.json age"
+        ));
+        assert!(!looks_like_perplexity_last_path_request(
+            "how old is perplexity last"
+        ));
         assert!(!looks_like_perplexity_request("perplexity last path"));
         assert!(!looks_like_perplexity_request("where is perplexity_last.json"));
         assert!(looks_like_perplexity_request("/perplexity"));
@@ -38569,7 +38833,10 @@ mod tests {
         assert!(reply.contains("Perplexity last file"));
         assert!(reply.contains("perplexity_last") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("perplexity last size") || reply.contains("on-disk"),
+            reply.to_lowercase().contains("perplexity last size")
+                || reply.to_lowercase().contains("perplexity last age")
+                || reply.contains("on-disk")
+                || reply.contains("bytes / mtime"),
             "{reply}"
         );
     }
@@ -38598,6 +38865,10 @@ mod tests {
         assert!(!looks_like_perplexity_last_size_request(
             "where is perplexity_last.json"
         ));
+        assert!(!looks_like_perplexity_last_size_request("perplexity last age"));
+        assert!(!looks_like_perplexity_last_size_request(
+            "how old is perplexity last"
+        ));
         assert!(!looks_like_perplexity_last_size_request("/perplexity"));
         assert!(!looks_like_perplexity_last_size_request("perplexity"));
         assert!(!looks_like_perplexity_last_size_request("perplexity size"));
@@ -38615,6 +38886,89 @@ mod tests {
                 && (reply.contains("on disk")
                     || reply.contains("no `perplexity_last.json`")
                     || reply.contains("empty `perplexity_last.json`")),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn perplexity_last_age_request_detected() {
+        assert!(looks_like_perplexity_last_age_request("perplexity last age"));
+        assert!(looks_like_perplexity_last_age_request(
+            "perplexity_last.json age"
+        ));
+        assert!(looks_like_perplexity_last_age_request("perplexity_last age"));
+        assert!(looks_like_perplexity_last_age_request(
+            "perplexity last file age"
+        ));
+        assert!(looks_like_perplexity_last_age_request("perplexity cache age"));
+        assert!(looks_like_perplexity_last_age_request(
+            "how old is perplexity last"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "how old is perplexity_last.json"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "when was perplexity last updated"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "when was perplexity_last.json updated"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "perplexity_last.json last modified"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "is perplexity last stale"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "mac-stats perplexity last age"
+        ));
+        assert!(looks_like_perplexity_last_age_request(
+            "last search file age"
+        ));
+        assert!(!looks_like_perplexity_last_age_request("perplexity last path"));
+        assert!(!looks_like_perplexity_last_age_request(
+            "where is perplexity_last.json"
+        ));
+        assert!(!looks_like_perplexity_last_age_request("perplexity last size"));
+        assert!(!looks_like_perplexity_last_age_request(
+            "how big is perplexity last"
+        ));
+        assert!(!looks_like_perplexity_last_age_request("perplexity_last.json"));
+        assert!(!looks_like_perplexity_last_age_request("/perplexity"));
+        assert!(!looks_like_perplexity_last_age_request("perplexity"));
+        assert!(!looks_like_perplexity_last_age_request("perplexity age"));
+        assert!(!looks_like_perplexity_last_age_request("how old is perplexity"));
+        assert!(!looks_like_perplexity_last_age_request("last search"));
+        assert!(!looks_like_perplexity_last_age_request("perplexity top"));
+        assert!(!looks_like_perplexity_last_age_request("history age"));
+        assert!(!looks_like_perplexity_last_age_request(
+            "discord channels age"
+        ));
+        assert!(!looks_like_perplexity_last_path_request("perplexity last age"));
+        assert!(!looks_like_perplexity_last_size_request("perplexity last age"));
+        assert!(!looks_like_perplexity_last_size_request(
+            "how old is perplexity last"
+        ));
+        assert!(!looks_like_discord_channels_age_request(
+            "perplexity last age"
+        ));
+        assert!(!looks_like_history_age_request("perplexity last age"));
+        assert!(!looks_like_disk_cleanup_age_request("perplexity last age"));
+        assert!(!looks_like_perplexity_request("perplexity last age"));
+        assert!(!looks_like_perplexity_request("perplexity_last.json age"));
+        let reply = try_operator_instant_reply("perplexity last age")
+            .expect("perplexity last age instant");
+        assert!(
+            reply.contains("Perplexity last")
+                && (reply.contains("last write")
+                    || reply.contains("no `perplexity_last.json`")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Perplexity last file:"));
+        assert!(
+            reply.to_lowercase().contains("perplexity last path")
+                || reply.to_lowercase().contains("perplexity last size")
+                || reply.contains("/perplexity"),
             "{reply}"
         );
     }

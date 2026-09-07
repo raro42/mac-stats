@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.931] - 2026-09-08
+
+### Added
+
+- **Instant lane: perplexity_last.json age** — `perplexity last age`, `perplexity_last.json age`, `how old is perplexity last`, `when was perplexity last updated`, and close variants return the last-write age of `perplexity_last.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `perplexity last path` / `perplexity last size` / `/perplexity`; p50 latency).
+
 ## [0.1.930] - 2026-09-08
 
 ### Added
