@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.915] - 2026-09-07
+
+### Added
+
+- **Instant lane: browser_storage_state.json size** — `storage state size`, `browser_storage_state.json size`, `how big are browser cookies`, `browser cookies size`, and close variants return on-disk size of the CDP cookie jar without Ollama (Discord + AI Chat; stat only — no dump; does not steal `storage state path` / cookie reject / browser credentials; p50 latency).
+
 ## [0.1.914] - 2026-09-07
 
 ### Added

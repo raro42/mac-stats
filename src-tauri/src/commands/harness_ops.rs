@@ -9676,19 +9676,296 @@ pub fn format_browser_credentials_path_gateway() -> String {
     )
 }
 
-/// True for short “where is browser_storage_state.json / cookies path…” asks.
-/// Config path only — does not list, dump, clear, or edit cookies from the jar.
+/// True for short “how big is browser_storage_state.json / storage state size…” asks.
+/// Stat only — does not dump cookies, clear the jar, or return path / `/browser` Ready.
+pub fn looks_like_browser_storage_state_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        // Do not use bare `age` — it matches inside `storage`.
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || (n.contains("updated")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || (n.contains("modified")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("export")
+        || n.contains("import")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/browser"
+        || n == "/cdp"
+        || n == "browser"
+        || n == "cdp"
+        || n == "browser status"
+        || n == "cdp status"
+        || n == "browser ready"
+        || n == "cdp ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let state_ctx = n.contains("browser_storage_state")
+        || n.contains("browser-storage-state")
+        || n.contains("browser storage state")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || n.contains("storage state size")
+        || n == "how big is storage state"
+        || n == "how big is the storage state"
+        || n == "how large is storage state"
+        || n == "how large is the storage state"
+        || n == "how big are browser cookies"
+        || n == "how large are browser cookies"
+        || (n.contains("cookies")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("jar")))
+        || (n.contains("cookie")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("jar")));
+    if !state_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "storage state size"
+            | "storage_state size"
+            | "storage_state.json size"
+            | "browser storage state size"
+            | "browser_storage_state size"
+            | "browser_storage_state.json size"
+            | "browser-storage-state size"
+            | "browser-storage-state.json size"
+            | "browser storage state file size"
+            | "storage state file size"
+            | "storage state bytes"
+            | "browser_storage_state.json bytes"
+            | "cookie jar size"
+            | "cookies jar size"
+            | "browser cookies size"
+            | "browser cookie size"
+            | "browser cookies file size"
+            | "cdp cookies size"
+            | "how big is storage state"
+            | "how big is the storage state"
+            | "how big is browser_storage_state.json"
+            | "how big is the browser_storage_state.json"
+            | "how big is browser storage state"
+            | "how big is the browser storage state"
+            | "how big is the storage state file"
+            | "how big are browser cookies"
+            | "how big is the cookie jar"
+            | "how large is storage state"
+            | "how large is the storage state"
+            | "how large is browser_storage_state.json"
+            | "how large is browser storage state"
+            | "how large are browser cookies"
+            | "mac-stats storage state size"
+            | "mac stats storage state size"
+            | "mac-stats browser_storage_state.json size"
+            | "mac stats browser_storage_state.json size"
+            | "mac-stats cookies size"
+            | "mac stats cookies size"
+    ) || (state_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM browser_storage_state.json file size (stat only; no dump/list/clear cookies).
+pub fn format_browser_storage_state_size_gateway() -> String {
+    let path = crate::config::Config::browser_storage_state_json_path();
+    if !path.exists() {
+        return "**Browser storage state:** no `browser_storage_state.json` yet · `storage state path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Browser storage state:** empty `browser_storage_state.json` · `storage state path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Browser storage state:** **{label}** on disk · CDP cookie jar · `storage state path` for the file · does not dump cookies or clear the jar."
+            )
+        }
+        Err(e) => {
+            format!(
+                "**Browser storage state** — could not stat `browser_storage_state.json`: {e}"
+            )
+        }
+    }
+}
+
+/// True for short “where is browser_storage_state.json / browser cookies path…” asks.
+/// Config path only — does not list/dump/clear cookies.
+/// Size asks use the browser_storage_state.json size lane (v0.1.915).
 pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
         return false;
     }
-    // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate asks.
+    // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate / size asks.
     // String-only cookie_reject exclude (do not nest looks_like_*_path_request — exponential).
     if n.contains("cookie_reject")
         || n.contains("cookie-reject")
         || n.contains("cookie reject")
         || n.contains("reject patterns")
+        // Size asks use the browser_storage_state.json size lane (v0.1.915).
+        || n.contains("size")
+        || n.contains("bytes")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
         || looks_like_config_path_request(content)
         || looks_like_debug_log_path_request(content)
         || looks_like_screenshots_path_request(content)
@@ -9848,7 +10125,7 @@ pub fn format_browser_storage_state_path_gateway() -> String {
     let path = crate::config::Config::browser_storage_state_json_path();
     let display = path.display().to_string();
     format!(
-        "**Browser storage state:** `{display}` · CDP cookie jar · `/browser` for CDP status."
+        "**Browser storage state:** `{display}` · CDP cookie jar · path only · `storage state size` for on-disk bytes · `/browser` for CDP status."
     )
 }
 
@@ -26109,6 +26386,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_credentials_path_request(content) {
         return Some(format_browser_credentials_path_gateway());
     }
+    // browser_storage_state.json size before path (stat only; no dump).
+    if looks_like_browser_storage_state_size_request(content) {
+        return Some(format_browser_storage_state_size_gateway());
+    }
     if looks_like_browser_storage_state_path_request(content) {
         return Some(format_browser_storage_state_path_gateway());
     }
@@ -26407,7 +26688,8 @@ pub fn format_ops_help_gateway() -> String {
 • `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit)\n\
-• `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear)\n\
+• `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
+• `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` for on-disk bytes)\n\
 • `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `/downloads`)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
 • `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
@@ -28137,6 +28419,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser credentials file path asks (v0.1.827) — config only; no list/edit/dump.
     if looks_like_browser_credentials_path_request(question) {
+        return true;
+    }
+    // Read-only browser_storage_state.json size asks (v0.1.915) — stat only; no dump/clear.
+    if looks_like_browser_storage_state_size_request(question) {
         return true;
     }
     // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
@@ -33363,6 +33649,82 @@ mod tests {
         assert!(
             reply.contains("browser_storage_state.json") || reply.contains(".mac-stats")
         );
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser_storage_state.json size"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "how big are browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "storage state size"
+        ));
+    }
+
+    #[test]
+    fn browser_storage_state_size_request_detected() {
+        assert!(looks_like_browser_storage_state_size_request(
+            "storage state size"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "browser_storage_state.json size"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "browser cookies size"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "how big are browser cookies"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "how big is browser_storage_state.json"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "how large is the storage state file"
+        ));
+        assert!(looks_like_browser_storage_state_size_request(
+            "cookie jar size"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "storage state path"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "where are browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "dump browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "clear cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "cookie reject patterns size"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "browser downloads size"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request("/browser"));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser_storage_state.json size"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_size_request(
+            "browser cookies size"
+        ));
+        assert!(!looks_like_browser_downloads_size_request(
+            "storage state size"
+        ));
+        assert!(!looks_like_browser_ready_request("storage state size"));
+        let reply = try_operator_instant_reply("browser_storage_state.json size")
+            .expect("browser storage state size instant");
+        assert!(
+            reply.contains("Browser storage state")
+                && (reply.contains("on disk")
+                    || reply.contains("no `browser_storage_state.json`")
+                    || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Browser storage state: `"));
     }
 
     #[test]
