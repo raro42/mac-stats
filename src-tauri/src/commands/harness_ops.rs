@@ -5496,6 +5496,7 @@ pub fn format_memory_md_path_gateway() -> String {
 /// True for short “where is discord memory / memory-discord path…” asks.
 /// Config path only — does not list Knowledge files or dump channel notes.
 /// Does not steal bare `discord memory` / `/knowledge discord` (list lane).
+/// Size asks use the Discord channel memory size lane (v0.1.918).
 pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 88 {
@@ -5521,7 +5522,15 @@ pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
         return false;
     }
     // String-only sibling excludes (do not nest looks_like_* — exponential).
-    if n.contains("memory.md")
+    // Size asks use the Discord channel memory size lane (v0.1.918).
+    if n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("memory.md")
         || n.contains("memory-md")
         || n.contains("curated memory")
         || n == "memory path"
@@ -5682,8 +5691,253 @@ pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
 pub fn format_discord_memory_path_gateway() -> String {
     let agents = crate::config::Config::agents_dir().display().to_string();
     format!(
-        "**Discord channel memory:** `{agents}/memory-discord-<channelId>.md` · under agents/ · path only · does not list or dump · `/knowledge discord` to list · `memory.md path` for curated · `memory path` for notes."
+        "**Discord channel memory:** `{agents}/memory-discord-<channelId>.md` · under agents/ · path only · `discord memory size` for on-disk bytes · does not list or dump · `/knowledge discord` to list · `memory.md path` for curated · `memory path` for notes."
     )
+}
+
+/// True for short “how big is discord memory / memory-discord size…” asks.
+/// Stat only — sums `memory-discord-*.md` under agents/; does not list or dump.
+/// Does not steal `discord memory path` / `/knowledge discord` / `memory.md size` / `notes size`.
+pub fn looks_like_discord_memory_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact Knowledge Discord list asks stay on `/knowledge discord`.
+    if matches!(
+        n.as_str(),
+        "discord memory"
+            | "discord memories"
+            | "channel memory"
+            | "channel memories"
+            | "/knowledge"
+            | "/knowledge discord"
+            | "knowledge discord"
+            | "discord knowledge"
+    ) {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || (n.contains("updated")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || (n.contains("modified")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("update")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("channels.json")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("session path")
+        || n.contains("session size")
+        || n.contains("agents size")
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n == "/discord"
+        || n == "discord"
+        || n == "discord ready"
+        || n == "discord status"
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let dm_ctx = n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("memorydiscord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("discord-channel-memory")
+        || (n.contains("discord")
+            && n.contains("memory")
+            && (n.contains("size")
+                || n.contains("big")
+                || n.contains("large")
+                || n.contains("bytes")
+                || n.contains(" mb")
+                || n.contains(" kb")
+                || n.contains(" gi")));
+    if !dm_ctx {
+        return false;
+    }
+    if !(n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "discord memory size"
+            | "discord memories size"
+            | "discord memory file size"
+            | "discord memories file size"
+            | "channel memory size"
+            | "channel memories size"
+            | "channel memory file size"
+            | "discord channel memory size"
+            | "discord channel memory file size"
+            | "memory-discord size"
+            | "memory_discord size"
+            | "memory-discord.md size"
+            | "memory-discord file size"
+            | "memory-discord files size"
+            | "how big is discord memory"
+            | "how big is the discord memory"
+            | "how big are discord memory"
+            | "how big are discord memories"
+            | "how big is channel memory"
+            | "how big is the channel memory"
+            | "how big are channel memories"
+            | "how big is discord channel memory"
+            | "how big is memory-discord"
+            | "how big are memory-discord"
+            | "how big are memory-discord files"
+            | "how large is discord memory"
+            | "how large is the discord memory"
+            | "how large are discord memories"
+            | "how large is memory-discord"
+            | "how large are memory-discord files"
+            | "mac-stats discord memory size"
+            | "mac stats discord memory size"
+    ) || (dm_ctx
+        && (n.contains("size")
+            || n.contains("big")
+            || n.contains("large")
+            || n.contains("bytes")
+            || n.contains(" mb")
+            || n.contains(" kb")
+            || n.contains(" gi")))
+}
+
+/// Zero-LLM Discord channel memory file sizes (sum `memory-discord-*.md`; no list/dump).
+pub fn format_discord_memory_size_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut total: u64 = 0;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("memory-discord-") || !name.ends_with(".md") {
+                continue;
+            }
+            let path = entry.path();
+            if let Ok(meta) = std::fs::metadata(&path) {
+                if meta.is_file() {
+                    total = total.saturating_add(meta.len());
+                    count = count.saturating_add(1);
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Discord channel memory:** no `memory-discord-*.md` yet · `discord memory path` for the pattern · `/knowledge discord` to list · does not dump notes."
+            .to_string();
+    }
+    let label = crate::commands::disk_cleanup::format_bytes(total);
+    if count == 1 {
+        format!(
+            "**Discord channel memory:** **{label}** on disk · 1 `memory-discord-*.md` · `discord memory path` for the pattern · does not list or dump."
+        )
+    } else {
+        format!(
+            "**Discord channel memory:** **{label}** on disk · {count} `memory-discord-*.md` files · `discord memory path` for the pattern · does not list or dump."
+        )
+    }
 }
 
 /// True for short “where is session memory / session-memory path…” asks.
@@ -26514,6 +26768,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
     }
+    // Discord channel memory size before path (stat only; no list/dump).
+    if looks_like_discord_memory_size_request(content) {
+        return Some(format_discord_memory_size_gateway());
+    }
     // Discord channel memory path before notes-folder / Knowledge list (path-only asks).
     if looks_like_discord_memory_path_request(content) {
         return Some(format_discord_memory_path_gateway());
@@ -26779,6 +27037,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // memory.md curated file before notes-folder combo path.
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
+    }
+    // Discord channel memory size before path (stat only; no list/dump).
+    if looks_like_discord_memory_size_request(content) {
+        return Some(format_discord_memory_size_gateway());
     }
     // Discord channel memory path before notes-folder / Knowledge list.
     if looks_like_discord_memory_path_request(content) {
@@ -27155,9 +27417,11 @@ pub fn format_ops_help_gateway() -> String {
 • `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` for on-disk bytes; does not steal `/agents`)\n\
 • `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agents size` / `config.json`)\n\
 • `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` for on-disk bytes; does not steal `agents path` / `config path`)\n\
-• `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; does not steal `/knowledge discord`)\n\
+• `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`)\n\
+• `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; `discord memory size` for on-disk bytes; does not steal `/knowledge discord`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; does not steal `session path` / `/sessions`)\n\
-• `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; no load/unload)\n\
+• `launchagent size` · `how big is the launchagent` · `mac-stats.plist size` · `harness plist size` — LaunchAgent plist sizes on disk (stat only; no dump; does not steal `launchagent path` / load/unload)\n\
+• `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` for on-disk bytes; no load/unload)\n\
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
@@ -28769,6 +29033,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory.md curated file path asks (v0.1.858) — config only; no dump/edit.
     if looks_like_memory_md_path_request(question) {
+        return true;
+    }
+    // Read-only Discord channel memory size asks (v0.1.918) — stat only; no list/dump.
+    if looks_like_discord_memory_size_request(question) {
         return true;
     }
     // Read-only Discord channel memory path asks (v0.1.862) — config only; no list/dump.
@@ -32990,6 +33258,10 @@ mod tests {
         assert!(!looks_like_discord_memory_path_request("memory.md path"));
         assert!(!looks_like_discord_memory_path_request("memory path"));
         assert!(!looks_like_discord_memory_path_request("discord channels path"));
+        assert!(!looks_like_discord_memory_path_request("discord memory size"));
+        assert!(!looks_like_discord_memory_path_request(
+            "how big is discord memory"
+        ));
         assert!(!looks_like_memory_path_request("discord memory path"));
         assert!(!looks_like_memory_path_request("where is discord memory"));
         assert!(!looks_like_memory_md_path_request("discord memory path"));
@@ -33013,6 +33285,71 @@ mod tests {
             "{list_reply}"
         );
         assert!(!list_reply.contains("path only"), "{list_reply}");
+    }
+
+    #[test]
+    fn discord_memory_size_request_detected() {
+        assert!(looks_like_discord_memory_size_request("discord memory size"));
+        assert!(looks_like_discord_memory_size_request(
+            "discord memories size"
+        ));
+        assert!(looks_like_discord_memory_size_request("channel memory size"));
+        assert!(looks_like_discord_memory_size_request(
+            "discord channel memory size"
+        ));
+        assert!(looks_like_discord_memory_size_request("memory-discord size"));
+        assert!(looks_like_discord_memory_size_request(
+            "memory-discord.md size"
+        ));
+        assert!(looks_like_discord_memory_size_request(
+            "how big is discord memory"
+        ));
+        assert!(looks_like_discord_memory_size_request(
+            "how big are discord memories"
+        ));
+        assert!(looks_like_discord_memory_size_request(
+            "how big are memory-discord files"
+        ));
+        assert!(looks_like_discord_memory_size_request(
+            "how large is discord memory"
+        ));
+        assert!(!looks_like_discord_memory_size_request("discord memory"));
+        assert!(!looks_like_discord_memory_size_request("channel memory"));
+        assert!(!looks_like_discord_memory_size_request("discord memory path"));
+        assert!(!looks_like_discord_memory_size_request(
+            "where is discord memory"
+        ));
+        assert!(!looks_like_discord_memory_size_request("/knowledge discord"));
+        assert!(!looks_like_discord_memory_size_request("list discord memory"));
+        assert!(!looks_like_discord_memory_size_request("dump discord memory"));
+        assert!(!looks_like_discord_memory_size_request("memory.md size"));
+        assert!(!looks_like_discord_memory_size_request("notes size"));
+        assert!(!looks_like_discord_memory_size_request("session memory size"));
+        assert!(!looks_like_discord_memory_size_request("agents size"));
+        assert!(!looks_like_discord_memory_size_request(
+            "discord channels size"
+        ));
+        assert!(!looks_like_discord_memory_path_request("discord memory size"));
+        assert!(!looks_like_memory_md_size_request("discord memory size"));
+        assert!(!looks_like_knowledge_request("discord memory size"));
+        assert!(!looks_like_knowledge_request("how big is discord memory"));
+        let reply = try_operator_instant_reply("discord memory size")
+            .expect("discord memory size instant");
+        assert!(reply.contains("Discord channel memory"), "{reply}");
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("no `memory-discord")
+                || reply.contains("B")
+                || reply.contains("bytes")
+                || reply.contains("KB")
+                || reply.contains("kB")
+                || reply.contains("MB"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("discord memory path") || reply.contains("does not"),
+            "{reply}"
+        );
     }
 
     #[test]

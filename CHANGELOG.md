@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.918] - 2026-09-07
+
+### Added
+
+- **Instant lane: Discord channel memory size** — `discord memory size`, `memory-discord size`, `how big is discord memory`, `channel memory size`, and close variants return on-disk bytes of `memory-discord-*.md` under agents/ without Ollama (Discord + AI Chat; stat only — no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`; p50 latency).
+
 ## [0.1.917] - 2026-09-07
 
 ### Added
