@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped more **p50 instant** age lanes for con
 
 | Version | What |
 |---------|------|
+| **v0.1.931** | Instant: `perplexity_last.json` age (`perplexity last age` / `how old is perplexity last`) |
 | **v0.1.930** | Instant: `discord_channels.json` age (`discord channels age` / `how old is discord channels`) |
 | **v0.1.929** | Instant: `pinned_processes.json` age (`pinned processes age` / `how old is pinned processes`) |
 | **v0.1.928** | Instant: `disk_cleanup.json` age |
@@ -18,14 +19,14 @@ Overnight Track B (20:00–06:00) shipped more **p50 instant** age lanes for con
 
 - Digester **open** stayed empty (stale Elmasnow weather; Review logs already instant).
 - Design review **not due** (grace).
-- Standing backlog p50 → next JSON age after pinned_processes: **discord_channels**.
+- Standing backlog p50 → next JSON age after discord_channels: **perplexity_last**.
 
 ## Try
 
 ```text
-how old is discord channels
-discord_channels.json age
-when was discord channels updated
+how old is perplexity last
+perplexity_last.json age
+when was perplexity last updated
 ```
 
-Expect a last-write age without Ollama. Path / size / `/discord` stay separate.
+Expect a last-write age without Ollama. Path / size / `/perplexity` stay separate.
