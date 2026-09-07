@@ -1,19 +1,20 @@
 # Morning surprise — 2026-09-08
 
-Overnight Track B (20:00–06:00 local). Digester open was empty; design review not due.
+Overnight Track B kept shipping instant-lane p50 wins (digester open empty; design review in grace).
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.921** | Instant lane: **before-reset transcript size** (`before reset transcript size` / `how big is before reset transcript` / `last_session_before_reset.jsonl size`) — on-disk bytes, no dump; does not steal path / before-compaction / session reset phrases |
+| **v0.1.921** | Instant: before-reset transcript size (stat only; no dump) |
+| **v0.1.922** | Instant: before-compaction transcript size (stat only; no dump) |
 
-## Tried / context
+## Why it matters
 
-- Digester: open empty (stale Elmasnow weather; Review logs already instant).
-- Design review: due=false (grace).
-- Fuel: standing backlog p50 — size lane for before-reset transcript (path existed since v0.1.860).
+Operators can ask how big the before-reset / before-compaction JSONL exports are without waking Ollama or dumping contents.
 
-## Next
+## Next fuel
 
-- before-compaction transcript size, Ori vault size, or design-review when due / TCC allows.
+- Ori vault size (or other remaining size lanes)
+- Design review screenshot when TCC allows (`feature-ai-chat` / `feature-processes` aged)
+- Sibling Hermes insights / session UX ports
