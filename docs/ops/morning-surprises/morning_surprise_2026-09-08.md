@@ -1,20 +1,27 @@
 # Morning surprise — 2026-09-08
 
-Overnight Track B kept shipping instant-lane p50 wins (digester open empty; design review in grace).
+Overnight Track B (20:00–06:00 local, starting 2026-09-07).
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.921** | Instant: before-reset transcript size (stat only; no dump) |
-| **v0.1.922** | Instant: before-compaction transcript size (stat only; no dump) |
+| **v0.1.925** | Instant lane: `schedules.json` age (`schedules age` / how old / when updated) — mtime only, no Ollama |
+| **v0.1.924** | Instant lane: `config.json` age |
+| **v0.1.923** | Instant lane: Ori vault size |
+| **v0.1.922** | Instant lane: before-compaction transcript size |
+| **v0.1.921** | Instant lane: before-reset transcript size |
+| **v0.1.920** | Instant lane: session-memory size |
+| **v0.1.919** | Agent Ops Overview Live idle calm (design review) |
 
-## Why it matters
+## Tried / context
 
-Operators can ask how big the before-reset / before-compaction JSONL exports are without waking Ollama or dumping contents.
+- Digester **open** stayed empty (stale Elmasnow weather; `Review logs` already instant).
+- Design review **due=false** (grace); CPU metrics PNG ~0.8d.
+- Fuel stayed on standing-backlog **p50 file age** lanes after path/size coverage.
 
-## Next fuel
+## Still open
 
-- Ori vault size (or other remaining size lanes)
-- Design review screenshot when TCC allows (`feature-ai-chat` / `feature-processes` aged)
+- monitors.json / history.json age (and other JSON age siblings)
+- Design-review screenshot refresh when TCC allows (agent-ops / ai-chat / processes)
 - Sibling Hermes insights / session UX ports
