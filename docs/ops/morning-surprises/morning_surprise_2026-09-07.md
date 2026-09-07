@@ -1,24 +1,31 @@
 # Morning surprise — 2026-09-07
 
-Overnight Track B kept shipping p50 instant file-size lanes while digester open stayed empty.
+Overnight Track B (autoresearch) for Ralf.
 
-## Shipped tonight (so far)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.913** | Instant: downloads-organizer-state.json size (`organizer state size` / `how big is downloads organizer state`; no dump; path / rules / `/downloads` untouched) |
-| **v0.1.912** | Instant: downloads-organizer-rules.md size (`organizer rules size` / `how big is downloads organizer rules`; no dump; path / state / `/downloads` untouched) |
-| **v0.1.911** | Instant: `cookie_reject_patterns.md` size (`cookie reject size` / `how big is cookie reject patterns`; no dump; path lane untouched) |
-| **v0.1.910** | Instant: `session_reset_phrases.md` size |
-| **v0.1.909** | Instant: `escalation_patterns.md` size |
-| **v0.1.908** | Instant: curated `memory.md` size |
-| **v0.1.907** | Instant: per-agent `agent.json` size |
+| **v0.1.914** | **History sparkline Hot attention glance** — when any history chart hits menu-bar amber (CPU ≥50%, GPU ≥15%, Freq ≥3.5 GHz, Temp ≥70°C), a **Hot · …** amber strip appears above the sparklines (power-strip / Details Hot parity). Click opens the first hot chart and its ring. Hot charts also get a soft amber wash. Rings under the gauges stay pulse-only (no layout-shifting Hot bar). Design review / `feature-cpu-metrics`. Recaptured `docs/screens/feature-cpu-metrics.png`. |
+| **v0.1.913** | Instant lane: downloads-organizer-state.json size |
+| **v0.1.912** | Instant lane: downloads-organizer-rules.md size |
+| **v0.1.911** | Instant lane: cookie_reject_patterns.md size |
+| **v0.1.910** | Instant lane: session_reset_phrases.md size |
+| **v0.1.909** | Instant lane: escalation_patterns.md size |
 
-## Digester / design review
+## Why this tick
 
-- Digester open: empty (stale Elmasnow weather; `Review logs` already instant).
-- Design review: grace (not due); recommended surface still `feature-ai-chat` (~23.5d).
+- Digester open pointed at **overnight design review** (`feature-cpu-metrics` ~25.7d stale).
+- `overnight_design_review.py` said `due=true`.
+- No product ERROR/WARN clusters in the recent debug.log window.
 
-## Why it matters
+## Ratchet
 
-Operators can ask how big the downloads organizer state file is without waking Ollama or Brave — same pattern as the rules / cookie-reject size lanes.
+- keep @ `d1f3d428` — v0.1.914 History sparkline Hot attention glance
+- Earlier keeps this night: v0.1.909–913 (file-size instant lanes)
+
+## Next fuel
+
+- Next stale design-review surface (`feature-agent-ops` / `feature-ai-chat`) when due again.
+- Digester open / debug.log product errors when present.
+- More p50 instant lanes or Hermes insights / session UX ports.
