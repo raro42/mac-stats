@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.913] - 2026-09-07
+
+### Added
+
+- **Instant lane: downloads-organizer-state.json size** — `organizer state size`, `downloads-organizer-state.json size`, `how big is downloads organizer state`, `downloads organizer state size`, and close variants return on-disk size of the downloads organizer state file without Ollama (Discord + AI Chat; stat only — no dump; does not steal `downloads organizer state path` / rules / `/downloads`; p50 latency).
+
 ## [0.1.912] - 2026-09-07
 
 ### Added
