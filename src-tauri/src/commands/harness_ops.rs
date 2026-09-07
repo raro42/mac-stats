@@ -3523,6 +3523,16 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
         || n.contains("big")
         || n.contains("large")
         || n.contains("bytes")
+        // Age asks use the config.json age lane (v0.1.924) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
     {
         return false;
     }
@@ -3594,7 +3604,7 @@ pub fn format_config_path_gateway() -> String {
         .unwrap_or_else(|| "~/.mac-stats".into());
     let config_display = config.display().to_string();
     format!(
-        "**Config:** `{config_display}` · data home `{home}` · Settings for credentials · `config size` for on-disk bytes · `/logs` for debug.log."
+        "**Config:** `{config_display}` · data home `{home}` · Settings for credentials · `config size` for on-disk bytes · `config age` for last write · `/logs` for debug.log."
     )
 }
 
@@ -3744,16 +3754,176 @@ pub fn looks_like_config_size_request(content: &str) -> bool {
 pub fn format_config_size_gateway() -> String {
     let path = crate::config::Config::config_file_path();
     if !path.exists() {
-        return "**Config:** no `config.json` yet · app will create it on first save · `config path` for the file.".to_string();
+        return "**Config:** no `config.json` yet · app will create it on first save · `config path` for the file · `config age` after first save.".to_string();
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Config:** empty `config.json` · `config path` for the file.".to_string()
+            "**Config:** empty `config.json` · `config path` for the file · `config age` for last write.".to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Config:** **{label}** on disk · app settings JSON · `config path` for the file · Settings for credentials."
+                "**Config:** **{label}** on disk · app settings JSON · `config path` for the file · `config age` for last write · Settings for credentials."
+            )
+        }
+        Err(e) => format!("**Config** — could not stat `config.json`: {e}"),
+    }
+}
+
+/// True for short “config age / how old is config.json…” asks.
+/// Mtime only on app `config.json` — does not steal path / size / `.config.env` / edit.
+pub fn looks_like_config_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
+        || n.contains("secrets env")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("schedules.json")
+        || n.contains("monitors.json")
+        || n.contains("history.json")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("configure")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let config_ctx = n.contains("config.json")
+        || n.contains("config json")
+        || n == "config age"
+        || n == "config file age"
+        || n == "how old is config"
+        || n == "how old is the config"
+        || n == "when was config updated"
+        || n == "when was the config updated"
+        || n == "mac-stats config age"
+        || n == "mac stats config age"
+        || n == "is config stale"
+        || n == "is the config stale"
+        || (n.contains("config")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !config_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "config age"
+            | "config file age"
+            | "config.json age"
+            | "config json age"
+            | "mac-stats config age"
+            | "mac stats config age"
+            | "how old is config"
+            | "how old is the config"
+            | "how old is config.json"
+            | "how old is the config.json"
+            | "how old is mac-stats config"
+            | "how old is mac stats config"
+            | "when was config updated"
+            | "when was the config updated"
+            | "when was config.json updated"
+            | "when was the config.json updated"
+            | "config last modified"
+            | "config.json last modified"
+            | "config file last modified"
+            | "is config stale"
+            | "is the config stale"
+            | "is config.json stale"
+            | "is the config.json stale"
+    ) || (n.contains("config")
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM app config.json age from file mtime (stat only; no dump/edit).
+pub fn format_config_age_gateway() -> String {
+    let path = crate::config::Config::config_file_path();
+    if !path.exists() {
+        return "**Config:** no `config.json` yet · app will create it on first save · `config path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Config:** last write **{age}** ago · app settings JSON · `config path` for the file · `config size` for on-disk bytes · Settings for credentials."
             )
         }
         Err(e) => format!("**Config** — could not stat `config.json`: {e}"),
@@ -27871,9 +28041,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_env_path_request(content) {
         return Some(format_config_env_path_gateway());
     }
-    // config.json size before path (stat only; no dump).
+    // config.json size before age/path (stat only; no dump).
     if looks_like_config_size_request(content) {
         return Some(format_config_size_gateway());
+    }
+    // config.json age before path (mtime only; no dump).
+    if looks_like_config_age_request(content) {
+        return Some(format_config_age_gateway());
     }
     // Improvements dir size before path (recursive bytes; no list); path before overnight-content asks.
     if looks_like_improvements_size_request(content) {
@@ -28411,8 +28585,9 @@ pub fn format_ops_help_gateway() -> String {
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
-• `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only)\n\
-• `config size` · `config.json size` · `how big is config` — config.json file size on disk (stat only; no dump; does not steal `config path` / `.config.env`)\n\
+• `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only; `config size` / `config age` for bytes / mtime)\n\
+• `config size` · `config.json size` · `how big is config` — config.json file size on disk (stat only; no dump; does not steal `config path` / `config age` / `.config.env`)\n\
+• `config age` · `config.json age` · `how old is config` · `when was config updated` — config.json last write age (mtime; no dump; does not steal `config path` / `config size` / `.config.env`)\n\
 • `config.env size` · `.config.env size` · `how big is .config.env` · `secrets env size` — `.config.env` file size on disk (stat only; no key dump; does not steal `config.env path` / `config size`)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump; `config.env size` for on-disk bytes)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
@@ -29946,6 +30121,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only config.json size asks (v0.1.889) — stat only; no dump/edit.
     if looks_like_config_size_request(question) {
+        return true;
+    }
+    // Read-only config.json age asks (v0.1.924) — mtime only; no dump/edit.
+    if looks_like_config_age_request(question) {
         return true;
     }
     // Read-only improvements dir size asks (v0.1.873) — recursive file bytes; no list dump.
@@ -32544,7 +32723,9 @@ mod tests {
         assert!(reply.contains("Config"));
         assert!(reply.contains("config.json") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("config size") || reply.contains("on-disk"),
+            reply.to_lowercase().contains("config size")
+                || reply.to_lowercase().contains("config age")
+                || reply.contains("on-disk"),
             "{reply}"
         );
     }
@@ -32568,6 +32749,8 @@ mod tests {
         assert!(!looks_like_config_size_request("configure ollama"));
         assert!(!looks_like_config_size_request("digest size"));
         assert!(!looks_like_config_size_request("improvements size"));
+        assert!(!looks_like_config_size_request("config age"));
+        assert!(!looks_like_config_size_request("how old is config"));
         assert!(!looks_like_config_path_request("config size"));
         assert!(!looks_like_config_path_request("how big is config"));
         assert!(!looks_like_config_env_path_request("config size"));
@@ -32577,6 +32760,50 @@ mod tests {
             reply.to_lowercase().contains("on disk")
                 || reply.contains("config.json")
                 || reply.contains("empty"),
+            "{reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("config age") || reply.contains("last write"),
+            "size reply should mention age lane: {reply}"
+        );
+        assert!(!reply.to_lowercase().contains("discord_bot_token"));
+        assert!(!reply.to_lowercase().contains("api_key"));
+    }
+
+    #[test]
+    fn config_age_request_detected() {
+        assert!(looks_like_config_age_request("config age"));
+        assert!(looks_like_config_age_request("config.json age"));
+        assert!(looks_like_config_age_request("config file age"));
+        assert!(looks_like_config_age_request("how old is config"));
+        assert!(looks_like_config_age_request("how old is config.json"));
+        assert!(looks_like_config_age_request("when was config updated"));
+        assert!(looks_like_config_age_request("when was config.json updated"));
+        assert!(looks_like_config_age_request("config.json last modified"));
+        assert!(looks_like_config_age_request("is config stale"));
+        assert!(looks_like_config_age_request("mac-stats config age"));
+        assert!(!looks_like_config_age_request("config path"));
+        assert!(!looks_like_config_age_request("where is config"));
+        assert!(!looks_like_config_age_request("config size"));
+        assert!(!looks_like_config_age_request("how big is config"));
+        assert!(!looks_like_config_age_request("config.json"));
+        assert!(!looks_like_config_age_request("config.env path"));
+        assert!(!looks_like_config_age_request("how big is .config.env"));
+        assert!(!looks_like_config_age_request("agent.json size"));
+        assert!(!looks_like_config_age_request("edit config"));
+        assert!(!looks_like_config_age_request("configure ollama"));
+        assert!(!looks_like_config_age_request("digest age"));
+        assert!(!looks_like_config_age_request("log age"));
+        assert!(!looks_like_config_age_request("runs age"));
+        assert!(!looks_like_config_path_request("config age"));
+        assert!(!looks_like_config_path_request("how old is config"));
+        assert!(!looks_like_config_size_request("config age"));
+        assert!(!looks_like_config_size_request("how old is config"));
+        assert!(!looks_like_config_env_path_request("config age"));
+        let reply = try_operator_instant_reply("how old is config").expect("config age instant");
+        assert!(reply.contains("Config"));
+        assert!(
+            reply.contains("ago") || reply.contains("no `config.json`"),
             "{reply}"
         );
         assert!(!reply.to_lowercase().contains("discord_bot_token"));

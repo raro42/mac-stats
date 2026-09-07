@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.924] - 2026-09-07
+
+### Added
+
+- **Instant lane: config.json age** — `config age`, `config.json age`, `how old is config`, `when was config updated`, and close variants return the last-write age of app `config.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `config path` / `config size` / `.config.env`; p50 latency).
+
 ## [0.1.923] - 2026-09-07
 
 ### Added
