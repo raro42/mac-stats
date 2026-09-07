@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.932] - 2026-09-08
+
+### Added
+
+- **Instant lane: scheduler_delivery_awareness.json age** — `delivery awareness age`, `scheduler_delivery_awareness.json age`, `how old is delivery awareness`, `when was delivery awareness updated`, and close variants return the last-write age of `scheduler_delivery_awareness.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `delivery awareness path` / `delivery awareness size` / `last delivery` / `/schedules`; p50 latency).
+
 ## [0.1.931] - 2026-09-08
 
 ### Added

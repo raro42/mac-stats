@@ -16337,7 +16337,242 @@ pub fn format_scheduler_delivery_awareness_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Delivery awareness:** **{label}** on disk · scheduler Discord delivery log · `delivery awareness path` for the file · `last delivery` for the newest entry."
+                "**Delivery awareness:** **{label}** on disk · scheduler Discord delivery log · `delivery awareness path` for the file · `delivery awareness age` for last write · `last delivery` for the newest entry."
+            )
+        }
+        Err(e) => format!("**Delivery awareness** — could not stat `scheduler_delivery_awareness.json`: {e}"),
+    }
+}
+
+/// True for short “how old is scheduler_delivery_awareness.json / delivery awareness age…” asks.
+/// Mtime only — does not steal path / size / `last delivery` / `/schedules`.
+pub fn looks_like_scheduler_delivery_awareness_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("schedule a")
+        || n.contains("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("keychain")
+        || n == "/schedules"
+        || n == "schedules"
+        || n == "/schedules jobs"
+        || n == "schedules jobs"
+        || n == "/schedules deliveries"
+        || n == "schedules deliveries"
+        || n == "/cron"
+        || n == "cron"
+        || n == "/cron list"
+        || n == "cron list"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "my schedules"
+        || n == "my jobs"
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "last delivery"
+        || n == "recent deliveries"
+        || n == "/last delivery"
+        || n == "delivery age"
+        || n == "how old is delivery"
+        || n == "how old is the delivery"
+        || n == "awareness age"
+        || n == "how old is awareness"
+        || n == "how old is the awareness"
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("config.json")
+        || n.contains("config age")
+        || n.contains("pinned_processes")
+        || n.contains("pinned processes")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let aw_ctx = n.contains("scheduler_delivery_awareness.json")
+        || n.contains("scheduler_delivery_awareness")
+        || n.contains("scheduler-delivery-awareness")
+        || n.contains("delivery_awareness.json")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery-awareness")
+        || n.contains("delivery awareness.json")
+        || n.contains("delivery awareness file")
+        || n.contains("delivery awareness age")
+        || n.contains("scheduler awareness")
+        || n.contains("scheduler delivery awareness")
+        || n.contains("awareness file")
+        || n == "delivery awareness age"
+        || n == "how old is delivery awareness"
+        || n == "how old is the delivery awareness"
+        || n == "when was delivery awareness updated"
+        || n == "when was the delivery awareness updated"
+        || n == "mac-stats delivery awareness age"
+        || n == "mac stats delivery awareness age"
+        || n == "is delivery awareness stale"
+        || n == "is the delivery awareness stale"
+        || (n.contains("awareness")
+            && (n.contains("delivery")
+                || n.contains("scheduler")
+                || n.contains("json")
+                || n.contains("file"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !aw_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "delivery awareness age"
+            | "delivery_awareness age"
+            | "delivery_awareness.json age"
+            | "delivery_awareness file age"
+            | "delivery-awareness age"
+            | "delivery-awareness.json age"
+            | "delivery awareness file age"
+            | "delivery awareness json age"
+            | "scheduler delivery awareness age"
+            | "scheduler_delivery_awareness age"
+            | "scheduler_delivery_awareness.json age"
+            | "scheduler_delivery_awareness file age"
+            | "scheduler-delivery-awareness age"
+            | "scheduler awareness age"
+            | "scheduler awareness file age"
+            | "awareness file age"
+            | "awareness.json age"
+            | "mac-stats delivery awareness age"
+            | "mac stats delivery awareness age"
+            | "how old is delivery awareness"
+            | "how old is the delivery awareness"
+            | "how old is delivery_awareness.json"
+            | "how old is the delivery_awareness.json"
+            | "how old is scheduler_delivery_awareness.json"
+            | "how old is the scheduler_delivery_awareness.json"
+            | "how old is the delivery awareness file"
+            | "how old is awareness.json"
+            | "how old is the awareness file"
+            | "when was delivery awareness updated"
+            | "when was the delivery awareness updated"
+            | "when was delivery_awareness.json updated"
+            | "when was the delivery_awareness.json updated"
+            | "when was scheduler_delivery_awareness.json updated"
+            | "when was the scheduler_delivery_awareness.json updated"
+            | "delivery awareness last modified"
+            | "delivery_awareness.json last modified"
+            | "scheduler_delivery_awareness.json last modified"
+            | "awareness file last modified"
+            | "is delivery awareness stale"
+            | "is the delivery awareness stale"
+            | "is delivery_awareness.json stale"
+            | "is the delivery_awareness.json stale"
+            | "is scheduler_delivery_awareness.json stale"
+            | "is the scheduler_delivery_awareness.json stale"
+    ) || (aw_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM scheduler_delivery_awareness.json age from file mtime (stat only; no list / `last delivery` / `/schedules`).
+pub fn format_scheduler_delivery_awareness_age_gateway() -> String {
+    let path = crate::config::Config::scheduler_delivery_awareness_file_path();
+    if !path.exists() {
+        return "**Delivery awareness:** no `scheduler_delivery_awareness.json` yet · app writes it after scheduler Discord deliveries · `delivery awareness path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Delivery awareness:** last write **{age}** ago · scheduler Discord delivery log · `delivery awareness path` for the file · `delivery awareness size` for on-disk bytes · `last delivery` for the newest entry."
             )
         }
         Err(e) => format!("**Delivery awareness** — could not stat `scheduler_delivery_awareness.json`: {e}"),
@@ -16347,6 +16582,7 @@ pub fn format_scheduler_delivery_awareness_size_gateway() -> String {
 /// True for short “where is scheduler_delivery_awareness.json / delivery awareness path…” asks.
 /// Config path only — does not list deliveries or run `/schedules` / last delivery.
 /// Size asks use the scheduler_delivery_awareness.json size lane (v0.1.897).
+/// Age asks use the scheduler_delivery_awareness.json age lane (v0.1.932).
 pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -16411,6 +16647,13 @@ pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bo
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the scheduler_delivery_awareness.json age lane (v0.1.932) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("schedule a")
         || n.contains("schedule me")
         || n.contains(" for tomorrow")
@@ -16530,7 +16773,7 @@ pub fn format_scheduler_delivery_awareness_path_gateway() -> String {
     let path = crate::config::Config::scheduler_delivery_awareness_file_path();
     let display = path.display().to_string();
     format!(
-        "**Delivery awareness file:** `{display}` · scheduler Discord delivery log for chat context · `delivery awareness size` for on-disk bytes · `last delivery` for the newest entry · does not list deliveries."
+        "**Delivery awareness file:** `{display}` · scheduler Discord delivery log for chat context · `delivery awareness size` / `delivery awareness age` for bytes / mtime · `last delivery` for the newest entry · does not list deliveries."
     )
 }
 
@@ -29727,9 +29970,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_discord_channels_path_request(content) {
         return Some(format_discord_channels_path_gateway());
     }
-    // scheduler_delivery_awareness.json size before path (stat only; no dump).
+    // scheduler_delivery_awareness.json size before age/path (stat only; no dump).
     if looks_like_scheduler_delivery_awareness_size_request(content) {
         return Some(format_scheduler_delivery_awareness_size_gateway());
+    }
+    // scheduler_delivery_awareness.json age before path (mtime only; no dump).
+    if looks_like_scheduler_delivery_awareness_age_request(content) {
+        return Some(format_scheduler_delivery_awareness_age_gateway());
     }
     if looks_like_scheduler_delivery_awareness_path_request(content) {
         return Some(format_scheduler_delivery_awareness_path_gateway());
@@ -30237,8 +30484,9 @@ pub fn format_ops_help_gateway() -> String {
 • `discord channels size` · `discord_channels.json size` · `how big is discord channels` — discord_channels.json file size on disk (stat only; no dump; does not steal `discord channels path` / `discord channels age` / `/discord`)\n\
 • `discord channels age` · `discord_channels.json age` · `how old is discord channels` · `when was discord channels updated` — discord_channels.json last write age (mtime; no dump; does not steal `discord channels path` / `discord channels size` / `/discord`)\n\
 • `discord channels path` · `where is discord_channels.json` · `channels.json` — Discord per-channel config file (config only; no list/edit; `discord channels size` / `discord channels age` for bytes / mtime; does not steal `/discord`)\n\
-• `delivery awareness size` · `scheduler_delivery_awareness.json size` · `how big is delivery awareness` — scheduler_delivery_awareness.json file size on disk (stat only; no dump; does not steal `delivery awareness path` / `last delivery` / `/schedules`)\n\
-• `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; does not steal `last delivery` / `/schedules`)\n\
+• `delivery awareness size` · `scheduler_delivery_awareness.json size` · `how big is delivery awareness` — scheduler_delivery_awareness.json file size on disk (stat only; no dump; does not steal `delivery awareness path` / `delivery awareness age` / `last delivery` / `/schedules`)\n\
+• `delivery awareness age` · `scheduler_delivery_awareness.json age` · `how old is delivery awareness` · `when was delivery awareness updated` — scheduler_delivery_awareness.json last write age (mtime; no dump; does not steal `delivery awareness path` / `delivery awareness size` / `last delivery` / `/schedules`)\n\
+• `delivery awareness path` · `where is scheduler_delivery_awareness.json` · `awareness file path` — scheduler Discord delivery log file (config only; no list; `delivery awareness size` / `delivery awareness age` for bytes / mtime; does not steal `last delivery` / `/schedules`)\n\
 • `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / who-am-i)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` for on-disk bytes)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
@@ -32101,6 +32349,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only scheduler_delivery_awareness.json size asks (v0.1.897) — stat only; no dump/list.
     if looks_like_scheduler_delivery_awareness_size_request(question) {
+        return true;
+    }
+    // Read-only scheduler_delivery_awareness.json age asks (v0.1.932) — mtime only; no dump/list.
+    if looks_like_scheduler_delivery_awareness_age_request(question) {
         return true;
     }
     // Read-only scheduler_delivery_awareness.json path asks (v0.1.838) — config only; no list.
@@ -39232,6 +39484,15 @@ mod tests {
         assert!(!looks_like_scheduler_delivery_awareness_path_request(
             "how big is delivery awareness"
         ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "delivery awareness age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "how old is delivery awareness"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "when was delivery awareness updated"
+        ));
         assert!(!looks_like_schedules_path_request("delivery awareness path"));
         assert!(!looks_like_schedules_path_request(
             "where is scheduler_delivery_awareness.json"
@@ -39245,7 +39506,9 @@ mod tests {
             reply.contains("scheduler_delivery_awareness") || reply.contains(".mac-stats")
         );
         assert!(
-            reply.to_lowercase().contains("delivery awareness size") || reply.contains("on-disk"),
+            reply.to_lowercase().contains("delivery awareness size")
+                || reply.to_lowercase().contains("delivery awareness age")
+                || reply.contains("on-disk"),
             "{reply}"
         );
     }
@@ -39282,6 +39545,12 @@ mod tests {
         assert!(!looks_like_scheduler_delivery_awareness_size_request(
             "where is scheduler_delivery_awareness.json"
         ));
+        assert!(!looks_like_scheduler_delivery_awareness_size_request(
+            "delivery awareness age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_size_request(
+            "how old is delivery awareness"
+        ));
         assert!(!looks_like_scheduler_delivery_awareness_size_request("/schedules"));
         assert!(!looks_like_scheduler_delivery_awareness_size_request("schedules"));
         assert!(!looks_like_scheduler_delivery_awareness_size_request("last delivery"));
@@ -39305,6 +39574,103 @@ mod tests {
             "{reply}"
         );
         assert!(!reply.contains("Delivery awareness file:"));
+    }
+
+    #[test]
+    fn scheduler_delivery_awareness_age_request_detected() {
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "delivery awareness age"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "scheduler_delivery_awareness.json age"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "scheduler_delivery_awareness age"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "delivery awareness file age"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "how old is delivery awareness"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "how old is scheduler_delivery_awareness.json"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "when was delivery awareness updated"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "when was scheduler_delivery_awareness.json updated"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "scheduler_delivery_awareness.json last modified"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "is delivery awareness stale"
+        ));
+        assert!(looks_like_scheduler_delivery_awareness_age_request(
+            "mac-stats delivery awareness age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "delivery awareness path"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "where is scheduler_delivery_awareness.json"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "delivery awareness size"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "how big is delivery awareness"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "scheduler_delivery_awareness.json"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("/schedules"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("schedules"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("last delivery"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("delivery age"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "how old is delivery"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("awareness age"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request("history age"));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "discord channels age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_age_request(
+            "schedules age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_path_request(
+            "delivery awareness age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_size_request(
+            "delivery awareness age"
+        ));
+        assert!(!looks_like_scheduler_delivery_awareness_size_request(
+            "how old is delivery awareness"
+        ));
+        assert!(!looks_like_last_delivery_request("delivery awareness age"));
+        assert!(!looks_like_schedules_age_request("delivery awareness age"));
+        assert!(!looks_like_discord_channels_age_request(
+            "delivery awareness age"
+        ));
+        assert!(!looks_like_history_age_request("delivery awareness age"));
+        let reply = try_operator_instant_reply("delivery awareness age")
+            .expect("delivery awareness age instant");
+        assert!(
+            reply.contains("Delivery awareness")
+                && (reply.contains("last write")
+                    || reply.contains("no `scheduler_delivery_awareness.json`")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Delivery awareness file:"));
+        assert!(
+            reply.to_lowercase().contains("delivery awareness path")
+                || reply.to_lowercase().contains("delivery awareness size")
+                || reply.to_lowercase().contains("last delivery"),
+            "{reply}"
+        );
     }
 
     #[test]
