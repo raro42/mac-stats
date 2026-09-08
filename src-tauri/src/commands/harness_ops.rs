@@ -24428,6 +24428,7 @@ pub fn format_skill_md_size_gateway() -> String {
 /// Config path only — does not dump/edit mood text or open Agent Ops Agents.
 /// Mood is per-agent (`agent-<id>/mood.md`), not a shared file like soul.md.
 /// Size asks use the mood.md size lane (v0.1.902).
+/// Age asks use the mood.md age lane (v0.1.937).
 pub fn looks_like_mood_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -24540,6 +24541,13 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the mood.md age lane (v0.1.937) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("http://")
@@ -24605,7 +24613,7 @@ pub fn looks_like_mood_path_request(content: &str) -> bool {
 pub fn format_mood_path_gateway() -> String {
     let display = crate::config::Config::mood_file_path_display();
     format!(
-        "**Mood file:** `{display}` · per-agent mood (not shared like soul.md) · path only · `mood size` for on-disk bytes · does not dump or edit mood text · Agent Ops → Agents for content."
+        "**Mood file:** `{display}` · per-agent mood (not shared like soul.md) · path only · `mood size` / `mood age` for bytes / mtime · does not dump or edit mood text · Agent Ops → Agents for content."
     )
 }
 
@@ -24817,17 +24825,248 @@ pub fn format_mood_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Mood file:** no `mood.md` yet · `mood path` for the file pattern · Agent Ops → Agents for content."
+        return "**Mood file:** no `mood.md` yet · `mood path` for the file pattern · `mood age` for last write · Agent Ops → Agents for content."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Mood file:** **{label}** on disk · 1 per-agent `mood.md` · `mood path` for the file · does not dump mood text."
+            "**Mood file:** **{label}** on disk · 1 per-agent `mood.md` · `mood path` for the file · `mood age` for last write · does not dump mood text."
         )
     } else {
         format!(
-            "**Mood file:** **{label}** on disk · {count} per-agent `mood.md` files · `mood path` for the pattern · does not dump mood text."
+            "**Mood file:** **{label}** on disk · {count} per-agent `mood.md` files · `mood path` for the pattern · `mood age` for last write · does not dump mood text."
+        )
+    }
+}
+
+/// True for short “how old is mood.md / mood age…” asks.
+/// Newest mtime across per-agent `mood.md` — does not steal path / size / soul / agents / dump.
+pub fn looks_like_mood_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("soul")
+        || n.contains("skill.md")
+        || n.contains("skill age")
+        || n.contains("skill file")
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing age")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts age")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let mood_ctx = n.contains("mood.md")
+        || n.contains("mood file")
+        || n.contains("mood age")
+        || n.contains("mood md")
+        || n == "mood"
+        || n == "how old is mood"
+        || n == "how old is the mood"
+        || n == "when was mood updated"
+        || n == "when was the mood updated"
+        || n == "mac-stats mood age"
+        || n == "mac stats mood age"
+        || n == "is mood stale"
+        || (n.contains("mood")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("md")));
+    if !mood_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "mood age"
+            | "mood.md age"
+            | "mood file age"
+            | "mood md age"
+            | "mood.md file age"
+            | "mac-stats mood age"
+            | "mac stats mood age"
+            | "how old is mood"
+            | "how old is the mood"
+            | "how old is mood.md"
+            | "how old is the mood.md"
+            | "how old is mood file"
+            | "how old is the mood file"
+            | "how old is the mood.md file"
+            | "when was mood updated"
+            | "when was the mood updated"
+            | "when was mood.md updated"
+            | "when was the mood.md updated"
+            | "when was mood file updated"
+            | "when was the mood file updated"
+            | "mood last modified"
+            | "mood.md last modified"
+            | "mood file last modified"
+            | "is mood stale"
+            | "is the mood stale"
+            | "is mood.md stale"
+            | "is the mood.md stale"
+    ) || (mood_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM per-agent mood.md age from newest file mtime (stat only; no dump/edit).
+pub fn format_mood_age_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let mood = entry.path().join("mood.md");
+            if let Ok(meta) = std::fs::metadata(&mood) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    if let Ok(modified) = meta.modified() {
+                        let ms = modified
+                            .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                            .map(|d| d.as_millis() as u64)
+                            .unwrap_or(0);
+                        newest_ms = Some(match newest_ms {
+                            Some(prev) => prev.max(ms),
+                            None => ms,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Mood file:** no `mood.md` yet · `mood path` for the file pattern · Agent Ops → Agents for content."
+            .to_string();
+    }
+    let Some(ms) = newest_ms else {
+        return "**Mood file** — could not read mtime on per-agent `mood.md`.".to_string();
+    };
+    let age = age_from_ms(ms);
+    if count == 1 {
+        format!(
+            "**Mood file:** last write **{age}** ago · 1 per-agent `mood.md` · `mood path` for the file · `mood size` for on-disk bytes · does not dump mood text."
+        )
+    } else {
+        format!(
+            "**Mood file:** newest write **{age}** ago · {count} per-agent `mood.md` files · `mood path` for the pattern · `mood size` for on-disk bytes · does not dump mood text."
         )
     }
 }
@@ -30617,9 +30856,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
     }
-    // mood.md size before path (stat only; no dump).
+    // mood.md size before age/path (stat only; no dump).
     if looks_like_mood_size_request(content) {
         return Some(format_mood_size_gateway());
+    }
+    // mood.md age before path (mtime only; no dump).
+    if looks_like_mood_age_request(content) {
+        return Some(format_mood_age_gateway());
     }
     // mood.md before soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_mood_path_request(content) {
@@ -30861,9 +31104,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skill_md_path_request(content) {
         return Some(format_skill_md_path_gateway());
     }
-    // mood.md size before path (stat only; no dump).
+    // mood.md size before age/path (stat only; no dump).
     if looks_like_mood_size_request(content) {
         return Some(format_mood_size_gateway());
+    }
+    // mood.md age before path (mtime only; no dump).
+    if looks_like_mood_age_request(content) {
+        return Some(format_mood_age_gateway());
     }
     // mood.md before soul / agents-dir path lane.
     if looks_like_mood_path_request(content) {
@@ -31367,8 +31614,9 @@ pub fn format_ops_help_gateway() -> String {
 • `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / `soul age` / mood / agents)\n\
 • `soul age` · `soul.md age` · `how old is soul` · `when was soul updated` — soul.md last write age (mtime; no dump; does not steal `soul path` / `soul size` / mood / agents)\n\
 • `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` / `soul age` for bytes / mtime; does not steal `/agents`)\n\
-• `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / soul / agents)\n\
-• `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` for on-disk bytes; does not steal `/agents`)\n\
+• `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / `mood age` / soul / agents)\n\
+• `mood age` · `mood.md age` · `how old is mood` · `when was mood updated` — newest per-agent mood.md last write age (mtime; no dump; does not steal `mood path` / `mood size` / soul / agents)\n\
+• `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` / `mood age` for bytes / mtime; does not steal `/agents`)\n\
 • `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skills size` / `/skills`)\n\
 • `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` for on-disk bytes; does not steal `/skills`)\n\
 • `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / run tests / `/agents`)\n\
@@ -33001,6 +33249,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only mood.md size asks (v0.1.902) — stat only; no dump/edit.
     if looks_like_mood_size_request(question) {
+        return true;
+    }
+    // Read-only mood.md age asks (v0.1.937) — mtime only; no dump/edit.
+    if looks_like_mood_age_request(question) {
         return true;
     }
     // Read-only mood.md path asks (v0.1.852) — config only; no dump/edit.
@@ -37434,6 +37686,8 @@ mod tests {
         assert!(!looks_like_mood_path_request("session reset phrases path"));
         assert!(!looks_like_mood_path_request("mood size"));
         assert!(!looks_like_mood_path_request("how big is mood.md"));
+        assert!(!looks_like_mood_path_request("mood age"));
+        assert!(!looks_like_mood_path_request("how old is mood.md"));
         assert!(!looks_like_agents_path_request("mood path"));
         assert!(!looks_like_agents_path_request("where is mood.md"));
         assert!(!looks_like_soul_path_request("mood path"));
@@ -37444,6 +37698,12 @@ mod tests {
         assert!(reply.to_lowercase().contains("per-agent"));
         assert!(!reply.to_lowercase().contains("agents dir"));
         assert!(reply.to_lowercase().contains("path only"));
+        assert!(
+            reply.to_lowercase().contains("mood size")
+                || reply.to_lowercase().contains("mood age")
+                || reply.contains("mtime"),
+            "path reply should mention size/age lanes: {reply}"
+        );
     }
 
     #[test]
@@ -37463,6 +37723,8 @@ mod tests {
         assert!(!looks_like_mood_size_request("agents size"));
         assert!(!looks_like_mood_size_request("memory.md size"));
         assert!(!looks_like_mood_size_request("notes size"));
+        assert!(!looks_like_mood_size_request("mood age"));
+        assert!(!looks_like_mood_size_request("how old is mood"));
         assert!(!looks_like_mood_path_request("mood size"));
         assert!(!looks_like_mood_path_request("how big is mood"));
         assert!(!looks_like_soul_size_request("mood size"));
@@ -37471,9 +37733,67 @@ mod tests {
             reply.contains("Mood file") || reply.to_lowercase().contains("mood"),
             "unexpected reply: {reply}"
         );
+        assert!(!reply.to_lowercase().contains("you have opinions"));
+        assert!(
+            reply.to_lowercase().contains("mood age") || reply.contains("last write"),
+            "size reply should mention age lane: {reply}"
+        );
         assert!(
             try_operator_instant_reply("how big is mood.md").is_some(),
             "how big is mood.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("mood path")
+                .expect("mood path")
+                .to_lowercase()
+                .contains("path only"),
+            "mood path must stay on path lane"
+        );
+    }
+
+    #[test]
+    fn mood_age_request_detected() {
+        assert!(looks_like_mood_age_request("mood age"));
+        assert!(looks_like_mood_age_request("mood.md age"));
+        assert!(looks_like_mood_age_request("mood file age"));
+        assert!(looks_like_mood_age_request("how old is mood"));
+        assert!(looks_like_mood_age_request("how old is mood.md"));
+        assert!(looks_like_mood_age_request("how old is the mood file"));
+        assert!(looks_like_mood_age_request("when was mood updated"));
+        assert!(looks_like_mood_age_request("when was mood.md updated"));
+        assert!(looks_like_mood_age_request("mood.md last modified"));
+        assert!(looks_like_mood_age_request("is mood stale"));
+        assert!(looks_like_mood_age_request("mac-stats mood age"));
+        assert!(!looks_like_mood_age_request("mood path"));
+        assert!(!looks_like_mood_age_request("where is mood.md"));
+        assert!(!looks_like_mood_age_request("mood size"));
+        assert!(!looks_like_mood_age_request("how big is mood"));
+        assert!(!looks_like_mood_age_request("dump mood"));
+        assert!(!looks_like_mood_age_request("edit mood.md"));
+        assert!(!looks_like_mood_age_request("soul age"));
+        assert!(!looks_like_mood_age_request("agents age"));
+        assert!(!looks_like_mood_age_request("memory.md age"));
+        assert!(!looks_like_mood_path_request("mood age"));
+        assert!(!looks_like_mood_path_request("how old is mood"));
+        assert!(!looks_like_mood_size_request("mood age"));
+        assert!(!looks_like_mood_size_request("how old is mood.md"));
+        assert!(!looks_like_soul_age_request("mood age"));
+        let reply = try_operator_instant_reply("mood age").expect("mood age instant");
+        assert!(
+            reply.contains("Mood file") || reply.to_lowercase().contains("mood"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago")
+                || reply.contains("last write")
+                || reply.contains("newest write")
+                || reply.contains("no `mood.md` yet"),
+            "age reply should include mtime or empty cue: {reply}"
+        );
+        assert!(!reply.to_lowercase().contains("you have opinions"));
+        assert!(
+            try_operator_instant_reply("how old is mood.md").is_some(),
+            "how old is mood.md should be instant"
         );
         assert!(
             try_operator_instant_reply("mood path")

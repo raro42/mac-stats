@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.937] - 2026-09-08
+
+### Added
+
+- **Instant lane: mood.md age** — `mood age`, `mood.md age`, `how old is mood`, `when was mood updated`, and close variants return the newest last-write age across per-agent `mood.md` files without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `mood path` / `mood size` / soul / agents; p50 latency).
+
 ## [0.1.936] - 2026-09-08
 
 ### Added
