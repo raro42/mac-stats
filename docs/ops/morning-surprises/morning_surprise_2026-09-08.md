@@ -1,25 +1,20 @@
 # Morning surprise — 2026-09-08
 
-Overnight Track B kept shipping. Highlights for Ralf:
+Overnight Track B (mac-stats product). Window started ~20:00 local.
 
-## Shipped tonight
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.941** | Instant lane: **agent.json age** (`agent.json age` / `agent config age` / `how old is agent.json`) — newest per-agent mtime, no dump |
-| **v0.1.940** | Instant lane: **testing.md age** (`testing age` / `testing.md age` / `how old is testing`) — newest per-agent mtime, no dump |
-| **v0.1.939** | Instant lane: **skill.md age** (`skill.md age` / `skill file age` / `how old is skill.md`) — newest per-agent mtime, no dump |
-| **v0.1.938** | AI Chat **empty Ready calm** (ok wash + warm empty copy; design review) |
-| **v0.1.937** | Instant lane: **mood.md age** |
-| **v0.1.936** | Instant lane: **soul.md age** |
-| **v0.1.935** | Instant lane: **`.config.env` age** |
-| **v0.1.934** | Instant lane: **credential_accounts.json age** |
+| **v0.1.942** | **AI Chat filter-miss calm** — You / Assistant / Errors with zero matching turns gets a titled warm empty pane and cue wash (ok green when Errors is empty). Clear filter CTA stays. Design review / `feature-ai-chat`. |
 
-## Still open
+## Tried / context
 
-- `docs/screens/feature-ai-chat.png` still aged (~24d); screenshot TCC deferred earlier — recapture when Screen Recording allows.
-- Next p50: **planning/execution prompt age** / memory.md age; sibling Hermes insights / session UX when digester is empty.
+- Digester open: stale `feature-ai-chat.png` (~25d) → design review due.
+- Prior night already shipped Ready empty calm (**v0.1.938**) and instant ages through **v0.1.941**; this tick opened the new overnight window with the due design-review surface.
+- Screenshot recapture: attempt after install; if Screen Recording TCC blocks `screencapture -l`, prior Aug 14 asset stays and polish grace is marked.
 
-## Nightly ratchet
+## Next fuel
 
-≥1 keep this window (many keeps). Not a quiet night.
+- One design-review polish already used tonight — prefer digester / p50 instant (planning·execution prompt age, memory.md age) or sibling Hermes insights.
+- Recapture `feature-ai-chat.png` when TCC allows.
