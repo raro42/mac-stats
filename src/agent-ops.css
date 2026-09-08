@@ -1537,6 +1537,42 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, currentColor 3.5%, transparent);
   text-align: center;
   cursor: text;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+/* Ready + model: soft ok wash (Live idle calm / Chat · Ready glance parity). */
+.chat-empty.is-ready {
+  border-style: solid;
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.chat-empty.is-ready .chat-empty-title {
+  opacity: 1;
+}
+
+.chat-empty.is-ready .chat-empty-copy {
+  opacity: 0.88;
+}
+
+.chat-empty.is-no-model {
+  border-style: solid;
+  border-color: color-mix(in srgb, #ff9500 34%, transparent);
+  background: color-mix(in srgb, #ff9500 8%, transparent);
+}
+
+.chat-empty.is-offline,
+.chat-empty.is-circuit {
+  border-style: solid;
+  border-color: color-mix(in srgb, #ff9500 34%, transparent);
+  background: color-mix(in srgb, #ff9500 8%, transparent);
+}
+
+.chat-empty.is-not-set {
+  border-style: solid;
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
 
 .chat-empty-title {

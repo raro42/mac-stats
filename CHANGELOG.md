@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.938] - 2026-09-08
+
+### Changed
+
+- **AI Chat empty Ready calm** — When Ollama is connected with a model and the transcript is empty, the empty pane uses a soft ok wash and warmer copy (“Nothing here yet — glad you're here”). Offline / not set / no model / circuit get matching cue washes and a short next step (Live idle calm parity; design review / `feature-ai-chat`).
+
 ## [0.1.937] - 2026-09-08
 
 ### Added

@@ -1140,6 +1140,7 @@ function applyChatModelGlanceState() {
     glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
   }
   applyChatOfflineAttentionGlanceState();
+  syncChatEmptyCalmState();
 }
 
 function wireChatModelGlanceClick(glance) {
@@ -2358,6 +2359,81 @@ function ensureChatEmptySuggestionsToolbarKeyboard(row) {
 }
 
 /**
+ * Empty AI Chat calm state (Live idle calm parity).
+ * Ready + model → soft ok wash + warm copy (not muted “broken”).
+ * Offline / not set / no model → soft cue wash + short next step.
+ */
+function syncChatEmptyCalmState(emptyEl) {
+  const empty =
+    emptyEl ||
+    document
+      .getElementById('chat-messages')
+      ?.querySelector('.chat-empty:not(.chat-filter-miss)');
+  if (!empty) return;
+  const title = empty.querySelector('.chat-empty-title');
+  const copy = empty.querySelector('.chat-empty-copy');
+  const status = chatModelGlanceState.status || 'unknown';
+  const model = getChatModelGlanceLabel();
+  const circuit = status === 'error' && !!chatModelGlanceState.circuitOpen;
+
+  empty.classList.remove(
+    'is-ready',
+    'is-offline',
+    'is-not-set',
+    'is-no-model',
+    'is-circuit'
+  );
+
+  if (status === 'connected' && model) {
+    empty.classList.add('is-ready');
+    if (title) title.textContent = 'Nothing here yet — glad you\'re here';
+    if (copy) {
+      copy.textContent =
+        'Ask about CPU, RAM, schedules, or tasks — answers stay on this Mac.';
+    }
+    empty.title = 'Ready — try a starter or type below';
+    return;
+  }
+  if (status === 'connected' && !model) {
+    empty.classList.add('is-no-model');
+    if (title) title.textContent = 'Nothing here yet — pick a model';
+    if (copy) {
+      copy.textContent =
+        'Choose a model in the header, then try a starter below.';
+    }
+    empty.title = 'Connected — choose an Ollama model';
+    return;
+  }
+  if (circuit) {
+    empty.classList.add('is-circuit');
+    if (title) title.textContent = 'Nothing here yet — circuit open';
+    if (copy) {
+      copy.textContent =
+        'Chat is paused for a moment. Retry soon, then try a starter.';
+    }
+    empty.title = 'Ollama circuit open — retry soon';
+    return;
+  }
+  if (status === 'error') {
+    empty.classList.add('is-offline');
+    if (title) title.textContent = 'Nothing here yet — Ollama is offline';
+    if (copy) {
+      copy.textContent =
+        'Check the connection cue above, then try a starter.';
+    }
+    empty.title = 'Ollama offline — click the status light to set the URL';
+    return;
+  }
+  empty.classList.add('is-not-set');
+  if (title) title.textContent = 'Nothing here yet — set an Ollama URL';
+  if (copy) {
+    copy.textContent =
+      'Click the status light to configure, then pick a model.';
+  }
+  empty.title = 'Ollama not configured — click the status light';
+}
+
+/**
  * Show a calm empty-state hint when the chat pane has no messages yet.
  */
 function ensureChatEmptyHint() {
@@ -2374,6 +2450,7 @@ function ensureChatEmptyHint() {
   if (existing) {
     const row = existing.querySelector('.chat-empty-suggestions');
     if (row) ensureChatEmptySuggestionsToolbarKeyboard(row);
+    syncChatEmptyCalmState(existing);
     applyChatListFilter();
     applyChatOfflineAttentionGlanceState();
     return;
@@ -2384,7 +2461,7 @@ function ensureChatEmptyHint() {
 
   const title = document.createElement('p');
   title.className = 'chat-empty-title';
-  title.textContent = 'Nothing in this chat yet';
+  title.textContent = 'Nothing here yet — glad you\'re here';
   empty.appendChild(title);
 
   const copy = document.createElement('p');
@@ -2418,6 +2495,7 @@ function ensureChatEmptyHint() {
   });
 
   container.appendChild(empty);
+  syncChatEmptyCalmState(empty);
   ensureChatEmptySuggestionsToolbarKeyboard(row);
   applyChatListFilter();
   applyChatOfflineAttentionGlanceState();
