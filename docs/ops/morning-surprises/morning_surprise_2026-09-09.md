@@ -1,20 +1,24 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B (20:00–06:00) kept shipping instant-lane age reads so operator asks skip Ollama.
+Updated: 2026-09-09 01:50 local (overnight autoresearch)
 
 ## Shipped tonight
-- **v0.1.953** — Instant lane: screenshots directory age (newest file mtime under the BROWSER_SCREENSHOT dir; no list dump; path/size/take/list safe).
-- **v0.1.952** — Instant lane: improvements directory age (newest file mtime under `~/.mac-stats/improvements/`; no list dump; path/size/`results.tsv age`/overnight content safe).
-- **v0.1.951** — Instant lane: Ori vault age (newest file mtime under configured vault; no list/MCP; path/size/`/ori` safe).
-- Earlier in the window: **v0.1.950** before-compaction transcript age; **v0.1.949** before-reset transcript age; **v0.1.948** Discord channel memory age; **v0.1.947** session-memory age; **v0.1.946** notes folder age (from prior ticks same night).
-- Design review: AI Chat filter-miss calm already used (**v0.1.942** at window open); `feature-ai-chat.png` still stale until TCC/window recapture.
 
-## Tried / deferred
-- Digester open pointed at design-review for `feature-ai-chat.png` — deferred (one polish/night cap).
-- Sibling Hermes insights / session UX — parked for a later tick.
+| Version | What |
+|---------|------|
+| **v0.1.954** | Instant lane: LaunchAgent plist age (app + overnight harness mtimes; no dump; path/size/load safe) |
+| **v0.1.953** | Instant lane: screenshots directory age (newest file mtime; path/size/take safe) |
+| **v0.1.952** | Instant lane: improvements directory age (newest file mtime; path/size/results.tsv/overnight safe) |
+| **v0.1.951** | Instant lane: Ori vault age (newest file mtime; path/size/`/ori` safe) |
+| **v0.1.942** | AI Chat filter-miss calm (You/Assistant/Errors empty titled warm + cue wash; design review) |
 
-## Next
-- Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (next night’s design-review slot).
-- More p50 age / path lanes (LaunchAgent / skills / agents) or sibling ports when digester is quiet.
+## Tried / notes
 
-Generated: 2026-09-09T01:25+02:00
+- Design review due (`feature-ai-chat` still stale) — one polish/night already used (v0.1.942); later ticks stayed on standing-backlog p50 age lanes.
+- Digester open was design-review only; weather Slowest filtered as already shipped.
+
+## Next fuel
+
+- skills / agents directory age (path + size exist; age missing)
+- Recapture `feature-ai-chat.png` when TCC allows (next night’s design-review slot)
+- Sibling Hermes insights / session UX when age lanes thin out

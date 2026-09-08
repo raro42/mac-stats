@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.954] - 2026-09-09
+
+### Added
+- Instant lane: LaunchAgent plist age (`launchagent age`, `how old is the launchagent`, `mac-stats.plist age`, `harness plist age`) — app KeepAlive + overnight harness plist mtimes; no dump; does not steal path / size / load/unload.
+
 ## [0.1.953] - 2026-09-09
 
 ### Added

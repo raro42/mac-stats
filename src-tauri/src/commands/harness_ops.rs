@@ -7812,6 +7812,7 @@ pub fn looks_like_launchagent_path_request(content: &str) -> bool {
     }
     // String-only sibling excludes (do not nest looks_like_* — exponential).
     // Size asks use the LaunchAgent plist size lane (v0.1.917).
+    // Age asks use the LaunchAgent plist age lane (v0.1.954).
     if n.contains("size")
         || n.contains("big")
         || n.contains("large")
@@ -7819,6 +7820,17 @@ pub fn looks_like_launchagent_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || ((n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
         || n.contains("improvements path")
         || n.contains("improvements folder")
         || n.contains("improvements directory")
@@ -7983,7 +7995,7 @@ pub fn format_launchagent_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**LaunchAgents:** `{app}` · app KeepAlive · overnight harness: `{harness}` · `launchagent size` for on-disk bytes · path only · does not load or unload."
+        "**LaunchAgents:** `{app}` · app KeepAlive · overnight harness: `{harness}` · `launchagent size` for on-disk bytes · `launchagent age` for mtime · path only · does not load or unload."
     )
 }
 
@@ -7995,6 +8007,7 @@ pub fn looks_like_launchagent_size_request(content: &str) -> bool {
         return false;
     }
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    // Age asks use the LaunchAgent plist age lane (v0.1.954).
     if n.contains("path")
         || n.contains("where")
         || n.contains("location")
@@ -8004,6 +8017,7 @@ pub fn looks_like_launchagent_size_request(content: &str) -> bool {
         || n.starts_with("dir ")
         || n == "dir"
         || n.contains("home")
+        || n.contains("age")
         || n.contains("how old")
         || n.contains("stale")
         || n.contains(" last modified")
@@ -8202,7 +8216,232 @@ pub fn format_launchagent_size_gateway() -> String {
     let app_line = format_one_plist_size_line("App LaunchAgent", &app);
     let harness_line = format_one_plist_size_line("Overnight harness", &harness);
     format!(
-        "{app_line} · {harness_line} · `launchagent path` for paths · does not load, unload, or dump XML."
+        "{app_line} · {harness_line} · `launchagent path` for paths · `launchagent age` for mtime · does not load, unload, or dump XML."
+    )
+}
+
+/// True for short “how old is the LaunchAgent / launchagent age…” asks.
+/// Mtime only — does not dump plist XML, load/unload, or return path/size.
+pub fn looks_like_launchagent_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("install")
+        || n.contains("bootstrap")
+        || n.contains("kickstart")
+        || n.contains("bootout")
+        || n.contains("unload")
+        || n.contains("reload")
+        || n.contains("load ")
+        || n.starts_with("load ")
+        || n.contains("launchctl")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("export")
+        || n.contains("import")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session path")
+        || n.contains("agents path")
+        || n.contains("memory path")
+        || n.contains("notes path")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let la_ctx = n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains("launch-agent")
+        || n.contains("launch_agent")
+        || n.contains("com.raro42.mac-stats.plist")
+        || n.contains("com.raro42.mac-stats-overnight-harness.plist")
+        || n.contains("mac-stats.plist")
+        || n.contains("mac_stats.plist")
+        || n.contains("overnight-harness.plist")
+        || n.contains("overnight harness plist")
+        || n.contains("harness plist")
+        || n.contains("harness launchagent")
+        || n.contains("harness launch agent")
+        || (n.contains("plist")
+            && (n.contains("mac-stats")
+                || n.contains("mac stats")
+                || n.contains("keepalive")
+                || n.contains("keep alive")
+                || n.contains("launchd")
+                || n.contains("harness")
+                || n.contains("overnight")
+                || n.contains("launchagent")
+                || n.contains("launch agent")));
+    if !la_ctx {
+        return false;
+    }
+    // Bare “launchagent” / path-only asks stay on the path lane.
+    if n == "launchagent"
+        || n == "launch agent"
+        || n == "launchagents"
+        || n == "launch agents"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "launchagent age"
+            | "launch agent age"
+            | "launch-agent age"
+            | "launch_agent age"
+            | "launchagent plist age"
+            | "launch agent plist age"
+            | "launchagent file age"
+            | "launch agent file age"
+            | "mac-stats plist age"
+            | "mac stats plist age"
+            | "mac-stats.plist age"
+            | "mac_stats.plist age"
+            | "com.raro42.mac-stats.plist age"
+            | "com.raro42.mac-stats-overnight-harness.plist age"
+            | "harness plist age"
+            | "overnight harness plist age"
+            | "overnight-harness plist age"
+            | "how old is launchagent"
+            | "how old is the launchagent"
+            | "how old is launch agent"
+            | "how old is the launch agent"
+            | "how old is the launchagent plist"
+            | "how old is the launch agent plist"
+            | "how old is mac-stats.plist"
+            | "how old is the mac-stats plist"
+            | "how old are launchagents"
+            | "how old are launch agents"
+            | "when was launchagent updated"
+            | "when was the launchagent updated"
+            | "when was launch agent updated"
+            | "when was the launch agent updated"
+            | "when was the launchagent plist updated"
+            | "when was mac-stats.plist updated"
+            | "launchagent last modified"
+            | "launch agent last modified"
+            | "is launchagent stale"
+            | "is the launchagent stale"
+            | "is the launchagent plist stale"
+            | "harness launchagent age"
+            | "harness launch agent age"
+            | "overnight harness launchagent age"
+            | "overnight harness launch agent age"
+            | "mac-stats launchagent age"
+            | "mac stats launchagent age"
+    ) || (la_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+fn format_one_plist_age_line(label: &str, path: &std::path::Path) -> String {
+    let display = path.display().to_string();
+    if !path.exists() {
+        return format!("**{label}:** not installed · `{display}`");
+    }
+    match std::fs::metadata(path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!("**{label}:** last write **{age}** ago · `{display}`")
+        }
+        Err(e) => format!("**{label}:** could not stat `{display}`: {e}"),
+    }
+}
+
+/// Zero-LLM LaunchAgent plist ages (mtime only; no dump/load/unload).
+pub fn format_launchagent_age_gateway() -> String {
+    let app = crate::config::Config::mac_stats_launch_agent_plist();
+    let harness = crate::config::Config::overnight_harness_launch_agent_plist();
+    let app_line = format_one_plist_age_line("App LaunchAgent", &app);
+    let harness_line = format_one_plist_age_line("Overnight harness", &harness);
+    format!(
+        "{app_line} · {harness_line} · `launchagent path` for paths · `launchagent size` for on-disk bytes · does not load, unload, or dump XML."
     )
 }
 
@@ -34440,6 +34679,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_memory_path_request(content) {
         return Some(format_session_memory_path_gateway());
     }
+    // LaunchAgent plist age before size/path (mtime only; no dump/load).
+    if looks_like_launchagent_age_request(content) {
+        return Some(format_launchagent_age_gateway());
+    }
     // LaunchAgent plist size before path (stat only; no dump/load).
     if looks_like_launchagent_size_request(content) {
         return Some(format_launchagent_size_gateway());
@@ -34810,6 +35053,14 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // Session-memory-*.md path before notes-folder / session-dir path.
     if looks_like_session_memory_path_request(content) {
         return Some(format_session_memory_path_gateway());
+    }
+    // LaunchAgent plist age before size/path (mtime only; no dump/load).
+    if looks_like_launchagent_age_request(content) {
+        return Some(format_launchagent_age_gateway());
+    }
+    // LaunchAgent plist size before path (stat only; no dump/load).
+    if looks_like_launchagent_size_request(content) {
+        return Some(format_launchagent_size_gateway());
     }
     // LaunchAgent plist paths (path-only; no load/unload).
     if looks_like_launchagent_path_request(content) {
@@ -35230,8 +35481,9 @@ pub fn format_ops_help_gateway() -> String {
 • `session memory size` · `session-memory size` · `how big is session memory` — `session-memory-*.md` size on disk (stat only; no dump; does not steal `session memory path` / `session memory age` / `session size` / `/sessions`)\n\
 • `session memory age` · `session-memory age` · `how old is session memory` · `when was session memory updated` — newest `session-memory-*.md` last write age (mtime; no dump; does not steal `session memory path` / `session memory size` / `session size` / `/sessions`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; `session memory size` / `session memory age` for bytes / mtime; does not steal `session path` / `/sessions`)\n\
-• `launchagent size` · `how big is the launchagent` · `mac-stats.plist size` · `harness plist size` — LaunchAgent plist sizes on disk (stat only; no dump; does not steal `launchagent path` / load/unload)\n\
-• `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` for on-disk bytes; no load/unload)\n\
+• `launchagent age` · `how old is the launchagent` · `mac-stats.plist age` · `harness plist age` — LaunchAgent plist last write ages (mtime; no dump; does not steal `launchagent path` / size / load/unload)\n\
+• `launchagent size` · `how big is the launchagent` · `mac-stats.plist size` · `harness plist size` — LaunchAgent plist sizes on disk (stat only; no dump; does not steal `launchagent path` / age / load/unload)\n\
+• `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` / `launchagent age` for bytes / mtime; no load/unload)\n\
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
@@ -36942,6 +37194,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session-memory-*.md path asks (v0.1.863) — config only; no list/dump.
     if looks_like_session_memory_path_request(question) {
+        return true;
+    }
+    // Read-only LaunchAgent plist age asks (v0.1.954) — mtime only; no dump/load.
+    if looks_like_launchagent_age_request(question) {
         return true;
     }
     // Read-only LaunchAgent plist size asks (v0.1.917) — stat only; no dump/load.
@@ -43469,6 +43725,8 @@ mod tests {
         assert!(!looks_like_launchagent_path_request("config path"));
         assert!(!looks_like_launchagent_path_request("launchagent size"));
         assert!(!looks_like_launchagent_path_request("how big is the launchagent plist"));
+        assert!(!looks_like_launchagent_path_request("launchagent age"));
+        assert!(!looks_like_launchagent_path_request("how old is the launchagent"));
         assert!(!looks_like_improvements_path_request("launchagent path"));
         let reply =
             try_operator_instant_reply("launchagent path").expect("launchagent path instant");
@@ -43498,6 +43756,8 @@ mod tests {
         assert!(!looks_like_launchagent_size_request("dump launchagent"));
         assert!(!looks_like_launchagent_size_request("improvements path"));
         assert!(!looks_like_launchagent_size_request("results.tsv size"));
+        assert!(!looks_like_launchagent_size_request("launchagent age"));
+        assert!(!looks_like_launchagent_size_request("how old is the launchagent"));
         assert!(!looks_like_launchagent_path_request("launchagent size"));
         assert!(!looks_like_launchagent_path_request(
             "how big is the launchagent plist"
@@ -43517,6 +43777,52 @@ mod tests {
                     || reply.contains("MB"))
         );
         assert!(reply.contains("launchagent path") || reply.contains("does not load"));
+    }
+
+    #[test]
+    fn launchagent_age_request_detected() {
+        assert!(looks_like_launchagent_age_request("launchagent age"));
+        assert!(looks_like_launchagent_age_request("launch agent age"));
+        assert!(looks_like_launchagent_age_request("launchagent plist age"));
+        assert!(looks_like_launchagent_age_request("how old is the launchagent"));
+        assert!(looks_like_launchagent_age_request(
+            "how old is the launchagent plist"
+        ));
+        assert!(looks_like_launchagent_age_request("mac-stats.plist age"));
+        assert!(looks_like_launchagent_age_request("harness plist age"));
+        assert!(looks_like_launchagent_age_request(
+            "overnight harness plist age"
+        ));
+        assert!(looks_like_launchagent_age_request("when was launchagent updated"));
+        assert!(looks_like_launchagent_age_request("is the launchagent stale"));
+        assert!(!looks_like_launchagent_age_request("launchagent path"));
+        assert!(!looks_like_launchagent_age_request("where is launchagent"));
+        assert!(!looks_like_launchagent_age_request("launchagent size"));
+        assert!(!looks_like_launchagent_age_request("how big is the launchagent"));
+        assert!(!looks_like_launchagent_age_request("install launchagent"));
+        assert!(!looks_like_launchagent_age_request("launchctl unload"));
+        assert!(!looks_like_launchagent_age_request("dump launchagent"));
+        assert!(!looks_like_launchagent_age_request("improvements path"));
+        assert!(!looks_like_launchagent_age_request("results.tsv age"));
+        assert!(!looks_like_launchagent_path_request("launchagent age"));
+        assert!(!looks_like_launchagent_path_request(
+            "how old is the launchagent plist"
+        ));
+        assert!(!looks_like_launchagent_size_request("launchagent age"));
+        assert!(!looks_like_results_tsv_age_request("launchagent age"));
+        let reply =
+            try_operator_instant_reply("launchagent age").expect("launchagent age instant");
+        assert!(
+            reply.contains("LaunchAgent")
+                && (reply.contains("ago")
+                    || reply.contains("not installed")
+                    || reply.contains("could not stat"))
+        );
+        assert!(reply.contains("launchagent path") || reply.contains("does not load"));
+        assert!(
+            try_operator_instant_reply("launchagent age").is_some(),
+            "launchagent age should be instant"
+        );
     }
 
     #[test]
