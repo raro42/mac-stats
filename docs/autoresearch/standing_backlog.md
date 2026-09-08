@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.940** — Instant lane: testing.md age (`testing age`, `testing.md age`, `how old is testing`, `when was testing updated`; newest mtime across per-agent files; no dump; does not steal path / size / skill / mood / soul; does not run tests; p50 latency).
+
 - **v0.1.939** — Instant lane: skill.md age (`skill.md age`, `skill file age`, `how old is skill.md`, `when was skill.md updated`; newest mtime across per-agent files; no dump; does not steal path / size / bare `skill age` / skills folder / mood / soul; p50 latency).
 
 - **v0.1.938** — AI Chat empty Ready calm (connected + model → soft ok wash + “Nothing here yet — glad you're here”; offline/not-set/no-model/circuit cue washes; design review / `feature-ai-chat`).

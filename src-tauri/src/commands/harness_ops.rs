@@ -22252,6 +22252,7 @@ pub fn format_downloads_organizer_state_path_gateway() -> String {
 /// Config path only — does not dump/edit testing prompts or run `agent test`.
 /// Testing is per-agent (`agent-<id>/testing.md`).
 /// Size asks use the testing.md size lane (v0.1.904).
+/// Age asks use the testing.md age lane (v0.1.940).
 pub fn looks_like_testing_md_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -22373,6 +22374,19 @@ pub fn looks_like_testing_md_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the testing.md age lane (v0.1.940) — keyword-only (no nest).
+        // Do not use bare `contains("age")` — it matches inside `agent`.
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("md age")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run ")
@@ -22442,12 +22456,13 @@ pub fn looks_like_testing_md_path_request(content: &str) -> bool {
 pub fn format_testing_md_path_gateway() -> String {
     let display = crate::config::Config::testing_file_path_display();
     format!(
-        "**Testing file:** `{display}` · per-agent test prompts (`mac_stats agent test`) · path only · `testing.md size` for on-disk bytes · does not dump or edit testing text · Agent Ops → Agents for content."
+        "**Testing file:** `{display}` · per-agent test prompts (`mac_stats agent test`) · path only · `testing.md size` / `testing.md age` for bytes / mtime · does not dump or edit testing text · Agent Ops → Agents for content."
     )
 }
 
 /// True for short “how big is testing.md / testing size…” asks.
-/// Stat only on per-agent `testing.md` files — does not steal path / skill / mood / soul / dump / run tests.
+/// Stat only on per-agent `testing.md` files — does not steal path / age / skill / mood / soul / dump / run tests.
+/// Age asks use the testing.md age lane (v0.1.940).
 pub fn looks_like_testing_md_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -22677,17 +22692,261 @@ pub fn format_testing_md_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Testing file:** no `testing.md` yet · `testing.md path` for the file pattern · Agent Ops → Agents for content · does not run tests."
+        return "**Testing file:** no `testing.md` yet · `testing.md path` for the file pattern · `testing.md age` for last write · Agent Ops → Agents for content · does not run tests."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Testing file:** **{label}** on disk · 1 per-agent `testing.md` · `testing.md path` for the file · does not dump testing text or run tests."
+            "**Testing file:** **{label}** on disk · 1 per-agent `testing.md` · `testing.md path` for the file · `testing.md age` for last write · does not dump testing text or run tests."
         )
     } else {
         format!(
-            "**Testing file:** **{label}** on disk · {count} per-agent `testing.md` files · `testing.md path` for the pattern · does not dump testing text or run tests."
+            "**Testing file:** **{label}** on disk · {count} per-agent `testing.md` files · `testing.md path` for the pattern · `testing.md age` for last write · does not dump testing text or run tests."
+        )
+    }
+}
+
+/// True for short “how old is testing.md / testing age…” asks.
+/// Newest mtime across per-agent `testing.md` — does not steal path / size / skill / mood / soul / dump / run tests.
+pub fn looks_like_testing_md_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || (n.contains("agent test") && !n.contains("agent testing"))
+        || n.contains("unit test")
+        || n.contains("cargo test")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill age")
+        || n.contains("skill file")
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts age")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let testing_ctx = n.contains("testing.md")
+        || n.contains("testing file")
+        || n.contains("testing age")
+        || n.contains("testing md")
+        || n.contains("agent testing.md")
+        || n.contains("agent testing file")
+        || n == "testing age"
+        || n == "how old is testing"
+        || n == "how old is the testing"
+        || n == "when was testing updated"
+        || n == "when was the testing updated"
+        || n == "is testing stale"
+        || n == "is the testing stale"
+        || n == "mac-stats testing age"
+        || n == "mac stats testing age"
+        || (n.contains("testing")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !testing_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "testing age"
+            | "testing.md age"
+            | "testing file age"
+            | "testing md age"
+            | "testing.md file age"
+            | "agent testing.md age"
+            | "agent testing file age"
+            | "agent testing age"
+            | "mac-stats testing.md age"
+            | "mac stats testing.md age"
+            | "mac-stats testing age"
+            | "mac stats testing age"
+            | "mac-stats testing file age"
+            | "mac stats testing file age"
+            | "how old is testing"
+            | "how old is the testing"
+            | "how old is testing.md"
+            | "how old is the testing.md"
+            | "how old is testing file"
+            | "how old is the testing file"
+            | "how old is the testing.md file"
+            | "when was testing updated"
+            | "when was the testing updated"
+            | "when was testing.md updated"
+            | "when was the testing.md updated"
+            | "when was testing file updated"
+            | "when was the testing file updated"
+            | "testing.md last modified"
+            | "testing file last modified"
+            | "testing last modified"
+            | "is testing stale"
+            | "is the testing stale"
+            | "is testing.md stale"
+            | "is the testing.md stale"
+            | "is testing file stale"
+            | "is the testing file stale"
+    ) || (testing_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM per-agent testing.md age from newest file mtime (stat only; no dump/edit/run).
+pub fn format_testing_md_age_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let testing = entry.path().join("testing.md");
+            if let Ok(meta) = std::fs::metadata(&testing) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    if let Ok(modified) = meta.modified() {
+                        let ms = modified
+                            .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                            .map(|d| d.as_millis() as u64)
+                            .unwrap_or(0);
+                        newest_ms = Some(match newest_ms {
+                            Some(prev) => prev.max(ms),
+                            None => ms,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Testing file:** no `testing.md` yet · `testing.md path` for the file pattern · Agent Ops → Agents for content · does not run tests."
+            .to_string();
+    }
+    let Some(ms) = newest_ms else {
+        return "**Testing file** — could not read mtime on per-agent `testing.md`.".to_string();
+    };
+    let age = age_from_ms(ms);
+    if count == 1 {
+        format!(
+            "**Testing file:** last write **{age}** ago · 1 per-agent `testing.md` · `testing.md path` for the file · `testing.md size` for on-disk bytes · does not dump testing text or run tests."
+        )
+    } else {
+        format!(
+            "**Testing file:** newest write **{age}** ago · {count} per-agent `testing.md` files · `testing.md path` for the pattern · `testing.md size` for on-disk bytes · does not dump testing text or run tests."
         )
     }
 }
@@ -31108,9 +31367,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_planning_prompt_path_request(content) {
         return Some(format_planning_prompt_path_gateway());
     }
-    // testing.md size before path (stat only; no dump).
+    // testing.md size before age/path (stat only; no dump).
     if looks_like_testing_md_size_request(content) {
         return Some(format_testing_md_size_gateway());
+    }
+    // testing.md age before path (mtime only; no dump).
+    if looks_like_testing_md_age_request(content) {
+        return Some(format_testing_md_age_gateway());
     }
     // testing.md before skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_testing_md_path_request(content) {
@@ -31360,9 +31623,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_planning_prompt_path_request(content) {
         return Some(format_planning_prompt_path_gateway());
     }
-    // testing.md size before path (stat only; no dump).
+    // testing.md size before age/path (stat only; no dump).
     if looks_like_testing_md_size_request(content) {
         return Some(format_testing_md_size_gateway());
+    }
+    // testing.md age before path (mtime only; no dump).
+    if looks_like_testing_md_age_request(content) {
+        return Some(format_testing_md_age_gateway());
     }
     // testing.md before skill / mood / soul / agents-dir path lane.
     if looks_like_testing_md_path_request(content) {
@@ -31896,8 +32163,9 @@ pub fn format_ops_help_gateway() -> String {
 • `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skill.md age` / `skills size` / `/skills`)\n\
 • `skill.md age` · `skill file age` · `how old is skill.md` · `when was skill.md updated` — newest per-agent skill.md last write age (mtime; no dump; does not steal `skill.md path` / `skill.md size` / `skills` / mood / soul)\n\
 • `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` / `skill.md age` for bytes / mtime; does not steal `/skills`)\n\
-• `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / run tests / `/agents`)\n\
-• `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` for on-disk bytes; does not steal `/agents`)\n\
+• `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / `testing.md age` / run tests / `/agents`)\n\
+• `testing age` · `testing.md age` · `how old is testing` · `when was testing updated` — newest per-agent testing.md last write age (mtime; no dump; does not steal `testing.md path` / `testing.md size` / skill / mood / soul; does not run tests)\n\
+• `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` / `testing.md age` for bytes / mtime; does not steal `/agents`)\n\
 • `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agents size` / `config.json`)\n\
 • `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` for on-disk bytes; does not steal `agents path` / `config path`)\n\
 • `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`)\n\
@@ -33510,6 +33778,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only testing.md size asks (v0.1.904) — stat only; no dump/edit/run.
     if looks_like_testing_md_size_request(question) {
+        return true;
+    }
+    // Read-only testing.md age asks (v0.1.940) — mtime only; no dump/edit/run.
+    if looks_like_testing_md_age_request(question) {
         return true;
     }
     // Read-only testing.md path asks (v0.1.854) — config only; no dump/edit/run.
@@ -37798,6 +38070,9 @@ mod tests {
         assert!(!looks_like_testing_md_path_request("testing.md size"));
         assert!(!looks_like_testing_md_path_request("how big is testing.md"));
         assert!(!looks_like_testing_md_path_request("testing size"));
+        assert!(!looks_like_testing_md_path_request("testing.md age"));
+        assert!(!looks_like_testing_md_path_request("how old is testing.md"));
+        assert!(!looks_like_testing_md_path_request("testing age"));
         assert!(!looks_like_agents_path_request("testing.md path"));
         assert!(!looks_like_skill_md_path_request("testing.md path"));
         assert!(!looks_like_mood_path_request("testing.md path"));
@@ -37832,6 +38107,9 @@ mod tests {
         assert!(!looks_like_testing_md_size_request("mood size"));
         assert!(!looks_like_testing_md_size_request("soul size"));
         assert!(!looks_like_testing_md_size_request("agents size"));
+        assert!(!looks_like_testing_md_size_request("testing.md age"));
+        assert!(!looks_like_testing_md_size_request("how old is testing.md"));
+        assert!(!looks_like_testing_md_size_request("testing age"));
         assert!(!looks_like_testing_md_path_request("testing.md size"));
         assert!(!looks_like_testing_md_path_request("how big is testing.md"));
         assert!(!looks_like_skill_md_size_request("testing.md size"));
@@ -37855,6 +38133,80 @@ mod tests {
                 .to_lowercase()
                 .contains("path only"),
             "testing.md path must stay on path lane"
+        );
+    }
+
+    #[test]
+    fn testing_md_age_request_detected() {
+        assert!(looks_like_testing_md_age_request("testing age"));
+        assert!(looks_like_testing_md_age_request("testing.md age"));
+        assert!(looks_like_testing_md_age_request("testing file age"));
+        assert!(looks_like_testing_md_age_request("testing md age"));
+        assert!(looks_like_testing_md_age_request("how old is testing.md"));
+        assert!(looks_like_testing_md_age_request("how old is testing"));
+        assert!(looks_like_testing_md_age_request("how old is the testing file"));
+        assert!(looks_like_testing_md_age_request("when was testing.md updated"));
+        assert!(looks_like_testing_md_age_request("when was testing updated"));
+        assert!(looks_like_testing_md_age_request("testing.md last modified"));
+        assert!(looks_like_testing_md_age_request("is testing.md stale"));
+        assert!(looks_like_testing_md_age_request("mac-stats testing.md age"));
+        assert!(looks_like_testing_md_age_request("agent testing.md age"));
+        assert!(!looks_like_testing_md_age_request("testing.md path"));
+        assert!(!looks_like_testing_md_age_request("where is testing.md"));
+        assert!(!looks_like_testing_md_age_request("testing.md size"));
+        assert!(!looks_like_testing_md_age_request("how big is testing.md"));
+        assert!(!looks_like_testing_md_age_request("dump testing.md"));
+        assert!(!looks_like_testing_md_age_request("edit testing.md"));
+        assert!(!looks_like_testing_md_age_request("run tests"));
+        assert!(!looks_like_testing_md_age_request("agent test"));
+        assert!(!looks_like_testing_md_age_request("skill.md age"));
+        assert!(!looks_like_testing_md_age_request("mood age"));
+        assert!(!looks_like_testing_md_age_request("soul age"));
+        assert!(!looks_like_testing_md_age_request("agents age"));
+        assert!(!looks_like_testing_md_path_request("testing.md age"));
+        assert!(!looks_like_testing_md_path_request("how old is testing.md"));
+        assert!(!looks_like_testing_md_size_request("testing.md age"));
+        assert!(!looks_like_testing_md_size_request("how old is testing.md"));
+        assert!(!looks_like_skill_md_age_request("testing.md age"));
+        assert!(!looks_like_mood_age_request("testing.md age"));
+        assert!(!looks_like_soul_age_request("testing.md age"));
+        let reply = try_operator_instant_reply("testing.md age").expect("testing.md age instant");
+        assert!(
+            reply.contains("Testing file") || reply.to_lowercase().contains("testing"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago")
+                || reply.to_lowercase().contains("last write")
+                || reply.to_lowercase().contains("newest write")
+                || reply.to_lowercase().contains("no `testing.md`"),
+            "age reply should mention mtime: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how old is testing.md").is_some(),
+            "how old is testing.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("testing age").is_some(),
+            "testing age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("testing.md path")
+                .expect("testing.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "testing.md path must stay on path lane"
+        );
+        assert!(
+            try_operator_instant_reply("testing.md size")
+                .expect("testing.md size")
+                .to_lowercase()
+                .contains("on disk")
+                || try_operator_instant_reply("testing.md size")
+                    .expect("testing.md size")
+                    .to_lowercase()
+                    .contains("no `testing.md`"),
+            "testing.md size must stay on size lane"
         );
     }
 

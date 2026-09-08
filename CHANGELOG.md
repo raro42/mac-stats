@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.940] - 2026-09-08
+
+### Added
+
+- **Instant lane: testing.md age** — `testing age`, `testing.md age`, `how old is testing`, `when was testing updated`, and close variants return the newest last-write age across per-agent `testing.md` files without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `testing.md path` / `testing.md size` / skill / mood / soul; does not run tests; p50 latency).
+
 ## [0.1.939] - 2026-09-08
 
 ### Added
