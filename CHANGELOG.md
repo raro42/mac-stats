@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.945] - 2026-09-08
+
+### Added
+
+- **Instant lane: memory.md age** — `memory.md age`, `curated memory age`, `how old is memory.md`, `when was memory.md updated`, and close variants return the last-write age of curated `agents/memory.md` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `memory.md path` / `memory.md size` / notes folder / bare `memory age`; p50 latency).
+
 ## [0.1.944] - 2026-09-08
 
 ### Added
