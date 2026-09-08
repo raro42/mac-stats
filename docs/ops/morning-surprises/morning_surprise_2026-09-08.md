@@ -1,21 +1,25 @@
 # Morning surprise — 2026-09-08
 
-Overnight Track B (mac-stats product). Window started ~20:00 local.
+Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.942** | **AI Chat filter-miss calm** — You / Assistant / Errors with zero matching turns gets a titled warm empty pane and cue wash (ok green when Errors is empty). Clear filter CTA stays. Design review / `feature-ai-chat`. |
-| **v0.1.943** | **Instant lane: planning_prompt.md age** — `planning age` / `planning_prompt.md age` / `how old is planning` / `when was planning updated` return last-write age without Ollama (mtime only; no dump; does not steal path / size / prompts / execution; p50). |
+| **v0.1.944** | Instant lane: `execution_prompt.md` age (`execution age`, `how old is execution`, …) — mtime only; no dump; does not steal path / size / planning |
+| **v0.1.943** | Instant lane: `planning_prompt.md` age |
+| **v0.1.942** | AI Chat filter-miss calm (You/Assistant/Errors empty → warm titled hint + cue wash; design review / `feature-ai-chat`) |
+| **v0.1.941** | Instant lane: `agent.json` age |
+| **v0.1.940** | Instant lane: `testing.md` age |
+| **v0.1.939** | Instant lane: `skill.md` age |
+| **v0.1.938** | AI Chat empty Ready calm (design review) |
+| **v0.1.937** | Instant lane: `mood.md` age |
+| **v0.1.936** | Instant lane: `soul.md` age |
 
-## Tried / context
+## Still open
 
-- Digester open: stale `feature-ai-chat.png` (~25d) → design review due; first tick of the night shipped filter-miss calm (**v0.1.942**).
-- Second tick: design-review cap already used → standing backlog p50 planning_prompt.md age (**v0.1.943**).
-- Screenshot recapture: still deferred if Screen Recording TCC blocks `screencapture -l`; prior Aug 14 asset stays.
+- Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (polish already shipped).
+- Next p50 fuel: `memory.md` age (and remaining age lanes).
+- Sibling: Hermes insights / session UX ports when digester is quiet.
 
-## Next fuel
-
-- execution_prompt.md age, memory.md age, or digester Slowest / sibling Hermes insights.
-- Recapture `feature-ai-chat.png` when TCC allows (one design-review polish already used tonight).
+Generated: 2026-09-08T21:05:33+02:00
