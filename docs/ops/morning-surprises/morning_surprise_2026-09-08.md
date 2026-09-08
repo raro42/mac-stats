@@ -6,6 +6,7 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 
 | Version | What |
 |---------|------|
+| **v0.1.949** | Instant lane: before-reset transcript age (`before reset transcript age`, `before-reset transcript age`, `how old is before reset transcript`, `when was before reset transcript updated`, `last_session_before_reset.jsonl age`, …) — mtime only; no dump/hook; does not steal path / size / before-compaction / session reset phrases |
 | **v0.1.948** | Instant lane: Discord channel memory age (`discord memory age`, `memory-discord age`, `channel memory age`, `how old is discord memory`, `when was discord memory updated`, …) — newest `memory-discord-*.md` mtime; no dump; does not steal path / size / `/knowledge discord` |
 | **v0.1.947** | Instant lane: session-memory age (`session memory age`, `how old is session memory`, `when was session memory updated`, …) — newest `session-memory-*.md` mtime; no dump; does not steal path / size / session folder / `/sessions` |
 | **v0.1.946** | Instant lane: notes folder age (`notes age`, `how old are notes`, `memory folder age`, …) — newest file mtime; no dump; does not steal path / size / memory.md age / bare `memory age`; session-memory size plural/`.md` detector fix |
@@ -22,8 +23,8 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 
 ## Still open
 
-- Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (polish already shipped).
-- Next p50 fuel: before-reset / before-compaction transcript age, Ori vault age (and remaining age lanes).
+- Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (polish already shipped; one design-review/night cap used).
+- Next p50 fuel: before-compaction transcript age, Ori vault age (and remaining age lanes).
 - Sibling: Hermes insights / session UX ports when digester is quiet.
 
-Generated: 2026-09-08T23:05:00+02:00
+Generated: 2026-09-08T23:32:00+02:00
