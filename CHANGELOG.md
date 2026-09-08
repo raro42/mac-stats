@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.934] - 2026-09-08
+
+### Added
+
+- **Instant lane: credential_accounts.json age** — `credential accounts age`, `credential_accounts.json age`, `how old is credential accounts`, `when was credential accounts updated`, and close variants return the last-write age of `credential_accounts.json` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials; p50 latency).
+
 ## [0.1.933] - 2026-09-08
 
 ### Added
