@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.946] - 2026-09-08
+
+### Added
+
+- **Instant lane: notes folder age** — `notes age`, `how old are notes`, `memory folder age`, `notes folder age`, and close variants return the newest file mtime under `~/.mac-stats/agents/notes/` without Ollama (Discord + AI Chat; no list dump; does not steal `notes path` / `notes size` / `memory.md age` / bare `memory age`; p50 latency).
+
+### Fixed
+
+- **Session-memory size detector** — `session memories size` and `session-memory.md size` now match the instant lane (plural `memories` context; `memory.md` exclude no longer steals `session-memory.md`).
+
 ## [0.1.945] - 2026-09-08
 
 ### Added

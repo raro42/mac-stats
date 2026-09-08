@@ -5071,14 +5071,282 @@ pub fn format_memory_size_gateway() -> String {
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Notes:** **{label}** on disk ({files} files) · `memory path` / `notes path` for the folder · does not list names."
+                "**Notes:** **{label}** on disk ({files} files) · `memory path` / `notes path` for the folder · `notes age` for last write · does not list names."
             )
+        }
+    }
+}
+
+/// True for short “notes age / how old are notes / memory folder age…” asks.
+/// Newest file mtime under notes dir — no list dump / path / size / scrub / RAM / memory.md lanes.
+/// Rejects bare `memory age` (ambiguity); prefer `notes age` / `memory folder age`.
+pub fn looks_like_memory_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("purge")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("append")
+        || n.contains("save ")
+        || n.contains("saved note")
+        || n.contains("what did")
+        || n.contains("what you")
+        || n.contains("memory:")
+        || n.contains("memory_")
+        || n.contains("note:")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("memory file")
+        || n.contains("memory md")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log file age")
+        || n.contains("/ram")
+        || n.contains("ram ")
+        || n.starts_with("ram")
+        || n.contains(" rss")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("cpu")
+        || n.contains("gpu")
+        || n.contains("ssd")
+        || n.contains("battery")
+        || n.contains("heat")
+        || n.contains("thermal")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Bare “memory age” / “how old is memory” stay off this lane (ambiguity).
+    if n == "memory age"
+        || n == "memory"
+        || n == "how old is memory"
+        || n == "how old is the memory"
+        || n == "when was memory updated"
+        || n == "when was the memory updated"
+        || n == "is memory stale"
+        || n == "is the memory stale"
+        || n == "memory last modified"
+    {
+        return false;
+    }
+    let notes_ctx = n.contains("notes folder")
+        || n.contains("notes directory")
+        || n.contains("notes dir")
+        || n.contains("notes age")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("memory dir")
+        || n.contains("memory notes")
+        || n.contains("mac-stats notes")
+        || n.contains("mac stats notes")
+        || n.contains("mac-stats memory folder")
+        || n.contains("mac stats memory folder")
+        || ((n.contains("notes")
+            || n.contains("memory notes")
+            || n.contains("memory folder")
+            || n.contains("memory directory")
+            || n.contains("memory dir"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !notes_ctx {
+        return false;
+    }
+    // Path-only / bare folder labels stay on the path lane.
+    if n == "notes"
+        || n == "memory folder"
+        || n == "memory directory"
+        || n == "memory dir"
+        || n == "notes folder"
+        || n == "notes directory"
+        || n == "notes dir"
+        || n == "memory notes"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "notes age"
+            | "notes folder age"
+            | "notes directory age"
+            | "notes dir age"
+            | "memory folder age"
+            | "memory directory age"
+            | "memory dir age"
+            | "memory notes age"
+            | "memory notes folder age"
+            | "memory notes directory age"
+            | "memory notes dir age"
+            | "how old are notes"
+            | "how old is notes"
+            | "how old is the notes folder"
+            | "how old is notes folder"
+            | "how old is the notes directory"
+            | "how old is the memory folder"
+            | "how old is memory folder"
+            | "how old is the memory directory"
+            | "how old is memory directory"
+            | "how old is the memory dir"
+            | "when were notes updated"
+            | "when was the notes folder updated"
+            | "when was notes folder updated"
+            | "when was the memory folder updated"
+            | "when was memory folder updated"
+            | "notes last modified"
+            | "notes folder last modified"
+            | "memory folder last modified"
+            | "is notes stale"
+            | "is the notes folder stale"
+            | "is the memory folder stale"
+            | "mac-stats notes age"
+            | "mac stats notes age"
+            | "mac-stats memory folder age"
+            | "mac stats memory folder age"
+    ) || (n.contains("age") && notes_ctx)
+        || (n.contains("old") && notes_ctx)
+        || (n.contains("stale") && notes_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified")) && notes_ctx)
+}
+
+/// Zero-LLM memory notes directory age (newest file mtime; no list dump).
+pub fn format_memory_age_gateway() -> String {
+    let dir = crate::config::Config::memory_notes_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Notes:** not created yet · app recreates under `~/.mac-stats/agents/notes/` · `memory path` / `notes path` for the folder."
+                .to_string()
+        }
+        Err(e) => format!("**Notes** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Notes:** empty · `memory path` / `notes path` for the folder · `MEMORY: save <slug>` to add · does not list names."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Notes:** last write **{age}** ago · 1 file · `memory path` / `notes path` for the folder · `notes size` for disk use · does not list names."
+                )
+            } else {
+                format!(
+                    "**Notes:** newest write **{age}** ago · {files} files · `memory path` / `notes path` for the folder · `notes size` for disk use · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Notes** — could not read mtime under the notes folder.".to_string()
         }
     }
 }
 
 /// True for short “where is the notes folder / memory path…” asks.
 /// Config path only — does not list, read, save, scrub, or append memory.
+/// Age asks use the notes/memory folder age lane (v0.1.946).
 pub fn looks_like_memory_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -5117,6 +5385,21 @@ pub fn looks_like_memory_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+    {
+        return false;
+    }
+    // Age asks use the notes/memory folder age lane (v0.1.946).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("notes age")
     {
         return false;
     }
@@ -5229,7 +5512,7 @@ pub fn format_memory_path_gateway() -> String {
         .display()
         .to_string();
     format!(
-        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `notes size` for disk use · `memory.md path` for curated file only · `memory.md size` for curated bytes · `memory.md age` for last write."
+        "**Memory:** notes `{notes}` · curated `{curated}` · `MEMORY: save <slug>` for verbatim · `scrub memory` to clean · `notes size` for disk use · `notes age` for last write · `memory.md path` for curated file only · `memory.md size` for curated bytes · `memory.md age` for last write."
     )
 }
 
@@ -5246,6 +5529,7 @@ pub fn looks_like_memory_md_size_request(content: &str) -> bool {
         || n.contains("where")
         || n.contains("location")
         || n.contains("notes size")
+        || n.contains("notes age")
         || n.contains("notes folder")
         || n.contains("notes directory")
         || n.contains("notes dir")
@@ -6491,8 +6775,8 @@ pub fn looks_like_session_memory_size_request(content: &str) -> bool {
         || n.contains("channel memories")
         || n.contains("memory-discord")
         || n.contains("memory_discord")
-        || n.contains("memory.md")
-        || n.contains("memory-md")
+        || (n.contains("memory.md") && !n.contains("session-memory"))
+        || (n.contains("memory-md") && !n.contains("session-memory") && !n.contains("session_memory"))
         || n.contains("curated memory")
         || n.contains("notes size")
         || n.contains("notes folder")
@@ -6528,8 +6812,9 @@ pub fn looks_like_session_memory_size_request(content: &str) -> bool {
         || n.contains("session_memory")
         || n.contains("sessionmemory")
         || n.contains("session memory")
+        || n.contains("session memories")
         || (n.contains("session")
-            && n.contains("memory")
+            && (n.contains("memory") || n.contains("memories"))
             && (n.contains("size")
                 || n.contains("big")
                 || n.contains("large")
@@ -18700,6 +18985,52 @@ fn dir_total_bytes(dir: &std::path::Path, max_entries: usize) -> Result<(u64, us
         }
     }
     Ok((total, files))
+}
+
+/// Newest file mtime under `dir` (recursive). Caps at `max_entries` visited files+dirs.
+/// Returns `(newest_ms, file_count)`. Empty dir → `(None, 0)`. Missing → `Err("missing")`.
+fn dir_newest_mtime_ms(
+    dir: &std::path::Path,
+    max_entries: usize,
+) -> Result<(Option<u64>, usize), String> {
+    if !dir.exists() {
+        return Err("missing".to_string());
+    }
+    let mut newest_ms: Option<u64> = None;
+    let mut files = 0usize;
+    let mut visited = 0usize;
+    let mut stack = vec![dir.to_path_buf()];
+    while let Some(cur) = stack.pop() {
+        let rd = match std::fs::read_dir(&cur) {
+            Ok(rd) => rd,
+            Err(e) => return Err(e.to_string()),
+        };
+        for ent in rd.flatten() {
+            visited = visited.saturating_add(1);
+            if visited > max_entries {
+                return Ok((newest_ms, files));
+            }
+            let Ok(meta) = ent.metadata() else {
+                continue;
+            };
+            if meta.is_dir() {
+                stack.push(ent.path());
+            } else if meta.is_file() {
+                files = files.saturating_add(1);
+                if let Ok(modified) = meta.modified() {
+                    let ms = modified
+                        .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                        .map(|d| d.as_millis() as u64)
+                        .unwrap_or(0);
+                    newest_ms = Some(match newest_ms {
+                        Some(prev) => prev.max(ms),
+                        None => ms,
+                    });
+                }
+            }
+        }
+    }
+    Ok((newest_ms, files))
 }
 
 /// Zero-LLM improvements directory size (recursive file bytes; no list dump).
@@ -32816,7 +33147,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
-    // Notes/memory folder size before path (recursive bytes; no list); path before scrub/save.
+    // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
+    if looks_like_memory_age_request(content) {
+        return Some(format_memory_age_gateway());
+    }
     if looks_like_memory_size_request(content) {
         return Some(format_memory_size_gateway());
     }
@@ -33187,8 +33521,9 @@ pub fn format_ops_help_gateway() -> String {
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
 • `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `/tasks`)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` for disk use)\n\
-• `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / scrub / bare `memory size` RAM)\n\
-• `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` for disk use)\n\
+• `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` RAM)\n\
+• `notes age` · `how old are notes` · `memory folder age` · `notes folder age` — notes folder last write age (newest file mtime; no list dump; does not steal `memory path` / `notes path` / `notes size` / `memory.md age` / bare `memory age`)\n\
+• `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` / `notes age` for disk use / mtime)\n\
 • `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `memory.md age` / `notes size` / bare `memory size`)\n\
 • `memory.md age` · `curated memory age` · `how old is memory.md` · `when was memory.md updated` — curated `agents/memory.md` last write age (mtime; no dump; does not steal `memory.md path` / `memory.md size` / notes folder / bare `memory age`)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; `memory.md size` / `memory.md age` for bytes / mtime; does not steal `memory path` / notes folder)\n\
@@ -34963,6 +35298,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only task dir path asks (v0.1.814) — config only; no list/create.
     if looks_like_task_path_request(question) {
+        return true;
+    }
+    // Read-only notes/memory folder age asks (v0.1.946) — newest file mtime; no list dump.
+    if looks_like_memory_age_request(question) {
         return true;
     }
     // Read-only notes/memory folder size asks (v0.1.887) — recursive file bytes; no list dump.
@@ -40573,6 +40912,9 @@ mod tests {
         assert!(!looks_like_memory_size_request("task size"));
         assert!(!looks_like_memory_size_request("session size"));
         assert!(!looks_like_memory_size_request("agents size"));
+        assert!(!looks_like_memory_size_request("notes age"));
+        assert!(!looks_like_memory_size_request("how old are notes"));
+        assert!(!looks_like_memory_size_request("memory folder age"));
         assert!(!looks_like_memory_path_request("notes size"));
         assert!(!looks_like_memory_path_request("how big are notes"));
         assert!(!looks_like_memory_path_request("memory folder size"));
@@ -40584,6 +40926,78 @@ mod tests {
                 || reply.contains("empty")
                 || reply.contains("not created")
                 || reply.contains("could not scan")
+        );
+    }
+
+    #[test]
+    fn memory_age_request_detected() {
+        assert!(looks_like_memory_age_request("notes age"));
+        assert!(looks_like_memory_age_request("notes folder age"));
+        assert!(looks_like_memory_age_request("notes directory age"));
+        assert!(looks_like_memory_age_request("notes dir age"));
+        assert!(looks_like_memory_age_request("memory folder age"));
+        assert!(looks_like_memory_age_request("memory directory age"));
+        assert!(looks_like_memory_age_request("memory dir age"));
+        assert!(looks_like_memory_age_request("memory notes age"));
+        assert!(looks_like_memory_age_request("how old are notes"));
+        assert!(looks_like_memory_age_request("how old is the notes folder"));
+        assert!(looks_like_memory_age_request("how old is the memory folder"));
+        assert!(looks_like_memory_age_request("when was the notes folder updated"));
+        assert!(looks_like_memory_age_request("mac-stats notes age"));
+        // Path / size / curated / bare memory / siblings
+        assert!(!looks_like_memory_age_request("memory age"));
+        assert!(!looks_like_memory_age_request("how old is memory"));
+        assert!(!looks_like_memory_age_request("memory path"));
+        assert!(!looks_like_memory_age_request("notes path"));
+        assert!(!looks_like_memory_age_request("where are notes"));
+        assert!(!looks_like_memory_age_request("notes folder"));
+        assert!(!looks_like_memory_age_request("notes size"));
+        assert!(!looks_like_memory_age_request("how big are notes"));
+        assert!(!looks_like_memory_age_request("list notes"));
+        assert!(!looks_like_memory_age_request("scrub memory"));
+        assert!(!looks_like_memory_age_request("MEMORY: save itinerary"));
+        assert!(!looks_like_memory_age_request("memory.md path"));
+        assert!(!looks_like_memory_age_request("memory.md age"));
+        assert!(!looks_like_memory_age_request("how old is memory.md"));
+        assert!(!looks_like_memory_age_request("curated memory age"));
+        assert!(!looks_like_memory_age_request("discord memory age"));
+        assert!(!looks_like_memory_age_request("session memory age"));
+        assert!(!looks_like_memory_age_request("/ram"));
+        assert!(!looks_like_memory_path_request("notes age"));
+        assert!(!looks_like_memory_path_request("how old are notes"));
+        assert!(!looks_like_memory_path_request("memory folder age"));
+        assert!(!looks_like_memory_size_request("notes age"));
+        assert!(!looks_like_memory_size_request("how old are notes"));
+        assert!(!looks_like_memory_md_age_request("notes age"));
+        assert!(!looks_like_memory_md_age_request("memory folder age"));
+        let reply = try_operator_instant_reply("how old are notes").expect("notes age instant");
+        assert!(reply.contains("Notes"));
+        assert!(
+            reply.to_lowercase().contains("ago")
+                || reply.contains("last write")
+                || reply.contains("newest write")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("notes age").is_some(),
+            "notes age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("memory folder age").is_some(),
+            "memory folder age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("notes path")
+                .expect("notes path")
+                .to_lowercase()
+                .contains("notes size")
+                || try_operator_instant_reply("notes path")
+                    .expect("notes path")
+                    .contains("disk use"),
+            "notes path must stay on path lane"
         );
     }
 
@@ -40606,12 +41020,18 @@ mod tests {
         assert!(!looks_like_memory_path_request("task path"));
         assert!(!looks_like_memory_path_request("notes size"));
         assert!(!looks_like_memory_path_request("how big are notes"));
+        assert!(!looks_like_memory_path_request("notes age"));
+        assert!(!looks_like_memory_path_request("how old are notes"));
         assert!(!looks_like_memory_scrub_request("memory path"));
         let reply = try_operator_instant_reply("where are notes").expect("memory path instant");
         assert!(reply.contains("Memory"));
         assert!(reply.contains("notes") || reply.contains(".mac-stats"));
         assert!(
             reply.to_lowercase().contains("notes size") || reply.contains("disk use")
+        );
+        assert!(
+            reply.to_lowercase().contains("notes age") || reply.contains("last write"),
+            "path reply should mention notes age: {reply}"
         );
     }
 
