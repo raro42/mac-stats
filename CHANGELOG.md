@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.948] - 2026-09-08
+
+### Added
+
+- **Instant lane: Discord channel memory age** — `discord memory age`, `memory-discord age`, `channel memory age`, `how old is discord memory`, `when was discord memory updated`, and close variants return the newest `memory-discord-*.md` mtime without Ollama (Discord + AI Chat; no list dump; does not steal `discord memory path` / `discord memory size` / `/knowledge discord`; p50 latency).
+
 ## [0.1.947] - 2026-09-08
 
 ### Added

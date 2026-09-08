@@ -6239,7 +6239,6 @@ pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
     ) {
         return false;
     }
-    // String-only sibling excludes (do not nest looks_like_* — exponential).
     // Size asks use the Discord channel memory size lane (v0.1.918).
     if n.contains("size")
         || n.contains("big")
@@ -6248,7 +6247,25 @@ pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
-        || n.contains("memory.md")
+    {
+        return false;
+    }
+    // Age asks use the Discord channel memory age lane (v0.1.948) — keyword-only (no nest).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("memory.md")
         || n.contains("memory-md")
         || n.contains("curated memory")
         || n == "memory path"
@@ -6406,10 +6423,12 @@ pub fn looks_like_discord_memory_path_request(content: &str) -> bool {
 }
 
 /// Zero-LLM Discord channel memory path (config only; no list/dump/scrub).
+/// Size asks use the Discord channel memory size lane (v0.1.918).
+/// Age asks use the Discord channel memory age lane (v0.1.948).
 pub fn format_discord_memory_path_gateway() -> String {
     let agents = crate::config::Config::agents_dir().display().to_string();
     format!(
-        "**Discord channel memory:** `{agents}/memory-discord-<channelId>.md` · under agents/ · path only · `discord memory size` for on-disk bytes · does not list or dump · `/knowledge discord` to list · `memory.md path` for curated · `memory path` for notes."
+        "**Discord channel memory:** `{agents}/memory-discord-<channelId>.md` · under agents/ · path only · `discord memory size` for on-disk bytes · `discord memory age` for newest mtime · does not list or dump · `/knowledge discord` to list · `memory.md path` for curated · `memory path` for notes."
     )
 }
 
@@ -6643,18 +6662,267 @@ pub fn format_discord_memory_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Discord channel memory:** no `memory-discord-*.md` yet · `discord memory path` for the pattern · `/knowledge discord` to list · does not dump notes."
+        return "**Discord channel memory:** no `memory-discord-*.md` yet · `discord memory path` for the pattern · `discord memory age` for newest mtime · `/knowledge discord` to list · does not dump notes."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Discord channel memory:** **{label}** on disk · 1 `memory-discord-*.md` · `discord memory path` for the pattern · does not list or dump."
+            "**Discord channel memory:** **{label}** on disk · 1 `memory-discord-*.md` · `discord memory path` for the pattern · `discord memory age` for newest mtime · does not list or dump."
         )
     } else {
         format!(
-            "**Discord channel memory:** **{label}** on disk · {count} `memory-discord-*.md` files · `discord memory path` for the pattern · does not list or dump."
+            "**Discord channel memory:** **{label}** on disk · {count} `memory-discord-*.md` files · `discord memory path` for the pattern · `discord memory age` for newest mtime · does not list or dump."
         )
+    }
+}
+
+/// True for short “how old is discord memory / memory-discord age…” asks.
+/// Newest `memory-discord-*.md` mtime — does not list or dump; does not steal path / size / `/knowledge discord`.
+pub fn looks_like_discord_memory_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact Knowledge Discord list asks stay on `/knowledge discord`.
+    if matches!(
+        n.as_str(),
+        "discord memory"
+            | "discord memories"
+            | "channel memory"
+            | "channel memories"
+            | "/knowledge"
+            | "/knowledge discord"
+            | "knowledge discord"
+            | "discord knowledge"
+    ) {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("curated memory")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n.contains("discord_channels")
+        || n.contains("discord-channels")
+        || n.contains("discord channels")
+        || n.contains("channels.json")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("session path")
+        || n.contains("session size")
+        || n.contains("agents size")
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n == "/discord"
+        || n == "discord"
+        || n == "discord ready"
+        || n == "discord status"
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let dm_ctx = n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || n.contains("memorydiscord")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("discord channel memory")
+        || n.contains("discord-channel-memory")
+        || (n.contains("discord")
+            && (n.contains("memory") || n.contains("memories"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !dm_ctx {
+        return false;
+    }
+    if !n.contains("age")
+        && !n.contains("old")
+        && !n.contains("stale")
+        && !n.contains("when")
+        && !n.contains("updated")
+        && !n.contains("modified")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "discord memory age"
+            | "discord memories age"
+            | "discord memory file age"
+            | "discord memories file age"
+            | "channel memory age"
+            | "channel memories age"
+            | "channel memory file age"
+            | "discord channel memory age"
+            | "discord channel memory file age"
+            | "memory-discord age"
+            | "memory_discord age"
+            | "memory-discord.md age"
+            | "memory-discord file age"
+            | "memory-discord files age"
+            | "how old is discord memory"
+            | "how old is the discord memory"
+            | "how old are discord memory"
+            | "how old are discord memories"
+            | "how old is channel memory"
+            | "how old is the channel memory"
+            | "how old are channel memories"
+            | "how old is discord channel memory"
+            | "how old is memory-discord"
+            | "how old are memory-discord"
+            | "how old are memory-discord files"
+            | "when was discord memory updated"
+            | "when was the discord memory updated"
+            | "when were discord memories updated"
+            | "when was channel memory updated"
+            | "when was memory-discord updated"
+            | "discord memory last modified"
+            | "memory-discord last modified"
+            | "is discord memory stale"
+            | "is the discord memory stale"
+            | "mac-stats discord memory age"
+            | "mac stats discord memory age"
+    ) || (dm_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM Discord channel memory age (newest `memory-discord-*.md` mtime; no list/dump).
+pub fn format_discord_memory_age_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("memory-discord-") || !name.ends_with(".md") {
+                continue;
+            }
+            let path = entry.path();
+            if let Ok(meta) = std::fs::metadata(&path) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    let ms = file_mtime_ms(&meta);
+                    if ms > 0 {
+                        newest_ms = Some(newest_ms.map_or(ms, |cur| cur.max(ms)));
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Discord channel memory:** no `memory-discord-*.md` yet · `discord memory path` for the pattern · `discord memory size` for on-disk bytes · `/knowledge discord` to list · does not dump notes."
+            .to_string();
+    }
+    match newest_ms {
+        Some(ms) => {
+            let age = age_from_ms(ms);
+            if count == 1 {
+                format!(
+                    "**Discord channel memory:** last write **{age}** ago · 1 `memory-discord-*.md` · `discord memory path` for the pattern · `discord memory size` for on-disk bytes · does not list or dump."
+                )
+            } else {
+                format!(
+                    "**Discord channel memory:** newest write **{age}** ago · {count} `memory-discord-*.md` files · `discord memory path` for the pattern · `discord memory size` for on-disk bytes · does not list or dump."
+                )
+            }
+        }
+        None => {
+            "**Discord channel memory** — could not read mtime on `memory-discord-*.md` files."
+                .to_string()
+        }
     }
 }
 
@@ -33041,9 +33309,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
     }
-    // Discord channel memory size before path (stat only; no list/dump).
+    // Discord channel memory size before age/path (stat only; no list/dump).
     if looks_like_discord_memory_size_request(content) {
         return Some(format_discord_memory_size_gateway());
+    }
+    // Discord channel memory age before path (newest mtime; no list/dump).
+    if looks_like_discord_memory_age_request(content) {
+        return Some(format_discord_memory_age_gateway());
     }
     // Discord channel memory path before notes-folder / Knowledge list (path-only asks).
     if looks_like_discord_memory_path_request(content) {
@@ -33391,9 +33663,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_md_path_request(content) {
         return Some(format_memory_md_path_gateway());
     }
-    // Discord channel memory size before path (stat only; no list/dump).
+    // Discord channel memory size before age/path (stat only; no list/dump).
     if looks_like_discord_memory_size_request(content) {
         return Some(format_discord_memory_size_gateway());
+    }
+    // Discord channel memory age before path (newest mtime; no list/dump).
+    if looks_like_discord_memory_age_request(content) {
+        return Some(format_discord_memory_age_gateway());
     }
     // Discord channel memory path before notes-folder / Knowledge list.
     if looks_like_discord_memory_path_request(content) {
@@ -33820,8 +34096,9 @@ pub fn format_ops_help_gateway() -> String {
 • `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agent.json age` / `agents size` / `config.json`)\n\
 • `agent.json age` · `agent config age` · `how old is agent.json` · `when was agent.json updated` — newest per-agent agent.json last write age (mtime; no dump; does not steal `agent.json path` / `agent.json size` / agents / config.json)\n\
 • `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` / `agent.json age` for bytes / mtime; does not steal `agents path` / `config path`)\n\
-• `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`)\n\
-• `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; `discord memory size` for on-disk bytes; does not steal `/knowledge discord`)\n\
+• `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `discord memory age` / `/knowledge discord` / `memory.md size`)\n\
+• `discord memory age` · `memory-discord age` · `how old is discord memory` · `when was discord memory updated` · `channel memory age` — newest `memory-discord-*.md` last write age (mtime; no dump; does not steal `discord memory path` / `discord memory size` / `/knowledge discord`)\n\
+• `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; `discord memory size` / `discord memory age` for bytes / mtime; does not steal `/knowledge discord`)\n\
 • `session memory size` · `session-memory size` · `how big is session memory` — `session-memory-*.md` size on disk (stat only; no dump; does not steal `session memory path` / `session memory age` / `session size` / `/sessions`)\n\
 • `session memory age` · `session-memory age` · `how old is session memory` · `when was session memory updated` — newest `session-memory-*.md` last write age (mtime; no dump; does not steal `session memory path` / `session memory size` / `session size` / `/sessions`)\n\
 • `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; `session memory size` / `session memory age` for bytes / mtime; does not steal `session path` / `/sessions`)\n\
@@ -35505,6 +35782,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only Discord channel memory size asks (v0.1.918) — stat only; no list/dump.
     if looks_like_discord_memory_size_request(question) {
+        return true;
+    }
+    // Read-only Discord channel memory age asks (v0.1.948) — newest mtime; no list/dump.
+    if looks_like_discord_memory_age_request(question) {
         return true;
     }
     // Read-only Discord channel memory path asks (v0.1.862) — config only; no list/dump.
@@ -40805,6 +41086,13 @@ mod tests {
         assert!(!looks_like_discord_memory_path_request(
             "how big is discord memory"
         ));
+        assert!(!looks_like_discord_memory_path_request("discord memory age"));
+        assert!(!looks_like_discord_memory_path_request(
+            "how old is discord memory"
+        ));
+        assert!(!looks_like_discord_memory_path_request(
+            "discord memory file age"
+        ));
         assert!(!looks_like_memory_path_request("discord memory path"));
         assert!(!looks_like_memory_path_request("where is discord memory"));
         assert!(!looks_like_memory_md_path_request("discord memory path"));
@@ -40862,6 +41150,10 @@ mod tests {
         assert!(!looks_like_discord_memory_size_request(
             "where is discord memory"
         ));
+        assert!(!looks_like_discord_memory_size_request("discord memory age"));
+        assert!(!looks_like_discord_memory_size_request(
+            "how old is discord memory"
+        ));
         assert!(!looks_like_discord_memory_size_request("/knowledge discord"));
         assert!(!looks_like_discord_memory_size_request("list discord memory"));
         assert!(!looks_like_discord_memory_size_request("dump discord memory"));
@@ -40891,6 +41183,85 @@ mod tests {
         );
         assert!(
             reply.contains("discord memory path") || reply.contains("does not"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn discord_memory_age_request_detected() {
+        assert!(looks_like_discord_memory_age_request("discord memory age"));
+        assert!(looks_like_discord_memory_age_request(
+            "discord memories age"
+        ));
+        assert!(looks_like_discord_memory_age_request("channel memory age"));
+        assert!(looks_like_discord_memory_age_request(
+            "discord channel memory age"
+        ));
+        assert!(looks_like_discord_memory_age_request("memory-discord age"));
+        assert!(looks_like_discord_memory_age_request(
+            "memory-discord.md age"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "how old is discord memory"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "how old are discord memories"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "how old are memory-discord files"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "when was discord memory updated"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "discord memory last modified"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "is discord memory stale"
+        ));
+        assert!(looks_like_discord_memory_age_request(
+            "mac-stats discord memory age"
+        ));
+        assert!(!looks_like_discord_memory_age_request("discord memory"));
+        assert!(!looks_like_discord_memory_age_request("channel memory"));
+        assert!(!looks_like_discord_memory_age_request("discord memory path"));
+        assert!(!looks_like_discord_memory_age_request(
+            "where is discord memory"
+        ));
+        assert!(!looks_like_discord_memory_age_request("discord memory size"));
+        assert!(!looks_like_discord_memory_age_request(
+            "how big is discord memory"
+        ));
+        assert!(!looks_like_discord_memory_age_request("/knowledge discord"));
+        assert!(!looks_like_discord_memory_age_request("list discord memory"));
+        assert!(!looks_like_discord_memory_age_request("dump discord memory"));
+        assert!(!looks_like_discord_memory_age_request("memory.md age"));
+        assert!(!looks_like_discord_memory_age_request("notes age"));
+        assert!(!looks_like_discord_memory_age_request("session memory age"));
+        assert!(!looks_like_discord_memory_age_request("agents age"));
+        assert!(!looks_like_discord_memory_age_request(
+            "discord channels age"
+        ));
+        assert!(!looks_like_discord_memory_path_request("discord memory age"));
+        assert!(!looks_like_discord_memory_size_request("discord memory age"));
+        assert!(!looks_like_memory_md_age_request("discord memory age"));
+        assert!(!looks_like_memory_age_request("discord memory age"));
+        assert!(!looks_like_session_memory_age_request("discord memory age"));
+        assert!(!looks_like_knowledge_request("discord memory age"));
+        assert!(!looks_like_knowledge_request("how old is discord memory"));
+        let reply = try_operator_instant_reply("discord memory age")
+            .expect("discord memory age instant");
+        assert!(reply.contains("Discord channel memory"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no `memory-discord")
+                || reply.contains("could not read mtime"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("discord memory path")
+                || reply.contains("discord memory size")
+                || reply.contains("does not"),
             "{reply}"
         );
     }
