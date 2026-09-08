@@ -3940,7 +3940,7 @@ pub fn looks_like_screenshots_path_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
-    // Do not steal take/list/clean/BROWSER_* screenshot work or size asks.
+    // Do not steal take/list/clean/BROWSER_* screenshot work or size/age asks.
     if n.contains("take")
         || n.contains("capture")
         || n.contains("attach")
@@ -3967,6 +3967,12 @@ pub fn looks_like_screenshots_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -4011,7 +4017,7 @@ pub fn format_screenshots_path_gateway() -> String {
     let dir = crate::config::Config::screenshots_dir();
     let display = dir.display().to_string();
     format!(
-        "**Screenshots:** `{display}` · BROWSER_SCREENSHOT saves PNG here · Disk Cleanup can prune old files · `screenshots size` for disk use."
+        "**Screenshots:** `{display}` · BROWSER_SCREENSHOT saves PNG here · Disk Cleanup can prune old files · `screenshots size` for disk use · `screenshots age` for newest mtime."
     )
 }
 
@@ -4131,19 +4137,166 @@ pub fn format_screenshots_size_gateway() -> String {
     let dir = crate::config::Config::screenshots_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Screenshots:** not created yet · BROWSER_SCREENSHOT writes PNG here · `screenshot path` for the folder."
+            "**Screenshots:** not created yet · BROWSER_SCREENSHOT writes PNG here · `screenshot path` for the folder · `screenshots age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Screenshots** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Screenshots:** empty · `screenshot path` for the folder · BROWSER_SCREENSHOT saves PNG here."
+            "**Screenshots:** empty · `screenshot path` for the folder · BROWSER_SCREENSHOT saves PNG here · `screenshots age` for newest mtime."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Screenshots:** **{label}** on disk ({files} files) · BROWSER_SCREENSHOT · `screenshot path` for the folder · does not list names."
+                "**Screenshots:** **{label}** on disk ({files} files) · BROWSER_SCREENSHOT · `screenshot path` for the folder · `screenshots age` for newest mtime · does not list names."
             )
+        }
+    }
+}
+
+/// True for short “how old are screenshots / screenshots age…” asks.
+/// Newest file mtime under screenshots dir — no list dump / path / size / take lanes.
+pub fn looks_like_screenshots_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("take")
+        || n.contains("capture")
+        || n.contains("attach")
+        || n.contains("send")
+        || n.contains("browser")
+        || n.contains("navigate")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let shot_ctx = n.contains("screenshot") || n.contains("screenshots");
+    if !shot_ctx {
+        return false;
+    }
+    // Bare “screenshot(s)” / path-only asks stay on the path lane.
+    if n == "screenshot"
+        || n == "screenshots"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "screenshots age"
+            | "screenshot age"
+            | "screenshots folder age"
+            | "screenshot folder age"
+            | "screenshots directory age"
+            | "screenshot directory age"
+            | "screenshots dir age"
+            | "screenshot dir age"
+            | "how old are screenshots"
+            | "how old is screenshots"
+            | "how old is the screenshots folder"
+            | "how old is screenshots folder"
+            | "how old is the screenshot folder"
+            | "how old is screenshot folder"
+            | "how old is the screenshots directory"
+            | "how old is the screenshot directory"
+            | "when was screenshots updated"
+            | "when was the screenshots folder updated"
+            | "when was the screenshot folder updated"
+            | "screenshots last modified"
+            | "screenshot folder last modified"
+            | "is screenshots stale"
+            | "is the screenshots folder stale"
+            | "mac-stats screenshots age"
+            | "mac stats screenshots age"
+    ) || (shot_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM screenshots directory age (newest file mtime; no list dump).
+pub fn format_screenshots_age_gateway() -> String {
+    let dir = crate::config::Config::screenshots_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Screenshots:** not created yet · BROWSER_SCREENSHOT writes PNG here · `screenshot path` for the folder · `screenshots size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Screenshots** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Screenshots:** empty · `screenshot path` for the folder · BROWSER_SCREENSHOT saves PNG here · `screenshots size` for on-disk bytes."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Screenshots:** last write **{age}** ago · 1 file · BROWSER_SCREENSHOT · `screenshot path` for the folder · `screenshots size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Screenshots:** newest write **{age}** ago · {files} files · BROWSER_SCREENSHOT · `screenshot path` for the folder · `screenshots size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Screenshots** — could not read mtime · `screenshot path` for the folder · `screenshots size` for on-disk bytes."
+                .to_string()
         }
     }
 }
@@ -34594,7 +34747,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_scheduler_delivery_awareness_path_request(content) {
         return Some(format_scheduler_delivery_awareness_path_gateway());
     }
-    // Screenshots dir size before path (recursive bytes; no list); path before take/list.
+    // Screenshots dir age before size/path (newest mtime; no list); size before path; path before take/list.
+    if looks_like_screenshots_age_request(content) {
+        return Some(format_screenshots_age_gateway());
+    }
     if looks_like_screenshots_size_request(content) {
         return Some(format_screenshots_size_gateway());
     }
@@ -35039,8 +35195,9 @@ pub fn format_ops_help_gateway() -> String {
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; `downloads organizer rules size` for on-disk bytes; does not steal `/downloads`)\n\
 • `organizer state size` · `downloads-organizer-state.json size` · `how big is downloads organizer state` · `downloads organizer state size` — downloads-organizer-state.json file size on disk (stat only; no dump; does not steal `downloads organizer state path` / rules / `/downloads`)\n\
 • `downloads organizer state path` · `where is downloads-organizer-state.json` · `organizer state path` — Downloads organizer state file (config only; no dump/run; `downloads organizer state size` for on-disk bytes; does not steal `/downloads`)\n\
-• `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only)\n\
-• `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / take/list)\n\
+• `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only; `screenshots size` / `screenshots age` for disk use / mtime)\n\
+• `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / `screenshots age` / take/list)\n\
+• `screenshots age` · `how old are screenshots` · `screenshots folder age` · `when was screenshots updated` — screenshots folder last write age (newest file mtime; no list dump; does not steal `screenshot path` / size / take/list)\n\
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `runs size` · `how big is runs.jsonl` · `runs file size` — runs.jsonl size on disk (stat only; no list/count)\n\
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
@@ -36821,6 +36978,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only config.json / data-home path asks (v0.1.811) — config only.
     if looks_like_config_path_request(question) {
+        return true;
+    }
+    // Read-only screenshots dir age asks (v0.1.953) — newest file mtime; no list dump.
+    if looks_like_screenshots_age_request(question) {
         return true;
     }
     // Read-only screenshots dir size asks (v0.1.874) — recursive file bytes; no list dump.
@@ -42650,6 +42811,9 @@ mod tests {
         assert!(!looks_like_screenshots_path_request("where is config"));
         assert!(!looks_like_screenshots_path_request("screenshots size"));
         assert!(!looks_like_screenshots_path_request("how big are screenshots"));
+        assert!(!looks_like_screenshots_path_request("screenshots age"));
+        assert!(!looks_like_screenshots_path_request("how old are screenshots"));
+        assert!(!looks_like_screenshots_path_request("how old is the screenshots folder"));
         assert!(!looks_like_config_path_request("screenshot folder"));
         let reply =
             try_operator_instant_reply("where are screenshots").expect("screenshots path instant");
@@ -42675,6 +42839,8 @@ mod tests {
         assert!(!looks_like_screenshots_size_request("list screenshots"));
         assert!(!looks_like_screenshots_size_request("improvements size"));
         assert!(!looks_like_screenshots_size_request("runs size"));
+        assert!(!looks_like_screenshots_size_request("screenshots age"));
+        assert!(!looks_like_screenshots_size_request("how old are screenshots"));
         assert!(!looks_like_screenshots_path_request("screenshots size"));
         assert!(!looks_like_improvements_size_request("screenshots size"));
         let reply = try_operator_instant_reply("how big are screenshots")
@@ -42687,6 +42853,50 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("screenshot path") || reply.contains("folder"));
+    }
+
+    #[test]
+    fn screenshots_age_request_detected() {
+        assert!(looks_like_screenshots_age_request("screenshots age"));
+        assert!(looks_like_screenshots_age_request("screenshot age"));
+        assert!(looks_like_screenshots_age_request("screenshots folder age"));
+        assert!(looks_like_screenshots_age_request("screenshots dir age"));
+        assert!(looks_like_screenshots_age_request("screenshots directory age"));
+        assert!(looks_like_screenshots_age_request("how old are screenshots"));
+        assert!(looks_like_screenshots_age_request("how old is screenshots"));
+        assert!(looks_like_screenshots_age_request("how old is the screenshots folder"));
+        assert!(looks_like_screenshots_age_request(
+            "when was the screenshots folder updated"
+        ));
+        assert!(looks_like_screenshots_age_request("screenshots last modified"));
+        assert!(looks_like_screenshots_age_request("is the screenshots folder stale"));
+        assert!(looks_like_screenshots_age_request("mac-stats screenshots age"));
+        assert!(!looks_like_screenshots_age_request("screenshot path"));
+        assert!(!looks_like_screenshots_age_request("where are screenshots"));
+        assert!(!looks_like_screenshots_age_request("screenshots"));
+        assert!(!looks_like_screenshots_age_request("screenshots size"));
+        assert!(!looks_like_screenshots_age_request("how big are screenshots"));
+        assert!(!looks_like_screenshots_age_request("take a screenshot"));
+        assert!(!looks_like_screenshots_age_request("list screenshots"));
+        assert!(!looks_like_screenshots_age_request("improvements age"));
+        assert!(!looks_like_screenshots_age_request("runs age"));
+        assert!(!looks_like_screenshots_path_request("screenshots age"));
+        assert!(!looks_like_screenshots_size_request("screenshots age"));
+        assert!(!looks_like_improvements_age_request("screenshots age"));
+        let reply = try_operator_instant_reply("how old are screenshots")
+            .expect("screenshots age instant");
+        assert!(reply.contains("Screenshots"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not"),
+            "{reply}"
+        );
+        assert!(
+            try_operator_instant_reply("screenshots age").is_some(),
+            "screenshots age should be instant"
+        );
     }
 
     #[test]

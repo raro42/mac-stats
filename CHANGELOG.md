@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.953] - 2026-09-09
+
+### Added
+- Instant lane: screenshots directory age (`screenshots age`, `how old are screenshots`, `screenshots folder age`, `when was screenshots updated`) — newest file mtime under the BROWSER_SCREENSHOT dir; no list dump; does not steal path / size / take/list asks.
+
 ## [0.1.952] - 2026-09-09
 
 ### Added
