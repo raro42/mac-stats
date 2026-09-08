@@ -25026,12 +25026,217 @@ pub fn format_soul_size_gateway() -> String {
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Soul file:** empty `soul.md` · `soul path` for the file.".to_string()
+            "**Soul file:** empty `soul.md` · `soul path` for the file · `soul age` for last write."
+                .to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Soul file:** **{label}** on disk · shared persona · `soul path` for the file · does not dump soul text."
+                "**Soul file:** **{label}** on disk · shared persona · `soul path` for the file · `soul age` for last write · does not dump soul text."
+            )
+        }
+        Err(e) => format!("**Soul file** — could not stat `soul.md`: {e}"),
+    }
+}
+
+/// True for short “how old is soul.md / soul age…” asks.
+/// Mtime only — does not steal path / size / mood / agents / dump.
+pub fn looks_like_soul_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill age")
+        || n.contains("skill file")
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing age")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts age")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let soul_ctx = n.contains("soul.md")
+        || n.contains("soul file")
+        || n.contains("soul age")
+        || n.contains("soul md")
+        || n == "soul"
+        || n == "how old is soul"
+        || n == "how old is the soul"
+        || n == "when was soul updated"
+        || n == "when was the soul updated"
+        || n == "mac-stats soul age"
+        || n == "mac stats soul age"
+        || n == "is soul stale"
+        || (n.contains("soul")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("md")));
+    if !soul_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "soul age"
+            | "soul.md age"
+            | "soul file age"
+            | "soul md age"
+            | "soul.md file age"
+            | "mac-stats soul age"
+            | "mac stats soul age"
+            | "how old is soul"
+            | "how old is the soul"
+            | "how old is soul.md"
+            | "how old is the soul.md"
+            | "how old is soul file"
+            | "how old is the soul file"
+            | "how old is the soul.md file"
+            | "when was soul updated"
+            | "when was the soul updated"
+            | "when was soul.md updated"
+            | "when was the soul.md updated"
+            | "when was soul file updated"
+            | "when was the soul file updated"
+            | "soul last modified"
+            | "soul.md last modified"
+            | "soul file last modified"
+            | "is soul stale"
+            | "is the soul stale"
+            | "is soul.md stale"
+            | "is the soul.md stale"
+    ) || (soul_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM shared soul.md age from file mtime (stat only; no dump/edit).
+pub fn format_soul_age_gateway() -> String {
+    let path = crate::config::Config::soul_file_path();
+    if !path.exists() {
+        return "**Soul file:** no `soul.md` yet · `soul path` for the file · Agent Ops → Agents for content."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Soul file:** last write **{age}** ago · shared persona · `soul path` for the file · `soul size` for on-disk bytes · does not dump soul text."
             )
         }
         Err(e) => format!("**Soul file** — could not stat `soul.md`: {e}"),
@@ -25041,6 +25246,7 @@ pub fn format_soul_size_gateway() -> String {
 /// True for short “where is soul.md / soul path…” asks.
 /// Config path only — does not dump/edit soul text or open Agent Ops Agents.
 /// Size asks use the soul.md size lane (v0.1.901).
+/// Age asks use the soul.md age lane (v0.1.936).
 pub fn looks_like_soul_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -25153,6 +25359,13 @@ pub fn looks_like_soul_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the soul.md age lane (v0.1.936) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("http://")
@@ -25219,7 +25432,7 @@ pub fn format_soul_path_gateway() -> String {
     let path = crate::config::Config::soul_file_path();
     let display = path.display().to_string();
     format!(
-        "**Soul file:** `{display}` · shared persona · path only · `soul size` for on-disk bytes · does not dump or edit soul text · Agent Ops → Agents for content."
+        "**Soul file:** `{display}` · shared persona · path only · `soul size` / `soul age` for bytes / mtime · does not dump or edit soul text · Agent Ops → Agents for content."
     )
 }
 
@@ -30412,9 +30625,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_mood_path_request(content) {
         return Some(format_mood_path_gateway());
     }
-    // soul.md size before path (stat only; no dump).
+    // soul.md size before age/path (stat only; no dump).
     if looks_like_soul_size_request(content) {
         return Some(format_soul_size_gateway());
+    }
+    // soul.md age before path (mtime only; no dump).
+    if looks_like_soul_age_request(content) {
+        return Some(format_soul_age_gateway());
     }
     // soul.md before agents-dir path / /agents catalog (path-only asks).
     if looks_like_soul_path_request(content) {
@@ -30652,9 +30869,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_mood_path_request(content) {
         return Some(format_mood_path_gateway());
     }
-    // soul.md size before path (stat only; no dump).
+    // soul.md size before age/path (stat only; no dump).
     if looks_like_soul_size_request(content) {
         return Some(format_soul_size_gateway());
+    }
+    // soul.md age before path (mtime only; no dump).
+    if looks_like_soul_age_request(content) {
+        return Some(format_soul_age_gateway());
     }
     // soul.md before agents-dir path lane.
     if looks_like_soul_path_request(content) {
@@ -31143,8 +31364,9 @@ pub fn format_ops_help_gateway() -> String {
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` for disk use)\n\
 • `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `notes size` / bare `memory size`)\n\
 • `memory.md path` · `where is memory.md` · `curated memory path` — curated `agents/memory.md` only (config only; no dump/edit; `memory.md size` for on-disk bytes; does not steal `memory path` / notes folder)\n\
-• `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / mood / agents)\n\
-• `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` for on-disk bytes; does not steal `/agents`)\n\
+• `soul size` · `soul.md size` · `how big is soul` · `soul file size` — soul.md file size on disk (stat only; no dump; does not steal `soul path` / `soul age` / mood / agents)\n\
+• `soul age` · `soul.md age` · `how old is soul` · `when was soul updated` — soul.md last write age (mtime; no dump; does not steal `soul path` / `soul size` / mood / agents)\n\
+• `soul path` · `where is soul.md` · `soul file path` — shared `agents/soul.md` (config only; no dump/edit; `soul size` / `soul age` for bytes / mtime; does not steal `/agents`)\n\
 • `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / soul / agents)\n\
 • `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` for on-disk bytes; does not steal `/agents`)\n\
 • `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skills size` / `/skills`)\n\
@@ -32787,6 +33009,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only soul.md size asks (v0.1.901) — stat only; no dump/edit.
     if looks_like_soul_size_request(question) {
+        return true;
+    }
+    // Read-only soul.md age asks (v0.1.936) — mtime only; no dump/edit.
+    if looks_like_soul_age_request(question) {
         return true;
     }
     // Read-only soul.md path asks (v0.1.851) — config only; no dump/edit.
@@ -37277,6 +37503,8 @@ mod tests {
         assert!(!looks_like_soul_path_request("session reset phrases path"));
         assert!(!looks_like_soul_path_request("soul size"));
         assert!(!looks_like_soul_path_request("how big is soul.md"));
+        assert!(!looks_like_soul_path_request("soul age"));
+        assert!(!looks_like_soul_path_request("how old is soul.md"));
         assert!(!looks_like_agents_path_request("soul path"));
         assert!(!looks_like_agents_path_request("where is soul.md"));
         assert!(!looks_like_memory_path_request("soul path"));
@@ -37285,6 +37513,12 @@ mod tests {
         assert!(reply.contains("soul.md") || reply.contains(".mac-stats"));
         assert!(!reply.to_lowercase().contains("agents dir"));
         assert!(reply.to_lowercase().contains("path only"));
+        assert!(
+            reply.to_lowercase().contains("soul size")
+                || reply.to_lowercase().contains("soul age")
+                || reply.contains("mtime"),
+            "path reply should mention size/age lanes: {reply}"
+        );
     }
 
     #[test]
@@ -37304,6 +37538,8 @@ mod tests {
         assert!(!looks_like_soul_size_request("agents size"));
         assert!(!looks_like_soul_size_request("memory.md size"));
         assert!(!looks_like_soul_size_request("notes size"));
+        assert!(!looks_like_soul_size_request("soul age"));
+        assert!(!looks_like_soul_size_request("how old is soul"));
         assert!(!looks_like_soul_path_request("soul size"));
         assert!(!looks_like_soul_path_request("how big is soul"));
         let reply = try_operator_instant_reply("soul size").expect("soul size instant");
@@ -37312,6 +37548,10 @@ mod tests {
             "unexpected reply: {reply}"
         );
         assert!(!reply.to_lowercase().contains("you have opinions"));
+        assert!(
+            reply.to_lowercase().contains("soul age") || reply.contains("last write"),
+            "size reply should mention age lane: {reply}"
+        );
         assert!(
             try_operator_instant_reply("how big is soul.md").is_some(),
             "how big is soul.md should be instant"
@@ -37322,6 +37562,66 @@ mod tests {
                 .to_lowercase()
                 .contains("path only"),
             "soul path must stay on path lane"
+        );
+    }
+
+    #[test]
+    fn soul_age_request_detected() {
+        assert!(looks_like_soul_age_request("soul age"));
+        assert!(looks_like_soul_age_request("soul.md age"));
+        assert!(looks_like_soul_age_request("soul file age"));
+        assert!(looks_like_soul_age_request("how old is soul"));
+        assert!(looks_like_soul_age_request("how old is soul.md"));
+        assert!(looks_like_soul_age_request("how old is the soul file"));
+        assert!(looks_like_soul_age_request("when was soul updated"));
+        assert!(looks_like_soul_age_request("when was soul.md updated"));
+        assert!(looks_like_soul_age_request("soul.md last modified"));
+        assert!(looks_like_soul_age_request("is soul stale"));
+        assert!(looks_like_soul_age_request("mac-stats soul age"));
+        assert!(!looks_like_soul_age_request("soul path"));
+        assert!(!looks_like_soul_age_request("where is soul.md"));
+        assert!(!looks_like_soul_age_request("soul size"));
+        assert!(!looks_like_soul_age_request("how big is soul"));
+        assert!(!looks_like_soul_age_request("dump soul"));
+        assert!(!looks_like_soul_age_request("edit soul.md"));
+        assert!(!looks_like_soul_age_request("mood age"));
+        assert!(!looks_like_soul_age_request("agents age"));
+        assert!(!looks_like_soul_age_request("memory.md age"));
+        assert!(!looks_like_soul_path_request("soul age"));
+        assert!(!looks_like_soul_path_request("how old is soul"));
+        assert!(!looks_like_soul_size_request("soul age"));
+        assert!(!looks_like_soul_size_request("how old is soul.md"));
+        let reply = try_operator_instant_reply("soul age").expect("soul age instant");
+        assert!(
+            reply.contains("Soul file") || reply.to_lowercase().contains("soul"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago") || reply.contains("last write"),
+            "age reply should include mtime: {reply}"
+        );
+        assert!(!reply.to_lowercase().contains("you have opinions"));
+        assert!(
+            try_operator_instant_reply("how old is soul.md").is_some(),
+            "how old is soul.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("soul path")
+                .expect("soul path")
+                .to_lowercase()
+                .contains("path only"),
+            "soul path must stay on path lane"
+        );
+        assert!(
+            try_operator_instant_reply("soul size")
+                .expect("soul size")
+                .to_lowercase()
+                .contains("on disk")
+                || try_operator_instant_reply("soul size")
+                    .expect("soul size")
+                    .to_lowercase()
+                    .contains("empty"),
+            "soul size must stay on size lane"
         );
     }
 

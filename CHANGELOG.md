@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.936] - 2026-09-08
+
+### Added
+
+- **Instant lane: soul.md age** — `soul age`, `soul.md age`, `how old is soul`, `when was soul updated`, and close variants return the last-write age of shared `agents/soul.md` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `soul path` / `soul size` / mood / agents; p50 latency).
+
 ## [0.1.935] - 2026-09-08
 
 ### Added
