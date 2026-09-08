@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.952] - 2026-09-09
+
+### Added
+- Instant lane: improvements directory age (`improvements age`, `how old is the improvements folder`, `when was improvements updated`) — newest file mtime under `~/.mac-stats/improvements/`; no list dump; does not steal path / size / `results.tsv age` / overnight content asks.
+
 ## [0.1.951] - 2026-09-09
 
 ### Added

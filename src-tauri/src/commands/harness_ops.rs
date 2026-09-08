@@ -19277,6 +19277,12 @@ pub fn looks_like_improvements_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -19587,7 +19593,7 @@ pub fn format_improvements_size_gateway() -> String {
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Improvements dir:** **{label}** on disk ({files} files) · digester · morning surprise · results.tsv · `improvements path` for the folder · does not list names."
+                "**Improvements dir:** **{label}** on disk ({files} files) · digester · morning surprise · results.tsv · `improvements path` for the folder · `improvements age` for newest mtime · does not list names."
             )
         }
     }
@@ -19598,8 +19604,199 @@ pub fn format_improvements_path_gateway() -> String {
     let dir = crate::config::Config::improvements_dir();
     let display = dir.display().to_string();
     format!(
-        "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files · `improvements size` for disk use."
+        "**Improvements dir:** `{display}` · digester · morning surprise · results.tsv · Agent Ops → Digest · does not list files · `improvements size` for disk use · `improvements age` for newest mtime."
     )
+}
+
+/// True for short “how old is the improvements folder / improvements age…” asks.
+/// Newest file mtime under `~/.mac-stats/improvements/` — no list dump / path / size / overnight content.
+/// Does not steal `results.tsv age` / digest age / runs age.
+pub fn looks_like_improvements_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results age")
+        || n.contains("results file")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log size")
+        || n.contains("digest age")
+        || n.contains("digest size")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("latest.json")
+        || n.contains("screenshot")
+        || n.contains("screenshots")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("overnight")
+        || n.contains("coding session")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let imp_ctx = n.contains("improvements")
+        || n.contains("improvement")
+        || n.contains("autoresearch folder")
+        || n.contains("autoresearch directory")
+        || n.contains("autoresearch dir")
+        || ((n.contains("autoresearch") || n.contains("auto research"))
+            && (n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !imp_ctx {
+        return false;
+    }
+    // Bare “improvements” / path-only asks stay on the path lane.
+    if n == "improvements"
+        || n == "improvement"
+        || n == "autoresearch"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "improvements age"
+            | "improvement age"
+            | "improvements folder age"
+            | "improvements directory age"
+            | "improvements dir age"
+            | "improvement folder age"
+            | "improvement directory age"
+            | "improvement dir age"
+            | "how old is improvements"
+            | "how old is the improvements folder"
+            | "how old is improvements folder"
+            | "how old is the improvements directory"
+            | "how old is improvements directory"
+            | "how old is the improvements dir"
+            | "how old is improvements dir"
+            | "how old are improvements"
+            | "when was improvements updated"
+            | "when was the improvements folder updated"
+            | "when was the improvements directory updated"
+            | "when was the improvements dir updated"
+            | "improvements last modified"
+            | "improvements folder last modified"
+            | "is improvements stale"
+            | "is the improvements folder stale"
+            | "mac-stats improvements age"
+            | "mac stats improvements age"
+            | "autoresearch age"
+            | "autoresearch folder age"
+            | "autoresearch directory age"
+            | "autoresearch dir age"
+            | "how old is autoresearch"
+            | "how old is the autoresearch folder"
+            | "when was autoresearch updated"
+    ) || (imp_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM improvements directory age (newest file mtime; no list dump).
+pub fn format_improvements_age_gateway() -> String {
+    let dir = crate::config::Config::improvements_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Improvements dir:** not created yet · digester / overnight harness writes here · `improvements path` for the folder · `improvements size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Improvements dir** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Improvements dir:** empty · `improvements path` for the folder · digester writes `latest.md` here · `improvements size` for on-disk bytes."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Improvements dir:** last write **{age}** ago · 1 file · digester · morning surprise · results.tsv · `improvements path` for the folder · `improvements size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Improvements dir:** newest write **{age}** ago · {files} files · digester · morning surprise · results.tsv · `improvements path` for the folder · `improvements size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Improvements dir** — could not read mtime · `improvements path` for the folder · `improvements size` for on-disk bytes."
+                .to_string()
+        }
+    }
 }
 
 /// True for short “how big is credential_accounts.json / credential accounts size…” asks.
@@ -34177,9 +34374,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_config_age_request(content) {
         return Some(format_config_age_gateway());
     }
-    // Improvements dir size before path (recursive bytes; no list); path before overnight-content asks.
+    // Improvements dir size before age/path (recursive bytes; no list); age before path.
     if looks_like_improvements_size_request(content) {
         return Some(format_improvements_size_gateway());
+    }
+    if looks_like_improvements_age_request(content) {
+        return Some(format_improvements_age_gateway());
     }
     // Improvements dir before overnight-content asks collide on the word “improvements”.
     if looks_like_improvements_path_request(content) {
@@ -34814,8 +35014,9 @@ pub fn format_ops_help_gateway() -> String {
 • `config.env size` · `.config.env size` · `how big is .config.env` · `secrets env size` — `.config.env` file size on disk (stat only; no key dump; does not steal `config.env path` / `config.env age` / `config size`)\n\
 • `config.env age` · `.config.env age` · `how old is .config.env` · `when was config.env updated` — `.config.env` last write age (mtime; no key dump; does not steal `config.env path` / `config.env size` / `config age`)\n\
 • `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump; `config.env size` / `config.env age` for bytes / mtime)\n\
-• `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
-• `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path`)\n\
+• `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks; `improvements size` / `improvements age` for bytes / mtime)\n\
+• `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path` / `improvements age`)\n\
+• `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
@@ -36380,6 +36581,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only improvements dir size asks (v0.1.873) — recursive file bytes; no list dump.
     if looks_like_improvements_size_request(question) {
+        return true;
+    }
+    // Read-only improvements dir age asks (v0.1.952) — newest file mtime; no list dump.
+    if looks_like_improvements_age_request(question) {
         return true;
     }
     // Read-only improvements dir path asks (v0.1.841) — config only; no list/open.
@@ -39320,6 +39525,8 @@ mod tests {
         assert!(!looks_like_improvements_path_request("where is config"));
         assert!(!looks_like_improvements_path_request("improvements size"));
         assert!(!looks_like_improvements_path_request("how big is the improvements folder"));
+        assert!(!looks_like_improvements_path_request("improvements age"));
+        assert!(!looks_like_improvements_path_request("how old is the improvements folder"));
         assert!(!looks_like_config_env_path_request("improvements path"));
         let reply =
             try_operator_instant_reply("where is the improvements folder")
@@ -39349,6 +39556,8 @@ mod tests {
         assert!(!looks_like_improvements_size_request("digest.md size"));
         assert!(!looks_like_improvements_size_request("runs size"));
         assert!(!looks_like_improvements_size_request("list improvements"));
+        assert!(!looks_like_improvements_size_request("improvements age"));
+        assert!(!looks_like_improvements_size_request("how old is the improvements folder"));
         assert!(!looks_like_improvements_path_request("improvements size"));
         assert!(!looks_like_results_tsv_size_request("improvements size"));
         let reply = try_operator_instant_reply("how big is the improvements folder")
@@ -39361,6 +39570,55 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(!reply.to_lowercase().contains("latest.md\n"));
+    }
+
+    #[test]
+    fn improvements_age_request_detected() {
+        assert!(looks_like_improvements_age_request("improvements age"));
+        assert!(looks_like_improvements_age_request("improvements folder age"));
+        assert!(looks_like_improvements_age_request("improvements dir age"));
+        assert!(looks_like_improvements_age_request("improvements directory age"));
+        assert!(looks_like_improvements_age_request("how old is the improvements folder"));
+        assert!(looks_like_improvements_age_request("how old is improvements"));
+        assert!(looks_like_improvements_age_request("how old are improvements"));
+        assert!(looks_like_improvements_age_request(
+            "when was the improvements folder updated"
+        ));
+        assert!(looks_like_improvements_age_request("improvements last modified"));
+        assert!(looks_like_improvements_age_request("is the improvements folder stale"));
+        assert!(looks_like_improvements_age_request("mac-stats improvements age"));
+        assert!(looks_like_improvements_age_request("autoresearch folder age"));
+        assert!(looks_like_improvements_age_request("how old is the autoresearch folder"));
+        assert!(!looks_like_improvements_age_request("improvements path"));
+        assert!(!looks_like_improvements_age_request("where is the improvements folder"));
+        assert!(!looks_like_improvements_age_request("improvements"));
+        assert!(!looks_like_improvements_age_request("improvements size"));
+        assert!(!looks_like_improvements_age_request("how big is the improvements folder"));
+        assert!(!looks_like_improvements_age_request("any improvements from last night"));
+        assert!(!looks_like_improvements_age_request("results.tsv age"));
+        assert!(!looks_like_improvements_age_request("how old is results.tsv"));
+        assert!(!looks_like_improvements_age_request("digest age"));
+        assert!(!looks_like_improvements_age_request("runs age"));
+        assert!(!looks_like_improvements_age_request("list improvements"));
+        assert!(!looks_like_improvements_path_request("improvements age"));
+        assert!(!looks_like_improvements_size_request("improvements age"));
+        assert!(!looks_like_results_tsv_age_request("improvements age"));
+        assert!(!looks_like_results_tsv_age_request("how old is the improvements folder"));
+        let reply = try_operator_instant_reply("how old is the improvements folder")
+            .expect("improvements age instant");
+        assert!(reply.contains("Improvements dir"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not"),
+            "{reply}"
+        );
+        assert!(
+            try_operator_instant_reply("improvements age").is_some(),
+            "improvements age should be instant"
+        );
+        assert!(try_operator_instant_reply("any improvements from last night").is_none());
     }
 
     #[test]
