@@ -21800,7 +21800,7 @@ pub fn format_before_reset_transcript_path_gateway() -> String {
 
 /// True for short “how big is the before-compaction transcript / last_session_before_compaction.jsonl size…” asks.
 /// Stat only — does not dump JSONL, run the hook, or compact a session.
-/// Does not steal `before compaction transcript path` / before-reset / session reset phrases.
+/// Does not steal `before compaction transcript path` / age / before-reset / session reset phrases.
 pub fn looks_like_before_compaction_transcript_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 96 {
@@ -22016,22 +22016,265 @@ pub fn format_before_compaction_transcript_size_gateway() -> String {
         Config::default_before_compaction_transcript_path()
     };
     if !path.exists() {
-        return "**Before-compaction transcript:** no file yet · `before compaction transcript path` for the location · written when a before-compaction hook runs · does not dump JSONL."
+        return "**Before-compaction transcript:** no file yet · `before compaction transcript path` for the location · `before compaction transcript age` for mtime · written when a before-compaction hook runs · does not dump JSONL."
             .to_string();
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Before-compaction transcript:** empty file · `before compaction transcript path` for the location · does not dump JSONL."
+            "**Before-compaction transcript:** empty file · `before compaction transcript path` for the location · `before compaction transcript age` for mtime · does not dump JSONL."
                 .to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Before-compaction transcript:** **{label}** on disk · `before compaction transcript path` for the location · does not dump JSONL or run compaction."
+                "**Before-compaction transcript:** **{label}** on disk · `before compaction transcript path` for the location · `before compaction transcript age` for mtime · does not dump JSONL or run compaction."
             )
         }
         Err(_) => {
-            "**Before-compaction transcript:** could not read size · `before compaction transcript path` for the location."
+            "**Before-compaction transcript:** could not read size · `before compaction transcript path` for the location · `before compaction transcript age` for mtime."
+                .to_string()
+        }
+    }
+}
+
+/// True for short “how old is the before-compaction transcript / last_session_before_compaction.jsonl age…” asks.
+/// Mtime only — does not dump JSONL, run the hook, or compact a session.
+/// Does not steal `before compaction transcript path` / size / before-reset / session reset phrases.
+pub fn looks_like_before_compaction_transcript_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 96 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("export")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("trigger")
+        || n.contains("run hook")
+        || n.contains("run the hook")
+        || n.contains("run compaction")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("beforereset")
+        || n.contains("last_session_before_reset")
+        || n.contains("session_reset_phrases")
+        || n.contains("session-reset-phrases")
+        || n.contains("session reset")
+        || n.contains("session-reset")
+        || n.contains("session_reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("discord memory")
+        || n.contains("memory.md")
+        || n.contains("notes age")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let bc_ctx = n.contains("last_session_before_compaction")
+        || n.contains("last-session-before-compaction")
+        || n.contains("beforecompactiontranscript")
+        || n.contains("before_compaction_transcript")
+        || n.contains("before-compaction-transcript")
+        || n.contains("before compaction transcript")
+        || n.contains("before-compaction transcript")
+        || n.contains("before_compaction transcript")
+        || n.contains("before compaction jsonl")
+        || n.contains("before-compaction jsonl")
+        || n.contains("before_compaction jsonl")
+        || n.contains("mac_stats_before_compaction_transcript")
+        || (n.contains("before compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("before-compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")))
+        || (n.contains("before_compaction")
+            && (n.contains("transcript")
+                || n.contains("jsonl")
+                || n.contains("file")
+                || n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !bc_ctx {
+        return false;
+    }
+    if !n.contains("age")
+        && !n.contains("old")
+        && !n.contains("stale")
+        && !n.contains("when")
+        && !n.contains("updated")
+        && !n.contains("modified")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "before compaction transcript age"
+            | "before-compaction transcript age"
+            | "before_compaction transcript age"
+            | "before compaction transcript file age"
+            | "before-compaction transcript file age"
+            | "before_compaction transcript file age"
+            | "before compaction jsonl age"
+            | "before-compaction jsonl age"
+            | "before_compaction jsonl age"
+            | "last_session_before_compaction age"
+            | "last_session_before_compaction.jsonl age"
+            | "last_session_before_compaction file age"
+            | "how old is before compaction transcript"
+            | "how old is the before compaction transcript"
+            | "how old is before-compaction transcript"
+            | "how old is the before-compaction transcript"
+            | "how old is before_compaction transcript"
+            | "how old is last_session_before_compaction"
+            | "how old is last_session_before_compaction.jsonl"
+            | "when was before compaction transcript updated"
+            | "when was the before compaction transcript updated"
+            | "when was before-compaction transcript updated"
+            | "when was last_session_before_compaction updated"
+            | "when was last_session_before_compaction.jsonl updated"
+            | "before compaction transcript last modified"
+            | "before-compaction transcript last modified"
+            | "last_session_before_compaction last modified"
+            | "is before compaction transcript stale"
+            | "is the before compaction transcript stale"
+            | "is before-compaction transcript stale"
+            | "mac-stats before compaction transcript age"
+            | "mac stats before compaction transcript age"
+    ) || (bc_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM before-compaction transcript age (mtime only; no dump / no hook / no compact).
+pub fn format_before_compaction_transcript_age_gateway() -> String {
+    use crate::config::Config;
+    let path = if let Some(p) = Config::before_compaction_transcript_path_resolved() {
+        p
+    } else {
+        Config::default_before_compaction_transcript_path()
+    };
+    if !path.exists() {
+        return "**Before-compaction transcript:** no file yet · `before compaction transcript path` for the location · `before compaction transcript size` for on-disk bytes · written when a before-compaction hook runs · does not dump JSONL."
+            .to_string();
+    }
+    match std::fs::metadata(&path) {
+        Ok(meta) => {
+            let ms = file_mtime_ms(&meta);
+            if ms == 0 {
+                return "**Before-compaction transcript** — could not read mtime · `before compaction transcript path` for the location · `before compaction transcript size` for on-disk bytes."
+                    .to_string();
+            }
+            let age = age_from_ms(ms);
+            format!(
+                "**Before-compaction transcript:** last write **{age}** ago · `before compaction transcript path` for the location · `before compaction transcript size` for on-disk bytes · does not dump JSONL or run compaction."
+            )
+        }
+        Err(_) => {
+            "**Before-compaction transcript:** could not read mtime · `before compaction transcript path` for the location · `before compaction transcript size` for on-disk bytes."
                 .to_string()
         }
     }
@@ -22040,6 +22283,7 @@ pub fn format_before_compaction_transcript_size_gateway() -> String {
 /// True for short “where is the before-compaction transcript / last_session_before_compaction.jsonl…” asks.
 /// Config/env path only — does not dump JSONL, run the hook, or compact a session.
 /// Size asks use the before-compaction transcript size lane (v0.1.922).
+/// Age asks use the before-compaction transcript age lane (v0.1.950).
 pub fn looks_like_before_compaction_transcript_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 96 {
@@ -22053,6 +22297,13 @@ pub fn looks_like_before_compaction_transcript_path_request(content: &str) -> bo
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the before-compaction transcript age lane (v0.1.950) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -22217,7 +22468,7 @@ pub fn format_before_compaction_transcript_path_gateway() -> String {
         "default when a before-compaction hook runs (set `beforeCompactionTranscriptPath` / `MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH` to override)"
     };
     format!(
-        "**Before-compaction transcript:** `{display}` · {note} · path only · `before compaction transcript size` for on-disk bytes · does not dump JSONL or run compaction · `before reset transcript path` for the reset export."
+        "**Before-compaction transcript:** `{display}` · {note} · path only · `before compaction transcript size` for on-disk bytes · `before compaction transcript age` for mtime · does not dump JSONL or run compaction · `before reset transcript path` for the reset export."
     )
 }
 
@@ -33695,9 +33946,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_escalation_patterns_path_request(content) {
         return Some(format_escalation_patterns_path_gateway());
     }
-    // before-compaction transcript size before path (stat only; no dump/hook).
+    // before-compaction transcript size before age/path (stat only; no dump/hook).
     if looks_like_before_compaction_transcript_size_request(content) {
         return Some(format_before_compaction_transcript_size_gateway());
+    }
+    // before-compaction transcript age before path (mtime only; no dump/hook).
+    if looks_like_before_compaction_transcript_age_request(content) {
+        return Some(format_before_compaction_transcript_age_gateway());
     }
     // before-compaction transcript before before-reset / session_reset_phrases / session-dir path lanes.
     if looks_like_before_compaction_transcript_path_request(content) {
@@ -34315,8 +34570,9 @@ pub fn format_ops_help_gateway() -> String {
 • `before reset transcript size` · `before-reset transcript size` · `how big is before reset transcript` · `last_session_before_reset.jsonl size` — before-reset transcript size on disk (stat only; no dump; does not steal `before reset transcript path` / `before reset transcript age` / before-compaction / session reset phrases)\n\
 • `before reset transcript age` · `before-reset transcript age` · `how old is before reset transcript` · `when was before reset transcript updated` · `last_session_before_reset.jsonl age` — before-reset transcript last write age (mtime; no dump; does not steal `before reset transcript path` / size / before-compaction / session reset phrases)\n\
 • `before reset transcript path` · `where is before reset transcript` · `last_session_before_reset.jsonl` — before-reset JSONL path (config/env only; no dump/hook; `before reset transcript size` / `before reset transcript age` for bytes / mtime; does not steal before-compaction)\n\
-• `before compaction transcript size` · `before-compaction transcript size` · `how big is before compaction transcript` · `last_session_before_compaction.jsonl size` — before-compaction transcript size on disk (stat only; no dump; does not steal `before compaction transcript path` / before-reset / session reset phrases)\n\
-• `before compaction transcript path` · `where is before compaction transcript` · `last_session_before_compaction.jsonl` — before-compaction JSONL path (config/env only; no dump/hook; `before compaction transcript size` for on-disk bytes; does not steal before-reset)\n\
+• `before compaction transcript size` · `before-compaction transcript size` · `how big is before compaction transcript` · `last_session_before_compaction.jsonl size` — before-compaction transcript size on disk (stat only; no dump; does not steal `before compaction transcript path` / `before compaction transcript age` / before-reset / session reset phrases)\n\
+• `before compaction transcript age` · `before-compaction transcript age` · `how old is before compaction transcript` · `when was before compaction transcript updated` · `last_session_before_compaction.jsonl age` — before-compaction transcript last write age (mtime; no dump; does not steal `before compaction transcript path` / size / before-reset / session reset phrases)\n\
+• `before compaction transcript path` · `where is before compaction transcript` · `last_session_before_compaction.jsonl` — before-compaction JSONL path (config/env only; no dump/hook; `before compaction transcript size` / `before compaction transcript age` for bytes / mtime; does not steal before-reset)\n\
 • `cookie reject size` · `cookie_reject_patterns.md size` · `how big is cookie reject patterns` · `cookie reject patterns size` — cookie_reject_patterns.md file size on disk (stat only; no dump; does not steal `cookie reject patterns path` / session-reset / escalation)\n\
 • `cookie reject patterns path` · `where is cookie_reject_patterns.md` · `cookie reject path` · `reject patterns path` — cookie reject patterns file (config only; no list/edit; `cookie reject patterns size` for on-disk bytes; does not steal browser cookies)\n\
 • `organizer rules size` · `downloads-organizer-rules.md size` · `how big is downloads organizer rules` · `downloads organizer rules size` — downloads-organizer-rules.md file size on disk (stat only; no dump; does not steal `downloads organizer rules path` / organizer state / `/downloads`)\n\
@@ -35893,6 +36149,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only before-compaction transcript size asks (v0.1.922) — stat only; no dump/hook.
     if looks_like_before_compaction_transcript_size_request(question) {
+        return true;
+    }
+    // Read-only before-compaction transcript age asks (v0.1.950) — mtime only; no dump/hook.
+    if looks_like_before_compaction_transcript_age_request(question) {
         return true;
     }
     // Read-only before-compaction transcript path asks (v0.1.861) — config/env only; no dump/hook.
@@ -39528,6 +39788,12 @@ mod tests {
         assert!(!looks_like_before_compaction_transcript_path_request(
             "how big is before compaction transcript"
         ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "before compaction transcript age"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "how old is before compaction transcript"
+        ));
         assert!(!looks_like_before_reset_transcript_path_request(
             "before compaction transcript path"
         ));
@@ -39541,6 +39807,10 @@ mod tests {
         assert!(reply.to_lowercase().contains("path only"), "{reply}");
         assert!(
             reply.contains("before compaction transcript size") || reply.contains("on-disk"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("before compaction transcript age") || reply.contains("mtime"),
             "{reply}"
         );
     }
@@ -39578,6 +39848,12 @@ mod tests {
             "where is before compaction transcript"
         ));
         assert!(!looks_like_before_compaction_transcript_size_request(
+            "before compaction transcript age"
+        ));
+        assert!(!looks_like_before_compaction_transcript_size_request(
+            "how old is before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_size_request(
             "before reset transcript size"
         ));
         assert!(!looks_like_before_compaction_transcript_size_request(
@@ -39611,6 +39887,94 @@ mod tests {
         );
         assert!(
             reply.contains("before compaction transcript path") || reply.contains("does not"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("before compaction transcript age") || reply.contains("mtime"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn before_compaction_transcript_age_request_detected() {
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "before compaction transcript age"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "before-compaction transcript age"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "before_compaction transcript age"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "last_session_before_compaction.jsonl age"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "how old is before compaction transcript"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "how old is the before-compaction transcript"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "when was before compaction transcript updated"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "when was last_session_before_compaction.jsonl updated"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "before compaction jsonl age"
+        ));
+        assert!(looks_like_before_compaction_transcript_age_request(
+            "is before compaction transcript stale"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "before compaction transcript path"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "where is before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "before compaction transcript size"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "how big is before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "before reset transcript age"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "session reset phrases age"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "dump before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_age_request(
+            "export before compaction transcript"
+        ));
+        assert!(!looks_like_before_compaction_transcript_path_request(
+            "before compaction transcript age"
+        ));
+        assert!(!looks_like_before_compaction_transcript_size_request(
+            "before compaction transcript age"
+        ));
+        assert!(!looks_like_before_reset_transcript_age_request(
+            "before compaction transcript age"
+        ));
+        let reply = try_operator_instant_reply("before compaction transcript age")
+            .expect("before-compaction transcript age instant");
+        assert!(reply.contains("Before-compaction transcript"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no file yet")
+                || reply.contains("could not"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("before compaction transcript path") || reply.contains("does not"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("before compaction transcript size") || reply.contains("on-disk"),
             "{reply}"
         );
     }
