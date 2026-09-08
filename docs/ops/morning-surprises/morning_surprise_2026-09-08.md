@@ -6,6 +6,7 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 
 | Version | What |
 |---------|------|
+| **v0.1.945** | Instant lane: `memory.md` age (`memory.md age`, `curated memory age`, `how old is memory.md`, …) — mtime only; no dump; does not steal path / size / notes / bare `memory age` |
 | **v0.1.944** | Instant lane: `execution_prompt.md` age (`execution age`, `how old is execution`, …) — mtime only; no dump; does not steal path / size / planning |
 | **v0.1.943** | Instant lane: `planning_prompt.md` age |
 | **v0.1.942** | AI Chat filter-miss calm (You/Assistant/Errors empty → warm titled hint + cue wash; design review / `feature-ai-chat`) |
@@ -19,7 +20,7 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 ## Still open
 
 - Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (polish already shipped).
-- Next p50 fuel: `memory.md` age (and remaining age lanes).
+- Next p50 fuel: notes age (and remaining age lanes).
 - Sibling: Hermes insights / session UX ports when digester is quiet.
 
-Generated: 2026-09-08T21:05:33+02:00
+Generated: 2026-09-08T21:35:00+02:00
