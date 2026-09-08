@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.949] - 2026-09-08
+
+### Added
+
+- **Instant lane: before-reset transcript age** — `before reset transcript age`, `before-reset transcript age`, `how old is before reset transcript`, `when was before reset transcript updated`, `last_session_before_reset.jsonl age`, and close variants return the transcript file mtime without Ollama (Discord + AI Chat; no dump/hook; does not steal `before reset transcript path` / size / before-compaction / session reset phrases; p50 latency).
+
 ## [0.1.948] - 2026-09-08
 
 ### Added
