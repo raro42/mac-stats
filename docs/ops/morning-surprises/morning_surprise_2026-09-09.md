@@ -1,26 +1,18 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B kept shipping instant-lane mtime answers so Discord/AI Chat stay off Ollama for file-age asks.
+Overnight Track B (20:00–06:00) kept shipping instant-lane age reads so operator asks skip Ollama.
 
-## Shipped tonight (highlights)
+## Shipped tonight
+- **v0.1.951** — Instant lane: Ori vault age (newest file mtime under configured vault; no list/MCP; path/size/`/ori` safe).
+- Earlier in the window: **v0.1.950** before-compaction transcript age; **v0.1.949** before-reset transcript age; **v0.1.948** Discord channel memory age; **v0.1.947** session-memory age; **v0.1.946** notes folder age (from prior ticks same night).
+- Design review: AI Chat filter-miss calm already used (**v0.1.942** at window open); `feature-ai-chat.png` still stale until TCC/window recapture.
 
-| Version | What |
-|---------|------|
-| **v0.1.950** | Instant lane: **before-compaction transcript age** (`before compaction transcript age` / `how old is before compaction transcript` / `last_session_before_compaction.jsonl age`) — mtime only; no dump/hook; does not steal path / size / before-reset |
-| **v0.1.949** | Instant lane: before-reset transcript age |
-| **v0.1.948** | Instant lane: Discord channel memory age |
-| **v0.1.947** | Instant lane: session-memory age |
-| **v0.1.946** | Instant lane: notes folder age (+ session-memory size detector fix) |
-| **v0.1.942** | Design review: AI Chat filter-miss calm (You/Assistant/Errors empty wash) |
+## Tried / deferred
+- Digester open pointed at design-review for `feature-ai-chat.png` — deferred (one polish/night cap).
+- Sibling Hermes insights / session UX — parked for a later tick.
 
-## Also this window
+## Next
+- Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (next night’s design-review slot).
+- More p50 age / path lanes or sibling ports when digester is quiet.
 
-- Digester open candidate was design-review (`feature-ai-chat.png` still aged) — one design-review polish already used earlier tonight (v0.1.942); later ticks took standing-backlog p50 age lanes.
-- `overnight_git_flush` dry-run: clean. `maybe_cut_github_release`: already cut today.
-- Debug log scan: no new product-owned error cluster for this tick.
-
-## Next fuel
-
-- Ori vault age instant (standing backlog p50).
-- Recapture `feature-ai-chat.png` when TCC allows (still stale until screenshot).
-- Sibling Hermes insights / session UX when digester is empty of age gaps.
+Generated: 2026-09-09T00:27+02:00
