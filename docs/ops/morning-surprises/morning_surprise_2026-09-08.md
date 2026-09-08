@@ -6,6 +6,7 @@ Overnight Track B kept shipping. Highlights for Ralf:
 
 | Version | What |
 |---------|------|
+| **v0.1.941** | Instant lane: **agent.json age** (`agent.json age` / `agent config age` / `how old is agent.json`) — newest per-agent mtime, no dump |
 | **v0.1.940** | Instant lane: **testing.md age** (`testing age` / `testing.md age` / `how old is testing`) — newest per-agent mtime, no dump |
 | **v0.1.939** | Instant lane: **skill.md age** (`skill.md age` / `skill file age` / `how old is skill.md`) — newest per-agent mtime, no dump |
 | **v0.1.938** | AI Chat **empty Ready calm** (ok wash + warm empty copy; design review) |
@@ -17,7 +18,7 @@ Overnight Track B kept shipping. Highlights for Ralf:
 ## Still open
 
 - `docs/screens/feature-ai-chat.png` still aged (~24d); screenshot TCC deferred earlier — recapture when Screen Recording allows.
-- Next p50: **agent.json age** / planning·execution prompt age; sibling Hermes insights / session UX when digester is empty.
+- Next p50: **planning/execution prompt age** / memory.md age; sibling Hermes insights / session UX when digester is empty.
 
 ## Nightly ratchet
 
