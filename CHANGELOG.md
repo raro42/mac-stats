@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.951] - 2026-09-09
+
+### Added
+
+- **Instant lane: Ori vault age** — `ori vault age`, `mnemos vault age`, `how old is ori vault`, `when was ori vault updated`, `ori_vault age`, and close variants return the newest file mtime under the configured Ori vault without Ollama (Discord + AI Chat; no list/MCP; does not steal `ori vault path` / size / `/ori` Ready; p50 latency).
+
 ## [0.1.950] - 2026-09-08
 
 ### Added

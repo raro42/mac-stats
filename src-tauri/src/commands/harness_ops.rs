@@ -33145,28 +33145,276 @@ pub fn format_ori_vault_size_gateway() -> String {
     use crate::config::Config;
     let raw = Config::ori_vault_path_raw();
     if raw.trim().is_empty() {
-        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · `ori vault path` for the location · `/ori` for Ready / Off · does not list vault."
+        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · `ori vault path` for the location · `ori vault age` for newest mtime · `/ori` for Ready / Off · does not list vault."
             .to_string();
     }
     let Some(dir) = Config::expand_user_path_str(raw.trim()) else {
-        return "**Ori vault:** path not usable · check `ORI_VAULT` / `MAC_STATS_ORI_VAULT` · `ori vault path` for the configured string · does not list vault."
+        return "**Ori vault:** path not usable · check `ORI_VAULT` / `MAC_STATS_ORI_VAULT` · `ori vault path` for the configured string · `ori vault age` for newest mtime · does not list vault."
             .to_string();
     };
     match dir_total_bytes(&dir, 12_000) {
         Err(msg) if msg == "missing" => {
-            "**Ori vault:** folder missing · `ori vault path` for the location · must contain `.ori` · `/ori` for Ready / Off · does not list vault."
+            "**Ori vault:** folder missing · `ori vault path` for the location · `ori vault age` for newest mtime · must contain `.ori` · `/ori` for Ready / Off · does not list vault."
                 .to_string()
         }
         Err(e) => format!("**Ori vault** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Ori vault:** empty · `ori vault path` for the location · `/ori` for Ready / Off · does not list names."
+            "**Ori vault:** empty · `ori vault path` for the location · `ori vault age` for newest mtime · `/ori` for Ready / Off · does not list names."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Ori vault:** **{label}** on disk ({files} files) · `ori vault path` for the location · `/ori` for Ready / Off · does not list names or call MCP."
+                "**Ori vault:** **{label}** on disk ({files} files) · `ori vault path` for the location · `ori vault age` for newest mtime · `/ori` for Ready / Off · does not list names or call MCP."
             )
+        }
+    }
+}
+
+/// True for short “how old is the Ori vault / ORI_VAULT age…” asks.
+/// Newest file mtime under the configured vault root — does not list, dump, or call MCP.
+/// Does not steal `ori vault path` / size / `/ori` Ready / agents age / notes age.
+pub fn looks_like_ori_vault_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact Ready / slash asks stay on `/ori`.
+    if matches!(
+        n.as_str(),
+        "/ori"
+            | "/mnemos"
+            | "/ori-mnemos"
+            | "ori"
+            | "mnemos"
+            | "ori vault"
+            | "mnemos vault"
+            | "ori status"
+            | "ori ready"
+            | "ori health"
+            | "ori on"
+            | "ori off"
+            | "ori lifecycle"
+            | "mnemos status"
+            | "mnemos ready"
+    ) {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("orient")
+        || n.contains("prefetch")
+        || n.contains("capture")
+        || n.contains("mcp:")
+        || n.starts_with("mcp ")
+        || n.contains("memory_append")
+        || n.contains("memory append")
+        || (n.contains("ori_")
+            && !n.contains("ori_vault")
+            && !n.starts_with("ori_vault"))
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("agents age")
+        || n.contains("agents size")
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("notes age")
+        || n.contains("notes size")
+        || n.contains("notes folder")
+        || n.contains("memory folder")
+        || n.contains("memory.md")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("discord memory")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let vault_ctx = n.contains("ori vault")
+        || n.contains("mnemos vault")
+        || n.contains("ori_vault")
+        || n.contains("ori-vault")
+        || n.contains("orivault")
+        || n == "ori_vault"
+        || n == "ori-vault"
+        || (n.contains("ori")
+            && n.contains("vault")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains(" dir")))
+        || (n.contains("mnemos")
+            && n.contains("vault")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains(" dir")));
+    if !vault_ctx {
+        return false;
+    }
+    if !n.contains("age")
+        && !n.contains("old")
+        && !n.contains("stale")
+        && !n.contains("when")
+        && !n.contains("updated")
+        && !n.contains("modified")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "ori vault age"
+            | "ori vault folder age"
+            | "ori vault directory age"
+            | "ori vault dir age"
+            | "mnemos vault age"
+            | "mnemos vault folder age"
+            | "mnemos vault directory age"
+            | "ori_vault age"
+            | "ori-vault age"
+            | "orivault age"
+            | "ori_vault folder age"
+            | "ori-vault folder age"
+            | "how old is ori vault"
+            | "how old is the ori vault"
+            | "how old is mnemos vault"
+            | "how old is the mnemos vault"
+            | "how old is ori_vault"
+            | "how old is ori-vault"
+            | "when was ori vault updated"
+            | "when was the ori vault updated"
+            | "when was mnemos vault updated"
+            | "when was ori_vault updated"
+            | "ori vault last modified"
+            | "mnemos vault last modified"
+            | "ori_vault last modified"
+            | "is ori vault stale"
+            | "is the ori vault stale"
+            | "is mnemos vault stale"
+            | "mac-stats ori vault age"
+            | "mac stats ori vault age"
+    ) || (vault_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM Ori vault directory age (newest file mtime; no list/MCP/Ready).
+pub fn format_ori_vault_age_gateway() -> String {
+    use crate::config::Config;
+    let raw = Config::ori_vault_path_raw();
+    if raw.trim().is_empty() {
+        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · `ori vault path` for the location · `ori vault size` for on-disk bytes · `/ori` for Ready / Off · does not list vault."
+            .to_string();
+    }
+    let Some(dir) = Config::expand_user_path_str(raw.trim()) else {
+        return "**Ori vault:** path not usable · check `ORI_VAULT` / `MAC_STATS_ORI_VAULT` · `ori vault path` for the configured string · `ori vault size` for on-disk bytes · does not list vault."
+            .to_string();
+    };
+    match dir_newest_mtime_ms(&dir, 12_000) {
+        Err(msg) if msg == "missing" => {
+            "**Ori vault:** folder missing · `ori vault path` for the location · `ori vault size` for on-disk bytes · must contain `.ori` · `/ori` for Ready / Off · does not list vault."
+                .to_string()
+        }
+        Err(e) => format!("**Ori vault** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Ori vault:** empty · `ori vault path` for the location · `ori vault size` for on-disk bytes · `/ori` for Ready / Off · does not list names."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Ori vault:** last write **{age}** ago · 1 file · `ori vault path` for the location · `ori vault size` for on-disk bytes · `/ori` for Ready / Off · does not list names or call MCP."
+                )
+            } else {
+                format!(
+                    "**Ori vault:** newest write **{age}** ago · {files} files · `ori vault path` for the location · `ori vault size` for on-disk bytes · `/ori` for Ready / Off · does not list names or call MCP."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Ori vault** — could not read mtime under the vault · `ori vault path` for the location · `ori vault size` for on-disk bytes."
+                .to_string()
         }
     }
 }
@@ -33174,12 +33422,14 @@ pub fn format_ori_vault_size_gateway() -> String {
 /// True for short “where is the Ori vault / ORI_VAULT path…” asks.
 /// Config/env path only — does not list vault, call MCP, or return Ready/Off.
 /// Size asks use the Ori vault size lane (v0.1.923).
+/// Age asks use the Ori vault age lane (v0.1.951).
 pub fn looks_like_ori_vault_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
         return false;
     }
     // Size asks use the Ori vault size lane (v0.1.923).
+    // Age asks use the Ori vault age lane (v0.1.951) — keyword-only (no nest).
     if n.contains("size")
         || n.contains("big")
         || n.contains("large")
@@ -33187,6 +33437,12 @@ pub fn looks_like_ori_vault_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -33333,7 +33589,7 @@ pub fn format_ori_vault_path_gateway() -> String {
     use crate::config::Config;
     let raw = Config::ori_vault_path_raw();
     if raw.trim().is_empty() {
-        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · path only · `ori vault size` for on-disk bytes · does not list vault or call MCP · `/ori` for Ready / Off."
+        return "**Ori vault:** not set · set `ORI_VAULT` / `MAC_STATS_ORI_VAULT` (or Settings Product) · path only · `ori vault size` for on-disk bytes · `ori vault age` for newest mtime · does not list vault or call MCP · `/ori` for Ready / Off."
             .to_string();
     }
     let display = match Config::expand_user_path_str(raw.trim()) {
@@ -33341,7 +33597,7 @@ pub fn format_ori_vault_path_gateway() -> String {
         None => raw.trim().to_string(),
     };
     format!(
-        "**Ori vault:** `{display}` · must contain `.ori` · path only · `ori vault size` for on-disk bytes · does not list vault or call MCP · `/ori` for Ready / Off · Settings Product."
+        "**Ori vault:** `{display}` · must contain `.ori` · path only · `ori vault size` for on-disk bytes · `ori vault age` for newest mtime · does not list vault or call MCP · `/ori` for Ready / Off · Settings Product."
     )
 }
 
@@ -33855,9 +34111,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
-    // Ori vault size before path (recursive bytes; no list/MCP); path before `/ori` Ready.
+    // Ori vault size before age/path (recursive bytes; no list/MCP); age before path; path before `/ori` Ready.
     if looks_like_ori_vault_size_request(content) {
         return Some(format_ori_vault_size_gateway());
+    }
+    if looks_like_ori_vault_age_request(content) {
+        return Some(format_ori_vault_age_gateway());
     }
     // Ori vault path before `/ori` Ready chip (path-only asks).
     if looks_like_ori_vault_path_request(content) {
@@ -36345,6 +36604,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
     if looks_like_ori_vault_size_request(question) {
+        return true;
+    }
+    // Read-only Ori vault age asks (v0.1.951) — newest file mtime; no list/MCP.
+    if looks_like_ori_vault_age_request(question) {
         return true;
     }
     // Read-only Ori vault path asks (v0.1.859) — config/env only; no list/MCP.
@@ -42033,6 +42296,8 @@ mod tests {
         assert!(!looks_like_ori_vault_size_request("ori vault"));
         assert!(!looks_like_ori_vault_size_request("ori vault path"));
         assert!(!looks_like_ori_vault_size_request("where is ori vault"));
+        assert!(!looks_like_ori_vault_size_request("ori vault age"));
+        assert!(!looks_like_ori_vault_size_request("how old is ori vault"));
         assert!(!looks_like_ori_vault_size_request("/ori"));
         assert!(!looks_like_ori_vault_size_request("ori"));
         assert!(!looks_like_ori_vault_size_request("enable ori"));
@@ -42056,6 +42321,58 @@ mod tests {
         );
         assert!(
             reply.contains("ori vault path") || reply.contains("does not"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn ori_vault_age_request_detected() {
+        assert!(looks_like_ori_vault_age_request("ori vault age"));
+        assert!(looks_like_ori_vault_age_request("ori vault folder age"));
+        assert!(looks_like_ori_vault_age_request("mnemos vault age"));
+        assert!(looks_like_ori_vault_age_request("ori_vault age"));
+        assert!(looks_like_ori_vault_age_request("ori-vault age"));
+        assert!(looks_like_ori_vault_age_request("how old is ori vault"));
+        assert!(looks_like_ori_vault_age_request("how old is the ori vault"));
+        assert!(looks_like_ori_vault_age_request("how old is mnemos vault"));
+        assert!(looks_like_ori_vault_age_request(
+            "when was ori vault updated"
+        ));
+        assert!(looks_like_ori_vault_age_request("ori vault last modified"));
+        assert!(looks_like_ori_vault_age_request("is ori vault stale"));
+        assert!(looks_like_ori_vault_age_request("mac-stats ori vault age"));
+        assert!(!looks_like_ori_vault_age_request("ori vault"));
+        assert!(!looks_like_ori_vault_age_request("ori vault path"));
+        assert!(!looks_like_ori_vault_age_request("where is ori vault"));
+        assert!(!looks_like_ori_vault_age_request("ori vault size"));
+        assert!(!looks_like_ori_vault_age_request("how big is ori vault"));
+        assert!(!looks_like_ori_vault_age_request("/ori"));
+        assert!(!looks_like_ori_vault_age_request("ori"));
+        assert!(!looks_like_ori_vault_age_request("enable ori"));
+        assert!(!looks_like_ori_vault_age_request("list ori vault"));
+        assert!(!looks_like_ori_vault_age_request("agents age"));
+        assert!(!looks_like_ori_vault_age_request("notes age"));
+        assert!(!looks_like_ori_vault_path_request("ori vault age"));
+        assert!(!looks_like_ori_vault_path_request("how old is ori vault"));
+        assert!(!looks_like_ori_vault_size_request("ori vault age"));
+        assert!(!looks_like_ori_ready_request("ori vault age"));
+        assert!(!looks_like_ori_ready_request("how old is ori vault"));
+        let reply =
+            try_operator_instant_reply("ori vault age").expect("ori vault age instant");
+        assert!(reply.contains("Ori vault"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("not set")
+                || reply.contains("missing")
+                || reply.contains("empty")
+                || reply.contains("could not")
+                || reply.contains("not usable"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("ori vault path")
+                || reply.contains("ori vault size")
+                || reply.contains("does not"),
             "{reply}"
         );
     }
@@ -45974,8 +46291,14 @@ mod tests {
         assert!(!looks_like_ori_vault_path_request("ori_orient"));
         assert!(!looks_like_ori_vault_path_request("scrub memory"));
         assert!(!looks_like_ori_vault_path_request("ori vault size"));
+        assert!(!looks_like_ori_vault_path_request("ori vault age"));
+        assert!(!looks_like_ori_vault_path_request("how old is ori vault"));
         assert!(looks_like_ori_vault_size_request("ori vault size"));
         assert!(looks_like_ori_vault_size_request("how big is ori vault"));
+        assert!(looks_like_ori_vault_age_request("ori vault age"));
+        assert!(looks_like_ori_vault_age_request("how old is ori vault"));
+        assert!(!looks_like_ori_vault_size_request("ori vault age"));
+        assert!(!looks_like_ori_vault_age_request("ori vault size"));
         let ori_path =
             try_operator_instant_reply("ori vault path").expect("ori vault path instant");
         assert!(ori_path.contains("Ori vault"), "{ori_path}");
@@ -46004,6 +46327,18 @@ mod tests {
                 || ori_size.contains("could not scan")
                 || ori_size.contains("not usable"),
             "{ori_size}"
+        );
+        let ori_age =
+            try_operator_instant_reply("ori vault age").expect("ori vault age instant");
+        assert!(ori_age.contains("Ori vault"), "{ori_age}");
+        assert!(
+            ori_age.contains("ago")
+                || ori_age.contains("not set")
+                || ori_age.contains("missing")
+                || ori_age.contains("empty")
+                || ori_age.contains("could not")
+                || ori_age.contains("not usable"),
+            "{ori_age}"
         );
         let ori_chip = format_ori_ready_chip();
         assert!(ori_chip.to_lowercase().contains("ori"), "{ori_chip}");
