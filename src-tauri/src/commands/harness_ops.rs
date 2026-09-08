@@ -6892,18 +6892,273 @@ pub fn format_session_memory_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Session memory:** no `session-memory-*.md` yet · `session memory path` for the pattern · `/sessions` for Live/Files · does not dump transcripts."
+        return "**Session memory:** no `session-memory-*.md` yet · `session memory path` for the pattern · `session memory age` for newest mtime · `/sessions` for Live/Files · does not dump transcripts."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Session memory:** **{label}** on disk · 1 `session-memory-*.md` · `session memory path` for the pattern · does not list or dump."
+            "**Session memory:** **{label}** on disk · 1 `session-memory-*.md` · `session memory path` for the pattern · `session memory age` for newest mtime · does not list or dump."
         )
     } else {
         format!(
-            "**Session memory:** **{label}** on disk · {count} `session-memory-*.md` files · `session memory path` for the pattern · does not list or dump."
+            "**Session memory:** **{label}** on disk · {count} `session-memory-*.md` files · `session memory path` for the pattern · `session memory age` for newest mtime · does not list or dump."
         )
+    }
+}
+
+/// True for short “how old is session memory / session-memory age…” asks.
+/// Newest `session-memory-*.md` mtime — does not list or dump; does not steal path / size / `/sessions`.
+pub fn looks_like_session_memory_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Exact `/sessions` catalog asks stay on the Live/Files lane.
+    if matches!(
+        n.as_str(),
+        "/sessions"
+            | "/sessions live"
+            | "/sessions files"
+            | "sessions"
+            | "live sessions"
+            | "session files"
+            | "list sessions"
+            | "sessions list"
+            | "sessions live"
+            | "sessions files"
+            | "session size"
+            | "sessions size"
+            | "session folder size"
+            | "session directory size"
+            | "session age"
+            | "sessions age"
+            | "session folder age"
+            | "session directory age"
+    ) {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("resume")
+        || n.contains("compact")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("session reset")
+        || n.contains("session-reset")
+        || n.contains("session_reset")
+        || n.contains("reset phrases")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("discord memory")
+        || n.contains("discord memories")
+        || n.contains("channel memory")
+        || n.contains("channel memories")
+        || n.contains("memory-discord")
+        || n.contains("memory_discord")
+        || (n.contains("memory.md") && !n.contains("session-memory"))
+        || (n.contains("memory-md") && !n.contains("session-memory") && !n.contains("session_memory"))
+        || n.contains("curated memory")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("memory folder")
+        || n.contains("memory directory")
+        || n == "session path"
+        || n == "sessions path"
+        || n == "session folder"
+        || n == "sessions folder"
+        || n == "session directory"
+        || n == "sessions directory"
+        || n.contains("agents size")
+        || n.contains("agents path")
+        || n.contains("agents folder")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("ori vault")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let sm_ctx = n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("sessionmemory")
+        || n.contains("session memory")
+        || n.contains("session memories")
+        || (n.contains("session")
+            && (n.contains("memory") || n.contains("memories"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")));
+    if !sm_ctx {
+        return false;
+    }
+    if !n.contains("age")
+        && !n.contains("old")
+        && !n.contains("stale")
+        && !n.contains("when")
+        && !n.contains("updated")
+        && !n.contains("modified")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "session memory age"
+            | "session memories age"
+            | "session memory file age"
+            | "session memories file age"
+            | "session-memory age"
+            | "session_memory age"
+            | "session-memory.md age"
+            | "session-memory file age"
+            | "session-memory files age"
+            | "how old is session memory"
+            | "how old is the session memory"
+            | "how old are session memory"
+            | "how old are session memories"
+            | "how old is session-memory"
+            | "how old are session-memory"
+            | "how old are session-memory files"
+            | "when was session memory updated"
+            | "when was the session memory updated"
+            | "when were session memories updated"
+            | "when was session-memory updated"
+            | "session memory last modified"
+            | "session-memory last modified"
+            | "is session memory stale"
+            | "is the session memory stale"
+            | "mac-stats session memory age"
+            | "mac stats session memory age"
+    ) || (sm_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM session-memory age (newest `session-memory-*.md` mtime; no list/dump).
+pub fn format_session_memory_age_gateway() -> String {
+    let dir = crate::config::Config::session_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&dir) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("session-memory-") || !name.ends_with(".md") {
+                continue;
+            }
+            let path = entry.path();
+            if let Ok(meta) = std::fs::metadata(&path) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    let ms = file_mtime_ms(&meta);
+                    if ms > 0 {
+                        newest_ms = Some(newest_ms.map_or(ms, |cur| cur.max(ms)));
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Session memory:** no `session-memory-*.md` yet · `session memory path` for the pattern · `session memory size` for on-disk bytes · `/sessions` for Live/Files · does not dump transcripts."
+            .to_string();
+    }
+    match newest_ms {
+        Some(ms) => {
+            let age = age_from_ms(ms);
+            if count == 1 {
+                format!(
+                    "**Session memory:** last write **{age}** ago · 1 `session-memory-*.md` · `session memory path` for the pattern · `session memory size` for on-disk bytes · does not list or dump."
+                )
+            } else {
+                format!(
+                    "**Session memory:** newest write **{age}** ago · {count} `session-memory-*.md` files · `session memory path` for the pattern · `session memory size` for on-disk bytes · does not list or dump."
+                )
+            }
+        }
+        None => {
+            "**Session memory** — could not read mtime on `session-memory-*.md` files.".to_string()
+        }
     }
 }
 
@@ -6911,6 +7166,7 @@ pub fn format_session_memory_size_gateway() -> String {
 /// Config path only — does not list, dump, resume, or prune session-memory-*.md files.
 /// Does not steal `session path` (directory) or `/sessions` Live/Files.
 /// Size asks use the session-memory size lane (v0.1.920).
+/// Age asks use the session-memory age lane (v0.1.947).
 pub fn looks_like_session_memory_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 88 {
@@ -6940,6 +7196,20 @@ pub fn looks_like_session_memory_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+    {
+        return false;
+    }
+    // Age asks use the session-memory age lane (v0.1.947) — keyword-only (no nest).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -7107,7 +7377,7 @@ pub fn looks_like_session_memory_path_request(content: &str) -> bool {
 pub fn format_session_memory_path_gateway() -> String {
     let dir = crate::config::Config::session_dir().display().to_string();
     format!(
-        "**Session memory files:** `{dir}/session-memory-<id>-<timestamp>-<topic>.md` · under session/ · path only · `session memory size` for on-disk bytes · does not list or dump · `session path` for the folder · `/sessions` for Live/Files."
+        "**Session memory files:** `{dir}/session-memory-<id>-<timestamp>-<topic>.md` · under session/ · path only · `session memory size` for on-disk bytes · `session memory age` for newest mtime · does not list or dump · `session path` for the folder · `/sessions` for Live/Files."
     )
 }
 
@@ -32779,9 +33049,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_discord_memory_path_request(content) {
         return Some(format_discord_memory_path_gateway());
     }
-    // Session-memory-*.md size before path (stat only; no list/dump).
+    // Session-memory-*.md size before age/path (stat only; no list/dump).
     if looks_like_session_memory_size_request(content) {
         return Some(format_session_memory_size_gateway());
+    }
+    // Session-memory-*.md age before path (newest mtime; no list/dump).
+    if looks_like_session_memory_age_request(content) {
+        return Some(format_session_memory_age_gateway());
     }
     // Session-memory-*.md path before notes-folder / session-dir path (path-only asks).
     if looks_like_session_memory_path_request(content) {
@@ -33125,9 +33399,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_discord_memory_path_request(content) {
         return Some(format_discord_memory_path_gateway());
     }
-    // Session-memory-*.md size before path (stat only; no list/dump).
+    // Session-memory-*.md size before age/path (stat only; no list/dump).
     if looks_like_session_memory_size_request(content) {
         return Some(format_session_memory_size_gateway());
+    }
+    // Session-memory-*.md age before path (newest mtime; no list/dump).
+    if looks_like_session_memory_age_request(content) {
+        return Some(format_session_memory_age_gateway());
     }
     // Session-memory-*.md path before notes-folder / session-dir path.
     if looks_like_session_memory_path_request(content) {
@@ -33544,8 +33822,9 @@ pub fn format_ops_help_gateway() -> String {
 • `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` / `agent.json age` for bytes / mtime; does not steal `agents path` / `config path`)\n\
 • `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; `discord memory size` for on-disk bytes; does not steal `/knowledge discord`)\n\
-• `session memory size` · `session-memory size` · `how big is session memory` — `session-memory-*.md` size on disk (stat only; no dump; does not steal `session memory path` / `session size` / `/sessions`)\n\
-• `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; `session memory size` for on-disk bytes; does not steal `session path` / `/sessions`)\n\
+• `session memory size` · `session-memory size` · `how big is session memory` — `session-memory-*.md` size on disk (stat only; no dump; does not steal `session memory path` / `session memory age` / `session size` / `/sessions`)\n\
+• `session memory age` · `session-memory age` · `how old is session memory` · `when was session memory updated` — newest `session-memory-*.md` last write age (mtime; no dump; does not steal `session memory path` / `session memory size` / `session size` / `/sessions`)\n\
+• `session memory path` · `where is session memory` · `session-memory path` — `session/session-memory-<id>-<ts>-<topic>.md` (config only; no list/dump; `session memory size` / `session memory age` for bytes / mtime; does not steal `session path` / `/sessions`)\n\
 • `launchagent size` · `how big is the launchagent` · `mac-stats.plist size` · `harness plist size` — LaunchAgent plist sizes on disk (stat only; no dump; does not steal `launchagent path` / load/unload)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` for on-disk bytes; no load/unload)\n\
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
@@ -35234,6 +35513,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session-memory-*.md size asks (v0.1.920) — stat only; no list/dump.
     if looks_like_session_memory_size_request(question) {
+        return true;
+    }
+    // Read-only session-memory-*.md age asks (v0.1.947) — newest mtime; no list/dump.
+    if looks_like_session_memory_age_request(question) {
         return true;
     }
     // Read-only session-memory-*.md path asks (v0.1.863) — config only; no list/dump.
@@ -41138,6 +41421,11 @@ mod tests {
         ));
         assert!(!looks_like_session_memory_path_request("session memory size"));
         assert!(!looks_like_session_memory_path_request("session-memory size"));
+        assert!(!looks_like_session_memory_path_request("session memory age"));
+        assert!(!looks_like_session_memory_path_request("session-memory age"));
+        assert!(!looks_like_session_memory_path_request(
+            "how old is session memory"
+        ));
         assert!(!looks_like_memory_path_request("session memory path"));
         assert!(!looks_like_session_path_request("session memory path"));
         let reply = try_operator_instant_reply("session memory path")
@@ -41188,6 +41476,10 @@ mod tests {
         assert!(!looks_like_session_memory_size_request("discord memory size"));
         assert!(!looks_like_session_memory_size_request("memory.md size"));
         assert!(!looks_like_session_memory_size_request("notes size"));
+        assert!(!looks_like_session_memory_size_request("session memory age"));
+        assert!(!looks_like_session_memory_size_request(
+            "how old is session memory"
+        ));
         assert!(!looks_like_session_size_request("session memory size"));
         assert!(!looks_like_discord_memory_size_request("session memory size"));
         assert!(!looks_like_session_memory_path_request("session memory size"));
@@ -41202,6 +41494,77 @@ mod tests {
                 || reply.contains("KB")
                 || reply.contains("kB")
                 || reply.contains("MB"),
+            "{reply}"
+        );
+        assert!(
+            reply.contains("session memory path") || reply.contains("does not"),
+            "{reply}"
+        );
+    }
+
+    #[test]
+    fn session_memory_age_request_detected() {
+        assert!(looks_like_session_memory_age_request("session memory age"));
+        assert!(looks_like_session_memory_age_request(
+            "session memories age"
+        ));
+        assert!(looks_like_session_memory_age_request("session-memory age"));
+        assert!(looks_like_session_memory_age_request(
+            "session-memory.md age"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "session memory file age"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "how old is session memory"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "how old are session memories"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "how old are session-memory files"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "when was session memory updated"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "session memory last modified"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "is session memory stale"
+        ));
+        assert!(looks_like_session_memory_age_request(
+            "mac-stats session memory age"
+        ));
+        assert!(!looks_like_session_memory_age_request("session memory"));
+        assert!(!looks_like_session_memory_age_request("session memory path"));
+        assert!(!looks_like_session_memory_age_request(
+            "where is session memory"
+        ));
+        assert!(!looks_like_session_memory_age_request("session memory size"));
+        assert!(!looks_like_session_memory_age_request(
+            "how big is session memory"
+        ));
+        assert!(!looks_like_session_memory_age_request("session size"));
+        assert!(!looks_like_session_memory_age_request("session folder age"));
+        assert!(!looks_like_session_memory_age_request("/sessions"));
+        assert!(!looks_like_session_memory_age_request("list session memory"));
+        assert!(!looks_like_session_memory_age_request("dump session memory"));
+        assert!(!looks_like_session_memory_age_request("discord memory age"));
+        assert!(!looks_like_session_memory_age_request("memory.md age"));
+        assert!(!looks_like_session_memory_age_request("notes age"));
+        assert!(!looks_like_session_memory_age_request("memory age"));
+        assert!(!looks_like_memory_age_request("session memory age"));
+        assert!(!looks_like_memory_md_age_request("session memory age"));
+        assert!(!looks_like_session_memory_size_request("session memory age"));
+        assert!(!looks_like_session_memory_path_request("session memory age"));
+        let reply = try_operator_instant_reply("session memory age")
+            .expect("session memory age instant");
+        assert!(reply.contains("Session memory"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no `session-memory")
+                || reply.contains("could not"),
             "{reply}"
         );
         assert!(

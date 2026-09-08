@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.947] - 2026-09-08
+
+### Added
+
+- **Instant lane: session-memory age** — `session memory age`, `session-memory age`, `how old is session memory`, `when was session memory updated`, and close variants return the newest `session-memory-*.md` mtime without Ollama (Discord + AI Chat; no list dump; does not steal `session memory path` / `session memory size` / `session size` / `/sessions`; p50 latency).
+
 ## [0.1.946] - 2026-09-08
 
 ### Added
