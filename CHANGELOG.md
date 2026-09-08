@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.943] - 2026-09-08
+
+### Added
+
+- **Instant lane: planning_prompt.md age** — `planning age`, `planning_prompt.md age`, `how old is planning`, `when was planning updated`, and close variants return the last-write age of `agents/prompts/planning_prompt.md` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `planning_prompt.md path` / `planning_prompt.md size` / `prompts path` / execution; p50 latency).
+
 ## [0.1.942] - 2026-09-08
 
 ### Changed

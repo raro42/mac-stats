@@ -23170,18 +23170,241 @@ pub fn looks_like_planning_prompt_size_request(content: &str) -> bool {
 pub fn format_planning_prompt_size_gateway() -> String {
     let path = crate::config::Config::planning_prompt_path();
     if !path.exists() {
-        return "**Planning prompt:** no `planning_prompt.md` yet · `planning_prompt.md path` for the file · `prompts path` for the folder."
+        return "**Planning prompt:** no `planning_prompt.md` yet · `planning_prompt.md path` for the file · `planning_prompt.md age` for last write · `prompts path` for the folder."
             .to_string();
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Planning prompt:** empty `planning_prompt.md` · `planning_prompt.md path` for the file."
+            "**Planning prompt:** empty `planning_prompt.md` · `planning_prompt.md path` for the file · `planning_prompt.md age` for last write."
                 .to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Planning prompt:** **{label}** on disk · agent-router planning step · `planning_prompt.md path` for the file · does not dump prompt text."
+                "**Planning prompt:** **{label}** on disk · agent-router planning step · `planning_prompt.md path` for the file · `planning_prompt.md age` for last write · does not dump prompt text."
+            )
+        }
+        Err(e) => format!("**Planning prompt** — could not stat `planning_prompt.md`: {e}"),
+    }
+}
+
+/// True for short “how old is planning_prompt.md / planning prompt age…” asks.
+/// Mtime only — does not dump/edit planning text or steal path / size / execution / prompts folder.
+pub fn looks_like_planning_prompt_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        || n.contains("execution")
+        || n.contains("system prompt")
+        || n.contains("prompts age")
+        || n.contains("prompts size")
+        || n.contains("prompts folder")
+        || n.contains("prompts path")
+        || n == "prompt age"
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill age")
+        || n.contains("skill file")
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing age")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let planning_ctx = n.contains("planning_prompt.md")
+        || n.contains("planning_prompt")
+        || n.contains("planning prompt")
+        || n.contains("planning file")
+        || n.contains("planning md")
+        || n.contains("planning age")
+        || n == "planning age"
+        || n == "how old is planning"
+        || n == "how old is the planning"
+        || n == "when was planning updated"
+        || n == "when was the planning updated"
+        || n == "mac-stats planning age"
+        || n == "mac stats planning age"
+        || n == "is planning stale"
+        || (n.contains("planning")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("md")
+                || n.contains("prompt")));
+    if !planning_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "planning age"
+            | "planning_prompt.md age"
+            | "planning_prompt age"
+            | "planning prompt age"
+            | "planning file age"
+            | "planning md age"
+            | "planning_prompt.md file age"
+            | "planning prompt file age"
+            | "mac-stats planning age"
+            | "mac stats planning age"
+            | "mac-stats planning_prompt.md age"
+            | "mac stats planning_prompt.md age"
+            | "how old is planning"
+            | "how old is the planning"
+            | "how old is planning_prompt.md"
+            | "how old is the planning_prompt.md"
+            | "how old is planning prompt"
+            | "how old is the planning prompt"
+            | "how old is planning file"
+            | "how old is the planning file"
+            | "how old is the planning_prompt.md file"
+            | "when was planning updated"
+            | "when was the planning updated"
+            | "when was planning_prompt.md updated"
+            | "when was the planning_prompt.md updated"
+            | "when was planning prompt updated"
+            | "when was the planning prompt updated"
+            | "when was planning file updated"
+            | "when was the planning file updated"
+            | "planning last modified"
+            | "planning_prompt.md last modified"
+            | "planning prompt last modified"
+            | "planning file last modified"
+            | "is planning stale"
+            | "is the planning stale"
+            | "is planning_prompt.md stale"
+            | "is the planning_prompt.md stale"
+    ) || (planning_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM planning_prompt.md age from file mtime (stat only; no dump/edit).
+pub fn format_planning_prompt_age_gateway() -> String {
+    let path = crate::config::Config::planning_prompt_path();
+    if !path.exists() {
+        return "**Planning prompt:** no `planning_prompt.md` yet · `planning_prompt.md path` for the file · `prompts path` for the folder."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Planning prompt:** last write **{age}** ago · agent-router planning step · `planning_prompt.md path` for the file · `planning_prompt.md size` for on-disk bytes · does not dump prompt text."
             )
         }
         Err(e) => format!("**Planning prompt** — could not stat `planning_prompt.md`: {e}"),
@@ -23191,6 +23414,7 @@ pub fn format_planning_prompt_size_gateway() -> String {
 /// True for short “where is planning_prompt.md / planning prompt path…” asks.
 /// Config path only — does not dump/edit planning text or open the prompts directory list.
 /// Size asks use the planning_prompt.md size lane (v0.1.905).
+/// Age asks use the planning_prompt.md age lane (v0.1.943).
 pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -23288,6 +23512,17 @@ pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the planning_prompt.md age lane (v0.1.943) — keyword-only (no nest).
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run ")
@@ -23364,7 +23599,7 @@ pub fn looks_like_planning_prompt_path_request(content: &str) -> bool {
 pub fn format_planning_prompt_path_gateway() -> String {
     let display = crate::config::Config::planning_prompt_path().display().to_string();
     format!(
-        "**Planning prompt:** `{display}` · agent-router planning step · path only · `planning_prompt.md size` for on-disk bytes · does not dump or edit prompt text · `prompts path` for the folder."
+        "**Planning prompt:** `{display}` · agent-router planning step · path only · `planning_prompt.md size` / `planning_prompt.md age` for bytes / mtime · does not dump or edit prompt text · `prompts path` for the folder."
     )
 }
 
@@ -31633,9 +31868,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_execution_prompt_path_request(content) {
         return Some(format_execution_prompt_path_gateway());
     }
-    // planning_prompt.md size before path (stat only; no dump).
+    // planning_prompt.md size before age/path (stat only; no dump).
     if looks_like_planning_prompt_size_request(content) {
         return Some(format_planning_prompt_size_gateway());
+    }
+    // planning_prompt.md age before path (mtime only; no dump).
+    if looks_like_planning_prompt_age_request(content) {
+        return Some(format_planning_prompt_age_gateway());
     }
     // planning_prompt.md before prompts-dir path / testing / skill (path-only asks).
     if looks_like_planning_prompt_path_request(content) {
@@ -31893,9 +32132,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_execution_prompt_path_request(content) {
         return Some(format_execution_prompt_path_gateway());
     }
-    // planning_prompt.md size before path (stat only; no dump).
+    // planning_prompt.md size before age/path (stat only; no dump).
     if looks_like_planning_prompt_size_request(content) {
         return Some(format_planning_prompt_size_gateway());
+    }
+    // planning_prompt.md age before path (mtime only; no dump).
+    if looks_like_planning_prompt_age_request(content) {
+        return Some(format_planning_prompt_age_gateway());
     }
     // planning_prompt.md before prompts-dir / testing / skill path lanes.
     if looks_like_planning_prompt_path_request(content) {
@@ -32459,8 +32702,9 @@ pub fn format_ops_help_gateway() -> String {
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills` / `skill.md size`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
 • `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
-• `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `prompts size`)\n\
-• `planning_prompt.md` · `where is planning_prompt.md` · `planning prompt path` · `planning path` — `agents/prompts/planning_prompt.md` (config only; no dump/edit; `planning_prompt.md size` for on-disk bytes; does not steal `prompts path`)\n\
+• `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md age` / `prompts size`)\n\
+• `planning age` · `planning_prompt.md age` · `how old is planning` · `when was planning updated` — planning_prompt.md last write age (mtime; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md size` / `prompts path` / execution)\n\
+• `planning_prompt.md` · `where is planning_prompt.md` · `planning prompt path` · `planning path` — `agents/prompts/planning_prompt.md` (config only; no dump/edit; `planning_prompt.md size` / `planning_prompt.md age` for bytes / mtime; does not steal `prompts path`)\n\
 • `execution size` · `execution_prompt.md size` · `how big is execution_prompt.md` · `execution prompt size` — execution_prompt.md size on disk (stat only; no dump; does not steal `execution_prompt.md path` / `prompts size`)\n\
 • `execution_prompt.md` · `where is execution_prompt.md` · `execution prompt path` · `execution path` — `agents/prompts/execution_prompt.md` (config only; no dump/edit; `execution_prompt.md size` for on-disk bytes; does not steal `prompts path`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
@@ -34053,6 +34297,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only planning_prompt.md size asks (v0.1.905) — stat only; no dump/edit.
     if looks_like_planning_prompt_size_request(question) {
+        return true;
+    }
+    // Read-only planning_prompt.md age asks (v0.1.943) — mtime only; no dump/edit.
+    if looks_like_planning_prompt_age_request(question) {
         return true;
     }
     // Read-only planning_prompt.md path asks (v0.1.855) — config only; no dump/edit.
@@ -38403,6 +38651,105 @@ mod tests {
                 .to_lowercase()
                 .contains("path only"),
             "planning_prompt.md path must stay on path lane"
+        );
+    }
+
+    #[test]
+    fn planning_prompt_age_request_detected() {
+        assert!(looks_like_planning_prompt_age_request("planning age"));
+        assert!(looks_like_planning_prompt_age_request(
+            "planning_prompt.md age"
+        ));
+        assert!(looks_like_planning_prompt_age_request(
+            "planning prompt age"
+        ));
+        assert!(looks_like_planning_prompt_age_request("planning file age"));
+        assert!(looks_like_planning_prompt_age_request("how old is planning"));
+        assert!(looks_like_planning_prompt_age_request(
+            "how old is planning_prompt.md"
+        ));
+        assert!(looks_like_planning_prompt_age_request(
+            "how old is the planning prompt"
+        ));
+        assert!(looks_like_planning_prompt_age_request(
+            "when was planning updated"
+        ));
+        assert!(looks_like_planning_prompt_age_request(
+            "when was planning_prompt.md updated"
+        ));
+        assert!(looks_like_planning_prompt_age_request(
+            "planning_prompt.md last modified"
+        ));
+        assert!(looks_like_planning_prompt_age_request("is planning stale"));
+        assert!(looks_like_planning_prompt_age_request(
+            "mac-stats planning age"
+        ));
+        assert!(!looks_like_planning_prompt_age_request(
+            "planning_prompt.md path"
+        ));
+        assert!(!looks_like_planning_prompt_age_request(
+            "where is planning_prompt.md"
+        ));
+        assert!(!looks_like_planning_prompt_age_request(
+            "planning_prompt.md size"
+        ));
+        assert!(!looks_like_planning_prompt_age_request("how big is planning"));
+        assert!(!looks_like_planning_prompt_age_request(
+            "dump planning prompt"
+        ));
+        assert!(!looks_like_planning_prompt_age_request(
+            "edit planning prompt"
+        ));
+        assert!(!looks_like_planning_prompt_age_request("prompts age"));
+        assert!(!looks_like_planning_prompt_age_request("prompt age"));
+        assert!(!looks_like_planning_prompt_age_request(
+            "execution prompt age"
+        ));
+        assert!(!looks_like_planning_prompt_age_request("testing.md age"));
+        assert!(!looks_like_planning_prompt_age_request("soul age"));
+        assert!(!looks_like_planning_prompt_path_request("planning age"));
+        assert!(!looks_like_planning_prompt_path_request(
+            "how old is planning_prompt.md"
+        ));
+        assert!(!looks_like_planning_prompt_size_request("planning age"));
+        assert!(!looks_like_planning_prompt_size_request(
+            "how old is planning_prompt.md"
+        ));
+        let reply = try_operator_instant_reply("planning_prompt.md age")
+            .expect("planning_prompt.md age instant");
+        assert!(
+            reply.contains("Planning prompt") || reply.to_lowercase().contains("planning"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago") || reply.contains("last write"),
+            "age reply should include mtime: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how old is planning_prompt.md").is_some(),
+            "how old is planning_prompt.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("planning age").is_some(),
+            "planning age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("planning_prompt.md path")
+                .expect("planning_prompt.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "planning_prompt.md path must stay on path lane"
+        );
+        assert!(
+            try_operator_instant_reply("planning_prompt.md size")
+                .expect("planning_prompt.md size")
+                .to_lowercase()
+                .contains("on disk")
+                || try_operator_instant_reply("planning_prompt.md size")
+                    .expect("planning_prompt.md size")
+                    .to_lowercase()
+                    .contains("empty"),
+            "planning_prompt.md size must stay on size lane"
         );
     }
 
