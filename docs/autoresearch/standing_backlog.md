@@ -20,6 +20,9 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.937** — Instant lane: mood.md age (`mood age`, `mood.md age`, `how old is mood`, `when was mood updated`; newest mtime across per-agent files; no dump; does not steal path / size / soul / agents; p50 latency).
+
+
 - **v0.1.936** — Instant lane: soul.md age (`soul age`, `soul.md age`, `how old is soul`, `when was soul updated`; mtime only; no dump; does not steal path / size / mood / agents; p50 latency).
 
 
