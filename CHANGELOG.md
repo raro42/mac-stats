@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.944] - 2026-09-08
+
+### Added
+
+- **Instant lane: execution_prompt.md age** — `execution age`, `execution_prompt.md age`, `how old is execution`, `when was execution updated`, and close variants return the last-write age of `agents/prompts/execution_prompt.md` without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `execution_prompt.md path` / `execution_prompt.md size` / `prompts path` / planning; p50 latency).
+
 ## [0.1.943] - 2026-09-08
 
 ### Added
