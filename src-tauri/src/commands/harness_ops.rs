@@ -23974,6 +23974,7 @@ pub fn format_agent_json_size_gateway() -> String {
 /// Config path only — does not dump/edit skill text or open Agent Ops Agents.
 /// Skill is per-agent (`agent-<id>/skill.md`), not the Hermes `skills/` directory.
 /// Size asks use the skill.md size lane (v0.1.903).
+/// Age asks use the skill.md age lane (v0.1.939).
 pub fn looks_like_skill_md_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -24103,6 +24104,19 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the skill.md age lane (v0.1.939) — keyword-only (no nest).
+        // Do not use bare `contains("age")` — it matches inside `agent`.
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("md age")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run skill")
@@ -24181,13 +24195,14 @@ pub fn looks_like_skill_md_path_request(content: &str) -> bool {
 pub fn format_skill_md_path_gateway() -> String {
     let display = crate::config::Config::skill_file_path_display();
     format!(
-        "**Skill file:** `{display}` · per-agent skill (not the Hermes skills/ folder) · path only · `skill.md size` for on-disk bytes · does not dump or edit skill text · Agent Ops → Agents for content · `/skills` for catalog."
+        "**Skill file:** `{display}` · per-agent skill (not the Hermes skills/ folder) · path only · `skill.md size` / `skill.md age` for bytes / mtime · does not dump or edit skill text · Agent Ops → Agents for content · `/skills` for catalog."
     )
 }
 
 /// True for short “how big is skill.md / skill file size…” asks.
-/// Stat only on per-agent `skill.md` files — does not steal path / skills dir / mood / soul / dump.
+/// Stat only on per-agent `skill.md` files — does not steal path / age / skills dir / mood / soul / dump.
 /// Bare `skill size` / `skills size` stay on the skills-directory size lane (v0.1.881).
+/// Age asks use the skill.md age lane (v0.1.939).
 pub fn looks_like_skill_md_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -24409,17 +24424,270 @@ pub fn format_skill_md_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Skill file:** no `skill.md` yet · `skill.md path` for the file pattern · Agent Ops → Agents for content · `skills size` for the Hermes skills/ folder."
+        return "**Skill file:** no `skill.md` yet · `skill.md path` for the file pattern · `skill.md age` for last write · Agent Ops → Agents for content · `skills size` for the Hermes skills/ folder."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Skill file:** **{label}** on disk · 1 per-agent `skill.md` · `skill.md path` for the file · does not dump skill text · `skills size` for Hermes skills/."
+            "**Skill file:** **{label}** on disk · 1 per-agent `skill.md` · `skill.md path` for the file · `skill.md age` for last write · does not dump skill text · `skills size` for Hermes skills/."
         )
     } else {
         format!(
-            "**Skill file:** **{label}** on disk · {count} per-agent `skill.md` files · `skill.md path` for the pattern · does not dump skill text · `skills size` for Hermes skills/."
+            "**Skill file:** **{label}** on disk · {count} per-agent `skill.md` files · `skill.md path` for the pattern · `skill.md age` for last write · does not dump skill text · `skills size` for Hermes skills/."
+        )
+    }
+}
+
+/// True for short “how old is skill.md / skill.md age…” asks.
+/// Newest mtime across per-agent `skill.md` — does not steal path / size / skills dir / mood / soul / dump.
+/// Bare `skill age` / `skills age` stay off this lane (ambiguous with Hermes skills/).
+pub fn looks_like_skill_md_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("/skills")
+        // Bare / folder age stays off this lane.
+        || n == "skill age"
+        || n == "skills age"
+        || n == "skill stale"
+        || n == "skills stale"
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("skills directory")
+        || n.contains("skills dir")
+        || n.contains("how old are skills")
+        || n.contains("how old is skills")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing.md")
+        || n.contains("testing age")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("prompts age")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Require skill.md / skill file context — not bare "skill age" (skills dir).
+    let skill_md_ctx = n.contains("skill.md")
+        || n.contains("skill file")
+        || n.contains("skill md")
+        || n.contains("agent skill.md")
+        || n.contains("agent skill file")
+        || n == "how old is skill.md"
+        || n == "how old is the skill.md"
+        || n == "how old is skill file"
+        || n == "how old is the skill file"
+        || n == "when was skill.md updated"
+        || n == "when was the skill.md updated"
+        || n == "when was skill file updated"
+        || n == "when was the skill file updated"
+        || n == "is skill.md stale"
+        || n == "is the skill.md stale"
+        || n == "mac-stats skill.md age"
+        || n == "mac stats skill.md age"
+        || n == "mac-stats skill file age"
+        || n == "mac stats skill file age"
+        || (n.contains("skill")
+            && !n.contains("skills")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified"))
+            && (n.contains("md") || n.contains("file")));
+    if !skill_md_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "skill.md age"
+            | "skill file age"
+            | "skill md age"
+            | "skill.md file age"
+            | "agent skill.md age"
+            | "agent skill file age"
+            | "mac-stats skill.md age"
+            | "mac stats skill.md age"
+            | "mac-stats skill file age"
+            | "mac stats skill file age"
+            | "how old is skill.md"
+            | "how old is the skill.md"
+            | "how old is skill file"
+            | "how old is the skill file"
+            | "how old is the skill.md file"
+            | "when was skill.md updated"
+            | "when was the skill.md updated"
+            | "when was skill file updated"
+            | "when was the skill file updated"
+            | "skill.md last modified"
+            | "skill file last modified"
+            | "is skill.md stale"
+            | "is the skill.md stale"
+            | "is skill file stale"
+            | "is the skill file stale"
+    ) || (skill_md_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM per-agent skill.md age from newest file mtime (stat only; no dump/edit).
+pub fn format_skill_md_age_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let skill = entry.path().join("skill.md");
+            if let Ok(meta) = std::fs::metadata(&skill) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    if let Ok(modified) = meta.modified() {
+                        let ms = modified
+                            .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                            .map(|d| d.as_millis() as u64)
+                            .unwrap_or(0);
+                        newest_ms = Some(match newest_ms {
+                            Some(prev) => prev.max(ms),
+                            None => ms,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Skill file:** no `skill.md` yet · `skill.md path` for the file pattern · Agent Ops → Agents for content · `skills size` for Hermes skills/."
+            .to_string();
+    }
+    let Some(ms) = newest_ms else {
+        return "**Skill file** — could not read mtime on per-agent `skill.md`.".to_string();
+    };
+    let age = age_from_ms(ms);
+    if count == 1 {
+        format!(
+            "**Skill file:** last write **{age}** ago · 1 per-agent `skill.md` · `skill.md path` for the file · `skill.md size` for on-disk bytes · does not dump skill text."
+        )
+    } else {
+        format!(
+            "**Skill file:** newest write **{age}** ago · {count} per-agent `skill.md` files · `skill.md path` for the pattern · `skill.md size` for on-disk bytes · does not dump skill text."
         )
     }
 }
@@ -30848,9 +31116,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_testing_md_path_request(content) {
         return Some(format_testing_md_path_gateway());
     }
-    // skill.md size before path (stat only; no dump).
+    // skill.md size before age/path (stat only; no dump).
     if looks_like_skill_md_size_request(content) {
         return Some(format_skill_md_size_gateway());
+    }
+    // skill.md age before path (mtime only; no dump).
+    if looks_like_skill_md_age_request(content) {
+        return Some(format_skill_md_age_gateway());
     }
     // skill.md before mood / soul / skills-dir / agents-dir path / /agents catalog (path-only asks).
     if looks_like_skill_md_path_request(content) {
@@ -31096,9 +31368,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_testing_md_path_request(content) {
         return Some(format_testing_md_path_gateway());
     }
-    // skill.md size before path (stat only; no dump).
+    // skill.md size before age/path (stat only; no dump).
     if looks_like_skill_md_size_request(content) {
         return Some(format_skill_md_size_gateway());
+    }
+    // skill.md age before path (mtime only; no dump).
+    if looks_like_skill_md_age_request(content) {
+        return Some(format_skill_md_age_gateway());
     }
     // skill.md before mood / soul / skills-dir / agents-dir path lane.
     if looks_like_skill_md_path_request(content) {
@@ -31617,8 +31893,9 @@ pub fn format_ops_help_gateway() -> String {
 • `mood size` · `mood.md size` · `how big is mood` · `mood file size` — per-agent mood.md size on disk (stat only; no dump; does not steal `mood path` / `mood age` / soul / agents)\n\
 • `mood age` · `mood.md age` · `how old is mood` · `when was mood updated` — newest per-agent mood.md last write age (mtime; no dump; does not steal `mood path` / `mood size` / soul / agents)\n\
 • `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` / `mood age` for bytes / mtime; does not steal `/agents`)\n\
-• `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skills size` / `/skills`)\n\
-• `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` for on-disk bytes; does not steal `/skills`)\n\
+• `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skill.md age` / `skills size` / `/skills`)\n\
+• `skill.md age` · `skill file age` · `how old is skill.md` · `when was skill.md updated` — newest per-agent skill.md last write age (mtime; no dump; does not steal `skill.md path` / `skill.md size` / `skills` / mood / soul)\n\
+• `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` / `skill.md age` for bytes / mtime; does not steal `/skills`)\n\
 • `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / run tests / `/agents`)\n\
 • `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` for on-disk bytes; does not steal `/agents`)\n\
 • `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agents size` / `config.json`)\n\
@@ -33241,6 +33518,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only skill.md size asks (v0.1.903) — stat only; no dump/edit.
     if looks_like_skill_md_size_request(question) {
+        return true;
+    }
+    // Read-only skill.md age asks (v0.1.939) — mtime only; no dump/edit.
+    if looks_like_skill_md_age_request(question) {
         return true;
     }
     // Read-only skill.md path asks (v0.1.853) — config only; no dump/edit.
@@ -37600,6 +37881,8 @@ mod tests {
         assert!(!looks_like_skill_md_path_request("skill.md size"));
         assert!(!looks_like_skill_md_path_request("how big is skill.md"));
         assert!(!looks_like_skill_md_path_request("skill file size"));
+        assert!(!looks_like_skill_md_path_request("skill.md age"));
+        assert!(!looks_like_skill_md_path_request("how old is skill.md"));
         assert!(!looks_like_skills_path_request("skill.md"));
         assert!(!looks_like_skills_path_request("where is skill.md"));
         assert!(!looks_like_skills_path_request("skill file path"));
@@ -37613,6 +37896,10 @@ mod tests {
         assert!(reply.to_lowercase().contains("per-agent"));
         assert!(!reply.to_lowercase().contains("skills dir"));
         assert!(reply.to_lowercase().contains("path only"));
+        assert!(
+            reply.to_lowercase().contains("skill.md age") || reply.to_lowercase().contains("mtime"),
+            "path reply should mention age: {reply}"
+        );
         // skills/ directory lane still owns bare "skill path".
         let dir_reply =
             try_operator_instant_reply("skill path").expect("skills dir still owns skill path");
@@ -37632,6 +37919,8 @@ mod tests {
         assert!(!looks_like_skill_md_size_request("where is skill.md"));
         assert!(!looks_like_skill_md_size_request("dump skill.md"));
         assert!(!looks_like_skill_md_size_request("edit skill.md"));
+        assert!(!looks_like_skill_md_size_request("skill.md age"));
+        assert!(!looks_like_skill_md_size_request("how old is skill.md"));
         // Bare skill size stays on Hermes skills/ directory size lane.
         assert!(!looks_like_skill_md_size_request("skill size"));
         assert!(!looks_like_skill_md_size_request("skills size"));
@@ -37650,6 +37939,10 @@ mod tests {
             "unexpected reply: {reply}"
         );
         assert!(
+            reply.to_lowercase().contains("skill.md age") || reply.to_lowercase().contains("last write"),
+            "size reply should mention age: {reply}"
+        );
+        assert!(
             try_operator_instant_reply("how big is skill.md").is_some(),
             "how big is skill.md should be instant"
         );
@@ -37664,6 +37957,74 @@ mod tests {
         assert!(
             skills_dir.contains("Skills dir") || skills_dir.to_lowercase().contains("skills"),
             "bare skill size must stay on skills dir size: {skills_dir}"
+        );
+    }
+
+    #[test]
+    fn skill_md_age_request_detected() {
+        assert!(looks_like_skill_md_age_request("skill.md age"));
+        assert!(looks_like_skill_md_age_request("skill file age"));
+        assert!(looks_like_skill_md_age_request("skill md age"));
+        assert!(looks_like_skill_md_age_request("how old is skill.md"));
+        assert!(looks_like_skill_md_age_request("how old is the skill file"));
+        assert!(looks_like_skill_md_age_request("when was skill.md updated"));
+        assert!(looks_like_skill_md_age_request("when was skill file updated"));
+        assert!(looks_like_skill_md_age_request("skill.md last modified"));
+        assert!(looks_like_skill_md_age_request("is skill.md stale"));
+        assert!(looks_like_skill_md_age_request("mac-stats skill.md age"));
+        assert!(looks_like_skill_md_age_request("agent skill.md age"));
+        assert!(!looks_like_skill_md_age_request("skill.md path"));
+        assert!(!looks_like_skill_md_age_request("where is skill.md"));
+        assert!(!looks_like_skill_md_age_request("skill.md size"));
+        assert!(!looks_like_skill_md_age_request("how big is skill.md"));
+        assert!(!looks_like_skill_md_age_request("dump skill.md"));
+        assert!(!looks_like_skill_md_age_request("edit skill.md"));
+        // Bare skill age stays off this lane (ambiguous with skills/).
+        assert!(!looks_like_skill_md_age_request("skill age"));
+        assert!(!looks_like_skill_md_age_request("skills age"));
+        assert!(!looks_like_skill_md_age_request("how old are skills"));
+        assert!(!looks_like_skill_md_age_request("mood age"));
+        assert!(!looks_like_skill_md_age_request("soul age"));
+        assert!(!looks_like_skill_md_age_request("agents age"));
+        assert!(!looks_like_skill_md_path_request("skill.md age"));
+        assert!(!looks_like_skill_md_path_request("how old is skill.md"));
+        assert!(!looks_like_skill_md_size_request("skill.md age"));
+        assert!(!looks_like_skill_md_size_request("how old is skill.md"));
+        assert!(!looks_like_mood_age_request("skill.md age"));
+        assert!(!looks_like_soul_age_request("skill.md age"));
+        let reply = try_operator_instant_reply("skill.md age").expect("skill.md age instant");
+        assert!(
+            reply.contains("Skill file") || reply.to_lowercase().contains("skill"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago")
+                || reply.to_lowercase().contains("last write")
+                || reply.to_lowercase().contains("newest write")
+                || reply.to_lowercase().contains("no `skill.md`"),
+            "age reply should mention mtime: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how old is skill.md").is_some(),
+            "how old is skill.md should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("skill.md path")
+                .expect("skill.md path")
+                .to_lowercase()
+                .contains("path only"),
+            "skill.md path must stay on path lane"
+        );
+        assert!(
+            try_operator_instant_reply("skill.md size")
+                .expect("skill.md size")
+                .to_lowercase()
+                .contains("on disk")
+                || try_operator_instant_reply("skill.md size")
+                    .expect("skill.md size")
+                    .to_lowercase()
+                    .contains("no `skill.md`"),
+            "skill.md size must stay on size lane"
         );
     }
 

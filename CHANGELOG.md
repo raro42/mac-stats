@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.939] - 2026-09-08
+
+### Added
+
+- **Instant lane: skill.md age** — `skill.md age`, `skill file age`, `how old is skill.md`, `when was skill.md updated`, and close variants return the newest last-write age across per-agent `skill.md` files without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `skill.md path` / `skill.md size` / bare `skill age` / skills folder / mood / soul; p50 latency).
+
 ## [0.1.938] - 2026-09-08
 
 ### Changed
