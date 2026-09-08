@@ -4307,10 +4307,30 @@ textarea.ops-agent-editor.is-dirty {
   align-items: center;
   justify-content: center;
   padding: 18px 14px 16px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+}
+
+.chat-filter-miss.is-errors {
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.chat-filter-miss.is-you,
+.chat-filter-miss.is-assistant {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+.chat-filter-miss-title {
+  margin: 0 0 6px;
 }
 
 .chat-filter-miss-msg {
-  margin-bottom: 4px;
+  margin: 0 0 12px;
+  opacity: 0.88;
 }
 
 .chat-filter-miss-hint {

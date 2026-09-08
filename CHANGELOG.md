@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.942] - 2026-09-08
+
+### Changed
+
+- **AI Chat filter-miss calm** — When You / Assistant / Errors shows zero matching turns, the empty pane uses a titled warm hint and a cue wash (green when Errors is empty — no failed turns; accent for You/Assistant). Copy points at Clear filter instead of a dashed muted “Nothing matches this filter” box (Ready empty calm parity; design review / `feature-ai-chat`).
+
 ## [0.1.941] - 2026-09-08
 
 ### Added

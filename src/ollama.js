@@ -610,15 +610,42 @@ function setChatFilterMode(mode) {
 
 function chatFilterMissHint() {
   if (chatFilterMode === 'errors') {
-    return 'No failed turns in this chat right now.';
+    return 'This chat looks clean. Clear the filter to see every turn.';
   }
   if (chatFilterMode === 'you') {
-    return 'No messages from you yet.';
+    return 'Assistant replies are hidden. Clear the filter to see the full chat.';
   }
   if (chatFilterMode === 'assistant') {
-    return 'No assistant replies yet.';
+    return 'Your messages are hidden. Clear the filter to see the full chat.';
   }
   return 'Try All, or clear the role filter.';
+}
+
+function chatFilterMissTitle() {
+  if (chatFilterMode === 'errors') {
+    return 'Nothing here yet — no failed turns';
+  }
+  if (chatFilterMode === 'you') {
+    return 'Nothing here yet — no notes from you';
+  }
+  if (chatFilterMode === 'assistant') {
+    return 'Nothing here yet — no replies in this view';
+  }
+  return 'Nothing here yet — this filter is empty';
+}
+
+function syncChatFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-errors', 'is-you', 'is-assistant');
+  if (chatFilterMode === 'errors') wrap.classList.add('is-errors');
+  else if (chatFilterMode === 'you') wrap.classList.add('is-you');
+  else if (chatFilterMode === 'assistant') wrap.classList.add('is-assistant');
+  const title = wrap.querySelector('.chat-filter-miss-title');
+  if (title) title.textContent = chatFilterMissTitle();
+  wrap.title =
+    chatFilterMode === 'errors'
+      ? 'No failed turns — click Clear filter for All'
+      : 'Nothing matches this filter — click Clear filter for All';
 }
 
 function ensureChatFilterMissState(container, show) {
@@ -634,8 +661,8 @@ function ensureChatFilterMissState(container, show) {
     wrap.className = 'chat-empty chat-filter-miss';
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
-      `<div class="chat-empty-copy chat-filter-miss-msg">Nothing matches this filter</div>` +
-      `<div class="chat-filter-miss-hint"></div>` +
+      `<p class="chat-empty-title chat-filter-miss-title"></p>` +
+      `<p class="chat-empty-copy chat-filter-miss-msg"></p>` +
       `<button type="button" class="chat-filter-miss-cta chat-clear-filter">Clear filter</button>`;
     container.appendChild(wrap);
     wrap.querySelector('.chat-clear-filter')?.addEventListener('click', (e) => {
@@ -644,8 +671,9 @@ function ensureChatFilterMissState(container, show) {
       setChatFilterMode('all');
     });
   }
-  const hint = wrap.querySelector('.chat-filter-miss-hint');
+  const hint = wrap.querySelector('.chat-filter-miss-msg');
   if (hint) hint.textContent = chatFilterMissHint();
+  syncChatFilterMissCalmState(wrap);
 }
 
 function applyChatListFilter() {
