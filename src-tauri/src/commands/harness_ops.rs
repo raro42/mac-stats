@@ -17613,12 +17613,242 @@ pub fn format_config_env_size_gateway() -> String {
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Secrets env:** empty `.config.env` · `config.env path` for the file.".to_string()
+            "**Secrets env:** empty `.config.env` · `config.env path` for the file · `config.env age` for last write.".to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Secrets env:** **{label}** on disk · `.config.env` · `config.env path` for the file · does not read keys."
+                "**Secrets env:** **{label}** on disk · `.config.env` · `config.env path` for the file · `config.env age` for last write · does not read keys."
+            )
+        }
+        Err(e) => format!("**Secrets env** — could not stat `.config.env`: {e}"),
+    }
+}
+
+/// True for short “how old is .config.env / config.env age…” asks.
+/// Mtime only — does not steal path / size / config.json age / key dumps.
+pub fn looks_like_config_env_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        // Avoid bare `tail` — it matches inside `details`.
+        || n.contains(" tail")
+        || n.starts_with("tail ")
+        || n == "tail"
+        || n.ends_with(" tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("api key")
+        || n.contains("api-key")
+        || n.contains("token")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("config.json")
+        || n == "config age"
+        || n == "how old is config"
+        || n == "how old is the config"
+        || n == "when was config updated"
+        || n == "when was the config updated"
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("keychain accounts")
+        || n.contains("user-info")
+        || n.contains("user_info")
+        || n.contains("user info")
+        || n.contains("userinfo")
+        || n.contains("discord_channels")
+        || n.contains("discord channels")
+        || n.contains("delivery_awareness")
+        || n.contains("delivery awareness")
+        || n.contains("scheduler_delivery")
+        || n.contains("perplexity")
+        || n.contains("disk_cleanup")
+        || n.contains("disk-cleanup")
+        || n.contains("disk cleanup")
+        || n.contains("history.json")
+        || n.contains("history age")
+        || n.contains("monitors.json")
+        || n.contains("monitors age")
+        || n.contains("schedules.json")
+        || n.contains("schedules age")
+        || n.contains("pinned_processes")
+        || n.contains("pinned processes")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest age")
+        || n.contains("digest")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("screenshot")
+        || n.contains("/disk")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let env_ctx = n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("config env")
+        || n.contains(".env.config")
+        || n.contains("env.config")
+        || n.contains("secrets env")
+        || n.contains("secrets file")
+        || n.contains("config.env age")
+        || n.contains("config env age")
+        || n.contains(".config.env age")
+        || n.contains("secrets env age")
+        || n == "config.env age"
+        || n == "how old is config.env"
+        || n == "how old is .config.env"
+        || n == "when was config.env updated"
+        || n == "when was .config.env updated"
+        || n == "mac-stats config.env age"
+        || n == "mac stats config.env age"
+        || n == "is config.env stale"
+        || n == "is .config.env stale";
+    if !env_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "config.env age"
+            | ".config.env age"
+            | "config env age"
+            | "config.env file age"
+            | ".config.env file age"
+            | "config env file age"
+            | "secrets env age"
+            | "secrets env file age"
+            | "secrets file age"
+            | "env.config age"
+            | ".env.config age"
+            | "mac-stats config.env age"
+            | "mac stats config.env age"
+            | "how old is config.env"
+            | "how old is .config.env"
+            | "how old is the config.env"
+            | "how old is the .config.env"
+            | "how old is config env"
+            | "how old is the config env"
+            | "how old is the config.env file"
+            | "how old is the .config.env file"
+            | "how old is secrets env"
+            | "how old is the secrets env"
+            | "how old is the secrets file"
+            | "when was config.env updated"
+            | "when was .config.env updated"
+            | "when was the config.env updated"
+            | "when was the .config.env updated"
+            | "when was config env updated"
+            | "when was the config env updated"
+            | "when was secrets env updated"
+            | "config.env last modified"
+            | ".config.env last modified"
+            | "config env last modified"
+            | "secrets env last modified"
+            | "is config.env stale"
+            | "is .config.env stale"
+            | "is the config.env stale"
+            | "is the .config.env stale"
+            | "is secrets env stale"
+            | "is the secrets env stale"
+    ) || (env_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM `.config.env` age from file mtime (stat only; never dumps keys).
+pub fn format_config_env_age_gateway() -> String {
+    let path = crate::config::Config::home_config_env_path();
+    if !path.exists() {
+        return "**Secrets env:** no `.config.env` yet · sync from repo with `./scripts/sync-home-config-env.sh` · `config.env path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Secrets env:** last write **{age}** ago · `.config.env` · `config.env path` for the file · `config.env size` for on-disk bytes · does not read keys."
             )
         }
         Err(e) => format!("**Secrets env** — could not stat `.config.env`: {e}"),
@@ -17628,6 +17858,7 @@ pub fn format_config_env_size_gateway() -> String {
 /// True for short “where is .config.env / config.env path…” asks.
 /// Path only — never reads keys or file contents.
 /// Size asks use the `.config.env` size lane (v0.1.900).
+/// Age asks use the `.config.env` age lane (v0.1.935).
 pub fn looks_like_config_env_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -17739,6 +17970,13 @@ pub fn looks_like_config_env_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the `.config.env` age lane (v0.1.935) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -17814,7 +18052,7 @@ pub fn format_config_env_path_gateway() -> String {
     let path = crate::config::Config::home_config_env_path();
     let display = path.display().to_string();
     format!(
-        "**Secrets env file:** `{display}` · path only · `config.env size` for on-disk bytes · does not read or list keys · sync from repo with `./scripts/sync-home-config-env.sh` · Settings / Keychain for many credentials."
+        "**Secrets env file:** `{display}` · path only · `config.env size` / `config.env age` for bytes / mtime · does not read or list keys · sync from repo with `./scripts/sync-home-config-env.sh` · Settings / Keychain for many credentials."
     )
 }
 
@@ -30270,9 +30508,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_debug_log_age_request(content) {
         return Some(format_debug_log_age_gateway());
     }
-    // .config.env size before path (stat only; never dumps keys).
+    // .config.env size before age/path (stat only; never dumps keys).
     if looks_like_config_env_size_request(content) {
         return Some(format_config_env_size_gateway());
+    }
+    // .config.env age before path (mtime only; never dumps keys).
+    if looks_like_config_env_age_request(content) {
+        return Some(format_config_env_age_gateway());
     }
     // .config.env before generic config.json / data-home path lane.
     if looks_like_config_env_path_request(content) {
@@ -30865,8 +31107,9 @@ pub fn format_ops_help_gateway() -> String {
 • `where is config` · `config path` · `mac-stats home` — config.json + data home paths (config only; `config size` / `config age` for bytes / mtime)\n\
 • `config size` · `config.json size` · `how big is config` — config.json file size on disk (stat only; no dump; does not steal `config path` / `config age` / `.config.env`)\n\
 • `config age` · `config.json age` · `how old is config` · `when was config updated` — config.json last write age (mtime; no dump; does not steal `config path` / `config size` / `.config.env`)\n\
-• `config.env size` · `.config.env size` · `how big is .config.env` · `secrets env size` — `.config.env` file size on disk (stat only; no key dump; does not steal `config.env path` / `config size`)\n\
-• `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump; `config.env size` for on-disk bytes)\n\
+• `config.env size` · `.config.env size` · `how big is .config.env` · `secrets env size` — `.config.env` file size on disk (stat only; no key dump; does not steal `config.env path` / `config.env age` / `config size`)\n\
+• `config.env age` · `.config.env age` · `how old is .config.env` · `when was config.env updated` — `.config.env` last write age (mtime; no key dump; does not steal `config.env path` / `config.env size` / `config age`)\n\
+• `config.env path` · `where is .config.env` · `config env path` — `~/.mac-stats/.config.env` path only (no key dump; `config.env size` / `config.env age` for bytes / mtime)\n\
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks)\n\
 • `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path`)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
@@ -32400,6 +32643,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only .config.env size asks (v0.1.900) — stat only; never dumps keys.
     if looks_like_config_env_size_request(question) {
+        return true;
+    }
+    // Read-only .config.env age asks (v0.1.935) — mtime only; never dumps keys.
+    if looks_like_config_env_age_request(question) {
         return true;
     }
     // Read-only .config.env path asks (v0.1.840) — path only; never dumps keys.
@@ -35161,14 +35408,19 @@ mod tests {
         assert!(!looks_like_config_env_path_request("improvements path"));
         assert!(!looks_like_config_env_path_request("config.env size"));
         assert!(!looks_like_config_env_path_request("how big is .config.env"));
+        assert!(!looks_like_config_env_path_request("config.env age"));
+        assert!(!looks_like_config_env_path_request("how old is .config.env"));
         assert!(!looks_like_user_info_path_request("config.env path"));
         let reply = try_operator_instant_reply("where is .config.env")
             .expect("config.env path instant");
         assert!(reply.contains("Secrets env file"));
         assert!(reply.contains(".config.env") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("config.env size") || reply.contains("on-disk"),
-            "path reply should mention size lane: {reply}"
+            reply.to_lowercase().contains("config.env size")
+                || reply.to_lowercase().contains("config.env age")
+                || reply.contains("on-disk")
+                || reply.contains("mtime"),
+            "path reply should mention size/age lane: {reply}"
         );
         assert!(!reply.to_lowercase().contains("discord_bot_token"));
         assert!(!reply.to_lowercase().contains("api_key="));
@@ -35193,6 +35445,8 @@ mod tests {
         assert!(!looks_like_config_env_size_request("dump config.env"));
         assert!(!looks_like_config_env_size_request("show secrets"));
         assert!(!looks_like_config_env_size_request("credential accounts size"));
+        assert!(!looks_like_config_env_size_request("config.env age"));
+        assert!(!looks_like_config_env_size_request("how old is .config.env"));
         assert!(!looks_like_config_env_path_request("config.env size"));
         assert!(!looks_like_config_size_request("config.env size"));
         assert!(!looks_like_config_size_request("how big is .config.env"));
@@ -35214,6 +35468,58 @@ mod tests {
                 .to_lowercase()
                 .contains("config"),
             "config size must stay on config.json lane"
+        );
+    }
+
+    #[test]
+    fn config_env_age_request_detected() {
+        assert!(looks_like_config_env_age_request("config.env age"));
+        assert!(looks_like_config_env_age_request(".config.env age"));
+        assert!(looks_like_config_env_age_request("config env age"));
+        assert!(looks_like_config_env_age_request("how old is .config.env"));
+        assert!(looks_like_config_env_age_request("how old is config.env"));
+        assert!(looks_like_config_env_age_request("how old is the .config.env file"));
+        assert!(looks_like_config_env_age_request("when was config.env updated"));
+        assert!(looks_like_config_env_age_request("when was .config.env updated"));
+        assert!(looks_like_config_env_age_request("secrets env age"));
+        assert!(looks_like_config_env_age_request("is .config.env stale"));
+        assert!(looks_like_config_env_age_request("mac-stats config.env age"));
+        assert!(!looks_like_config_env_age_request("config.env path"));
+        assert!(!looks_like_config_env_age_request("where is .config.env"));
+        assert!(!looks_like_config_env_age_request("config.env size"));
+        assert!(!looks_like_config_env_age_request("how big is .config.env"));
+        assert!(!looks_like_config_env_age_request("config age"));
+        assert!(!looks_like_config_env_age_request("how old is config"));
+        assert!(!looks_like_config_env_age_request("dump config.env"));
+        assert!(!looks_like_config_env_age_request("show secrets"));
+        assert!(!looks_like_config_env_age_request("credential accounts age"));
+        assert!(!looks_like_config_env_path_request("config.env age"));
+        assert!(!looks_like_config_env_size_request("config.env age"));
+        assert!(!looks_like_config_age_request("config.env age"));
+        assert!(!looks_like_config_age_request("how old is .config.env"));
+        assert!(!looks_like_credential_accounts_age_request("config.env age"));
+        let reply =
+            try_operator_instant_reply("config.env age").expect("config.env age instant");
+        assert!(
+            reply.contains("Secrets env") || reply.to_lowercase().contains("config.env"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.contains("ago") || reply.contains("no `.config.env`"),
+            "{reply}"
+        );
+        assert!(!reply.to_lowercase().contains("discord_bot_token"));
+        assert!(!reply.to_lowercase().contains("api_key="));
+        assert!(!reply.contains("REDMINE"));
+        assert!(
+            try_operator_instant_reply("how old is .config.env").is_some(),
+            "how old is .config.env should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("config age")
+                .expect("config age")
+                .contains("Config"),
+            "config age must stay on config.json lane"
         );
     }
 

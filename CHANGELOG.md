@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.935] - 2026-09-08
+
+### Added
+
+- **Instant lane: `.config.env` age** — `config.env age`, `.config.env age`, `how old is .config.env`, `when was config.env updated`, and close variants return the last-write age of `~/.mac-stats/.config.env` without Ollama (Discord + AI Chat; mtime only — no key dump; does not steal `config.env path` / `config.env size` / `config age`; p50 latency).
+
 ## [0.1.934] - 2026-09-08
 
 ### Added
