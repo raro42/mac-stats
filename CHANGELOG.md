@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.941] - 2026-09-08
+
+### Added
+
+- **Instant lane: agent.json age** — `agent.json age`, `agent config age`, `how old is agent.json`, `when was agent.json updated`, and close variants return the newest last-write age across per-agent `agent.json` files without Ollama (Discord + AI Chat; mtime only — no dump; does not steal `agent.json path` / `agent.json size` / agents folder / `config.json`; does not use bare `age` matching inside `agent`; p50 latency).
+
 ## [0.1.940] - 2026-09-08
 
 ### Added

@@ -23792,6 +23792,7 @@ pub fn format_execution_prompt_path_gateway() -> String {
 /// Config path only — does not dump/edit agent.json or open Agent Ops Agents.
 /// Per-agent (`agent-<id>/agent.json`), not app `config.json` or the agents/ directory.
 /// Size asks use the agent.json size lane (v0.1.907).
+/// Age asks use the agent.json age lane (v0.1.941).
 pub fn looks_like_agent_json_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -23916,6 +23917,19 @@ pub fn looks_like_agent_json_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the agent.json age lane (v0.1.941) — keyword-only (no nest).
+        // Do not use bare `contains("age")` — it matches inside `agent`.
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("json age")
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("run ")
@@ -23981,12 +23995,13 @@ pub fn looks_like_agent_json_path_request(content: &str) -> bool {
 pub fn format_agent_json_path_gateway() -> String {
     let display = crate::config::Config::agent_json_file_path_display();
     format!(
-        "**Agent config:** `{display}` · per-agent name · model · enabled · tool limits · path only · `agent.json size` for on-disk bytes · does not dump or edit JSON · Agent Ops → Agents · `agents path` for the folder · `config path` for app config.json."
+        "**Agent config:** `{display}` · per-agent name · model · enabled · tool limits · path only · `agent.json size` / `agent.json age` for bytes / mtime · does not dump or edit JSON · Agent Ops → Agents · `agents path` for the folder · `config path` for app config.json."
     )
 }
 
 /// True for short “how big is agent.json / agent config size…” asks.
-/// Stat only on per-agent `agent.json` files — does not steal path / agents size / config.json / dump.
+/// Stat only on per-agent `agent.json` files — does not steal path / age / agents size / config.json / dump.
+/// Age asks use the agent.json age lane (v0.1.941).
 pub fn looks_like_agent_json_size_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -24214,17 +24229,272 @@ pub fn format_agent_json_size_gateway() -> String {
         }
     }
     if count == 0 {
-        return "**Agent config:** no `agent.json` yet · `agent.json path` for the file pattern · Agent Ops → Agents for content · does not dump JSON."
+        return "**Agent config:** no `agent.json` yet · `agent.json path` for the file pattern · `agent.json age` for last write · Agent Ops → Agents for content · does not dump JSON."
             .to_string();
     }
     let label = crate::commands::disk_cleanup::format_bytes(total);
     if count == 1 {
         format!(
-            "**Agent config:** **{label}** on disk · 1 per-agent `agent.json` · `agent.json path` for the file · does not dump JSON."
+            "**Agent config:** **{label}** on disk · 1 per-agent `agent.json` · `agent.json path` for the file · `agent.json age` for last write · does not dump JSON."
         )
     } else {
         format!(
-            "**Agent config:** **{label}** on disk · {count} per-agent `agent.json` files · `agent.json path` for the pattern · does not dump JSON."
+            "**Agent config:** **{label}** on disk · {count} per-agent `agent.json` files · `agent.json path` for the pattern · `agent.json age` for last write · does not dump JSON."
+        )
+    }
+}
+
+/// True for short “how old is agent.json / agent.json age…” asks.
+/// Newest mtime across per-agent `agent.json` — does not steal path / size / agents dir / config.json / dump.
+/// Do not use bare `contains("age")` as the only age signal — it matches inside `agent`.
+pub fn looks_like_agent_json_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("set ")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("reset")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run ")
+        || n.contains("invoke")
+        // Folder / bare agent age stays off this lane.
+        || n == "agent age"
+        || n == "agents age"
+        || n == "agent stale"
+        || n == "agents stale"
+        || n.contains("agents age")
+        || n.contains("agents folder")
+        || n.contains("agents directory")
+        || n.contains("agents dir")
+        || n.contains("agents path")
+        || n.contains("agent path")
+        || n.contains("how old are agents")
+        || n.contains("how old is agents")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill.md")
+        || n.contains("skill age")
+        || n.contains("skill file")
+        || n.contains("skills age")
+        || n.contains("skills folder")
+        || n.contains("testing.md")
+        || n.contains("testing age")
+        || n.contains("testing file")
+        || n.contains("memory.md")
+        || n.contains("memory age")
+        || n.contains("memory folder")
+        || n.contains("notes age")
+        || n.contains("notes folder")
+        || n.contains("notes path")
+        || n.contains("prompts age")
+        || n.contains("prompts path")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("credential_accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n == "config age"
+        || n == "config.json age"
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n.contains("/agents")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agent_json_ctx = n.contains("agent.json")
+        || n.contains("agent-json")
+        || n.contains("agent json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n == "how old is agent.json"
+        || n == "how old is the agent.json"
+        || n == "how old is agent config"
+        || n == "how old is the agent config"
+        || n == "when was agent.json updated"
+        || n == "when was the agent.json updated"
+        || n == "when was agent config updated"
+        || n == "when was the agent config updated"
+        || n == "is agent.json stale"
+        || n == "is the agent.json stale"
+        || n == "mac-stats agent.json age"
+        || n == "mac stats agent.json age"
+        || n == "mac-stats agent config age"
+        || n == "mac stats agent config age";
+    if !agent_json_ctx {
+        return false;
+    }
+    // Age signal — avoid bare `contains("age")` (matches inside `agent`).
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("json age")
+        || n.contains(".json age");
+    if !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "agent.json age"
+            | "agent json age"
+            | "agent.json file age"
+            | "agent json file age"
+            | "agent config age"
+            | "agent-config age"
+            | "agent config file age"
+            | "agent.json last modified"
+            | "agent json last modified"
+            | "agent config last modified"
+            | "mac-stats agent.json age"
+            | "mac stats agent.json age"
+            | "mac-stats agent config age"
+            | "mac stats agent config age"
+            | "how old is agent.json"
+            | "how old is the agent.json"
+            | "how old is agent.json file"
+            | "how old is the agent.json file"
+            | "how old is agent config"
+            | "how old is the agent config"
+            | "how old is agent config file"
+            | "how old is the agent config file"
+            | "when was agent.json updated"
+            | "when was the agent.json updated"
+            | "when was agent config updated"
+            | "when was the agent config updated"
+            | "when was agent.json file updated"
+            | "when was the agent.json file updated"
+            | "is agent.json stale"
+            | "is the agent.json stale"
+            | "is agent config stale"
+            | "is the agent config stale"
+    ) || (agent_json_ctx && ageish)
+}
+
+/// Zero-LLM per-agent agent.json age from newest file mtime (stat only; no dump/edit).
+pub fn format_agent_json_age_gateway() -> String {
+    let agents = crate::config::Config::agents_dir();
+    let mut newest_ms: Option<u64> = None;
+    let mut count: usize = 0;
+    if let Ok(entries) = std::fs::read_dir(&agents) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with("agent-") {
+                continue;
+            }
+            let agent_json = entry.path().join("agent.json");
+            if let Ok(meta) = std::fs::metadata(&agent_json) {
+                if meta.is_file() {
+                    count = count.saturating_add(1);
+                    if let Ok(modified) = meta.modified() {
+                        let ms = modified
+                            .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                            .map(|d| d.as_millis() as u64)
+                            .unwrap_or(0);
+                        newest_ms = Some(match newest_ms {
+                            Some(prev) => prev.max(ms),
+                            None => ms,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    if count == 0 {
+        return "**Agent config:** no `agent.json` yet · `agent.json path` for the file pattern · Agent Ops → Agents for content · does not dump JSON."
+            .to_string();
+    }
+    let Some(ms) = newest_ms else {
+        return "**Agent config** — could not read mtime on per-agent `agent.json`.".to_string();
+    };
+    let age = age_from_ms(ms);
+    if count == 1 {
+        format!(
+            "**Agent config:** last write **{age}** ago · 1 per-agent `agent.json` · `agent.json path` for the file · `agent.json size` for on-disk bytes · does not dump JSON."
+        )
+    } else {
+        format!(
+            "**Agent config:** newest write **{age}** ago · {count} per-agent `agent.json` files · `agent.json path` for the pattern · `agent.json size` for on-disk bytes · does not dump JSON."
         )
     }
 }
@@ -31343,9 +31613,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
-    // agent.json size before path (stat only; no dump).
+    // agent.json size before age/path (stat only; no dump).
     if looks_like_agent_json_size_request(content) {
         return Some(format_agent_json_size_gateway());
+    }
+    // agent.json age before path (mtime only; no dump).
+    if looks_like_agent_json_age_request(content) {
+        return Some(format_agent_json_age_gateway());
     }
     // agent.json before testing / skill / mood / soul / agents-dir path / /agents catalog (path-only asks).
     if looks_like_agent_json_path_request(content) {
@@ -31599,9 +31873,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_path_request(content) {
         return Some(format_downloads_organizer_rules_path_gateway());
     }
-    // agent.json size before path (stat only; no dump).
+    // agent.json size before age/path (stat only; no dump).
     if looks_like_agent_json_size_request(content) {
         return Some(format_agent_json_size_gateway());
+    }
+    // agent.json age before path (mtime only; no dump).
+    if looks_like_agent_json_age_request(content) {
+        return Some(format_agent_json_age_gateway());
     }
     // agent.json before testing / skill / mood / soul / agents-dir path lane.
     if looks_like_agent_json_path_request(content) {
@@ -32166,8 +32444,9 @@ pub fn format_ops_help_gateway() -> String {
 • `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / `testing.md age` / run tests / `/agents`)\n\
 • `testing age` · `testing.md age` · `how old is testing` · `when was testing updated` — newest per-agent testing.md last write age (mtime; no dump; does not steal `testing.md path` / `testing.md size` / skill / mood / soul; does not run tests)\n\
 • `testing.md` · `where is testing.md` · `testing path` · `testing file path` — per-agent `agent-<id>/testing.md` (config only; no dump/edit/run; `testing.md size` / `testing.md age` for bytes / mtime; does not steal `/agents`)\n\
-• `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agents size` / `config.json`)\n\
-• `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` for on-disk bytes; does not steal `agents path` / `config path`)\n\
+• `agent.json size` · `agent config size` · `how big is agent.json` — per-agent agent.json size on disk (stat only; no dump; does not steal `agent.json path` / `agent.json age` / `agents size` / `config.json`)\n\
+• `agent.json age` · `agent config age` · `how old is agent.json` · `when was agent.json updated` — newest per-agent agent.json last write age (mtime; no dump; does not steal `agent.json path` / `agent.json size` / agents / config.json)\n\
+• `agent.json` · `where is agent.json` · `agent.json path` · `agent config path` — per-agent `agent-<id>/agent.json` (config only; no dump/edit; `agent.json size` / `agent.json age` for bytes / mtime; does not steal `agents path` / `config path`)\n\
 • `discord memory size` · `memory-discord size` · `how big is discord memory` · `channel memory size` — Discord channel `memory-discord-*.md` size on disk (stat only; no dump; does not steal `discord memory path` / `/knowledge discord` / `memory.md size`)\n\
 • `discord memory path` · `where is discord memory` · `memory-discord path` — Discord channel `memory-discord-<id>.md` under agents/ (config only; no list/dump; `discord memory size` for on-disk bytes; does not steal `/knowledge discord`)\n\
 • `session memory size` · `session-memory size` · `how big is session memory` — `session-memory-*.md` size on disk (stat only; no dump; does not steal `session memory path` / `session size` / `/sessions`)\n\
@@ -33754,6 +34033,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only agent.json size asks (v0.1.907) — stat only; no dump/edit.
     if looks_like_agent_json_size_request(question) {
+        return true;
+    }
+    // Read-only agent.json age asks (v0.1.941) — mtime only; no dump/edit.
+    if looks_like_agent_json_age_request(question) {
         return true;
     }
     // Read-only agent.json path asks (v0.1.857) — config only; no dump/edit.
@@ -37844,6 +38127,9 @@ mod tests {
         assert!(!looks_like_agent_json_path_request("agent.json size"));
         assert!(!looks_like_agent_json_path_request("how big is agent.json"));
         assert!(!looks_like_agent_json_path_request("agent config size"));
+        assert!(!looks_like_agent_json_path_request("agent.json age"));
+        assert!(!looks_like_agent_json_path_request("how old is agent.json"));
+        assert!(!looks_like_agent_json_path_request("agent config age"));
         assert!(!looks_like_agents_path_request("agent.json"));
         assert!(!looks_like_agents_path_request("agent.json path"));
         assert!(!looks_like_agents_path_request("agent config path"));
@@ -37888,6 +38174,9 @@ mod tests {
         assert!(!looks_like_agent_json_size_request("config size"));
         assert!(!looks_like_agent_json_size_request("testing.md size"));
         assert!(!looks_like_agent_json_size_request("soul size"));
+        assert!(!looks_like_agent_json_size_request("agent.json age"));
+        assert!(!looks_like_agent_json_size_request("how old is agent.json"));
+        assert!(!looks_like_agent_json_size_request("agent config age"));
         assert!(!looks_like_agents_size_request("agent.json size"));
         assert!(!looks_like_agents_size_request("agent config size"));
         assert!(!looks_like_config_size_request("agent.json size"));
@@ -37920,6 +38209,75 @@ mod tests {
         assert!(
             try_operator_instant_reply("agent size").is_some(),
             "agent size should stay on agents folder size lane"
+        );
+    }
+
+    #[test]
+    fn agent_json_age_request_detected() {
+        assert!(looks_like_agent_json_age_request("agent.json age"));
+        assert!(looks_like_agent_json_age_request("agent json age"));
+        assert!(looks_like_agent_json_age_request("agent config age"));
+        assert!(looks_like_agent_json_age_request("agent.json file age"));
+        assert!(looks_like_agent_json_age_request("how old is agent.json"));
+        assert!(looks_like_agent_json_age_request("how old is agent config"));
+        assert!(looks_like_agent_json_age_request("when was agent.json updated"));
+        assert!(looks_like_agent_json_age_request("when was agent config updated"));
+        assert!(looks_like_agent_json_age_request("agent.json last modified"));
+        assert!(looks_like_agent_json_age_request("is agent.json stale"));
+        assert!(looks_like_agent_json_age_request("mac-stats agent.json age"));
+        assert!(looks_like_agent_json_age_request("agent config last modified"));
+        assert!(!looks_like_agent_json_age_request("agent.json path"));
+        assert!(!looks_like_agent_json_age_request("where is agent.json"));
+        assert!(!looks_like_agent_json_age_request("agent.json size"));
+        assert!(!looks_like_agent_json_age_request("how big is agent.json"));
+        assert!(!looks_like_agent_json_age_request("dump agent.json"));
+        assert!(!looks_like_agent_json_age_request("edit agent.json"));
+        assert!(!looks_like_agent_json_age_request("agent age"));
+        assert!(!looks_like_agent_json_age_request("agents age"));
+        assert!(!looks_like_agent_json_age_request("how old are agents"));
+        assert!(!looks_like_agent_json_age_request("config.json age"));
+        assert!(!looks_like_agent_json_age_request("config age"));
+        assert!(!looks_like_agent_json_age_request("testing.md age"));
+        assert!(!looks_like_agent_json_age_request("soul age"));
+        assert!(!looks_like_agent_json_age_request("skill.md age"));
+        assert!(!looks_like_agent_json_path_request("agent.json age"));
+        assert!(!looks_like_agent_json_size_request("agent.json age"));
+        assert!(!looks_like_testing_md_age_request("agent.json age"));
+        assert!(!looks_like_skill_md_age_request("agent.json age"));
+        assert!(!looks_like_soul_age_request("agent.json age"));
+        let reply = try_operator_instant_reply("agent.json age").expect("agent.json age instant");
+        assert!(
+            reply.contains("Agent config") || reply.to_lowercase().contains("agent"),
+            "unexpected reply: {reply}"
+        );
+        assert!(
+            reply.to_lowercase().contains("ago")
+                || reply.to_lowercase().contains("mtime")
+                || reply.to_lowercase().contains("write")
+                || reply.to_lowercase().contains("no `agent.json`"),
+            "age reply should mention mtime/age: {reply}"
+        );
+        assert!(
+            try_operator_instant_reply("how old is agent.json").is_some(),
+            "how old is agent.json should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent config age").is_some(),
+            "agent config age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent.json path")
+                .expect("agent.json path")
+                .to_lowercase()
+                .contains("path only"),
+            "agent.json path must stay on path lane"
+        );
+        let size_reply =
+            try_operator_instant_reply("agent.json size").expect("agent.json size");
+        assert!(
+            size_reply.to_lowercase().contains("on disk")
+                || size_reply.to_lowercase().contains("no `agent.json`"),
+            "agent.json size must stay on size lane: {size_reply}"
         );
     }
 
