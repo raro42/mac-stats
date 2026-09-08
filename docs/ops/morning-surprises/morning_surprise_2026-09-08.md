@@ -6,6 +6,7 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 
 | Version | What |
 |---------|------|
+| **v0.1.948** | Instant lane: Discord channel memory age (`discord memory age`, `memory-discord age`, `channel memory age`, `how old is discord memory`, `when was discord memory updated`, …) — newest `memory-discord-*.md` mtime; no dump; does not steal path / size / `/knowledge discord` |
 | **v0.1.947** | Instant lane: session-memory age (`session memory age`, `how old is session memory`, `when was session memory updated`, …) — newest `session-memory-*.md` mtime; no dump; does not steal path / size / session folder / `/sessions` |
 | **v0.1.946** | Instant lane: notes folder age (`notes age`, `how old are notes`, `memory folder age`, …) — newest file mtime; no dump; does not steal path / size / memory.md age / bare `memory age`; session-memory size plural/`.md` detector fix |
 | **v0.1.945** | Instant lane: `memory.md` age (`memory.md age`, `curated memory age`, `how old is memory.md`, …) — mtime only; no dump; does not steal path / size / notes / bare `memory age` |
@@ -22,7 +23,7 @@ Overnight Track B kept shipping p50 instant lanes and one AI Chat design polish.
 ## Still open
 
 - Recapture stale `docs/screens/feature-ai-chat.png` when TCC / on-screen window allows (polish already shipped).
-- Next p50 fuel: discord memory age (and remaining age lanes).
+- Next p50 fuel: before-reset / before-compaction transcript age, Ori vault age (and remaining age lanes).
 - Sibling: Hermes insights / session UX ports when digester is quiet.
 
-Generated: 2026-09-08T22:35:00+02:00
+Generated: 2026-09-08T23:05:00+02:00
