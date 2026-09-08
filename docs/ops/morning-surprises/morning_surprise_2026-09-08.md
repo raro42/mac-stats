@@ -7,14 +7,15 @@ Overnight Track B (mac-stats product). Window started ~20:00 local.
 | Version | What |
 |---------|------|
 | **v0.1.942** | **AI Chat filter-miss calm** — You / Assistant / Errors with zero matching turns gets a titled warm empty pane and cue wash (ok green when Errors is empty). Clear filter CTA stays. Design review / `feature-ai-chat`. |
+| **v0.1.943** | **Instant lane: planning_prompt.md age** — `planning age` / `planning_prompt.md age` / `how old is planning` / `when was planning updated` return last-write age without Ollama (mtime only; no dump; does not steal path / size / prompts / execution; p50). |
 
 ## Tried / context
 
-- Digester open: stale `feature-ai-chat.png` (~25d) → design review due.
-- Prior night already shipped Ready empty calm (**v0.1.938**) and instant ages through **v0.1.941**; this tick opened the new overnight window with the due design-review surface.
-- Screenshot recapture: attempt after install; if Screen Recording TCC blocks `screencapture -l`, prior Aug 14 asset stays and polish grace is marked.
+- Digester open: stale `feature-ai-chat.png` (~25d) → design review due; first tick of the night shipped filter-miss calm (**v0.1.942**).
+- Second tick: design-review cap already used → standing backlog p50 planning_prompt.md age (**v0.1.943**).
+- Screenshot recapture: still deferred if Screen Recording TCC blocks `screencapture -l`; prior Aug 14 asset stays.
 
 ## Next fuel
 
-- One design-review polish already used tonight — prefer digester / p50 instant (planning·execution prompt age, memory.md age) or sibling Hermes insights.
-- Recapture `feature-ai-chat.png` when TCC allows.
+- execution_prompt.md age, memory.md age, or digester Slowest / sibling Hermes insights.
+- Recapture `feature-ai-chat.png` when TCC allows (one design-review polish already used tonight).
