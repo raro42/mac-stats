@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.974] - 2026-09-10
+
+### Added
+- Instant lane: session_reset_phrases.md age (`session reset age`, `session_reset_phrases.md age`, `how old is session reset phrases`, `when was session reset phrases updated`, `session reset phrases age`) — file mtime only; no dump; does not steal path / size / escalation / cookie reject.
+
 ## [0.1.973] - 2026-09-10
 
 ### Added

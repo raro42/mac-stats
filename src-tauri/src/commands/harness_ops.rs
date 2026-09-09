@@ -24967,7 +24967,248 @@ pub fn format_session_reset_phrases_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Session reset phrases:** **{label}** on disk · phrases that clear a Discord session · `session reset phrases path` for the file · does not list phrases."
+                "**Session reset phrases:** **{label}** on disk · phrases that clear a Discord session · `session reset phrases path` for the file · `session reset phrases age` for last write · does not list phrases."
+            )
+        }
+        Err(e) => {
+            format!("**Session reset phrases** — could not stat `session_reset_phrases.md`: {e}")
+        }
+    }
+}
+
+/// True for short “how old is session_reset_phrases.md / session reset phrases age…” asks.
+/// Mtime only — does not steal path / size / escalation / cookie reject / before-reset.
+pub fn looks_like_session_reset_phrases_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("trigger")
+        || n.contains("clear session")
+        || n.contains("new session")
+        || n.contains("start over")
+        || n.contains("start fresh")
+        || n.contains("wipe session")
+        || n.contains("forget this")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before_reset")
+        || n.contains("last_session_before_reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("before_compaction")
+        || n.contains("last_session_before_compaction")
+        || n.contains("escalation")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agents age")
+        || n.contains("session size")
+        || n.contains("session folder")
+        || n.contains("session directory")
+        || n.contains("session dir")
+        || n.contains("session path")
+        || n.contains("session age")
+        || n == "how old is session"
+        || n == "how old is the session"
+        || n == "when was session updated"
+        || n == "when was the session updated"
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let reset_ctx = n.contains("session_reset_phrases.md")
+        || n.contains("session_reset_phrases")
+        || n.contains("session-reset-phrases")
+        || n.contains("session reset phrases")
+        || n.contains("session reset phrase")
+        || n.contains("session-reset phrases")
+        || n.contains("session_reset phrases")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("reset phrases file")
+        || n.contains("reset phrase file")
+        || n.contains("session reset age")
+        || n == "how old is session reset"
+        || n == "how old is the session reset"
+        || n == "when was session reset updated"
+        || n == "when was the session reset updated"
+        || n == "mac-stats session reset age"
+        || n == "mac stats session reset age"
+        || n == "is session reset stale"
+        || n == "is the session reset stale"
+        || (n.contains("session reset")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("md")
+                || n.contains("phrase")
+                || n.contains("file")));
+    if !reset_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "session reset age"
+            | "session reset phrases age"
+            | "session reset phrase age"
+            | "session_reset_phrases age"
+            | "session_reset_phrases.md age"
+            | "session_reset_phrases file age"
+            | "session-reset-phrases age"
+            | "session-reset-phrases.md age"
+            | "reset phrases age"
+            | "reset phrase age"
+            | "reset phrases file age"
+            | "session reset phrases last modified"
+            | "session_reset_phrases.md last modified"
+            | "reset phrases last modified"
+            | "how old is session reset"
+            | "how old is the session reset"
+            | "how old is session_reset_phrases.md"
+            | "how old is the session_reset_phrases.md"
+            | "how old is session reset phrases"
+            | "how old is the session reset phrases"
+            | "how old is session reset phrases file"
+            | "how old is the session reset phrases file"
+            | "how old is the reset phrases file"
+            | "how old is reset phrases"
+            | "when was session reset updated"
+            | "when was the session reset updated"
+            | "when was session_reset_phrases.md updated"
+            | "when was the session_reset_phrases.md updated"
+            | "when was session reset phrases updated"
+            | "when was the session reset phrases updated"
+            | "when was the reset phrases file updated"
+            | "is session reset stale"
+            | "is the session reset stale"
+            | "is session_reset_phrases.md stale"
+            | "is the session_reset_phrases.md stale"
+            | "is session reset phrases stale"
+            | "is the session reset phrases stale"
+            | "mac-stats session reset age"
+            | "mac stats session reset age"
+            | "mac-stats session_reset_phrases.md age"
+            | "mac stats session_reset_phrases.md age"
+    ) || (reset_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM session_reset_phrases.md age from file mtime (stat only; no dump/list phrases).
+pub fn format_session_reset_phrases_age_gateway() -> String {
+    let path = crate::config::Config::session_reset_phrases_path();
+    if !path.exists() {
+        return "**Session reset phrases:** no `session_reset_phrases.md` yet · `session reset phrases path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Session reset phrases:** last write **{age}** ago · phrases that clear a Discord session · `session reset phrases path` for the file · `session reset phrases size` for on-disk bytes."
             )
         }
         Err(e) => {
@@ -24979,6 +25220,7 @@ pub fn format_session_reset_phrases_size_gateway() -> String {
 /// True for short “where is session_reset_phrases.md / session reset phrases path…” asks.
 /// Config path only — does not list phrases or trigger a session clear.
 /// Size asks use the session_reset_phrases.md size lane (v0.1.910).
+/// Age asks use the session_reset_phrases.md age lane (v0.1.974).
 pub fn looks_like_session_reset_phrases_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -25074,6 +25316,13 @@ pub fn looks_like_session_reset_phrases_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the session_reset_phrases.md age lane (v0.1.974) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -25196,7 +25445,7 @@ pub fn format_session_reset_phrases_path_gateway() -> String {
     let path = crate::config::Config::session_reset_phrases_path();
     let display = path.display().to_string();
     format!(
-        "**Session reset phrases file:** `{display}` · phrases that clear a Discord session · path only · `session reset phrases size` for on-disk bytes · does not list or trigger a reset."
+        "**Session reset phrases file:** `{display}` · phrases that clear a Discord session · path only · `session reset phrases size` for on-disk bytes · `session reset phrases age` for last write · does not list or trigger a reset."
     )
 }
 
@@ -39054,9 +39303,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_before_reset_transcript_path_request(content) {
         return Some(format_before_reset_transcript_path_gateway());
     }
-    // session_reset_phrases.md size before path (stat only; no dump).
+    // session_reset_phrases.md size before age/path (stat only; no dump).
     if looks_like_session_reset_phrases_size_request(content) {
         return Some(format_session_reset_phrases_size_gateway());
+    }
+    // session_reset_phrases.md age before path (mtime only; no dump).
+    if looks_like_session_reset_phrases_age_request(content) {
+        return Some(format_session_reset_phrases_age_gateway());
     }
     // session_reset_phrases.md before agents-dir / generic session path lanes.
     if looks_like_session_reset_phrases_path_request(content) {
@@ -39720,8 +39973,9 @@ pub fn format_ops_help_gateway() -> String {
 • `escalation size` · `escalation_patterns.md size` · `how big is escalation patterns` · `escalation patterns size` — escalation_patterns.md file size on disk (stat only; no dump; does not steal `escalation patterns path` / `escalation patterns age` / session-reset / cookie reject)\n\
 • `escalation age` · `escalation_patterns.md age` · `how old is escalation patterns` · `when was escalation patterns updated` · `escalation patterns age` — escalation_patterns.md last write age (mtime; no dump; does not steal `escalation patterns path` / size / session-reset / cookie reject)\n\
 • `escalation patterns path` · `where is escalation_patterns.md` · `escalation file path` — escalation phrases file (config only; no list/append; `escalation patterns size` / `escalation patterns age` for bytes / mtime; does not steal session-reset)\n\
-• `session reset size` · `session_reset_phrases.md size` · `how big is session reset phrases` · `session reset phrases size` — session_reset_phrases.md file size on disk (stat only; no dump; does not steal `session reset phrases path` / escalation / cookie reject)\n\
-• `session reset phrases path` · `where is session_reset_phrases.md` · `reset phrases path` — session reset phrases file (config only; no list/clear; `session reset phrases size` for on-disk bytes; does not steal escalation)\n\
+• `session reset size` · `session_reset_phrases.md size` · `how big is session reset phrases` · `session reset phrases size` — session_reset_phrases.md file size on disk (stat only; no dump; does not steal `session reset phrases path` / `session reset phrases age` / escalation / cookie reject)\n\
+• `session reset age` · `session_reset_phrases.md age` · `how old is session reset phrases` · `when was session reset phrases updated` · `session reset phrases age` — session_reset_phrases.md last write age (mtime; no dump; does not steal `session reset phrases path` / size / escalation / cookie reject)\n\
+• `session reset phrases path` · `where is session_reset_phrases.md` · `reset phrases path` — session reset phrases file (config only; no list/clear; `session reset phrases size` / `session reset phrases age` for bytes / mtime; does not steal escalation)\n\
 • `before reset transcript size` · `before-reset transcript size` · `how big is before reset transcript` · `last_session_before_reset.jsonl size` — before-reset transcript size on disk (stat only; no dump; does not steal `before reset transcript path` / `before reset transcript age` / before-compaction / session reset phrases)\n\
 • `before reset transcript age` · `before-reset transcript age` · `how old is before reset transcript` · `when was before reset transcript updated` · `last_session_before_reset.jsonl age` — before-reset transcript last write age (mtime; no dump; does not steal `before reset transcript path` / size / before-compaction / session reset phrases)\n\
 • `before reset transcript path` · `where is before reset transcript` · `last_session_before_reset.jsonl` — before-reset JSONL path (config/env only; no dump/hook; `before reset transcript size` / `before reset transcript age` for bytes / mtime; does not steal before-compaction)\n\
@@ -41354,6 +41608,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session_reset_phrases.md size asks (v0.1.910) — stat only; no dump/list.
     if looks_like_session_reset_phrases_size_request(question) {
+        return true;
+    }
+    // Read-only session_reset_phrases.md age asks (v0.1.974) — mtime only; no dump/list.
+    if looks_like_session_reset_phrases_age_request(question) {
         return true;
     }
     // Read-only session_reset_phrases.md path asks (v0.1.847) — config only; no list/clear.
@@ -44845,6 +45103,12 @@ mod tests {
         assert!(!looks_like_session_reset_phrases_path_request(
             "how big is session reset phrases"
         ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "session_reset_phrases.md age"
+        ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "how old is session reset phrases"
+        ));
         let reply = try_operator_instant_reply("where is session_reset_phrases.md")
             .expect("session_reset_phrases path instant");
         assert!(reply.contains("Session reset phrases file"));
@@ -44852,7 +45116,76 @@ mod tests {
             reply.contains("session_reset_phrases.md") || reply.contains(".mac-stats")
         );
         assert!(reply.contains("session reset phrases size") || reply.contains("on-disk"));
+        assert!(reply.contains("session reset phrases age") || reply.contains("last write"));
         assert!(!reply.to_lowercase().contains("escalation"));
+    }
+
+    #[test]
+    fn session_reset_phrases_age_request_detected() {
+        assert!(looks_like_session_reset_phrases_age_request("session reset age"));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "session_reset_phrases.md age"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "session reset phrases age"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "how old is session reset phrases"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "how old is session_reset_phrases.md"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "when was session reset phrases updated"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request(
+            "is session reset phrases stale"
+        ));
+        assert!(looks_like_session_reset_phrases_age_request("reset phrases age"));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "session reset phrases path"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "session reset phrases size"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "where is session_reset_phrases.md"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "list session reset phrases"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request("clear session"));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "escalation patterns age"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_session_reset_phrases_age_request("soul age"));
+        assert!(!looks_like_session_reset_phrases_age_request("session age"));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "session_reset_phrases.md age"
+        ));
+        assert!(!looks_like_session_reset_phrases_size_request(
+            "session reset phrases age"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "session reset phrases age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "session reset phrases age"
+        ));
+        let reply = try_operator_instant_reply("session_reset_phrases.md age")
+            .expect("session_reset_phrases age instant");
+        assert!(
+            reply.contains("Session reset phrases")
+                && (reply.contains("ago")
+                    || reply.contains("no `session_reset_phrases.md`")
+                    || reply.contains("could not stat")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Session reset phrases file:"));
+        assert!(!reply.contains("on disk"));
     }
 
     #[test]
@@ -44892,6 +45225,9 @@ mod tests {
         ));
         assert!(!looks_like_session_reset_phrases_size_request("soul size"));
         assert!(!looks_like_session_reset_phrases_size_request("session size"));
+        assert!(!looks_like_session_reset_phrases_size_request(
+            "session reset phrases age"
+        ));
         assert!(!looks_like_session_reset_phrases_path_request(
             "session_reset_phrases.md size"
         ));
