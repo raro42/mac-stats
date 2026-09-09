@@ -12557,6 +12557,203 @@ pub fn format_tmp_size_gateway() -> String {
     }
 }
 
+/// True for short “how old is the uploads folder / uploads age…” asks.
+/// Newest file mtime under uploads dir — no list dump / path / size / upload lanes.
+pub fn looks_like_uploads_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("improvements")
+        || n.contains("traces")
+        || n.contains("pdf")
+        || n.contains("quarantine")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("skills")
+        || n.contains("plugins")
+        || n.contains("scripts")
+        || n.contains("prompts")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let upload_ctx = n.contains("uploads folder")
+        || n.contains("uploads directory")
+        || n.contains("uploads dir")
+        || n.contains("uploads age")
+        || n.contains("upload folder")
+        || n.contains("upload directory")
+        || n.contains("upload dir")
+        || n.contains("upload age")
+        || n.contains("browser uploads")
+        || n.contains("browser upload")
+        || n.contains("mac-stats uploads")
+        || n.contains("mac stats uploads")
+        || n == "uploads"
+        || n == "upload"
+        || ((n.contains("upload"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !upload_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("uploads age")
+        || n.contains("upload age");
+    // Bare “uploads” / “upload” / path-only asks stay on the path lane.
+    if n == "uploads" || n == "upload" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "uploads age"
+            | "upload age"
+            | "uploads folder age"
+            | "upload folder age"
+            | "uploads directory age"
+            | "upload directory age"
+            | "uploads dir age"
+            | "upload dir age"
+            | "how old are uploads"
+            | "how old is uploads"
+            | "how old is upload"
+            | "how old is the uploads folder"
+            | "how old is uploads folder"
+            | "how old is the upload folder"
+            | "how old is upload folder"
+            | "how old is the uploads directory"
+            | "how old is the upload directory"
+            | "when was uploads updated"
+            | "when was upload updated"
+            | "when was the uploads folder updated"
+            | "when was the upload folder updated"
+            | "uploads last modified"
+            | "upload last modified"
+            | "uploads folder last modified"
+            | "is uploads stale"
+            | "is the uploads folder stale"
+            | "browser uploads age"
+            | "browser upload age"
+            | "mac-stats uploads age"
+            | "mac stats uploads age"
+    ) || (upload_ctx && ageish)
+}
+
+/// Zero-LLM uploads directory age (newest file mtime; no list dump).
+pub fn format_uploads_age_gateway() -> String {
+    let dir = crate::config::Config::browser_uploads_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Uploads:** not created yet · app recreates under `~/.mac-stats/uploads/` · `uploads path` for the folder · `uploads size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Uploads** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Uploads:** empty · `uploads path` for the folder · `uploads size` for on-disk bytes · BROWSER_UPLOAD roots · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Uploads:** last write **{age}** ago · 1 file · `uploads path` for the folder · `uploads size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Uploads:** newest write **{age}** ago · {files} files · `uploads path` for the folder · `uploads size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Uploads** — could not read mtime · `uploads path` for the folder · `uploads size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big are uploads / uploads size…” asks.
 /// Recursive file-byte sum under uploads dir — no list dump / path / upload lanes.
 pub fn looks_like_uploads_size_request(content: &str) -> bool {
@@ -12715,18 +12912,18 @@ pub fn format_uploads_size_gateway() -> String {
     let dir = crate::config::Config::browser_uploads_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Uploads:** not created yet · app recreates under `~/.mac-stats/uploads/` · `uploads path` for the folder."
+            "**Uploads:** not created yet · app recreates under `~/.mac-stats/uploads/` · `uploads path` for the folder · `uploads age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Uploads** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Uploads:** empty · `uploads path` for the folder · BROWSER_UPLOAD roots · `/browser` for CDP status."
+            "**Uploads:** empty · `uploads path` for the folder · `uploads age` for newest mtime · BROWSER_UPLOAD roots · `/browser` for CDP status."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Uploads:** **{label}** on disk ({files} files) · BROWSER_UPLOAD · `uploads path` for the folder · does not list names."
+                "**Uploads:** **{label}** on disk ({files} files) · BROWSER_UPLOAD · `uploads path` for the folder · `uploads age` for newest mtime · does not list names."
             )
         }
     }
@@ -12756,6 +12953,8 @@ pub fn looks_like_uploads_path_request(content: &str) -> bool {
     {
         return false;
     }
+    // Size/big/large asks use the uploads size lane (v0.1.876).
+    // Age/how-old asks use the uploads age lane (v0.1.963).
     if n.contains("browser_")
         || n.contains("browser:")
         || n.contains("size")
@@ -12765,6 +12964,16 @@ pub fn looks_like_uploads_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -12869,7 +13078,7 @@ pub fn format_uploads_path_gateway() -> String {
     let dir = crate::config::Config::browser_uploads_dir();
     let display = dir.display().to_string();
     format!(
-        "**Uploads dir:** `{display}` · BROWSER_UPLOAD roots · put files here · `/browser` for CDP status · `uploads size` for disk use."
+        "**Uploads dir:** `{display}` · BROWSER_UPLOAD roots · put files here · `/browser` for CDP status · `uploads size` for disk use · `uploads age` for newest mtime."
     )
 }
 
@@ -36764,7 +36973,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_tmp_path_request(content) {
         return Some(format_tmp_path_gateway());
     }
-    // Uploads dir size before path (recursive bytes; no list); path before upload/list.
+    // Uploads dir age before size/path (newest mtime; no list); size before path; path before upload/list.
+    if looks_like_uploads_age_request(content) {
+        return Some(format_uploads_age_gateway());
+    }
     if looks_like_uploads_size_request(content) {
         return Some(format_uploads_size_gateway());
     }
@@ -37145,8 +37357,9 @@ pub fn format_ops_help_gateway() -> String {
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune; `tmp size` / `tmp age` for bytes / mtime)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / `tmp age` / prune)\n\
 • `tmp age` · `how old is tmp` · `tmp folder age` · `when was tmp updated` — tmp folder last write age (newest file mtime; no list dump; does not steal `tmp path` / `tmp size` / prune)\n\
-• `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
-• `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
+• `uploads age` · `how old are uploads` · `uploads folder age` · `when was uploads updated` — uploads folder last write age (newest file mtime; no list dump; does not steal `uploads path` / `uploads size` / upload)\n\
+• `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / `uploads age` / upload)\n\
+• `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload; `uploads size` / `uploads age` for bytes / mtime)\n\
 • `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / prune)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
 • `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
@@ -38997,6 +39210,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only tmp dir path asks (v0.1.822) — config only; no list/prune.
     if looks_like_tmp_path_request(question) {
+        return true;
+    }
+    // Read-only uploads dir age asks (v0.1.963) — newest file mtime; no list dump.
+    if looks_like_uploads_age_request(question) {
         return true;
     }
     // Read-only uploads dir size asks (v0.1.876) — recursive file bytes; no list dump.
@@ -46330,12 +46547,18 @@ mod tests {
         assert!(!looks_like_uploads_path_request("/browser"));
         assert!(!looks_like_uploads_path_request("uploads size"));
         assert!(!looks_like_uploads_path_request("how big are uploads"));
+        assert!(!looks_like_uploads_path_request("uploads age"));
+        assert!(!looks_like_uploads_path_request("how old are uploads"));
         assert!(!looks_like_tmp_path_request("uploads path"));
         let reply =
             try_operator_instant_reply("where is the uploads folder").expect("uploads path instant");
         assert!(reply.contains("Uploads dir"));
         assert!(reply.contains("uploads") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("uploads size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("uploads age") || reply.contains("mtime"),
+            "path reply should mention uploads age: {reply}"
+        );
     }
 
     #[test]
@@ -46357,6 +46580,8 @@ mod tests {
         assert!(!looks_like_uploads_size_request("tmp size"));
         assert!(!looks_like_uploads_size_request("screenshots size"));
         assert!(!looks_like_uploads_size_request("improvements size"));
+        assert!(!looks_like_uploads_size_request("uploads age"));
+        assert!(!looks_like_uploads_size_request("how old are uploads"));
         assert!(!looks_like_uploads_path_request("uploads size"));
         assert!(!looks_like_tmp_size_request("uploads size"));
         let reply =
@@ -46369,6 +46594,48 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("uploads path") || reply.contains("folder"));
+        assert!(
+            reply.to_lowercase().contains("uploads age") || reply.contains("mtime"),
+            "size reply should mention uploads age: {reply}"
+        );
+    }
+
+    #[test]
+    fn uploads_age_request_detected() {
+        assert!(looks_like_uploads_age_request("uploads age"));
+        assert!(looks_like_uploads_age_request("upload age"));
+        assert!(looks_like_uploads_age_request("uploads folder age"));
+        assert!(looks_like_uploads_age_request("uploads directory age"));
+        assert!(looks_like_uploads_age_request("uploads dir age"));
+        assert!(looks_like_uploads_age_request("how old are uploads"));
+        assert!(looks_like_uploads_age_request("how old is the uploads folder"));
+        assert!(looks_like_uploads_age_request("when was uploads updated"));
+        assert!(looks_like_uploads_age_request("when was the uploads folder updated"));
+        assert!(looks_like_uploads_age_request("is the uploads folder stale"));
+        assert!(looks_like_uploads_age_request("browser uploads age"));
+        assert!(looks_like_uploads_age_request("mac-stats uploads age"));
+        assert!(!looks_like_uploads_age_request("uploads path"));
+        assert!(!looks_like_uploads_age_request("where is the uploads folder"));
+        assert!(!looks_like_uploads_age_request("uploads"));
+        assert!(!looks_like_uploads_age_request("uploads size"));
+        assert!(!looks_like_uploads_age_request("how big are uploads"));
+        assert!(!looks_like_uploads_age_request("list uploads"));
+        assert!(!looks_like_uploads_age_request("clean uploads"));
+        assert!(!looks_like_uploads_age_request("tmp age"));
+        assert!(!looks_like_uploads_age_request("task age"));
+        assert!(!looks_like_uploads_age_request("traces age"));
+        assert!(!looks_like_uploads_path_request("uploads age"));
+        assert!(!looks_like_uploads_size_request("uploads age"));
+        assert!(!looks_like_tmp_age_request("uploads age"));
+        let reply =
+            try_operator_instant_reply("how old is the uploads folder").expect("uploads age instant");
+        assert!(reply.contains("Uploads"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
     }
 
     #[test]
