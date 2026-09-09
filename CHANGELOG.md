@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+
+## [0.1.964] - 2026-09-09
+
+### Added
+- Instant lane: CDP traces directory age (`traces age`, `how old are traces`, `traces folder age`, `when was traces updated`, `cdp traces age`) — newest file mtime under `~/.mac-stats/traces/`; no list dump; does not steal path / size / prune.
+
 ## [0.1.963] - 2026-09-09
 
 ### Added

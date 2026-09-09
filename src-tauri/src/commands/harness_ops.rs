@@ -13082,6 +13082,211 @@ pub fn format_uploads_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is the traces folder / traces age…” asks.
+/// Newest file mtime under CDP traces dir — no list dump / path / size / prune lanes.
+pub fn looks_like_traces_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("stacktrace")
+        || n.contains("stack trace")
+        || n.contains("backtrace")
+        || n.contains("back trace")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("improvements")
+        || n.contains("pdf")
+        || n.contains("quarantine")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("skills")
+        || n.contains("plugins")
+        || n.contains("scripts")
+        || n.contains("prompts")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let traces_ctx = n.contains("traces folder")
+        || n.contains("traces directory")
+        || n.contains("traces dir")
+        || n.contains("traces age")
+        || n.contains("trace folder")
+        || n.contains("trace directory")
+        || n.contains("trace dir")
+        || n.contains("trace age")
+        || n.contains("cdp traces")
+        || n.contains("cdp trace")
+        || n.contains("browser traces")
+        || n.contains("browser trace")
+        || n.contains("mac-stats traces")
+        || n.contains("mac stats traces")
+        || n == "traces"
+        || n == "trace"
+        || ((n.contains("trace"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !traces_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("traces age")
+        || n.contains("trace age");
+    // Bare “traces” / “trace” / path-only asks stay on the path lane.
+    if n == "traces" || n == "trace" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "traces age"
+            | "trace age"
+            | "traces folder age"
+            | "trace folder age"
+            | "traces directory age"
+            | "trace directory age"
+            | "traces dir age"
+            | "trace dir age"
+            | "how old are traces"
+            | "how old is traces"
+            | "how old is trace"
+            | "how old is the traces folder"
+            | "how old is traces folder"
+            | "how old is the trace folder"
+            | "how old is trace folder"
+            | "how old is the traces directory"
+            | "how old is the trace directory"
+            | "when was traces updated"
+            | "when was trace updated"
+            | "when was the traces folder updated"
+            | "when was the trace folder updated"
+            | "traces last modified"
+            | "trace last modified"
+            | "traces folder last modified"
+            | "is traces stale"
+            | "is the traces folder stale"
+            | "cdp traces age"
+            | "cdp trace age"
+            | "browser traces age"
+            | "browser trace age"
+            | "mac-stats traces age"
+            | "mac stats traces age"
+    ) || (traces_ctx && ageish)
+}
+
+/// Zero-LLM CDP traces directory age (newest file mtime; no list dump).
+pub fn format_traces_age_gateway() -> String {
+    let dir = crate::config::Config::browser_cdp_traces_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Traces:** not created yet · app recreates under `~/.mac-stats/traces/` · `traces path` for the folder · `traces size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Traces** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Traces:** empty · `traces path` for the folder · `traces size` for on-disk bytes · CDP `*_cdp_trace.json` · `/browser` for CDP status · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Traces:** last write **{age}** ago · 1 file · `traces path` for the folder · `traces size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Traces:** newest write **{age}** ago · {files} files · `traces path` for the folder · `traces size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Traces** — could not read mtime · `traces path` for the folder · `traces size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big are traces / traces size…” asks.
 /// Recursive file-byte sum under CDP traces dir — no list dump / path / prune lanes.
 pub fn looks_like_traces_size_request(content: &str) -> bool {
@@ -13248,18 +13453,18 @@ pub fn format_traces_size_gateway() -> String {
     let dir = crate::config::Config::browser_cdp_traces_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Traces:** not created yet · app recreates under `~/.mac-stats/traces/` · `traces path` for the folder."
+            "**Traces:** not created yet · app recreates under `~/.mac-stats/traces/` · `traces path` for the folder · `traces age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Traces** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Traces:** empty · `traces path` for the folder · CDP `*_cdp_trace.json` · `/browser` for CDP status."
+            "**Traces:** empty · `traces path` for the folder · `traces age` for newest mtime · CDP `*_cdp_trace.json` · `/browser` for CDP status."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Traces:** **{label}** on disk ({files} files) · CDP · `traces path` for the folder · does not list names."
+                "**Traces:** **{label}** on disk ({files} files) · CDP · `traces path` for the folder · `traces age` for newest mtime · does not list names."
             )
         }
     }
@@ -13290,6 +13495,8 @@ pub fn looks_like_traces_path_request(content: &str) -> bool {
     {
         return false;
     }
+    // Size/big/large asks use the traces size lane (v0.1.877).
+    // Age/how-old asks use the traces age lane (v0.1.964).
     if n.contains("stacktrace")
         || n.contains("stack trace")
         || n.contains("backtrace")
@@ -13303,6 +13510,16 @@ pub fn looks_like_traces_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -13413,7 +13630,7 @@ pub fn format_traces_path_gateway() -> String {
     let dir = crate::config::Config::browser_cdp_traces_dir();
     let display = dir.display().to_string();
     format!(
-        "**Traces dir:** `{display}` · CDP `*_cdp_trace.json` · pruned by retention · `/browser` for CDP status · `traces size` for disk use."
+        "**Traces dir:** `{display}` · CDP `*_cdp_trace.json` · pruned by retention · `/browser` for CDP status · `traces size` for disk use · `traces age` for newest mtime."
     )
 }
 
@@ -36983,7 +37200,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_uploads_path_request(content) {
         return Some(format_uploads_path_gateway());
     }
-    // Traces dir size before path (recursive bytes; no list); path before prune/list.
+    // Traces dir age before size/path (newest mtime; no list); size before path; path before prune/list.
+    if looks_like_traces_age_request(content) {
+        return Some(format_traces_age_gateway());
+    }
     if looks_like_traces_size_request(content) {
         return Some(format_traces_size_gateway());
     }
@@ -37360,8 +37580,9 @@ pub fn format_ops_help_gateway() -> String {
 • `uploads age` · `how old are uploads` · `uploads folder age` · `when was uploads updated` — uploads folder last write age (newest file mtime; no list dump; does not steal `uploads path` / `uploads size` / upload)\n\
 • `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / `uploads age` / upload)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload; `uploads size` / `uploads age` for bytes / mtime)\n\
-• `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / prune)\n\
-• `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune)\n\
+• `traces age` · `how old are traces` · `traces folder age` · `when was traces updated` · `cdp traces age` — CDP traces folder last write age (newest file mtime; no list dump; does not steal `traces path` / `traces size` / prune)\n\
+• `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / `traces age` / prune)\n\
+• `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune; `traces size` / `traces age` for bytes / mtime)\n\
 • `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
 • `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / storage state / credential accounts)\n\
@@ -39222,6 +39443,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only uploads dir path asks (v0.1.824) — config only; no list/upload.
     if looks_like_uploads_path_request(question) {
+        return true;
+    }
+    // Read-only CDP traces dir age asks (v0.1.964) — newest file mtime; no list dump.
+    if looks_like_traces_age_request(question) {
         return true;
     }
     // Read-only CDP traces dir size asks (v0.1.877) — recursive file bytes; no list dump.
@@ -46662,12 +46887,18 @@ mod tests {
         assert!(!looks_like_traces_path_request("/browser"));
         assert!(!looks_like_traces_path_request("traces size"));
         assert!(!looks_like_traces_path_request("how big are traces"));
+        assert!(!looks_like_traces_path_request("traces age"));
+        assert!(!looks_like_traces_path_request("how old are traces"));
         assert!(!looks_like_uploads_path_request("traces path"));
         let reply =
             try_operator_instant_reply("where is the traces folder").expect("traces path instant");
         assert!(reply.contains("Traces dir"));
         assert!(reply.contains("traces") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("traces size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("traces age") || reply.contains("mtime"),
+            "path reply should mention traces age: {reply}"
+        );
     }
 
     #[test]
@@ -46692,6 +46923,8 @@ mod tests {
         assert!(!looks_like_traces_size_request("uploads size"));
         assert!(!looks_like_traces_size_request("screenshots size"));
         assert!(!looks_like_traces_size_request("pdfs size"));
+        assert!(!looks_like_traces_size_request("traces age"));
+        assert!(!looks_like_traces_size_request("how old are traces"));
         assert!(!looks_like_traces_path_request("traces size"));
         assert!(!looks_like_uploads_size_request("traces size"));
         assert!(!looks_like_tmp_size_request("traces size"));
@@ -46706,6 +46939,49 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("traces path") || reply.contains("folder"));
+        assert!(
+            reply.to_lowercase().contains("traces age") || reply.contains("mtime"),
+            "size reply should mention traces age: {reply}"
+        );
+    }
+
+    #[test]
+    fn traces_age_request_detected() {
+        assert!(looks_like_traces_age_request("traces age"));
+        assert!(looks_like_traces_age_request("trace age"));
+        assert!(looks_like_traces_age_request("traces folder age"));
+        assert!(looks_like_traces_age_request("traces directory age"));
+        assert!(looks_like_traces_age_request("traces dir age"));
+        assert!(looks_like_traces_age_request("how old are traces"));
+        assert!(looks_like_traces_age_request("how old is the traces folder"));
+        assert!(looks_like_traces_age_request("when was traces updated"));
+        assert!(looks_like_traces_age_request("when was the traces folder updated"));
+        assert!(looks_like_traces_age_request("is the traces folder stale"));
+        assert!(looks_like_traces_age_request("cdp traces age"));
+        assert!(looks_like_traces_age_request("browser traces age"));
+        assert!(looks_like_traces_age_request("mac-stats traces age"));
+        assert!(!looks_like_traces_age_request("traces path"));
+        assert!(!looks_like_traces_age_request("where is the traces folder"));
+        assert!(!looks_like_traces_age_request("traces"));
+        assert!(!looks_like_traces_age_request("traces size"));
+        assert!(!looks_like_traces_age_request("how big are traces"));
+        assert!(!looks_like_traces_age_request("list traces"));
+        assert!(!looks_like_traces_age_request("clean traces"));
+        assert!(!looks_like_traces_age_request("stack trace"));
+        assert!(!looks_like_traces_age_request("uploads age"));
+        assert!(!looks_like_traces_age_request("tmp age"));
+        assert!(!looks_like_traces_path_request("traces age"));
+        assert!(!looks_like_traces_size_request("traces age"));
+        assert!(!looks_like_uploads_age_request("traces age"));
+        let reply =
+            try_operator_instant_reply("how old is the traces folder").expect("traces age instant");
+        assert!(reply.contains("Traces"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
     }
 
     #[test]
