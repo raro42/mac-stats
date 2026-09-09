@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.961] - 2026-09-09
+
+### Added
+- Instant lane: task directory age (`task age`, `how old are tasks`, `task folder age`, `when was tasks updated`) — newest file mtime under `~/.mac-stats/task/`; no list dump; does not steal path / size / `/tasks`.
+
 ## [0.1.960] - 2026-09-09
 
 ### Changed

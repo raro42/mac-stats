@@ -4655,6 +4655,222 @@ pub fn format_runs_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is the task folder / task age…” asks.
+/// Newest file mtime under task dir — no list dump / path / size / Active list lanes.
+pub fn looks_like_task_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("append")
+        || n.contains("assign")
+        || n.contains("status")
+        || n.contains("close")
+        || n.contains("finish")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/tasks")
+        || n.contains("task:")
+        || n.contains("task_")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("schedule")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let task_ctx = n.contains("task folder")
+        || n.contains("tasks folder")
+        || n.contains("task directory")
+        || n.contains("tasks directory")
+        || n.contains("task dir")
+        || n.contains("tasks dir")
+        || n.contains("task age")
+        || n.contains("tasks age")
+        || n.contains("mac-stats task")
+        || n.contains("mac stats task")
+        || n.contains("mac-stats tasks")
+        || n.contains("mac stats tasks")
+        || n == "task"
+        || n == "tasks"
+        || ((n.contains("task") || n.contains("tasks"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !task_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("task age")
+        || n.contains("tasks age");
+    // Bare “task(s)” / path-only asks stay on the path lane.
+    if n == "task" || n == "tasks" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "task age"
+            | "tasks age"
+            | "task folder age"
+            | "tasks folder age"
+            | "task directory age"
+            | "tasks directory age"
+            | "task dir age"
+            | "tasks dir age"
+            | "how old are tasks"
+            | "how old is tasks"
+            | "how old is task"
+            | "how old is the task folder"
+            | "how old is task folder"
+            | "how old is the tasks folder"
+            | "how old is tasks folder"
+            | "how old is the task directory"
+            | "how old is the tasks directory"
+            | "when was tasks updated"
+            | "when was the task folder updated"
+            | "when was the tasks folder updated"
+            | "task last modified"
+            | "tasks last modified"
+            | "task folder last modified"
+            | "is tasks stale"
+            | "is the task folder stale"
+            | "mac-stats task age"
+            | "mac stats task age"
+            | "mac-stats tasks age"
+            | "mac stats tasks age"
+    ) || (task_ctx && ageish)
+}
+
+/// Zero-LLM task directory age (newest file mtime; no list dump).
+pub fn format_task_age_gateway() -> String {
+    let dir = crate::config::Config::task_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Tasks:** not created yet · app recreates under `~/.mac-stats/task/` · `task path` for the folder · `task size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Tasks** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Tasks:** empty · `task path` for the folder · `/tasks` for Active list · `task size` for on-disk bytes · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Tasks:** last write **{age}** ago · 1 file · `task path` for the folder · `task size` for on-disk bytes · `/tasks` for Active list · does not list names."
+                )
+            } else {
+                format!(
+                    "**Tasks:** newest write **{age}** ago · {files} files · `task path` for the folder · `task size` for on-disk bytes · `/tasks` for Active list · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Tasks** — could not read mtime · `task path` for the folder · `task size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big is the task folder / task size…” asks.
 /// Recursive file-byte sum under task dir — no list dump / path / Active list lanes.
 pub fn looks_like_task_size_request(content: &str) -> bool {
@@ -4845,18 +5061,18 @@ pub fn format_task_size_gateway() -> String {
     let dir = crate::config::Config::task_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Tasks:** not created yet · app recreates under `~/.mac-stats/task/` · `task path` for the folder."
+            "**Tasks:** not created yet · app recreates under `~/.mac-stats/task/` · `task path` for the folder · `task age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Tasks** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Tasks:** empty · `task path` for the folder · `/tasks` for Active list · `TASK_CREATE:` to add one."
+            "**Tasks:** empty · `task path` for the folder · `/tasks` for Active list · `task age` for newest mtime · `TASK_CREATE:` to add one."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Tasks:** **{label}** on disk ({files} files) · `/tasks` for Active list · `task path` for the folder · does not list names."
+                "**Tasks:** **{label}** on disk ({files} files) · `/tasks` for Active list · `task path` for the folder · `task age` for newest mtime · does not list names."
             )
         }
     }
@@ -4874,6 +5090,7 @@ pub fn looks_like_task_path_request(content: &str) -> bool {
         return false;
     }
     // Size/big/large asks use the task size lane (v0.1.885).
+    // Age/how-old asks use the task age lane (v0.1.961).
     if n.contains("size")
         || n.contains("big")
         || n.contains("large")
@@ -4881,6 +5098,16 @@ pub fn looks_like_task_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -4973,7 +5200,7 @@ pub fn format_task_path_gateway() -> String {
     let dir = crate::config::Config::task_dir();
     let display = dir.display().to_string();
     format!(
-        "**Tasks:** `{display}` · `/tasks` for Active list · `task size` for disk use · `TASK_CREATE:` to add one."
+        "**Tasks:** `{display}` · `/tasks` for Active list · `task size` for disk use · `task age` for newest mtime · `TASK_CREATE:` to add one."
     )
 }
 
@@ -36180,7 +36407,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_runs_path_request(content) {
         return Some(format_runs_path_gateway());
     }
-    // Task dir size before path (recursive bytes; no list); path before Active catalog.
+    // Task dir age before size/path (newest mtime; no list); size before path; path before Active catalog.
+    if looks_like_task_age_request(content) {
+        return Some(format_task_age_gateway());
+    }
     if looks_like_task_size_request(content) {
         return Some(format_task_size_gateway());
     }
@@ -36636,8 +36866,9 @@ pub fn format_ops_help_gateway() -> String {
 • `runs path` · `where is runs.jsonl` · `runs file path` — runs.jsonl path (config only; no list/count)\n\
 • `runs size` · `how big is runs.jsonl` · `runs file size` — runs.jsonl size on disk (stat only; no list/count)\n\
 • `runs age` · `how old is runs.jsonl` · `when was runs updated` — runs.jsonl last write age (mtime; no list/count)\n\
-• `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `/tasks`)\n\
-• `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` for disk use)\n\
+• `task age` · `how old are tasks` · `task folder age` · `when was tasks updated` — task folder last write age (newest file mtime; no list dump; does not steal `task path` / size / `/tasks`)\n\
+• `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `task age` / `/tasks`)\n\
+• `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` / `task age` for bytes / mtime)\n\
 • `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` RAM)\n\
 • `notes age` · `how old are notes` · `memory folder age` · `notes folder age` — notes folder last write age (newest file mtime; no list dump; does not steal `memory path` / `notes path` / `notes size` / `memory.md age` / bare `memory age`)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` / `notes age` for disk use / mtime)\n\
@@ -38447,6 +38678,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only runs.jsonl path asks (v0.1.813) — config only; no list/count.
     if looks_like_runs_path_request(question) {
+        return true;
+    }
+    // Read-only task dir age asks (v0.1.961) — newest file mtime; no list dump.
+    if looks_like_task_age_request(question) {
         return true;
     }
     // Read-only task dir size asks (v0.1.885) — recursive file bytes; no list dump.
@@ -44462,11 +44697,18 @@ mod tests {
         assert!(!looks_like_task_path_request("runs path"));
         assert!(!looks_like_task_path_request("task size"));
         assert!(!looks_like_task_path_request("how big are tasks"));
+        assert!(!looks_like_task_path_request("task age"));
+        assert!(!looks_like_task_path_request("how old are tasks"));
+        assert!(!looks_like_task_path_request("task folder age"));
         assert!(!looks_like_tasks_request("task path"));
         let reply = try_operator_instant_reply("where is the task folder").expect("task path instant");
         assert!(reply.contains("Tasks"));
         assert!(reply.contains("task") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("task size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("task age") || reply.contains("mtime"),
+            "path reply should mention task age: {reply}"
+        );
     }
 
     #[test]
@@ -44489,6 +44731,8 @@ mod tests {
         assert!(!looks_like_task_size_request("session size"));
         assert!(!looks_like_task_size_request("agents size"));
         assert!(!looks_like_task_size_request("prompts size"));
+        assert!(!looks_like_task_size_request("task age"));
+        assert!(!looks_like_task_size_request("how old are tasks"));
         assert!(!looks_like_task_path_request("task size"));
         assert!(!looks_like_session_size_request("task size"));
         assert!(!looks_like_agents_size_request("task size"));
@@ -44499,6 +44743,49 @@ mod tests {
                 || reply.contains("empty")
                 || reply.contains("not created")
                 || reply.contains("could not scan")
+        );
+        assert!(
+            reply.to_lowercase().contains("task age") || reply.contains("mtime"),
+            "size reply should mention task age: {reply}"
+        );
+    }
+
+    #[test]
+    fn task_age_request_detected() {
+        assert!(looks_like_task_age_request("task age"));
+        assert!(looks_like_task_age_request("tasks age"));
+        assert!(looks_like_task_age_request("task folder age"));
+        assert!(looks_like_task_age_request("task directory age"));
+        assert!(looks_like_task_age_request("task dir age"));
+        assert!(looks_like_task_age_request("how old are tasks"));
+        assert!(looks_like_task_age_request("how old is the task folder"));
+        assert!(looks_like_task_age_request("when was tasks updated"));
+        assert!(looks_like_task_age_request("when was the task folder updated"));
+        assert!(looks_like_task_age_request("is the task folder stale"));
+        assert!(looks_like_task_age_request("mac-stats task age"));
+        assert!(!looks_like_task_age_request("task path"));
+        assert!(!looks_like_task_age_request("where is the task folder"));
+        assert!(!looks_like_task_age_request("task"));
+        assert!(!looks_like_task_age_request("task size"));
+        assert!(!looks_like_task_age_request("how big are tasks"));
+        assert!(!looks_like_task_age_request("list tasks"));
+        assert!(!looks_like_task_age_request("/tasks"));
+        assert!(!looks_like_task_age_request("TASK_CREATE: demo"));
+        assert!(!looks_like_task_age_request("session age"));
+        assert!(!looks_like_task_age_request("agents age"));
+        assert!(!looks_like_task_age_request("prompts age"));
+        assert!(!looks_like_task_path_request("task age"));
+        assert!(!looks_like_task_size_request("task age"));
+        assert!(!looks_like_session_age_request("task age"));
+        assert!(!looks_like_agents_age_request("task age"));
+        assert!(!looks_like_prompts_age_request("task age"));
+        let reply = try_operator_instant_reply("how old are tasks").expect("task age instant");
+        assert!(reply.contains("Tasks"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
         );
     }
 
