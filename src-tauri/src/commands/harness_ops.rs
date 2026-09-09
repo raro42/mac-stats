@@ -10556,19 +10556,269 @@ pub fn format_plugins_size_gateway() -> String {
     let dir = crate::config::Config::scripts_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Plugins/scripts:** not created yet · app recreates under scripts/ · `plugins path` for the folder."
+            "**Plugins/scripts:** not created yet · app recreates under scripts/ · `plugins path` for the folder · `plugins age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Plugins/scripts** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Plugins/scripts:** empty · `plugins path` for the folder · `/plugins` for On/Off · no run from this ask."
+            "**Plugins/scripts:** empty · `plugins path` for the folder · `/plugins` for On/Off · `plugins age` for newest mtime · no run from this ask."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Plugins/scripts:** **{label}** on disk ({files} files) · `/plugins` for On/Off · `plugins path` for the folder · does not list names."
+                "**Plugins/scripts:** **{label}** on disk ({files} files) · `/plugins` for On/Off · `plugins path` for the folder · `plugins age` for newest mtime · does not list names."
             )
+        }
+    }
+}
+
+/// True for short “how old are plugins / plugins age…” asks.
+/// Newest file mtime under scripts/plugins dir — no list dump / path / size / On-Off lanes.
+pub fn looks_like_plugins_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/plugins")
+        || n.contains("plugins on")
+        || n.contains("plugins off")
+        || n.contains("run plugin")
+        || n.contains("execute")
+        || n.contains("install")
+        || n.contains("plugin:")
+        || n.contains("tauri")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let plugins_ctx = n.contains("plugins folder")
+        || n.contains("plugin folder")
+        || n.contains("plugins directory")
+        || n.contains("plugin directory")
+        || n.contains("plugins dir")
+        || n.contains("plugin dir")
+        || n.contains("plugins age")
+        || n.contains("plugin age")
+        || n.contains("scripts folder")
+        || n.contains("script folder")
+        || n.contains("scripts directory")
+        || n.contains("script directory")
+        || n.contains("scripts dir")
+        || n.contains("script dir")
+        || n.contains("scripts age")
+        || n.contains("script age")
+        || n.contains("mac-stats plugins")
+        || n.contains("mac stats plugins")
+        || n.contains("mac-stats scripts")
+        || n.contains("mac stats scripts")
+        || n == "plugins"
+        || n == "plugin"
+        || n == "scripts"
+        || n == "script"
+        || ((n.contains("plugins") || n.contains("plugin") || n.contains("scripts") || n.contains("script"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !plugins_ctx {
+        return false;
+    }
+    // Bare “plugins” / path-only asks stay on the path lane.
+    if n == "plugins"
+        || n == "plugin"
+        || n == "scripts"
+        || n == "script"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "plugins age"
+            | "plugin age"
+            | "plugins folder age"
+            | "plugin folder age"
+            | "plugins directory age"
+            | "plugin directory age"
+            | "plugins dir age"
+            | "plugin dir age"
+            | "scripts age"
+            | "script age"
+            | "scripts folder age"
+            | "script folder age"
+            | "scripts directory age"
+            | "script directory age"
+            | "scripts dir age"
+            | "script dir age"
+            | "how old are plugins"
+            | "how old is plugins"
+            | "how old is the plugins folder"
+            | "how old is plugins folder"
+            | "how old is the plugin folder"
+            | "how old is plugin folder"
+            | "how old is the plugins directory"
+            | "how old is the plugin directory"
+            | "how old is plugin"
+            | "how old is the plugin"
+            | "how old are scripts"
+            | "how old is scripts"
+            | "how old is the scripts folder"
+            | "how old is scripts folder"
+            | "how old is the script folder"
+            | "how old is script folder"
+            | "how old is the scripts directory"
+            | "how old is the script directory"
+            | "how old is script"
+            | "how old is the script"
+            | "when was plugins updated"
+            | "when was the plugins folder updated"
+            | "when was the plugin folder updated"
+            | "when was scripts updated"
+            | "when was the scripts folder updated"
+            | "when was the script folder updated"
+            | "plugins last modified"
+            | "plugin folder last modified"
+            | "scripts last modified"
+            | "script folder last modified"
+            | "is plugins stale"
+            | "is the plugins folder stale"
+            | "is scripts stale"
+            | "is the scripts folder stale"
+            | "mac-stats plugins age"
+            | "mac stats plugins age"
+            | "mac-stats scripts age"
+            | "mac stats scripts age"
+    ) || (plugins_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM plugins/scripts directory age (newest file mtime; no list dump).
+pub fn format_plugins_age_gateway() -> String {
+    let dir = crate::config::Config::scripts_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Plugins/scripts:** not created yet · app recreates under scripts/ · `plugins path` for the folder · `plugins size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Plugins/scripts** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Plugins/scripts:** empty · `plugins path` for the folder · `/plugins` for On/Off · `plugins size` for on-disk bytes · no run from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Plugins/scripts:** last write **{age}** ago · 1 file · `/plugins` for On/Off · `plugins path` for the folder · `plugins size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Plugins/scripts:** newest write **{age}** ago · {files} files · `/plugins` for On/Off · `plugins path` for the folder · `plugins size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Plugins/scripts** — could not read mtime · `plugins path` for the folder · `plugins size` for on-disk bytes."
+                .to_string()
         }
     }
 }
@@ -10587,6 +10837,20 @@ pub fn looks_like_plugins_path_request(content: &str) -> bool {
     if looks_like_skills_path_request(content)
         || looks_like_agents_path_request(content)
         || looks_like_memory_path_request(content)
+    {
+        return false;
+    }
+    // Age asks use the plugins directory age lane (v0.1.957).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -10726,7 +10990,7 @@ pub fn format_plugins_path_gateway() -> String {
     let dir = crate::config::Config::scripts_dir();
     let display = dir.display().to_string();
     format!(
-        "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · `plugins size` for disk use · no run from this ask."
+        "**Plugins/scripts dir:** `{display}` · `/plugins` for On/Off list · `plugins size` for disk use · `plugins age` for newest mtime · no run from this ask."
     )
 }
 
@@ -35557,7 +35821,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_skills_path_request(content) {
         return Some(format_skills_path_gateway());
     }
-    // Plugins/scripts dir size before path (recursive bytes; no list); path before On/Off.
+    // Plugins/scripts dir age before size/path (newest mtime; no list); size before path; path before On/Off.
+    if looks_like_plugins_age_request(content) {
+        return Some(format_plugins_age_gateway());
+    }
     if looks_like_plugins_size_request(content) {
         return Some(format_plugins_size_gateway());
     }
@@ -35940,7 +36207,8 @@ pub fn format_ops_help_gateway() -> String {
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `agents age` / `/agents`)\n\
 • `skills age` · `how old are skills` · `skills folder age` · `when was skills updated` — skills folder last write age (newest file mtime; no list dump; does not steal `skills path` / size / `skill.md age` / `/skills`)\n\
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `skills age` / `/skills` / `skill.md size`)\n\
-• `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
+• `plugins age` · `scripts age` · `how old are plugins` · `plugins folder age` · `when was plugins updated` — plugins/scripts folder last write age (newest file mtime; no list dump; does not steal `plugins path` / size / `/plugins`)\n\
+• `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `plugins age` / `/plugins`)\n\
 • `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
 • `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md age` / `prompts size`)\n\
 • `planning age` · `planning_prompt.md age` · `how old is planning` · `when was planning updated` — planning_prompt.md last write age (mtime; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md size` / `prompts path` / execution)\n\
@@ -35950,7 +36218,7 @@ pub fn format_ops_help_gateway() -> String {
 • `execution_prompt.md` · `where is execution_prompt.md` · `execution prompt path` · `execution path` — `agents/prompts/execution_prompt.md` (config only; no dump/edit; `execution_prompt.md size` / `execution_prompt.md age` for bytes / mtime; does not steal `prompts path`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create; `agents size` / `agents age` for disk use / mtime)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` / `skills age` for disk use / mtime)\n\
-• `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
+• `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` / `plugins age` for disk use / mtime)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` for disk use)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
@@ -37762,6 +38030,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only skills dir path asks (v0.1.819) — config only; no list/run.
     if looks_like_skills_path_request(question) {
+        return true;
+    }
+    // Read-only plugins/scripts dir age asks (v0.1.957) — newest file mtime; no list dump.
+    if looks_like_plugins_age_request(question) {
         return true;
     }
     // Read-only plugins/scripts dir size asks (v0.1.882) — recursive file bytes; no list dump.
@@ -44648,6 +44920,8 @@ mod tests {
         assert!(!looks_like_plugins_path_request("skills path"));
         assert!(!looks_like_plugins_path_request("agents path"));
         assert!(!looks_like_plugins_path_request("plugins size"));
+        assert!(!looks_like_plugins_path_request("plugins age"));
+        assert!(!looks_like_plugins_path_request("how old are plugins"));
         assert!(!looks_like_plugins_request("plugins path"));
         assert!(!looks_like_plugins_request("scripts path"));
         let reply =
@@ -44655,6 +44929,7 @@ mod tests {
         assert!(reply.contains("Plugins/scripts dir"));
         assert!(reply.contains("scripts") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("plugins size") || reply.contains("disk use"));
+        assert!(reply.to_lowercase().contains("plugins age") || reply.contains("mtime"));
     }
 
     #[test]
@@ -44679,6 +44954,8 @@ mod tests {
         assert!(!looks_like_plugins_size_request("skills size"));
         assert!(!looks_like_plugins_size_request("agents size"));
         assert!(!looks_like_plugins_size_request("tmp size"));
+        assert!(!looks_like_plugins_size_request("plugins age"));
+        assert!(!looks_like_plugins_size_request("how old are plugins"));
         assert!(!looks_like_plugins_path_request("plugins size"));
         assert!(!looks_like_skills_size_request("plugins size"));
         assert!(!looks_like_agents_size_request("plugins size"));
@@ -44693,6 +44970,62 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("plugins path") || reply.contains("folder"));
+        assert!(reply.to_lowercase().contains("plugins age") || reply.contains("mtime"));
+    }
+
+    #[test]
+    fn plugins_age_request_detected() {
+        assert!(looks_like_plugins_age_request("plugins age"));
+        assert!(looks_like_plugins_age_request("plugin age"));
+        assert!(looks_like_plugins_age_request("plugins folder age"));
+        assert!(looks_like_plugins_age_request("plugins directory age"));
+        assert!(looks_like_plugins_age_request("plugins dir age"));
+        assert!(looks_like_plugins_age_request("scripts age"));
+        assert!(looks_like_plugins_age_request("scripts folder age"));
+        assert!(looks_like_plugins_age_request("how old are plugins"));
+        assert!(looks_like_plugins_age_request("how old is plugins"));
+        assert!(looks_like_plugins_age_request("how old is the plugins folder"));
+        assert!(looks_like_plugins_age_request("how old is plugin"));
+        assert!(looks_like_plugins_age_request("how old are scripts"));
+        assert!(looks_like_plugins_age_request(
+            "when was the plugins folder updated"
+        ));
+        assert!(looks_like_plugins_age_request("plugins last modified"));
+        assert!(looks_like_plugins_age_request("is the plugins folder stale"));
+        assert!(looks_like_plugins_age_request("mac-stats plugins age"));
+        assert!(looks_like_plugins_age_request("mac-stats scripts age"));
+        assert!(!looks_like_plugins_age_request("plugins path"));
+        assert!(!looks_like_plugins_age_request("where is the plugins folder"));
+        assert!(!looks_like_plugins_age_request("plugins"));
+        assert!(!looks_like_plugins_age_request("plugins size"));
+        assert!(!looks_like_plugins_age_request("how big are plugins"));
+        assert!(!looks_like_plugins_age_request("list plugins"));
+        assert!(!looks_like_plugins_age_request("/plugins"));
+        assert!(!looks_like_plugins_age_request("run plugin foo"));
+        assert!(!looks_like_plugins_age_request("skills age"));
+        assert!(!looks_like_plugins_age_request("agents age"));
+        assert!(!looks_like_plugins_age_request("tmp age"));
+        assert!(!looks_like_plugins_path_request("plugins age"));
+        assert!(!looks_like_plugins_size_request("plugins age"));
+        assert!(!looks_like_skills_age_request("plugins age"));
+        assert!(!looks_like_agents_age_request("plugins age"));
+        let reply = try_operator_instant_reply("how old are plugins").expect("plugins age instant");
+        assert!(reply.contains("Plugins/scripts"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
+        assert!(reply.to_lowercase().contains("plugins path") || reply.contains("folder"));
+        assert!(
+            try_operator_instant_reply("plugins age").is_some(),
+            "plugins age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("scripts age").is_some(),
+            "scripts age should be plugins-dir age instant"
+        );
     }
 
     #[test]

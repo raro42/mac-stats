@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.957] - 2026-09-09
+
+### Added
+- Instant lane: plugins/scripts directory age (`plugins age`, `scripts age`, `how old are plugins`, `plugins folder age`, `when was plugins updated`) — newest file mtime under `~/.mac-stats/scripts/`; no list dump; does not steal path / size / `/plugins`.
+
 ## [0.1.956] - 2026-09-09
 
 ### Added
