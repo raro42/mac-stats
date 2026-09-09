@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.971] - 2026-09-09
+
+### Added
+- Instant lane: browser-credentials.toml age (`browser credentials age`, `browser-credentials.toml age`, `how old are browser credentials`, `when was browser credentials updated`) — file mtime only; no dump; does not steal path / size / storage state / credential accounts.
+
 ## [0.1.970] - 2026-09-09
 
 ### Added

@@ -14178,13 +14178,15 @@ pub fn format_pdfs_path_gateway() -> String {
 /// True for short “where is browser-credentials.toml / browser credentials path…” asks.
 /// Config path only — does not list, edit, or dump secrets from `~/.mac-stats/browser-credentials.toml`.
 /// Size asks use the browser-credentials.toml size lane (v0.1.916).
+/// Age asks use the browser-credentials.toml age lane (v0.1.971).
 pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
         return false;
     }
-    // Do not steal sibling path / browser-status / disk-cleanup / secret-edit / size asks.
+    // Do not steal sibling path / browser-status / disk-cleanup / secret-edit / size / age asks.
     // Size asks use the browser-credentials.toml size lane (v0.1.916).
+    // Age asks use the browser-credentials.toml age lane (v0.1.971) — keyword-only (no nest).
     if n.contains("size")
         || n.contains("bytes")
         || n.contains("how big")
@@ -14192,6 +14194,12 @@ pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || looks_like_config_path_request(content)
         || looks_like_debug_log_path_request(content)
         || looks_like_screenshots_path_request(content)
@@ -14328,7 +14336,7 @@ pub fn format_browser_credentials_path_gateway() -> String {
     let path = crate::config::Config::browser_credentials_toml_path();
     let display = path.display().to_string();
     format!(
-        "**Browser credentials:** `{display}` · BROWSER_INPUT `<secret>…</secret>` · edit the TOML · `browser credentials size` for on-disk bytes · `/browser` for CDP status."
+        "**Browser credentials:** `{display}` · BROWSER_INPUT `<secret>…</secret>` · edit the TOML · `browser credentials size` for on-disk bytes · `browser credentials age` for last write · `/browser` for CDP status."
     )
 }
 
@@ -14572,7 +14580,241 @@ pub fn format_browser_credentials_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Browser credentials:** **{label}** on disk · BROWSER_INPUT secrets TOML · `browser credentials path` for the file · does not dump secrets or edit the file."
+                "**Browser credentials:** **{label}** on disk · BROWSER_INPUT secrets TOML · `browser credentials path` for the file · `browser credentials age` for last write · does not dump secrets or edit the file."
+            )
+        }
+        Err(e) => {
+            format!("**Browser credentials** — could not stat `browser-credentials.toml`: {e}")
+        }
+    }
+}
+
+/// True for short “how old is browser-credentials.toml / browser credentials age…” asks.
+/// Mtime only — does not steal path / size / storage state / credential accounts / `/browser`.
+pub fn looks_like_browser_credentials_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
+        || n.contains("keychain")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("discord")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/browser"
+        || n == "/cdp"
+        || n == "browser"
+        || n == "cdp"
+        || n == "browser status"
+        || n == "cdp status"
+        || n == "browser ready"
+        || n == "cdp ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let cred_ctx = n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("browser secrets")
+        || n.contains("browser secret")
+        || n.contains("mac-stats credentials")
+        || n.contains("mac stats credentials")
+        || n.contains("credentials.toml")
+        || (n.contains("credentials")
+            && (n.contains("browser")
+                || n.contains("cdp")
+                || n.contains("mac-stats")
+                || n.contains("mac stats"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("toml")))
+        || (n.contains("credential")
+            && (n.contains("browser") || n.contains("cdp"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("toml")));
+    if !cred_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "browser credentials age"
+            | "browser credential age"
+            | "browser-credentials age"
+            | "browser-credentials.toml age"
+            | "browser credentials file age"
+            | "browser credential file age"
+            | "browser credentials toml age"
+            | "credentials.toml age"
+            | "cdp credentials age"
+            | "cdp credential age"
+            | "browser secrets age"
+            | "browser secret age"
+            | "browser credentials last modified"
+            | "browser-credentials.toml last modified"
+            | "how old is browser credentials"
+            | "how old is the browser credentials"
+            | "how old is browser-credentials"
+            | "how old is browser-credentials.toml"
+            | "how old is the browser-credentials.toml"
+            | "how old is browser credentials file"
+            | "how old is the browser credentials file"
+            | "how old are browser credentials"
+            | "when was browser credentials updated"
+            | "when was the browser credentials updated"
+            | "when was browser-credentials.toml updated"
+            | "when was the browser-credentials.toml updated"
+            | "when were browser credentials updated"
+            | "is browser credentials stale"
+            | "is the browser credentials stale"
+            | "is browser-credentials.toml stale"
+            | "is the browser-credentials.toml stale"
+            | "mac-stats credentials age"
+            | "mac stats credentials age"
+            | "mac-stats browser-credentials.toml age"
+            | "mac stats browser-credentials.toml age"
+            | "mac-stats browser credentials age"
+            | "mac stats browser credentials age"
+    ) || (cred_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM browser-credentials.toml age from file mtime (stat only; no dump/list secrets).
+pub fn format_browser_credentials_age_gateway() -> String {
+    let path = crate::config::Config::browser_credentials_toml_path();
+    if !path.exists() {
+        return "**Browser credentials:** no `browser-credentials.toml` yet · `browser credentials path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Browser credentials:** last write **{age}** ago · BROWSER_INPUT secrets TOML · `browser credentials path` for the file · `browser credentials size` for on-disk bytes."
             )
         }
         Err(e) => {
@@ -38650,9 +38892,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_pdfs_path_request(content) {
         return Some(format_pdfs_path_gateway());
     }
-    // browser-credentials.toml size before path (stat only; no dump).
+    // browser-credentials.toml size before age/path (stat only; no dump).
     if looks_like_browser_credentials_size_request(content) {
         return Some(format_browser_credentials_size_gateway());
+    }
+    // browser-credentials.toml age before path (mtime only; no dump).
+    if looks_like_browser_credentials_age_request(content) {
+        return Some(format_browser_credentials_age_gateway());
     }
     if looks_like_browser_credentials_path_request(content) {
         return Some(format_browser_credentials_path_gateway());
@@ -39030,8 +39276,9 @@ pub fn format_ops_help_gateway() -> String {
 • `pdfs age` · `how old are pdfs` · `pdfs folder age` · `when was pdfs updated` · `pdf exports age` — PDF exports folder last write age (newest file mtime; no list dump; does not steal `pdfs path` / `pdfs size` / save)\n\
 • `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / `pdfs age` / save)\n\
 • `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save; `pdfs size` / `pdfs age` for bytes / mtime)\n\
-• `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / storage state / credential accounts)\n\
-• `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` for on-disk bytes)\n\
+• `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / `browser credentials age` / storage state / credential accounts)\n\
+• `browser credentials age` · `browser-credentials.toml age` · `how old are browser credentials` · `when was browser credentials updated` — browser-credentials.toml last write age (mtime; no dump; does not steal `browser credentials path` / size / storage state / credential accounts)\n\
+• `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` / `browser credentials age` for bytes / mtime)\n\
 • `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` for on-disk bytes)\n\
 • `browser downloads age` · `how old are browser downloads` · `browser-downloads age` · `when was browser downloads updated` · `cdp downloads age` — CDP download folder last write age (newest file mtime; no list dump; does not steal `browser downloads path` / `browser downloads size` / `/downloads`)\n\
@@ -40929,6 +41176,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser-credentials.toml size asks (v0.1.916) — stat only; no dump/edit.
     if looks_like_browser_credentials_size_request(question) {
+        return true;
+    }
+    // Read-only browser-credentials.toml age asks (v0.1.971) — mtime only; no dump/list.
+    if looks_like_browser_credentials_age_request(question) {
         return true;
     }
     // Read-only browser credentials file path asks (v0.1.827) — config only; no list/edit/dump.
@@ -48865,6 +49116,15 @@ mod tests {
         assert!(!looks_like_browser_credentials_path_request(
             "browser credentials size"
         ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser-credentials.toml age"
+        ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "how old are browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser credentials age"
+        ));
         assert!(!looks_like_pdfs_path_request("browser credentials path"));
         assert!(!looks_like_browser_ready_request("browser credentials path"));
         let reply = try_operator_instant_reply("where are browser credentials")
@@ -48919,6 +49179,12 @@ mod tests {
         assert!(!looks_like_browser_credentials_size_request(
             "browser cookies size"
         ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "browser credentials age"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "how old are browser credentials"
+        ));
         assert!(!looks_like_browser_credentials_size_request("/browser"));
         assert!(!looks_like_browser_credentials_path_request(
             "browser-credentials.toml size"
@@ -48937,6 +49203,73 @@ mod tests {
                 && (reply.contains("on disk")
                     || reply.contains("no `browser-credentials.toml`")
                     || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Browser credentials: `"));
+    }
+
+    #[test]
+    fn browser_credentials_age_request_detected() {
+        assert!(looks_like_browser_credentials_age_request(
+            "browser credentials age"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "browser-credentials.toml age"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "how old are browser credentials"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "how old is browser-credentials.toml"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "when was browser credentials updated"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "browser credentials file age"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "cdp credentials age"
+        ));
+        assert!(looks_like_browser_credentials_age_request(
+            "mac-stats credentials age"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "browser credentials path"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "browser credentials size"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "where are browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "dump browser credentials"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "credential accounts age"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "storage state age"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "browser cookies age"
+        ));
+        assert!(!looks_like_browser_credentials_age_request("/browser"));
+        assert!(!looks_like_browser_credentials_path_request(
+            "browser-credentials.toml age"
+        ));
+        assert!(!looks_like_browser_credentials_size_request(
+            "browser credentials age"
+        ));
+        assert!(!looks_like_browser_ready_request("browser credentials age"));
+        let reply = try_operator_instant_reply("browser-credentials.toml age")
+            .expect("browser credentials age instant");
+        assert!(
+            reply.contains("Browser credentials")
+                && (reply.contains("ago")
+                    || reply.contains("no `browser-credentials.toml`")
+                    || reply.contains("could not")),
             "{reply}"
         );
         assert!(!reply.contains("Browser credentials: `"));
