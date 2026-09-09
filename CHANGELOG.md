@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.959] - 2026-09-09
+
+### Added
+- Instant lane: session directory age (`session age`, `how old are sessions`, `session folder age`, `when was sessions updated`) — newest file mtime under `~/.mac-stats/session/`; no list dump; does not steal path / size / `session memory age` / `/sessions`.
+
 ## [0.1.958] - 2026-09-09
 
 ### Added

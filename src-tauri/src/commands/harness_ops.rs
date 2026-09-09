@@ -8907,6 +8907,229 @@ pub fn format_results_tsv_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is the session folder / session age…” asks.
+/// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
+pub fn looks_like_session_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("resume")
+        || n.contains("compact")
+        || n.contains("reset")
+        || n.contains("/sessions")
+        || n.contains("sessions live")
+        || n.contains("sessions files")
+        || n.contains("live sessions")
+        || n.contains("session files")
+        || n.contains("session memory")
+        || n.contains("session-memory")
+        || n.contains("session_memory")
+        || n.contains("before reset")
+        || n.contains("before-reset")
+        || n.contains("before compaction")
+        || n.contains("before-compaction")
+        || n.contains("reset phrases")
+        || n.contains("session:")
+        || n.contains("session_")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let session_ctx = n.contains("session folder")
+        || n.contains("sessions folder")
+        || n.contains("session directory")
+        || n.contains("sessions directory")
+        || n.contains("session dir")
+        || n.contains("sessions dir")
+        || n.contains("session age")
+        || n.contains("sessions age")
+        || n.contains("mac-stats session")
+        || n.contains("mac stats session")
+        || n.contains("mac-stats sessions")
+        || n.contains("mac stats sessions")
+        || n == "session"
+        || n == "sessions"
+        || ((n.contains("session") || n.contains("sessions"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !session_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("session age")
+        || n.contains("sessions age");
+    // Bare “session(s)” / path-only asks stay on the path lane.
+    if n == "session" || n == "sessions" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "session age"
+            | "sessions age"
+            | "session folder age"
+            | "sessions folder age"
+            | "session directory age"
+            | "sessions directory age"
+            | "session dir age"
+            | "sessions dir age"
+            | "how old are sessions"
+            | "how old is sessions"
+            | "how old is session"
+            | "how old is the session folder"
+            | "how old is session folder"
+            | "how old is the sessions folder"
+            | "how old is sessions folder"
+            | "how old is the session directory"
+            | "how old is the sessions directory"
+            | "when was sessions updated"
+            | "when was the session folder updated"
+            | "when was the sessions folder updated"
+            | "session last modified"
+            | "sessions last modified"
+            | "session folder last modified"
+            | "is sessions stale"
+            | "is the session folder stale"
+            | "mac-stats session age"
+            | "mac stats session age"
+            | "mac-stats sessions age"
+            | "mac stats sessions age"
+    ) || (session_ctx && ageish)
+}
+
+/// Zero-LLM session directory age (newest file mtime; no list dump).
+pub fn format_session_age_gateway() -> String {
+    let dir = crate::config::Config::session_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Sessions:** not created yet · app recreates under `~/.mac-stats/session/` · `session path` for the folder · `session size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Sessions** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Sessions:** empty · `session path` for the folder · `/sessions` for Live/Files · `session size` for on-disk bytes · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Sessions:** last write **{age}** ago · 1 file · `session path` for the folder · `session size` for on-disk bytes · `/sessions` for Live/Files · does not list names."
+                )
+            } else {
+                format!(
+                    "**Sessions:** newest write **{age}** ago · {files} files · `session path` for the folder · `session size` for on-disk bytes · `/sessions` for Live/Files · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Sessions** — could not read mtime · `session path` for the folder · `session size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big is the session folder / session size…” asks.
 /// Recursive file-byte sum under session dir — no list dump / path / Live/Files lanes.
 pub fn looks_like_session_size_request(content: &str) -> bool {
@@ -9104,18 +9327,18 @@ pub fn format_session_size_gateway() -> String {
     let dir = crate::config::Config::session_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Sessions:** not created yet · app recreates under `~/.mac-stats/session/` · `session path` for the folder."
+            "**Sessions:** not created yet · app recreates under `~/.mac-stats/session/` · `session path` for the folder · `session age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Sessions** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Sessions:** empty · `session path` for the folder · `/sessions` for Live/Files · Agent Ops → Sessions."
+            "**Sessions:** empty · `session path` for the folder · `/sessions` for Live/Files · `session age` for newest mtime · Agent Ops → Sessions."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Sessions:** **{label}** on disk ({files} files) · `/sessions` for Live/Files · `session path` for the folder · does not list names."
+                "**Sessions:** **{label}** on disk ({files} files) · `/sessions` for Live/Files · `session path` for the folder · `session age` for newest mtime · does not list names."
             )
         }
     }
@@ -9136,6 +9359,20 @@ pub fn looks_like_session_path_request(content: &str) -> bool {
     if n.contains("session memory")
         || n.contains("session-memory")
         || n.contains("session_memory")
+    {
+        return false;
+    }
+    // Age asks use the session directory age lane (v0.1.959).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -9235,7 +9472,7 @@ pub fn format_session_path_gateway() -> String {
     let dir = crate::config::Config::session_dir();
     let display = dir.display().to_string();
     format!(
-        "**Sessions:** `{display}` · `/sessions` for Live/Files · `session size` for disk use · Agent Ops → Sessions."
+        "**Sessions:** `{display}` · `/sessions` for Live/Files · `session size` for disk use · `session age` for newest mtime · Agent Ops → Sessions."
     )
 }
 
@@ -36018,7 +36255,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_memory_path_request(content) {
         return Some(format_memory_path_gateway());
     }
-    // Session dir size before path (recursive bytes; no list); path before Live/Files catalog.
+    // Session dir age before size/path (newest mtime; no list); size before path; path before Live/Files.
+    if looks_like_session_age_request(content) {
+        return Some(format_session_age_gateway());
+    }
     if looks_like_session_size_request(content) {
         return Some(format_session_size_gateway());
     }
@@ -36428,8 +36668,9 @@ pub fn format_ops_help_gateway() -> String {
 • `launchagent age` · `how old is the launchagent` · `mac-stats.plist age` · `harness plist age` — LaunchAgent plist last write ages (mtime; no dump; does not steal `launchagent path` / size / load/unload)\n\
 • `launchagent size` · `how big is the launchagent` · `mac-stats.plist size` · `harness plist size` — LaunchAgent plist sizes on disk (stat only; no dump; does not steal `launchagent path` / age / load/unload)\n\
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` / `launchagent age` for bytes / mtime; no load/unload)\n\
-• `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
-• `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
+• `session age` · `how old are sessions` · `session folder age` · `when was sessions updated` — session folder last write age (newest file mtime; no list dump; does not steal `session path` / size / `session memory age` / `/sessions`)\n\
+• `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `session age` / `/sessions`)\n\
+• `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` / `session age` for bytes / mtime)\n\
 • `agents age` · `how old are agents` · `agents folder age` · `when was agents updated` — agents folder last write age (newest file mtime; no list dump; does not steal `agents path` / size / `agent.json age` / `/agents`)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `agents age` / `/agents`)\n\
 • `skills age` · `how old are skills` · `skills folder age` · `when was skills updated` — skills folder last write age (newest file mtime; no list dump; does not steal `skills path` / size / `skill.md age` / `/skills`)\n\
@@ -38226,6 +38467,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only memory/notes path asks (v0.1.815) — config only; no list/save/scrub.
     if looks_like_memory_path_request(question) {
+        return true;
+    }
+    // Read-only session dir age asks (v0.1.959) — newest file mtime; no list dump.
+    if looks_like_session_age_request(question) {
         return true;
     }
     // Read-only session dir size asks (v0.1.884) — recursive file bytes; no list dump.
@@ -44435,12 +44680,19 @@ mod tests {
         assert!(!looks_like_session_path_request("session-memory path"));
         assert!(!looks_like_session_path_request("session size"));
         assert!(!looks_like_session_path_request("how big are sessions"));
+        assert!(!looks_like_session_path_request("session age"));
+        assert!(!looks_like_session_path_request("how old are sessions"));
+        assert!(!looks_like_session_path_request("session folder age"));
         assert!(!looks_like_sessions_request("session path"));
         let reply =
             try_operator_instant_reply("where is the session folder").expect("session path instant");
         assert!(reply.contains("Sessions"));
         assert!(reply.contains("session") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("session size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("session age") || reply.contains("mtime"),
+            "path reply should mention session age: {reply}"
+        );
     }
 
     #[test]
@@ -44463,6 +44715,9 @@ mod tests {
         assert!(!looks_like_session_size_request("session-memory path"));
         assert!(!looks_like_session_size_request("session memory size"));
         assert!(!looks_like_session_size_request("session-memory size"));
+        assert!(!looks_like_session_size_request("session age"));
+        assert!(!looks_like_session_size_request("how old are sessions"));
+        assert!(!looks_like_session_size_request("session folder age"));
         assert!(!looks_like_session_size_request("agents size"));
         assert!(!looks_like_session_size_request("prompts size"));
         assert!(!looks_like_session_size_request("task size"));
@@ -44477,6 +44732,53 @@ mod tests {
                 || reply.contains("empty")
                 || reply.contains("not created")
                 || reply.contains("could not scan")
+        );
+        assert!(
+            reply.to_lowercase().contains("session age") || reply.contains("mtime"),
+            "size reply should mention session age: {reply}"
+        );
+    }
+
+    #[test]
+    fn session_age_request_detected() {
+        assert!(looks_like_session_age_request("session age"));
+        assert!(looks_like_session_age_request("sessions age"));
+        assert!(looks_like_session_age_request("session folder age"));
+        assert!(looks_like_session_age_request("session directory age"));
+        assert!(looks_like_session_age_request("session dir age"));
+        assert!(looks_like_session_age_request("how old are sessions"));
+        assert!(looks_like_session_age_request("how old is the session folder"));
+        assert!(looks_like_session_age_request("when was sessions updated"));
+        assert!(looks_like_session_age_request("when was the session folder updated"));
+        assert!(looks_like_session_age_request("is the session folder stale"));
+        assert!(looks_like_session_age_request("mac-stats session age"));
+        assert!(!looks_like_session_age_request("session path"));
+        assert!(!looks_like_session_age_request("where is the session folder"));
+        assert!(!looks_like_session_age_request("session"));
+        assert!(!looks_like_session_age_request("session size"));
+        assert!(!looks_like_session_age_request("how big are sessions"));
+        assert!(!looks_like_session_age_request("list sessions"));
+        assert!(!looks_like_session_age_request("/sessions"));
+        assert!(!looks_like_session_age_request("session memory age"));
+        assert!(!looks_like_session_age_request("session-memory age"));
+        assert!(!looks_like_session_age_request("session memory path"));
+        assert!(!looks_like_session_age_request("agents age"));
+        assert!(!looks_like_session_age_request("prompts age"));
+        assert!(!looks_like_session_age_request("task age"));
+        assert!(!looks_like_session_path_request("session age"));
+        assert!(!looks_like_session_size_request("session age"));
+        assert!(!looks_like_session_memory_age_request("session folder age"));
+        assert!(!looks_like_session_memory_age_request("session age"));
+        assert!(!looks_like_agents_age_request("session age"));
+        assert!(!looks_like_prompts_age_request("session age"));
+        let reply =
+            try_operator_instant_reply("how old are sessions").expect("session age instant");
+        assert!(reply.contains("Sessions"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
         );
     }
 
