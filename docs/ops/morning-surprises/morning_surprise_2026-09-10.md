@@ -6,6 +6,7 @@ Overnight Track B kept shipping instant-lane file ages so Discord/operator asks 
 
 | Version | What |
 |---------|------|
+| **v0.1.975** | Instant lane: `digest.md` / `latest.md` age (`digest.md age`, `how old is digest.md`, `when was latest.md updated`, …) — `latest.md` mtime; does not steal cache `digest age` |
 | **v0.1.974** | Instant lane: `session_reset_phrases.md` age (`session reset age`, `how old is session reset phrases`, …) — mtime only; path/size/escalation/cookie reject safe |
 | **v0.1.973** | Instant lane: `escalation_patterns.md` age (`escalation age`, `how old is escalation patterns`, …) — mtime only; path/size/session-reset/cookie reject safe |
 | **v0.1.972** | Instant lane: `browser_storage_state.json` age |
@@ -18,8 +19,8 @@ Overnight Track B kept shipping instant-lane file ages so Discord/operator asks 
 
 - Digester open: empty (wake-up instant noise + one lite BRAVE_SEARCH “Review logs”).
 - Design review: not due (grace; CPU metrics ~2.9d).
-- Next fuel: more p50 file-age gaps (or digester open / debug.log when present).
+- Next fuel: more p50 gaps / digester open / debug.log when present; sibling ports.
 
 ## Fitness
 
-Operators can ask how old session-reset phrases are and get an instant mtime answer — one less direct-lane round trip.
+Operators can ask how old `latest.md` is and get an instant mtime answer — separate from cache `digest age`, one less direct-lane round trip.
