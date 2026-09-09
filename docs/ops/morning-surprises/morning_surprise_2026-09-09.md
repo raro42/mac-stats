@@ -1,28 +1,16 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B shipped instant file-age lanes so Discord/AI Chat can answer “how old is …” without Ollama.
+Overnight Track B (product) kept shipping instant-lane file ages for operator asks.
 
 ## Shipped tonight
+- **v0.1.971** — Instant lane: `browser-credentials.toml` age (mtime; no secret dump; path/size/storage-state/credential-accounts safe).
+- **v0.1.970** — Instant lane: `downloads-organizer-state.json` age.
+- **v0.1.969** — Instant lane: `downloads-organizer-rules.md` age.
+- **v0.1.968** — Instant lane: `cookie_reject_patterns.md` age.
 
-| Version | What |
-| --- | --- |
-| **v0.1.970** | Instant: `downloads-organizer-state.json` age (mtime; path/size/rules/`/downloads` safe) |
-| **v0.1.969** | Instant: `downloads-organizer-rules.md` age |
-| **v0.1.968** | Instant: `cookie_reject_patterns.md` age |
-| **v0.1.967** | Instant: cleanup-quarantine directory age |
-| **v0.1.966** | Instant: browser-downloads directory age |
-| **v0.1.965** | Instant: PDF exports directory age |
+## Context
+- Digester open stayed empty; design-review surfaces still in grace.
+- Fuel: standing backlog p50 file-age gaps.
 
-## Try
-
-- `organizer state age` / `downloads-organizer-state.json age` / `how old is downloads organizer state`
-- `organizer rules age` / `cookie reject age`
-
-## Digester / design review
-
-- Digester open: empty (night used standing backlog).
-- Design review: not due (CPU metrics ~2.8d grace).
-
-## Next fuel
-
-- browser-credentials.toml age · browser_storage_state.json age · escalation_patterns.md age · session_reset_phrases.md age
+## Next
+- `browser_storage_state.json` age, then escalation / session-reset phrase ages.
