@@ -1,21 +1,23 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B kept shipping instant-lane **directory age** reads so Discord / AI Chat skip Ollama for “how old is …” folder asks.
+Overnight autoresearch (Track B) for Ralf.
 
-## Shipped tonight (keep)
-
+## Shipped tonight
 | Version | What |
 |---------|------|
+| **v0.1.957** | Instant lane: plugins/scripts directory age (`plugins age` / `scripts age` / how-old asks → newest `~/.mac-stats/scripts/` mtime; path/size/`/plugins` safe) |
+| **v0.1.956** | Instant lane: agents directory age |
+| **v0.1.955** | Instant lane: skills directory age |
+| **v0.1.954** | Instant lane: LaunchAgent plist age |
+| **v0.1.953** | Instant lane: screenshots directory age |
+| **v0.1.952** | Instant lane: improvements directory age |
 | **v0.1.942** | AI Chat filter-miss calm (design review / `feature-ai-chat`) |
-| **v0.1.946–955** | Notes · session-memory · Discord memory · before-reset/compaction · Ori vault · improvements · screenshots · LaunchAgent · **skills** age lanes |
-| **v0.1.956** | **Instant lane: agents directory age** — `agents age` / `how old are agents` / `agents folder age` / `when was agents updated` / bare `agent age` return newest `~/.mac-stats/agents/` mtime without Ollama; does not steal path / size / `agent.json age` / `/agents` |
 
-## This tick (~02:47)
+## Latest tick (~03:20)
+- Fuel: standing backlog p50 (design-review already used this night).
+- Keep @ `09aee68b` — plugins/scripts directory age instant lane.
+- Digester still surfaces stale `feature-ai-chat.png`; second design-review polish deferred (one/night cap). Screenshot recapture when TCC allows.
 
-- Digester open: design-review (`feature-ai-chat` stale) — polish already used this night (v0.1.942); one design-review/night cap.
-- Fuel: standing backlog p50 — agents directory age (path + size existed; age missing).
-- Ratchet keep @ `eec8bdc7`; push + install/kickstart.
-
-## Not a surprise alone
-
-Empty digester is not enough — the night still moved the ratchet via standing-backlog age lanes after the design-review cap.
+## Night status
+- Nightly minimum: **met** (multiple keeps in `results.tsv`).
+- Quiet ticks: none this window for product fuel.
