@@ -10994,6 +10994,216 @@ pub fn format_plugins_path_gateway() -> String {
     )
 }
 
+/// True for short “how old are prompts / prompts age…” asks.
+/// Newest file mtime under prompts dir — no list dump / path / size / planning·execution file lanes.
+pub fn looks_like_prompts_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("rewrite")
+        || n.contains("change ")
+        || n.contains("update ")
+        || n.contains("planning prompt")
+        || n.contains("execution prompt")
+        || n.contains("planning_prompt")
+        || n.contains("execution_prompt")
+        || n.contains("system prompt")
+        || n.contains("planning")
+        || n.contains("execution")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let prompts_ctx = n.contains("prompts folder")
+        || n.contains("prompt folder")
+        || n.contains("prompts directory")
+        || n.contains("prompt directory")
+        || n.contains("prompts dir")
+        || n.contains("prompt dir")
+        || n.contains("prompts age")
+        || n.contains("prompt age")
+        || n.contains("mac-stats prompts")
+        || n.contains("mac stats prompts")
+        || n == "prompts"
+        || n == "prompt"
+        || ((n.contains("prompts") || n.contains("prompt"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !prompts_ctx {
+        return false;
+    }
+    // Bare “prompts” / path-only asks stay on the path lane.
+    if n == "prompts"
+        || n == "prompt"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "prompts age"
+            | "prompt age"
+            | "prompts folder age"
+            | "prompt folder age"
+            | "prompts directory age"
+            | "prompt directory age"
+            | "prompts dir age"
+            | "prompt dir age"
+            | "how old are prompts"
+            | "how old is prompts"
+            | "how old is the prompts folder"
+            | "how old is prompts folder"
+            | "how old is the prompt folder"
+            | "how old is prompt folder"
+            | "how old is the prompts directory"
+            | "how old is the prompt directory"
+            | "how old is prompt"
+            | "how old is the prompt"
+            | "when was prompts updated"
+            | "when was the prompts folder updated"
+            | "when was the prompt folder updated"
+            | "prompts last modified"
+            | "prompt folder last modified"
+            | "is prompts stale"
+            | "is the prompts folder stale"
+            | "mac-stats prompts age"
+            | "mac stats prompts age"
+    ) || (prompts_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM prompts directory age (newest file mtime; no list dump).
+pub fn format_prompts_age_gateway() -> String {
+    let dir = crate::config::Config::prompts_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Prompts:** not created yet · app recreates under agents/prompts/ · `prompts path` for the folder · `prompts size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Prompts** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Prompts:** empty · `prompts path` for the folder · planning + execution `.md` · `prompts size` for on-disk bytes · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Prompts:** last write **{age}** ago · 1 file · `prompts path` for the folder · `prompts size` for on-disk bytes · planning + execution `.md` · does not list names."
+                )
+            } else {
+                format!(
+                    "**Prompts:** newest write **{age}** ago · {files} files · `prompts path` for the folder · `prompts size` for on-disk bytes · planning + execution `.md` · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Prompts** — could not read mtime · `prompts path` for the folder · `prompts size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big are prompts / prompts size…” asks.
 /// Recursive file-byte sum under prompts dir — no list dump / path / planning·execution file lanes.
 pub fn looks_like_prompts_size_request(content: &str) -> bool {
@@ -11175,18 +11385,18 @@ pub fn format_prompts_size_gateway() -> String {
     let dir = crate::config::Config::prompts_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Prompts:** not created yet · app recreates under agents/prompts/ · `prompts path` for the folder."
+            "**Prompts:** not created yet · app recreates under agents/prompts/ · `prompts path` for the folder · `prompts age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Prompts** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Prompts:** empty · `prompts path` for the folder · planning + execution `.md` · no dump from this ask."
+            "**Prompts:** empty · `prompts path` for the folder · planning + execution `.md` · `prompts age` for newest mtime · no dump from this ask."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Prompts:** **{label}** on disk ({files} files) · `prompts path` for the folder · planning + execution `.md` · does not list names."
+                "**Prompts:** **{label}** on disk ({files} files) · `prompts path` for the folder · `prompts age` for newest mtime · planning + execution `.md` · does not list names."
             )
         }
     }
@@ -11203,6 +11413,20 @@ pub fn looks_like_prompts_path_request(content: &str) -> bool {
         || looks_like_skills_path_request(content)
         || looks_like_memory_path_request(content)
         || looks_like_plugins_path_request(content)
+    {
+        return false;
+    }
+    // Age asks use the prompts directory age lane (v0.1.958).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -11309,7 +11533,7 @@ pub fn format_prompts_path_gateway() -> String {
     let dir = crate::config::Config::prompts_dir();
     let display = dir.display().to_string();
     format!(
-        "**Prompts dir:** `{display}` · planning + execution `.md` · `prompts size` for disk use · edit files on disk · `/agents` for soul/skill."
+        "**Prompts dir:** `{display}` · planning + execution `.md` · `prompts size` for disk use · `prompts age` for newest mtime · edit files on disk · `/agents` for soul/skill."
     )
 }
 
@@ -35831,7 +36055,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_plugins_path_request(content) {
         return Some(format_plugins_path_gateway());
     }
-    // Prompts dir size before path (recursive bytes; no list); path before planning/execution files.
+    // Prompts dir age before size/path (newest mtime; no list); size before path; path before planning/execution files.
+    if looks_like_prompts_age_request(content) {
+        return Some(format_prompts_age_gateway());
+    }
     if looks_like_prompts_size_request(content) {
         return Some(format_prompts_size_gateway());
     }
@@ -36209,7 +36436,8 @@ pub fn format_ops_help_gateway() -> String {
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `skills age` / `/skills` / `skill.md size`)\n\
 • `plugins age` · `scripts age` · `how old are plugins` · `plugins folder age` · `when was plugins updated` — plugins/scripts folder last write age (newest file mtime; no list dump; does not steal `plugins path` / size / `/plugins`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `plugins age` / `/plugins`)\n\
-• `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
+• `prompts age` · `how old are prompts` · `prompts folder age` · `when was prompts updated` — prompts folder last write age (newest file mtime; no list dump; does not steal `prompts path` / size / planning·execution file ages)\n\
+• `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / `prompts age` / planning·execution file paths)\n\
 • `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md age` / `prompts size`)\n\
 • `planning age` · `planning_prompt.md age` · `how old is planning` · `when was planning updated` — planning_prompt.md last write age (mtime; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md size` / `prompts path` / execution)\n\
 • `planning_prompt.md` · `where is planning_prompt.md` · `planning prompt path` · `planning path` — `agents/prompts/planning_prompt.md` (config only; no dump/edit; `planning_prompt.md size` / `planning_prompt.md age` for bytes / mtime; does not steal `prompts path`)\n\
@@ -36219,7 +36447,7 @@ pub fn format_ops_help_gateway() -> String {
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create; `agents size` / `agents age` for disk use / mtime)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` / `skills age` for disk use / mtime)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` / `plugins age` for disk use / mtime)\n\
-• `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` for disk use)\n\
+• `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` / `prompts age` for disk use / mtime)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
 • `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
 • `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
@@ -38042,6 +38270,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only plugins/scripts dir path asks (v0.1.820) — config only; no list/run.
     if looks_like_plugins_path_request(question) {
+        return true;
+    }
+    // Read-only prompts dir age asks (v0.1.958) — newest file mtime; no list dump.
+    if looks_like_prompts_age_request(question) {
         return true;
     }
     // Read-only prompts dir size asks (v0.1.883) — recursive file bytes; no list dump.
@@ -45046,6 +45278,8 @@ mod tests {
         assert!(!looks_like_prompts_path_request("skills path"));
         assert!(!looks_like_prompts_path_request("prompts size"));
         assert!(!looks_like_prompts_path_request("how big are prompts"));
+        assert!(!looks_like_prompts_path_request("prompts age"));
+        assert!(!looks_like_prompts_path_request("how old are prompts"));
         assert!(!looks_like_agents_path_request("prompts path"));
         assert!(!looks_like_agents_path_request("where is the prompts folder"));
         let reply =
@@ -45053,6 +45287,7 @@ mod tests {
         assert!(reply.contains("Prompts dir"));
         assert!(reply.contains("prompts") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("prompts size") || reply.contains("disk use"));
+        assert!(reply.to_lowercase().contains("prompts age") || reply.contains("mtime"));
     }
 
     #[test]
@@ -45076,6 +45311,8 @@ mod tests {
         assert!(!looks_like_prompts_size_request("plugins size"));
         assert!(!looks_like_prompts_size_request("skills size"));
         assert!(!looks_like_prompts_size_request("agents size"));
+        assert!(!looks_like_prompts_size_request("prompts age"));
+        assert!(!looks_like_prompts_size_request("how old are prompts"));
         assert!(!looks_like_prompts_path_request("prompts size"));
         assert!(!looks_like_plugins_size_request("prompts size"));
         assert!(!looks_like_skills_size_request("prompts size"));
@@ -45090,6 +45327,61 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("prompts path") || reply.contains("folder"));
+        assert!(reply.to_lowercase().contains("prompts age") || reply.contains("mtime"));
+    }
+
+    #[test]
+    fn prompts_age_request_detected() {
+        assert!(looks_like_prompts_age_request("prompts age"));
+        assert!(looks_like_prompts_age_request("prompt age"));
+        assert!(looks_like_prompts_age_request("prompts folder age"));
+        assert!(looks_like_prompts_age_request("prompts directory age"));
+        assert!(looks_like_prompts_age_request("prompts dir age"));
+        assert!(looks_like_prompts_age_request("how old are prompts"));
+        assert!(looks_like_prompts_age_request("how old is prompts"));
+        assert!(looks_like_prompts_age_request("how old is the prompts folder"));
+        assert!(looks_like_prompts_age_request("how old is prompt"));
+        assert!(looks_like_prompts_age_request(
+            "when was the prompts folder updated"
+        ));
+        assert!(looks_like_prompts_age_request("prompts last modified"));
+        assert!(looks_like_prompts_age_request("is the prompts folder stale"));
+        assert!(looks_like_prompts_age_request("mac-stats prompts age"));
+        assert!(!looks_like_prompts_age_request("prompts path"));
+        assert!(!looks_like_prompts_age_request("where is the prompts folder"));
+        assert!(!looks_like_prompts_age_request("prompts"));
+        assert!(!looks_like_prompts_age_request("prompts size"));
+        assert!(!looks_like_prompts_age_request("how big are prompts"));
+        assert!(!looks_like_prompts_age_request("list prompts"));
+        assert!(!looks_like_prompts_age_request("planning age"));
+        assert!(!looks_like_prompts_age_request("execution age"));
+        assert!(!looks_like_prompts_age_request("planning_prompt.md age"));
+        assert!(!looks_like_prompts_age_request("system prompt"));
+        assert!(!looks_like_prompts_age_request("plugins age"));
+        assert!(!looks_like_prompts_age_request("skills age"));
+        assert!(!looks_like_prompts_age_request("agents age"));
+        assert!(!looks_like_prompts_path_request("prompts age"));
+        assert!(!looks_like_prompts_size_request("prompts age"));
+        assert!(!looks_like_planning_prompt_age_request("prompts age"));
+        assert!(!looks_like_execution_prompt_age_request("prompts age"));
+        assert!(!looks_like_plugins_age_request("prompts age"));
+        let reply = try_operator_instant_reply("how old are prompts").expect("prompts age instant");
+        assert!(reply.contains("Prompts"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
+        assert!(reply.to_lowercase().contains("prompts path") || reply.contains("folder"));
+        assert!(
+            try_operator_instant_reply("prompts age").is_some(),
+            "prompts age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("prompt age").is_some(),
+            "prompt age should be prompts-dir age instant"
+        );
     }
 
     #[test]

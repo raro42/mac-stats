@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.958] - 2026-09-09
+
+### Added
+- Instant lane: prompts directory age (`prompts age`, `how old are prompts`, `prompts folder age`, `when was prompts updated`) — newest file mtime under `~/.mac-stats/agents/prompts/`; no list dump; does not steal path / size / planning·execution file ages.
+
 ## [0.1.957] - 2026-09-09
 
 ### Added
