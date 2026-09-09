@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.970] - 2026-09-09
+
+### Added
+- Instant lane: downloads-organizer-state.json age (`organizer state age`, `downloads organizer state age`, `how old is downloads organizer state`, `when was downloads organizer state updated`, `downloads-organizer-state.json age`) — file mtime only; no dump; does not steal path / size / organizer rules / `/downloads`.
+
 ## [0.1.969] - 2026-09-09
 
 ### Added

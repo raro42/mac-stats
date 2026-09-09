@@ -27415,7 +27415,251 @@ pub fn format_downloads_organizer_state_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Downloads organizer state:** **{label}** on disk · last-run summary · `downloads organizer state path` for the file · does not dump JSON or run organize-now."
+                "**Downloads organizer state:** **{label}** on disk · last-run summary · `downloads organizer state path` for the file · `downloads organizer state age` for last write · does not dump JSON or run organize-now."
+            )
+        }
+        Err(e) => {
+            format!(
+                "**Downloads organizer state** — could not stat `downloads-organizer-state.json`: {e}"
+            )
+        }
+    }
+}
+
+/// True for short “how old is downloads-organizer-state.json / downloads organizer state age…” asks.
+/// Mtime only — does not steal path / size / organizer rules / `/downloads` / cookie reject.
+pub fn looks_like_downloads_organizer_state_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("run organizer")
+        || n.contains("run downloads")
+        || n.contains("organize now")
+        || n.contains("organize my")
+        || n.contains("clean now")
+        || n.contains("/disk")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer-rules")
+        || n.contains("downloads_organizer_rules")
+        || n.contains("downloads organizer rules")
+        || n.contains("downloads organizer rule")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("organizer rule")
+        || n.contains("rules.md")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agents age")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest")
+        || n == "/downloads"
+        || n == "/organizer"
+        || n == "downloads"
+        || n == "organizer"
+        || n == "downloads status"
+        || n == "organizer status"
+        || n == "downloads ready"
+        || n == "organizer ready"
+        || n == "downloads organizer"
+        || n == "downloads organizer status"
+        || n == "downloads organizer ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let state_ctx = n.contains("downloads-organizer-state.json")
+        || n.contains("downloads-organizer-state")
+        || n.contains("downloads_organizer_state")
+        || n.contains("downloads organizer state")
+        || n.contains("organizer-state.json")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("organizer state age")
+        || n == "how old is organizer state"
+        || n == "how old is the organizer state"
+        || n == "when was organizer state updated"
+        || n == "when was the organizer state updated"
+        || n == "mac-stats organizer state age"
+        || n == "mac stats organizer state age"
+        || n == "is organizer state stale"
+        || n == "is the organizer state stale"
+        || (n.contains("state")
+            && (n.contains("downloads-organizer")
+                || n.contains("downloads organizer")
+                || n.contains("organizer"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("json")
+                || n.contains("file")));
+    if !state_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "organizer state age"
+            | "downloads organizer state age"
+            | "downloads-organizer-state age"
+            | "downloads-organizer-state.json age"
+            | "downloads-organizer-state file age"
+            | "downloads_organizer_state age"
+            | "downloads_organizer_state.json age"
+            | "organizer-state age"
+            | "organizer-state.json age"
+            | "organizer state file age"
+            | "organizer state last modified"
+            | "downloads-organizer-state.json last modified"
+            | "downloads organizer state last modified"
+            | "how old is organizer state"
+            | "how old is the organizer state"
+            | "how old is downloads-organizer-state.json"
+            | "how old is the downloads-organizer-state.json"
+            | "how old is downloads organizer state"
+            | "how old is the downloads organizer state"
+            | "how old is downloads organizer state file"
+            | "how old is the downloads organizer state file"
+            | "how old is the organizer state file"
+            | "when was organizer state updated"
+            | "when was the organizer state updated"
+            | "when was downloads-organizer-state.json updated"
+            | "when was the downloads-organizer-state.json updated"
+            | "when was downloads organizer state updated"
+            | "when was the downloads organizer state updated"
+            | "is organizer state stale"
+            | "is the organizer state stale"
+            | "is downloads-organizer-state.json stale"
+            | "is the downloads-organizer-state.json stale"
+            | "is downloads organizer state stale"
+            | "is the downloads organizer state stale"
+            | "mac-stats organizer state age"
+            | "mac stats organizer state age"
+            | "mac-stats downloads-organizer-state.json age"
+            | "mac stats downloads-organizer-state.json age"
+    ) || (state_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM downloads-organizer-state.json age from file mtime (stat only; no dump/list JSON).
+pub fn format_downloads_organizer_state_age_gateway() -> String {
+    let path = crate::config::Config::downloads_organizer_state_path();
+    if !path.exists() {
+        return "**Downloads organizer state:** no `downloads-organizer-state.json` yet · `downloads organizer state path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Downloads organizer state:** last write **{age}** ago · last-run summary · `downloads organizer state path` for the file · `downloads organizer state size` for on-disk bytes."
             )
         }
         Err(e) => {
@@ -27429,6 +27673,7 @@ pub fn format_downloads_organizer_state_size_gateway() -> String {
 /// True for short “where is downloads-organizer-state.json / downloads organizer state path…” asks.
 /// Config path only — does not dump last-run JSON, run organize-now, or return organizer Ready status.
 /// Size asks use the downloads-organizer-state.json size lane (v0.1.913).
+/// Age asks use the downloads-organizer-state.json age lane (v0.1.970).
 pub fn looks_like_downloads_organizer_state_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
@@ -27541,6 +27786,13 @@ pub fn looks_like_downloads_organizer_state_path_request(content: &str) -> bool 
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the downloads-organizer-state.json age lane (v0.1.970) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -27663,7 +27915,7 @@ pub fn format_downloads_organizer_state_path_gateway() -> String {
     let path = crate::config::Config::downloads_organizer_state_path();
     let display = path.display().to_string();
     format!(
-        "**Downloads organizer state file:** `{display}` · last-run summary · path only · `downloads organizer state size` for on-disk bytes · does not dump JSON or run organize-now."
+        "**Downloads organizer state file:** `{display}` · last-run summary · path only · `downloads organizer state size` for on-disk bytes · `downloads organizer state age` for last write · does not dump JSON or run organize-now."
     )
 }
 
@@ -37750,9 +38002,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_age_request(content) {
         return Some(format_downloads_organizer_rules_age_gateway());
     }
-    // downloads-organizer-state.json size before path (stat only; no dump).
+    // downloads-organizer-state.json size before age/path (stat only; no dump).
     if looks_like_downloads_organizer_state_size_request(content) {
         return Some(format_downloads_organizer_state_size_gateway());
+    }
+    // downloads-organizer-state.json age before path (mtime only; no dump).
+    if looks_like_downloads_organizer_state_age_request(content) {
+        return Some(format_downloads_organizer_state_age_gateway());
     }
     // downloads-organizer-state.json before rules / /downloads Ready (path-only asks).
     if looks_like_downloads_organizer_state_path_request(content) {
@@ -38056,9 +38312,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_downloads_organizer_rules_age_request(content) {
         return Some(format_downloads_organizer_rules_age_gateway());
     }
-    // downloads-organizer-state.json size before path (stat only; no dump).
+    // downloads-organizer-state.json size before age/path (stat only; no dump).
     if looks_like_downloads_organizer_state_size_request(content) {
         return Some(format_downloads_organizer_state_size_gateway());
+    }
+    // downloads-organizer-state.json age before path (mtime only; no dump).
+    if looks_like_downloads_organizer_state_age_request(content) {
+        return Some(format_downloads_organizer_state_age_gateway());
     }
     // downloads-organizer-state.json before rules / agents-dir / browser-downloads path lanes.
     if looks_like_downloads_organizer_state_path_request(content) {
@@ -38695,8 +38955,9 @@ pub fn format_ops_help_gateway() -> String {
 • `organizer rules size` · `downloads-organizer-rules.md size` · `how big is downloads organizer rules` · `downloads organizer rules size` — downloads-organizer-rules.md file size on disk (stat only; no dump; does not steal `downloads organizer rules path` / `downloads organizer rules age` / organizer state / `/downloads`)\n\
 • `organizer rules age` · `downloads-organizer-rules.md age` · `how old is downloads organizer rules` · `when was downloads organizer rules updated` · `downloads organizer rules age` — downloads-organizer-rules.md last write age (mtime; no dump; does not steal `downloads organizer rules path` / size / organizer state / `/downloads`)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; `downloads organizer rules size` / `downloads organizer rules age` for bytes / mtime; does not steal `/downloads`)\n\
-• `organizer state size` · `downloads-organizer-state.json size` · `how big is downloads organizer state` · `downloads organizer state size` — downloads-organizer-state.json file size on disk (stat only; no dump; does not steal `downloads organizer state path` / rules / `/downloads`)\n\
-• `downloads organizer state path` · `where is downloads-organizer-state.json` · `organizer state path` — Downloads organizer state file (config only; no dump/run; `downloads organizer state size` for on-disk bytes; does not steal `/downloads`)\n\
+• `organizer state size` · `downloads-organizer-state.json size` · `how big is downloads organizer state` · `downloads organizer state size` — downloads-organizer-state.json file size on disk (stat only; no dump; does not steal `downloads organizer state path` / `downloads organizer state age` / rules / `/downloads`)\n\
+• `organizer state age` · `downloads-organizer-state.json age` · `how old is downloads organizer state` · `when was downloads organizer state updated` · `downloads organizer state age` — downloads-organizer-state.json last write age (mtime; no dump; does not steal `downloads organizer state path` / size / rules / `/downloads`)\n\
+• `downloads organizer state path` · `where is downloads-organizer-state.json` · `organizer state path` — Downloads organizer state file (config only; no dump/run; `downloads organizer state size` / `downloads organizer state age` for bytes / mtime; does not steal `/downloads`)\n\
 • `screenshot path` · `where are screenshots` · `screenshot folder` — BROWSER_SCREENSHOT save dir (config only; `screenshots size` / `screenshots age` for disk use / mtime)\n\
 • `screenshots size` · `how big are screenshots` · `screenshots folder size` — screenshots folder size on disk (recursive file bytes; no list dump; does not steal `screenshot path` / `screenshots age` / take/list)\n\
 • `screenshots age` · `how old are screenshots` · `screenshots folder age` · `when was screenshots updated` — screenshots folder last write age (newest file mtime; no list dump; does not steal `screenshot path` / size / take/list)\n\
@@ -40336,6 +40597,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only downloads-organizer-state.json size asks (v0.1.913) — stat only; no dump/list.
     if looks_like_downloads_organizer_state_size_request(question) {
+        return true;
+    }
+    // Read-only downloads-organizer-state.json age asks (v0.1.970) — mtime only; no dump/list.
+    if looks_like_downloads_organizer_state_age_request(question) {
         return true;
     }
     // Read-only downloads-organizer-state.json path asks (v0.1.850) — config only; no dump/run.
@@ -44701,6 +44966,12 @@ mod tests {
         assert!(!looks_like_downloads_organizer_state_path_request(
             "how big is downloads organizer state"
         ));
+        assert!(!looks_like_downloads_organizer_state_path_request(
+            "downloads organizer state age"
+        ));
+        assert!(!looks_like_downloads_organizer_state_path_request(
+            "how old is downloads-organizer-state.json"
+        ));
         assert!(!looks_like_downloads_organizer_ready_request(
             "downloads organizer state path"
         ));
@@ -44722,9 +44993,79 @@ mod tests {
         assert!(
             reply.contains("downloads organizer state size") || reply.contains("on-disk")
         );
+        assert!(
+            reply.contains("downloads organizer state age") || reply.contains("last write")
+        );
         assert!(!reply.to_lowercase().contains("ready"));
         assert!(!reply.to_lowercase().contains("browser-downloads"));
         assert!(!reply.to_lowercase().contains("rules file"));
+    }
+
+    #[test]
+    fn downloads_organizer_state_age_request_detected() {
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "organizer state age"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "downloads-organizer-state.json age"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "downloads organizer state age"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "how old is downloads organizer state"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "how old is downloads-organizer-state.json"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "when was downloads organizer state updated"
+        ));
+        assert!(looks_like_downloads_organizer_state_age_request(
+            "when was the organizer state updated"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "downloads organizer state path"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "where is downloads-organizer-state.json"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "downloads organizer state size"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "how big is downloads organizer state"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "downloads organizer rules age"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_downloads_organizer_state_age_request("/downloads"));
+        assert!(!looks_like_downloads_organizer_state_path_request(
+            "downloads-organizer-state.json age"
+        ));
+        assert!(!looks_like_downloads_organizer_state_size_request(
+            "downloads organizer state age"
+        ));
+        assert!(!looks_like_downloads_organizer_rules_age_request(
+            "downloads organizer state age"
+        ));
+        assert!(!looks_like_downloads_organizer_ready_request(
+            "organizer state age"
+        ));
+        let reply = try_operator_instant_reply("downloads-organizer-state.json age")
+            .expect("downloads-organizer-state age instant");
+        assert!(
+            reply.contains("Downloads organizer state")
+                && (reply.contains("last write")
+                    || reply.contains("ago")
+                    || reply.contains("no `downloads-organizer-state.json`")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Downloads organizer state file:"));
+        assert!(!reply.to_lowercase().contains("ready"));
     }
 
     #[test]
@@ -44762,6 +45103,9 @@ mod tests {
         assert!(!looks_like_downloads_organizer_state_size_request(
             "cookie reject patterns size"
         ));
+        assert!(!looks_like_downloads_organizer_state_size_request(
+            "downloads organizer state age"
+        ));
         assert!(!looks_like_downloads_organizer_state_size_request("/downloads"));
         assert!(!looks_like_downloads_organizer_state_path_request(
             "downloads-organizer-state.json size"
@@ -44782,6 +45126,13 @@ mod tests {
             "{reply}"
         );
         assert!(!reply.contains("Downloads organizer state file:"));
+        assert!(
+            reply.contains("downloads organizer state age")
+                || reply.contains("last write")
+                || reply.contains("no `downloads-organizer-state.json`")
+                || reply.contains("empty"),
+            "{reply}"
+        );
     }
 
     #[test]
