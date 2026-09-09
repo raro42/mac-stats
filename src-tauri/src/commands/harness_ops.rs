@@ -13634,6 +13634,211 @@ pub fn format_traces_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is the pdfs folder / pdfs age…” asks.
+/// Newest file mtime under PDF exports dir — no list dump / path / size / save lanes.
+pub fn looks_like_pdfs_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("save_pdf")
+        || n.contains("save pdf")
+        || n.contains("print pdf")
+        || n.contains("print_pdf")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("improvements")
+        || n.contains("quarantine")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("skills")
+        || n.contains("plugins")
+        || n.contains("scripts")
+        || n.contains("prompts")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pdfs_ctx = n.contains("pdfs folder")
+        || n.contains("pdfs directory")
+        || n.contains("pdfs dir")
+        || n.contains("pdfs age")
+        || n.contains("pdf folder")
+        || n.contains("pdf directory")
+        || n.contains("pdf dir")
+        || n.contains("pdf age")
+        || n.contains("pdf exports")
+        || n.contains("pdf export")
+        || n.contains("browser pdfs")
+        || n.contains("browser pdf")
+        || n.contains("mac-stats pdfs")
+        || n.contains("mac stats pdfs")
+        || n == "pdfs"
+        || n == "pdf"
+        || ((n.contains("pdf"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !pdfs_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("pdfs age")
+        || n.contains("pdf age");
+    // Bare “pdfs” / “pdf” / path-only asks stay on the path lane.
+    if n == "pdfs" || n == "pdf" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "pdfs age"
+            | "pdf age"
+            | "pdfs folder age"
+            | "pdf folder age"
+            | "pdfs directory age"
+            | "pdf directory age"
+            | "pdfs dir age"
+            | "pdf dir age"
+            | "how old are pdfs"
+            | "how old is pdfs"
+            | "how old is pdf"
+            | "how old is the pdfs folder"
+            | "how old is pdfs folder"
+            | "how old is the pdf folder"
+            | "how old is pdf folder"
+            | "how old is the pdfs directory"
+            | "how old is the pdf directory"
+            | "when was pdfs updated"
+            | "when was pdf updated"
+            | "when was the pdfs folder updated"
+            | "when was the pdf folder updated"
+            | "pdfs last modified"
+            | "pdf last modified"
+            | "pdfs folder last modified"
+            | "is pdfs stale"
+            | "is the pdfs folder stale"
+            | "pdf exports age"
+            | "pdf export age"
+            | "browser pdfs age"
+            | "browser pdf age"
+            | "mac-stats pdfs age"
+            | "mac stats pdfs age"
+    ) || (pdfs_ctx && ageish)
+}
+
+/// Zero-LLM PDF exports directory age (newest file mtime; no list dump).
+pub fn format_pdfs_age_gateway() -> String {
+    let dir = crate::config::Config::pdfs_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**PDFs:** not created yet · app recreates under `~/.mac-stats/pdfs/` · `pdfs path` for the folder · `pdfs size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**PDFs** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**PDFs:** empty · `pdfs path` for the folder · `pdfs size` for on-disk bytes · BROWSER_SAVE_PDF exports · `/browser` for CDP status · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**PDFs:** last write **{age}** ago · 1 file · `pdfs path` for the folder · `pdfs size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**PDFs:** newest write **{age}** ago · {files} files · `pdfs path` for the folder · `pdfs size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**PDFs** — could not read mtime · `pdfs path` for the folder · `pdfs size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big are pdfs / pdfs size…” asks.
 /// Recursive file-byte sum under PDF exports dir — no list dump / path / save lanes.
 pub fn looks_like_pdfs_size_request(content: &str) -> bool {
@@ -13796,18 +14001,18 @@ pub fn format_pdfs_size_gateway() -> String {
     let dir = crate::config::Config::pdfs_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**PDFs:** not created yet · app recreates under `~/.mac-stats/pdfs/` · `pdfs path` for the folder."
+            "**PDFs:** not created yet · app recreates under `~/.mac-stats/pdfs/` · `pdfs path` for the folder · `pdfs age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**PDFs** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**PDFs:** empty · `pdfs path` for the folder · BROWSER_SAVE_PDF exports · `/browser` for CDP status."
+            "**PDFs:** empty · `pdfs path` for the folder · `pdfs age` for newest mtime · BROWSER_SAVE_PDF exports · `/browser` for CDP status."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**PDFs:** **{label}** on disk ({files} files) · exports · `pdfs path` for the folder · does not list names."
+                "**PDFs:** **{label}** on disk ({files} files) · exports · `pdfs path` for the folder · `pdfs age` for newest mtime · does not list names."
             )
         }
     }
@@ -13852,6 +14057,17 @@ pub fn looks_like_pdfs_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age/how-old asks use the pdfs age lane (v0.1.965).
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -13955,7 +14171,7 @@ pub fn format_pdfs_path_gateway() -> String {
     let dir = crate::config::Config::pdfs_dir();
     let display = dir.display().to_string();
     format!(
-        "**PDFs dir:** `{display}` · BROWSER_SAVE_PDF exports · pruned by retention · `/browser` for CDP status · `pdfs size` for disk use."
+        "**PDFs dir:** `{display}` · BROWSER_SAVE_PDF exports · pruned by retention · `/browser` for CDP status · `pdfs size` for disk use · `pdfs age` for newest mtime."
     )
 }
 
@@ -37210,7 +37426,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_traces_path_request(content) {
         return Some(format_traces_path_gateway());
     }
-    // PDFs dir size before path (recursive bytes; no list); path before save/list.
+    // PDFs dir age before size/path (newest mtime; no list); size before path; path before save/list.
+    if looks_like_pdfs_age_request(content) {
+        return Some(format_pdfs_age_gateway());
+    }
     if looks_like_pdfs_size_request(content) {
         return Some(format_pdfs_size_gateway());
     }
@@ -37583,8 +37802,9 @@ pub fn format_ops_help_gateway() -> String {
 • `traces age` · `how old are traces` · `traces folder age` · `when was traces updated` · `cdp traces age` — CDP traces folder last write age (newest file mtime; no list dump; does not steal `traces path` / `traces size` / prune)\n\
 • `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / `traces age` / prune)\n\
 • `traces path` · `where is the traces folder` · `cdp traces` — `~/.mac-stats/traces/` path (config only; no list/prune; `traces size` / `traces age` for bytes / mtime)\n\
-• `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / save)\n\
-• `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save)\n\
+• `pdfs age` · `how old are pdfs` · `pdfs folder age` · `when was pdfs updated` · `pdf exports age` — PDF exports folder last write age (newest file mtime; no list dump; does not steal `pdfs path` / `pdfs size` / save)\n\
+• `pdfs size` · `how big are pdfs` · `pdfs folder size` — PDF exports folder size on disk (recursive file bytes; no list dump; does not steal `pdfs path` / `pdfs age` / save)\n\
+• `pdfs path` · `where is the pdfs folder` · `pdf directory` — `~/.mac-stats/pdfs/` path (config only; no list/save; `pdfs size` / `pdfs age` for bytes / mtime)\n\
 • `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / storage state / credential accounts)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` for on-disk bytes)\n\
 • `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
@@ -39455,6 +39675,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only CDP traces dir path asks (v0.1.825) — config only; no list/prune.
     if looks_like_traces_path_request(question) {
+        return true;
+    }
+    // Read-only PDF exports dir age asks (v0.1.965) — newest file mtime; no list dump.
+    if looks_like_pdfs_age_request(question) {
         return true;
     }
     // Read-only PDF exports dir size asks (v0.1.878) — recursive file bytes; no list dump.
@@ -47014,6 +47238,10 @@ mod tests {
         assert!(reply.contains("PDFs dir"));
         assert!(reply.contains("pdfs") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("pdfs size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("pdfs age") || reply.contains("mtime"),
+            "path reply should mention pdfs age: {reply}"
+        );
     }
 
     #[test]
@@ -47037,6 +47265,7 @@ mod tests {
         assert!(!looks_like_pdfs_size_request("uploads size"));
         assert!(!looks_like_pdfs_size_request("traces size"));
         assert!(!looks_like_pdfs_size_request("screenshots size"));
+        assert!(!looks_like_pdfs_size_request("pdfs age"));
         assert!(!looks_like_pdfs_path_request("pdfs size"));
         assert!(!looks_like_uploads_size_request("pdfs size"));
         assert!(!looks_like_traces_size_request("pdfs size"));
@@ -47051,6 +47280,50 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("pdfs path") || reply.contains("folder"));
+        assert!(
+            reply.to_lowercase().contains("pdfs age") || reply.contains("mtime"),
+            "size reply should mention pdfs age: {reply}"
+        );
+    }
+
+    #[test]
+    fn pdfs_age_request_detected() {
+        assert!(looks_like_pdfs_age_request("pdfs age"));
+        assert!(looks_like_pdfs_age_request("pdf age"));
+        assert!(looks_like_pdfs_age_request("pdfs folder age"));
+        assert!(looks_like_pdfs_age_request("pdfs directory age"));
+        assert!(looks_like_pdfs_age_request("pdfs dir age"));
+        assert!(looks_like_pdfs_age_request("how old are pdfs"));
+        assert!(looks_like_pdfs_age_request("how old is the pdfs folder"));
+        assert!(looks_like_pdfs_age_request("when was pdfs updated"));
+        assert!(looks_like_pdfs_age_request("when was the pdfs folder updated"));
+        assert!(looks_like_pdfs_age_request("is the pdfs folder stale"));
+        assert!(looks_like_pdfs_age_request("pdf exports age"));
+        assert!(looks_like_pdfs_age_request("browser pdfs age"));
+        assert!(looks_like_pdfs_age_request("mac-stats pdfs age"));
+        assert!(!looks_like_pdfs_age_request("pdfs path"));
+        assert!(!looks_like_pdfs_age_request("where is the pdfs folder"));
+        assert!(!looks_like_pdfs_age_request("pdfs"));
+        assert!(!looks_like_pdfs_age_request("pdfs size"));
+        assert!(!looks_like_pdfs_age_request("how big are pdfs"));
+        assert!(!looks_like_pdfs_age_request("list pdfs"));
+        assert!(!looks_like_pdfs_age_request("clean pdfs"));
+        assert!(!looks_like_pdfs_age_request("save pdf"));
+        assert!(!looks_like_pdfs_age_request("traces age"));
+        assert!(!looks_like_pdfs_age_request("uploads age"));
+        assert!(!looks_like_pdfs_path_request("pdfs age"));
+        assert!(!looks_like_pdfs_size_request("pdfs age"));
+        assert!(!looks_like_traces_age_request("pdfs age"));
+        assert!(!looks_like_uploads_age_request("pdfs age"));
+        let reply =
+            try_operator_instant_reply("how old is the pdfs folder").expect("pdfs age instant");
+        assert!(reply.contains("PDFs"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
     }
 
     #[test]

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.965] - 2026-09-09
+
+### Added
+- Instant lane: PDF exports directory age (`pdfs age`, `how old are pdfs`, `pdfs folder age`, `when was pdfs updated`, `pdf exports age`) — newest file mtime under `~/.mac-stats/pdfs/`; no list dump; does not steal path / size / save.
+
 ## [0.1.964] - 2026-09-09
 
 ### Added
