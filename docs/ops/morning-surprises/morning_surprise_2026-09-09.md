@@ -6,6 +6,7 @@ Overnight Track B kept shipping operator instant lanes (file/directory age) whil
 
 | Version | What |
 |---------|------|
+| **v0.1.969** | Instant lane: **downloads-organizer-rules.md age** — file mtime; no dump; path/size/organizer state/`/downloads` safe |
 | **v0.1.968** | Instant lane: **cookie_reject_patterns.md age** — file mtime; no dump; path/size/session-reset/escalation/browser-cookies safe |
 | **v0.1.967** | Instant lane: **cleanup-quarantine directory age** — newest mtime under `~/.mac-stats/cleanup-quarantine/`; no list; path/size/`/disk` safe |
 | **v0.1.966** | Instant lane: browser-downloads directory age |
@@ -19,5 +20,5 @@ Overnight Track B kept shipping operator instant lanes (file/directory age) whil
 - Debug.log watch: Having fun idle-thought Ollama 300s timeout (1 cluster) — not fixed this tick.
 
 ## Next
-- Continue p50 file-age gaps (organizer rules/state, browser credentials/storage state, escalation/session-reset) or sibling Hermes insights when digester stays empty.
+- Continue p50 file-age gaps (organizer state, browser credentials/storage state, escalation/session-reset) or sibling Hermes insights when digester stays empty.
 - Design-review recapture when grace expires / TCC allows.
