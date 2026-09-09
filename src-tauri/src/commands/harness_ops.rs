@@ -25988,7 +25988,227 @@ pub fn format_cookie_reject_patterns_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Cookie reject patterns:** **{label}** on disk · browser cookie banner reject phrases · `cookie reject patterns path` for the file · does not list patterns."
+                "**Cookie reject patterns:** **{label}** on disk · browser cookie banner reject phrases · `cookie reject patterns path` for the file · `cookie reject patterns age` for last write · does not list patterns."
+            )
+        }
+        Err(e) => {
+            format!("**Cookie reject patterns** — could not stat `cookie_reject_patterns.md`: {e}")
+        }
+    }
+}
+
+/// True for short “how old is cookie_reject_patterns.md / cookie reject patterns age…” asks.
+/// Mtime only — does not steal path / size / session-reset / escalation / browser cookies.
+pub fn looks_like_cookie_reject_patterns_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("trigger")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agents age")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let reject_ctx = n.contains("cookie_reject_patterns.md")
+        || n.contains("cookie_reject_patterns")
+        || n.contains("cookie-reject-patterns")
+        || n.contains("cookie reject patterns")
+        || n.contains("cookie reject pattern")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("cookie reject age")
+        || n == "how old is cookie reject"
+        || n == "how old is the cookie reject"
+        || n == "when was cookie reject updated"
+        || n == "when was the cookie reject updated"
+        || n == "mac-stats cookie reject age"
+        || n == "mac stats cookie reject age"
+        || n == "is cookie reject stale"
+        || n == "is the cookie reject stale"
+        || (n.contains("reject")
+            && n.contains("cookie")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("md")
+                || n.contains("pattern")));
+    if !reject_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "cookie reject age"
+            | "cookie reject patterns age"
+            | "cookie reject pattern age"
+            | "cookie_reject_patterns age"
+            | "cookie_reject_patterns.md age"
+            | "cookie_reject_patterns file age"
+            | "cookie-reject-patterns age"
+            | "cookie-reject-patterns.md age"
+            | "reject patterns age"
+            | "reject pattern age"
+            | "reject patterns file age"
+            | "cookie reject patterns last modified"
+            | "cookie_reject_patterns.md last modified"
+            | "reject patterns last modified"
+            | "how old is cookie reject"
+            | "how old is the cookie reject"
+            | "how old is cookie_reject_patterns.md"
+            | "how old is the cookie_reject_patterns.md"
+            | "how old is cookie reject patterns"
+            | "how old is the cookie reject patterns"
+            | "how old is cookie reject patterns file"
+            | "how old is the cookie reject patterns file"
+            | "how old is the reject patterns file"
+            | "how old is reject patterns"
+            | "when was cookie reject updated"
+            | "when was the cookie reject updated"
+            | "when was cookie_reject_patterns.md updated"
+            | "when was the cookie_reject_patterns.md updated"
+            | "when was cookie reject patterns updated"
+            | "when was the cookie reject patterns updated"
+            | "when was reject patterns updated"
+            | "is cookie reject stale"
+            | "is the cookie reject stale"
+            | "is cookie_reject_patterns.md stale"
+            | "is the cookie_reject_patterns.md stale"
+            | "is cookie reject patterns stale"
+            | "is the cookie reject patterns stale"
+            | "mac-stats cookie reject age"
+            | "mac stats cookie reject age"
+            | "mac-stats cookie_reject_patterns.md age"
+            | "mac stats cookie_reject_patterns.md age"
+    ) || (reject_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM cookie_reject_patterns.md age from file mtime (stat only; no dump/list patterns).
+pub fn format_cookie_reject_patterns_age_gateway() -> String {
+    let path = crate::config::Config::cookie_reject_patterns_path();
+    if !path.exists() {
+        return "**Cookie reject patterns:** no `cookie_reject_patterns.md` yet · `cookie reject patterns path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Cookie reject patterns:** last write **{age}** ago · browser cookie banner reject phrases · `cookie reject patterns path` for the file · `cookie reject patterns size` for on-disk bytes."
             )
         }
         Err(e) => {
@@ -26000,6 +26220,7 @@ pub fn format_cookie_reject_patterns_size_gateway() -> String {
 /// True for short “where is cookie_reject_patterns.md / cookie reject patterns path…” asks.
 /// Config path only — does not list patterns or edit the reject list.
 /// Size asks use the cookie_reject_patterns.md size lane (v0.1.911).
+/// Age asks use the cookie_reject_patterns.md age lane (v0.1.968).
 pub fn looks_like_cookie_reject_patterns_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -26098,6 +26319,13 @@ pub fn looks_like_cookie_reject_patterns_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the cookie_reject_patterns.md age lane (v0.1.968) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
     {
         return false;
     }
@@ -26216,7 +26444,7 @@ pub fn format_cookie_reject_patterns_path_gateway() -> String {
     let path = crate::config::Config::cookie_reject_patterns_path();
     let display = path.display().to_string();
     format!(
-        "**Cookie reject patterns file:** `{display}` · browser cookie banner reject phrases · path only · `cookie reject patterns size` for on-disk bytes · does not list or edit patterns."
+        "**Cookie reject patterns file:** `{display}` · browser cookie banner reject phrases · path only · `cookie reject patterns size` for on-disk bytes · `cookie reject patterns age` for last write · does not list or edit patterns."
     )
 }
 
@@ -37551,9 +37779,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_reset_phrases_path_request(content) {
         return Some(format_session_reset_phrases_path_gateway());
     }
-    // cookie_reject_patterns.md size before path (stat only; no dump).
+    // cookie_reject_patterns.md size before age/path (stat only; no dump).
     if looks_like_cookie_reject_patterns_size_request(content) {
         return Some(format_cookie_reject_patterns_size_gateway());
+    }
+    // cookie_reject_patterns.md age before path (mtime only; no dump).
+    if looks_like_cookie_reject_patterns_age_request(content) {
+        return Some(format_cookie_reject_patterns_age_gateway());
     }
     // cookie_reject_patterns.md before browser cookies / agents-dir path lanes.
     if looks_like_cookie_reject_patterns_path_request(content) {
@@ -38196,8 +38428,9 @@ pub fn format_ops_help_gateway() -> String {
 • `before compaction transcript size` · `before-compaction transcript size` · `how big is before compaction transcript` · `last_session_before_compaction.jsonl size` — before-compaction transcript size on disk (stat only; no dump; does not steal `before compaction transcript path` / `before compaction transcript age` / before-reset / session reset phrases)\n\
 • `before compaction transcript age` · `before-compaction transcript age` · `how old is before compaction transcript` · `when was before compaction transcript updated` · `last_session_before_compaction.jsonl age` — before-compaction transcript last write age (mtime; no dump; does not steal `before compaction transcript path` / size / before-reset / session reset phrases)\n\
 • `before compaction transcript path` · `where is before compaction transcript` · `last_session_before_compaction.jsonl` — before-compaction JSONL path (config/env only; no dump/hook; `before compaction transcript size` / `before compaction transcript age` for bytes / mtime; does not steal before-reset)\n\
-• `cookie reject size` · `cookie_reject_patterns.md size` · `how big is cookie reject patterns` · `cookie reject patterns size` — cookie_reject_patterns.md file size on disk (stat only; no dump; does not steal `cookie reject patterns path` / session-reset / escalation)\n\
-• `cookie reject patterns path` · `where is cookie_reject_patterns.md` · `cookie reject path` · `reject patterns path` — cookie reject patterns file (config only; no list/edit; `cookie reject patterns size` for on-disk bytes; does not steal browser cookies)\n\
+• `cookie reject size` · `cookie_reject_patterns.md size` · `how big is cookie reject patterns` · `cookie reject patterns size` — cookie_reject_patterns.md file size on disk (stat only; no dump; does not steal `cookie reject patterns path` / `cookie reject patterns age` / session-reset / escalation)\n\
+• `cookie reject age` · `cookie_reject_patterns.md age` · `how old is cookie reject patterns` · `when was cookie reject patterns updated` · `cookie reject patterns age` — cookie_reject_patterns.md last write age (mtime; no dump; does not steal `cookie reject patterns path` / size / session-reset / escalation)\n\
+• `cookie reject patterns path` · `where is cookie_reject_patterns.md` · `cookie reject path` · `reject patterns path` — cookie reject patterns file (config only; no list/edit; `cookie reject patterns size` / `cookie reject patterns age` for bytes / mtime; does not steal browser cookies)\n\
 • `organizer rules size` · `downloads-organizer-rules.md size` · `how big is downloads organizer rules` · `downloads organizer rules size` — downloads-organizer-rules.md file size on disk (stat only; no dump; does not steal `downloads organizer rules path` / organizer state / `/downloads`)\n\
 • `downloads organizer rules path` · `where is downloads-organizer-rules.md` · `organizer rules path` — Downloads organizer rules file (config only; no list/run; `downloads organizer rules size` for on-disk bytes; does not steal `/downloads`)\n\
 • `organizer state size` · `downloads-organizer-state.json size` · `how big is downloads organizer state` · `downloads organizer state size` — downloads-organizer-state.json file size on disk (stat only; no dump; does not steal `downloads organizer state path` / rules / `/downloads`)\n\
@@ -39821,6 +40054,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only cookie_reject_patterns.md size asks (v0.1.911) — stat only; no dump/list.
     if looks_like_cookie_reject_patterns_size_request(question) {
+        return true;
+    }
+    // Read-only cookie_reject_patterns.md age asks (v0.1.968) — mtime only; no dump/list.
+    if looks_like_cookie_reject_patterns_age_request(question) {
         return true;
     }
     // Read-only cookie_reject_patterns.md path asks (v0.1.848) — config only; no list/edit.
@@ -43788,6 +44025,12 @@ mod tests {
         assert!(!looks_like_cookie_reject_patterns_path_request(
             "how big is cookie reject patterns"
         ));
+        assert!(!looks_like_cookie_reject_patterns_path_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_path_request(
+            "how old is cookie reject patterns"
+        ));
         let reply = try_operator_instant_reply("where is cookie_reject_patterns.md")
             .expect("cookie_reject_patterns path instant");
         assert!(reply.contains("Cookie reject patterns file"));
@@ -43795,8 +44038,74 @@ mod tests {
             reply.contains("cookie_reject_patterns.md") || reply.contains(".mac-stats")
         );
         assert!(reply.contains("cookie reject patterns size") || reply.contains("on-disk"));
+        assert!(reply.contains("cookie reject patterns age") || reply.contains("last write"));
         assert!(!reply.to_lowercase().contains("storage state"));
         assert!(!reply.to_lowercase().contains("session reset"));
+    }
+
+    #[test]
+    fn cookie_reject_patterns_age_request_detected() {
+        assert!(looks_like_cookie_reject_patterns_age_request("cookie reject age"));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "cookie_reject_patterns.md age"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "cookie reject patterns age"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "how old is cookie reject patterns"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "how old is cookie_reject_patterns.md"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "when was cookie reject patterns updated"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "reject patterns age"
+        ));
+        assert!(looks_like_cookie_reject_patterns_age_request(
+            "is cookie reject patterns stale"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "cookie reject patterns path"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "cookie reject patterns size"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "where is cookie_reject_patterns.md"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "list cookie reject patterns"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "session reset phrases age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "escalation patterns age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request("soul age"));
+        assert!(!looks_like_cookie_reject_patterns_path_request(
+            "cookie_reject_patterns.md age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_size_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "cookie reject patterns age"
+        ));
+        let reply = try_operator_instant_reply("cookie_reject_patterns.md age")
+            .expect("cookie_reject_patterns age instant");
+        assert!(
+            reply.contains("Cookie reject patterns")
+                && (reply.contains("ago")
+                    || reply.contains("no `cookie_reject_patterns.md`")
+                    || reply.contains("could not stat")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Cookie reject patterns file:"));
+        assert!(!reply.contains("on disk"));
     }
 
     #[test]
@@ -43836,6 +44145,12 @@ mod tests {
             "escalation patterns size"
         ));
         assert!(!looks_like_cookie_reject_patterns_size_request("soul size"));
+        assert!(!looks_like_cookie_reject_patterns_size_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_size_request(
+            "how old is cookie reject patterns"
+        ));
         assert!(!looks_like_cookie_reject_patterns_path_request(
             "cookie_reject_patterns.md size"
         ));

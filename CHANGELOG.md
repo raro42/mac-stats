@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.968] - 2026-09-09
+
+### Added
+- Instant lane: cookie_reject_patterns.md age (`cookie reject age`, `cookie reject patterns age`, `how old is cookie reject patterns`, `when was cookie reject patterns updated`, `cookie_reject_patterns.md age`) — file mtime only; no dump; does not steal path / size / session-reset / escalation / browser cookies.
+
 ## [0.1.967] - 2026-09-09
 
 ### Added
