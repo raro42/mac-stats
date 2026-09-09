@@ -15034,6 +15034,210 @@ pub fn format_browser_storage_state_path_gateway() -> String {
     )
 }
 
+/// True for short “how old are browser downloads / browser-downloads age…” asks.
+/// Newest file mtime under browser-downloads dir — no list dump / path / size / download / organizer lanes.
+pub fn looks_like_browser_downloads_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("browser_download:")
+        || n.contains("download file")
+        || n.contains("download this")
+        || n.contains("download the")
+        || n.contains("download from")
+        || n.contains("download url")
+        || n.contains("download http")
+        || (n.contains("browser_")
+            && !n.contains("browser_download")
+            && !n.contains("browser_downloads"))
+        || n.contains("browser:")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("improvements")
+        || n.contains("quarantine")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let dl_ctx = n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("browser_downloads")
+        || n.contains("browser_download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("mac-stats downloads")
+        || n.contains("mac stats downloads")
+        || (n.contains("downloads")
+            && (n.contains("browser")
+                || n.contains("cdp")
+                || n.contains("mac-stats")
+                || n.contains("mac stats"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !dl_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age");
+    // Bare folder labels stay on the path lane.
+    if n == "browser-downloads"
+        || n == "browser_downloads"
+        || n == "browser downloads"
+        || n == "cdp downloads"
+        || n == "mac-stats downloads"
+        || n == "mac stats downloads"
+        || !ageish
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "browser downloads age"
+            | "browser download age"
+            | "browser-downloads age"
+            | "browser_downloads age"
+            | "browser downloads folder age"
+            | "browser download folder age"
+            | "browser-downloads folder age"
+            | "browser downloads directory age"
+            | "browser-downloads directory age"
+            | "browser downloads dir age"
+            | "browser-downloads dir age"
+            | "how old are browser downloads"
+            | "how old is browser downloads"
+            | "how old is the browser downloads folder"
+            | "how old is browser downloads folder"
+            | "how old is the browser-downloads folder"
+            | "how old is browser-downloads"
+            | "when was browser downloads updated"
+            | "when was the browser downloads folder updated"
+            | "when was browser-downloads updated"
+            | "browser downloads last modified"
+            | "browser-downloads last modified"
+            | "is browser downloads stale"
+            | "is the browser downloads folder stale"
+            | "cdp downloads age"
+            | "cdp download age"
+            | "mac-stats downloads age"
+            | "mac stats downloads age"
+    ) || (dl_ctx && ageish)
+}
+
+/// Zero-LLM browser downloads directory age (newest file mtime; no list dump).
+pub fn format_browser_downloads_age_gateway() -> String {
+    let dir = crate::config::Config::browser_downloads_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Browser downloads:** not created yet · app recreates under `~/.mac-stats/browser-downloads/` · `browser downloads path` for the folder · `browser downloads size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Browser downloads** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Browser downloads:** empty · `browser downloads path` for the folder · `browser downloads size` for on-disk bytes · BROWSER_DOWNLOAD artifacts · `/browser` for CDP status · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Browser downloads:** last write **{age}** ago · 1 file · `browser downloads path` for the folder · `browser downloads size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Browser downloads:** newest write **{age}** ago · {files} files · `browser downloads path` for the folder · `browser downloads size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Browser downloads** — could not read mtime · `browser downloads path` for the folder · `browser downloads size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big are browser downloads / browser-downloads size…” asks.
 /// Recursive file-byte sum under browser-downloads dir — no list dump / path / download / organizer lanes.
 pub fn looks_like_browser_downloads_size_request(content: &str) -> bool {
@@ -15207,18 +15411,18 @@ pub fn format_browser_downloads_size_gateway() -> String {
     let dir = crate::config::Config::browser_downloads_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Browser downloads:** not created yet · app recreates under `~/.mac-stats/browser-downloads/` · `browser downloads path` for the folder."
+            "**Browser downloads:** not created yet · app recreates under `~/.mac-stats/browser-downloads/` · `browser downloads path` for the folder · `browser downloads age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Browser downloads** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Browser downloads:** empty · `browser downloads path` for the folder · BROWSER_DOWNLOAD artifacts · `/browser` for CDP status."
+            "**Browser downloads:** empty · `browser downloads path` for the folder · `browser downloads age` for newest mtime · BROWSER_DOWNLOAD artifacts · `/browser` for CDP status."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Browser downloads:** **{label}** on disk ({files} files) · BROWSER_DOWNLOAD · `browser downloads path` for the folder · does not list names."
+                "**Browser downloads:** **{label}** on disk ({files} files) · BROWSER_DOWNLOAD · `browser downloads path` for the folder · `browser downloads age` for newest mtime · does not list names."
             )
         }
     }
@@ -15264,6 +15468,17 @@ pub fn looks_like_browser_downloads_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age/how-old asks use the browser downloads age lane (v0.1.966).
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -15387,7 +15602,7 @@ pub fn format_browser_downloads_path_gateway() -> String {
     let dir = crate::config::Config::browser_downloads_dir();
     let display = dir.display().to_string();
     format!(
-        "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer · `browser downloads size` for disk use."
+        "**Browser downloads:** `{display}` · BROWSER_DOWNLOAD artifacts · pruned by retention · `/browser` for CDP status · `/downloads` for organizer · `browser downloads size` for disk use · `browser downloads age` for newest mtime."
     )
 }
 
@@ -37450,6 +37665,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_storage_state_path_request(content) {
         return Some(format_browser_storage_state_path_gateway());
     }
+    // Browser-downloads dir age before size/path (newest mtime; no list); size before path.
+    if looks_like_browser_downloads_age_request(content) {
+        return Some(format_browser_downloads_age_gateway());
+    }
     // Browser-downloads dir size before path (recursive bytes; no list); path before download/list.
     if looks_like_browser_downloads_size_request(content) {
         return Some(format_browser_downloads_size_gateway());
@@ -37809,8 +38028,9 @@ pub fn format_ops_help_gateway() -> String {
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` for on-disk bytes)\n\
 • `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
 • `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` for on-disk bytes)\n\
-• `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `/downloads`)\n\
-• `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; does not steal `/downloads`)\n\
+• `browser downloads age` · `how old are browser downloads` · `browser-downloads age` · `when was browser downloads updated` · `cdp downloads age` — CDP download folder last write age (newest file mtime; no list dump; does not steal `browser downloads path` / `browser downloads size` / `/downloads`)\n\
+• `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `browser downloads age` / `/downloads`)\n\
+• `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; `browser downloads size` / `browser downloads age` for bytes / mtime; does not steal `/downloads`)\n\
 • `cleanup quarantine size` · `how big is quarantine` · `quarantine folder size` — cleanup-quarantine folder size on disk (recursive file bytes; no list dump; does not steal `cleanup quarantine path` / `/disk`)\n\
 • `cleanup quarantine path` · `where is cleanup-quarantine` · `quarantine folder` — Disk Cleanup soft-delete dir (config only; no list/prune; `cleanup quarantine size` for disk use; does not steal `/disk`)\n\
 • `pinned processes size` · `pinned_processes.json size` · `how big is pinned processes` — pinned_processes.json file size on disk (stat only; no dump; does not steal `pinned processes path` / `pinned processes age` / `/pinned`)\n\
@@ -39703,6 +39923,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
     if looks_like_browser_storage_state_path_request(question) {
+        return true;
+    }
+    // Read-only browser-downloads dir age asks (v0.1.966) — newest file mtime; no list dump.
+    if looks_like_browser_downloads_age_request(question) {
         return true;
     }
     // Read-only browser-downloads dir size asks (v0.1.879) — recursive file bytes; no list dump.
@@ -47619,7 +47843,10 @@ mod tests {
         assert!(reply.contains("Browser downloads"));
         assert!(reply.contains("browser-downloads") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("browser downloads size") || reply.contains("disk use")
+            reply.to_lowercase().contains("browser downloads size")
+                || reply.to_lowercase().contains("browser downloads age")
+                || reply.contains("disk use")
+                || reply.contains("mtime")
         );
     }
 
@@ -47660,6 +47887,10 @@ mod tests {
             "where are browser downloads"
         ));
         assert!(!looks_like_browser_downloads_size_request("browser-downloads"));
+        assert!(!looks_like_browser_downloads_size_request("browser downloads age"));
+        assert!(!looks_like_browser_downloads_size_request(
+            "how old are browser downloads"
+        ));
         assert!(!looks_like_browser_downloads_size_request("list downloads"));
         assert!(!looks_like_browser_downloads_size_request("clean downloads"));
         assert!(!looks_like_browser_downloads_size_request("/downloads"));
@@ -47685,7 +47916,94 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(
-            reply.to_lowercase().contains("browser downloads path") || reply.contains("folder")
+            reply.to_lowercase().contains("browser downloads path")
+                || reply.to_lowercase().contains("browser downloads age")
+                || reply.contains("folder")
+                || reply.contains("mtime")
+        );
+    }
+
+    #[test]
+    fn browser_downloads_age_request_detected() {
+        assert!(looks_like_browser_downloads_age_request(
+            "browser downloads age"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "browser-downloads age"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "browser downloads folder age"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "browser-downloads folder age"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "browser downloads dir age"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "how old are browser downloads"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "how old is the browser downloads folder"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "when was browser downloads updated"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "when was the browser-downloads folder updated"
+        ));
+        assert!(looks_like_browser_downloads_age_request(
+            "is the browser downloads folder stale"
+        ));
+        assert!(looks_like_browser_downloads_age_request("cdp downloads age"));
+        assert!(looks_like_browser_downloads_age_request(
+            "mac-stats downloads age"
+        ));
+        assert!(!looks_like_browser_downloads_age_request(
+            "browser downloads path"
+        ));
+        assert!(!looks_like_browser_downloads_age_request(
+            "where are browser downloads"
+        ));
+        assert!(!looks_like_browser_downloads_age_request("browser-downloads"));
+        assert!(!looks_like_browser_downloads_age_request(
+            "browser downloads size"
+        ));
+        assert!(!looks_like_browser_downloads_age_request(
+            "how big are browser downloads"
+        ));
+        assert!(!looks_like_browser_downloads_age_request("list downloads"));
+        assert!(!looks_like_browser_downloads_age_request("clean downloads"));
+        assert!(!looks_like_browser_downloads_age_request("/downloads"));
+        assert!(!looks_like_browser_downloads_age_request("downloads"));
+        assert!(!looks_like_browser_downloads_age_request("uploads age"));
+        assert!(!looks_like_browser_downloads_age_request("pdfs age"));
+        assert!(!looks_like_browser_downloads_age_request("tmp age"));
+        assert!(!looks_like_browser_downloads_path_request(
+            "browser downloads age"
+        ));
+        assert!(!looks_like_browser_downloads_size_request(
+            "browser downloads age"
+        ));
+        assert!(!looks_like_uploads_age_request("browser downloads age"));
+        assert!(!looks_like_pdfs_age_request("browser downloads age"));
+        assert!(!looks_like_downloads_organizer_ready_request(
+            "browser downloads age"
+        ));
+        let reply = try_operator_instant_reply("how old are browser downloads")
+            .expect("browser downloads age instant");
+        assert!(reply.contains("Browser downloads"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+                || reply.contains("mtime")
+        );
+        assert!(
+            reply.to_lowercase().contains("browser downloads path")
+                || reply.to_lowercase().contains("browser downloads size")
+                || reply.contains("folder")
         );
     }
 

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.966] - 2026-09-09
+
+### Added
+- Instant lane: browser-downloads directory age (`browser downloads age`, `how old are browser downloads`, `browser-downloads age`, `when was browser downloads updated`, `cdp downloads age`) — newest file mtime under `~/.mac-stats/browser-downloads/`; no list dump; does not steal path / size / `/downloads`.
+
 ## [0.1.965] - 2026-09-09
 
 ### Added
