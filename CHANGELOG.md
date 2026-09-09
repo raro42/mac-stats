@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.956] - 2026-09-09
+
+### Added
+- Instant lane: agents directory age (`agents age`, `how old are agents`, `agents folder age`, `when was agents updated`) — newest file mtime under `~/.mac-stats/agents/`; no list dump; does not steal path / size / `agent.json age` / `/agents`.
+
 ## [0.1.955] - 2026-09-09
 
 ### Added

@@ -9416,19 +9416,226 @@ pub fn format_agents_size_gateway() -> String {
     let dir = crate::config::Config::agents_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Agents:** not created yet · app recreates under `~/.mac-stats/agents/` · `agents path` for the folder."
+            "**Agents:** not created yet · app recreates under `~/.mac-stats/agents/` · `agents path` for the folder · `agents age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Agents** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Agents:** empty · `agents path` for the folder · `/agents` for On/Off · Agent Ops → Agents."
+            "**Agents:** empty · `agents path` for the folder · `/agents` for On/Off · Agent Ops → Agents · `agents age` for newest mtime."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Agents:** **{label}** on disk ({files} files) · `/agents` for On/Off · `agents path` for the folder · does not list names."
+                "**Agents:** **{label}** on disk ({files} files) · `/agents` for On/Off · `agents path` for the folder · `agents age` for newest mtime · does not list names."
             )
+        }
+    }
+}
+
+/// True for short “how old are agents / agents age…” asks.
+/// Newest file mtime under agents dir — no list dump / path / size / agent.json / On-Off lanes.
+/// Do not use bare `contains("age")` — it matches inside `agent`.
+pub fn looks_like_agents_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/agents")
+        || n.contains("agents on")
+        || n.contains("agents off")
+        || n.contains("agent.json")
+        || n.contains("agent config")
+        || n.contains("agent-config")
+        || n.contains("agent json")
+        || n.contains("skill")
+        || n.contains("skills")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.starts_with("agent:")
+        || n.contains("agent:")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let agents_ctx = n.contains("agents folder")
+        || n.contains("agent folder")
+        || n.contains("agents directory")
+        || n.contains("agent directory")
+        || n.contains("agents dir")
+        || n.contains("agent dir")
+        || n.contains("agents age")
+        || n.contains("agent age")
+        || n.contains("mac-stats agents")
+        || n.contains("mac stats agents")
+        || n == "agents"
+        || n == "agent"
+        || ((n.contains("agents") || n.contains("agent"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !agents_ctx {
+        return false;
+    }
+    // Age signal — avoid bare `contains("age")` (matches inside `agent`).
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("agents age")
+        || n.contains("agent age");
+    // Bare “agents” / path-only asks stay on the path lane.
+    if n == "agents" || n == "agent" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "agents age"
+            | "agent age"
+            | "agents folder age"
+            | "agent folder age"
+            | "agents directory age"
+            | "agent directory age"
+            | "agents dir age"
+            | "agent dir age"
+            | "how old are agents"
+            | "how old is agents"
+            | "how old is the agents folder"
+            | "how old is agents folder"
+            | "how old is the agent folder"
+            | "how old is agent folder"
+            | "how old is the agents directory"
+            | "how old is the agent directory"
+            | "how old is agent"
+            | "how old is the agent"
+            | "when was agents updated"
+            | "when was the agents folder updated"
+            | "when was the agent folder updated"
+            | "agents last modified"
+            | "agent folder last modified"
+            | "is agents stale"
+            | "is the agents folder stale"
+            | "mac-stats agents age"
+            | "mac stats agents age"
+    ) || (agents_ctx && ageish)
+}
+
+/// Zero-LLM agents directory age (newest file mtime; no list dump).
+pub fn format_agents_age_gateway() -> String {
+    let dir = crate::config::Config::agents_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Agents:** not created yet · app recreates under `~/.mac-stats/agents/` · `agents path` for the folder · `agents size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Agents** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Agents:** empty · `agents path` for the folder · `/agents` for On/Off · Agent Ops → Agents · `agents size` for on-disk bytes."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Agents:** last write **{age}** ago · 1 file · `/agents` for On/Off · `agents path` for the folder · `agents size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Agents:** newest write **{age}** ago · {files} files · `/agents` for On/Off · `agents path` for the folder · `agents size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Agents** — could not read mtime · `agents path` for the folder · `agents size` for on-disk bytes."
+                .to_string()
         }
     }
 }
@@ -9454,6 +9661,20 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
         || n.contains("agent-config")
         || n == "where is agent.json"
         || n == "where is the agent.json"
+    {
+        return false;
+    }
+    // Age asks use the agents directory age lane (v0.1.956).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -9559,7 +9780,7 @@ pub fn format_agents_path_gateway() -> String {
     let dir = crate::config::Config::agents_dir();
     let display = dir.display().to_string();
     format!(
-        "**Agents dir:** `{display}` · `/agents` for On/Off · Agent Ops → Agents · `agents size` for disk use."
+        "**Agents dir:** `{display}` · `/agents` for On/Off · Agent Ops → Agents · `agents size` for disk use · `agents age` for newest mtime."
     )
 }
 
@@ -35316,7 +35537,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_session_path_request(content) {
         return Some(format_session_path_gateway());
     }
-    // Agents dir size before path (recursive bytes; no list); path before On/Off catalog.
+    // Agents dir age before size/path (newest mtime; no list); size before path; path before On/Off catalog.
+    if looks_like_agents_age_request(content) {
+        return Some(format_agents_age_gateway());
+    }
     if looks_like_agents_size_request(content) {
         return Some(format_agents_size_gateway());
     }
@@ -35712,7 +35936,8 @@ pub fn format_ops_help_gateway() -> String {
 • `launchagent path` · `where is launchagent` · `mac-stats.plist` · `harness plist` — `~/Library/LaunchAgents/com.raro42.mac-stats.plist` + overnight harness plist (path only; `launchagent size` / `launchagent age` for bytes / mtime; no load/unload)\n\
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
-• `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
+• `agents age` · `how old are agents` · `agents folder age` · `when was agents updated` — agents folder last write age (newest file mtime; no list dump; does not steal `agents path` / size / `agent.json age` / `/agents`)\n\
+• `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `agents age` / `/agents`)\n\
 • `skills age` · `how old are skills` · `skills folder age` · `when was skills updated` — skills folder last write age (newest file mtime; no list dump; does not steal `skills path` / size / `skill.md age` / `/skills`)\n\
 • `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `skills age` / `/skills` / `skill.md size`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
@@ -35723,7 +35948,7 @@ pub fn format_ops_help_gateway() -> String {
 • `execution size` · `execution_prompt.md size` · `how big is execution_prompt.md` · `execution prompt size` — execution_prompt.md size on disk (stat only; no dump; does not steal `execution_prompt.md path` / `execution_prompt.md age` / `prompts size`)\n\
 • `execution age` · `execution_prompt.md age` · `how old is execution` · `when was execution updated` — execution_prompt.md last write age (mtime; no dump; does not steal `execution_prompt.md path` / `execution_prompt.md size` / `prompts path` / planning)\n\
 • `execution_prompt.md` · `where is execution_prompt.md` · `execution prompt path` · `execution path` — `agents/prompts/execution_prompt.md` (config only; no dump/edit; `execution_prompt.md size` / `execution_prompt.md age` for bytes / mtime; does not steal `prompts path`)\n\
-• `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
+• `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create; `agents size` / `agents age` for disk use / mtime)\n\
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` / `skills age` for disk use / mtime)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` for disk use)\n\
@@ -37513,6 +37738,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only session dir path asks (v0.1.816) — config only; no list/resume.
     if looks_like_session_path_request(question) {
+        return true;
+    }
+    // Read-only agents dir age asks (v0.1.956) — newest file mtime; no list dump.
+    if looks_like_agents_age_request(question) {
         return true;
     }
     // Read-only agents dir size asks (v0.1.880) — recursive file bytes; no list dump.
@@ -44168,12 +44397,15 @@ mod tests {
         assert!(!looks_like_agents_path_request("session path"));
         assert!(!looks_like_agents_path_request("agents size"));
         assert!(!looks_like_agents_path_request("how big are agents"));
+        assert!(!looks_like_agents_path_request("agents age"));
+        assert!(!looks_like_agents_path_request("how old are agents"));
         assert!(!looks_like_agents_request("agents path"));
         let reply =
             try_operator_instant_reply("where is the agents folder").expect("agents path instant");
         assert!(reply.contains("Agents dir"));
         assert!(reply.contains("agents") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("agents size") || reply.contains("disk use"));
+        assert!(reply.to_lowercase().contains("agents age") || reply.contains("mtime"));
     }
 
     #[test]
@@ -44202,6 +44434,8 @@ mod tests {
         assert!(!looks_like_tmp_size_request("agents size"));
         assert!(!looks_like_uploads_size_request("agents size"));
         assert!(!looks_like_pdfs_size_request("agents size"));
+        assert!(!looks_like_agents_size_request("agents age"));
+        assert!(!looks_like_agents_size_request("how old are agents"));
         let reply =
             try_operator_instant_reply("how big are agents").expect("agents size instant");
         assert!(reply.contains("Agents"));
@@ -44212,6 +44446,60 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("agents path") || reply.contains("folder"));
+        assert!(reply.to_lowercase().contains("agents age") || reply.contains("mtime"));
+    }
+
+    #[test]
+    fn agents_age_request_detected() {
+        assert!(looks_like_agents_age_request("agents age"));
+        assert!(looks_like_agents_age_request("agent age"));
+        assert!(looks_like_agents_age_request("agents folder age"));
+        assert!(looks_like_agents_age_request("agents directory age"));
+        assert!(looks_like_agents_age_request("agents dir age"));
+        assert!(looks_like_agents_age_request("how old are agents"));
+        assert!(looks_like_agents_age_request("how old is agents"));
+        assert!(looks_like_agents_age_request("how old is the agents folder"));
+        assert!(looks_like_agents_age_request("how old is agent"));
+        assert!(looks_like_agents_age_request(
+            "when was the agents folder updated"
+        ));
+        assert!(looks_like_agents_age_request("agents last modified"));
+        assert!(looks_like_agents_age_request("is the agents folder stale"));
+        assert!(looks_like_agents_age_request("mac-stats agents age"));
+        assert!(!looks_like_agents_age_request("agents path"));
+        assert!(!looks_like_agents_age_request("where is the agents folder"));
+        assert!(!looks_like_agents_age_request("agents"));
+        assert!(!looks_like_agents_age_request("agents size"));
+        assert!(!looks_like_agents_age_request("how big are agents"));
+        assert!(!looks_like_agents_age_request("list agents"));
+        assert!(!looks_like_agents_age_request("/agents"));
+        assert!(!looks_like_agents_age_request("agent.json"));
+        assert!(!looks_like_agents_age_request("agent.json age"));
+        assert!(!looks_like_agents_age_request("how old is agent.json"));
+        assert!(!looks_like_agents_age_request("skills age"));
+        assert!(!looks_like_agents_age_request("tmp age"));
+        assert!(!looks_like_agents_path_request("agents age"));
+        assert!(!looks_like_agents_size_request("agents age"));
+        assert!(!looks_like_agent_json_age_request("agents age"));
+        assert!(!looks_like_agent_json_age_request("agent age"));
+        let reply = try_operator_instant_reply("how old are agents").expect("agents age instant");
+        assert!(reply.contains("Agents"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
+        assert!(reply.to_lowercase().contains("agents path") || reply.contains("folder"));
+        assert!(
+            try_operator_instant_reply("agents age").is_some(),
+            "agents age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("agent.json age").is_some(),
+            "agent.json age must stay on its lane"
+        );
+        assert!(!looks_like_agents_age_request("agent.json age"));
     }
 
     #[test]
