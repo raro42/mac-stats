@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.975] - 2026-09-10
+
+### Added
+- Instant lane: digest.md / latest.md age (`digest.md age`, `latest.md age`, `how old is digest.md`, `when was latest.md updated`, `digest markdown age`) — `latest.md` mtime only; no digester spawn; does not steal cache `digest age` / size / open / `/digest`.
+
 ## [0.1.974] - 2026-09-10
 
 ### Added

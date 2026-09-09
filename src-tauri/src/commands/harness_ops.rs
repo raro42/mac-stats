@@ -1101,6 +1101,13 @@ pub fn looks_like_digest_age_request(content: &str) -> bool {
         || n.contains("open candidate")
         || n.contains("digest open")
         || n.contains("open digest")
+        // digest.md / latest.md mtime uses the digest.md age lane (v0.1.975).
+        || n.contains("digest.md")
+        || n.contains("digest md")
+        || n.contains("latest.md")
+        || n.contains("latest md")
+        || n.contains("digest markdown")
+        || n.contains("md digest")
     {
         return false;
     }
@@ -1359,7 +1366,130 @@ pub fn format_digest_md_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Digest.md:** **{label}** on disk (`latest.md`) · `digest size` for `latest.json` · `digest age` for cache age · `/digest` to refresh."
+                "**Digest.md:** **{label}** on disk (`latest.md`) · `digest.md age` for mtime · `digest size` for `latest.json` · `digest age` for cache age · `/digest` to refresh."
+            )
+        }
+        Err(e) => format!("**Digest.md** — could not stat `latest.md`: {e}"),
+    }
+}
+
+/// True for short “how old is digest.md / latest.md age…” asks.
+/// Stat only on `latest.md` mtime — does not steal cache `digest age` / size / open / refresh.
+pub fn looks_like_digest_md_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("refresh")
+        || n.contains("run digester")
+        || n.contains("run digest")
+        || n.contains("rerun")
+        || n.starts_with("update digest")
+        || n.starts_with("refresh digest")
+        || n.contains("open candidate")
+        || n.contains("digest open")
+        || n.contains("open digest")
+        || n.contains("latest.json")
+        || n.contains("latest json")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("results age")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs size")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("log size")
+        || n.contains("improvements path")
+        || n.contains("improvements folder")
+        || n.contains("improvements age")
+        || n.contains("improvements size")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    // Require explicit latest.md / digest.md — do not steal bare `digest age` (cache).
+    let md_ctx = n.contains("digest.md")
+        || n.contains("digest md")
+        || n.contains("latest.md")
+        || n.contains("latest md")
+        || n.contains("digest markdown")
+        || n.contains("md digest");
+    if !md_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "digest.md age"
+            | "digest md age"
+            | "latest.md age"
+            | "latest md age"
+            | "how old is digest.md"
+            | "how old is latest.md"
+            | "how old is the digest.md"
+            | "how old is the latest.md"
+            | "when was digest.md updated"
+            | "when was latest.md updated"
+            | "when was the digest.md updated"
+            | "when was the latest.md updated"
+            | "digest.md last modified"
+            | "latest.md last modified"
+            | "is digest.md stale"
+            | "is latest.md stale"
+            | "is the digest.md stale"
+            | "is the latest.md stale"
+            | "digest markdown age"
+            | "md digest age"
+    ) || (n.contains("age") && md_ctx)
+        || (n.contains("old") && md_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified") || n.contains("stale"))
+            && md_ctx)
+}
+
+/// Zero-LLM digest `latest.md` age from file mtime (stat only; no digester spawn / open dump).
+pub fn format_digest_md_age_gateway() -> String {
+    let path = digest_md_path();
+    if !path.exists() {
+        return "**Digest.md:** no `latest.md` yet · run `/digest` first · `digest age` for cache age."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Digest.md:** last write **{age}** ago (`latest.md`) · `digest.md size` for on-disk bytes · `digest age` for cache age · `/digest` to refresh."
             )
         }
         Err(e) => format!("**Digest.md** — could not stat `latest.md`: {e}"),
@@ -1402,6 +1532,10 @@ pub fn try_digest_instant_reply(content: &str) -> Option<String> {
     // digest.md size before latest.json size (stat only; no digester spawn).
     if looks_like_digest_md_size_request(content) {
         return Some(format_digest_md_size_gateway());
+    }
+    // digest.md age before cache digest age (mtime; no digester spawn).
+    if looks_like_digest_md_age_request(content) {
+        return Some(format_digest_md_age_gateway());
     }
     // Size before age/open (stat only; no digester spawn).
     if looks_like_digest_size_request(content) {
@@ -40113,6 +40247,7 @@ pub fn format_ops_help_gateway() -> String {
 • `digest age` — cached digest timestamp (no digester spawn)\n\
 • `digest size` · `how big is the digest` · `latest.json size` — digest `latest.json` size on disk (stat only; no digester spawn)\n\
 • `digest.md size` · `latest.md size` · `how big is digest.md` — digest `latest.md` size on disk (stat only; no digester spawn; does not steal `digest size`)\n\
+• `digest.md age` · `latest.md age` · `how old is digest.md` · `when was latest.md updated` — digest `latest.md` last write age (mtime; no digester spawn; does not steal `digest age`)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
@@ -41500,6 +41635,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only digest.md size asks (v0.1.872) — latest.md stat only, no digester spawn.
     if looks_like_digest_md_size_request(question) {
+        return true;
+    }
+    // Read-only digest.md age asks (v0.1.975) — latest.md mtime only, no digester spawn.
+    if looks_like_digest_md_age_request(question) {
         return true;
     }
     // Read-only digest size asks (v0.1.871) — latest.json stat only, no digester spawn.
@@ -43829,11 +43968,54 @@ mod tests {
         assert!(!looks_like_digest_age_request("update digest"));
         assert!(!looks_like_digest_age_request("digest size"));
         assert!(!looks_like_digest_age_request("how big is the digest"));
+        assert!(!looks_like_digest_age_request("digest.md age"));
+        assert!(!looks_like_digest_age_request("latest.md age"));
+        assert!(!looks_like_digest_age_request("how old is digest.md"));
         let reply = try_operator_instant_reply("digest age").expect("digest age instant");
         assert!(reply.contains("cached"), "{reply}");
         assert!(
             !reply.to_lowercase().contains("refreshed"),
             "read-only must not re-run digester: {reply}"
+        );
+    }
+
+    #[test]
+    fn digest_md_age_request_detected() {
+        assert!(looks_like_digest_md_age_request("digest.md age"));
+        assert!(looks_like_digest_md_age_request("digest md age"));
+        assert!(looks_like_digest_md_age_request("latest.md age"));
+        assert!(looks_like_digest_md_age_request("how old is digest.md"));
+        assert!(looks_like_digest_md_age_request("how old is latest.md"));
+        assert!(looks_like_digest_md_age_request("when was latest.md updated"));
+        assert!(looks_like_digest_md_age_request("digest markdown age"));
+        assert!(!looks_like_digest_md_age_request("digest age"));
+        assert!(!looks_like_digest_md_age_request("how old is the digest"));
+        assert!(!looks_like_digest_md_age_request("digest.md size"));
+        assert!(!looks_like_digest_md_age_request("latest.json age"));
+        assert!(!looks_like_digest_md_age_request("digest open"));
+        assert!(!looks_like_digest_md_age_request("/digest"));
+        assert!(!looks_like_digest_md_age_request("results.tsv age"));
+        assert!(!looks_like_digest_md_age_request("runs age"));
+        assert!(!looks_like_digest_md_age_request("improvements age"));
+        assert!(!looks_like_digest_age_request("digest.md age"));
+        assert!(!looks_like_digest_md_size_request("digest.md age"));
+        assert!(!looks_like_digest_refresh_request("digest.md age"));
+        let reply =
+            try_operator_instant_reply("how old is digest.md").expect("digest.md age instant");
+        assert!(reply.contains("Digest.md"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no `latest.md`")
+                || reply.contains("could not stat"),
+            "{reply}"
+        );
+        assert!(
+            !reply.to_lowercase().contains("refreshed"),
+            "read-only must not re-run digester: {reply}"
+        );
+        assert!(
+            !reply.contains("cached"),
+            "must not steal cache digest age: {reply}"
         );
     }
 
