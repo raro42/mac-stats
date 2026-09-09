@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.972] - 2026-09-10
+
+### Added
+- Instant lane: browser_storage_state.json age (`storage state age`, `browser_storage_state.json age`, `how old are browser cookies`, `when was storage state updated`, `cdp cookies age`) — file mtime only; no dump; does not steal path / size / cookie reject / browser credentials.
+
 ## [0.1.971] - 2026-09-09
 
 ### Added

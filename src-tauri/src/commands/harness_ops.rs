@@ -15074,13 +15074,290 @@ pub fn format_browser_storage_state_size_gateway() -> String {
     }
     match std::fs::metadata(&path).map(|m| m.len()) {
         Ok(0) => {
-            "**Browser storage state:** empty `browser_storage_state.json` · `storage state path` for the file."
+            "**Browser storage state:** empty `browser_storage_state.json` · `storage state path` for the file · `storage state age` for last write."
                 .to_string()
         }
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Browser storage state:** **{label}** on disk · CDP cookie jar · `storage state path` for the file · does not dump cookies or clear the jar."
+                "**Browser storage state:** **{label}** on disk · CDP cookie jar · `storage state path` for the file · `storage state age` for last write · does not dump cookies or clear the jar."
+            )
+        }
+        Err(e) => {
+            format!(
+                "**Browser storage state** — could not stat `browser_storage_state.json`: {e}"
+            )
+        }
+    }
+}
+
+/// True for short “how old is browser_storage_state.json / storage state age…” asks.
+/// Mtime only — does not steal path / size / cookie reject / browser credentials / `/browser`.
+/// Do **not** use bare `age` — it matches inside `storage`.
+pub fn looks_like_browser_storage_state_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    // Avoid bare `age` — it matches inside `storage`.
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("clean")
+        || n.contains("clear")
+        || n.contains("scrub")
+        || n.contains("export")
+        || n.contains("import")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("escalation")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("credential_accounts")
+        || n.contains("credential-accounts")
+        || n.contains("credential accounts")
+        || n.contains("credentials accounts")
+        || n.contains("keychain accounts")
+        || n.contains("keychain")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser credential")
+        || n.contains("cdp credentials")
+        || n.contains("cdp credential")
+        || n.contains("credentials.toml")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser download")
+        || n.contains("cdp downloads")
+        || n.contains("cdp download")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("organizer-state")
+        || n.contains("organizer state")
+        || n.contains("organizer-rules")
+        || n.contains("organizer rules")
+        || n.contains("password")
+        || n.contains("secret value")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("discord")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("digest")
+        || n == "/browser"
+        || n == "/cdp"
+        || n == "browser"
+        || n == "cdp"
+        || n == "browser status"
+        || n == "cdp status"
+        || n == "browser ready"
+        || n == "cdp ready"
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let state_ctx = n.contains("browser_storage_state")
+        || n.contains("browser-storage-state")
+        || n.contains("browser storage state")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie jar")
+        || n.contains("cookies jar")
+        || n.contains("cdp cookies")
+        || n.contains("cdp cookie")
+        || n.contains("browser cookies")
+        || n.contains("browser cookie")
+        || (n.contains("cookies")
+            && (n.contains("browser")
+                || n.contains("cdp")
+                || n.contains("mac-stats")
+                || n.contains("mac stats"))
+            && (n.contains(" age")
+                || n.ends_with(" age")
+                || n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("jar")))
+        || (n.contains("cookie")
+            && (n.contains("browser") || n.contains("cdp") || n.contains("mac-stats") || n.contains("mac stats"))
+            && (n.contains(" age")
+                || n.ends_with(" age")
+                || n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("file")
+                || n.contains("json")
+                || n.contains("jar")));
+    if !state_ctx {
+        return false;
+    }
+    // Age intent — never bare `age` (matches inside `storage`).
+    let age_intent = n.contains(" age")
+        || n.ends_with(" age")
+        || n.starts_with("age ")
+        || n == "age"
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || n.contains("when was")
+        || n.contains("when were")
+        || (n.contains("updated")
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"))
+        || (n.contains("modified")
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large"));
+    if !age_intent {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "storage state age"
+            | "storage_state age"
+            | "storage_state.json age"
+            | "browser storage state age"
+            | "browser_storage_state age"
+            | "browser_storage_state.json age"
+            | "browser-storage-state age"
+            | "browser-storage-state.json age"
+            | "browser storage state file age"
+            | "storage state file age"
+            | "cookie jar age"
+            | "cookies jar age"
+            | "browser cookies age"
+            | "browser cookie age"
+            | "browser cookies file age"
+            | "cdp cookies age"
+            | "cdp cookie age"
+            | "storage state last modified"
+            | "browser_storage_state.json last modified"
+            | "how old is storage state"
+            | "how old is the storage state"
+            | "how old is browser_storage_state.json"
+            | "how old is the browser_storage_state.json"
+            | "how old is browser storage state"
+            | "how old is the browser storage state"
+            | "how old is the storage state file"
+            | "how old are browser cookies"
+            | "how old is the cookie jar"
+            | "when was storage state updated"
+            | "when was the storage state updated"
+            | "when was browser_storage_state.json updated"
+            | "when was the browser_storage_state.json updated"
+            | "when were browser cookies updated"
+            | "is storage state stale"
+            | "is the storage state stale"
+            | "is browser_storage_state.json stale"
+            | "is the browser_storage_state.json stale"
+            | "mac-stats storage state age"
+            | "mac stats storage state age"
+            | "mac-stats browser_storage_state.json age"
+            | "mac stats browser_storage_state.json age"
+            | "mac-stats cookies age"
+            | "mac stats cookies age"
+    ) || (state_ctx && age_intent)
+}
+
+/// Zero-LLM browser_storage_state.json age from file mtime (stat only; no dump/list cookies).
+pub fn format_browser_storage_state_age_gateway() -> String {
+    let path = crate::config::Config::browser_storage_state_json_path();
+    if !path.exists() {
+        return "**Browser storage state:** no `browser_storage_state.json` yet · `storage state path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Browser storage state:** last write **{age}** ago · CDP cookie jar · `storage state path` for the file · `storage state size` for on-disk bytes."
             )
         }
         Err(e) => {
@@ -15094,13 +15371,15 @@ pub fn format_browser_storage_state_size_gateway() -> String {
 /// True for short “where is browser_storage_state.json / browser cookies path…” asks.
 /// Config path only — does not list/dump/clear cookies.
 /// Size asks use the browser_storage_state.json size lane (v0.1.915).
+/// Age asks use the browser_storage_state.json age lane (v0.1.972).
 pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
         return false;
     }
-    // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate / size asks.
+    // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate / size / age asks.
     // String-only cookie_reject exclude (do not nest looks_like_*_path_request — exponential).
+    // Age asks: avoid bare `age` (matches inside `storage`).
     if n.contains("cookie_reject")
         || n.contains("cookie-reject")
         || n.contains("cookie reject")
@@ -15113,6 +15392,25 @@ pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the browser_storage_state.json age lane (v0.1.972).
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.starts_with("age ")
+        || n == "age"
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when was")
+        || n.contains("when were")
+        || n.contains(" last modified")
+        || n.ends_with(" modified")
+        || (n.contains("updated")
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("size"))
+        || (n.contains("modified")
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("size"))
         || looks_like_config_path_request(content)
         || looks_like_debug_log_path_request(content)
         || looks_like_screenshots_path_request(content)
@@ -15272,7 +15570,7 @@ pub fn format_browser_storage_state_path_gateway() -> String {
     let path = crate::config::Config::browser_storage_state_json_path();
     let display = path.display().to_string();
     format!(
-        "**Browser storage state:** `{display}` · CDP cookie jar · path only · `storage state size` for on-disk bytes · `/browser` for CDP status."
+        "**Browser storage state:** `{display}` · CDP cookie jar · path only · `storage state size` for on-disk bytes · `storage state age` for last write · `/browser` for CDP status."
     )
 }
 
@@ -38903,9 +39201,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_credentials_path_request(content) {
         return Some(format_browser_credentials_path_gateway());
     }
-    // browser_storage_state.json size before path (stat only; no dump).
+    // browser_storage_state.json size before age/path (stat only; no dump).
     if looks_like_browser_storage_state_size_request(content) {
         return Some(format_browser_storage_state_size_gateway());
+    }
+    // browser_storage_state.json age before path (mtime only; no dump).
+    if looks_like_browser_storage_state_age_request(content) {
+        return Some(format_browser_storage_state_age_gateway());
     }
     if looks_like_browser_storage_state_path_request(content) {
         return Some(format_browser_storage_state_path_gateway());
@@ -39279,8 +39581,9 @@ pub fn format_ops_help_gateway() -> String {
 • `browser credentials size` · `browser-credentials.toml size` · `how big are browser credentials` · `browser credentials file size` — browser-credentials.toml file size on disk (stat only; no dump; does not steal `browser credentials path` / `browser credentials age` / storage state / credential accounts)\n\
 • `browser credentials age` · `browser-credentials.toml age` · `how old are browser credentials` · `when was browser credentials updated` — browser-credentials.toml last write age (mtime; no dump; does not steal `browser credentials path` / size / storage state / credential accounts)\n\
 • `browser credentials path` · `where are browser credentials` · `browser-credentials.toml` — credentials TOML path (config only; no list/edit; `browser credentials size` / `browser credentials age` for bytes / mtime)\n\
-• `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / cookie reject / browser credentials)\n\
-• `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` for on-disk bytes)\n\
+• `storage state size` · `browser_storage_state.json size` · `how big are browser cookies` · `browser cookies size` — browser_storage_state.json file size on disk (stat only; no dump; does not steal `storage state path` / `storage state age` / cookie reject / browser credentials)\n\
+• `storage state age` · `browser_storage_state.json age` · `how old are browser cookies` · `when was storage state updated` — browser_storage_state.json last write age (mtime; no dump; does not steal `storage state path` / size / cookie reject / browser credentials)\n\
+• `storage state path` · `where are browser cookies` · `browser_storage_state.json` — cookie jar path (config only; no list/clear; `storage state size` / `storage state age` for bytes / mtime)\n\
 • `browser downloads age` · `how old are browser downloads` · `browser-downloads age` · `when was browser downloads updated` · `cdp downloads age` — CDP download folder last write age (newest file mtime; no list dump; does not steal `browser downloads path` / `browser downloads size` / `/downloads`)\n\
 • `browser downloads size` · `how big are browser downloads` · `browser-downloads size` — CDP download folder size on disk (recursive file bytes; no list dump; does not steal `browser downloads path` / `browser downloads age` / `/downloads`)\n\
 • `browser downloads path` · `where are browser downloads` · `browser-downloads` — CDP download dir (config only; no list/prune; `browser downloads size` / `browser downloads age` for bytes / mtime; does not steal `/downloads`)\n\
@@ -41188,6 +41491,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser_storage_state.json size asks (v0.1.915) — stat only; no dump/clear.
     if looks_like_browser_storage_state_size_request(question) {
+        return true;
+    }
+    // Read-only browser_storage_state.json age asks (v0.1.972) — mtime only; no dump/list.
+    if looks_like_browser_storage_state_age_request(question) {
         return true;
     }
     // Read-only browser storage-state / cookie-jar path asks (v0.1.828) — config only; no list/clear.
@@ -49332,6 +49639,15 @@ mod tests {
         assert!(!looks_like_browser_storage_state_path_request(
             "storage state size"
         ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser_storage_state.json age"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "how old are browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "storage state age"
+        ));
     }
 
     #[test]
@@ -49378,6 +49694,12 @@ mod tests {
         assert!(!looks_like_browser_storage_state_size_request(
             "browser downloads size"
         ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "storage state age"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "how old are browser cookies"
+        ));
         assert!(!looks_like_browser_storage_state_size_request("/browser"));
         assert!(!looks_like_browser_storage_state_path_request(
             "browser_storage_state.json size"
@@ -49396,6 +49718,79 @@ mod tests {
                 && (reply.contains("on disk")
                     || reply.contains("no `browser_storage_state.json`")
                     || reply.contains("empty")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Browser storage state: `"));
+    }
+
+    #[test]
+    fn browser_storage_state_age_request_detected() {
+        assert!(looks_like_browser_storage_state_age_request(
+            "storage state age"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "browser_storage_state.json age"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "how old are browser cookies"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "how old is browser_storage_state.json"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "when was storage state updated"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "browser cookies age"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "cdp cookies age"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "cookie jar age"
+        ));
+        assert!(looks_like_browser_storage_state_age_request(
+            "mac-stats storage state age"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "storage state path"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "storage state size"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "where are browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "dump browser cookies"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "browser credentials age"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request(
+            "browser downloads age"
+        ));
+        assert!(!looks_like_browser_storage_state_age_request("/browser"));
+        assert!(!looks_like_browser_storage_state_path_request(
+            "browser_storage_state.json age"
+        ));
+        assert!(!looks_like_browser_storage_state_size_request(
+            "storage state age"
+        ));
+        assert!(!looks_like_browser_credentials_age_request(
+            "storage state age"
+        ));
+        assert!(!looks_like_browser_ready_request("storage state age"));
+        let reply = try_operator_instant_reply("browser_storage_state.json age")
+            .expect("browser storage state age instant");
+        assert!(
+            reply.contains("Browser storage state")
+                && (reply.contains("ago")
+                    || reply.contains("no `browser_storage_state.json`")
+                    || reply.contains("could not")),
             "{reply}"
         );
         assert!(!reply.contains("Browser storage state: `"));
