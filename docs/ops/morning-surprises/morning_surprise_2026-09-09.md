@@ -1,24 +1,28 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B kept shipping operator instant lanes (file/directory age) while digester open stayed empty.
+Overnight Track B shipped instant file-age lanes so Discord/AI Chat can answer “how old is …” without Ollama.
 
-## Shipped tonight (keep)
+## Shipped tonight
 
 | Version | What |
-|---------|------|
-| **v0.1.969** | Instant lane: **downloads-organizer-rules.md age** — file mtime; no dump; path/size/organizer state/`/downloads` safe |
-| **v0.1.968** | Instant lane: **cookie_reject_patterns.md age** — file mtime; no dump; path/size/session-reset/escalation/browser-cookies safe |
-| **v0.1.967** | Instant lane: **cleanup-quarantine directory age** — newest mtime under `~/.mac-stats/cleanup-quarantine/`; no list; path/size/`/disk` safe |
-| **v0.1.966** | Instant lane: browser-downloads directory age |
-| **v0.1.965** | Instant lane: PDF exports directory age |
-| **v0.1.964** | Instant lane: CDP traces directory age |
-| **v0.1.963** | Instant lane: uploads directory age |
+| --- | --- |
+| **v0.1.970** | Instant: `downloads-organizer-state.json` age (mtime; path/size/rules/`/downloads` safe) |
+| **v0.1.969** | Instant: `downloads-organizer-rules.md` age |
+| **v0.1.968** | Instant: `cookie_reject_patterns.md` age |
+| **v0.1.967** | Instant: cleanup-quarantine directory age |
+| **v0.1.966** | Instant: browser-downloads directory age |
+| **v0.1.965** | Instant: PDF exports directory age |
 
-## Fuel notes
-- Digester open: empty all evening ticks so far.
-- Design review: not due (grace).
-- Debug.log watch: Having fun idle-thought Ollama 300s timeout (1 cluster) — not fixed this tick.
+## Try
 
-## Next
-- Continue p50 file-age gaps (organizer state, browser credentials/storage state, escalation/session-reset) or sibling Hermes insights when digester stays empty.
-- Design-review recapture when grace expires / TCC allows.
+- `organizer state age` / `downloads-organizer-state.json age` / `how old is downloads organizer state`
+- `organizer rules age` / `cookie reject age`
+
+## Digester / design review
+
+- Digester open: empty (night used standing backlog).
+- Design review: not due (CPU metrics ~2.8d grace).
+
+## Next fuel
+
+- browser-credentials.toml age · browser_storage_state.json age · escalation_patterns.md age · session_reset_phrases.md age
