@@ -15606,6 +15606,238 @@ pub fn format_browser_downloads_path_gateway() -> String {
     )
 }
 
+/// True for short “how old are cleanup-quarantine / quarantine age…” asks.
+/// Newest file mtime under quarantine dir — no list dump / path / size / `/disk` lanes.
+pub fn looks_like_cleanup_quarantine_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 80 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || (n.contains("delete") && !n.contains("soft delete") && !n.contains("soft-delete"))
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("restore")
+        || n.contains("recover")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("organize")
+        || n.contains("organizer")
+        || n.contains("/downloads")
+        || n.contains("browser-downloads")
+        || n.contains("browser downloads")
+        || n.contains("browser_download")
+        || n.contains("credential")
+        || n.contains("secret")
+        || n.contains("password")
+        || n.contains("storage state")
+        || n.contains("storage_state")
+        || n.contains("cookie")
+        || n.contains("pdf")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("screenshot")
+        || n.contains("navigate")
+        || n.contains("click")
+        || n.contains("download")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("skills")
+        || n.contains("skill")
+        || n.contains("plugins")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("script")
+        || n.contains("prompts")
+        || n.contains("prompt")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("improvements")
+        || n.contains("discord")
+        || n.contains("keychain")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("pinned_processes")
+        || n.contains("pinned process")
+        || n.contains("pin file")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let q_ctx = n.contains("cleanup-quarantine")
+        || n.contains("cleanup quarantine")
+        || n.contains("clean-up quarantine")
+        || n.contains("disk quarantine")
+        || n.contains("soft-delete quarantine")
+        || n.contains("soft delete quarantine")
+        || n.contains("mac-stats quarantine")
+        || n.contains("mac stats quarantine")
+        || (n.contains("quarantine")
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")
+                || n.contains("cleanup")
+                || n.contains("disk")));
+    if !q_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age");
+    // Bare folder labels stay on the path lane.
+    if n == "cleanup-quarantine"
+        || n == "cleanup quarantine"
+        || n == "quarantine"
+        || n == "disk quarantine"
+        || n == "soft-delete quarantine"
+        || n == "soft delete quarantine"
+        || n == "mac-stats quarantine"
+        || n == "mac stats quarantine"
+        || !ageish
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "cleanup quarantine age"
+            | "cleanup-quarantine age"
+            | "cleanup quarantine folder age"
+            | "cleanup-quarantine folder age"
+            | "cleanup quarantine directory age"
+            | "cleanup-quarantine directory age"
+            | "cleanup quarantine dir age"
+            | "cleanup-quarantine dir age"
+            | "quarantine age"
+            | "quarantine folder age"
+            | "quarantine directory age"
+            | "quarantine dir age"
+            | "how old is quarantine"
+            | "how old are quarantine"
+            | "how old is the quarantine"
+            | "how old is the quarantine folder"
+            | "how old is quarantine folder"
+            | "how old is cleanup-quarantine"
+            | "how old is the cleanup-quarantine"
+            | "how old is the cleanup quarantine"
+            | "how old is the cleanup quarantine folder"
+            | "how old is cleanup quarantine"
+            | "when was quarantine updated"
+            | "when was the quarantine folder updated"
+            | "when was cleanup-quarantine updated"
+            | "when was cleanup quarantine updated"
+            | "quarantine last modified"
+            | "cleanup quarantine last modified"
+            | "cleanup-quarantine last modified"
+            | "is quarantine stale"
+            | "is the quarantine folder stale"
+            | "disk quarantine age"
+            | "soft-delete quarantine age"
+            | "soft delete quarantine age"
+            | "mac-stats quarantine age"
+            | "mac stats quarantine age"
+    ) || (q_ctx && ageish)
+}
+
+/// Zero-LLM Disk Cleanup quarantine directory age (newest file mtime; no list dump).
+pub fn format_cleanup_quarantine_age_gateway() -> String {
+    let dir = crate::config::Config::cleanup_quarantine_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Cleanup quarantine:** not created yet · app recreates under `~/.mac-stats/cleanup-quarantine/` · `cleanup quarantine path` for the folder · `cleanup quarantine size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Cleanup quarantine** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Cleanup quarantine:** empty · `cleanup quarantine path` for the folder · `cleanup quarantine size` for on-disk bytes · `/disk` for scopes · soft-delete only · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Cleanup quarantine:** last write **{age}** ago · 1 file · soft-delete · `cleanup quarantine path` for the folder · `cleanup quarantine size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Cleanup quarantine:** newest write **{age}** ago · {files} files · soft-delete · `cleanup quarantine path` for the folder · `cleanup quarantine size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Cleanup quarantine** — could not read mtime · `cleanup quarantine path` for the folder · `cleanup quarantine size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “how big is cleanup-quarantine / quarantine size…” asks.
 /// Recursive file-byte sum under quarantine dir — no list dump / path / `/disk` lanes.
 pub fn looks_like_cleanup_quarantine_size_request(content: &str) -> bool {
@@ -15799,18 +16031,18 @@ pub fn format_cleanup_quarantine_size_gateway() -> String {
     let dir = crate::config::Config::cleanup_quarantine_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Cleanup quarantine:** not created yet · app recreates under `~/.mac-stats/cleanup-quarantine/` · `cleanup quarantine path` for the folder."
+            "**Cleanup quarantine:** not created yet · app recreates under `~/.mac-stats/cleanup-quarantine/` · `cleanup quarantine path` for the folder · `cleanup quarantine age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Cleanup quarantine** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Cleanup quarantine:** empty · `cleanup quarantine path` for the folder · `/disk` for scopes · soft-delete only."
+            "**Cleanup quarantine:** empty · `cleanup quarantine path` for the folder · `cleanup quarantine age` for newest mtime · `/disk` for scopes · soft-delete only."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Cleanup quarantine:** **{label}** on disk ({files} files) · soft-delete · `cleanup quarantine path` for the folder · does not list names."
+                "**Cleanup quarantine:** **{label}** on disk ({files} files) · soft-delete · `cleanup quarantine path` for the folder · `cleanup quarantine age` for newest mtime · does not list names."
             )
         }
     }
@@ -15856,6 +16088,20 @@ pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+    {
+        return false;
+    }
+    // Age/how-old asks use the cleanup quarantine age lane (v0.1.967).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -15980,7 +16226,7 @@ pub fn format_cleanup_quarantine_path_gateway() -> String {
     let dir = crate::config::Config::cleanup_quarantine_dir();
     let display = dir.display().to_string();
     format!(
-        "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · `cleanup quarantine size` for disk use · does not touch system Trash."
+        "**Cleanup quarantine:** `{display}` · Disk Cleanup auto soft-delete · `/disk` for scopes · `cleanup quarantine size` for disk use · `cleanup quarantine age` for newest mtime · does not touch system Trash."
     )
 }
 
@@ -37676,6 +37922,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_browser_downloads_path_request(content) {
         return Some(format_browser_downloads_path_gateway());
     }
+    // Cleanup-quarantine dir age before size/path (newest mtime; no list); size before path.
+    if looks_like_cleanup_quarantine_age_request(content) {
+        return Some(format_cleanup_quarantine_age_gateway());
+    }
     // Cleanup-quarantine dir size before path (recursive bytes; no list); path before /disk.
     if looks_like_cleanup_quarantine_size_request(content) {
         return Some(format_cleanup_quarantine_size_gateway());
@@ -39935,6 +40185,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only browser-downloads dir path asks (v0.1.829) — config only; no list/prune/download.
     if looks_like_browser_downloads_path_request(question) {
+        return true;
+    }
+    // Read-only cleanup-quarantine dir age asks (v0.1.967) — newest file mtime; no list dump.
+    if looks_like_cleanup_quarantine_age_request(question) {
         return true;
     }
     // Read-only cleanup-quarantine dir size asks (v0.1.886) — recursive file bytes; no list dump.
@@ -48008,6 +48262,92 @@ mod tests {
     }
 
     #[test]
+    fn cleanup_quarantine_age_request_detected() {
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "cleanup quarantine age"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "cleanup-quarantine age"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "cleanup quarantine folder age"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request("quarantine age"));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "quarantine folder age"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "how old is quarantine"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "how old is the quarantine folder"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "when was cleanup quarantine updated"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "when was the quarantine folder updated"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "is the quarantine folder stale"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "disk quarantine age"
+        ));
+        assert!(looks_like_cleanup_quarantine_age_request(
+            "mac-stats quarantine age"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request(
+            "cleanup quarantine path"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request(
+            "where is the quarantine folder"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request("cleanup-quarantine"));
+        assert!(!looks_like_cleanup_quarantine_age_request(
+            "cleanup quarantine size"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request(
+            "how big is quarantine"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request("list quarantine"));
+        assert!(!looks_like_cleanup_quarantine_age_request("prune quarantine"));
+        assert!(!looks_like_cleanup_quarantine_age_request("restore quarantine"));
+        assert!(!looks_like_cleanup_quarantine_age_request("clean now"));
+        assert!(!looks_like_cleanup_quarantine_age_request("/disk"));
+        assert!(!looks_like_cleanup_quarantine_age_request("disk cleanup"));
+        assert!(!looks_like_cleanup_quarantine_age_request(
+            "browser downloads age"
+        ));
+        assert!(!looks_like_cleanup_quarantine_age_request("tmp age"));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "cleanup quarantine age"
+        ));
+        assert!(!looks_like_cleanup_quarantine_size_request(
+            "cleanup quarantine age"
+        ));
+        assert!(!looks_like_disk_cleanup_age_request("cleanup quarantine age"));
+        assert!(!looks_like_browser_downloads_age_request(
+            "cleanup quarantine age"
+        ));
+        let reply = try_operator_instant_reply("how old is quarantine")
+            .expect("cleanup quarantine age instant");
+        assert!(reply.contains("Cleanup quarantine"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+                || reply.contains("mtime")
+        );
+        assert!(
+            reply.to_lowercase().contains("cleanup quarantine path")
+                || reply.to_lowercase().contains("cleanup quarantine size")
+                || reply.contains("folder")
+        );
+    }
+
+    #[test]
     fn cleanup_quarantine_path_request_detected() {
         assert!(looks_like_cleanup_quarantine_path_request(
             "cleanup quarantine path"
@@ -48045,6 +48385,12 @@ mod tests {
         assert!(!looks_like_cleanup_quarantine_path_request(
             "how big is quarantine"
         ));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "cleanup quarantine age"
+        ));
+        assert!(!looks_like_cleanup_quarantine_path_request(
+            "how old is quarantine"
+        ));
         assert!(!looks_like_disk_cleanup_request("cleanup quarantine path"));
         assert!(!looks_like_browser_downloads_path_request(
             "cleanup quarantine path"
@@ -48054,7 +48400,9 @@ mod tests {
         assert!(reply.contains("Cleanup quarantine"));
         assert!(reply.contains("cleanup-quarantine") || reply.contains(".mac-stats"));
         assert!(
-            reply.to_lowercase().contains("cleanup quarantine size") || reply.contains("disk use")
+            reply.to_lowercase().contains("cleanup quarantine size")
+                || reply.to_lowercase().contains("cleanup quarantine age")
+                || reply.contains("disk use")
         );
     }
 
@@ -48111,6 +48459,12 @@ mod tests {
         assert!(!looks_like_cleanup_quarantine_size_request("disk cleanup"));
         assert!(!looks_like_cleanup_quarantine_size_request("browser downloads size"));
         assert!(!looks_like_cleanup_quarantine_size_request("tmp size"));
+        assert!(!looks_like_cleanup_quarantine_size_request(
+            "cleanup quarantine age"
+        ));
+        assert!(!looks_like_cleanup_quarantine_size_request(
+            "how old is quarantine"
+        ));
         assert!(!looks_like_cleanup_quarantine_path_request(
             "cleanup quarantine size"
         ));
@@ -48126,6 +48480,11 @@ mod tests {
                 || reply.contains("empty")
                 || reply.contains("not created")
                 || reply.contains("could not scan")
+        );
+        assert!(
+            reply.to_lowercase().contains("cleanup quarantine path")
+                || reply.to_lowercase().contains("cleanup quarantine age")
+                || reply.contains("folder")
         );
     }
 

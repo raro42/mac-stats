@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.967] - 2026-09-09
+
+### Added
+- Instant lane: cleanup-quarantine directory age (`cleanup quarantine age`, `how old is quarantine`, `quarantine folder age`, `when was cleanup quarantine updated`, `disk quarantine age`) — newest file mtime under `~/.mac-stats/cleanup-quarantine/`; no list dump; does not steal path / size / `/disk`.
+
 ## [0.1.966] - 2026-09-09
 
 ### Added
