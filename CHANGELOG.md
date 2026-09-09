@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.962] - 2026-09-09
+
+### Added
+- Instant lane: tmp directory age (`tmp age`, `how old is tmp`, `tmp folder age`, `when was tmp updated`) — newest file mtime under `~/.mac-stats/tmp/`; no list dump; does not steal path / size / prune / temperature.
+
 ## [0.1.961] - 2026-09-09
 
 ### Added

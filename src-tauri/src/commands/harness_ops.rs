@@ -12001,6 +12001,213 @@ pub fn format_prompts_path_gateway() -> String {
     )
 }
 
+/// True for short “how old is the tmp folder / tmp age…” asks.
+/// Newest file mtime under tmp dir — no list dump / path / size / prune lanes.
+pub fn looks_like_tmp_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("temperature")
+        || n.contains("thermal")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("/tmp")
+        || n.contains("private/tmp")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("screenshot")
+        || n.contains("improvements")
+        || n.contains("uploads")
+        || n.contains("traces")
+        || n.contains("pdfs")
+        || n.contains("quarantine")
+        || n.contains("task")
+        || n.contains("session")
+        || n.contains("agents")
+        || n.contains("skills")
+        || n.contains("plugins")
+        || n.contains("scripts")
+        || n.contains("prompts")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let tmp_ctx = n.contains("tmp folder")
+        || n.contains("tmp directory")
+        || n.contains("tmp dir")
+        || n.contains("tmp age")
+        || n.contains("temp folder")
+        || n.contains("temp directory")
+        || n.contains("temp dir")
+        || n.contains("temp age")
+        || n.contains("temporary folder")
+        || n.contains("temporary directory")
+        || n.contains("temporary dir")
+        || n.contains("temporary age")
+        || n.contains("scratch folder")
+        || n.contains("scratch directory")
+        || n.contains("scratch dir")
+        || n.contains("scratch age")
+        || n.contains("mac-stats tmp")
+        || n.contains("mac stats tmp")
+        || n == "tmp"
+        || n == "temp"
+        || ((n.contains("tmp") || n.contains("temp") || n.contains("temporary") || n.contains("scratch"))
+            && (n.contains("how old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.ends_with(" age")
+                || n.contains(" age ")
+                || n.contains("folder age")
+                || n.contains("dir age")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !tmp_ctx {
+        return false;
+    }
+    let ageish = n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("folder age")
+        || n.contains("dir age")
+        || n.contains("tmp age")
+        || n.contains("temp age")
+        || n.contains("scratch age")
+        || n.contains("temporary age");
+    // Bare “tmp” / “temp” / path-only asks stay on the path lane.
+    if n == "tmp" || n == "temp" || !ageish {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "tmp age"
+            | "temp age"
+            | "temporary age"
+            | "scratch age"
+            | "tmp folder age"
+            | "temp folder age"
+            | "temporary folder age"
+            | "scratch folder age"
+            | "tmp directory age"
+            | "temp directory age"
+            | "temporary directory age"
+            | "scratch directory age"
+            | "tmp dir age"
+            | "temp dir age"
+            | "scratch dir age"
+            | "how old is tmp"
+            | "how old is temp"
+            | "how old is temporary"
+            | "how old is scratch"
+            | "how old is the tmp folder"
+            | "how old is tmp folder"
+            | "how old is the temp folder"
+            | "how old is temp folder"
+            | "how old is the temporary folder"
+            | "how old is the scratch folder"
+            | "how old is the tmp directory"
+            | "how old is the temp directory"
+            | "how old is the scratch directory"
+            | "when was tmp updated"
+            | "when was temp updated"
+            | "when was the tmp folder updated"
+            | "when was the temp folder updated"
+            | "when was the scratch folder updated"
+            | "tmp last modified"
+            | "temp last modified"
+            | "tmp folder last modified"
+            | "is tmp stale"
+            | "is the tmp folder stale"
+            | "mac-stats tmp age"
+            | "mac stats tmp age"
+    ) || (tmp_ctx && ageish)
+}
+
+/// Zero-LLM tmp directory age (newest file mtime; no list dump).
+pub fn format_tmp_age_gateway() -> String {
+    let dir = crate::config::Config::tmp_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Tmp:** not created yet · app recreates under `~/.mac-stats/tmp/` · `tmp path` for the folder · `tmp size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Tmp** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Tmp:** empty · `tmp path` for the folder · `tmp size` for on-disk bytes · safe to delete contents · no dump from this ask."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Tmp:** last write **{age}** ago · 1 file · `tmp path` for the folder · `tmp size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Tmp:** newest write **{age}** ago · {files} files · `tmp path` for the folder · `tmp size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Tmp** — could not read mtime · `tmp path` for the folder · `tmp size` for on-disk bytes."
+                .to_string()
+        }
+    }
+}
+
 /// True for short “where is the tmp folder / tmp path…” asks.
 /// Config path only — does not list, prune, or open scratch files under `~/.mac-stats/tmp/`.
 pub fn looks_like_tmp_path_request(content: &str) -> bool {
@@ -12023,6 +12230,8 @@ pub fn looks_like_tmp_path_request(content: &str) -> bool {
     {
         return false;
     }
+    // Size/big/large asks use the tmp size lane (v0.1.875).
+    // Age/how-old asks use the tmp age lane (v0.1.962).
     if n.contains("temperature")
         || n.contains("thermal")
         || n.contains("size")
@@ -12032,6 +12241,16 @@ pub fn looks_like_tmp_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
         || n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -12155,7 +12374,7 @@ pub fn format_tmp_path_gateway() -> String {
     let display = dir.display().to_string();
     let js_display = js.display().to_string();
     format!(
-        "**Tmp dir:** `{display}` · JS scratch: `{js_display}` · safe to delete contents · app recreates as needed · `tmp size` for disk use."
+        "**Tmp dir:** `{display}` · JS scratch: `{js_display}` · safe to delete contents · app recreates as needed · `tmp size` for disk use · `tmp age` for newest mtime."
     )
 }
 
@@ -12321,18 +12540,18 @@ pub fn format_tmp_size_gateway() -> String {
     let dir = crate::config::Config::tmp_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Tmp:** not created yet · app recreates under `~/.mac-stats/tmp/` · `tmp path` for the folder."
+            "**Tmp:** not created yet · app recreates under `~/.mac-stats/tmp/` · `tmp path` for the folder · `tmp age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Tmp** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Tmp:** empty · `tmp path` for the folder · safe to delete contents · app recreates as needed."
+            "**Tmp:** empty · `tmp path` for the folder · `tmp age` for newest mtime · safe to delete contents · app recreates as needed."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Tmp:** **{label}** on disk ({files} files) · scratch · `tmp path` for the folder · does not list names."
+                "**Tmp:** **{label}** on disk ({files} files) · scratch · `tmp path` for the folder · `tmp age` for newest mtime · does not list names."
             )
         }
     }
@@ -36535,7 +36754,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_prompts_path_request(content) {
         return Some(format_prompts_path_gateway());
     }
-    // Tmp dir size before path (recursive bytes; no list); path before prune/clean.
+    // Tmp dir age before size/path (newest mtime; no list); size before path; path before prune/clean.
+    if looks_like_tmp_age_request(content) {
+        return Some(format_tmp_age_gateway());
+    }
     if looks_like_tmp_size_request(content) {
         return Some(format_tmp_size_gateway());
     }
@@ -36920,8 +37142,9 @@ pub fn format_ops_help_gateway() -> String {
 • `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` / `skills age` for disk use / mtime)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` / `plugins age` for disk use / mtime)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` / `prompts age` for disk use / mtime)\n\
-• `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
-• `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / prune)\n\
+• `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune; `tmp size` / `tmp age` for bytes / mtime)\n\
+• `tmp size` · `how big is tmp` · `tmp folder size` — tmp folder size on disk (recursive file bytes; no list dump; does not steal `tmp path` / `tmp age` / prune)\n\
+• `tmp age` · `how old is tmp` · `tmp folder age` · `when was tmp updated` — tmp folder last write age (newest file mtime; no list dump; does not steal `tmp path` / `tmp size` / prune)\n\
 • `uploads size` · `how big are uploads` · `uploads folder size` — uploads folder size on disk (recursive file bytes; no list dump; does not steal `uploads path` / upload)\n\
 • `uploads path` · `where is the uploads folder` · `upload directory` — `~/.mac-stats/uploads/` path (config only; no list/upload)\n\
 • `traces size` · `how big are traces` · `traces folder size` · `cdp traces size` — CDP traces folder size on disk (recursive file bytes; no list dump; does not steal `traces path` / prune)\n\
@@ -38762,6 +38985,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only prompts dir path asks (v0.1.821) — config only; no open/edit.
     if looks_like_prompts_path_request(question) {
+        return true;
+    }
+    // Read-only tmp dir age asks (v0.1.962) — newest file mtime; no list dump.
+    if looks_like_tmp_age_request(question) {
         return true;
     }
     // Read-only tmp dir size asks (v0.1.875) — recursive file bytes; no list dump.
@@ -45994,10 +46221,16 @@ mod tests {
         assert!(!looks_like_tmp_path_request("where is config"));
         assert!(!looks_like_tmp_path_request("tmp size"));
         assert!(!looks_like_tmp_path_request("how big is the tmp folder"));
+        assert!(!looks_like_tmp_path_request("tmp age"));
+        assert!(!looks_like_tmp_path_request("how old is the tmp folder"));
         let reply = try_operator_instant_reply("where is the tmp folder").expect("tmp path instant");
         assert!(reply.contains("Tmp dir"));
         assert!(reply.contains("tmp") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("tmp size") || reply.contains("disk use"));
+        assert!(
+            reply.to_lowercase().contains("tmp age") || reply.contains("mtime"),
+            "path reply should mention tmp age: {reply}"
+        );
     }
 
     #[test]
@@ -46020,6 +46253,7 @@ mod tests {
         assert!(!looks_like_tmp_size_request("screenshots size"));
         assert!(!looks_like_tmp_size_request("improvements size"));
         assert!(!looks_like_tmp_size_request("uploads size"));
+        assert!(!looks_like_tmp_size_request("tmp age"));
         assert!(!looks_like_tmp_path_request("tmp size"));
         assert!(!looks_like_screenshots_size_request("tmp size"));
         let reply = try_operator_instant_reply("how big is the tmp folder").expect("tmp size instant");
@@ -46031,6 +46265,47 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("tmp path") || reply.contains("folder"));
+        assert!(
+            reply.to_lowercase().contains("tmp age") || reply.contains("mtime"),
+            "size reply should mention tmp age: {reply}"
+        );
+    }
+
+    #[test]
+    fn tmp_age_request_detected() {
+        assert!(looks_like_tmp_age_request("tmp age"));
+        assert!(looks_like_tmp_age_request("temp age"));
+        assert!(looks_like_tmp_age_request("tmp folder age"));
+        assert!(looks_like_tmp_age_request("tmp directory age"));
+        assert!(looks_like_tmp_age_request("tmp dir age"));
+        assert!(looks_like_tmp_age_request("scratch folder age"));
+        assert!(looks_like_tmp_age_request("how old is tmp"));
+        assert!(looks_like_tmp_age_request("how old is the tmp folder"));
+        assert!(looks_like_tmp_age_request("when was tmp updated"));
+        assert!(looks_like_tmp_age_request("when was the tmp folder updated"));
+        assert!(looks_like_tmp_age_request("is the tmp folder stale"));
+        assert!(looks_like_tmp_age_request("mac-stats tmp age"));
+        assert!(!looks_like_tmp_age_request("tmp path"));
+        assert!(!looks_like_tmp_age_request("where is the tmp folder"));
+        assert!(!looks_like_tmp_age_request("tmp"));
+        assert!(!looks_like_tmp_age_request("tmp size"));
+        assert!(!looks_like_tmp_age_request("how big is tmp"));
+        assert!(!looks_like_tmp_age_request("temperature"));
+        assert!(!looks_like_tmp_age_request("list tmp"));
+        assert!(!looks_like_tmp_age_request("clean tmp"));
+        assert!(!looks_like_tmp_age_request("task age"));
+        assert!(!looks_like_tmp_age_request("uploads age"));
+        assert!(!looks_like_tmp_path_request("tmp age"));
+        assert!(!looks_like_tmp_size_request("tmp age"));
+        assert!(!looks_like_task_age_request("tmp age"));
+        let reply = try_operator_instant_reply("how old is the tmp folder").expect("tmp age instant");
+        assert!(reply.contains("Tmp"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not")
+        );
     }
 
     #[test]
