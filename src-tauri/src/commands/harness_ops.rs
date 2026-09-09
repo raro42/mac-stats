@@ -24309,16 +24309,235 @@ pub fn format_escalation_patterns_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Escalation patterns:** **{label}** on disk · phrases that raise escalation mode · `escalation patterns path` for the file · does not list phrases."
+                "**Escalation patterns:** **{label}** on disk · phrases that raise escalation mode · `escalation patterns path` for the file · `escalation patterns age` for last write · does not list phrases."
             )
         }
         Err(e) => format!("**Escalation patterns** — could not stat `escalation_patterns.md`: {e}"),
     }
 }
 
+/// True for short “how old is escalation_patterns.md / escalation patterns age…” asks.
+/// Mtime only — does not steal path / size / session-reset / cookie reject.
+pub fn looks_like_escalation_patterns_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        // Avoid bare `dir` — it matches inside `details`.
+        || n.contains(" dir")
+        || n.starts_with("dir ")
+        || n == "dir"
+        || n.contains("home")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n.starts_with("counts ")
+        || n.ends_with(" counts")
+        || n.contains(" counts ")
+        || n == "counts"
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("edit")
+        || n.contains("rewrite")
+        || n.contains("change")
+        || n.contains("save")
+        || n.contains("write")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("append")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("trigger")
+        || n.contains("escalate now")
+        || n.contains("session_reset")
+        || n.contains("session-reset")
+        || n.contains("session reset")
+        || n.contains("reset phrases")
+        || n.contains("reset phrase")
+        || n.contains("cookie_reject")
+        || n.contains("cookie-reject")
+        || n.contains("cookie reject")
+        || n.contains("reject patterns")
+        || n.contains("reject pattern")
+        || n.contains("credential_accounts")
+        || n.contains("credential accounts")
+        || n.contains("browser-credentials")
+        || n.contains("browser credentials")
+        || n.contains("browser_storage_state")
+        || n.contains("storage state")
+        || n.contains("downloads-organizer")
+        || n.contains("downloads organizer")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("skill")
+        || n.contains("testing")
+        || n.contains("memory.md")
+        || n.contains("agents size")
+        || n.contains("agents folder")
+        || n.contains("agents path")
+        || n.contains("agents age")
+        || n.contains("config.json")
+        || n.contains(".config.env")
+        || n.contains("config.env")
+        || n.contains("improvements")
+        || n.contains("results.tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("digest")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let esc_ctx = n.contains("escalation_patterns.md")
+        || n.contains("escalation_patterns")
+        || n.contains("escalation-patterns")
+        || n.contains("escalation patterns")
+        || n.contains("escalation pattern")
+        || n.contains("escalation phrases")
+        || n.contains("escalation phrase")
+        || n.contains("escalation file")
+        || n.contains("escalation age")
+        || n == "how old is escalation"
+        || n == "how old is the escalation"
+        || n == "when was escalation updated"
+        || n == "when was the escalation updated"
+        || n == "mac-stats escalation age"
+        || n == "mac stats escalation age"
+        || n == "is escalation stale"
+        || n == "is the escalation stale"
+        || (n.contains("escalation")
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("md")
+                || n.contains("pattern")
+                || n.contains("phrase")
+                || n.contains("file")));
+    if !esc_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "escalation age"
+            | "escalation patterns age"
+            | "escalation pattern age"
+            | "escalation_patterns age"
+            | "escalation_patterns.md age"
+            | "escalation_patterns file age"
+            | "escalation-patterns age"
+            | "escalation-patterns.md age"
+            | "escalation file age"
+            | "escalation phrases age"
+            | "escalation phrase age"
+            | "escalation.md age"
+            | "escalation patterns last modified"
+            | "escalation_patterns.md last modified"
+            | "escalation file last modified"
+            | "how old is escalation"
+            | "how old is the escalation"
+            | "how old is escalation_patterns.md"
+            | "how old is the escalation_patterns.md"
+            | "how old is escalation patterns"
+            | "how old is the escalation patterns"
+            | "how old is escalation patterns file"
+            | "how old is the escalation patterns file"
+            | "how old is the escalation file"
+            | "when was escalation updated"
+            | "when was the escalation updated"
+            | "when was escalation_patterns.md updated"
+            | "when was the escalation_patterns.md updated"
+            | "when was escalation patterns updated"
+            | "when was the escalation patterns updated"
+            | "when was the escalation file updated"
+            | "is escalation stale"
+            | "is the escalation stale"
+            | "is escalation_patterns.md stale"
+            | "is the escalation_patterns.md stale"
+            | "is escalation patterns stale"
+            | "is the escalation patterns stale"
+            | "mac-stats escalation age"
+            | "mac stats escalation age"
+            | "mac-stats escalation_patterns.md age"
+            | "mac stats escalation_patterns.md age"
+    ) || (esc_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+                && !n.contains("path")
+                && !n.contains("where"))))
+}
+
+/// Zero-LLM escalation_patterns.md age from file mtime (stat only; no dump/list phrases).
+pub fn format_escalation_patterns_age_gateway() -> String {
+    let path = crate::config::Config::escalation_patterns_path();
+    if !path.exists() {
+        return "**Escalation patterns:** no `escalation_patterns.md` yet · `escalation patterns path` for the file."
+            .to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Escalation patterns:** last write **{age}** ago · phrases that raise escalation mode · `escalation patterns path` for the file · `escalation patterns size` for on-disk bytes."
+            )
+        }
+        Err(e) => {
+            format!("**Escalation patterns** — could not stat `escalation_patterns.md`: {e}")
+        }
+    }
+}
+
 /// True for short “where is escalation_patterns.md / escalation patterns path…” asks.
 /// Config path only — does not list phrases, append, or edit the file.
 /// Size asks use the escalation_patterns.md size lane (v0.1.909).
+/// Age asks use the escalation_patterns.md age lane (v0.1.973).
 pub fn looks_like_escalation_patterns_path_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 72 {
@@ -24449,6 +24668,13 @@ pub fn looks_like_escalation_patterns_path_request(content: &str) -> bool {
         || n.contains(" mb")
         || n.contains(" kb")
         || n.contains(" gi")
+        // Age asks use the escalation_patterns.md age lane (v0.1.973) — keyword-only (no nest).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
         || n.contains("http://")
         || n.contains("https://")
         || n.chars().any(|c| c.is_ascii_digit())
@@ -24519,7 +24745,7 @@ pub fn format_escalation_patterns_path_gateway() -> String {
     let path = crate::config::Config::escalation_patterns_path();
     let display = path.display().to_string();
     format!(
-        "**Escalation patterns file:** `{display}` · phrases that raise escalation mode · path only · `escalation patterns size` for on-disk bytes · does not list or edit phrases."
+        "**Escalation patterns file:** `{display}` · phrases that raise escalation mode · path only · `escalation patterns size` for on-disk bytes · `escalation patterns age` for last write · does not list or edit phrases."
     )
 }
 
@@ -38792,9 +39018,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_credential_accounts_path_request(content) {
         return Some(format_credential_accounts_path_gateway());
     }
-    // escalation_patterns.md size before path (stat only; no dump).
+    // escalation_patterns.md size before age/path (stat only; no dump).
     if looks_like_escalation_patterns_size_request(content) {
         return Some(format_escalation_patterns_size_gateway());
+    }
+    // escalation_patterns.md age before path (mtime only; no dump).
+    if looks_like_escalation_patterns_age_request(content) {
+        return Some(format_escalation_patterns_age_gateway());
     }
     // escalation_patterns.md before agents-dir / session-reset path lanes.
     if looks_like_escalation_patterns_path_request(content) {
@@ -39487,8 +39717,9 @@ pub fn format_ops_help_gateway() -> String {
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
-• `escalation size` · `escalation_patterns.md size` · `how big is escalation patterns` · `escalation patterns size` — escalation_patterns.md file size on disk (stat only; no dump; does not steal `escalation patterns path` / session-reset / cookie reject)\n\
-• `escalation patterns path` · `where is escalation_patterns.md` · `escalation file path` — escalation phrases file (config only; no list/append; `escalation patterns size` for on-disk bytes; does not steal session-reset)\n\
+• `escalation size` · `escalation_patterns.md size` · `how big is escalation patterns` · `escalation patterns size` — escalation_patterns.md file size on disk (stat only; no dump; does not steal `escalation patterns path` / `escalation patterns age` / session-reset / cookie reject)\n\
+• `escalation age` · `escalation_patterns.md age` · `how old is escalation patterns` · `when was escalation patterns updated` · `escalation patterns age` — escalation_patterns.md last write age (mtime; no dump; does not steal `escalation patterns path` / size / session-reset / cookie reject)\n\
+• `escalation patterns path` · `where is escalation_patterns.md` · `escalation file path` — escalation phrases file (config only; no list/append; `escalation patterns size` / `escalation patterns age` for bytes / mtime; does not steal session-reset)\n\
 • `session reset size` · `session_reset_phrases.md size` · `how big is session reset phrases` · `session reset phrases size` — session_reset_phrases.md file size on disk (stat only; no dump; does not steal `session reset phrases path` / escalation / cookie reject)\n\
 • `session reset phrases path` · `where is session_reset_phrases.md` · `reset phrases path` — session reset phrases file (config only; no list/clear; `session reset phrases size` for on-disk bytes; does not steal escalation)\n\
 • `before reset transcript size` · `before-reset transcript size` · `how big is before reset transcript` · `last_session_before_reset.jsonl size` — before-reset transcript size on disk (stat only; no dump; does not steal `before reset transcript path` / `before reset transcript age` / before-compaction / session reset phrases)\n\
@@ -41087,6 +41318,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only escalation_patterns.md size asks (v0.1.909) — stat only; no dump/list.
     if looks_like_escalation_patterns_size_request(question) {
+        return true;
+    }
+    // Read-only escalation_patterns.md age asks (v0.1.973) — mtime only; no dump/list.
+    if looks_like_escalation_patterns_age_request(question) {
         return true;
     }
     // Read-only escalation_patterns.md path asks (v0.1.846) — config only; no list/append.
@@ -44426,6 +44661,12 @@ mod tests {
         assert!(!looks_like_escalation_patterns_path_request(
             "how big is escalation patterns"
         ));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "escalation_patterns.md age"
+        ));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "how old is escalation patterns"
+        ));
         assert!(!looks_like_agents_path_request("escalation patterns path"));
         assert!(!looks_like_credential_accounts_path_request(
             "escalation patterns path"
@@ -44437,7 +44678,71 @@ mod tests {
             reply.contains("escalation_patterns.md") || reply.contains(".mac-stats")
         );
         assert!(reply.contains("escalation patterns size") || reply.contains("on-disk"));
+        assert!(reply.contains("escalation patterns age") || reply.contains("last write"));
         assert!(!reply.to_lowercase().contains("session_reset"));
+    }
+
+    #[test]
+    fn escalation_patterns_age_request_detected() {
+        assert!(looks_like_escalation_patterns_age_request("escalation age"));
+        assert!(looks_like_escalation_patterns_age_request(
+            "escalation_patterns.md age"
+        ));
+        assert!(looks_like_escalation_patterns_age_request(
+            "escalation patterns age"
+        ));
+        assert!(looks_like_escalation_patterns_age_request(
+            "how old is escalation patterns"
+        ));
+        assert!(looks_like_escalation_patterns_age_request(
+            "how old is escalation_patterns.md"
+        ));
+        assert!(looks_like_escalation_patterns_age_request(
+            "when was escalation patterns updated"
+        ));
+        assert!(looks_like_escalation_patterns_age_request(
+            "is escalation patterns stale"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "escalation patterns path"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "escalation patterns size"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "where is escalation_patterns.md"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request("list escalation patterns"));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "session reset phrases age"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request(
+            "cookie reject patterns age"
+        ));
+        assert!(!looks_like_escalation_patterns_age_request("soul age"));
+        assert!(!looks_like_escalation_patterns_path_request(
+            "escalation_patterns.md age"
+        ));
+        assert!(!looks_like_escalation_patterns_size_request(
+            "escalation patterns age"
+        ));
+        assert!(!looks_like_cookie_reject_patterns_age_request(
+            "escalation patterns age"
+        ));
+        assert!(!looks_like_session_reset_phrases_path_request(
+            "escalation patterns age"
+        ));
+        let reply = try_operator_instant_reply("escalation_patterns.md age")
+            .expect("escalation_patterns age instant");
+        assert!(
+            reply.contains("Escalation patterns")
+                && (reply.contains("ago")
+                    || reply.contains("no `escalation_patterns.md`")
+                    || reply.contains("could not stat")),
+            "{reply}"
+        );
+        assert!(!reply.contains("Escalation patterns file:"));
+        assert!(!reply.contains("on disk"));
     }
 
     #[test]
@@ -44468,6 +44773,9 @@ mod tests {
         assert!(!looks_like_escalation_patterns_size_request("append escalation phrase"));
         assert!(!looks_like_escalation_patterns_size_request("session reset phrases size"));
         assert!(!looks_like_escalation_patterns_size_request("cookie reject patterns size"));
+        assert!(!looks_like_escalation_patterns_size_request(
+            "escalation patterns age"
+        ));
         assert!(!looks_like_escalation_patterns_size_request("soul size"));
         assert!(!looks_like_escalation_patterns_size_request("agents size"));
         assert!(!looks_like_escalation_patterns_path_request(

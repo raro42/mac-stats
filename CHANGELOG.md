@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.973] - 2026-09-10
+
+### Added
+- Instant lane: escalation_patterns.md age (`escalation age`, `escalation_patterns.md age`, `how old is escalation patterns`, `when was escalation patterns updated`, `escalation patterns age`) — file mtime only; no dump; does not steal path / size / session-reset / cookie reject.
+
 ## [0.1.972] - 2026-09-10
 
 ### Added
