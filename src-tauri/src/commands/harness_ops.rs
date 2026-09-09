@@ -9745,19 +9745,228 @@ pub fn format_skills_size_gateway() -> String {
     let dir = crate::config::Config::skills_dir();
     match dir_total_bytes(&dir, 8_000) {
         Err(msg) if msg == "missing" => {
-            "**Skills:** not created yet · app recreates under skills/ · `skills path` for the folder."
+            "**Skills:** not created yet · app recreates under skills/ · `skills path` for the folder · `skills age` for newest mtime."
                 .to_string()
         }
         Err(e) => format!("**Skills** — could not scan: {e}"),
         Ok((0, 0)) => {
-            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run."
+            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills age` for newest mtime."
                 .to_string()
         }
         Ok((bytes, files)) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Skills:** **{label}** on disk ({files} files) · `/skills` for catalog · `skills path` for the folder · does not list names."
+                "**Skills:** **{label}** on disk ({files} files) · `/skills` for catalog · `skills path` for the folder · `skills age` for newest mtime · does not list names."
             )
+        }
+    }
+}
+
+/// True for short “how old are skills / skills age…” asks.
+/// Newest file mtime under Hermes skills dir — no list dump / path / size / skill.md / catalog lanes.
+pub fn looks_like_skills_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("go")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("list")
+        || n.contains("show ")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("number of")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("clean")
+        || n.contains("prune")
+        || n.contains("scrub")
+        || n.contains("reclaim")
+        || n.contains("/disk")
+        || n.contains("disk cleanup")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("enable")
+        || n.contains("disable")
+        || n.contains("/skills")
+        || n.contains("skill.md")
+        || n.contains("skill file")
+        || n.contains("skill md")
+        || n.contains("skill:")
+        || n.contains("skill=")
+        || n.contains("run skill")
+        || n.contains("invoke")
+        || n.contains("catalog")
+        || n.contains("installed")
+        || n.contains("available")
+        || n.contains("agents")
+        || n.contains("agent")
+        || n.contains("memory")
+        || n.contains("notes")
+        || n.contains("prompt")
+        || n.contains("prompts")
+        || n.contains("plugin")
+        || n.contains("scripts")
+        || n.contains("soul")
+        || n.contains("mood")
+        || n.contains("testing")
+        || n.contains("session")
+        || n.contains("task")
+        || n.contains("quarantine")
+        || n.contains("improvements")
+        || n.contains("screenshot")
+        || n.contains("tmp")
+        || n.contains("temp")
+        || n.contains("scratch")
+        || n.contains("upload")
+        || n.contains("trace")
+        || n.contains("pdf")
+        || n.contains("download")
+        || n.contains("browser_")
+        || n.contains("browser:")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log age")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    let skills_ctx = n.contains("skills folder")
+        || n.contains("skill folder")
+        || n.contains("skills directory")
+        || n.contains("skill directory")
+        || n.contains("skills dir")
+        || n.contains("skill dir")
+        || n.contains("skills age")
+        || n.contains("skill age")
+        || n.contains("mac-stats skills")
+        || n.contains("mac stats skills")
+        || n == "skills"
+        || n == "skill"
+        || ((n.contains("skills") || n.contains("skill"))
+            && (n.contains("age")
+                || n.contains("old")
+                || n.contains("stale")
+                || n.contains("when")
+                || n.contains("updated")
+                || n.contains("modified")
+                || n.contains("folder")
+                || n.contains("directory")
+                || n.contains("dir")));
+    if !skills_ctx {
+        return false;
+    }
+    // Bare “skills” / path-only asks stay on the path lane.
+    if n == "skills"
+        || n == "skill"
+        || (!n.contains("age")
+            && !n.contains("old")
+            && !n.contains("stale")
+            && !n.contains("when")
+            && !n.contains("updated")
+            && !n.contains("modified"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "skills age"
+            | "skill age"
+            | "skills folder age"
+            | "skill folder age"
+            | "skills directory age"
+            | "skill directory age"
+            | "skills dir age"
+            | "skill dir age"
+            | "how old are skills"
+            | "how old is skills"
+            | "how old is the skills folder"
+            | "how old is skills folder"
+            | "how old is the skill folder"
+            | "how old is skill folder"
+            | "how old is the skills directory"
+            | "how old is the skill directory"
+            | "how old is skill"
+            | "how old is the skill"
+            | "when was skills updated"
+            | "when was the skills folder updated"
+            | "when was the skill folder updated"
+            | "skills last modified"
+            | "skill folder last modified"
+            | "is skills stale"
+            | "is the skills folder stale"
+            | "mac-stats skills age"
+            | "mac stats skills age"
+    ) || (skills_ctx
+        && (n.contains("age")
+            || n.contains("old")
+            || n.contains("stale")
+            || n.contains("when")
+            || n.contains("updated")
+            || n.contains("modified")))
+}
+
+/// Zero-LLM skills directory age (newest file mtime; no list dump).
+pub fn format_skills_age_gateway() -> String {
+    let dir = crate::config::Config::skills_dir();
+    match dir_newest_mtime_ms(&dir, 8_000) {
+        Err(msg) if msg == "missing" => {
+            "**Skills:** not created yet · app recreates under skills/ · `skills path` for the folder · `skills size` for on-disk bytes."
+                .to_string()
+        }
+        Err(e) => format!("**Skills** — could not scan: {e}"),
+        Ok((_, 0)) => {
+            "**Skills:** empty · `skills path` for the folder · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for on-disk bytes."
+                .to_string()
+        }
+        Ok((Some(ms), files)) => {
+            let age = age_from_ms(ms);
+            if files == 1 {
+                format!(
+                    "**Skills:** last write **{age}** ago · 1 file · `/skills` for catalog · `skills path` for the folder · `skills size` for on-disk bytes · does not list names."
+                )
+            } else {
+                format!(
+                    "**Skills:** newest write **{age}** ago · {files} files · `/skills` for catalog · `skills path` for the folder · `skills size` for on-disk bytes · does not list names."
+                )
+            }
+        }
+        Ok((None, _)) => {
+            "**Skills** — could not read mtime · `skills path` for the folder · `skills size` for on-disk bytes."
+                .to_string()
         }
     }
 }
@@ -9782,6 +9991,20 @@ pub fn looks_like_skills_path_request(content: &str) -> bool {
         || n.contains("skill md")
         || n == "where is skill"
         || n == "where is the skill"
+    {
+        return false;
+    }
+    // Age asks use the skills directory age lane (v0.1.955).
+    if n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("file age")
+        || n.contains("folder age")
+        || n.contains("dir age")
     {
         return false;
     }
@@ -9889,7 +10112,7 @@ pub fn format_skills_path_gateway() -> String {
     let dir = crate::config::Config::skills_dir();
     let display = dir.display().to_string();
     format!(
-        "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for disk use."
+        "**Skills dir:** `{display}` · `/skills` for catalog · `SKILL: <n|topic>` to run · `skills size` for disk use · `skills age` for newest mtime."
     )
 }
 
@@ -35100,7 +35323,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_agents_path_request(content) {
         return Some(format_agents_path_gateway());
     }
-    // Skills dir size before path (recursive bytes; no list); path before catalog.
+    // Skills dir age before size/path (newest mtime; no list); size before path; path before catalog.
+    if looks_like_skills_age_request(content) {
+        return Some(format_skills_age_gateway());
+    }
     if looks_like_skills_size_request(content) {
         return Some(format_skills_size_gateway());
     }
@@ -35467,7 +35693,7 @@ pub fn format_ops_help_gateway() -> String {
 • `mood age` · `mood.md age` · `how old is mood` · `when was mood updated` — newest per-agent mood.md last write age (mtime; no dump; does not steal `mood path` / `mood size` / soul / agents)\n\
 • `mood path` · `where is mood.md` · `mood file path` — per-agent `agent-<id>/mood.md` (config only; no dump/edit; `mood size` / `mood age` for bytes / mtime; does not steal `/agents`)\n\
 • `skill.md size` · `skill file size` · `how big is skill.md` — per-agent skill.md size on disk (stat only; no dump; does not steal `skill.md path` / `skill.md age` / `skills size` / `/skills`)\n\
-• `skill.md age` · `skill file age` · `how old is skill.md` · `when was skill.md updated` — newest per-agent skill.md last write age (mtime; no dump; does not steal `skill.md path` / `skill.md size` / `skills` / mood / soul)\n\
+• `skill.md age` · `skill file age` · `how old is skill.md` · `when was skill.md updated` — newest per-agent skill.md last write age (mtime; no dump; does not steal `skill.md path` / `skill.md size` / `skills age` / mood / soul)\n\
 • `skill.md` · `where is skill.md` · `skill file path` — per-agent `agent-<id>/skill.md` (config only; no dump/edit; `skill.md size` / `skill.md age` for bytes / mtime; does not steal `/skills`)\n\
 • `testing size` · `testing.md size` · `how big is testing.md` · `testing file size` — per-agent testing.md size on disk (stat only; no dump; does not steal `testing.md path` / `testing.md age` / run tests / `/agents`)\n\
 • `testing age` · `testing.md age` · `how old is testing` · `when was testing updated` — newest per-agent testing.md last write age (mtime; no dump; does not steal `testing.md path` / `testing.md size` / skill / mood / soul; does not run tests)\n\
@@ -35487,7 +35713,8 @@ pub fn format_ops_help_gateway() -> String {
 • `session size` · `how big are sessions` · `session folder size` — session folder size on disk (recursive file bytes; no list dump; does not steal `session path` / `/sessions`)\n\
 • `session path` · `where is the session folder` · `session directory` — `~/.mac-stats/session/` path (config only; no list/resume; `session size` for disk use)\n\
 • `agents size` · `how big are agents` · `agents folder size` — agents folder size on disk (recursive file bytes; no list dump; does not steal `agents path` / `/agents`)\n\
-• `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `/skills` / `skill.md size`)\n\
+• `skills age` · `how old are skills` · `skills folder age` · `when was skills updated` — skills folder last write age (newest file mtime; no list dump; does not steal `skills path` / size / `skill.md age` / `/skills`)\n\
+• `skills size` · `how big are skills` · `skills folder size` — skills folder size on disk (recursive file bytes; no list dump; does not steal `skills path` / `skills age` / `/skills` / `skill.md size`)\n\
 • `plugins size` · `scripts size` · `how big are plugins` · `plugins folder size` — plugins/scripts folder size on disk (recursive file bytes; no list dump; does not steal `plugins path` / `/plugins`)\n\
 • `prompts size` · `how big are prompts` · `prompts folder size` — prompts folder size on disk (recursive file bytes; no list dump; does not steal `prompts path` / planning·execution file paths)\n\
 • `planning size` · `planning_prompt.md size` · `how big is planning_prompt.md` · `planning prompt size` — planning_prompt.md size on disk (stat only; no dump; does not steal `planning_prompt.md path` / `planning_prompt.md age` / `prompts size`)\n\
@@ -35497,7 +35724,7 @@ pub fn format_ops_help_gateway() -> String {
 • `execution age` · `execution_prompt.md age` · `how old is execution` · `when was execution updated` — execution_prompt.md last write age (mtime; no dump; does not steal `execution_prompt.md path` / `execution_prompt.md size` / `prompts path` / planning)\n\
 • `execution_prompt.md` · `where is execution_prompt.md` · `execution prompt path` · `execution path` — `agents/prompts/execution_prompt.md` (config only; no dump/edit; `execution_prompt.md size` / `execution_prompt.md age` for bytes / mtime; does not steal `prompts path`)\n\
 • `agents path` · `where is the agents folder` · `agents directory` — `~/.mac-stats/agents/` path (config only; no list/create)\n\
-• `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` for disk use)\n\
+• `skills path` · `where is the skills folder` · `skills directory` — `~/.mac-stats/agents/skills/` path (config only; no list/run; `skills size` / `skills age` for disk use / mtime)\n\
 • `plugins path` · `scripts path` · `where is the plugins folder` — `~/.mac-stats/scripts/` path (config only; no list/run; `plugins size` for disk use)\n\
 • `prompts path` · `where is the prompts folder` · `prompts directory` — `~/.mac-stats/agents/prompts/` path (config only; no open/edit; `prompts size` for disk use)\n\
 • `tmp path` · `where is the tmp folder` · `temp directory` — `~/.mac-stats/tmp/` path (config only; no list/prune)\n\
@@ -37294,6 +37521,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only agents dir path asks (v0.1.817) — config only; no list/create.
     if looks_like_agents_path_request(question) {
+        return true;
+    }
+    // Read-only skills dir age asks (v0.1.955) — newest file mtime; no list dump.
+    if looks_like_skills_age_request(question) {
         return true;
     }
     // Read-only skills dir size asks (v0.1.881) — recursive file bytes; no list dump.
@@ -44005,12 +44236,15 @@ mod tests {
         assert!(!looks_like_skills_path_request("memory path"));
         assert!(!looks_like_skills_path_request("skills size"));
         assert!(!looks_like_skills_path_request("how big are skills"));
+        assert!(!looks_like_skills_path_request("skills age"));
+        assert!(!looks_like_skills_path_request("how old are skills"));
         assert!(!looks_like_skills_request("skills path"));
         let reply =
             try_operator_instant_reply("where is the skills folder").expect("skills path instant");
         assert!(reply.contains("Skills dir"));
         assert!(reply.contains("skills") || reply.contains(".mac-stats"));
         assert!(reply.to_lowercase().contains("skills size") || reply.contains("disk use"));
+        assert!(reply.to_lowercase().contains("skills age") || reply.contains("mtime"));
     }
 
     #[test]
@@ -44034,7 +44268,10 @@ mod tests {
         assert!(!looks_like_skills_size_request("agents size"));
         assert!(!looks_like_skills_size_request("tmp size"));
         assert!(!looks_like_skills_size_request("plugins size"));
+        assert!(!looks_like_skills_size_request("skills age"));
+        assert!(!looks_like_skills_size_request("how old are skills"));
         assert!(!looks_like_skills_path_request("skills size"));
+        assert!(!looks_like_skills_path_request("skills age"));
         assert!(!looks_like_agents_size_request("skills size"));
         assert!(!looks_like_tmp_size_request("skills size"));
         let reply =
@@ -44047,6 +44284,59 @@ mod tests {
                 || reply.contains("could not scan")
         );
         assert!(reply.to_lowercase().contains("skills path") || reply.contains("folder"));
+    }
+
+    #[test]
+    fn skills_age_request_detected() {
+        assert!(looks_like_skills_age_request("skills age"));
+        assert!(looks_like_skills_age_request("skill age"));
+        assert!(looks_like_skills_age_request("skills folder age"));
+        assert!(looks_like_skills_age_request("skills directory age"));
+        assert!(looks_like_skills_age_request("skills dir age"));
+        assert!(looks_like_skills_age_request("how old are skills"));
+        assert!(looks_like_skills_age_request("how old is skills"));
+        assert!(looks_like_skills_age_request("how old is the skills folder"));
+        assert!(looks_like_skills_age_request("how old is skill"));
+        assert!(looks_like_skills_age_request(
+            "when was the skills folder updated"
+        ));
+        assert!(looks_like_skills_age_request("skills last modified"));
+        assert!(looks_like_skills_age_request("is the skills folder stale"));
+        assert!(looks_like_skills_age_request("mac-stats skills age"));
+        assert!(!looks_like_skills_age_request("skills path"));
+        assert!(!looks_like_skills_age_request("where is the skills folder"));
+        assert!(!looks_like_skills_age_request("skills"));
+        assert!(!looks_like_skills_age_request("skills size"));
+        assert!(!looks_like_skills_age_request("how big are skills"));
+        assert!(!looks_like_skills_age_request("list skills"));
+        assert!(!looks_like_skills_age_request("/skills"));
+        assert!(!looks_like_skills_age_request("skill.md"));
+        assert!(!looks_like_skills_age_request("skill.md age"));
+        assert!(!looks_like_skills_age_request("how old is skill.md"));
+        assert!(!looks_like_skills_age_request("SKILL: summarize"));
+        assert!(!looks_like_skills_age_request("agents age"));
+        assert!(!looks_like_skills_age_request("tmp age"));
+        assert!(!looks_like_skills_path_request("skills age"));
+        assert!(!looks_like_skills_size_request("skills age"));
+        assert!(!looks_like_skill_md_age_request("skills age"));
+        assert!(!looks_like_skill_md_age_request("how old are skills"));
+        let reply = try_operator_instant_reply("how old are skills").expect("skills age instant");
+        assert!(reply.contains("Skills"), "{reply}");
+        assert!(
+            reply.contains("ago")
+                || reply.contains("empty")
+                || reply.contains("not created")
+                || reply.contains("could not"),
+            "{reply}"
+        );
+        assert!(
+            try_operator_instant_reply("skills age").is_some(),
+            "skills age should be instant"
+        );
+        assert!(
+            try_operator_instant_reply("skill age").is_some(),
+            "skill age should be skills-dir age instant"
+        );
     }
 
     #[test]

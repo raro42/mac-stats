@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.955] - 2026-09-09
+
+### Added
+- Instant lane: skills directory age (`skills age`, `how old are skills`, `skills folder age`, `when was skills updated`) — newest file mtime under the Hermes skills dir; no list dump; does not steal path / size / `skill.md age` / `/skills`.
+
 ## [0.1.954] - 2026-09-09
 
 ### Added
