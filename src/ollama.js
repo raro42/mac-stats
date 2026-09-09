@@ -542,6 +542,56 @@ function syncChatMessageErrorClass(el) {
   return isErr;
 }
 
+/** Brief Clear → Cleared flash (save-button / conversation Clear parity). */
+function flashChatFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncChatFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·You·Assistant·Errors when a role filter is active (Ops N/M Clear parity). */
+function syncChatFilterClearBtn() {
+  const btn = document.getElementById('chat-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!chatFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensureChatFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('chat-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'chat-filter-clear';
+  btn.className = 'chat-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show every message (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
+}
+
 /** All · You · Assistant · Errors chips above the message list. */
 function ensureChatFilterChips() {
   const chat = document.getElementById('ollama-chat');
@@ -562,6 +612,15 @@ function ensureChatFilterChips() {
       '<button type="button" class="chat-filter-chip" data-chat-filter="errors" aria-pressed="false" title="Show failed turns only (Error: …)">Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span></button>';
     messages.parentNode.insertBefore(wrap, messages);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target && e.target.closest && e.target.closest('#chat-filter-clear, .chat-filter-clear');
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setChatFilterMode('all');
+        flashChatFilterClearBtn(clearBtn);
+        return;
+      }
       const btn = e.target && e.target.closest && e.target.closest('[data-chat-filter]');
       if (!btn || !wrap.contains(btn)) return;
       e.preventDefault();
@@ -579,6 +638,8 @@ function ensureChatFilterChips() {
       'Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span>';
     wrap.appendChild(errBtn);
   }
+  ensureChatFilterClearBtn(wrap);
+  syncChatFilterClearBtn();
   if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
     window.wireFilterChipToolbarKeyboard(wrap);
   }
@@ -605,6 +666,7 @@ function setChatFilterMode(mode) {
     btn.classList.toggle('is-active', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
+  syncChatFilterClearBtn();
   applyChatListFilter();
 }
 
@@ -669,6 +731,7 @@ function ensureChatFilterMissState(container, show) {
       e.preventDefault();
       e.stopPropagation();
       setChatFilterMode('all');
+      flashChatFilterClearBtn(document.getElementById('chat-filter-clear'));
     });
   }
   const hint = wrap.querySelector('.chat-filter-miss-msg');
@@ -719,6 +782,7 @@ function applyChatListFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensureChatFilterMissState(container, false);
+    syncChatFilterClearBtn();
     applyChatErrorsGlanceState();
     return;
   }

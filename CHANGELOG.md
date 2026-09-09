@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.960] - 2026-09-09
+
+### Changed
+- AI Chat: Clear chip beside All · You · Assistant · Errors when a role filter is active (Ops filter Clear parity) — flashes Cleared, then returns to All; empty filter-miss Clear uses the same flash.
+
 ## [0.1.959] - 2026-09-09
 
 ### Added
