@@ -1,12 +1,14 @@
 # Morning surprise — 2026-09-09
 
-Overnight Track B kept shipping instant-lane directory **age** reads so operator asks skip Ollama.
+Overnight Track B kept shipping instant-lane directory **age** reads, closed with an AI Chat design-review polish, then one more p50 age lane before dawn.
 
 ## Shipped tonight (highlights)
 
 | Version | What |
 |---------|------|
-| **v0.1.959** | Instant lane: **session directory age** (`session age` / `how old are sessions` / `session folder age`) — newest `~/.mac-stats/session/` mtime; no list; safe vs path / size / `session memory age` / `/sessions` |
+| **v0.1.961** | Instant lane: **task directory age** (`task age` / `how old are tasks` / `task folder age`) — newest `~/.mac-stats/task/` mtime; no list; safe vs path / size / `/tasks` |
+| **v0.1.960** | **AI Chat filter Clear chip** — Clear beside All·You·Assistant·Errors when a role filter is on (Ops Clear parity); flashes Cleared; design review / `feature-ai-chat` |
+| **v0.1.959** | Instant lane: **session directory age** |
 | **v0.1.958** | Instant lane: prompts directory age |
 | **v0.1.957** | Instant lane: plugins/scripts directory age |
 | **v0.1.956** | Instant lane: agents directory age |
@@ -14,16 +16,16 @@ Overnight Track B kept shipping instant-lane directory **age** reads so operator
 | **v0.1.954** | Instant lane: LaunchAgent plist age |
 | **v0.1.953** | Instant lane: screenshots directory age |
 | **v0.1.952** | Instant lane: improvements directory age |
-| **v0.1.942** | AI Chat filter-miss calm (design review; one polish/night) |
 
-## This tick (~04:15)
+## This tick (~05:25)
 
-- Digester: design-review open only (already used tonight).
+- Digester: open empty.
+- Design review: due=false (grace; AI Chat polish already tonight).
 - Debug scan: quiet.
-- Fuel: standing backlog p50 → session dir age.
-- Ratchet: keep after verify.
+- Fuel: standing backlog p50 → task directory age.
+- Ratchet: keep after verify @ b4475100.
 
 ## Still open
 
-- Recapture stale feature screens when TCC allows.
-- Next dir ages: task / tmp / uploads / traces / pdfs / quarantine.
+- Recapture `feature-ai-chat.png` when TCC allows (polish grace marked).
+- Next dir ages: tmp / uploads / traces / pdfs / quarantine.
