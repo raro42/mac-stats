@@ -1708,6 +1708,13 @@ impl Config {
         Self::improvements_dir().join("loop_backlog.md")
     }
 
+    /// Sibling harness scan note: `$HOME/.mac-stats/improvements/sibling_harness.md`
+    ///
+    /// Path only for operator instant lane — does not dump OpenClaw/Hermes notes.
+    pub fn sibling_harness_path() -> PathBuf {
+        Self::improvements_dir().join("sibling_harness.md")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.979] - 2026-09-10
+
+### Added
+- Instant lane: sibling_harness.md path (`sibling harness path`, `where is sibling_harness.md`, `openclaw hermes scan path`, `overnight sibling harness path`) — path only; no dump; does not steal `improvements path` / `loop backlog path` / standing backlog.
+
 ## [0.1.978] - 2026-09-10
 
 ### Added

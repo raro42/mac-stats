@@ -9769,6 +9769,179 @@ pub fn format_loop_backlog_age_gateway() -> String {
     }
 }
 
+/// True for short “where is sibling_harness.md / sibling harness path…” asks.
+/// Path only — does not dump OpenClaw/Hermes scan notes or open the file.
+/// Does not steal `improvements path` / `results.tsv path` / loop backlog / standing backlog.
+pub fn looks_like_sibling_harness_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Age/size reserved for later lanes — keyword-only (no nest).
+    if n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        || n == "improvements"
+        || n == "improvements path"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "where is improvements"
+        || n == "where is the improvements folder"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "sibling_harness"
+            | "sibling-harness"
+            | "sibling harness"
+            | "sibling_harness.md"
+            | "sibling-harness.md"
+            | "sibling harness.md"
+            | "sibling_harness path"
+            | "sibling-harness path"
+            | "sibling harness path"
+            | "sibling_harness.md path"
+            | "sibling-harness.md path"
+            | "sibling harness.md path"
+            | "sibling_harness file"
+            | "sibling-harness file"
+            | "sibling harness file"
+            | "sibling_harness location"
+            | "sibling-harness location"
+            | "sibling harness location"
+            | "openclaw hermes scan"
+            | "openclaw hermes scan path"
+            | "sibling scan path"
+            | "harness sibling path"
+            | "overnight sibling harness"
+            | "overnight sibling harness path"
+            | "where is sibling_harness"
+            | "where is sibling_harness.md"
+            | "where is the sibling_harness"
+            | "where is the sibling_harness.md"
+            | "where is sibling-harness"
+            | "where is the sibling-harness"
+            | "where is sibling harness"
+            | "where is the sibling harness"
+            | "where is the sibling harness file"
+            | "where is the overnight sibling harness"
+            | "where do sibling harness go"
+            | "where does sibling harness go"
+    ) {
+        return true;
+    }
+    let sh_ctx = n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || (n.contains("sibling") && n.contains("scan") && (n.contains("openclaw") || n.contains("hermes") || n.contains("path") || n.contains("where")));
+    sh_ctx && pathish
+}
+
+/// Zero-LLM overnight sibling_harness.md path (config only; no dump/list).
+pub fn format_sibling_harness_path_gateway() -> String {
+    let path = crate::config::Config::sibling_harness_path();
+    let display = path.display().to_string();
+    format!(
+        "**Sibling harness:** `{display}` · OpenClaw/Hermes overnight scan note · path only · does not dump notes · `improvements path` for the parent folder · `loop backlog path` for the tick log."
+    )
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -39827,6 +40000,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_loop_backlog_path_request(content) {
         return Some(format_loop_backlog_path_gateway());
     }
+    // sibling_harness.md path (config only; no dump); before improvements-dir / notes.
+    if looks_like_sibling_harness_path_request(content) {
+        return Some(format_sibling_harness_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -40235,6 +40412,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_loop_backlog_path_request(content) {
         return Some(format_loop_backlog_path_gateway());
     }
+    // sibling_harness.md path (config only; no dump); before notes/memory.
+    if looks_like_sibling_harness_path_request(content) {
+        return Some(format_sibling_harness_path_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -40632,6 +40813,7 @@ pub fn format_ops_help_gateway() -> String {
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
 • `loop backlog size` · `how big is loop_backlog.md` · `harness tick log size` — loop_backlog.md size on disk (stat only; no dump; does not steal `loop backlog path` / age / `improvements size` / `results.tsv size`)\n\
 • `loop backlog age` · `how old is loop_backlog.md` · `harness tick log age` · `when was loop backlog updated` — loop_backlog.md last write age (mtime; no dump; does not steal path / size / `improvements age` / `results.tsv age`)\n\
+• `sibling harness path` · `where is sibling_harness.md` · `openclaw hermes scan path` — `~/.mac-stats/improvements/sibling_harness.md` path only (no dump; does not steal `improvements path` / `loop backlog path` / standing backlog)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -42478,6 +42660,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only loop_backlog.md path asks (v0.1.976) — config only; no dump.
     if looks_like_loop_backlog_path_request(question) {
+        return true;
+    }
+    // Read-only sibling_harness.md path asks (v0.1.979) — config only; no dump.
+    if looks_like_sibling_harness_path_request(question) {
         return true;
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
@@ -49819,6 +50005,38 @@ mod tests {
         assert!(reply.contains("Loop backlog") || reply.contains("loop_backlog"));
         assert!(reply.contains("ago") || reply.contains("no `loop_backlog"));
         assert!(reply.contains("loop backlog path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn sibling_harness_path_request_detected() {
+        assert!(looks_like_sibling_harness_path_request("sibling_harness"));
+        assert!(looks_like_sibling_harness_path_request("sibling_harness.md"));
+        assert!(looks_like_sibling_harness_path_request("sibling harness path"));
+        assert!(looks_like_sibling_harness_path_request("sibling_harness path"));
+        assert!(looks_like_sibling_harness_path_request("where is sibling_harness.md"));
+        assert!(looks_like_sibling_harness_path_request("where is the sibling harness"));
+        assert!(looks_like_sibling_harness_path_request("openclaw hermes scan path"));
+        assert!(looks_like_sibling_harness_path_request("overnight sibling harness path"));
+        assert!(!looks_like_sibling_harness_path_request("improvements path"));
+        assert!(!looks_like_sibling_harness_path_request("autoresearch path"));
+        assert!(!looks_like_sibling_harness_path_request("results.tsv path"));
+        assert!(!looks_like_sibling_harness_path_request("loop backlog path"));
+        assert!(!looks_like_sibling_harness_path_request("standing backlog path"));
+        assert!(!looks_like_sibling_harness_path_request("list sibling harness"));
+        assert!(!looks_like_sibling_harness_path_request("dump sibling_harness.md"));
+        assert!(!looks_like_sibling_harness_path_request("sibling harness age"));
+        assert!(!looks_like_sibling_harness_path_request("how old is sibling harness"));
+        assert!(!looks_like_sibling_harness_path_request("sibling harness size"));
+        assert!(!looks_like_sibling_harness_path_request("how big is sibling_harness.md"));
+        assert!(!looks_like_loop_backlog_path_request("sibling harness path"));
+        assert!(!looks_like_improvements_path_request("sibling harness path"));
+        assert!(!looks_like_improvements_path_request("where is sibling_harness.md"));
+        assert!(!looks_like_results_tsv_path_request("sibling harness path"));
+        let reply =
+            try_operator_instant_reply("sibling harness path").expect("sibling harness path instant");
+        assert!(reply.contains("Sibling harness") || reply.contains("sibling_harness"));
+        assert!(reply.contains("sibling_harness.md"));
+        assert!(reply.contains("improvements path") || reply.contains("does not dump"));
     }
 
     #[test]
