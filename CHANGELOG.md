@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.980] - 2026-09-10
+
+### Added
+- Instant lane: sibling_harness.md size (`sibling harness size`, `how big is sibling_harness.md`, `openclaw hermes scan size`, `overnight sibling harness size`) — file size on disk (stat only; no dump; does not steal path / age / `improvements size` / `loop backlog size` / standing backlog).
+
 ## [0.1.979] - 2026-09-10
 
 ### Added
