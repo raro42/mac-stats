@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.981] - 2026-09-10
+
+### Added
+- Instant lane: sibling_harness.md age (`sibling harness age`, `how old is sibling_harness.md`, `openclaw hermes scan age`, `when was sibling harness updated`, `overnight sibling harness age`) — file mtime only; no dump; does not steal path / size / `improvements age` / `loop backlog age` / standing backlog.
+
 ## [0.1.980] - 2026-09-10
 
 ### Added
