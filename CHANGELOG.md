@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.990] - 2026-09-10
+
+### Added
+- Instant lane: overnight agent log path (`overnight agent log path`, `where is overnight_agent.log`, `overnight_agent.log path`, `harness agent log path`) — `~/.mac-stats/improvements/overnight_agent.log` path only; no dump/tail; does not steal `debug.log path` / morning surprise / improvements / loop / sibling / standing.
+
 ## [0.1.989] - 2026-09-10
 
 ### Fixed

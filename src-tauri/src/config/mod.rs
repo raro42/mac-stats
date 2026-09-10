@@ -1732,6 +1732,14 @@ impl Config {
         Self::improvements_dir().join(name)
     }
 
+    /// Overnight harness agent transcript:
+    /// `$HOME/.mac-stats/improvements/overnight_agent.log`
+    ///
+    /// Path only for operator instant lane — does not dump or tail the log.
+    pub fn overnight_agent_log_path() -> PathBuf {
+        Self::improvements_dir().join("overnight_agent.log")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
