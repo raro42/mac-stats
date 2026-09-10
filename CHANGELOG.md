@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.998] - 2026-09-11
+
+### Changed
+- Disk Cleanup: Clear chip beside All · Reclaim · Big · Clean when a filter is active (Monitors / Top Processes / AI Chat / Ops Clear parity) — flashes Cleared, then returns to All; empty filter-miss Clear uses the same flash.
 
 ## [0.1.997] - 2026-09-11
 

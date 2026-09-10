@@ -18365,6 +18365,56 @@ function wireDiskCleanupAttentionGlanceClick(glance) {
   });
 }
 
+/** Brief Clear → Cleared flash (Monitors / Top Processes / AI Chat Clear parity). */
+function flashDiskCleanupFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncDiskCleanupFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·Reclaim·Big·Clean when a filter is active. */
+function syncDiskCleanupFilterClearBtn() {
+  const btn = document.getElementById('disk-cleanup-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!diskCleanupFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensureDiskCleanupFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('disk-cleanup-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'disk-cleanup-filter-clear';
+  btn.className = 'disk-cleanup-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show every category (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
+}
+
 /** All / Reclaim / Clean chips (Monitors All/Up/Down parity). */
 function ensureDiskCleanupFilterChips() {
   const list = document.getElementById('disk-cleanup-list');
@@ -18384,6 +18434,17 @@ function ensureDiskCleanupFilterChips() {
       '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="clean">0</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#disk-cleanup-filter-clear, .disk-cleanup-filter-clear');
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setDiskCleanupFilterMode('all');
+        flashDiskCleanupFilterClearBtn(clearBtn);
+        return;
+      }
       const btn =
         e.target && e.target.closest && e.target.closest('[data-disk-cleanup-filter]');
       if (!btn || !wrap.contains(btn)) return;
@@ -18392,6 +18453,8 @@ function ensureDiskCleanupFilterChips() {
       setDiskCleanupFilterMode(btn.getAttribute('data-disk-cleanup-filter') || 'all');
     });
   }
+  ensureDiskCleanupFilterClearBtn(wrap);
+  syncDiskCleanupFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
@@ -18406,6 +18469,7 @@ function setDiskCleanupFilterMode(mode) {
       btn.classList.toggle('is-active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+  syncDiskCleanupFilterClearBtn();
   applyDiskCleanupListFilter();
 }
 
@@ -18430,6 +18494,7 @@ function ensureDiskCleanupFilterMissState(listEl, show) {
       e.preventDefault();
       e.stopPropagation();
       setDiskCleanupFilterMode('all');
+      flashDiskCleanupFilterClearBtn(document.getElementById('disk-cleanup-filter-clear'));
     });
   }
 }
@@ -18443,6 +18508,7 @@ function applyDiskCleanupListFilter() {
   const items = Array.from(listEl.querySelectorAll('.disk-cleanup-item'));
   const trueEmpty = !!listEl.querySelector('.disk-cleanup-list-empty');
   if (chips) chips.hidden = trueEmpty || items.length === 0;
+  syncDiskCleanupFilterClearBtn();
 
   let reclaimCount = 0;
   let bigCount = 0;
