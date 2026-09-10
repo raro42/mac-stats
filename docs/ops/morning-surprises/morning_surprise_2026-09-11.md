@@ -1,32 +1,21 @@
 # Morning surprise — 2026-09-11
 
-Overnight Track B (20:00–06:00 local) for Ralf.
+Overnight Track B kept shipping operator instant lanes for harness observability.
 
 ## Shipped tonight
+- **v0.1.995** — Instant: harness loop stdout **age** (`overnight_harness_loop.stdout.log` mtime).
+- **v0.1.994** — Instant: harness loop stdout **size**.
+- **v0.1.993** — Instant: harness loop stdout **path**.
+- **v0.1.992** — Instant: overnight agent log **age**.
+- **v0.1.991** — Instant: overnight agent log **size**.
+- **v0.1.990** — Instant: overnight agent log **path**.
+- **v0.1.989** — LaunchAgent WorkingDirectory (repo/HOME, not `/`).
+- **v0.1.988** — RUN_CMD workspace cwd (relative `python3 scripts/…`).
 
-| Version | What |
-|---------|------|
-| **v0.1.994** | Instant lane: **harness loop stdout size** (`harness loop stdout size`, `how big is overnight_harness_loop.stdout.log`) — stat only; no dump/tail |
-| **v0.1.993** | Instant lane: harness loop stdout path |
-| **v0.1.992** | Instant lane: overnight agent log age |
-| **v0.1.991** | Instant lane: overnight agent log size |
-| **v0.1.990** | Instant lane: overnight agent log path |
-| **v0.1.989** | LaunchAgent WorkingDirectory (repo/HOME, not `/`) |
-| **v0.1.988** | RUN_CMD workspace cwd (relative `scripts/…` under LaunchAgent) |
-| **v0.1.987** | Instant lane: morning surprise age |
+## Tried / notes
+- Digester open stayed empty (stale “Review logs” + wake-up noise).
+- Design review not due (CPU metrics still in grace).
+- Next fuel: harness loop **stderr** path·size·age.
 
 ## Why it matters
-
-Operators can ask how big the harness loop stdout capture is without dumping the file or confusing it with `overnight_agent.log` / `debug.log` / loop backlog.
-
-## Digester / design review
-
-- Digester open: empty (stale “Review logs” + wake-up instant noise).
-- Design review: grace (CPU metrics ~3.8d).
-
-## Next fuel
-
-1. Harness loop stdout **age**.
-2. Harness loop stderr path·size·age.
-3. Digester open / product-owned `debug.log` errors when present.
-4. Design-review recapture when due / TCC allows.
+Ralf can ask “how old is overnight_harness_loop.stdout.log?” and get an instant mtime answer — no LLM, no dump.
