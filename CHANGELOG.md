@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.977] - 2026-09-10
+
+### Added
+- Instant lane: loop_backlog.md size (`loop backlog size`, `how big is loop_backlog.md`, `harness tick log size`, `overnight loop backlog size`) — file size on disk (stat only; no dump; does not steal path / age / `improvements size` / `results.tsv size`).
+
 ## [0.1.976] - 2026-09-10
 
 ### Added
