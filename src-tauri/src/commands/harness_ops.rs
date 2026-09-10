@@ -12292,6 +12292,214 @@ pub fn format_harness_loop_stdout_size_gateway() -> String {
     }
 }
 
+/// True for short “how old is overnight_harness_loop.stdout.log / harness loop stdout age…” asks.
+/// Mtime only — does not dump/tail or steal path / size / overnight_agent.log / stderr / debug.log /
+/// morning surprise / improvements / loop backlog / sibling / standing.
+pub fn looks_like_harness_loop_stdout_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Path/size reserved — keyword-only (no nest).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("stderr")
+        || n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("stdout"))
+        || (n.contains("harness")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("stdout"))
+        || n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("stdout"))
+        || n == "log age"
+        || n == "log file age"
+        || n == "how old is the log"
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("backlog")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("improvements age")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n == "improvements"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    if matches!(
+        n.as_str(),
+        "harness loop stdout age"
+            | "harness loop stdout log age"
+            | "harness loop stdout.log age"
+            | "overnight harness loop stdout age"
+            | "overnight harness loop stdout log age"
+            | "overnight_harness_loop.stdout.log age"
+            | "overnight_harness_loop.stdout age"
+            | "overnight_harness_loop stdout age"
+            | "overnight-harness-loop.stdout.log age"
+            | "overnight-harness-loop stdout age"
+            | "harness_loop.stdout.log age"
+            | "harness_loop stdout age"
+            | "harness-loop stdout age"
+            | "stdout.log age"
+            | "harness stdout age"
+            | "harness stdout log age"
+            | "overnight harness stdout age"
+            | "overnight harness stdout log age"
+            | "how old is overnight_harness_loop.stdout.log"
+            | "how old is the overnight_harness_loop.stdout.log"
+            | "how old is overnight harness loop stdout"
+            | "how old is the overnight harness loop stdout"
+            | "how old is overnight harness loop stdout log"
+            | "how old is the overnight harness loop stdout log"
+            | "how old is harness loop stdout"
+            | "how old is the harness loop stdout"
+            | "how old is harness loop stdout log"
+            | "how old is the harness loop stdout log"
+            | "when was overnight_harness_loop.stdout.log updated"
+            | "when was the overnight_harness_loop.stdout.log updated"
+            | "when was overnight harness loop stdout updated"
+            | "when was the overnight harness loop stdout updated"
+            | "when was harness loop stdout updated"
+            | "when was the harness loop stdout updated"
+            | "when was harness loop stdout log updated"
+            | "overnight_harness_loop.stdout.log last modified"
+            | "harness loop stdout last modified"
+            | "is overnight_harness_loop.stdout.log stale"
+            | "is harness loop stdout stale"
+            | "is the harness loop stdout stale"
+            | "is the harness loop stdout log stale"
+    ) {
+        return true;
+    }
+    let stdout_ctx = n.contains("stdout")
+        || n.contains("overnight_harness_loop.stdout")
+        || n.contains("harness_loop.stdout")
+        || n.contains("overnight-harness-loop.stdout");
+    let loop_ctx = n.contains("harness")
+        || n.contains("overnight_harness_loop")
+        || n.contains("overnight-harness-loop")
+        || n.contains("overnight harness loop")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop");
+    let ageish = n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified");
+    // Bare `stdout.log age` already matched above; otherwise need harness/loop context.
+    stdout_ctx && (loop_ctx || n.contains("stdout.log")) && ageish
+}
+
+/// Zero-LLM overnight_harness_loop.stdout.log age from file mtime (stat only; no dump/tail).
+pub fn format_harness_loop_stdout_age_gateway() -> String {
+    let path = crate::config::Config::overnight_harness_loop_stdout_log_path();
+    if !path.exists() {
+        return "**Harness loop stdout:** no file yet · Track B creates it on harness ticks · `harness loop stdout path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Harness loop stdout:** last write **{age}** ago · Track B loop capture · `harness loop stdout path` for the file · `harness loop stdout size` for on-disk bytes · `overnight agent log age` for the agent transcript · `debug.log age` for the app log."
+            )
+        }
+        Err(e) => format!("**Harness loop stdout** — could not stat file: {e}"),
+    }
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -42436,9 +42644,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_overnight_agent_log_path_request(content) {
         return Some(format_overnight_agent_log_path_gateway());
     }
-    // harness loop stdout size before path before debug.log (stat only; no dump/tail).
+    // harness loop stdout size before age before path before debug.log (stat only; no dump/tail).
     if looks_like_harness_loop_stdout_size_request(content) {
         return Some(format_harness_loop_stdout_size_gateway());
+    }
+    if looks_like_harness_loop_stdout_age_request(content) {
+        return Some(format_harness_loop_stdout_age_gateway());
     }
     if looks_like_harness_loop_stdout_path_request(content) {
         return Some(format_harness_loop_stdout_path_gateway());
@@ -42851,9 +43062,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_overnight_agent_log_path_request(content) {
         return Some(format_overnight_agent_log_path_gateway());
     }
-    // harness loop stdout size before path (Track B loop capture; no dump/tail).
+    // harness loop stdout size before age before path (Track B loop capture; no dump/tail).
     if looks_like_harness_loop_stdout_size_request(content) {
         return Some(format_harness_loop_stdout_size_gateway());
+    }
+    if looks_like_harness_loop_stdout_age_request(content) {
+        return Some(format_harness_loop_stdout_age_gateway());
     }
     if looks_like_harness_loop_stdout_path_request(content) {
         return Some(format_harness_loop_stdout_path_gateway());
@@ -43269,6 +43483,7 @@ pub fn format_ops_help_gateway() -> String {
 • `overnight agent log age` · `how old is overnight_agent.log` · `overnight_agent.log age` · `harness agent log age` · `when was overnight agent log updated` — overnight_agent.log last write age (mtime; no dump/tail; does not steal path / size / `debug.log age` / morning surprise / improvements / loop / sibling / standing)\n\
 • `harness loop stdout path` · `where is overnight_harness_loop.stdout.log` · `overnight_harness_loop.stdout.log path` · `harness stdout path` — `~/.mac-stats/improvements/overnight_harness_loop.stdout.log` path only (no dump/tail; does not steal overnight_agent.log / stderr / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `harness loop stdout size` for bytes · `harness loop stdout age` for mtime)\n\
 • `harness loop stdout size` · `how big is overnight_harness_loop.stdout.log` · `overnight_harness_loop.stdout.log size` · `harness stdout size` — overnight_harness_loop.stdout.log size on disk (stat only; no dump/tail; does not steal path / age / overnight_agent.log / stderr / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
+• `harness loop stdout age` · `how old is overnight_harness_loop.stdout.log` · `overnight_harness_loop.stdout.log age` · `harness stdout age` · `when was harness loop stdout updated` — overnight_harness_loop.stdout.log last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stderr / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -44841,6 +45056,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_harness_loop_stdout_size_request(question) {
         return true;
     }
+    // Read-only harness loop stdout age asks (v0.1.995) — mtime only; no dump/tail.
+    if looks_like_harness_loop_stdout_age_request(question) {
+        return true;
+    }
     // Read-only harness loop stdout path asks (v0.1.993) — config only; no dump/tail.
     if looks_like_harness_loop_stdout_path_request(question) {
         return true;
@@ -45187,6 +45406,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only harness loop stdout size asks (v0.1.994) — stat only; no dump/tail.
     if looks_like_harness_loop_stdout_size_request(question) {
+        return true;
+    }
+    // Read-only harness loop stdout age asks (v0.1.995) — mtime only; no dump/tail.
+    if looks_like_harness_loop_stdout_age_request(question) {
         return true;
     }
     // Read-only harness loop stdout path asks (v0.1.993) — config only; no dump/tail.
@@ -53170,6 +53393,112 @@ mod tests {
         assert!(
             !reply.contains("Debug Log:") || reply.contains("debug.log size"),
             "must not steal debug.log size lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn harness_loop_stdout_age_request_detected() {
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "harness loop stdout age"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "overnight_harness_loop.stdout.log age"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "how old is overnight_harness_loop.stdout.log"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "how old is the harness loop stdout log"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "overnight harness loop stdout age"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request("harness stdout age"));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "when was harness loop stdout updated"
+        ));
+        assert!(looks_like_harness_loop_stdout_age_request(
+            "is the harness loop stdout stale"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "harness loop stdout path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "where is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "harness loop stdout size"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "how big is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "overnight agent log age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "how old is overnight_agent.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request("debug.log age"));
+        assert!(!looks_like_harness_loop_stdout_age_request("log file age"));
+        assert!(!looks_like_harness_loop_stdout_age_request("how old is the log"));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "morning surprise age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request("improvements age"));
+        assert!(!looks_like_harness_loop_stdout_age_request("loop backlog age"));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "standing backlog age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "sibling harness age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "harness loop stderr age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "tail overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "dump harness loop stdout"
+        ));
+        assert!(!looks_like_overnight_agent_log_age_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_debug_log_age_request("harness loop stdout age"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_size_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_overnight_agent_log_path_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_morning_surprise_age_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_improvements_age_request("harness loop stdout age"));
+        let reply = try_operator_instant_reply("how old is overnight_harness_loop.stdout.log")
+            .expect("harness loop stdout age instant");
+        assert!(
+            reply.contains("Harness loop stdout")
+                || reply.contains("overnight_harness_loop.stdout"),
+            "expected harness loop stdout age reply: {reply}"
+        );
+        assert!(
+            reply.contains("last write")
+                || reply.contains("no file yet")
+                || reply.contains("could not stat"),
+            "expected age reply: {reply}"
+        );
+        assert!(
+            !reply.contains("Overnight agent log:")
+                || reply.contains("overnight agent log age"),
+            "must not steal overnight agent log age lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Debug Log:") || reply.contains("debug.log age"),
+            "must not steal debug.log age lane: {reply}"
         );
     }
 

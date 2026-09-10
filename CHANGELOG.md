@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.995] - 2026-09-11
+
+### Added
+- Instant lane: harness loop stdout age (`harness loop stdout age`, `how old is overnight_harness_loop.stdout.log`, `overnight_harness_loop.stdout.log age`, `harness stdout age`, `when was harness loop stdout updated`) — `~/.mac-stats/improvements/overnight_harness_loop.stdout.log` last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stderr / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing).
+
 ## [0.1.994] - 2026-09-11
 
 ### Added
