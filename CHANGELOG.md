@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.992] - 2026-09-10
+
+### Added
+- Instant lane: overnight agent log age (`overnight agent log age`, `how old is overnight_agent.log`, `overnight_agent.log age`, `harness agent log age`, `when was overnight agent log updated`) — `~/.mac-stats/improvements/overnight_agent.log` last write age (mtime; no dump/tail; does not steal path / size / `debug.log age` / morning surprise / improvements / loop / sibling / standing).
+
 ## [0.1.991] - 2026-09-10
 
 ### Added
