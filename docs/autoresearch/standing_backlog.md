@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.988** — RUN_CMD working directory: children use Cursor Agent / config workspace (`~/projects/mac-stats`) so LaunchAgent cwd `/` no longer breaks relative `python3 scripts/…` (quality-weekly-review).
+
 - **v0.1.987** — Instant lane: morning surprise age (`morning surprise age`, `how old is morning_surprise.md`, `overnight morning surprise age`, `when was morning surprise updated`, `today's morning surprise age`; today's note mtime; no dump; does not steal path / size / improvements / standing / sibling / loop; p50).
 
 - **v0.1.986** — Instant lane: morning surprise size (`morning surprise size`, `how big is morning_surprise.md`, `overnight morning surprise size`, `today's morning surprise size`; today's note size on disk; no dump; does not steal path / age / improvements / standing / sibling / loop; p50).

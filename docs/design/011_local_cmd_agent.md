@@ -36,13 +36,15 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 
 ## RUN_CMD Agent
 
-The RUN_CMD agent lets Ollama read app data by running restricted local commands. Only read-only commands are allowed, and only for paths under `~/.mac-stats`. Each **pipeline stage** is executed via a shell (`sh -c "<stage>"`). Stages are split only at top-level `|` characters. **Compound shell in one stage is rejected** (`;`, `&&`, `||`, `|` inside a stage, command substitution, leading subshells, etc.) so that what is validated is what runs. Redirects such as `>`, `>>`, `<`, and `2>&1` remain supported inside a stage when they do not use disallowed metacharacters.
+The RUN_CMD agent lets Ollama read app data by running restricted local commands. Only read-only commands are allowed, and only for paths under `~/.mac-stats` (path args under `$HOME` by default). Each **pipeline stage** is executed via a shell (`sh -c "<stage>"`). Stages are split only at top-level `|` characters. **Compound shell in one stage is rejected** (`;`, `&&`, `||`, `|` inside a stage, command substitution, leading subshells, etc.) so that what is validated is what runs. Redirects such as `>`, `>>`, `<`, and `2>&1` remain supported inside a stage when they do not use disallowed metacharacters.
+
+**Working directory:** LaunchAgent often starts `mac_stats` with cwd `/`. RUN_CMD children use the Cursor Agent / `cursorAgentWorkspace` checkout (default `~/projects/mac-stats`) when that directory looks like the repo, so relative skill commands such as `python3 scripts/scan_repo_quality.py` resolve correctly. Absolute paths under `$HOME` still work.
 
 ### Overview
 
 *   **Agent name**: RUN_CMD  
 *   **Invocation**: Ollama replies with one line: `RUN_CMD: <command> [args]` (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`, `RUN_CMD: date`, `RUN_CMD: whoami`, or `RUN_CMD: ls ~/.mac-stats`).  
-*   The app runs each stage via `sh -c`. Path-like arguments are validated to be under `~/.mac-stats` where applicable. Stdout (or an error message) is injected back into the conversation.
+*   The app runs each stage via `sh -c` from the mac-stats workspace when discoverable (LaunchAgent cwd `/` is not used for relative `scripts/…` paths). Path-like arguments are validated to be under `$HOME` where applicable. Stdout (or an error message) is injected back into the conversation.
 
 ## Setup
 
@@ -56,7 +58,7 @@ The RUN_CMD agent lets Ollama read app data by running restricted local commands
 *   **Security — cursor-agent**: `cursor-agent` in the allowlist runs user/ or agent-controlled prompts in the user environment; its arguments are not path-validated. It is a privileged capability. To lock down, remove `cursor-agent` from the RUN_CMD allowlist in your orchestrator’s `skill.md` (see `## RUN_CMD allowlist`).
 *   **Paths**: Any argument that looks like a path (contains `/` or starts with `~`) must resolve to a location under `~/.mac-stats`. Paths are expanded (`~` → `$HOME`) and validated (canonical form must be under the permitted base). Paths outside `~/.mac-stats` are rejected with "Path not allowed (must be under ~/.mac-stats)."
 *   **Shell execution**: The app runs each pipeline stage with `sh -c "<stage>"`. The stage string is validated **fail-closed** for unsupported shell composition (see **Shell injection considerations** below). The first token of each stage must be in the allowlist and must not be a blocked nested interpreter (`sh`, `bash`, `env`, …); path-like arguments are validated to be under `~/.mac-stats`.
-*   **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` (no path), and the shell will run it from the current working directory; for listing app data use e.g. `RUN_CMD: ls ~/.mac-stats`. **`date` and `whoami`** need no path; use e.g. `RUN_CMD: date` or `RUN_CMD: whoami`.
+*   **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` from the RUN_CMD working directory (mac-stats repo when discoverable); for listing app data use e.g. `RUN_CMD: ls ~/.mac-stats`. **`date` and `whoami`** need no path; use e.g. `RUN_CMD: date` or `RUN_CMD: whoami`.
 *   **Pipelines**: Commands can be chained with **one** top-level `|` between whole stages (e.g. `RUN_CMD: ps aux | grep tail`, `RUN_CMD: cat ~/.mac-stats/schedules.json | wc -c`). A `|` inside a stage is rejected—split pipelines only at the outer `|` delimiters. Each stage runs via `sh -c`; the first token of each stage must be in the allowlist; path-like arguments in each stage must be under `~/.mac-stats`.
 
 ## Behaviour

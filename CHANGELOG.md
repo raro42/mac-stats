@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.988] - 2026-09-10
+
+### Fixed
+- **RUN_CMD** working directory: LaunchAgent starts with cwd `/`, so relative skill commands like `python3 scripts/scan_repo_quality.py` failed (`//scripts/...`). Children now use the Cursor Agent / config workspace (usually `~/projects/mac-stats`) when that repo is present.
+
 ## [0.1.987] - 2026-09-10
 
 ### Added

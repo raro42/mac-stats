@@ -367,6 +367,46 @@ fn expand_tilde(path: &str) -> String {
     path.to_string()
 }
 
+/// Working directory for RUN_CMD children.
+///
+/// LaunchAgent starts `mac_stats` with cwd `/`, so relative skill commands like
+/// `python3 scripts/scan_repo_quality.py` resolve to `/scripts/...` and fail.
+/// Prefer the Cursor Agent / config workspace (usually `~/projects/mac-stats`).
+fn run_cmd_working_dir() -> Option<PathBuf> {
+    let ws = crate::commands::cursor_agent::cursor_agent_workspace();
+    let p = PathBuf::from(ws.trim());
+    if p.is_dir() {
+        let looks_like_repo = p.join("scripts").is_dir()
+            || p.join("src-tauri").is_dir()
+            || p.join("Cargo.toml").is_file();
+        if looks_like_repo {
+            if let Ok(canon) = p.canonicalize() {
+                if canon != Path::new("/") {
+                    return Some(p);
+                }
+            } else if p != Path::new("/") {
+                return Some(p);
+            }
+        }
+    }
+    if let Ok(cwd) = std::env::current_dir() {
+        if cwd != Path::new("/") && cwd.is_dir() {
+            return Some(cwd);
+        }
+    }
+    None
+}
+
+fn apply_run_cmd_working_dir(cmd: &mut Command) {
+    if let Some(dir) = run_cmd_working_dir() {
+        info!(
+            "RUN_CMD: cwd {}",
+            crate::logging::ellipse(&dir.display().to_string(), 120)
+        );
+        cmd.current_dir(dir);
+    }
+}
+
 /// Check that canonical path is under permitted base.
 fn path_under_base(path: &Path, base: &Path) -> Result<bool, String> {
     let canonical = path
@@ -432,6 +472,7 @@ fn run_single_command_shell(
         );
         let mut cmd = Command::new("sh");
         crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+        apply_run_cmd_working_dir(&mut cmd);
         let mut child = cmd
             .args(["-c", stage])
             .stdin(if stdin_data.is_some() {
@@ -485,6 +526,7 @@ fn run_single_command_shell(
     );
     let mut cmd = Command::new("sh");
     crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+    apply_run_cmd_working_dir(&mut cmd);
     let mut child = cmd
         .args(["-c", stage])
         .stdin(if stdin_data.is_some() {
@@ -677,6 +719,14 @@ mod run_cmd_stage_validate_tests {
     fn pipeline_date_wc_integration() {
         let out = super::run_local_command("date | wc -c").expect("legal pipeline");
         assert!(!out.is_empty());
+    }
+
+    #[test]
+    fn working_dir_prefers_repo_when_available() {
+        // On maintainer machines cursor_agent_workspace points at mac-stats; otherwise None is ok.
+        if let Some(dir) = super::run_cmd_working_dir() {
+            assert!(dir.join("scripts").is_dir() || dir != std::path::Path::new("/"));
+        }
     }
 
     #[test]
