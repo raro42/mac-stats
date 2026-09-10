@@ -2194,6 +2194,32 @@ commit+push, then reply briefly.";
     }
 
     #[test]
+    fn morning_surprise_age_asks_are_instant_age_only() {
+        for q in [
+            "morning surprise age",
+            "how old is morning_surprise.md",
+            "when was morning surprise updated",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("morning surprise") || lower.contains("morning_surprise"),
+                        "expected morning surprise age for {q:?}: {reply}"
+                    );
+                    assert!(
+                        lower.contains("ago")
+                            || lower.contains("no note")
+                            || lower.contains("could not stat"),
+                        "expected age reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant age for {q:?}, got {:?}", other),
+            }
+        }
+    }
+
+    #[test]
     fn how_solved_task_asks_are_instant() {
         for q in [
             "How did you solve this task?",

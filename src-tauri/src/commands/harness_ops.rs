@@ -10943,7 +10943,7 @@ pub fn format_morning_surprise_path_gateway() -> String {
     let path = crate::config::Config::morning_surprise_path_today();
     let display = path.display().to_string();
     format!(
-        "**Morning surprise:** `{display}` · today's overnight note · path only · does not dump highlights · `morning surprise size` for on-disk bytes · `improvements path` for the parent folder · `standing backlog path` for Track B fuel · ask *morning surprise?* for the ship list."
+        "**Morning surprise:** `{display}` · today's overnight note · path only · does not dump highlights · `morning surprise size` for on-disk bytes · `morning surprise age` for last write · `improvements path` for the parent folder · `standing backlog path` for Track B fuel · ask *morning surprise?* for the ship list."
     )
 }
 
@@ -11105,6 +11105,178 @@ pub fn format_morning_surprise_size_gateway() -> String {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
                 "**Morning surprise:** **{label}** on disk · today's overnight note · `morning surprise path` for the file · `morning surprise age` for last write · ask *morning surprise?* for the ship list."
+            )
+        }
+        Err(e) => format!("**Morning surprise** — could not stat today's note: {e}"),
+    }
+}
+
+/// True for short “how old is morning_surprise.md / morning surprise age…” asks.
+/// Mtime only — does not dump highlights or steal path/size / improvements / standing / sibling / loop.
+pub fn looks_like_morning_surprise_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("what shipped")
+        || n.contains("what changed")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("highlight")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log file age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("improvements age")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let ms_ctx = n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"));
+    if matches!(
+        n.as_str(),
+        "morning_surprise age"
+            | "morning-surprise age"
+            | "morning surprise age"
+            | "morning_surprise.md age"
+            | "morning-surprise.md age"
+            | "morning surprise.md age"
+            | "morning_surprise file age"
+            | "morning-surprise file age"
+            | "morning surprise file age"
+            | "overnight morning surprise age"
+            | "today morning surprise age"
+            | "todays morning surprise age"
+            | "today's morning surprise age"
+            | "how old is morning_surprise"
+            | "how old is morning_surprise.md"
+            | "how old is the morning_surprise"
+            | "how old is the morning_surprise.md"
+            | "how old is morning-surprise"
+            | "how old is the morning-surprise"
+            | "how old is morning surprise"
+            | "how old is the morning surprise"
+            | "how old is the morning surprise file"
+            | "how old is the overnight morning surprise"
+            | "how old is today's morning surprise"
+            | "when was morning_surprise updated"
+            | "when was morning_surprise.md updated"
+            | "when was the morning_surprise updated"
+            | "when was morning surprise updated"
+            | "when was the morning surprise updated"
+            | "when was the overnight morning surprise updated"
+            | "when was today's morning surprise updated"
+            | "morning_surprise last modified"
+            | "morning surprise last modified"
+            | "morning_surprise.md last modified"
+            | "is morning_surprise stale"
+            | "is morning surprise stale"
+            | "is the morning surprise stale"
+            | "is today's morning surprise stale"
+    ) {
+        return true;
+    }
+    if !ms_ctx {
+        return false;
+    }
+    (n.contains("age") && ms_ctx)
+        || (n.contains("old") && ms_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified")) && ms_ctx)
+        || (n.contains("stale") && ms_ctx)
+}
+
+/// Zero-LLM today's morning_surprise_YYYY-MM-DD.md age from file mtime (stat only; no dump/list).
+pub fn format_morning_surprise_age_gateway() -> String {
+    let path = crate::config::Config::morning_surprise_path_today();
+    if !path.exists() {
+        return "**Morning surprise:** no note for today yet · overnight Track B will create it · `morning surprise path` for today's file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Morning surprise:** last write **{age}** ago · today's overnight note · `morning surprise path` for the file · `morning surprise size` for on-disk bytes · ask *morning surprise?* for the ship list."
             )
         }
         Err(e) => format!("**Morning surprise** — could not stat today's note: {e}"),
@@ -41195,9 +41367,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standing_backlog_path_request(content) {
         return Some(format_standing_backlog_path_gateway());
     }
-    // morning_surprise_*.md size before path (stat only; no dump); path before improvements-dir / content.
+    // morning_surprise_*.md size before age before path (stat only; no dump); path before improvements-dir / content.
     if looks_like_morning_surprise_size_request(content) {
         return Some(format_morning_surprise_size_gateway());
+    }
+    if looks_like_morning_surprise_age_request(content) {
+        return Some(format_morning_surprise_age_gateway());
     }
     if looks_like_morning_surprise_path_request(content) {
         return Some(format_morning_surprise_path_gateway());
@@ -41630,9 +41805,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standing_backlog_path_request(content) {
         return Some(format_standing_backlog_path_gateway());
     }
-    // morning_surprise_*.md size before path (stat only; no dump); path before notes/memory.
+    // morning_surprise_*.md size before age before path (stat only; no dump); path before notes/memory.
     if looks_like_morning_surprise_size_request(content) {
         return Some(format_morning_surprise_size_gateway());
+    }
+    if looks_like_morning_surprise_age_request(content) {
+        return Some(format_morning_surprise_age_gateway());
     }
     if looks_like_morning_surprise_path_request(content) {
         return Some(format_morning_surprise_path_gateway());
@@ -42040,8 +42218,9 @@ pub fn format_ops_help_gateway() -> String {
 • `standing backlog path` · `where is standing_backlog.md` · `overnight standing backlog path` · `track b backlog path` — `~/.mac-stats/improvements/standing_backlog.md` path only (no dump; does not steal `improvements path` / `loop backlog path` / `sibling harness path`; `standing backlog size` for bytes · `standing backlog age` for mtime)\n\
 • `standing backlog size` · `how big is standing_backlog.md` · `overnight standing backlog size` · `track b backlog size` — standing_backlog.md size on disk (stat only; no dump; does not steal `standing backlog path` / age / `improvements size` / `loop backlog size` / `sibling harness size`)\n\
 • `standing backlog age` · `how old is standing_backlog.md` · `overnight standing backlog age` · `when was standing backlog updated` · `track b backlog age` — standing_backlog.md last write age (mtime; no dump; does not steal path / size / `improvements age` / `loop backlog age` / `sibling harness age`)\n\
-• `morning surprise path` · `where is morning_surprise.md` · `where is the morning surprise` · `overnight morning surprise path` — today's `morning_surprise_YYYY-MM-DD.md` path only (no dump; does not steal `improvements path` / standing / sibling / loop; `morning surprise size` for bytes; ask *morning surprise?* for highlights)\n\
+• `morning surprise path` · `where is morning_surprise.md` · `where is the morning surprise` · `overnight morning surprise path` — today's `morning_surprise_YYYY-MM-DD.md` path only (no dump; does not steal `improvements path` / standing / sibling / loop; `morning surprise size` for bytes · `morning surprise age` for mtime; ask *morning surprise?* for highlights)\n\
 • `morning surprise size` · `how big is morning_surprise.md` · `overnight morning surprise size` · `today's morning surprise size` — today's morning surprise note size on disk (stat only; no dump; does not steal path / age / `improvements size` / standing / sibling / loop)\n\
+• `morning surprise age` · `how old is morning_surprise.md` · `overnight morning surprise age` · `when was morning surprise updated` · `today's morning surprise age` — today's morning surprise note last write age (mtime; no dump; does not steal path / size / `improvements age` / standing / sibling / loop)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -43916,6 +44095,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only morning_surprise_*.md size asks (v0.1.986) — stat only; no dump.
     if looks_like_morning_surprise_size_request(question) {
+        return true;
+    }
+    // Read-only morning_surprise_*.md age asks (v0.1.987) — mtime only; no dump.
+    if looks_like_morning_surprise_age_request(question) {
         return true;
     }
     // Read-only morning_surprise_*.md path asks (v0.1.985) — config only; no dump.
@@ -51534,6 +51717,46 @@ mod tests {
                 || reply.contains("no note for today")
         );
         assert!(reply.contains("morning surprise path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn morning_surprise_age_request_detected() {
+        assert!(looks_like_morning_surprise_age_request("morning surprise age"));
+        assert!(looks_like_morning_surprise_age_request("morning_surprise age"));
+        assert!(looks_like_morning_surprise_age_request("morning_surprise.md age"));
+        assert!(looks_like_morning_surprise_age_request("how old is morning_surprise.md"));
+        assert!(looks_like_morning_surprise_age_request("how old is the morning surprise"));
+        assert!(looks_like_morning_surprise_age_request("overnight morning surprise age"));
+        assert!(looks_like_morning_surprise_age_request("today's morning surprise age"));
+        assert!(looks_like_morning_surprise_age_request("when was morning surprise updated"));
+        assert!(looks_like_morning_surprise_age_request("is the morning surprise stale"));
+        assert!(!looks_like_morning_surprise_age_request("morning surprise path"));
+        assert!(!looks_like_morning_surprise_age_request("where is morning_surprise.md"));
+        assert!(!looks_like_morning_surprise_age_request("morning surprise size"));
+        assert!(!looks_like_morning_surprise_age_request("how big is morning_surprise.md"));
+        assert!(!looks_like_morning_surprise_age_request("improvements age"));
+        assert!(!looks_like_morning_surprise_age_request("standing backlog age"));
+        assert!(!looks_like_morning_surprise_age_request("sibling harness age"));
+        assert!(!looks_like_morning_surprise_age_request("loop backlog age"));
+        assert!(!looks_like_morning_surprise_age_request("results.tsv age"));
+        assert!(!looks_like_morning_surprise_age_request("list morning surprise"));
+        assert!(!looks_like_morning_surprise_age_request("dump morning_surprise.md"));
+        assert!(!looks_like_morning_surprise_age_request("morning surprise"));
+        assert!(!looks_like_morning_surprise_path_request("morning surprise age"));
+        assert!(!looks_like_morning_surprise_size_request("morning surprise age"));
+        assert!(!looks_like_standing_backlog_age_request("morning surprise age"));
+        assert!(!looks_like_improvements_age_request("morning surprise age"));
+        assert!(!looks_like_loop_backlog_age_request("morning surprise age"));
+        assert!(!looks_like_sibling_harness_age_request("morning surprise age"));
+        let reply = try_operator_instant_reply("how old is morning_surprise.md")
+            .expect("morning surprise age instant");
+        assert!(reply.contains("Morning surprise") || reply.contains("morning_surprise"));
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no note for today")
+                || reply.contains("could not stat")
+        );
+        assert!(reply.contains("morning surprise path") || reply.contains("morning surprise size"));
     }
 
     #[test]

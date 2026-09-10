@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.987** — Instant lane: morning surprise age (`morning surprise age`, `how old is morning_surprise.md`, `overnight morning surprise age`, `when was morning surprise updated`, `today's morning surprise age`; today's note mtime; no dump; does not steal path / size / improvements / standing / sibling / loop; p50).
+
 - **v0.1.986** — Instant lane: morning surprise size (`morning surprise size`, `how big is morning_surprise.md`, `overnight morning surprise size`, `today's morning surprise size`; today's note size on disk; no dump; does not steal path / age / improvements / standing / sibling / loop; p50).
 
 - **v0.1.985** — Instant lane: morning surprise path (`morning surprise path`, `where is morning_surprise.md`, `where is the morning surprise`, `overnight morning surprise path`; today's dated file path only; no dump; does not steal improvements / standing / sibling / loop; content asks still use *morning surprise?*; p50).

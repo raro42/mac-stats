@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.987] - 2026-09-10
+
+### Added
+- Instant lane: morning surprise age (`morning surprise age`, `how old is morning_surprise.md`, `overnight morning surprise age`, `when was morning surprise updated`, `today's morning surprise age`) — today's `morning_surprise_YYYY-MM-DD.md` last write age (mtime; no dump; does not steal path / size / `improvements age` / standing / sibling / loop).
+
 ## [0.1.986] - 2026-09-10
 
 ### Added
