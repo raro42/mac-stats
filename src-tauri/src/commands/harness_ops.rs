@@ -9159,6 +9159,9 @@ pub fn looks_like_results_tsv_path_request(content: &str) -> bool {
         || n.contains("launchagent")
         || n.contains("launch agent")
         || n.contains(".plist")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
     {
         return false;
     }
@@ -9264,7 +9267,182 @@ pub fn format_results_tsv_path_gateway() -> String {
     let path = crate::config::Config::autoresearch_results_tsv();
     let display = path.display().to_string();
     format!(
-        "**Autoresearch results:** `{display}` · keep/discard log · path only · does not dump rows · `improvements path` for the parent folder."
+        "**Autoresearch results:** `{display}` · keep/discard log · path only · does not dump rows · `improvements path` for the parent folder · `loop backlog path` for the tick log."
+    )
+}
+
+/// True for short “where is loop_backlog.md / loop backlog path…” asks.
+/// Path only — does not dump overnight tick notes or open the file.
+/// Does not steal `improvements path` / `results.tsv path` / sibling harness / standing backlog.
+pub fn looks_like_loop_backlog_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Age/size reserved for later lanes — keyword-only (no nest).
+    if n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        // Bare improvements-dir asks (not loop_backlog file).
+        || n == "improvements"
+        || n == "improvements path"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "where is improvements"
+        || n == "where is the improvements folder"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "loop_backlog"
+            | "loop-backlog"
+            | "loop backlog"
+            | "loop_backlog.md"
+            | "loop-backlog.md"
+            | "loop backlog.md"
+            | "loop_backlog path"
+            | "loop-backlog path"
+            | "loop backlog path"
+            | "loop_backlog.md path"
+            | "loop-backlog.md path"
+            | "loop backlog.md path"
+            | "loop_backlog file"
+            | "loop-backlog file"
+            | "loop backlog file"
+            | "loop_backlog location"
+            | "loop-backlog location"
+            | "loop backlog location"
+            | "harness loop backlog"
+            | "harness loop backlog path"
+            | "overnight loop backlog"
+            | "overnight loop backlog path"
+            | "tick log path"
+            | "harness tick log"
+            | "harness tick log path"
+            | "where is loop_backlog"
+            | "where is loop_backlog.md"
+            | "where is the loop_backlog"
+            | "where is the loop_backlog.md"
+            | "where is loop-backlog"
+            | "where is the loop-backlog"
+            | "where is loop backlog"
+            | "where is the loop backlog"
+            | "where is the loop backlog file"
+            | "where is the harness loop backlog"
+            | "where is the overnight loop backlog"
+            | "where do loop backlog go"
+            | "where does loop backlog go"
+    ) {
+        return true;
+    }
+    let lb_ctx = n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || (n.contains("tick log") && (n.contains("harness") || n.contains("overnight")))
+        || (n.contains("loop") && n.contains("backlog") && !n.contains("standing"));
+    lb_ctx && pathish
+}
+
+/// Zero-LLM overnight loop_backlog.md path (config only; no dump/list).
+pub fn format_loop_backlog_path_gateway() -> String {
+    let path = crate::config::Config::loop_backlog_path();
+    let display = path.display().to_string();
+    format!(
+        "**Loop backlog:** `{display}` · overnight harness tick log · path only · does not dump notes · `improvements path` for the parent folder · `results.tsv path` for keep/discard."
     )
 }
 
@@ -22996,6 +23174,9 @@ pub fn looks_like_improvements_path_request(content: &str) -> bool {
         || n.contains("ratchet results")
         || n.contains("keep discard results")
         || n.contains("keep discard log")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
     {
         return false;
     }
@@ -39309,6 +39490,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
+    // loop_backlog.md path before improvements-dir (path-only; no dump).
+    if looks_like_loop_backlog_path_request(content) {
+        return Some(format_loop_backlog_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -39707,6 +39892,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
+    // loop_backlog.md path before notes/memory (path-only; no dump).
+    if looks_like_loop_backlog_path_request(content) {
+        return Some(format_loop_backlog_path_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -40098,9 +40287,10 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements path` · `where is the improvements folder` · `autoresearch path` — `~/.mac-stats/improvements/` path only (no list; does not steal overnight improvements asks; `improvements size` / `improvements age` for bytes / mtime)\n\
 • `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path` / `improvements age`)\n\
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
-• `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path`)\n\
+• `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
+• `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -41935,6 +42125,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv path asks (v0.1.866) — config only; no dump.
     if looks_like_results_tsv_path_request(question) {
+        return true;
+    }
+    // Read-only loop_backlog.md path asks (v0.1.976) — config only; no dump.
+    if looks_like_loop_backlog_path_request(question) {
         return true;
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
@@ -49175,6 +49369,7 @@ mod tests {
         assert!(!looks_like_results_tsv_path_request("how old is results.tsv"));
         assert!(!looks_like_results_tsv_path_request("results.tsv size"));
         assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
+        assert!(!looks_like_results_tsv_path_request("loop backlog path"));
         assert!(!looks_like_improvements_path_request("results.tsv path"));
         assert!(!looks_like_improvements_path_request("autoresearch results path"));
         assert!(looks_like_improvements_path_request("autoresearch path"));
@@ -49182,6 +49377,37 @@ mod tests {
             try_operator_instant_reply("results.tsv path").expect("results.tsv path instant");
         assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
         assert!(reply.contains("results.tsv"));
+        assert!(reply.contains("improvements path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn loop_backlog_path_request_detected() {
+        assert!(looks_like_loop_backlog_path_request("loop_backlog"));
+        assert!(looks_like_loop_backlog_path_request("loop_backlog.md"));
+        assert!(looks_like_loop_backlog_path_request("loop backlog path"));
+        assert!(looks_like_loop_backlog_path_request("loop_backlog path"));
+        assert!(looks_like_loop_backlog_path_request("where is loop_backlog.md"));
+        assert!(looks_like_loop_backlog_path_request("where is the loop backlog"));
+        assert!(looks_like_loop_backlog_path_request("harness tick log path"));
+        assert!(looks_like_loop_backlog_path_request("overnight loop backlog path"));
+        assert!(!looks_like_loop_backlog_path_request("improvements path"));
+        assert!(!looks_like_loop_backlog_path_request("autoresearch path"));
+        assert!(!looks_like_loop_backlog_path_request("results.tsv path"));
+        assert!(!looks_like_loop_backlog_path_request("standing backlog path"));
+        assert!(!looks_like_loop_backlog_path_request("sibling harness path"));
+        assert!(!looks_like_loop_backlog_path_request("list loop backlog"));
+        assert!(!looks_like_loop_backlog_path_request("dump loop_backlog.md"));
+        assert!(!looks_like_loop_backlog_path_request("loop backlog age"));
+        assert!(!looks_like_loop_backlog_path_request("how old is loop backlog"));
+        assert!(!looks_like_loop_backlog_path_request("loop backlog size"));
+        assert!(!looks_like_loop_backlog_path_request("how big is loop_backlog.md"));
+        assert!(!looks_like_improvements_path_request("loop backlog path"));
+        assert!(!looks_like_improvements_path_request("where is loop_backlog.md"));
+        assert!(!looks_like_results_tsv_path_request("loop backlog path"));
+        let reply =
+            try_operator_instant_reply("loop backlog path").expect("loop backlog path instant");
+        assert!(reply.contains("Loop backlog") || reply.contains("loop_backlog"));
+        assert!(reply.contains("loop_backlog.md"));
         assert!(reply.contains("improvements path") || reply.contains("does not dump"));
     }
 

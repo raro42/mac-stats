@@ -1701,6 +1701,13 @@ impl Config {
             .join("results.tsv")
     }
 
+    /// Overnight harness tick log: `$HOME/.mac-stats/improvements/loop_backlog.md`
+    ///
+    /// Path only for operator instant lane — does not dump tick notes.
+    pub fn loop_backlog_path() -> PathBuf {
+        Self::improvements_dir().join("loop_backlog.md")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
