@@ -7757,6 +7757,56 @@ function wireMonitorsAttentionGlanceClick(glance) {
   });
 }
 
+/** Brief Clear → Cleared flash (Top Processes / AI Chat / Ops Clear parity). */
+function flashMonitorsFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncMonitorsFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·Up·Down·Slow when a filter is active. */
+function syncMonitorsFilterClearBtn() {
+  const btn = document.getElementById('monitors-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!monitorsFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensureMonitorsFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('monitors-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'monitors-filter-clear';
+  btn.className = 'monitors-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show every monitor (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
+}
+
 /** All / Up / Down / Slow chips (Top Processes Hot filter parity). */
 function ensureMonitorsFilterChips() {
   const content = document.getElementById('monitors-content');
@@ -7777,6 +7827,17 @@ function ensureMonitorsFilterChips() {
       `<button type="button" class="monitors-filter-chip" data-monitors-filter="slow" aria-pressed="false" title="Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)">Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span></button>`;
     summary.insertAdjacentElement('afterend', wrap);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#monitors-filter-clear, .monitors-filter-clear');
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setMonitorsFilterMode('all');
+        flashMonitorsFilterClearBtn(clearBtn);
+        return;
+      }
       const btn = e.target && e.target.closest && e.target.closest('[data-monitors-filter]');
       if (!btn || !wrap.contains(btn)) return;
       e.preventDefault();
@@ -7794,6 +7855,8 @@ function ensureMonitorsFilterChips() {
       'Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span>';
     wrap.appendChild(slowBtn);
   }
+  ensureMonitorsFilterClearBtn(wrap);
+  syncMonitorsFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
@@ -7810,6 +7873,7 @@ function setMonitorsFilterMode(mode) {
     btn.classList.toggle('is-active', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
+  syncMonitorsFilterClearBtn();
   applyMonitorsListFilter();
 }
 
@@ -7847,6 +7911,7 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
       e.preventDefault();
       e.stopPropagation();
       setMonitorsFilterMode('all');
+      flashMonitorsFilterClearBtn(document.getElementById('monitors-filter-clear'));
     });
   }
   const hint = wrap.querySelector('.monitors-empty-hint');
@@ -7862,6 +7927,7 @@ function applyMonitorsListFilter() {
   const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
   const trueEmpty = !!monitorsList.querySelector('.monitors-list-empty');
   if (chips) chips.hidden = trueEmpty || items.length === 0;
+  syncMonitorsFilterClearBtn();
 
   let upCount = 0;
   let downCount = 0;

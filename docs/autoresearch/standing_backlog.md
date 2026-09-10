@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.997** — External / Monitors filter Clear chip beside All · Up · Down · Slow when a filter is active (Top Processes / AI Chat / Ops Clear parity; Cleared flash; design review / `feature-monitors`).
+
+
+
 - **v0.1.996** — Top Processes filter Clear chip beside All · Pinned · Hot when a filter is active (AI Chat / Ops Clear parity; Cleared flash; design review / `feature-processes`).
 
 - **v0.1.995** — Instant lane: harness loop stdout age (`harness loop stdout age`, `how old is overnight_harness_loop.stdout.log`, `overnight_harness_loop.stdout.log age`, `harness stdout age`, `when was harness loop stdout updated`; mtime only; no dump/tail; does not steal path / size / overnight_agent.log / stderr / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing; p50).
