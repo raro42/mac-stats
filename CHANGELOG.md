@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.984] - 2026-09-10
+
+### Added
+- Instant lane: standing_backlog.md age (`standing backlog age`, `how old is standing_backlog.md`, `overnight standing backlog age`, `when was standing backlog updated`, `track b backlog age`) — file mtime only; no dump; does not steal path / size / `improvements age` / `loop backlog age` / `sibling harness age`.
+
 ## [0.1.983] - 2026-09-10
 
 ### Added
