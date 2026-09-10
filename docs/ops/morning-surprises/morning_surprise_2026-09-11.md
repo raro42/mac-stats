@@ -6,7 +6,8 @@ Overnight Track B (20:00–06:00 local) for Ralf.
 
 | Version | What |
 |---------|------|
-| **v0.1.993** | Instant lane: **harness loop stdout path** (`harness loop stdout path`, `where is overnight_harness_loop.stdout.log`) — path only; no dump/tail |
+| **v0.1.994** | Instant lane: **harness loop stdout size** (`harness loop stdout size`, `how big is overnight_harness_loop.stdout.log`) — stat only; no dump/tail |
+| **v0.1.993** | Instant lane: harness loop stdout path |
 | **v0.1.992** | Instant lane: overnight agent log age |
 | **v0.1.991** | Instant lane: overnight agent log size |
 | **v0.1.990** | Instant lane: overnight agent log path |
@@ -16,7 +17,7 @@ Overnight Track B (20:00–06:00 local) for Ralf.
 
 ## Why it matters
 
-Operators can ask where the harness loop stdout capture lives without dumping a megabyte log or confusing it with `overnight_agent.log` / `debug.log` / loop backlog.
+Operators can ask how big the harness loop stdout capture is without dumping the file or confusing it with `overnight_agent.log` / `debug.log` / loop backlog.
 
 ## Digester / design review
 
@@ -25,7 +26,7 @@ Operators can ask where the harness loop stdout capture lives without dumping a 
 
 ## Next fuel
 
-1. Harness loop stdout **size** then **age**.
+1. Harness loop stdout **age**.
 2. Harness loop stderr path·size·age.
 3. Digester open / product-owned `debug.log` errors when present.
 4. Design-review recapture when due / TCC allows.
