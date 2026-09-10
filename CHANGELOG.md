@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.986] - 2026-09-10
+
+### Added
+- Instant lane: morning surprise size (`morning surprise size`, `how big is morning_surprise.md`, `overnight morning surprise size`, `today's morning surprise size`) — today's `morning_surprise_YYYY-MM-DD.md` size on disk (stat only; no dump; does not steal path / age / `improvements size` / standing / sibling / loop).
+
 ## [0.1.985] - 2026-09-10
 
 ### Added

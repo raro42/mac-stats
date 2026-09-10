@@ -2164,6 +2164,36 @@ commit+push, then reply briefly.";
     }
 
     #[test]
+    fn morning_surprise_size_asks_are_instant_size_only() {
+        for q in [
+            "morning surprise size",
+            "how big is morning_surprise.md",
+            "how big is the morning surprise",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("morning surprise") || lower.contains("morning_surprise"),
+                        "expected morning surprise size for {q:?}: {reply}"
+                    );
+                    assert!(
+                        lower.contains("on disk")
+                            || lower.contains("empty")
+                            || lower.contains("no note"),
+                        "expected size reply for {q:?}: {reply}"
+                    );
+                    assert!(
+                        !reply.contains("morning_surprise_202") || lower.contains("on disk") || lower.contains("empty") || lower.contains("no note"),
+                        "size lane should not be a bare path dump for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant size for {q:?}, got {:?}", other),
+            }
+        }
+    }
+
+    #[test]
     fn how_solved_task_asks_are_instant() {
         for q in [
             "How did you solve this task?",
