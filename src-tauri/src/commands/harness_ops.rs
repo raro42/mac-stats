@@ -3375,6 +3375,23 @@ pub fn looks_like_debug_log_size_request(content: &str) -> bool {
     if looks_like_debug_log_count_request(content) {
         return false;
     }
+    // Overnight harness logs have their own size lanes — do not steal.
+    if n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || n.contains("overnight agent")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || n.contains("overnight_harness")
+        || n.contains("overnight-harness")
+        || n.contains("overnight harness")
+        || n.contains("stdout.log")
+        || n.contains("stderr.log")
+        || (n.contains("overnight") && n.contains("agent") && n.contains("log"))
+        || (n.contains("harness") && n.contains("agent") && n.contains("log"))
+    {
+        return false;
+    }
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -3539,6 +3556,24 @@ pub fn looks_like_debug_log_age_request(content: &str) -> bool {
     if looks_like_debug_log_count_request(content)
         || looks_like_debug_log_size_request(content)
         || looks_like_debug_log_path_request(content)
+    {
+        return false;
+    }
+    // Overnight harness logs have their own age lanes — do not steal.
+    // Do not use bare `age` / ` age` here for excludes; those match inside `agent`.
+    if n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || n.contains("overnight agent")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || n.contains("overnight_harness")
+        || n.contains("overnight-harness")
+        || n.contains("overnight harness")
+        || n.contains("stdout.log")
+        || n.contains("stderr.log")
+        || (n.contains("overnight") && n.contains("agent") && n.contains("log"))
+        || (n.contains("harness") && n.contains("agent") && n.contains("log"))
     {
         return false;
     }
@@ -11483,6 +11518,191 @@ pub fn format_overnight_agent_log_path_gateway() -> String {
     format!(
         "**Overnight agent log:** `{display}` · Track B harness transcript · path only · does not dump or tail · `overnight agent log size` for on-disk bytes · `overnight agent log age` for last write · `debug.log path` for the app log · `improvements path` for the parent folder."
     )
+}
+
+/// True for short “how big is overnight_agent.log / overnight agent log size…” asks.
+/// Stat only — does not dump/tail or steal path / age / debug.log / harness stdout·stderr /
+/// morning surprise / improvements / loop / sibling / standing.
+pub fn looks_like_overnight_agent_log_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Path/age reserved — keyword-only (no nest).
+    // Never use bare `age` / ` age` — both match inside `agent` / ` agent`.
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("overnight"))
+        || n == "log size"
+        || n == "log file size"
+        || n == "how big is the log"
+        || n.contains("stdout")
+        || n.contains("stderr")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || n.contains("overnight_harness_loop")
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        || n.contains("improvements size")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n == "improvements"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let oa_ctx = n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight") && n.contains("agent") && n.contains("log"))
+        || (n.contains("harness") && n.contains("agent") && n.contains("log"));
+    if matches!(
+        n.as_str(),
+        "overnight_agent size"
+            | "overnight-agent size"
+            | "overnight agent size"
+            | "overnight_agent.log size"
+            | "overnight-agent.log size"
+            | "overnight agent.log size"
+            | "overnight_agent log size"
+            | "overnight-agent log size"
+            | "overnight agent log size"
+            | "overnight_agent file size"
+            | "overnight agent file size"
+            | "overnight agent log file size"
+            | "harness agent log size"
+            | "harness overnight agent log size"
+            | "overnight harness agent log size"
+            | "how big is overnight_agent"
+            | "how big is overnight_agent.log"
+            | "how big is the overnight_agent"
+            | "how big is the overnight_agent.log"
+            | "how big is overnight-agent"
+            | "how big is the overnight-agent"
+            | "how big is overnight agent"
+            | "how big is the overnight agent"
+            | "how big is the overnight agent log"
+            | "how big is the overnight agent log file"
+            | "how large is overnight_agent.log"
+            | "how large is the overnight agent log"
+            | "overnight_agent bytes"
+            | "overnight agent log bytes"
+    ) {
+        return true;
+    }
+    if !oa_ctx {
+        return false;
+    }
+    (n.contains("size") && oa_ctx)
+        || (n.contains("big") && oa_ctx)
+        || (n.contains("large") && oa_ctx)
+        || (n.contains("bytes") && oa_ctx)
+        || ((n.contains(" mb") || n.contains(" kb") || n.contains(" gi")) && oa_ctx)
+}
+
+/// Zero-LLM overnight_agent.log file size (stat only; no dump/tail).
+pub fn format_overnight_agent_log_size_gateway() -> String {
+    let path = crate::config::Config::overnight_agent_log_path();
+    if !path.exists() {
+        return "**Overnight agent log:** no file yet · Track B creates it on harness ticks · `overnight agent log path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Overnight agent log:** empty · `overnight agent log path` for the file."
+                .to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Overnight agent log:** **{label}** on disk · Track B harness transcript · `overnight agent log path` for the file · `overnight agent log age` for last write · `debug.log size` for the app log."
+            )
+        }
+        Err(e) => format!("**Overnight agent log** — could not stat file: {e}"),
+    }
 }
 
 /// True for short “how old is the session folder / session age…” asks.
@@ -41619,6 +41839,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
             parse_debug_log_count_kind(content).expect("looks_like_debug_log_count_request implies kind");
         return Some(format_debug_log_count_gateway(kind));
     }
+    // overnight_agent.log size before path before debug.log size (stat only; no dump/tail).
+    if looks_like_overnight_agent_log_size_request(content) {
+        return Some(format_overnight_agent_log_size_gateway());
+    }
     if looks_like_debug_log_size_request(content) {
         return Some(format_debug_log_size_gateway());
     }
@@ -42020,6 +42244,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_morning_surprise_path_request(content) {
         return Some(format_morning_surprise_path_gateway());
+    }
+    // overnight_agent.log size before path (Track B harness transcript; no dump/tail).
+    if looks_like_overnight_agent_log_size_request(content) {
+        return Some(format_overnight_agent_log_size_gateway());
     }
     // overnight_agent.log path (Track B harness transcript; no dump/tail).
     if looks_like_overnight_agent_log_path_request(content) {
@@ -42431,6 +42659,8 @@ pub fn format_ops_help_gateway() -> String {
 • `morning surprise path` · `where is morning_surprise.md` · `where is the morning surprise` · `overnight morning surprise path` — today's `morning_surprise_YYYY-MM-DD.md` path only (no dump; does not steal `improvements path` / standing / sibling / loop; `morning surprise size` for bytes · `morning surprise age` for mtime; ask *morning surprise?* for highlights)\n\
 • `morning surprise size` · `how big is morning_surprise.md` · `overnight morning surprise size` · `today's morning surprise size` — today's morning surprise note size on disk (stat only; no dump; does not steal path / age / `improvements size` / standing / sibling / loop)\n\
 • `morning surprise age` · `how old is morning_surprise.md` · `overnight morning surprise age` · `when was morning surprise updated` · `today's morning surprise age` — today's morning surprise note last write age (mtime; no dump; does not steal path / size / `improvements age` / standing / sibling / loop)\n\
+• `overnight agent log path` · `where is overnight_agent.log` · `overnight_agent.log path` · `harness agent log path` — `~/.mac-stats/improvements/overnight_agent.log` path only (no dump/tail; does not steal `debug.log path` / morning surprise / improvements / loop / sibling / standing; `overnight agent log size` for bytes · `overnight agent log age` for mtime)\n\
+• `overnight agent log size` · `how big is overnight_agent.log` · `overnight_agent.log size` · `harness agent log size` — overnight_agent.log size on disk (stat only; no dump/tail; does not steal path / age / `debug.log size` / morning surprise / improvements / loop / sibling / standing)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -43987,6 +44217,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_debug_log_size_request(question) {
         return true;
     }
+    // Read-only overnight_agent.log size asks (v0.1.991) — stat only; no dump/tail.
+    if looks_like_overnight_agent_log_size_request(question) {
+        return true;
+    }
     // Read-only overnight_agent.log path asks (v0.1.990) — config only; no dump/tail.
     if looks_like_overnight_agent_log_path_request(question) {
         return true;
@@ -44317,6 +44551,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only morning_surprise_*.md path asks (v0.1.985) — config only; no dump.
     if looks_like_morning_surprise_path_request(question) {
+        return true;
+    }
+    // Read-only overnight_agent.log size asks (v0.1.991) — stat only; no dump/tail.
+    if looks_like_overnight_agent_log_size_request(question) {
         return true;
     }
     // Read-only overnight_agent.log path asks (v0.1.990) — config only; no dump/tail.
@@ -52017,6 +52255,52 @@ mod tests {
         assert!(
             !reply.contains("Debug Log:") || reply.contains("debug.log path"),
             "must not steal debug.log lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn overnight_agent_log_size_request_detected() {
+        assert!(looks_like_overnight_agent_log_size_request("overnight_agent.log size"));
+        assert!(looks_like_overnight_agent_log_size_request("overnight agent log size"));
+        assert!(looks_like_overnight_agent_log_size_request("how big is overnight_agent.log"));
+        assert!(looks_like_overnight_agent_log_size_request("how big is the overnight agent log"));
+        assert!(looks_like_overnight_agent_log_size_request("harness agent log size"));
+        assert!(!looks_like_overnight_agent_log_size_request("overnight agent log path"));
+        assert!(!looks_like_overnight_agent_log_size_request("where is overnight_agent.log"));
+        assert!(!looks_like_overnight_agent_log_size_request("overnight agent log age"));
+        assert!(!looks_like_overnight_agent_log_size_request("how old is overnight_agent.log"));
+        assert!(!looks_like_overnight_agent_log_size_request("debug.log size"));
+        assert!(!looks_like_overnight_agent_log_size_request("log file size"));
+        assert!(!looks_like_overnight_agent_log_size_request("how big is the log"));
+        assert!(!looks_like_overnight_agent_log_size_request("morning surprise size"));
+        assert!(!looks_like_overnight_agent_log_size_request("improvements size"));
+        assert!(!looks_like_overnight_agent_log_size_request("loop backlog size"));
+        assert!(!looks_like_overnight_agent_log_size_request("standing backlog size"));
+        assert!(!looks_like_overnight_agent_log_size_request("sibling harness size"));
+        assert!(!looks_like_overnight_agent_log_size_request("tail overnight_agent.log"));
+        assert!(!looks_like_overnight_agent_log_size_request("dump overnight agent log"));
+        assert!(!looks_like_overnight_agent_log_size_request("harness loop stdout size"));
+        assert!(!looks_like_debug_log_size_request("overnight agent log size"));
+        assert!(!looks_like_debug_log_size_request("how big is overnight_agent.log"));
+        assert!(!looks_like_overnight_agent_log_path_request("overnight agent log size"));
+        assert!(!looks_like_morning_surprise_size_request("overnight agent log size"));
+        assert!(!looks_like_improvements_size_request("overnight agent log size"));
+        let reply = try_operator_instant_reply("how big is overnight_agent.log")
+            .expect("overnight agent log size instant");
+        assert!(
+            reply.contains("Overnight agent log") || reply.contains("overnight_agent"),
+            "expected overnight agent size reply: {reply}"
+        );
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("no file yet")
+                || reply.contains("could not stat"),
+            "expected size reply: {reply}"
+        );
+        assert!(
+            !reply.contains("Debug Log:") || reply.contains("debug.log size"),
+            "must not steal debug.log size lane: {reply}"
         );
     }
 

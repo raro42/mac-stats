@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.991] - 2026-09-10
+
+### Added
+- Instant lane: overnight agent log size (`overnight agent log size`, `how big is overnight_agent.log`, `overnight_agent.log size`, `harness agent log size`) — `~/.mac-stats/improvements/overnight_agent.log` size on disk (stat only; no dump/tail; does not steal path / age / `debug.log size` / morning surprise / improvements / loop / sibling / standing).
+
 ## [0.1.990] - 2026-09-10
 
 ### Added
