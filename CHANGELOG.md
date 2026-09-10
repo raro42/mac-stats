@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.994] - 2026-09-11
+
+### Added
+- Instant lane: harness loop stdout size (`harness loop stdout size`, `how big is overnight_harness_loop.stdout.log`, `overnight_harness_loop.stdout.log size`, `harness stdout size`) — `~/.mac-stats/improvements/overnight_harness_loop.stdout.log` size on disk (stat only; no dump/tail; does not steal path / age / overnight_agent.log / stderr / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing).
+
 ## [0.1.993] - 2026-09-10
 
 ### Added
