@@ -1361,6 +1361,56 @@ function wireProcessesHotAttentionGlanceClick(glance) {
   });
 }
 
+/** Brief Clear → Cleared flash (AI Chat / Ops filter Clear parity). */
+function flashProcessesFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || "Clear";
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add("is-just-saved");
+  btn.textContent = "Cleared";
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove("is-just-saved");
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncProcessesFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·Pinned·Hot when a filter is active (AI Chat Clear parity). */
+function syncProcessesFilterClearBtn() {
+  const btn = document.getElementById("processes-filter-clear");
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!processesFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove("is-just-saved");
+    btn.textContent = btn.dataset.idleLabel || "Clear";
+  }
+}
+
+function ensureProcessesFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById("processes-filter-clear");
+  if (btn) return btn;
+  btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = "processes-filter-clear";
+  btn.className = "processes-filter-clear";
+  btn.hidden = true;
+  btn.dataset.idleLabel = "Clear";
+  btn.setAttribute("aria-label", "Clear filter");
+  btn.title = "Clear filter — show every process (All)";
+  btn.textContent = "Clear";
+  wrap.appendChild(btn);
+  return btn;
+}
+
 /** All / Pinned / Hot chips (Monitors All/Up/Down filter parity). */
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
@@ -1379,6 +1429,17 @@ function ensureProcessesFilterChips() {
       '<button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener("click", (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest("#processes-filter-clear, .processes-filter-clear");
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setProcessesFilterMode("all");
+        flashProcessesFilterClearBtn(clearBtn);
+        return;
+      }
       const btn = e.target && e.target.closest && e.target.closest("[data-processes-filter]");
       if (!btn || !wrap.contains(btn)) return;
       e.preventDefault();
@@ -1397,6 +1458,8 @@ function ensureProcessesFilterChips() {
       'Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span>';
     wrap.appendChild(hotBtn);
   }
+  ensureProcessesFilterClearBtn(wrap);
+  syncProcessesFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
@@ -1413,6 +1476,7 @@ function setProcessesFilterMode(mode) {
     btn.classList.toggle("is-active", on);
     btn.setAttribute("aria-pressed", on ? "true" : "false");
   });
+  syncProcessesFilterClearBtn();
   applyProcessesListFilter();
 }
 
@@ -1447,6 +1511,7 @@ function ensureProcessesFilterMissState(processList, show) {
       e.preventDefault();
       e.stopPropagation();
       setProcessesFilterMode("all");
+      flashProcessesFilterClearBtn(document.getElementById("processes-filter-clear"));
     });
   }
   const hint = wrap.querySelector(".processes-filter-miss-hint");

@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.996] - 2026-09-11
 
+### Changed
+- Top Processes: Clear chip beside All · Pinned · Hot when a filter is active (AI Chat / Ops filter Clear parity) — flashes Cleared, then returns to All; empty filter-miss Clear uses the same flash.
 
 ## [0.1.995] - 2026-09-11
 
