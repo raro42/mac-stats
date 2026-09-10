@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.983] - 2026-09-10
+
+### Added
+- Instant lane: standing_backlog.md size (`standing backlog size`, `how big is standing_backlog.md`, `overnight standing backlog size`, `track b backlog size`) — file size on disk (stat only; no dump; does not steal path / age / `improvements size` / `loop backlog size` / `sibling harness size`).
+
 ## [0.1.982] - 2026-09-10
 
 ### Added
