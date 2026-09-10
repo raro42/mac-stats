@@ -2,6 +2,7 @@
 
 Overnight Track B (autoresearch) shipped:
 
+- **v0.1.983** — Instant lane: `standing_backlog.md` size (`standing backlog size`, `how big is standing_backlog.md`, `overnight standing backlog size`, `track b backlog size`). Stat only; no dump. Does not steal path / age / improvements / loop backlog / sibling harness.
 - **v0.1.982** — Instant lane: `standing_backlog.md` path (`standing backlog path`, `where is standing_backlog.md`, `overnight standing backlog path`, `track b backlog path`). Path only; no dump. Does not steal improvements / loop backlog / sibling harness.
 - **v0.1.981** — Instant lane: `sibling_harness.md` age (`sibling harness age`, `how old is sibling_harness.md`, `openclaw hermes scan age`, `when was sibling harness updated`, `overnight sibling harness age`). Mtime only; no dump. Does not steal path / size / improvements / loop backlog / standing backlog.
 - **v0.1.980** — Instant lane: `sibling_harness.md` size
@@ -12,8 +13,8 @@ Overnight Track B (autoresearch) shipped:
 
 ## Fuel this night
 - Digester open empty; design review not due (grace).
-- Fuel: standing backlog p50 instant lanes — sibling harness age, then standing_backlog path.
+- Fuel: standing backlog p50 instant lanes — standing_backlog path, then size.
 
 ## Next
-- `standing_backlog.md` size/age lanes, or digester/debug when present.
+- `standing_backlog.md` age lane, or digester/debug when present.
 - Design review when a surface leaves grace (CPU metrics ~3d).
