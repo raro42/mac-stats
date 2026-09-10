@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.993] - 2026-09-10
+
+### Added
+- Instant lane: harness loop stdout path (`harness loop stdout path`, `where is overnight_harness_loop.stdout.log`, `overnight_harness_loop.stdout.log path`, `harness stdout path`) — `~/.mac-stats/improvements/overnight_harness_loop.stdout.log` path only; no dump/tail; does not steal overnight_agent.log / stderr / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing.
+
 ## [0.1.992] - 2026-09-10
 
 ### Added

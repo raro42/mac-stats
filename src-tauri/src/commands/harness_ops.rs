@@ -11901,6 +11901,197 @@ pub fn format_overnight_agent_log_age_gateway() -> String {
     }
 }
 
+/// True for short “where is overnight_harness_loop.stdout.log / harness loop stdout path…” asks.
+/// Path only — does not dump or tail. Does not steal overnight_agent.log / stderr / size / age /
+/// debug.log / morning surprise / improvements / loop backlog / sibling / standing / LaunchAgent.
+pub fn looks_like_harness_loop_stdout_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Age/size reserved for later lanes — keyword-only (no nest).
+    if n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("stderr")
+        || n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight") && n.contains("agent") && n.contains("log") && !n.contains("stdout"))
+        || (n.contains("harness") && n.contains("agent") && n.contains("log") && !n.contains("stdout"))
+        || n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("stdout"))
+        || n == "log path"
+        || n == "log file path"
+        || n == "where is the log"
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("backlog")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n == "improvements"
+        || n == "improvements path"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "where is improvements"
+        || n == "where is the improvements folder"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "harness loop stdout path"
+            | "harness loop stdout log path"
+            | "harness loop stdout.log path"
+            | "overnight harness loop stdout path"
+            | "overnight harness loop stdout log path"
+            | "overnight_harness_loop.stdout.log path"
+            | "overnight_harness_loop.stdout.log"
+            | "overnight_harness_loop.stdout path"
+            | "overnight_harness_loop stdout path"
+            | "overnight-harness-loop.stdout.log path"
+            | "overnight-harness-loop stdout path"
+            | "harness_loop.stdout.log path"
+            | "harness_loop.stdout.log"
+            | "harness_loop stdout path"
+            | "harness-loop stdout path"
+            | "stdout.log path"
+            | "harness stdout path"
+            | "harness stdout log path"
+            | "overnight harness stdout path"
+            | "overnight harness stdout log path"
+            | "where is overnight_harness_loop.stdout.log"
+            | "where is the overnight_harness_loop.stdout.log"
+            | "where is overnight harness loop stdout"
+            | "where is the overnight harness loop stdout"
+            | "where is overnight harness loop stdout log"
+            | "where is the overnight harness loop stdout log"
+            | "where is harness loop stdout"
+            | "where is the harness loop stdout"
+            | "where is harness loop stdout log"
+            | "where is the harness loop stdout log"
+            | "where does overnight_harness_loop.stdout.log go"
+            | "where do harness loop stdout logs go"
+    ) {
+        return true;
+    }
+    let stdout_ctx = n.contains("stdout")
+        || n.contains("overnight_harness_loop.stdout")
+        || n.contains("harness_loop.stdout")
+        || n.contains("overnight-harness-loop.stdout");
+    let loop_ctx = n.contains("harness")
+        || n.contains("overnight_harness_loop")
+        || n.contains("overnight-harness-loop")
+        || n.contains("overnight harness loop")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop");
+    // Bare `stdout.log path` already matched above; otherwise need harness/loop context.
+    stdout_ctx && (loop_ctx || n.contains("stdout.log")) && pathish
+}
+
+/// Zero-LLM overnight_harness_loop.stdout.log path (config only; no dump/tail).
+pub fn format_harness_loop_stdout_path_gateway() -> String {
+    let path = crate::config::Config::overnight_harness_loop_stdout_log_path();
+    let display = path.display().to_string();
+    format!(
+        "**Harness loop stdout:** `{display}` · Track B loop capture · path only · does not dump or tail · `harness loop stdout size` for on-disk bytes · `harness loop stdout age` for last write · `overnight agent log path` for the agent transcript · `debug.log path` for the app log · `improvements path` for the parent folder."
+    )
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -42045,6 +42236,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_overnight_agent_log_path_request(content) {
         return Some(format_overnight_agent_log_path_gateway());
     }
+    // harness loop stdout path before debug.log (config only; no dump/tail).
+    if looks_like_harness_loop_stdout_path_request(content) {
+        return Some(format_harness_loop_stdout_path_gateway());
+    }
     if looks_like_debug_log_size_request(content) {
         return Some(format_debug_log_size_gateway());
     }
@@ -42452,6 +42647,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_overnight_agent_log_path_request(content) {
         return Some(format_overnight_agent_log_path_gateway());
+    }
+    // harness loop stdout path (Track B loop capture; no dump/tail).
+    if looks_like_harness_loop_stdout_path_request(content) {
+        return Some(format_harness_loop_stdout_path_gateway());
     }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
@@ -42862,6 +43061,7 @@ pub fn format_ops_help_gateway() -> String {
 • `overnight agent log path` · `where is overnight_agent.log` · `overnight_agent.log path` · `harness agent log path` — `~/.mac-stats/improvements/overnight_agent.log` path only (no dump/tail; does not steal `debug.log path` / morning surprise / improvements / loop / sibling / standing; `overnight agent log size` for bytes · `overnight agent log age` for mtime)\n\
 • `overnight agent log size` · `how big is overnight_agent.log` · `overnight_agent.log size` · `harness agent log size` — overnight_agent.log size on disk (stat only; no dump/tail; does not steal path / age / `debug.log size` / morning surprise / improvements / loop / sibling / standing)\n\
 • `overnight agent log age` · `how old is overnight_agent.log` · `overnight_agent.log age` · `harness agent log age` · `when was overnight agent log updated` — overnight_agent.log last write age (mtime; no dump/tail; does not steal path / size / `debug.log age` / morning surprise / improvements / loop / sibling / standing)\n\
+• `harness loop stdout path` · `where is overnight_harness_loop.stdout.log` · `overnight_harness_loop.stdout.log path` · `harness stdout path` — `~/.mac-stats/improvements/overnight_harness_loop.stdout.log` path only (no dump/tail; does not steal overnight_agent.log / stderr / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `harness loop stdout size` for bytes · `harness loop stdout age` for mtime)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -44430,6 +44630,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_overnight_agent_log_path_request(question) {
         return true;
     }
+    // Read-only harness loop stdout path asks (v0.1.993) — config only; no dump/tail.
+    if looks_like_harness_loop_stdout_path_request(question) {
+        return true;
+    }
     // Read-only debug.log path asks (v0.1.809) — config only, no tail read.
     if looks_like_debug_log_path_request(question) {
         return true;
@@ -44768,6 +44972,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only overnight_agent.log path asks (v0.1.990) — config only; no dump/tail.
     if looks_like_overnight_agent_log_path_request(question) {
+        return true;
+    }
+    // Read-only harness loop stdout path asks (v0.1.993) — config only; no dump/tail.
+    if looks_like_harness_loop_stdout_path_request(question) {
         return true;
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
@@ -52561,6 +52769,94 @@ mod tests {
         assert!(
             !reply.contains("Debug Log:") || reply.contains("debug.log age"),
             "must not steal debug.log age lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn harness_loop_stdout_path_request_detected() {
+        assert!(looks_like_harness_loop_stdout_path_request(
+            "harness loop stdout path"
+        ));
+        assert!(looks_like_harness_loop_stdout_path_request(
+            "overnight_harness_loop.stdout.log path"
+        ));
+        assert!(looks_like_harness_loop_stdout_path_request(
+            "where is overnight_harness_loop.stdout.log"
+        ));
+        assert!(looks_like_harness_loop_stdout_path_request(
+            "where is the harness loop stdout log"
+        ));
+        assert!(looks_like_harness_loop_stdout_path_request(
+            "overnight harness loop stdout path"
+        ));
+        assert!(looks_like_harness_loop_stdout_path_request("harness stdout path"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "harness loop stdout size"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "how big is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "how old is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "overnight agent log path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "where is overnight_agent.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request("debug.log path"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "harness loop backlog path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request("loop backlog path"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "morning surprise path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request("improvements path"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "standing backlog path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "sibling harness path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "harness loop stderr path"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "tail overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "dump harness loop stdout"
+        ));
+        assert!(!looks_like_overnight_agent_log_path_request(
+            "harness loop stdout path"
+        ));
+        assert!(!looks_like_debug_log_path_request("harness loop stdout path"));
+        assert!(!looks_like_loop_backlog_path_request(
+            "harness loop stdout path"
+        ));
+        assert!(!looks_like_morning_surprise_path_request(
+            "harness loop stdout path"
+        ));
+        let reply = try_operator_instant_reply("harness loop stdout path")
+            .expect("harness loop stdout path instant");
+        assert!(
+            reply.contains("Harness loop stdout")
+                || reply.contains("overnight_harness_loop.stdout.log"),
+            "expected harness loop stdout path reply: {reply}"
+        );
+        assert!(
+            reply.contains("overnight_harness_loop.stdout.log"),
+            "expected stdout log filename in path: {reply}"
+        );
+        assert!(
+            !reply.contains("Overnight agent log:")
+                || reply.contains("overnight agent log path"),
+            "must not steal overnight agent log path lane: {reply}"
         );
     }
 
