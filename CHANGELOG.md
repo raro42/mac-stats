@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.982] - 2026-09-10
+
+### Added
+- Instant lane: standing_backlog.md path (`standing backlog path`, `where is standing_backlog.md`, `overnight standing backlog path`, `track b backlog path`) — path only; no dump; does not steal `improvements path` / `loop backlog path` / `sibling harness path`.
+
 ## [0.1.981] - 2026-09-10
 
 ### Added

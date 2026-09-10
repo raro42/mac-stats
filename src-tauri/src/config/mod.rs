@@ -1715,6 +1715,13 @@ impl Config {
         Self::improvements_dir().join("sibling_harness.md")
     }
 
+    /// Overnight standing backlog fuel: `$HOME/.mac-stats/improvements/standing_backlog.md`
+    ///
+    /// Path only for operator instant lane — does not dump Track B backlog notes.
+    pub fn standing_backlog_path() -> PathBuf {
+        Self::improvements_dir().join("standing_backlog.md")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
