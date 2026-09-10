@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.978] - 2026-09-10
+
+### Added
+- Instant lane: loop_backlog.md age (`loop backlog age`, `how old is loop_backlog.md`, `harness tick log age`, `when was loop backlog updated`) — file mtime only; no dump; does not steal path / size / `improvements age` / `results.tsv age`.
+
 ## [0.1.977] - 2026-09-10
 
 ### Added

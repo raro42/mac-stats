@@ -9442,7 +9442,7 @@ pub fn format_loop_backlog_path_gateway() -> String {
     let path = crate::config::Config::loop_backlog_path();
     let display = path.display().to_string();
     format!(
-        "**Loop backlog:** `{display}` · overnight harness tick log · path only · does not dump notes · `improvements path` for the parent folder · `results.tsv path` for keep/discard · `loop backlog size` for on-disk bytes."
+        "**Loop backlog:** `{display}` · overnight harness tick log · path only · does not dump notes · `improvements path` for the parent folder · `results.tsv path` for keep/discard · `loop backlog size` for on-disk bytes · `loop backlog age` for last write."
     )
 }
 
@@ -9595,6 +9595,174 @@ pub fn format_loop_backlog_size_gateway() -> String {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
                 "**Loop backlog:** **{label}** on disk · overnight harness tick log · `loop backlog path` for the file · `loop backlog age` for last write."
+            )
+        }
+        Err(e) => format!("**Loop backlog** — could not stat `loop_backlog.md`: {e}"),
+    }
+}
+
+/// True for short “how old is loop_backlog.md / loop backlog age…” asks.
+/// Mtime only — does not dump overnight tick notes or steal path/size lanes.
+/// Does not steal `improvements age` / `results.tsv age` / sibling harness / standing backlog.
+pub fn looks_like_loop_backlog_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Keyword-only sibling excludes (no nested looks_like_* — exponential).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || n.contains("morning surprise")
+        || n.contains("what shipped")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n.contains("log file age")
+        || n.contains("digest age")
+        || n.contains("digest.md")
+        || n.contains("latest.md")
+        || n.contains("improvements age")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let lb_ctx = n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || (n.contains("tick log") && (n.contains("harness") || n.contains("overnight")))
+        || (n.contains("loop") && n.contains("backlog") && !n.contains("standing"));
+    if !lb_ctx {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "loop_backlog age"
+            | "loop-backlog age"
+            | "loop backlog age"
+            | "loop_backlog.md age"
+            | "loop-backlog.md age"
+            | "loop backlog.md age"
+            | "loop_backlog file age"
+            | "loop-backlog file age"
+            | "loop backlog file age"
+            | "harness loop backlog age"
+            | "overnight loop backlog age"
+            | "tick log age"
+            | "harness tick log age"
+            | "overnight tick log age"
+            | "how old is loop_backlog"
+            | "how old is loop_backlog.md"
+            | "how old is the loop_backlog"
+            | "how old is the loop_backlog.md"
+            | "how old is loop-backlog"
+            | "how old is the loop-backlog"
+            | "how old is loop backlog"
+            | "how old is the loop backlog"
+            | "how old is the loop backlog file"
+            | "how old is the harness loop backlog"
+            | "how old is the overnight loop backlog"
+            | "how old is the tick log"
+            | "how old is harness tick log"
+            | "when was loop_backlog updated"
+            | "when was loop_backlog.md updated"
+            | "when was the loop_backlog updated"
+            | "when was loop backlog updated"
+            | "when was the loop backlog updated"
+            | "when was the harness loop backlog updated"
+            | "when was the overnight loop backlog updated"
+            | "when was harness tick log updated"
+            | "loop_backlog last modified"
+            | "loop backlog last modified"
+            | "loop_backlog.md last modified"
+            | "harness tick log last modified"
+            | "is loop_backlog stale"
+            | "is loop backlog stale"
+            | "is the loop backlog stale"
+            | "is harness tick log stale"
+    ) || (n.contains("age") && lb_ctx)
+        || (n.contains("old") && lb_ctx)
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified")) && lb_ctx)
+        || (n.contains("stale") && lb_ctx)
+}
+
+/// Zero-LLM overnight loop_backlog.md age from file mtime (stat only; no dump/list).
+pub fn format_loop_backlog_age_gateway() -> String {
+    let path = crate::config::Config::loop_backlog_path();
+    if !path.exists() {
+        return "**Loop backlog:** no `loop_backlog.md` yet · overnight ticks will create it · `loop backlog path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Loop backlog:** last write **{age}** ago · overnight harness tick log · `loop backlog path` for the file · `loop backlog size` for on-disk bytes."
             )
         }
         Err(e) => format!("**Loop backlog** — could not stat `loop_backlog.md`: {e}"),
@@ -23766,6 +23934,10 @@ pub fn looks_like_improvements_age_request(content: &str) -> bool {
         || n.contains("digest.md")
         || n.contains("latest.md")
         || n.contains("latest.json")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
         || n.contains("screenshot")
         || n.contains("screenshots")
         || n.contains("morning surprise")
@@ -39645,9 +39817,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
-    // loop_backlog.md size before path (stat only; no dump); path before improvements-dir.
+    // loop_backlog.md size before age before path (stat only; no dump); path before improvements-dir.
     if looks_like_loop_backlog_size_request(content) {
         return Some(format_loop_backlog_size_gateway());
+    }
+    if looks_like_loop_backlog_age_request(content) {
+        return Some(format_loop_backlog_age_gateway());
     }
     if looks_like_loop_backlog_path_request(content) {
         return Some(format_loop_backlog_path_gateway());
@@ -40050,9 +40225,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_path_request(content) {
         return Some(format_results_tsv_path_gateway());
     }
-    // loop_backlog.md size before path (stat only; no dump); path before notes/memory.
+    // loop_backlog.md size before age before path (stat only; no dump); path before notes/memory.
     if looks_like_loop_backlog_size_request(content) {
         return Some(format_loop_backlog_size_gateway());
+    }
+    if looks_like_loop_backlog_age_request(content) {
+        return Some(format_loop_backlog_age_gateway());
     }
     if looks_like_loop_backlog_path_request(content) {
         return Some(format_loop_backlog_path_gateway());
@@ -40451,8 +40629,9 @@ pub fn format_ops_help_gateway() -> String {
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
-• `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes)\n\
+• `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
 • `loop backlog size` · `how big is loop_backlog.md` · `harness tick log size` — loop_backlog.md size on disk (stat only; no dump; does not steal `loop backlog path` / age / `improvements size` / `results.tsv size`)\n\
+• `loop backlog age` · `how old is loop_backlog.md` · `harness tick log age` · `when was loop backlog updated` — loop_backlog.md last write age (mtime; no dump; does not steal path / size / `improvements age` / `results.tsv age`)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -42291,6 +42470,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only loop_backlog.md size asks (v0.1.977) — stat only; no dump.
     if looks_like_loop_backlog_size_request(question) {
+        return true;
+    }
+    // Read-only loop_backlog.md age asks (v0.1.978) — mtime only; no dump.
+    if looks_like_loop_backlog_age_request(question) {
         return true;
     }
     // Read-only loop_backlog.md path asks (v0.1.976) — config only; no dump.
@@ -49603,6 +49786,38 @@ mod tests {
             try_operator_instant_reply("how big is loop_backlog.md").expect("loop backlog size instant");
         assert!(reply.contains("Loop backlog") || reply.contains("loop_backlog"));
         assert!(reply.contains("on disk") || reply.contains("empty") || reply.contains("no `loop_backlog"));
+        assert!(reply.contains("loop backlog path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn loop_backlog_age_request_detected() {
+        assert!(looks_like_loop_backlog_age_request("loop_backlog age"));
+        assert!(looks_like_loop_backlog_age_request("loop backlog age"));
+        assert!(looks_like_loop_backlog_age_request("loop_backlog.md age"));
+        assert!(looks_like_loop_backlog_age_request("how old is loop_backlog.md"));
+        assert!(looks_like_loop_backlog_age_request("how old is the loop backlog"));
+        assert!(looks_like_loop_backlog_age_request("when was loop backlog updated"));
+        assert!(looks_like_loop_backlog_age_request("harness tick log age"));
+        assert!(looks_like_loop_backlog_age_request("overnight loop backlog age"));
+        assert!(looks_like_loop_backlog_age_request("is the loop backlog stale"));
+        assert!(!looks_like_loop_backlog_age_request("loop backlog path"));
+        assert!(!looks_like_loop_backlog_age_request("where is loop_backlog.md"));
+        assert!(!looks_like_loop_backlog_age_request("loop backlog size"));
+        assert!(!looks_like_loop_backlog_age_request("how big is loop_backlog.md"));
+        assert!(!looks_like_loop_backlog_age_request("improvements age"));
+        assert!(!looks_like_loop_backlog_age_request("results.tsv age"));
+        assert!(!looks_like_loop_backlog_age_request("list loop backlog"));
+        assert!(!looks_like_loop_backlog_age_request("dump loop_backlog.md"));
+        assert!(!looks_like_loop_backlog_age_request("standing backlog age"));
+        assert!(!looks_like_loop_backlog_age_request("sibling harness age"));
+        assert!(!looks_like_loop_backlog_path_request("loop backlog age"));
+        assert!(!looks_like_loop_backlog_size_request("loop backlog age"));
+        assert!(!looks_like_results_tsv_age_request("loop backlog age"));
+        assert!(!looks_like_improvements_age_request("loop backlog age"));
+        let reply =
+            try_operator_instant_reply("how old is loop_backlog.md").expect("loop backlog age instant");
+        assert!(reply.contains("Loop backlog") || reply.contains("loop_backlog"));
+        assert!(reply.contains("ago") || reply.contains("no `loop_backlog"));
         assert!(reply.contains("loop backlog path") || reply.contains("does not dump"));
     }
 
