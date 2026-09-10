@@ -10772,6 +10772,181 @@ pub fn format_standing_backlog_age_gateway() -> String {
     }
 }
 
+/// True for short “where is morning_surprise_*.md / morning surprise path…” asks.
+/// Path only — does not dump highlights / what-shipped content.
+/// Does not steal `improvements path` / `results.tsv` / loop / sibling / standing backlog.
+pub fn looks_like_morning_surprise_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Age/size reserved for later lanes — keyword-only (no nest).
+    if n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("what shipped")
+        || n.contains("what changed")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("last night")
+        || n.contains("highlight")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("debug.log")
+        || n.contains("debug log")
+        || n == "where is config"
+        || n == "config path"
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains(".plist")
+        || n == "improvements"
+        || n == "improvements path"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "where is improvements"
+        || n == "where is the improvements folder"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "morning_surprise path"
+            | "morning-surprise path"
+            | "morning surprise path"
+            | "morning_surprise.md path"
+            | "morning-surprise.md path"
+            | "morning surprise.md path"
+            | "morning_surprise.md"
+            | "morning-surprise.md"
+            | "morning surprise.md"
+            | "morning_surprise file"
+            | "morning-surprise file"
+            | "morning surprise file"
+            | "morning_surprise location"
+            | "morning-surprise location"
+            | "morning surprise location"
+            | "overnight morning surprise path"
+            | "today morning surprise path"
+            | "todays morning surprise path"
+            | "today's morning surprise path"
+            | "where is morning_surprise"
+            | "where is morning_surprise.md"
+            | "where is the morning_surprise"
+            | "where is the morning_surprise.md"
+            | "where is morning-surprise"
+            | "where is the morning-surprise"
+            | "where is morning surprise"
+            | "where is the morning surprise"
+            | "where is the morning surprise file"
+            | "where is the overnight morning surprise"
+            | "where do morning surprise go"
+            | "where does morning surprise go"
+            | "where is morning_surprise_*.md"
+            | "where is morning surprise note"
+    ) {
+        return true;
+    }
+    let ms_ctx = n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"));
+    ms_ctx && pathish
+}
+
+/// Zero-LLM today's morning_surprise_YYYY-MM-DD.md path (config only; no dump/list).
+pub fn format_morning_surprise_path_gateway() -> String {
+    let path = crate::config::Config::morning_surprise_path_today();
+    let display = path.display().to_string();
+    format!(
+        "**Morning surprise:** `{display}` · today's overnight note · path only · does not dump highlights · `improvements path` for the parent folder · `standing backlog path` for Track B fuel · ask *morning surprise?* for the ship list."
+    )
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -40856,6 +41031,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standing_backlog_path_request(content) {
         return Some(format_standing_backlog_path_gateway());
     }
+    // morning_surprise_*.md path before improvements-dir / content dump (path only; no highlights).
+    if looks_like_morning_surprise_path_request(content) {
+        return Some(format_morning_surprise_path_gateway());
+    }
     if looks_like_downloads_organizer_ready_request(content) {
         return Some(format_downloads_organizer_ready_chip());
     }
@@ -41284,6 +41463,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_standing_backlog_path_request(content) {
         return Some(format_standing_backlog_path_gateway());
     }
+    // morning_surprise_*.md path before notes/memory (path only; no highlights dump).
+    if looks_like_morning_surprise_path_request(content) {
+        return Some(format_morning_surprise_path_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -41687,6 +41870,7 @@ pub fn format_ops_help_gateway() -> String {
 • `standing backlog path` · `where is standing_backlog.md` · `overnight standing backlog path` · `track b backlog path` — `~/.mac-stats/improvements/standing_backlog.md` path only (no dump; does not steal `improvements path` / `loop backlog path` / `sibling harness path`; `standing backlog size` for bytes · `standing backlog age` for mtime)\n\
 • `standing backlog size` · `how big is standing_backlog.md` · `overnight standing backlog size` · `track b backlog size` — standing_backlog.md size on disk (stat only; no dump; does not steal `standing backlog path` / age / `improvements size` / `loop backlog size` / `sibling harness size`)\n\
 • `standing backlog age` · `how old is standing_backlog.md` · `overnight standing backlog age` · `when was standing backlog updated` · `track b backlog age` — standing_backlog.md last write age (mtime; no dump; does not steal path / size / `improvements age` / `loop backlog age` / `sibling harness age`)\n\
+• `morning surprise path` · `where is morning_surprise.md` · `where is the morning surprise` · `overnight morning surprise path` — today's `morning_surprise_YYYY-MM-DD.md` path only (no dump; does not steal `improvements path` / standing / sibling / loop; ask *morning surprise?* for highlights)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
 • `credential accounts age` · `credential_accounts.json age` · `how old is credential accounts` · `when was credential accounts updated` — credential_accounts.json last write age (mtime; no dump; does not steal `credential accounts path` / `credential accounts size` / browser credentials)\n\
 • `credential accounts path` · `where is credential_accounts.json` · `keychain accounts path` — Keychain account-name list file (config only; no list/dump; `credential accounts size` / `credential accounts age` for bytes / mtime; does not steal browser credentials)\n\
@@ -43557,6 +43741,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only standing_backlog.md path asks (v0.1.982) — config only; no dump.
     if looks_like_standing_backlog_path_request(question) {
+        return true;
+    }
+    // Read-only morning_surprise_*.md path asks (v0.1.985) — config only; no dump.
+    if looks_like_morning_surprise_path_request(question) {
         return true;
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
@@ -51095,6 +51283,45 @@ mod tests {
         assert!(reply.contains("Standing backlog") || reply.contains("standing_backlog"));
         assert!(reply.contains("ago") || reply.contains("no `standing_backlog"));
         assert!(reply.contains("standing backlog path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn morning_surprise_path_request_detected() {
+        assert!(looks_like_morning_surprise_path_request("morning surprise path"));
+        assert!(looks_like_morning_surprise_path_request("morning_surprise path"));
+        assert!(looks_like_morning_surprise_path_request("morning_surprise.md path"));
+        assert!(looks_like_morning_surprise_path_request("where is morning_surprise.md"));
+        assert!(looks_like_morning_surprise_path_request("where is the morning surprise"));
+        assert!(looks_like_morning_surprise_path_request("overnight morning surprise path"));
+        assert!(looks_like_morning_surprise_path_request("where is morning surprise note"));
+        assert!(!looks_like_morning_surprise_path_request("morning surprise"));
+        assert!(!looks_like_morning_surprise_path_request("what's the morning surprise"));
+        assert!(!looks_like_morning_surprise_path_request("improvements path"));
+        assert!(!looks_like_morning_surprise_path_request("standing backlog path"));
+        assert!(!looks_like_morning_surprise_path_request("sibling harness path"));
+        assert!(!looks_like_morning_surprise_path_request("loop backlog path"));
+        assert!(!looks_like_morning_surprise_path_request("results.tsv path"));
+        assert!(!looks_like_morning_surprise_path_request("list morning surprise"));
+        assert!(!looks_like_morning_surprise_path_request("dump morning_surprise.md"));
+        assert!(!looks_like_morning_surprise_path_request("morning surprise age"));
+        assert!(!looks_like_morning_surprise_path_request("how old is morning surprise"));
+        assert!(!looks_like_morning_surprise_path_request("morning surprise size"));
+        assert!(!looks_like_morning_surprise_path_request("how big is morning_surprise.md"));
+        assert!(!looks_like_standing_backlog_path_request("morning surprise path"));
+        assert!(!looks_like_improvements_path_request("morning surprise path"));
+        assert!(!looks_like_loop_backlog_path_request("morning surprise path"));
+        assert!(!looks_like_sibling_harness_path_request("morning surprise path"));
+        assert!(!looks_like_results_tsv_path_request("morning surprise path"));
+        let reply = try_operator_instant_reply("morning surprise path")
+            .expect("morning surprise path instant");
+        assert!(reply.contains("Morning surprise") || reply.contains("morning_surprise"));
+        assert!(reply.contains("morning_surprise_"));
+        assert!(reply.contains(".md"));
+        assert!(
+            reply.contains("does not dump")
+                || reply.contains("path only")
+                || reply.contains("improvements path")
+        );
     }
 
     #[test]

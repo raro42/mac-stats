@@ -422,6 +422,25 @@ fn is_morning_surprise_ask(n: &str) -> bool {
     {
         return false;
     }
+    // Path/size/age reserved for harness_ops instant lanes (do not dump highlights).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how large")
+        || n.contains("bytes")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("_age")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("what shipped")
+            && !n.contains("what changed"))
+    {
+        return false;
+    }
     n.contains("morning surprise")
         || n.contains("morning-surprise")
         || (n.contains("surprise") && (n.contains("morning") || n.contains("today")))
@@ -2110,8 +2129,36 @@ commit+push, then reply briefly.";
                             || lower.contains("mac-stats"),
                         "expected morning surprise blurb for {q:?}: {reply}"
                     );
+                    assert!(
+                        !lower.contains("path only"),
+                        "content ask must not return path-only for {q:?}: {reply}"
+                    );
                 }
                 other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+    }
+
+    #[test]
+    fn morning_surprise_path_asks_are_instant_path_only() {
+        for q in [
+            "morning surprise path",
+            "where is morning_surprise.md",
+            "where is the morning surprise",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("morning_surprise") || lower.contains("morning surprise"),
+                        "expected morning surprise path for {q:?}: {reply}"
+                    );
+                    assert!(
+                        reply.contains(".md") && (lower.contains("path") || reply.contains('/')),
+                        "expected path reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant path for {q:?}, got {:?}", other),
             }
         }
     }

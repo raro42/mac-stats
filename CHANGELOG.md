@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.985] - 2026-09-10
+
+### Added
+- Instant lane: morning surprise path (`morning surprise path`, `where is morning_surprise.md`, `where is the morning surprise`, `overnight morning surprise path`) — today's `morning_surprise_YYYY-MM-DD.md` path only; no dump; does not steal `improvements path` / standing / sibling / loop; content asks still use *morning surprise?*.
+
 ## [0.1.984] - 2026-09-10
 
 ### Added

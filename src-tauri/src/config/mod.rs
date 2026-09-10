@@ -1722,6 +1722,16 @@ impl Config {
         Self::improvements_dir().join("standing_backlog.md")
     }
 
+    /// Today's morning surprise note:
+    /// `$HOME/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md`
+    ///
+    /// Path only for operator instant lane — does not dump highlights or ship list.
+    pub fn morning_surprise_path_today() -> PathBuf {
+        let day = chrono::Local::now().date_naive();
+        let name = format!("morning_surprise_{}.md", day.format("%Y-%m-%d"));
+        Self::improvements_dir().join(name)
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
