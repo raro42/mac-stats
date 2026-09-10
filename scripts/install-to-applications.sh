@@ -102,6 +102,17 @@ if [[ -f "$PLIST" ]]; then
       break
     fi
   done
+  # Avoid launchd default cwd `/` (breaks relative RUN_CMD / skill scripts). Prefer repo root when
+  # installing from the tree; fall back to $HOME. RUN_CMD also self-heals via workspace (v0.1.988+).
+  LAUNCH_WD="$ROOT"
+  if [[ ! -d "$LAUNCH_WD" ]]; then
+    LAUNCH_WD="$HOME"
+  fi
+  if /usr/libexec/PlistBuddy -c 'Print :WorkingDirectory' "$PLIST" >/dev/null 2>&1; then
+    /usr/libexec/PlistBuddy -c "Set :WorkingDirectory $LAUNCH_WD" "$PLIST" 2>/dev/null || true
+  else
+    /usr/libexec/PlistBuddy -c "Add :WorkingDirectory string $LAUNCH_WD" "$PLIST" 2>/dev/null || true
+  fi
 fi
 
 # Deep-sign the full .app after replacing the Mach-O. Do not restart with a broken

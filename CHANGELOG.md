@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.989] - 2026-09-10
+
+### Fixed
+- **LaunchAgent WorkingDirectory** — `install-to-applications.sh` sets `WorkingDirectory` on `com.raro42.mac-stats.plist` to the repo root (else `$HOME`) so launchd no longer leaves process cwd at `/`. Defense in depth with RUN_CMD workspace (v0.1.988). Docs in `agents.md` updated.
+
 ## [0.1.988] - 2026-09-10
 
 ### Fixed

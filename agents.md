@@ -77,6 +77,9 @@ Create `~/Library/LaunchAgents/com.raro42.mac-stats.plist`:
     <string>-vv</string>
   </array>
   <!-- Do NOT add --cpu here: that keeps WKWebView + “Graphics and Media” hot (~0.5–1% CPU) 24/7. -->
+  <!-- Avoid launchd default cwd `/` (relative skill scripts). Prefer the mac-stats repo; else $HOME. -->
+  <key>WorkingDirectory</key>
+  <string>/Users/YOU/projects/mac-stats</string>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>

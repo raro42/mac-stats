@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.989** — LaunchAgent WorkingDirectory: `install-to-applications.sh` sets repo (else `$HOME`) on `com.raro42.mac-stats.plist` so launchd cwd is not `/` (defense in depth with RUN_CMD v0.1.988; `agents.md` example updated).
+
 - **v0.1.988** — RUN_CMD working directory: children use Cursor Agent / config workspace (`~/projects/mac-stats`) so LaunchAgent cwd `/` no longer breaks relative `python3 scripts/…` (quality-weekly-review).
 
 - **v0.1.987** — Instant lane: morning surprise age (`morning surprise age`, `how old is morning_surprise.md`, `overnight morning surprise age`, `when was morning surprise updated`, `today's morning surprise age`; today's note mtime; no dump; does not steal path / size / improvements / standing / sibling / loop; p50).
