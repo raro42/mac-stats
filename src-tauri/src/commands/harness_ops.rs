@@ -2225,8 +2225,31 @@ pub fn looks_like_schedules_request(content: &str) -> bool {
         "schedules"
             | "/schedules"
             | "list schedules"
+            | "list the schedules"
+            | "list schedule"
+            | "list the schedule"
             | "show schedules"
+            | "show the schedules"
+            | "show me schedules"
+            | "show me the schedules"
+            | "show schedule"
+            | "show the schedule"
+            | "show me schedule"
+            | "show me the schedule"
+            | "view schedules"
+            | "view the schedules"
+            | "view schedule"
+            | "view the schedule"
+            | "see schedules"
+            | "see the schedules"
+            | "see schedule"
+            | "see the schedule"
+            | "open schedules"
+            | "open the schedules"
+            | "open schedule"
+            | "open the schedule"
             | "my schedules"
+            | "the schedules"
             | "what's scheduled"
             | "whats scheduled"
             | "what is scheduled"
@@ -22613,6 +22636,8 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
         || n.contains("number of")
         || n.contains("list")
         || n.contains("show ")
+        || n.contains("view ")
+        || n.contains("see ")
         || n.contains("open ")
         || n.contains("create")
         || n.contains("add ")
@@ -22659,6 +22684,7 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
         || n == "upcoming jobs"
         || n == "scheduled jobs"
         || n == "my schedules"
+        || n == "the schedules"
         || n == "my jobs"
         || n == "deliveries"
         || n == "delivery"
@@ -22767,6 +22793,9 @@ pub fn looks_like_schedules_size_request(content: &str) -> bool {
         || n.contains("number of")
         || n.contains("list")
         || n.contains("show ")
+        || n.contains("view ")
+        || n.contains("see ")
+        || n.contains("open ")
         || n.contains("dump")
         || n.contains("tail")
         || n.contains("read ")
@@ -22827,6 +22856,7 @@ pub fn looks_like_schedules_size_request(content: &str) -> bool {
         || n == "upcoming jobs"
         || n == "scheduled jobs"
         || n == "my schedules"
+        || n == "the schedules"
         || n == "my jobs"
         || n == "deliveries"
         || n == "delivery"
@@ -22956,6 +22986,9 @@ pub fn looks_like_schedules_age_request(content: &str) -> bool {
         || n.contains("number of")
         || n.contains("list")
         || n.contains("show ")
+        || n.contains("view ")
+        || n.contains("see ")
+        || n.contains("open ")
         || n.contains("dump")
         || n.contains("tail")
         || n.contains("read ")
@@ -23021,6 +23054,7 @@ pub fn looks_like_schedules_age_request(content: &str) -> bool {
         || n == "upcoming jobs"
         || n == "scheduled jobs"
         || n == "my schedules"
+        || n == "the schedules"
         || n == "my jobs"
         || n == "deliveries"
         || n == "delivery"
@@ -45501,7 +45535,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
-• `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
+• `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` · `view schedules` · `see schedules` · `show me the schedules` · `open schedules` · `list the schedules` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` · `view disk` · `see disk` · `show me the disk cleanup` · `open disk` · `list the disk cleanup` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
@@ -46184,10 +46218,18 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/schedules` jobs/deliveries operator asks (v0.1.708).
+    // `/schedules` jobs/deliveries operator asks (v0.1.708);
+    // view/see/show me/open NL (v0.1.1021).
     if (q.contains("/schedules")
         || q == "schedules"
         || q.contains("list schedules")
+        || q.contains("list the schedules")
+        || q.contains("show schedules")
+        || q.contains("show me the schedules")
+        || q.contains("view schedules")
+        || q.contains("see schedules")
+        || q.contains("open schedules")
+        || q == "the schedules"
         || q.contains("schedules jobs")
         || q.contains("schedules deliveries")
         || q.contains("list deliveries")
@@ -49761,6 +49803,12 @@ mod tests {
         assert!(looks_like_schedules_request("/schedules"));
         assert!(looks_like_schedules_request("/cron list"));
         assert!(looks_like_schedules_request("list schedules"));
+        assert!(looks_like_schedules_request("list the schedules"));
+        assert!(looks_like_schedules_request("view schedules"));
+        assert!(looks_like_schedules_request("see schedules"));
+        assert!(looks_like_schedules_request("show me the schedules"));
+        assert!(looks_like_schedules_request("open schedules"));
+        assert!(looks_like_schedules_request("the schedules"));
         assert!(looks_like_schedules_request("@Werner schedules"));
         assert!(looks_like_schedules_request("upcoming jobs"));
         assert!(looks_like_schedules_request("my cron jobs"));
@@ -49790,6 +49838,11 @@ mod tests {
             parse_schedules_list_filter("recent deliveries"),
             SchedulesListFilter::Deliveries
         );
+        let view = try_operator_instant_reply("view schedules").expect("view schedules instant");
+        assert!(view.contains("Schedules"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the schedules").expect("show me the schedules");
+        assert!(show_me.contains("Schedules"), "{show_me}");
     }
 
     #[test]

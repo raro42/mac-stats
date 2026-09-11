@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1021] - 2026-09-12
+
+### Added
+- Instant lane: more Schedules NL for `/schedules` — `view schedules`, `see schedules`, `show me the schedules`, `open schedules`, `list the schedules` (and close variants) join `list schedules` / Jobs · Deliveries filters.
+
 ## [0.1.1020] - 2026-09-12
 
 ### Added
