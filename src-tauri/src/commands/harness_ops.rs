@@ -2487,9 +2487,32 @@ pub fn looks_like_monitors_request(content: &str) -> bool {
         "/monitors"
             | "monitors"
             | "list monitors"
+            | "list the monitors"
+            | "list monitor"
+            | "list the monitor"
             | "show monitors"
+            | "show the monitors"
+            | "show me monitors"
+            | "show me the monitors"
+            | "show monitor"
+            | "show the monitor"
+            | "show me monitor"
+            | "show me the monitor"
+            | "view monitors"
+            | "view the monitors"
+            | "view monitor"
+            | "view the monitor"
+            | "see monitors"
+            | "see the monitors"
+            | "see monitor"
+            | "see the monitor"
+            | "open monitors"
+            | "open the monitors"
+            | "open monitor"
+            | "open the monitor"
             | "my monitors"
             | "all monitors"
+            | "the monitors"
             | "monitor list"
             | "website monitors"
             | "site monitors"
@@ -23154,7 +23177,18 @@ pub fn looks_like_monitors_age_request(content: &str) -> bool {
         || n == "down monitors"
         || n == "slow monitors"
         || n == "list monitors"
+        || n == "list the monitors"
         || n == "show monitors"
+        || n == "show the monitors"
+        || n == "show me monitors"
+        || n == "show me the monitors"
+        || n == "view monitors"
+        || n == "view the monitors"
+        || n == "see monitors"
+        || n == "see the monitors"
+        || n == "open monitors"
+        || n == "open the monitors"
+        || n == "the monitors"
         || n == "my monitors"
         || n == "website monitors"
         || n == "site monitors"
@@ -23337,7 +23371,18 @@ pub fn looks_like_monitors_size_request(content: &str) -> bool {
         || n == "down monitors"
         || n == "slow monitors"
         || n == "list monitors"
+        || n == "list the monitors"
         || n == "show monitors"
+        || n == "show the monitors"
+        || n == "show me monitors"
+        || n == "show me the monitors"
+        || n == "view monitors"
+        || n == "view the monitors"
+        || n == "see monitors"
+        || n == "see the monitors"
+        || n == "open monitors"
+        || n == "open the monitors"
+        || n == "the monitors"
         || n == "my monitors"
         || n == "website monitors"
         || n == "site monitors"
@@ -23520,7 +23565,18 @@ pub fn looks_like_monitors_path_request(content: &str) -> bool {
         || n == "down monitors"
         || n == "slow monitors"
         || n == "list monitors"
+        || n == "list the monitors"
         || n == "show monitors"
+        || n == "show the monitors"
+        || n == "show me monitors"
+        || n == "show me the monitors"
+        || n == "view monitors"
+        || n == "view the monitors"
+        || n == "see monitors"
+        || n == "see the monitors"
+        || n == "open monitors"
+        || n == "open the monitors"
+        || n == "the monitors"
         || n == "my monitors"
         || n == "website monitors"
         || n == "site monitors"
@@ -45296,7 +45352,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
-• `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
+• `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
@@ -46002,7 +46058,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if (q.contains("/monitors")
         || q == "monitors"
         || q.contains("list monitors")
+        || q.contains("list the monitors")
         || q.contains("show monitors")
+        || q.contains("show me the monitors")
+        || q.contains("view monitors")
+        || q.contains("see monitors")
+        || q.contains("open monitors")
+        || q == "the monitors"
         || q.contains("monitors up")
         || q.contains("monitors down")
         || q.contains("monitors slow")
@@ -49709,6 +49771,12 @@ mod tests {
     fn monitors_request_detected() {
         assert!(looks_like_monitors_request("/monitors"));
         assert!(looks_like_monitors_request("list monitors"));
+        assert!(looks_like_monitors_request("list the monitors"));
+        assert!(looks_like_monitors_request("view monitors"));
+        assert!(looks_like_monitors_request("see monitors"));
+        assert!(looks_like_monitors_request("show me the monitors"));
+        assert!(looks_like_monitors_request("open monitors"));
+        assert!(looks_like_monitors_request("the monitors"));
         assert!(looks_like_monitors_request("@Werner monitors"));
         assert!(looks_like_monitors_request("/monitors up"));
         assert!(looks_like_monitors_request("/monitors down"));
@@ -49737,6 +49805,11 @@ mod tests {
             parse_monitors_list_filter("slow monitors"),
             MonitorsListFilter::Slow
         );
+        let view = try_operator_instant_reply("view monitors").expect("view monitors instant");
+        assert!(view.contains("Monitors"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the monitors").expect("show me the monitors");
+        assert!(show_me.contains("Monitors"), "{show_me}");
     }
 
     #[test]

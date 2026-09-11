@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1019] - 2026-09-12
+
+### Added
+- Instant lane: more External / Monitors NL for `/monitors` — `view monitors`, `see monitors`, `show me the monitors`, `open monitors`, `list the monitors` (and close variants) join `list monitors` / `show monitors` / Up · Down · Slow filters.
+
 ## [0.1.1018] - 2026-09-11
 
 ### Added
