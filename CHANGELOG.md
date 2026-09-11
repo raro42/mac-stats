@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1011] - 2026-09-11
+
+### Added
+- Disk Cleanup scopes: Clear chip beside All · On · Off when a scope filter is active (category Clear / Monitors / Top Processes / AI Chat parity) — flashes Cleared, then returns to All; empty scope filter-miss Clear uses the same flash.
+
 ## [0.1.1010] - 2026-09-11
 
 ### Changed

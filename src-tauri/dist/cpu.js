@@ -18151,6 +18151,62 @@ function visibleDiskCleanupScopeRows(scopesEl) {
   );
 }
 
+function diskCleanupScopeFilterAttentionLabel() {
+  if (diskCleanupScopeFilterMode === 'on') return 'On';
+  if (diskCleanupScopeFilterMode === 'off') return 'Off';
+  return '';
+}
+
+/** Brief Clear → Cleared flash (category Clear / Monitors parity). */
+function flashDiskCleanupScopeFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncDiskCleanupScopeFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·On·Off when a scope filter is active. */
+function syncDiskCleanupScopeFilterClearBtn() {
+  const btn = document.getElementById('disk-cleanup-scope-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!diskCleanupScopeFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensureDiskCleanupScopeFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('disk-cleanup-scope-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'disk-cleanup-scope-filter-clear';
+  btn.className = 'disk-cleanup-scope-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show every scope (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
+}
+
 /** All / On / Off chips above scopes (Agents All/On/Off parity). */
 function ensureDiskCleanupScopeFilterChips() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
@@ -18169,6 +18225,19 @@ function ensureDiskCleanupScopeFilterChips() {
       '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="off" aria-pressed="false" title="Show disabled scopes only">Off <span class="disk-cleanup-scope-filter-count" data-disk-cleanup-scope-filter-count="off">0</span></button>';
     scopesEl.parentNode.insertBefore(wrap, scopesEl);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest(
+          '#disk-cleanup-scope-filter-clear, .disk-cleanup-scope-filter-clear'
+        );
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setDiskCleanupScopeFilterMode('all');
+        flashDiskCleanupScopeFilterClearBtn(clearBtn);
+        return;
+      }
       const btn =
         e.target &&
         e.target.closest &&
@@ -18181,6 +18250,8 @@ function ensureDiskCleanupScopeFilterChips() {
       );
     });
   }
+  ensureDiskCleanupScopeFilterClearBtn(wrap);
+  syncDiskCleanupScopeFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
@@ -18196,6 +18267,7 @@ function setDiskCleanupScopeFilterMode(mode) {
       btn.classList.toggle('is-active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+  syncDiskCleanupScopeFilterClearBtn();
   applyDiskCleanupScopeFilter();
 }
 
@@ -18224,6 +18296,9 @@ function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
         e.preventDefault();
         e.stopPropagation();
         setDiskCleanupScopeFilterMode('all');
+        flashDiskCleanupScopeFilterClearBtn(
+          document.getElementById('disk-cleanup-scope-filter-clear')
+        );
       });
   }
 }
@@ -18236,6 +18311,7 @@ function applyDiskCleanupScopeFilter() {
 
   const items = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
   if (chips) chips.hidden = items.length === 0;
+  syncDiskCleanupScopeFilterClearBtn();
 
   let onCount = 0;
   let offCount = 0;
