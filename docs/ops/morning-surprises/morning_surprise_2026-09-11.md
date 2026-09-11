@@ -4,6 +4,7 @@ Overnight Track B kept shipping. Digester open stayed empty; fuel came from stan
 
 | Version | What shipped |
 | --- | --- |
+| **v0.1.1001** | Instant lane: harness loop **stderr** age (`overnight_harness_loop.stderr.log`) |
 | **v0.1.1000** | Instant lane: harness loop **stderr** size (`overnight_harness_loop.stderr.log`) |
 | **v0.1.999** | Instant lane: harness loop **stderr** path (`overnight_harness_loop.stderr.log`) |
 | **v0.1.998** | Disk Cleanup filter Clear chip (All · Reclaim · Big · Clean) |
@@ -13,4 +14,4 @@ Overnight Track B kept shipping. Digester open stayed empty; fuel came from stan
 | **v0.1.994** | Instant lane: harness loop stdout size |
 | **v0.1.993** | Instant lane: harness loop stdout path |
 
-Next: harness loop stderr age · design review when due · sibling ports when they clearly fit.
+Next: digester open / debug.log product errors · design review when due · sibling ports when they clearly fit.
