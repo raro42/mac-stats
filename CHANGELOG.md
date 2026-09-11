@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1022] - 2026-09-12
+
+### Added
+- Instant lane: more Sessions NL for `/sessions` — `view sessions`, `see sessions`, `show me the sessions`, `open sessions`, `list the sessions` (and close variants) join `list sessions` / Live · Files filters. Exact `open sessions` only — singular `open session …` stays with the agent.
+
 ## [0.1.1021] - 2026-09-12
 
 ### Added

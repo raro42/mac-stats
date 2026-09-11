@@ -41107,9 +41107,10 @@ pub fn parse_sessions_list_filter(content: &str) -> SessionsListFilter {
 }
 
 /// True for `/sessions` / `list sessions` — Agent Ops Live/Files parity; not resume/delete asks.
+/// View/see/show me/open/list-the NL (v0.1.1022). Exact `open sessions` only — not `open session …`.
 pub fn looks_like_sessions_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     if n.contains("create")
@@ -41118,7 +41119,6 @@ pub fn looks_like_sessions_request(content: &str) -> bool {
         || n.contains("delete")
         || n.contains("remove")
         || n.contains("resume")
-        || n.contains("open ")
         || n.contains("write")
         || n.contains(" for ")
         || n.contains(" about ")
@@ -41135,10 +41135,32 @@ pub fn looks_like_sessions_request(content: &str) -> bool {
         "/sessions"
             | "sessions"
             | "list sessions"
+            | "list the sessions"
+            | "list session"
+            | "list the session"
+            | "show sessions"
+            | "show the sessions"
+            | "show me sessions"
+            | "show me the sessions"
+            | "show session"
+            | "show the session"
+            | "show me session"
+            | "show me the session"
+            | "view sessions"
+            | "view the sessions"
+            | "view session"
+            | "view the session"
+            | "see sessions"
+            | "see the sessions"
+            | "see session"
+            | "see the session"
+            | "open sessions"
+            | "open the sessions"
             | "my sessions"
             | "which sessions"
             | "what sessions"
             | "all sessions"
+            | "the sessions"
             | "session list"
             | "sessions list"
             | "/sessions live"
@@ -45533,7 +45555,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
-• `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
+• `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` · `view schedules` · `see schedules` · `show me the schedules` · `open schedules` · `list the schedules` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
@@ -46183,10 +46205,18 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/sessions` operator asks (v0.1.706).
+    // `/sessions` operator asks (v0.1.706);
+    // view/see/show me/open NL (v0.1.1022). Exact open sessions only — not open session ….
     if (q.contains("/sessions")
         || q == "sessions"
         || q.contains("list sessions")
+        || q.contains("list the sessions")
+        || q.contains("show sessions")
+        || q.contains("show me the sessions")
+        || q.contains("view sessions")
+        || q.contains("see sessions")
+        || q.contains("open sessions")
+        || q == "the sessions"
         || q.contains("live sessions")
         || q.contains("session files")
         || q.contains("saved sessions")
@@ -49411,6 +49441,12 @@ mod tests {
     fn sessions_request_detected() {
         assert!(looks_like_sessions_request("/sessions"));
         assert!(looks_like_sessions_request("list sessions"));
+        assert!(looks_like_sessions_request("list the sessions"));
+        assert!(looks_like_sessions_request("view sessions"));
+        assert!(looks_like_sessions_request("see sessions"));
+        assert!(looks_like_sessions_request("show me the sessions"));
+        assert!(looks_like_sessions_request("open sessions"));
+        assert!(looks_like_sessions_request("the sessions"));
         assert!(looks_like_sessions_request("live sessions"));
         assert!(looks_like_sessions_request("/sessions files"));
         assert!(looks_like_sessions_request("saved sessions"));
@@ -49418,6 +49454,9 @@ mod tests {
         assert!(!looks_like_sessions_request("resume this session"));
         assert!(!looks_like_sessions_request("delete session files"));
         assert!(!looks_like_sessions_request("why are sessions empty"));
+        // Singular "open session …" stays with the agent (resume/open flow).
+        assert!(!looks_like_sessions_request("open session"));
+        assert!(!looks_like_sessions_request("open this session"));
         assert_eq!(
             parse_sessions_list_filter("/sessions"),
             SessionsListFilter::All
@@ -49430,6 +49469,11 @@ mod tests {
             parse_sessions_list_filter("session files"),
             SessionsListFilter::Files
         );
+        let view = try_operator_instant_reply("view sessions").expect("view sessions instant");
+        assert!(view.contains("Sessions"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the sessions").expect("show me the sessions");
+        assert!(show_me.contains("Sessions"), "{show_me}");
     }
 
     #[test]
