@@ -1,27 +1,25 @@
 # Morning surprise — 2026-09-11
 
-Overnight Track B kept shipping Clear-chip parity across filter rows.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review was in grace. Fuel: Ops filter Clear parity.
 
-## Shipped tonight (so far)
+## Shipped
 
 | Version | What |
-|--------|------|
-| **v0.1.1014** | Agent Ops **Runs** Clear beside All · Instant · Lite · Direct · Slow · Fail (Cleared flash; filter-miss Clear when a lane was on) |
-| **v0.1.1013** | Agent Ops **Agents** Clear beside All · On · Off (Cleared flash; filter-miss Clear when On/Off was on) |
-| **v0.1.1012** | Agent Ops **Sessions** Clear beside All · Live · Files |
-| **v0.1.1011** | Disk Cleanup **scopes** Clear beside All · On · Off |
-| **v0.1.1010** | Perplexity Search Clear beside All · Top · Snippet |
-| **v0.1.1009** | Debug Log Clear beside All · Error · Warn |
+|---------|------|
+| **v0.1.1015** | Agent Ops Knowledge: Clear chip beside All · Discord · Core (Runs / Sessions / Agents parity; Cleared flash; filter-miss Clear) |
+| **v0.1.1014** | Agent Ops Runs: Clear chip beside All · Instant · Lite · Direct · Slow · Fail |
+| **v0.1.1013** | Agent Ops Agents: Clear chip beside All · On · Off |
+| **v0.1.1012** | Agent Ops Sessions: Clear chip beside All · Live · Files |
+| **v0.1.1011** | Disk Cleanup scopes: Clear chip beside All · On · Off |
+| **v0.1.1010** | Perplexity Search: Clear chip beside All · Top · Snippet |
+| **v0.1.1009** | Debug Log: Clear chip beside All · Error · Warn |
 
-## Tick notes (~22:08)
+## Tried / notes
 
-- Digester open empty; design review not due (grace).
-- Fuel: standing backlog Ops Clear gaps → Runs lanes.
-- Ratchet: keep. Install/kickstart after ship.
-- Still early in the 20:00–06:00 window; later ticks may add Knowledge / Schedules Clear.
+- No digester open candidates; no debug.log ERROR/WARN clusters in the scan window.
+- Design review `due=false` (grace); recommended surface still CPU metrics (~4.8d) when TCC allows a recapture.
+- Next Clear gap: Schedules All · Jobs · Deliveries.
 
-## Next fuel
+## Head
 
-- Ops Clear gaps: Knowledge Discord/Core, Schedules Jobs/Deliveries.
-- Design review screenshot when due / TCC allows.
-- Digester open candidates when present.
+`4702fec2` on `main` — Cargo.toml **0.1.1015**.
