@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1006] - 2026-09-11
+
+### Added
+- Instant lane: launchd stdout size (`launchd stdout size`, `how big is launchd.stdout.log`, `launchd.stdout.log size`, `mac-stats launchd stdout size`) — `~/.mac-stats/launchd.stdout.log` size on disk (stat only; no dump/tail; does not steal path / age / harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing).
+
 ## [0.1.1005] - 2026-09-11
 
 ### Added
