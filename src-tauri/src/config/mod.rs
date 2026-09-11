@@ -1748,6 +1748,14 @@ impl Config {
         Self::improvements_dir().join("overnight_harness_loop.stdout.log")
     }
 
+    /// Overnight harness loop stderr capture:
+    /// `$HOME/.mac-stats/improvements/overnight_harness_loop.stderr.log`
+    ///
+    /// Path only for operator instant lane — does not dump or tail the log.
+    pub fn overnight_harness_loop_stderr_log_path() -> PathBuf {
+        Self::improvements_dir().join("overnight_harness_loop.stderr.log")
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
