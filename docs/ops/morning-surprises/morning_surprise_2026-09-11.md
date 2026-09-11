@@ -5,6 +5,7 @@ Overnight Track B kept shipping operator instant lanes and filter Clear chips.
 ## Shipped tonight
 | Version | What |
 |---------|------|
+| **v0.1.1007** | Instant: `launchd.stdout.log` age |
 | **v0.1.1006** | Instant: `launchd.stdout.log` size |
 | **v0.1.1005** | Instant: `launchd.stdout.log` path |
 | **v0.1.1004** | Instant: `launchd.stderr.log` age |
@@ -21,6 +22,5 @@ Overnight Track B kept shipping operator instant lanes and filter Clear chips.
 Open candidates: none. Night pulled standing backlog (p50 latency) + design-review Clear chips earlier.
 
 ## Next
-- `launchd.stdout` age
 - Design review when due (CPU metrics screen ~4d in grace)
 - Sibling ports (Hermes insights / session UX)
