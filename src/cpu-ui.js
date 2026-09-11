@@ -3922,15 +3922,58 @@
         el.style.display = enabled ? "" : "none";
       } else if (el.classList.contains("icon-line-item")) {
         el.style.opacity = enabled ? "" : "0.55";
-        el.style.pointerEvents = enabled ? "" : "none";
-        el.title = enabled ? el.title.replace(/ \(AI off\)$/, "") : (el.getAttribute("data-title-base") || el.title) + " (AI off)";
-        if (!el.getAttribute("data-title-base")) el.setAttribute("data-title-base", el.title.replace(/ \(AI off\)$/, ""));
+        // Keep clickable when AI is off (GitHub #11) — click can enable AI or open Settings.
+        el.style.pointerEvents = "";
+        el.dataset.aiGated = enabled ? "0" : "1";
+        el.setAttribute("aria-disabled", enabled ? "false" : "true");
+        const base =
+          el.getAttribute("data-title-base") ||
+          (el.title || "").replace(/ \(AI off.*\)$/, "");
+        if (!el.getAttribute("data-title-base")) {
+          el.setAttribute("data-title-base", base);
+        }
+        el.title = enabled
+          ? base
+          : base + " (AI off — click to enable if Ollama is running)";
       } else {
         el.style.display = enabled ? "" : "none";
       }
     });
     if (typeof window.refreshIconLineRovingTabindex === "function") {
       window.refreshIconLineRovingTabindex();
+    }
+  }
+
+  /** Enable AI from an icon click when gated off (local Ollama preferred). */
+  async function tryEnableAiFromGatedIcon() {
+    const invoke = getInvoke();
+    if (!invoke) return false;
+    try {
+      const on = !!(await invoke("get_ai_agent_enabled"));
+      if (on) return true;
+      const ok = window.confirm(
+        "Local AI is off (monitor-only).\n\nTurn on the AI agent now? Needs Ollama on this Mac."
+      );
+      if (!ok) {
+        openSettingsModal();
+        const aiToggle = document.getElementById("ai-agent-enabled-toggle");
+        try {
+          aiToggle?.focus();
+        } catch (_) {
+          /* focus optional */
+        }
+        return false;
+      }
+      const v = await invoke("set_ai_agent_enabled", { enabled: true });
+      applyAiUiVisibility(!!v);
+      const toggle = document.getElementById("ai-agent-enabled-toggle");
+      if (toggle) toggle.checked = !!v;
+      applySettingsAiAttentionGlanceState();
+      return !!v;
+    } catch (e) {
+      console.error(e);
+      alert("Could not enable AI: " + e);
+      return false;
     }
   }
 
@@ -4851,6 +4894,9 @@
     applySettingsVoiceSttAttentionGlanceState;
   window.applySettingsCompactAttentionGlanceState =
     applySettingsCompactAttentionGlanceState;
+  window.openSettingsModal = openSettingsModal;
+  window.applyAiUiVisibility = applyAiUiVisibility;
+  window.tryEnableAiFromGatedIcon = tryEnableAiFromGatedIcon;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

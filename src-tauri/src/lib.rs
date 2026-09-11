@@ -584,7 +584,10 @@ fn run_internal(open_cpu_window: bool) {
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
             // Ollama warmup / Discord / scheduler only when AI agent is enabled (opt-in).
+            // DMG / Homebrew installs skip install.sh — if local Ollama is already up, enable AI once
+            // so the Ollama icon and chat are usable without a Settings hunt (GitHub #11).
             // Also watch config.json so install.sh / hand-edits can enable AI without restart.
+            let _ = ai_agent_stack::maybe_auto_enable_ai_from_local_ollama();
             ai_agent_stack::ensure_ai_agent_stack_started();
             if !config::Config::ai_agent_enabled() {
                 tracing::info!(

@@ -413,6 +413,27 @@ impl Config {
         Self::merge_config_bool("aiAgentEnabled", enabled)
     }
 
+    /// True after a one-shot Ollama auto-enable ran, or after the user chose monitor-only
+    /// (Settings off / Reset to monitor defaults). Stops re-enabling AI on every launch.
+    pub fn ai_agent_ollama_auto_probe_done() -> bool {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json
+                    .get("aiAgentOllamaAutoProbeDone")
+                    .and_then(|v| v.as_bool())
+                {
+                    return v;
+                }
+            }
+        }
+        false
+    }
+
+    pub fn set_ai_agent_ollama_auto_probe_done(done: bool) -> Result<(), String> {
+        Self::merge_config_bool("aiAgentOllamaAutoProbeDone", done)
+    }
+
     /// Compact menu bar (CPU + SSD + cached temp when available). Default **true**.
     /// Set `menuBarCompact: false` for the classic CPU/GPU/RAM/SSD grid.
     pub fn menu_bar_compact() -> bool {
@@ -632,6 +653,8 @@ impl Config {
             .unwrap_or_else(|| json!({}));
         let obj = after.as_object_mut().ok_or_else(|| "config.json is not an object".to_string())?;
         obj.insert("aiAgentEnabled".into(), json!(false));
+        // User chose monitor-only — do not auto-enable again when Ollama is running.
+        obj.insert("aiAgentOllamaAutoProbeDone".into(), json!(true));
         obj.insert("agentJudgeEnabled".into(), json!(false));
         obj.insert("agentJudgeOnFailureOnly".into(), json!(true));
         obj.insert("downloadsOrganizerEnabled".into(), json!(false));

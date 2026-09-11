@@ -59,7 +59,7 @@ Stars are how quiet tools get found. If mac-stats earns a click, [★ star the r
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
-That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. If a local **Ollama** API is already running (`http://127.0.0.1:11434`), it sets `aiAgentEnabled: true`; otherwise AI stays off. **No Ollama required** for the monitor.
+That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. If a local **Ollama** API is already running (`http://127.0.0.1:11434`), it sets `aiAgentEnabled: true`; otherwise AI stays off. **No Ollama required** for the monitor. The app also does a **one-shot** enable on startup when Ollama is reachable (DMG / brew without `install.sh`); opt out with `MAC_STATS_NO_AI=1` or Settings → AI off.
 
 > **Do not** run only `brew install --cask mac-stats`. mac-stats is **not** in Homebrew’s official casks, so that command fails with “No Cask with this name exists” (and may suggest unrelated `mac-sai`). Use the one-liner above, or see [docs/homebrew.md](docs/homebrew.md).
 

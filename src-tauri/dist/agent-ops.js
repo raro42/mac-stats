@@ -9517,9 +9517,16 @@ function escapeHtml(s) {
 
     if (icon && !icon.dataset.opsWired) {
       icon.dataset.opsWired = '1';
-      const onIcon = (e) => {
+      const onIcon = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (icon.dataset.aiGated === '1') {
+          const enabled =
+            typeof window.tryEnableAiFromGatedIcon === 'function'
+              ? await window.tryEnableAiFromGatedIcon()
+              : false;
+          if (!enabled) return;
+        }
         toggleAgentOpsSection();
       };
       icon.addEventListener('click', onIcon);

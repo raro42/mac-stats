@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1008] - 2026-09-11
+
+### Fixed
+- **Ollama icon / AI chat on fresh installs** — if local Ollama answers on startup and AI was still off (common after DMG / Homebrew without `install.sh`), mac-stats turns `aiAgentEnabled` on once so the Ollama icon and chat work. Opt out: `MAC_STATS_NO_AI=1`, Settings → AI off, or Reset to monitor defaults (`aiAgentOllamaAutoProbeDone`). When AI is off, the Ollama / Agent Ops / Perplexity icons stay clickable and can enable AI or open Settings (GitHub #11).
+
 ## [0.1.1007] - 2026-09-11
 
 ### Added

@@ -54,6 +54,8 @@ Runs on **app launch**, every **24h while running** (configurable), and **Clean 
 
 Off until `aiAgentEnabled: true` (Settings or config).
 
+**Auto-enable:** if local Ollama answers on startup (`http://127.0.0.1:11434` or `OLLAMA_HOST`) and you have not chosen monitor-only yet, mac-stats turns AI on once (same idea as `install.sh`). Opt out with `MAC_STATS_NO_AI=1`, Settings → AI off, or **Reset to monitor defaults**.
+
 | Feature | Notes |
 |---------|--------|
 | Ollama chat | Local LLM; code execution loop |

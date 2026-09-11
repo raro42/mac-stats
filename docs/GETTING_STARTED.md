@@ -25,7 +25,7 @@ open -a mac-stats
 
 Details: [README Quick start](../README.md#if-macos-says-the-dmg--app-is-damaged) and [NOTARIZATION.md](NOTARIZATION.md).
 
-AI features stay **off** until you enable them (`aiAgentEnabled`). Full feature list: [FEATURES.md](../FEATURES.md).
+AI features stay **off** until you enable them (`aiAgentEnabled`). If **Ollama** is already running when you start the app (and you have not chosen monitor-only), mac-stats turns AI on once so the chat icon works — same idea as `install.sh`. Full feature list: [FEATURES.md](../FEATURES.md).
 
 ### B) Monitor + AI agent
 

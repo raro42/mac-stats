@@ -21307,10 +21307,17 @@ function initIconLine() {
     });
   }
   
-  // Ollama icon click - toggle the AI Chat section
+  // Ollama icon click - toggle the AI Chat section (or enable AI when gated off)
   if (ollamaIcon) {
-    ollamaIcon.addEventListener('click', (e) => {
+    ollamaIcon.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (ollamaIcon.dataset.aiGated === '1') {
+        const enabled =
+          typeof window.tryEnableAiFromGatedIcon === 'function'
+            ? await window.tryEnableAiFromGatedIcon()
+            : false;
+        if (!enabled) return;
+      }
       const ollamaHeader = document.getElementById('ollama-header');
       if (ollamaHeader) {
         ollamaHeader.click();
@@ -21320,8 +21327,15 @@ function initIconLine() {
   
   // Perplexity icon click - toggle the Perplexity Search section
   if (perplexityIcon) {
-    perplexityIcon.addEventListener('click', (e) => {
+    perplexityIcon.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (perplexityIcon.dataset.aiGated === '1') {
+        const enabled =
+          typeof window.tryEnableAiFromGatedIcon === 'function'
+            ? await window.tryEnableAiFromGatedIcon()
+            : false;
+        if (!enabled) return;
+      }
       const perplexityHeader = document.getElementById('perplexity-header');
       if (perplexityHeader) {
         perplexityHeader.click();

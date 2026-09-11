@@ -1308,6 +1308,9 @@ pub fn set_ai_agent_enabled(enabled: bool) -> Result<bool, String> {
     crate::config::Config::set_ai_agent_enabled(enabled)?;
     if enabled {
         crate::ai_agent_stack::ensure_ai_agent_stack_started();
+    } else {
+        // Explicit off (Settings / Reset) — do not auto-enable on next launch when Ollama is up.
+        let _ = crate::config::Config::set_ai_agent_ollama_auto_probe_done(true);
     }
     Ok(crate::config::Config::ai_agent_enabled())
 }

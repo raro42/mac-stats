@@ -27,6 +27,100 @@ static AI_STACK_STARTED: AtomicBool = AtomicBool::new(false);
 
 const CONFIG_WATCH_DEBOUNCE_MS: u64 = 400;
 
+/// Resolve the local Ollama base URL (same defaults as install.sh / Ollama docs).
+fn local_ollama_base_url() -> String {
+    let raw = std::env::var("OLLAMA_HOST")
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "http://127.0.0.1:11434".to_string());
+    let with_scheme = if raw.starts_with("http://") || raw.starts_with("https://") {
+        raw
+    } else {
+        format!("http://{raw}")
+    };
+    with_scheme.trim_end_matches('/').to_string()
+}
+
+/// True when GET `{base}/api/tags` succeeds quickly (local Ollama is up).
+fn local_ollama_api_reachable() -> bool {
+    let base = local_ollama_base_url();
+    let url = format!("{base}/api/tags");
+    let client = match reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(2))
+        .connect_timeout(Duration::from_secs(1))
+        .build()
+    {
+        Ok(c) => c,
+        Err(_) => return false,
+    };
+    match client.get(&url).send() {
+        Ok(resp) => resp.status().is_success(),
+        Err(_) => false,
+    }
+}
+
+/// One-shot: if AI is off, Ollama answers locally, and we have not already probed / the user
+/// has not chosen monitor-only, turn `aiAgentEnabled` on (same idea as `install.sh`).
+///
+/// Opt out: `MAC_STATS_NO_AI=1`, or Settings → AI off / Reset to monitor defaults
+/// (sets `aiAgentOllamaAutoProbeDone`).
+///
+/// Returns true when this call enabled AI.
+pub fn maybe_auto_enable_ai_from_local_ollama() -> bool {
+    if Config::ai_agent_enabled() {
+        return false;
+    }
+    match std::env::var("MAC_STATS_NO_AI") {
+        Ok(v) if matches!(v.trim().to_ascii_lowercase().as_str(), "1" | "true" | "yes") => {
+            info!(
+                target: "mac_stats::ai_agent_stack",
+                "MAC_STATS_NO_AI set — skipping Ollama auto-enable"
+            );
+            return false;
+        }
+        _ => {}
+    }
+    if Config::ai_agent_ollama_auto_probe_done() {
+        debug!(
+            target: "mac_stats::ai_agent_stack",
+            "aiAgentOllamaAutoProbeDone — skipping Ollama auto-enable"
+        );
+        return false;
+    }
+    if !local_ollama_api_reachable() {
+        debug!(
+            target: "mac_stats::ai_agent_stack",
+            "local Ollama not reachable — leaving aiAgentEnabled=false (will retry next launch)"
+        );
+        return false;
+    }
+
+    info!(
+        target: "mac_stats::ai_agent_stack",
+        "Local Ollama API reachable — enabling aiAgentEnabled (one-shot auto-enable)"
+    );
+    if let Err(e) = Config::set_ai_agent_enabled(true) {
+        warn!(
+            target: "mac_stats::ai_agent_stack",
+            "Ollama auto-enable: set_ai_agent_enabled failed: {}",
+            e
+        );
+        return false;
+    }
+    if let Err(e) = Config::set_ai_agent_ollama_auto_probe_done(true) {
+        warn!(
+            target: "mac_stats::ai_agent_stack",
+            "Ollama auto-enable: set probe-done failed: {}",
+            e
+        );
+    }
+    if let Some(app) = APP_HANDLE.get() {
+        let _ = app.emit("ai-agent-enabled-changed", true);
+    }
+    true
+}
+
 /// Start Ollama warmup + Discord + scheduler + heartbeat + task review + compaction.
 /// Safe to call many times: the heavy stack starts at most once; Discord spawn is itself gated.
 pub fn ensure_ai_agent_stack_started() {
@@ -206,4 +300,34 @@ fn event_touches_config(event: &notify::Event, config_path: &Path) -> bool {
             _ => false,
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::local_ollama_base_url;
+
+    #[test]
+    fn local_ollama_base_url_default() {
+        // Do not assert against a polluted OLLAMA_HOST from the parent process in CI;
+        // only check scheme/port shape when unset is hard — normalize helper instead.
+        let u = local_ollama_base_url();
+        assert!(u.starts_with("http://") || u.starts_with("https://"));
+        assert!(!u.ends_with('/'));
+    }
+
+    #[test]
+    fn local_ollama_base_url_adds_scheme() {
+        std::env::set_var("OLLAMA_HOST", "127.0.0.1:11434");
+        let u = local_ollama_base_url();
+        std::env::remove_var("OLLAMA_HOST");
+        assert_eq!(u, "http://127.0.0.1:11434");
+    }
+
+    #[test]
+    fn local_ollama_base_url_strips_trailing_slash() {
+        std::env::set_var("OLLAMA_HOST", "http://localhost:11434/");
+        let u = local_ollama_base_url();
+        std::env::remove_var("OLLAMA_HOST");
+        assert_eq!(u, "http://localhost:11434");
+    }
 }
