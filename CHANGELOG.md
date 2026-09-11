@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1012] - 2026-09-11
+
+### Added
+- Agent Ops Sessions: Clear chip beside All · Live · Files when a kind filter is active (Processes / Disk / Debug Log / Perplexity Clear parity) — flashes Cleared, then returns to All; filter-miss Clear filter CTA uses the same flash when Live/Files was on.
+
 ## [0.1.1011] - 2026-09-11
 
 ### Added

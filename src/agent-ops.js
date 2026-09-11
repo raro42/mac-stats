@@ -341,8 +341,14 @@
       sessions: {
         id: 'ops-session-filter',
         clear() {
+          const kindWasActive = !!opsSessionsFilterAttentionLabel();
           opsSessionFilterQ = '';
           setOpsSessionKindFilter('all');
+          if (kindWasActive) {
+            flashOpsSessionKindFilterClearBtn(
+              document.getElementById('ops-session-kind-filter-clear')
+            );
+          }
         },
       },
       memory: {
@@ -1543,6 +1549,56 @@ function ensureOpsSessionFilter() {
     });
 }
 
+/** Flash Cleared on Sessions kind Clear (Processes / Disk / Debug Log parity). */
+function flashOpsSessionKindFilterClearBtn(btn) {
+    if (!btn) return;
+    if (btn._clearFlashTimer) {
+        clearTimeout(btn._clearFlashTimer);
+        btn._clearFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Clear';
+    btn.dataset.idleLabel = idle;
+    btn.hidden = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Cleared';
+    btn._clearFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn._clearFlashTimer = null;
+        syncOpsSessionKindFilterClearBtn();
+    }, 1600);
+}
+
+/** Show Clear beside All·Live·Files when Live or Files is active. */
+function syncOpsSessionKindFilterClearBtn() {
+    const btn = document.getElementById('ops-session-kind-filter-clear');
+    if (!btn) return;
+    if (btn._clearFlashTimer) return;
+    const active = !!opsSessionsFilterAttentionLabel();
+    btn.hidden = !active;
+    if (!active) {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = btn.dataset.idleLabel || 'Clear';
+    }
+}
+
+function ensureOpsSessionKindFilterClearBtn(wrap) {
+    if (!wrap) return null;
+    let btn = document.getElementById('ops-session-kind-filter-clear');
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ops-session-kind-filter-clear';
+    btn.className = 'ops-session-kind-filter-clear';
+    btn.hidden = true;
+    btn.dataset.idleLabel = 'Clear';
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter — show live sessions and saved files (All)';
+    btn.textContent = 'Clear';
+    wrap.appendChild(btn);
+    return btn;
+}
+
 /** All · Live · Files chips (Monitors / Top Processes filter parity). */
 function ensureOpsSessionKindChips() {
     const panel = document.getElementById('ops-panel-sessions');
@@ -1561,12 +1617,27 @@ function ensureOpsSessionKindChips() {
             '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
         wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-session-kind-filter-clear, .ops-session-kind-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsSessionKindFilter('all');
+                flashOpsSessionKindFilterClearBtn(clearBtn);
+                return;
+            }
             const btn =
                 e.target && e.target.closest && e.target.closest('[data-ops-session-kind]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsSessionKindFilter(btn.getAttribute('data-ops-session-kind') || 'all');
         });
     }
+    ensureOpsSessionKindFilterClearBtn(wrap);
+    syncOpsSessionKindFilterClearBtn();
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
     }
@@ -1587,6 +1658,7 @@ function setOpsSessionKindFilter(mode) {
 function paintOpsSessionKindChips() {
     const wrap = document.getElementById('ops-session-kind-chips');
     if (!wrap) return;
+    ensureOpsSessionKindFilterClearBtn(wrap);
     const liveAll = opsLiveCache || [];
     const filesAll = opsSessionFilesCache || [];
     const liveEl = wrap.querySelector('[data-ops-session-kind-count="live"]');
@@ -1604,6 +1676,7 @@ function paintOpsSessionKindChips() {
             btn.classList.toggle('has-hits', filesAll.length > 0);
         }
     });
+    syncOpsSessionKindFilterClearBtn();
     applyOpsSessionsFilterAttentionGlanceState();
 }
 
