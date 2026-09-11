@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1016] - 2026-09-11
+
+### Added
+- Agent Ops Schedules: Clear chip beside All · Jobs · Deliveries when a kind filter is active (Knowledge / Runs / Sessions Clear parity) — flashes Cleared, then returns to All; filter-miss Clear filter CTA uses the same flash when Jobs/Deliveries was on.
+
 ## [0.1.1015] - 2026-09-11
 
 ### Added

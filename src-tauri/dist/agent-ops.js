@@ -393,8 +393,14 @@
       schedules: {
         id: 'ops-schedules-filter',
         clear() {
+          const kindWasActive = !!opsSchedulesFilterAttentionLabel();
           opsSchedulesFilterQ = '';
           setOpsSchedulesKindFilter('all');
+          if (kindWasActive) {
+            flashOpsSchedulesKindFilterClearBtn(
+              document.getElementById('ops-schedules-kind-filter-clear')
+            );
+          }
         },
       },
     };
@@ -4655,6 +4661,56 @@ function ensureOpsSchedulesFilter() {
     });
 }
 
+/** Flash Cleared on Schedules kind Clear (Knowledge / Runs / Sessions parity). */
+function flashOpsSchedulesKindFilterClearBtn(btn) {
+    if (!btn) return;
+    if (btn._clearFlashTimer) {
+        clearTimeout(btn._clearFlashTimer);
+        btn._clearFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Clear';
+    btn.dataset.idleLabel = idle;
+    btn.hidden = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Cleared';
+    btn._clearFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn._clearFlashTimer = null;
+        syncOpsSchedulesKindFilterClearBtn();
+    }, 1600);
+}
+
+/** Show Clear beside All·Jobs·Deliveries when Jobs or Deliveries is active. */
+function syncOpsSchedulesKindFilterClearBtn() {
+    const btn = document.getElementById('ops-schedules-kind-filter-clear');
+    if (!btn) return;
+    if (btn._clearFlashTimer) return;
+    const active = !!opsSchedulesFilterAttentionLabel();
+    btn.hidden = !active;
+    if (!active) {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = btn.dataset.idleLabel || 'Clear';
+    }
+}
+
+function ensureOpsSchedulesKindFilterClearBtn(wrap) {
+    if (!wrap) return null;
+    let btn = document.getElementById('ops-schedules-kind-filter-clear');
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ops-schedules-kind-filter-clear';
+    btn.className = 'ops-schedules-kind-filter-clear';
+    btn.hidden = true;
+    btn.dataset.idleLabel = 'Clear';
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter — show jobs and deliveries (All)';
+    btn.textContent = 'Clear';
+    wrap.appendChild(btn);
+    return btn;
+}
+
 /** All · Jobs · Deliveries chips (Sessions Live/Files parity). */
 function ensureOpsSchedulesKindChips() {
     const panel = document.getElementById('ops-panel-schedules');
@@ -4672,13 +4728,45 @@ function ensureOpsSchedulesKindChips() {
             '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="jobs">0</span></button>' +
             '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="deliveries">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.dataset.opsSchedulesKindClearBound = '1';
         wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-schedules-kind-filter-clear, .ops-schedules-kind-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsSchedulesKindFilter('all');
+                flashOpsSchedulesKindFilterClearBtn(clearBtn);
+                return;
+            }
             const btn =
                 e.target && e.target.closest && e.target.closest('[data-ops-schedules-kind]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsSchedulesKindFilter(btn.getAttribute('data-ops-schedules-kind') || 'all');
         });
+    } else if (wrap.dataset.opsSchedulesKindClearBound !== '1') {
+        wrap.dataset.opsSchedulesKindClearBound = '1';
+        wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-schedules-kind-filter-clear, .ops-schedules-kind-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsSchedulesKindFilter('all');
+                flashOpsSchedulesKindFilterClearBtn(clearBtn);
+            }
+        });
     }
+    ensureOpsSchedulesKindFilterClearBtn(wrap);
+    syncOpsSchedulesKindFilterClearBtn();
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
     }
@@ -4698,6 +4786,7 @@ function setOpsSchedulesKindFilter(mode) {
 function paintOpsSchedulesKindChips() {
     const wrap = document.getElementById('ops-schedules-kind-chips');
     if (!wrap) return;
+    ensureOpsSchedulesKindFilterClearBtn(wrap);
     const jobsAll = opsSchedulesCache || [];
     const delAll = opsDeliveriesCache || [];
     const jobsEl = wrap.querySelector('[data-ops-schedules-kind-count="jobs"]');
@@ -4715,6 +4804,7 @@ function paintOpsSchedulesKindChips() {
             btn.classList.toggle('has-hits', delAll.length > 0);
         }
     });
+    syncOpsSchedulesKindFilterClearBtn();
     applyOpsSchedulesFilterAttentionGlanceState();
 }
 
