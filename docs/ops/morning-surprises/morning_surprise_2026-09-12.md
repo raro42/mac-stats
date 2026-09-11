@@ -1,28 +1,39 @@
 # Morning surprise — 2026-09-12
 
-Overnight Track B (20:00–06:00) shipped product instant-lane NL for Disk Cleanup.
+Overnight Track B kept shipping instant-lane NL so operator asks skip the slow path.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1020** | `/disk` NL: `view disk`, `see disk`, `show me the disk cleanup`, `open disk`, `list the disk cleanup` (+ close variants) → Disk Cleanup instant (On · Off · Reclaim · Big · Clean unchanged) |
-| **v0.1.1019** | `/monitors` NL expand (view/see/show me/open/list-the) |
-| **v0.1.1018** | `/processes` NL expand |
-| **v0.1.1017** | `/logs` NL + digester Slowest filters |
-| **v0.1.1016** | Agent Ops Schedules filter Clear chip |
-| **v0.1.1015** | Agent Ops Knowledge filter Clear chip |
-| **v0.1.1014** | Agent Ops Runs filter Clear chip |
+| **v0.1.1021** | `/schedules` — `view` / `see` / `show me` / `open` / `list the` schedules → Jobs · Deliveries instant |
+| **v0.1.1020** | `/disk` — same NL family for Disk Cleanup (On · Off · Reclaim · Big · Clean) |
+| **v0.1.1019** | `/monitors` — same NL family (Up · Down · Slow) |
+| **v0.1.1018** | `/processes` — same NL family (Hot · Pinned) |
+| **v0.1.1017** | `/logs` — view/see/show me/open/list + digester Slowest filters |
 
-## Tick notes (~00:43)
+## Also earlier in the window
 
-- Digester open: empty (did not quiet-default).
-- Design review: due=false (grace on feature screens).
-- Fuel: standing backlog p50 — `/disk` NL parity with `/logs` / `/processes` / `/monitors`.
-- Ratchet: keep @ 5653f79; push + install/kickstart.
+- Agent Ops filter Clear chips closed out through Schedules (**v0.1.1009–1016**).
+
+## Night health
+
+- Digester open: empty most ticks (standing backlog / design-review fuel).
+- Design review: grace (not due); CPU metrics screen oldest ~4.9d when due again.
+- Debug log scan: no ERROR/WARN/panic clusters in the watch window.
+- Ratchet: keeps landed in `results.tsv` (nightly minimum satisfied).
+
+## Try in AI Chat / Discord
+
+```text
+view schedules
+show me the schedules
+open schedules
+list the schedules
+```
 
 ## Next fuel
 
-- Digester open / debug.log product errors when present.
-- Design review when due (CPU metrics ~4.9d; Ops Clear gaps closed).
-- Next operator slash NL: `/schedules` or `/sessions` view/see/show me/open parity; sibling ports if digester stays empty.
+- `/sessions` NL parity (careful with `open ` exclusion).
+- Design review when due.
+- Digester open / product-owned debug.log errors when they appear.
