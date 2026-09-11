@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-11
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review was in grace. Fuel: Ops filter Clear parity.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review was in grace. Fuel: p50 Slowest noise + `/logs` NL.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1017** | Instant `/logs` NL: `view logs` · `see logs` · `show me the logs` · `open logs` · `list the logs`; digester drops historical Review logs + Instant wake-ups from Slowest/p50 |
 | **v0.1.1016** | Agent Ops Schedules: Clear chip beside All · Jobs · Deliveries (Knowledge / Runs / Sessions parity; Cleared flash; filter-miss Clear) — last Ops Clear gap |
 | **v0.1.1015** | Agent Ops Knowledge: Clear chip beside All · Discord · Core (Runs / Sessions / Agents parity; Cleared flash; filter-miss Clear) |
 | **v0.1.1014** | Agent Ops Runs: Clear chip beside All · Instant · Lite · Direct · Slow · Fail |
@@ -19,8 +20,8 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 
 - No digester open candidates; no debug.log ERROR/WARN clusters in the scan window.
 - Design review `due=false` (grace); recommended surface still CPU metrics (~4.8d) when TCC allows a recapture.
-- Ops chip Clear gaps closed (Schedules shipped).
+- Digester Slowest cleaned: wake-ups + Review logs no longer inflate p50.
 
 ## Head
 
-`82e97255` on `main` — Cargo.toml **0.1.1016**.
+`06c791d9` on `main` — Cargo.toml **0.1.1017**.
