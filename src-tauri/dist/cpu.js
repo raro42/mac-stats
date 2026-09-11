@@ -13829,6 +13829,17 @@ function ensurePerplexityFilterChips() {
       '<button type="button" class="perplexity-filter-chip" data-perplexity-filter="snippet" aria-pressed="false" title="Show results with preview text">Snippet <span class="perplexity-filter-count" data-perplexity-filter-count="snippet">0</span></button>';
     resultsEl.parentNode.insertBefore(wrap, resultsEl);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#perplexity-filter-clear, .perplexity-filter-clear');
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setPerplexityFilterMode('all');
+        flashPerplexityFilterClearBtn(clearBtn);
+        return;
+      }
       const btn =
         e.target && e.target.closest && e.target.closest('[data-perplexity-filter]');
       if (!btn || !wrap.contains(btn)) return;
@@ -13837,14 +13848,66 @@ function ensurePerplexityFilterChips() {
       setPerplexityFilterMode(btn.getAttribute('data-perplexity-filter') || 'all');
     });
   }
+  ensurePerplexityFilterClearBtn(wrap);
+  syncPerplexityFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
-/** Human label for the active non-All Perplexity filter (Filter attention glance). */
+/** Human label for the active non-All Perplexity filter (Filter attention / Clear). */
 function perplexityFilterAttentionLabel() {
   if (perplexityFilterMode === 'top') return 'Top';
   if (perplexityFilterMode === 'snippet') return 'Snippet';
   return '';
+}
+
+/** Brief Clear → Cleared flash (Debug Log / Disk / Monitors / Processes / AI Chat Clear parity). */
+function flashPerplexityFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncPerplexityFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·Top·Snippet when a filter is active. */
+function syncPerplexityFilterClearBtn() {
+  const btn = document.getElementById('perplexity-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!perplexityFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensurePerplexityFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('perplexity-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'perplexity-filter-clear';
+  btn.className = 'perplexity-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show every result (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
 }
 
 function setPerplexityFilterMode(mode) {
@@ -13857,6 +13920,7 @@ function setPerplexityFilterMode(mode) {
       btn.classList.toggle('is-active', on);
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
+  syncPerplexityFilterClearBtn();
   applyPerplexityResultsFilter();
   applyPerplexityLastGlanceState();
 }
@@ -13882,6 +13946,7 @@ function ensurePerplexityFilterMissState(resultsEl, show) {
       e.preventDefault();
       e.stopPropagation();
       setPerplexityFilterMode('all');
+      flashPerplexityFilterClearBtn(document.getElementById('perplexity-filter-clear'));
     });
   }
 }
@@ -13927,6 +13992,7 @@ function applyPerplexityResultsFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensurePerplexityFilterMissState(resultsEl, false);
+    syncPerplexityFilterClearBtn();
     applyPerplexityAttentionGlanceState();
     return;
   }
@@ -13943,6 +14009,7 @@ function applyPerplexityResultsFilter() {
   });
 
   ensurePerplexityFilterMissState(resultsEl, visible === 0);
+  syncPerplexityFilterClearBtn();
   syncPerplexityResultsTabOrder(resultsEl);
   applyPerplexityAttentionGlanceState();
 }

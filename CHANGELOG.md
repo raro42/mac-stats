@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1010] - 2026-09-11
 
+### Changed
+- Perplexity Search: Clear chip beside All · Top · Snippet when a filter is active (Debug Log / Disk Cleanup / Monitors / Top Processes / AI Chat Clear parity) — flashes Cleared, then returns to All; empty filter-miss Clear uses the same flash.
 
 ## [0.1.1009] - 2026-09-11
 
