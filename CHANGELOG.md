@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1020] - 2026-09-12
+
+### Added
+- Instant lane: more Disk Cleanup NL for `/disk` — `view disk`, `see disk`, `show me the disk cleanup`, `open disk`, `list the disk cleanup` (and close variants) join `disk cleanup` / `list cleanup` / On · Off · Reclaim · Big · Clean filters.
+
 ## [0.1.1019] - 2026-09-12
 
 ### Added

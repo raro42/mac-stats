@@ -2779,7 +2779,43 @@ pub fn looks_like_disk_cleanup_request(content: &str) -> bool {
             | "cleanup status"
             | "disk cleanup status"
             | "list cleanup"
+            | "list the cleanup"
+            | "list disk"
+            | "list the disk"
+            | "list disk cleanup"
+            | "list the disk cleanup"
             | "show cleanup"
+            | "show the cleanup"
+            | "show me cleanup"
+            | "show me the cleanup"
+            | "show disk"
+            | "show the disk"
+            | "show me disk"
+            | "show me the disk"
+            | "show disk cleanup"
+            | "show the disk cleanup"
+            | "show me disk cleanup"
+            | "show me the disk cleanup"
+            | "view cleanup"
+            | "view the cleanup"
+            | "view disk"
+            | "view the disk"
+            | "view disk cleanup"
+            | "view the disk cleanup"
+            | "see cleanup"
+            | "see the cleanup"
+            | "see disk"
+            | "see the disk"
+            | "see disk cleanup"
+            | "see the disk cleanup"
+            | "open cleanup"
+            | "open the cleanup"
+            | "open disk"
+            | "open the disk"
+            | "open disk cleanup"
+            | "open the disk cleanup"
+            | "the disk cleanup"
+            | "my disk cleanup"
             | "cleanup scopes"
             | "disk scopes"
             | "/disk on"
@@ -24277,6 +24313,44 @@ pub fn looks_like_disk_cleanup_age_request(content: &str) -> bool {
         || n == "disk cleanup"
         || n == "cleanup status"
         || n == "disk cleanup status"
+        || n == "list cleanup"
+        || n == "list the cleanup"
+        || n == "list disk"
+        || n == "list the disk"
+        || n == "list disk cleanup"
+        || n == "list the disk cleanup"
+        || n == "show cleanup"
+        || n == "show the cleanup"
+        || n == "show me cleanup"
+        || n == "show me the cleanup"
+        || n == "show disk"
+        || n == "show the disk"
+        || n == "show me disk"
+        || n == "show me the disk"
+        || n == "show disk cleanup"
+        || n == "show the disk cleanup"
+        || n == "show me disk cleanup"
+        || n == "show me the disk cleanup"
+        || n == "view cleanup"
+        || n == "view the cleanup"
+        || n == "view disk"
+        || n == "view the disk"
+        || n == "view disk cleanup"
+        || n == "view the disk cleanup"
+        || n == "see cleanup"
+        || n == "see the cleanup"
+        || n == "see disk"
+        || n == "see the disk"
+        || n == "see disk cleanup"
+        || n == "see the disk cleanup"
+        || n == "open cleanup"
+        || n == "open the cleanup"
+        || n == "open disk"
+        || n == "open the disk"
+        || n == "open disk cleanup"
+        || n == "open the disk cleanup"
+        || n == "the disk cleanup"
+        || n == "my disk cleanup"
         || n == "/disk on"
         || n == "disk on"
         || n == "/disk off"
@@ -24483,6 +24557,44 @@ pub fn looks_like_disk_cleanup_size_request(content: &str) -> bool {
         || n == "disk cleanup"
         || n == "cleanup status"
         || n == "disk cleanup status"
+        || n == "list cleanup"
+        || n == "list the cleanup"
+        || n == "list disk"
+        || n == "list the disk"
+        || n == "list disk cleanup"
+        || n == "list the disk cleanup"
+        || n == "show cleanup"
+        || n == "show the cleanup"
+        || n == "show me cleanup"
+        || n == "show me the cleanup"
+        || n == "show disk"
+        || n == "show the disk"
+        || n == "show me disk"
+        || n == "show me the disk"
+        || n == "show disk cleanup"
+        || n == "show the disk cleanup"
+        || n == "show me disk cleanup"
+        || n == "show me the disk cleanup"
+        || n == "view cleanup"
+        || n == "view the cleanup"
+        || n == "view disk"
+        || n == "view the disk"
+        || n == "view disk cleanup"
+        || n == "view the disk cleanup"
+        || n == "see cleanup"
+        || n == "see the cleanup"
+        || n == "see disk"
+        || n == "see the disk"
+        || n == "see disk cleanup"
+        || n == "see the disk cleanup"
+        || n == "open cleanup"
+        || n == "open the cleanup"
+        || n == "open disk"
+        || n == "open the disk"
+        || n == "open disk cleanup"
+        || n == "open the disk cleanup"
+        || n == "the disk cleanup"
+        || n == "my disk cleanup"
         || n == "/disk on"
         || n == "disk on"
         || n == "/disk off"
@@ -24682,6 +24794,44 @@ pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
         || n == "disk cleanup"
         || n == "cleanup status"
         || n == "disk cleanup status"
+        || n == "list cleanup"
+        || n == "list the cleanup"
+        || n == "list disk"
+        || n == "list the disk"
+        || n == "list disk cleanup"
+        || n == "list the disk cleanup"
+        || n == "show cleanup"
+        || n == "show the cleanup"
+        || n == "show me cleanup"
+        || n == "show me the cleanup"
+        || n == "show disk"
+        || n == "show the disk"
+        || n == "show me disk"
+        || n == "show me the disk"
+        || n == "show disk cleanup"
+        || n == "show the disk cleanup"
+        || n == "show me disk cleanup"
+        || n == "show me the disk cleanup"
+        || n == "view cleanup"
+        || n == "view the cleanup"
+        || n == "view disk"
+        || n == "view the disk"
+        || n == "view disk cleanup"
+        || n == "view the disk cleanup"
+        || n == "see cleanup"
+        || n == "see the cleanup"
+        || n == "see disk"
+        || n == "see the disk"
+        || n == "see disk cleanup"
+        || n == "see the disk cleanup"
+        || n == "open cleanup"
+        || n == "open the cleanup"
+        || n == "open disk"
+        || n == "open the disk"
+        || n == "open disk cleanup"
+        || n == "open the disk cleanup"
+        || n == "the disk cleanup"
+        || n == "my disk cleanup"
         || n == "/disk on"
         || n == "disk on"
         || n == "/disk off"
@@ -45353,7 +45503,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
-• `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
+• `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` · `view disk` · `see disk` · `show me the disk cleanup` · `open disk` · `list the disk cleanup` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
@@ -46086,12 +46236,16 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/disk` On/Off/Reclaim/Big/Clean operator asks (v0.1.710).
+    // `/disk` On/Off/Reclaim/Big/Clean operator asks (v0.1.710);
+    // view/see/show me/open NL (v0.1.1020).
     if (q.contains("/disk")
         || q.contains("/cleanup")
         || q.contains("disk cleanup")
         || q.contains("cleanup status")
         || q.contains("list cleanup")
+        || q.contains("list the cleanup")
+        || q.contains("list disk")
+        || q.contains("list the disk")
         || q.contains("cleanup scopes")
         || q.contains("reclaimable")
         || q.contains("disk reclaim")
@@ -46100,11 +46254,23 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("cleanup reclaim")
         || q.contains("cleanup on")
         || q.contains("cleanup off")
+        || q.contains("view cleanup")
+        || q.contains("view disk")
+        || q.contains("see cleanup")
+        || q.contains("see disk")
+        || q.contains("show me the cleanup")
+        || q.contains("show me the disk")
+        || q.contains("show me disk cleanup")
+        || q.contains("show disk cleanup")
+        || q.contains("open cleanup")
+        || q.contains("open disk")
         || q == "cleanup"
         || q == "reclaim"
         || q == "what's reclaimable"
         || q == "whats reclaimable"
-        || q == "what is reclaimable")
+        || q == "what is reclaimable"
+        || q == "the disk cleanup"
+        || q == "my disk cleanup")
         && !q.contains("why")
         && !q.contains("clean now")
         && !q.contains("run cleanup")
@@ -49825,6 +49991,12 @@ mod tests {
         assert!(looks_like_disk_cleanup_request("what's reclaimable"));
         assert!(looks_like_disk_cleanup_request("enabled scopes"));
         assert!(looks_like_disk_cleanup_request("cleanup scopes"));
+        assert!(looks_like_disk_cleanup_request("list the disk cleanup"));
+        assert!(looks_like_disk_cleanup_request("view disk"));
+        assert!(looks_like_disk_cleanup_request("see disk"));
+        assert!(looks_like_disk_cleanup_request("show me the disk cleanup"));
+        assert!(looks_like_disk_cleanup_request("open disk"));
+        assert!(looks_like_disk_cleanup_request("the disk cleanup"));
         assert!(!looks_like_disk_cleanup_request("clean now"));
         assert!(!looks_like_disk_cleanup_request("disk usage"));
         assert!(!looks_like_disk_cleanup_request("run cleanup"));
@@ -49853,6 +50025,11 @@ mod tests {
             parse_disk_cleanup_list_filter("clean categories"),
             DiskCleanupListFilter::Clean
         );
+        let view = try_operator_instant_reply("view disk").expect("view disk instant");
+        assert!(view.contains("Disk Cleanup"), "{view}");
+        let show_me = try_operator_instant_reply("show me the disk cleanup")
+            .expect("show me the disk cleanup");
+        assert!(show_me.contains("Disk Cleanup"), "{show_me}");
     }
 
     #[test]
