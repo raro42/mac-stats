@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1009] - 2026-09-11
+
+### Added
+- Debug Log filter Clear chip beside All · Error · Warn when a filter is active (Disk Cleanup / Monitors / Top Processes / AI Chat Clear parity; Cleared flash; filter-miss Clear filter CTA).
+
 ## [0.1.1008] - 2026-09-11
 
 ### Fixed

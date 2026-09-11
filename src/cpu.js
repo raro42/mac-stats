@@ -16439,6 +16439,63 @@ function ensureLogsToolbarKeyboard() {
   });
 }
 
+/** Human label for the active non-All Debug Log filter (Filter attention / Clear). */
+function logsFilterAttentionLabel() {
+  if (logsFilterMode === 'error') return 'Error';
+  if (logsFilterMode === 'warn') return 'Warn';
+  return '';
+}
+
+/** Brief Clear → Cleared flash (Disk Cleanup / Monitors / Top Processes / AI Chat Clear parity). */
+function flashLogsFilterClearBtn(btn) {
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.hidden = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    syncLogsFilterClearBtn();
+  }, 1600);
+}
+
+/** Show Clear beside All·Error·Warn when a filter is active. */
+function syncLogsFilterClearBtn() {
+  const btn = document.getElementById('logs-filter-clear');
+  if (!btn) return;
+  if (btn._clearFlashTimer) return;
+  const active = !!logsFilterAttentionLabel();
+  btn.hidden = !active;
+  if (!active) {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn.dataset.idleLabel || 'Clear';
+  }
+}
+
+function ensureLogsFilterClearBtn(wrap) {
+  if (!wrap) return null;
+  let btn = document.getElementById('logs-filter-clear');
+  if (btn) return btn;
+  btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'logs-filter-clear';
+  btn.className = 'logs-filter-clear';
+  btn.hidden = true;
+  btn.dataset.idleLabel = 'Clear';
+  btn.setAttribute('aria-label', 'Clear filter');
+  btn.title = 'Clear filter — show the full log tail (All)';
+  btn.textContent = 'Clear';
+  wrap.appendChild(btn);
+  return btn;
+}
+
 function ensureLogsFilterChips() {
   const toolbar = document.querySelector('#logs-content .logs-toolbar') || document.querySelector('.logs-toolbar');
   if (!toolbar) return;
@@ -16455,6 +16512,17 @@ function ensureLogsFilterChips() {
       '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count" data-logs-filter-count="warn">0</span></button>';
     toolbar.appendChild(wrap);
     wrap.addEventListener('click', (e) => {
+      const clearBtn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#logs-filter-clear, .logs-filter-clear');
+      if (clearBtn && wrap.contains(clearBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        setLogsFilterMode('all');
+        flashLogsFilterClearBtn(clearBtn);
+        return;
+      }
       const btn = e.target && e.target.closest && e.target.closest('[data-logs-filter]');
       if (!btn || !wrap.contains(btn)) return;
       e.preventDefault();
@@ -16462,6 +16530,8 @@ function ensureLogsFilterChips() {
       setLogsFilterMode(btn.getAttribute('data-logs-filter') || 'all');
     });
   }
+  ensureLogsFilterClearBtn(wrap);
+  syncLogsFilterClearBtn();
   wireFilterChipToolbarKeyboard(wrap);
 }
 
@@ -16475,6 +16545,7 @@ function setLogsFilterMode(mode) {
     btn.classList.toggle('is-active', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
+  syncLogsFilterClearBtn();
   applyLogsFilter(true);
 }
 
@@ -16798,20 +16869,44 @@ function applyLogsFilter(scrollToEnd) {
       logsFilterMode === 'error'
         ? 'Nothing here yet — no ERROR lines in this tail'
         : 'Nothing here yet — no WARN lines in this tail';
-    const key = `miss|${logsFilterMode}|${prefix}|${empty}`;
-    if (key === logsViewerRenderKey && viewer.querySelector('.logs-viewer-empty')) {
+    const key = `miss|${logsFilterMode}|${prefix}|${empty}|clear`;
+    if (
+      key === logsViewerRenderKey &&
+      viewer.querySelector('.logs-viewer-empty.logs-filter-miss')
+    ) {
       ensureLogsKbHint(viewer, false);
+      syncLogsFilterClearBtn();
       return;
     }
     logsViewerRenderKey = key;
     logsSelectedLineText = '';
     viewer.replaceChildren();
     const emptyEl = document.createElement('div');
-    emptyEl.className = 'logs-viewer-empty';
-    emptyEl.textContent = prefix + empty;
+    emptyEl.className = 'logs-viewer-empty logs-filter-miss';
+    emptyEl.setAttribute('role', 'status');
+    const msg = document.createElement('div');
+    msg.className = 'logs-filter-miss-msg';
+    msg.textContent = prefix + empty;
+    const hint = document.createElement('div');
+    hint.className = 'logs-filter-miss-hint';
+    hint.textContent = 'Try All, or clear the level filter.';
+    const cta = document.createElement('button');
+    cta.type = 'button';
+    cta.className = 'logs-filter-miss-cta logs-clear-filter';
+    cta.textContent = 'Clear filter';
+    cta.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setLogsFilterMode('all');
+      flashLogsFilterClearBtn(document.getElementById('logs-filter-clear'));
+    });
+    emptyEl.appendChild(msg);
+    emptyEl.appendChild(hint);
+    emptyEl.appendChild(cta);
     viewer.appendChild(emptyEl);
     viewer.classList.add('is-empty');
     ensureLogsKbHint(viewer, false);
+    syncLogsFilterClearBtn();
     return;
   }
 
