@@ -3062,7 +3062,25 @@ pub fn looks_like_debug_log_request(content: &str) -> bool {
             | "debug log"
             | "debug logs"
             | "show logs"
+            | "show the logs"
+            | "show me the logs"
+            | "show me logs"
+            | "the logs"
+            | "the log"
             | "list logs"
+            | "list the logs"
+            | "view logs"
+            | "view the logs"
+            | "view log"
+            | "view the log"
+            | "see logs"
+            | "see the logs"
+            | "see log"
+            | "see the log"
+            | "open logs"
+            | "open the logs"
+            | "open log"
+            | "open the log"
             | "review logs"
             | "review log"
             | "review the logs"
@@ -45254,7 +45272,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
-• `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` — Debug Log Error/Warn list\n\
+• `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
 • `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
@@ -46009,13 +46027,25 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/logs` Error/Warn operator asks (v0.1.711); review/check NL (v0.1.888).
+    // `/logs` Error/Warn operator asks (v0.1.711); review/check NL (v0.1.888);
+    // view/see/show me/open NL (v0.1.1017).
     if (q.contains("/logs")
         || q.contains("/log")
         || q.contains("debug log")
         || q.contains("debug logs")
         || q.contains("show logs")
+        || q.contains("show the logs")
+        || q.contains("show me the logs")
+        || q.contains("show me logs")
         || q.contains("list logs")
+        || q.contains("list the logs")
+        || q.contains("view logs")
+        || q.contains("view the logs")
+        || q.contains("view log")
+        || q.contains("see logs")
+        || q.contains("see the logs")
+        || q.contains("open logs")
+        || q.contains("open the logs")
         || q.contains("review logs")
         || q.contains("review log")
         || q.contains("review the logs")
@@ -49727,11 +49757,18 @@ mod tests {
         assert!(looks_like_debug_log_request("check the log"));
         assert!(looks_like_debug_log_request("look at the logs"));
         assert!(looks_like_debug_log_request("read logs"));
+        assert!(looks_like_debug_log_request("view logs"));
+        assert!(looks_like_debug_log_request("view the logs"));
+        assert!(looks_like_debug_log_request("see the logs"));
+        assert!(looks_like_debug_log_request("show me the logs"));
+        assert!(looks_like_debug_log_request("open logs"));
+        assert!(looks_like_debug_log_request("list the logs"));
         assert!(!looks_like_debug_log_request("why is there an error"));
         assert!(!looks_like_debug_log_request("fix the error"));
         assert!(!looks_like_debug_log_request("explain the warning"));
         assert!(!looks_like_debug_log_request("clear log"));
         assert!(!looks_like_debug_log_request("review logs for redmine"));
+        assert!(!looks_like_debug_log_request("open in editor"));
         assert_eq!(
             parse_debug_log_list_filter("/logs"),
             DebugLogListFilter::All
@@ -49740,10 +49777,22 @@ mod tests {
             parse_debug_log_list_filter("Review logs"),
             DebugLogListFilter::All
         );
+        assert_eq!(
+            parse_debug_log_list_filter("view the logs"),
+            DebugLogListFilter::All
+        );
         let review = try_operator_instant_reply("Review logs").expect("review logs instant");
         assert!(
             review.to_lowercase().contains("debug log"),
             "{review}"
+        );
+        let view = try_operator_instant_reply("view logs").expect("view logs instant");
+        assert!(view.to_lowercase().contains("debug log"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the logs").expect("show me the logs instant");
+        assert!(
+            show_me.to_lowercase().contains("debug log"),
+            "{show_me}"
         );
         assert_eq!(
             parse_debug_log_list_filter("/logs error"),

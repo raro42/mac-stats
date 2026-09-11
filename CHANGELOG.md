@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1017] - 2026-09-11
+
+### Added
+- Instant lane: more Debug Log NL for `/logs` — `view logs`, `see logs`, `show me the logs`, `open logs`, `list the logs` (and close variants) join `review logs` / `check logs`; digester Slowest/p50 also drops historical `Review logs` lite+BRAVE and Instant wake-up Discord overhead (~2–3s).
+
 ## [0.1.1016] - 2026-09-11
 
 ### Added

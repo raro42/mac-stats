@@ -134,6 +134,90 @@ def looks_like_wakeup(q: str) -> bool:
     return "wake-up" in q or "wakeup" in q or "wake up" in q
 
 
+def looks_like_debug_log_list_ask(q: str) -> bool:
+    """Short Debug Log list asks now Instant (`/logs`, review/check/view/see/open).
+
+    Historical lite+BRAVE `Review logs` turns (pre-v0.1.888) must not inflate Slowest/p50.
+    """
+    n = (q or "").strip().lower().rstrip("?").strip()
+    if not n or len(n) > 48:
+        return False
+    if any(
+        x in n
+        for x in (
+            "why",
+            "fix",
+            "explain",
+            "how to",
+            " for ",
+            " about ",
+            "ticket",
+            "redmine",
+            "clear log",
+            "rotate",
+            "open in",
+            "editor",
+            "path",
+            "where is",
+            "how big",
+            "how old",
+            "size",
+            "age",
+            "count",
+            "how many",
+        )
+    ):
+        return False
+    exact = {
+        "logs",
+        "log",
+        "/logs",
+        "/log",
+        "debug log",
+        "debug logs",
+        "show logs",
+        "show the logs",
+        "show me the logs",
+        "show me logs",
+        "the logs",
+        "the log",
+        "list logs",
+        "list the logs",
+        "view logs",
+        "view the logs",
+        "view log",
+        "view the log",
+        "see logs",
+        "see the logs",
+        "see log",
+        "see the log",
+        "open logs",
+        "open the logs",
+        "open log",
+        "open the log",
+        "review logs",
+        "review log",
+        "review the logs",
+        "review the log",
+        "check logs",
+        "check log",
+        "check the logs",
+        "check the log",
+        "look at logs",
+        "look at the logs",
+        "look at log",
+        "look at the log",
+        "read logs",
+        "read the logs",
+        "read log",
+        "read the log",
+        "log tail",
+        "logs tail",
+        "tail logs",
+    }
+    return n in exact
+
+
 def looks_like_overnight_improvements(q: str) -> bool:
     ql = (q or "").lower()
     if ("mac-stats" in ql or "mac stats" in ql) and (
@@ -872,9 +956,12 @@ def looks_like_ollama_ready(q: str) -> bool:
 
 def is_now_instant_slowest_noise(r: dict) -> bool:
     """Drop historical turns from Slowest when they match shipped instant patterns."""
-    if (r.get("lane") or "") == "instant":
-        return is_trivial_instant_noise(r)
     q = (r.get("question_preview") or "").lower()
+    # Scheduled wake-ups are Instant but often 2–3s Discord overhead — not product debt.
+    if (r.get("lane") or "") == "instant":
+        if looks_like_wakeup(q):
+            return True
+        return is_trivial_instant_noise(r)
     tools = r.get("tools") or []
     tool_steps = int(r.get("tool_steps") or 0)
     ts = parse_ts(str(r.get("ts", "")))
@@ -939,6 +1026,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_travel_plan(q)
         or looks_like_bare_news_ask(q)
         or looks_like_topic_dump(q)
+        # `/logs` NL (v0.1.888+) — historical Review logs + BRAVE must not inflate p50.
+        or looks_like_debug_log_list_ask(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency
