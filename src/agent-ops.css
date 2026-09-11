@@ -6155,6 +6155,52 @@ textarea.ops-agent-editor.is-dirty {
   padding: 0 2px;
 }
 
+/* Clear beside All·Instant·Lite·Direct·Slow·Fail when a lane filter is active (Agents / Sessions Clear parity). */
+.ops-runs-lane-filter-clear {
+  flex: 0 0 auto;
+  margin-left: auto;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.92;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ops-runs-lane-filter-clear[hidden] {
+  display: none !important;
+}
+
+.ops-runs-lane-filter-clear:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, transparent);
+}
+
+.ops-runs-lane-filter-clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+}
+
+.ops-runs-lane-filter-clear.is-just-saved {
+  opacity: 1;
+  background: color-mix(in srgb, #34c759 16%, transparent);
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
+
 .ops-runs-lane-chip {
   appearance: none;
   display: inline-flex;

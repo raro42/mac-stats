@@ -361,8 +361,14 @@
       runs: {
         id: 'ops-runs-filter',
         clear() {
+          const laneWasActive = !!opsRunsFilterAttentionLabel();
           opsRunsFilterQ = '';
           setOpsRunsLaneFilter('all');
+          if (laneWasActive) {
+            flashOpsRunsLaneFilterClearBtn(
+              document.getElementById('ops-runs-lane-filter-clear')
+            );
+          }
         },
       },
       agents: {
@@ -1873,6 +1879,56 @@ function ensureOpsRunsFilter() {
     });
 }
 
+/** Flash Cleared on Runs lane Clear (Agents / Sessions / Processes parity). */
+function flashOpsRunsLaneFilterClearBtn(btn) {
+    if (!btn) return;
+    if (btn._clearFlashTimer) {
+        clearTimeout(btn._clearFlashTimer);
+        btn._clearFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Clear';
+    btn.dataset.idleLabel = idle;
+    btn.hidden = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Cleared';
+    btn._clearFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn._clearFlashTimer = null;
+        syncOpsRunsLaneFilterClearBtn();
+    }, 1600);
+}
+
+/** Show Clear beside All·Instant·Lite·Direct·Slow·Fail when a lane filter is active. */
+function syncOpsRunsLaneFilterClearBtn() {
+    const btn = document.getElementById('ops-runs-lane-filter-clear');
+    if (!btn) return;
+    if (btn._clearFlashTimer) return;
+    const active = !!opsRunsFilterAttentionLabel();
+    btn.hidden = !active;
+    if (!active) {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = btn.dataset.idleLabel || 'Clear';
+    }
+}
+
+function ensureOpsRunsLaneFilterClearBtn(wrap) {
+    if (!wrap) return null;
+    let btn = document.getElementById('ops-runs-lane-filter-clear');
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ops-runs-lane-filter-clear';
+    btn.className = 'ops-runs-lane-filter-clear';
+    btn.hidden = true;
+    btn.dataset.idleLabel = 'Clear';
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter — show every run lane (All)';
+    btn.textContent = 'Clear';
+    wrap.appendChild(btn);
+    return btn;
+}
+
 /** All · Instant · Lite · Direct · Slow · Fail chips (Monitors Slow / AI Chat Errors parity). */
 function ensureOpsRunsLaneChips() {
     const panel = document.getElementById('ops-panel-runs');
@@ -1893,7 +1949,21 @@ function ensureOpsRunsLaneChips() {
             `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>` +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.dataset.opsRunsLaneClearBound = '1';
         wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-runs-lane-filter-clear, .ops-runs-lane-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsRunsLaneFilter('all');
+                flashOpsRunsLaneFilterClearBtn(clearBtn);
+                return;
+            }
             const btn =
                 e.target && e.target.closest && e.target.closest('[data-ops-runs-lane]');
             if (!btn || !wrap.contains(btn)) return;
@@ -1935,7 +2005,26 @@ function ensureOpsRunsLaneChips() {
                 'Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span>';
             wrap.appendChild(failBtn);
         }
+        if (wrap.dataset.opsRunsLaneClearBound !== '1') {
+            wrap.dataset.opsRunsLaneClearBound = '1';
+            wrap.addEventListener('click', (e) => {
+                const clearBtn =
+                    e.target &&
+                    e.target.closest &&
+                    e.target.closest(
+                        '#ops-runs-lane-filter-clear, .ops-runs-lane-filter-clear'
+                    );
+                if (clearBtn && wrap.contains(clearBtn)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpsRunsLaneFilter('all');
+                    flashOpsRunsLaneFilterClearBtn(clearBtn);
+                }
+            });
+        }
     }
+    ensureOpsRunsLaneFilterClearBtn(wrap);
+    syncOpsRunsLaneFilterClearBtn();
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
     }
@@ -1969,6 +2058,7 @@ function runsRowIsFail(r) {
 function paintOpsRunsLaneChips() {
     const wrap = document.getElementById('ops-runs-lane-chips');
     if (!wrap) return;
+    ensureOpsRunsLaneFilterClearBtn(wrap);
     const recent = Array.isArray(opsRunsInsightsCache?.recent)
         ? opsRunsInsightsCache.recent
         : [];
@@ -2004,6 +2094,7 @@ function paintOpsRunsLaneChips() {
             btn.classList.toggle('has-hits', failN > 0);
         }
     });
+    syncOpsRunsLaneFilterClearBtn();
     applyOpsRunsFilterAttentionGlanceState();
     // Fail/Slow strip may hide when Fail/Slow Filter is active on Runs.
     applyOpsRunsAttentionGlanceState();

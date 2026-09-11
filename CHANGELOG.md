@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1014] - 2026-09-11
+
+### Added
+- Agent Ops Runs: Clear chip beside All · Instant · Lite · Direct · Slow · Fail when a lane filter is active (Agents / Sessions / Processes Clear parity) — flashes Cleared, then returns to All; filter-miss Clear filter CTA uses the same flash when a lane was on.
+
 ## [0.1.1013] - 2026-09-11
 
 ### Added
