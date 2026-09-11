@@ -1,17 +1,21 @@
 # Morning surprise — 2026-09-11
 
-Overnight Track B kept shipping. Digester open stayed empty; fuel came from standing backlog + design-review Clear chips earlier.
+Overnight Track B kept shipping operator instant lanes and filter Clear chips.
 
-| Version | What shipped |
-| --- | --- |
-| **v0.1.1001** | Instant lane: harness loop **stderr** age (`overnight_harness_loop.stderr.log`) |
-| **v0.1.1000** | Instant lane: harness loop **stderr** size (`overnight_harness_loop.stderr.log`) |
-| **v0.1.999** | Instant lane: harness loop **stderr** path (`overnight_harness_loop.stderr.log`) |
-| **v0.1.998** | Disk Cleanup filter Clear chip (All · Reclaim · Big · Clean) |
-| **v0.1.997** | External / Monitors filter Clear chip (All · Up · Down · Slow) |
-| **v0.1.996** | Top Processes filter Clear chip (All · Pinned · Hot) |
-| **v0.1.995** | Instant lane: harness loop stdout age |
-| **v0.1.994** | Instant lane: harness loop stdout size |
-| **v0.1.993** | Instant lane: harness loop stdout path |
+## Shipped tonight
+| Version | What |
+|---------|------|
+| **v0.1.1002** | Instant: `launchd.stderr.log` path |
+| **v0.1.1001** | Instant: harness loop stderr age |
+| **v0.1.1000** | Instant: harness loop stderr size |
+| **v0.1.999** | Instant: harness loop stderr path |
+| **v0.1.998** | Disk Cleanup filter Clear chip |
+| **v0.1.997** | Monitors filter Clear chip |
+| **v0.1.996** | Top Processes filter Clear chip |
 
-Next: digester open / debug.log product errors · design review when due · sibling ports when they clearly fit.
+## Digester
+Open candidates: none. Night pulled standing backlog (p50 latency) + design-review Clear chips earlier.
+
+## Next
+- `launchd stderr` size/age; `launchd.stdout` path triad
+- Design review when due (CPU metrics screen ~4d in grace)
