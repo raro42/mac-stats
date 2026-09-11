@@ -14051,6 +14051,200 @@ pub fn format_launchd_stdout_size_gateway() -> String {
     }
 }
 
+/// True for short “how old is launchd.stdout.log / launchd stdout age…” asks.
+/// Mtime only — does not dump/tail or steal path / size / harness loop stdout / stderr /
+/// overnight_agent.log / debug.log / LaunchAgent plist / launchd.stderr / morning surprise /
+/// improvements / loop backlog / sibling / standing.
+pub fn looks_like_launchd_stdout_age_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Path/size reserved — keyword-only (no nest).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("stderr")
+        || n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("launchd"))
+        || (n.contains("harness")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("launchd"))
+        || n.contains("overnight_harness_loop")
+        || n.contains("overnight-harness-loop")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || (n.contains("harness") && n.contains("stdout"))
+        || n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("launchd"))
+        || n == "log age"
+        || n == "log file age"
+        || n == "how old is the log"
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("backlog")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains("launch-agent")
+        || n.contains("launch_agent")
+        || n.contains(".plist")
+        || n.contains("runs.jsonl")
+        || n.contains("runs age")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("improvements age")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n == "improvements"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    if matches!(
+        n.as_str(),
+        "launchd stdout age"
+            | "launchd stdout log age"
+            | "launchd.stdout.log age"
+            | "launchd.stdout age"
+            | "launchd-stdout age"
+            | "launchd-stdout.log age"
+            | "mac-stats launchd stdout age"
+            | "mac stats launchd stdout age"
+            | "mac-stats launchd stdout log age"
+            | "how old is launchd.stdout.log"
+            | "how old is the launchd.stdout.log"
+            | "how old is launchd stdout"
+            | "how old is the launchd stdout"
+            | "how old is launchd stdout log"
+            | "how old is the launchd stdout log"
+            | "when was launchd.stdout.log updated"
+            | "when was the launchd.stdout.log updated"
+            | "when was launchd stdout updated"
+            | "when was the launchd stdout updated"
+            | "when was launchd stdout log updated"
+            | "launchd.stdout.log last modified"
+            | "launchd stdout last modified"
+            | "is launchd.stdout.log stale"
+            | "is launchd stdout stale"
+            | "is the launchd stdout stale"
+            | "is the launchd stdout log stale"
+    ) {
+        return true;
+    }
+    let launchd_ctx = n.contains("launchd.stdout")
+        || n.contains("launchd stdout")
+        || n.contains("launchd-stdout")
+        || (n.contains("launchd") && n.contains("stdout"));
+    let ageish = n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("updated")
+        || n.contains("modified");
+    launchd_ctx && ageish
+}
+
+/// Zero-LLM launchd.stdout.log age from file mtime (stat only; no dump/tail).
+pub fn format_launchd_stdout_age_gateway() -> String {
+    let path = crate::config::Config::launchd_stdout_log_path();
+    if !path.exists() {
+        return "**Launchd stdout:** no file yet · LaunchAgent creates it when the app runs · `launchd stdout path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).and_then(|m| m.modified()) {
+        Ok(modified) => {
+            let ms = modified
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
+            let age = age_from_ms(ms);
+            format!(
+                "**Launchd stdout:** last write **{age}** ago · app LaunchAgent stdout redirect · `launchd stdout path` for the file · `launchd stdout size` for on-disk bytes · `harness loop stdout age` for Track B loop stdout · `debug.log age` for the app log."
+            )
+        }
+        Err(e) => format!("**Launchd stdout** — could not stat file: {e}"),
+    }
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -44225,9 +44419,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
-    // launchd.stdout.log size before path (app LaunchAgent stdout redirect; no dump/tail).
+    // launchd.stdout.log size before age before path (app LaunchAgent stdout redirect; no dump/tail).
     if looks_like_launchd_stdout_size_request(content) {
         return Some(format_launchd_stdout_size_gateway());
+    }
+    if looks_like_launchd_stdout_age_request(content) {
+        return Some(format_launchd_stdout_age_gateway());
     }
     if looks_like_launchd_stdout_path_request(content) {
         return Some(format_launchd_stdout_path_gateway());
@@ -44670,9 +44867,12 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
-    // launchd.stdout.log size before path (app LaunchAgent stdout redirect; no dump/tail).
+    // launchd.stdout.log size before age before path (app LaunchAgent stdout redirect; no dump/tail).
     if looks_like_launchd_stdout_size_request(content) {
         return Some(format_launchd_stdout_size_gateway());
+    }
+    if looks_like_launchd_stdout_age_request(content) {
+        return Some(format_launchd_stdout_age_gateway());
     }
     if looks_like_launchd_stdout_path_request(content) {
         return Some(format_launchd_stdout_path_gateway());
@@ -45095,6 +45295,7 @@ pub fn format_ops_help_gateway() -> String {
 • `launchd stderr age` · `how old is launchd.stderr.log` · `launchd.stderr.log age` · `mac-stats launchd stderr age` · `when was launchd stderr updated` — `~/.mac-stats/launchd.stderr.log` last write age (mtime; no dump/tail; does not steal path / size / harness loop stderr / LaunchAgent plist / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `launchd stdout path` · `where is launchd.stdout.log` · `launchd.stdout.log path` · `mac-stats launchd stdout path` — `~/.mac-stats/launchd.stdout.log` path only (no dump/tail; does not steal harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `launchd stdout size` / `launchd stdout age` for bytes / mtime)\n\
 • `launchd stdout size` · `how big is launchd.stdout.log` · `launchd.stdout.log size` · `mac-stats launchd stdout size` — `~/.mac-stats/launchd.stdout.log` size on disk (stat only; no dump/tail; does not steal path / age / harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
+• `launchd stdout age` · `how old is launchd.stdout.log` · `launchd.stdout.log age` · `mac-stats launchd stdout age` · `when was launchd stdout updated` — `~/.mac-stats/launchd.stdout.log` last write age (mtime; no dump/tail; does not steal path / size / harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr size` · `how big is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log size` · `harness stderr size` — overnight_harness_loop.stderr.log size on disk (stat only; no dump/tail; does not steal path / age / overnight_agent.log / stdout / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr age` · `how old is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log age` · `harness stderr age` · `when was harness loop stderr updated` — overnight_harness_loop.stderr.log last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stdout / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
@@ -46705,6 +46906,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_launchd_stdout_size_request(question) {
         return true;
     }
+    // Read-only launchd.stdout.log age asks (v0.1.1007) — mtime only; no dump/tail.
+    if looks_like_launchd_stdout_age_request(question) {
+        return true;
+    }
     // Read-only launchd.stdout.log path asks (v0.1.1005) — config only; no dump/tail.
     if looks_like_launchd_stdout_path_request(question) {
         return true;
@@ -47087,6 +47292,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only launchd.stdout.log size asks (v0.1.1006) — stat only; no dump/tail.
     if looks_like_launchd_stdout_size_request(question) {
+        return true;
+    }
+    // Read-only launchd.stdout.log age asks (v0.1.1007) — mtime only; no dump/tail.
+    if looks_like_launchd_stdout_age_request(question) {
         return true;
     }
     // Read-only launchd.stdout.log path asks (v0.1.1005) — config only; no dump/tail.
@@ -55300,6 +55509,92 @@ mod tests {
         assert!(
             !reply.contains("Debug Log:") || reply.contains("debug.log size"),
             "must not steal debug.log size lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn launchd_stdout_age_request_detected() {
+        assert!(looks_like_launchd_stdout_age_request("launchd stdout age"));
+        assert!(looks_like_launchd_stdout_age_request(
+            "launchd.stdout.log age"
+        ));
+        assert!(looks_like_launchd_stdout_age_request(
+            "how old is launchd.stdout.log"
+        ));
+        assert!(looks_like_launchd_stdout_age_request(
+            "how old is the launchd stdout log"
+        ));
+        assert!(looks_like_launchd_stdout_age_request(
+            "mac-stats launchd stdout age"
+        ));
+        assert!(looks_like_launchd_stdout_age_request(
+            "when was launchd stdout updated"
+        ));
+        assert!(looks_like_launchd_stdout_age_request(
+            "is the launchd stdout stale"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request("launchd stdout path"));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "where is launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request("launchd stdout size"));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "how big is launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "harness loop stdout age"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "how old is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request("debug.log age"));
+        assert!(!looks_like_launchd_stdout_age_request("log file age"));
+        assert!(!looks_like_launchd_stdout_age_request("how old is the log"));
+        assert!(!looks_like_launchd_stdout_age_request("morning surprise age"));
+        assert!(!looks_like_launchd_stdout_age_request("improvements age"));
+        assert!(!looks_like_launchd_stdout_age_request("loop backlog age"));
+        assert!(!looks_like_launchd_stdout_age_request("standing backlog age"));
+        assert!(!looks_like_launchd_stdout_age_request("sibling harness age"));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "launchd.stderr.log age"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request(
+            "tail launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_age_request("dump launchd stdout"));
+        assert!(!looks_like_harness_loop_stdout_age_request(
+            "launchd stdout age"
+        ));
+        assert!(!looks_like_debug_log_age_request("launchd stdout age"));
+        assert!(!looks_like_launchd_stdout_path_request("launchd stdout age"));
+        assert!(!looks_like_launchd_stdout_size_request("launchd stdout age"));
+        assert!(!looks_like_launchd_stderr_age_request("launchd stdout age"));
+        assert!(!looks_like_launchagent_age_request("launchd stdout age"));
+        let reply = try_operator_instant_reply("how old is launchd.stdout.log")
+            .expect("launchd stdout age instant");
+        assert!(
+            reply.contains("Launchd stdout") || reply.contains("launchd.stdout"),
+            "expected launchd stdout age reply: {reply}"
+        );
+        assert!(
+            reply.contains("ago")
+                || reply.contains("no file yet")
+                || reply.contains("could not stat"),
+            "expected age reply: {reply}"
+        );
+        assert!(
+            !reply.contains("Launchd stderr:")
+                || reply.contains("launchd stderr age"),
+            "must not steal launchd stderr age lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Harness loop stdout:")
+                || reply.contains("harness loop stdout age"),
+            "must not steal harness loop stdout age lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Debug Log:") || reply.contains("debug.log age"),
+            "must not steal debug.log age lane: {reply}"
         );
     }
 
