@@ -6,6 +6,7 @@ Overnight Track B kept shipping instant-lane NL so operator asks skip the slow p
 
 | Version | What |
 |---------|------|
+| **v0.1.1022** | `/sessions` — `view` / `see` / `show me` / `open` / `list the` sessions → Live · Files instant (exact `open sessions` only; singular `open session …` stays with the agent) |
 | **v0.1.1021** | `/schedules` — `view` / `see` / `show me` / `open` / `list the` schedules → Jobs · Deliveries instant |
 | **v0.1.1020** | `/disk` — same NL family for Disk Cleanup (On · Off · Reclaim · Big · Clean) |
 | **v0.1.1019** | `/monitors` — same NL family (Up · Down · Slow) |
@@ -26,14 +27,14 @@ Overnight Track B kept shipping instant-lane NL so operator asks skip the slow p
 ## Try in AI Chat / Discord
 
 ```text
-view schedules
-show me the schedules
-open schedules
-list the schedules
+view sessions
+show me the sessions
+open sessions
+list the sessions
 ```
 
 ## Next fuel
 
-- `/sessions` NL parity (careful with `open ` exclusion).
+- `/knowledge` NL parity (view/see/show me/open/list-the).
 - Design review when due.
 - Digester open / product-owned debug.log errors when they appear.
