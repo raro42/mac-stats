@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1013] - 2026-09-11
+
+### Added
+- Agent Ops Agents: Clear chip beside All · On · Off when an enabled filter is active (Sessions / Processes / Disk Clear parity) — flashes Cleared, then returns to All; filter-miss Clear filter CTA uses the same flash when On/Off was on.
+
 ## [0.1.1012] - 2026-09-11
 
 ### Added

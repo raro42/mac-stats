@@ -368,8 +368,14 @@
       agents: {
         id: 'ops-agents-filter',
         clear() {
+          const kindWasActive = !!opsAgentsFilterAttentionLabel();
           opsAgentsFilterQ = '';
           setOpsAgentsEnabledFilter('all');
+          if (kindWasActive) {
+            flashOpsAgentsEnabledFilterClearBtn(
+              document.getElementById('ops-agents-enabled-filter-clear')
+            );
+          }
         },
       },
       schedules: {
@@ -4279,6 +4285,56 @@ function ensureOpsAgentsFilter() {
     });
 }
 
+/** Flash Cleared on Agents enabled Clear (Sessions / Processes / Disk parity). */
+function flashOpsAgentsEnabledFilterClearBtn(btn) {
+    if (!btn) return;
+    if (btn._clearFlashTimer) {
+        clearTimeout(btn._clearFlashTimer);
+        btn._clearFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Clear';
+    btn.dataset.idleLabel = idle;
+    btn.hidden = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Cleared';
+    btn._clearFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn._clearFlashTimer = null;
+        syncOpsAgentsEnabledFilterClearBtn();
+    }, 1600);
+}
+
+/** Show Clear beside All·On·Off when On or Off is active. */
+function syncOpsAgentsEnabledFilterClearBtn() {
+    const btn = document.getElementById('ops-agents-enabled-filter-clear');
+    if (!btn) return;
+    if (btn._clearFlashTimer) return;
+    const active = !!opsAgentsFilterAttentionLabel();
+    btn.hidden = !active;
+    if (!active) {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = btn.dataset.idleLabel || 'Clear';
+    }
+}
+
+function ensureOpsAgentsEnabledFilterClearBtn(wrap) {
+    if (!wrap) return null;
+    let btn = document.getElementById('ops-agents-enabled-filter-clear');
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ops-agents-enabled-filter-clear';
+    btn.className = 'ops-agents-enabled-filter-clear';
+    btn.hidden = true;
+    btn.dataset.idleLabel = 'Clear';
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter — show every agent (All)';
+    btn.textContent = 'Clear';
+    wrap.appendChild(btn);
+    return btn;
+}
+
 /** All · On · Off chips (Sessions / Monitors filter parity). */
 function ensureOpsAgentsEnabledChips() {
     const panel = document.getElementById('ops-panel-agents');
@@ -4297,12 +4353,27 @@ function ensureOpsAgentsEnabledChips() {
             '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="off">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
         wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-agents-enabled-filter-clear, .ops-agents-enabled-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsAgentsEnabledFilter('all');
+                flashOpsAgentsEnabledFilterClearBtn(clearBtn);
+                return;
+            }
             const btn =
                 e.target && e.target.closest && e.target.closest('[data-ops-agents-enabled]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsAgentsEnabledFilter(btn.getAttribute('data-ops-agents-enabled') || 'all');
         });
     }
+    ensureOpsAgentsEnabledFilterClearBtn(wrap);
+    syncOpsAgentsEnabledFilterClearBtn();
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
     }
@@ -4319,6 +4390,7 @@ function setOpsAgentsEnabledFilter(mode) {
 function paintOpsAgentsEnabledChips() {
     const wrap = document.getElementById('ops-agents-enabled-chips');
     if (!wrap) return;
+    ensureOpsAgentsEnabledFilterClearBtn(wrap);
     const all = opsAgentsCache || [];
     const onN = all.filter((a) => a.enabled).length;
     const offN = all.length - onN;
@@ -4337,6 +4409,7 @@ function paintOpsAgentsEnabledChips() {
             btn.classList.toggle('has-hits', offN > 0);
         }
     });
+    syncOpsAgentsEnabledFilterClearBtn();
     applyOpsAgentsFilterAttentionGlanceState();
 }
 
