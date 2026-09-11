@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1018] - 2026-09-11
+
+### Added
+- Instant lane: more Top Processes NL for `/processes` — `view processes`, `see processes`, `show me the processes`, `open processes`, `list the processes` (and close variants) join `top processes` / `show processes` / Hot · Pinned filters.
+
 ## [0.1.1017] - 2026-09-11
 
 ### Added

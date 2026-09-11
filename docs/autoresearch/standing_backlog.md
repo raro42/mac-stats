@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.1018** — Instant lane: more Top Processes NL (`view processes`, `see processes`, `show me the processes`, `open processes`, `list the processes` + close variants) join `top processes` / Hot · Pinned (p50).
+
 - **v0.1.1017** — Instant lane: more Debug Log NL (`view logs`, `see logs`, `show me the logs`, `open logs`, `list the logs`) + digester Slowest filters for historical Review logs and Instant wake-ups (p50).
 
 - **v0.1.1016** — Agent Ops Schedules filter Clear chip beside All · Jobs · Deliveries when a kind filter is active (Knowledge / Runs / Sessions Clear parity; Cleared flash; filter-miss Clear when Jobs/Deliveries was on; design review / Schedules).

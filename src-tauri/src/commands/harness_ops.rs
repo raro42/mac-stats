@@ -38885,9 +38885,35 @@ pub fn looks_like_processes_request(content: &str) -> bool {
             | "/process"
             | "process list"
             | "list processes"
+            | "list the processes"
+            | "list process"
+            | "list the process"
             | "show processes"
+            | "show the processes"
+            | "show me processes"
+            | "show me the processes"
+            | "show process"
+            | "show the process"
+            | "show me process"
+            | "show me the process"
+            | "view processes"
+            | "view the processes"
+            | "view process"
+            | "view the process"
+            | "see processes"
+            | "see the processes"
+            | "see process"
+            | "see the process"
+            | "open processes"
+            | "open the processes"
+            | "open process"
+            | "open the process"
+            | "open process list"
+            | "open the process list"
             | "top processes"
             | "top process"
+            | "the processes"
+            | "the process list"
             | "process status"
             | "processes status"
             | "/processes hot"
@@ -45450,7 +45476,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / `user info age` / who-am-i)\n\
 • `user info age` · `user-info.json age` · `how old is user info` · `when was user info updated` — user-info.json last write age (mtime; no dump; does not steal `user info path` / `user info size` / who-am-i)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
-• `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
+• `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
 • `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
@@ -46675,7 +46701,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/processes` Hot/Pinned operator asks (v0.1.712 / v0.1.714).
+    // `/processes` Hot/Pinned operator asks (v0.1.712 / v0.1.714);
+    // view/see/show me/open/list-the NL (v0.1.1018).
     if (q.contains("/processes")
         || q.contains("/process")
         || q.contains("/hot")
@@ -46683,7 +46710,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("top processes")
         || q.contains("top process")
         || q.contains("list processes")
+        || q.contains("list the processes")
         || q.contains("show processes")
+        || q.contains("show the processes")
+        || q.contains("show me processes")
+        || q.contains("show me the processes")
+        || q.contains("view processes")
+        || q.contains("view the processes")
+        || q.contains("see processes")
+        || q.contains("see the processes")
+        || q.contains("open processes")
+        || q.contains("open the processes")
+        || q.contains("open process list")
+        || q.contains("open the process list")
+        || q.contains("the process list")
         || q.contains("hot processes")
         || q.contains("hot process")
         || q.contains("processes hot")
@@ -46697,6 +46737,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("favorite processes")
         || q == "processes"
         || q == "process list"
+        || q == "the processes"
         || q == "hot"
         || q == "pinned"
         || q == "what's hot"
@@ -59588,6 +59629,12 @@ mod tests {
         assert!(looks_like_processes_request("/processes"));
         assert!(looks_like_processes_request("top processes"));
         assert!(looks_like_processes_request("@Werner /processes"));
+        assert!(looks_like_processes_request("view processes"));
+        assert!(looks_like_processes_request("see the processes"));
+        assert!(looks_like_processes_request("show me the processes"));
+        assert!(looks_like_processes_request("open processes"));
+        assert!(looks_like_processes_request("list the processes"));
+        assert!(looks_like_processes_request("open the process list"));
         assert!(looks_like_processes_request("/processes hot"));
         assert!(looks_like_processes_request("/hot"));
         assert!(looks_like_processes_request("what's hot"));
