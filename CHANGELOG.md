@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1015] - 2026-09-11
+
+### Added
+- Agent Ops Knowledge: Clear chip beside All · Discord · Core when a kind filter is active (Runs / Sessions / Agents Clear parity) — flashes Cleared, then returns to All; filter-miss Clear filter CTA uses the same flash when Discord/Core was on.
+
 ## [0.1.1014] - 2026-09-11
 
 ### Added

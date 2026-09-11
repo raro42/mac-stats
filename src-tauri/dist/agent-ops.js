@@ -354,8 +354,14 @@
       memory: {
         id: 'ops-memory-filter',
         clear() {
+          const kindWasActive = !!opsMemoryFilterAttentionLabel();
           opsMemoryFilterQ = '';
           setOpsMemoryKindFilter('all');
+          if (kindWasActive) {
+            flashOpsMemoryKindFilterClearBtn(
+              document.getElementById('ops-memory-kind-filter-clear')
+            );
+          }
         },
       },
       runs: {
@@ -1751,6 +1757,56 @@ function ensureOpsMemoryFilter() {
     });
 }
 
+/** Flash Cleared on Knowledge kind Clear (Runs / Sessions / Agents parity). */
+function flashOpsMemoryKindFilterClearBtn(btn) {
+    if (!btn) return;
+    if (btn._clearFlashTimer) {
+        clearTimeout(btn._clearFlashTimer);
+        btn._clearFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Clear';
+    btn.dataset.idleLabel = idle;
+    btn.hidden = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Cleared';
+    btn._clearFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn._clearFlashTimer = null;
+        syncOpsMemoryKindFilterClearBtn();
+    }, 1600);
+}
+
+/** Show Clear beside All·Discord·Core when Discord or Core is active. */
+function syncOpsMemoryKindFilterClearBtn() {
+    const btn = document.getElementById('ops-memory-kind-filter-clear');
+    if (!btn) return;
+    if (btn._clearFlashTimer) return;
+    const active = !!opsMemoryFilterAttentionLabel();
+    btn.hidden = !active;
+    if (!active) {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = btn.dataset.idleLabel || 'Clear';
+    }
+}
+
+function ensureOpsMemoryKindFilterClearBtn(wrap) {
+    if (!wrap) return null;
+    let btn = document.getElementById('ops-memory-kind-filter-clear');
+    if (btn) return btn;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ops-memory-kind-filter-clear';
+    btn.className = 'ops-memory-kind-filter-clear';
+    btn.hidden = true;
+    btn.dataset.idleLabel = 'Clear';
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter — show every knowledge file (All)';
+    btn.textContent = 'Clear';
+    wrap.appendChild(btn);
+    return btn;
+}
+
 /** All · Discord · Core chips (Sessions Live/Files parity). */
 function ensureOpsMemoryKindChips() {
     const panel = document.getElementById('ops-panel-memory');
@@ -1768,13 +1824,45 @@ function ensureOpsMemoryKindChips() {
             '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count" data-ops-memory-kind-count="discord">0</span></button>' +
             '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count" data-ops-memory-kind-count="core">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.dataset.opsMemoryKindClearBound = '1';
         wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-memory-kind-filter-clear, .ops-memory-kind-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsMemoryKindFilter('all');
+                flashOpsMemoryKindFilterClearBtn(clearBtn);
+                return;
+            }
             const btn =
                 e.target && e.target.closest && e.target.closest('[data-ops-memory-kind]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsMemoryKindFilter(btn.getAttribute('data-ops-memory-kind') || 'all');
         });
+    } else if (wrap.dataset.opsMemoryKindClearBound !== '1') {
+        wrap.dataset.opsMemoryKindClearBound = '1';
+        wrap.addEventListener('click', (e) => {
+            const clearBtn =
+                e.target &&
+                e.target.closest &&
+                e.target.closest(
+                    '#ops-memory-kind-filter-clear, .ops-memory-kind-filter-clear'
+                );
+            if (clearBtn && wrap.contains(clearBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpsMemoryKindFilter('all');
+                flashOpsMemoryKindFilterClearBtn(clearBtn);
+            }
+        });
     }
+    ensureOpsMemoryKindFilterClearBtn(wrap);
+    syncOpsMemoryKindFilterClearBtn();
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
     }
@@ -1792,6 +1880,7 @@ function setOpsMemoryKindFilter(mode) {
 function paintOpsMemoryKindChips() {
     const wrap = document.getElementById('ops-memory-kind-chips');
     if (!wrap) return;
+    ensureOpsMemoryKindFilterClearBtn(wrap);
     const all = opsMemoryCache || [];
     const discordN = all.filter((f) => memoryRowMatchesKind(f, 'discord')).length;
     const coreN = all.filter((f) => memoryRowMatchesKind(f, 'core')).length;
@@ -1810,6 +1899,7 @@ function paintOpsMemoryKindChips() {
             btn.classList.toggle('has-hits', coreN > 0);
         }
     });
+    syncOpsMemoryKindFilterClearBtn();
     applyOpsMemoryFilterAttentionGlanceState();
 }
 
