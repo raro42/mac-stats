@@ -1,34 +1,23 @@
 # Morning surprise — 2026-09-11
 
-Ralf: overnight Track B kept shipping.
+Overnight Track B (mac-stats product ratchet). Digester open stayed empty; ticks pulled design-review Clear parity + standing backlog.
 
-## Shipped tonight (so far)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1011** | Disk Cleanup scopes filter **Clear** beside All · On · Off (Cleared flash; filter-miss Clear filter CTA; category Clear / Monitors / Processes / AI Chat parity) |
-| **v0.1.1010** | Perplexity Search filter **Clear** beside All · Top · Snippet (Cleared flash; filter-miss Clear filter CTA; Debug Log/Disk/Monitors/Processes/AI Chat parity) |
-| **v0.1.1009** | Debug Log filter **Clear** beside All · Error · Warn (Cleared flash; filter-miss Clear filter CTA; Disk/Monitors/Processes/AI Chat parity) |
-| **v0.1.1008** | Auto-enable AI when local Ollama answers on fresh installs (GitHub #11) |
-| **v0.1.1007** | Instant lane: `launchd.stdout.log` age |
-| **v0.1.1006** | Instant lane: `launchd.stdout.log` size |
-| **v0.1.1005** | Instant lane: `launchd.stdout.log` path |
-| **v0.1.1004** | Instant lane: `launchd.stderr.log` age |
-| **v0.1.1003** | Instant lane: `launchd.stderr.log` size |
-| **v0.1.1002** | Instant lane: `launchd.stderr.log` path |
-| **v0.1.1001** | Instant lane: harness loop stderr age |
-| **v0.1.1000** | Instant lane: harness loop stderr size |
-| **v0.1.999** | Instant lane: harness loop stderr path |
-| **v0.1.998** | Disk Cleanup filter Clear chip |
-| **v0.1.997** | Monitors filter Clear chip |
-| **v0.1.996** | Top Processes filter Clear chip |
+| **v0.1.1012** | Agent Ops Sessions: Clear beside All · Live · Files (Cleared flash; filter-miss Clear flash) |
+| **v0.1.1011** | Disk Cleanup scopes: Clear beside All · On · Off |
+| **v0.1.1010** | Perplexity Search: Clear beside All · Top · Snippet |
+| **v0.1.1009** | Debug Log: Clear beside All · Error · Warn |
+| **v0.1.1007–1002** | Instant lanes: launchd stdout/stderr path · size · age (earlier in window / prior ticks) |
 
-## Fuel notes
-- Digester open empty; design review in grace (~4.7d on CPU metrics).
-- 20:55 tick picked Disk Cleanup scopes Clear (All·On·Off) — category Clear already shipped in v0.1.998.
-- Next: digester/debug errors when present; design review when due; Ops chip Clear gaps (Sessions/Agents/Runs/Knowledge/Schedules); sibling ports.
+## Also this window
 
-## How to try
-1. Open CPU window → Disk Cleanup → scopes row.
-2. Tap **On** or **Off**.
-3. Clear appears beside the chips; tap it (or the filter-miss **Clear filter** CTA) → **Cleared** flash → back to All.
+- Digester: no open candidates; Slowest still lists an old `Review logs` lite+Brave sample (instant `/logs` already shipped — not reopened).
+- Design review: due=false (grace); recommended surface still CPU metrics (~4.7d).
+- Next Clear gaps: Agents On/Off · Runs lanes · Knowledge Discord/Core · Schedules Jobs/Deliveries.
+
+## Fitness
+
+Operators can leave Live/Files with one Clear chip (Processes / Disk / Debug / Perplexity parity) instead of hunting All.
