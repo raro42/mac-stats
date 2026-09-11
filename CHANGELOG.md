@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1004] - 2026-09-11
+
+### Added
+- Instant lane: launchd stderr age (`launchd stderr age`, `how old is launchd.stderr.log`, `launchd.stderr.log age`, `mac-stats launchd stderr age`, `when was launchd stderr updated`) — `~/.mac-stats/launchd.stderr.log` last write age (mtime; no dump/tail; does not steal path / size / harness loop stderr / LaunchAgent plist / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing).
+
 ## [0.1.1003] - 2026-09-11
 
 ### Added
