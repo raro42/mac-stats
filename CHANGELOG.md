@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1002] - 2026-09-11
+
+### Added
+- Instant lane: launchd stderr path (`launchd stderr path`, `where is launchd.stderr.log`, `launchd.stderr.log path`, `mac-stats launchd stderr path`) — `~/.mac-stats/launchd.stderr.log` path only; no dump/tail; does not steal harness loop stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing.
+
 ## [0.1.1001] - 2026-09-11
 
 ### Added

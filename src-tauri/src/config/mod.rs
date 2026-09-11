@@ -1756,6 +1756,17 @@ impl Config {
         Self::improvements_dir().join("overnight_harness_loop.stderr.log")
     }
 
+    /// App LaunchAgent stderr redirect:
+    /// `$HOME/.mac-stats/launchd.stderr.log`
+    ///
+    /// Path only for operator instant lane — does not dump or tail the log.
+    pub fn launchd_stderr_log_path() -> PathBuf {
+        Self::log_file_path()
+            .parent()
+            .map(|p| p.join("launchd.stderr.log"))
+            .unwrap_or_else(|| std::env::temp_dir().join("mac-stats-launchd.stderr.log"))
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
