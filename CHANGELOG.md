@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1005] - 2026-09-11
+
+### Added
+- Instant lane: launchd stdout path (`launchd stdout path`, `where is launchd.stdout.log`, `launchd.stdout.log path`, `mac-stats launchd stdout path`) — `~/.mac-stats/launchd.stdout.log` path only; no dump/tail; does not steal harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing.
+
 ## [0.1.1004] - 2026-09-11
 
 ### Added

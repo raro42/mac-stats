@@ -1767,6 +1767,17 @@ impl Config {
             .unwrap_or_else(|| std::env::temp_dir().join("mac-stats-launchd.stderr.log"))
     }
 
+    /// App LaunchAgent stdout redirect:
+    /// `$HOME/.mac-stats/launchd.stdout.log`
+    ///
+    /// Path only for operator instant lane — does not dump or tail the log.
+    pub fn launchd_stdout_log_path() -> PathBuf {
+        Self::log_file_path()
+            .parent()
+            .map(|p| p.join("launchd.stdout.log"))
+            .unwrap_or_else(|| std::env::temp_dir().join("mac-stats-launchd.stdout.log"))
+    }
+
     /// User LaunchAgents directory: `$HOME/Library/LaunchAgents/`.
     pub fn launch_agents_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

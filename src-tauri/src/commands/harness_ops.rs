@@ -13288,7 +13288,7 @@ pub fn format_launchd_stderr_path_gateway() -> String {
     let path = crate::config::Config::launchd_stderr_log_path();
     let display = path.display().to_string();
     format!(
-        "**Launchd stderr:** `{display}` · app LaunchAgent stderr redirect · path only · does not dump or tail · `launchd stderr size` for on-disk bytes · `launchd stderr age` for last write · `harness loop stderr path` for Track B loop stderr · `debug.log path` for the app log · `launchagent path` for the plists."
+        "**Launchd stderr:** `{display}` · app LaunchAgent stderr redirect · path only · does not dump or tail · `launchd stderr size` for on-disk bytes · `launchd stderr age` for last write · `launchd stdout path` for stdout · `harness loop stderr path` for Track B loop stderr · `debug.log path` for the app log · `launchagent path` for the plists."
     )
 }
 
@@ -13672,6 +13672,183 @@ pub fn format_launchd_stderr_age_gateway() -> String {
         }
         Err(e) => format!("**Launchd stderr** — could not stat file: {e}"),
     }
+}
+
+/// True for short “where is launchd.stdout.log / launchd stdout path…” asks.
+/// Path only — does not dump or tail. Does not steal harness loop stdout / stderr /
+/// overnight_agent.log / debug.log / LaunchAgent plist / launchd.stderr / morning surprise /
+/// improvements / loop backlog / sibling / standing.
+pub fn looks_like_launchd_stdout_path_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Age/size reserved for later lanes — keyword-only (no nest).
+    if n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("path")
+            && !n.contains("where")
+            && !n.contains("location"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("stderr")
+        || n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight") && n.contains("agent") && n.contains("log"))
+        || (n.contains("harness") && n.contains("agent") && n.contains("log"))
+        || n.contains("overnight_harness_loop")
+        || n.contains("overnight-harness-loop")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || (n.contains("harness") && n.contains("stdout"))
+        || n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("launchd"))
+        || n == "log path"
+        || n == "log file path"
+        || n == "where is the log"
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("backlog")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains("launch-agent")
+        || n.contains("launch_agent")
+        || n.contains(".plist")
+        || n.contains("runs.jsonl")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n == "improvements"
+        || n == "improvements path"
+        || n == "improvements folder"
+        || n == "improvements directory"
+        || n == "improvements dir"
+        || n == "where is improvements"
+        || n == "where is the improvements folder"
+        || n == "autoresearch path"
+        || n == "autoresearch folder"
+        || n == "autoresearch directory"
+        || n == "autoresearch dir"
+        || n == "where is autoresearch"
+        || n == "where is the autoresearch folder"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    let pathish = n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("file");
+    if matches!(
+        n.as_str(),
+        "launchd stdout path"
+            | "launchd stdout log path"
+            | "launchd.stdout.log path"
+            | "launchd.stdout.log"
+            | "launchd.stdout path"
+            | "launchd stdout"
+            | "mac-stats launchd stdout path"
+            | "mac stats launchd stdout path"
+            | "mac-stats launchd stdout log path"
+            | "where is launchd.stdout.log"
+            | "where is the launchd.stdout.log"
+            | "where is launchd stdout"
+            | "where is the launchd stdout"
+            | "where is launchd stdout log"
+            | "where is the launchd stdout log"
+            | "where does launchd.stdout.log go"
+            | "where do launchd stdout logs go"
+    ) {
+        return true;
+    }
+    let launchd_ctx = n.contains("launchd.stdout")
+        || n.contains("launchd stdout")
+        || n.contains("launchd-stdout")
+        || (n.contains("launchd") && n.contains("stdout"));
+    launchd_ctx && pathish
+}
+
+/// Zero-LLM launchd.stdout.log path (config only; no dump/tail).
+pub fn format_launchd_stdout_path_gateway() -> String {
+    let path = crate::config::Config::launchd_stdout_log_path();
+    let display = path.display().to_string();
+    format!(
+        "**Launchd stdout:** `{display}` · app LaunchAgent stdout redirect · path only · does not dump or tail · `launchd stdout size` for on-disk bytes · `launchd stdout age` for last write · `launchd stderr path` for stderr · `harness loop stdout path` for Track B loop stdout · `debug.log path` for the app log · `launchagent path` for the plists."
+    )
 }
 
 /// True for short “how old is the session folder / session age…” asks.
@@ -43848,6 +44025,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
+    // launchd.stdout.log path (app LaunchAgent stdout redirect; no dump/tail).
+    if looks_like_launchd_stdout_path_request(content) {
+        return Some(format_launchd_stdout_path_gateway());
+    }
     if looks_like_debug_log_size_request(content) {
         return Some(format_debug_log_size_gateway());
     }
@@ -44286,6 +44467,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
+    // launchd.stdout.log path (app LaunchAgent stdout redirect; no dump/tail).
+    if looks_like_launchd_stdout_path_request(content) {
+        return Some(format_launchd_stdout_path_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -44702,6 +44887,7 @@ pub fn format_ops_help_gateway() -> String {
 • `launchd stderr path` · `where is launchd.stderr.log` · `launchd.stderr.log path` · `mac-stats launchd stderr path` — `~/.mac-stats/launchd.stderr.log` path only (no dump/tail; does not steal harness loop stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `launchd stderr size` / `launchd stderr age` for bytes / mtime)\n\
 • `launchd stderr size` · `how big is launchd.stderr.log` · `launchd.stderr.log size` · `mac-stats launchd stderr size` — `~/.mac-stats/launchd.stderr.log` size on disk (stat only; no dump/tail; does not steal path / age / harness loop stderr / LaunchAgent plist / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `launchd stderr age` · `how old is launchd.stderr.log` · `launchd.stderr.log age` · `mac-stats launchd stderr age` · `when was launchd stderr updated` — `~/.mac-stats/launchd.stderr.log` last write age (mtime; no dump/tail; does not steal path / size / harness loop stderr / LaunchAgent plist / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
+• `launchd stdout path` · `where is launchd.stdout.log` · `launchd.stdout.log path` · `mac-stats launchd stdout path` — `~/.mac-stats/launchd.stdout.log` path only (no dump/tail; does not steal harness loop stdout / launchd stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `launchd stdout size` / `launchd stdout age` for bytes / mtime)\n\
 • `harness loop stderr size` · `how big is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log size` · `harness stderr size` — overnight_harness_loop.stderr.log size on disk (stat only; no dump/tail; does not steal path / age / overnight_agent.log / stdout / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr age` · `how old is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log age` · `harness stderr age` · `when was harness loop stderr updated` — overnight_harness_loop.stderr.log last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stdout / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
@@ -46308,6 +46494,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_launchd_stderr_path_request(question) {
         return true;
     }
+    // Read-only launchd.stdout.log path asks (v0.1.1005) — config only; no dump/tail.
+    if looks_like_launchd_stdout_path_request(question) {
+        return true;
+    }
     // Read-only debug.log path asks (v0.1.809) — config only, no tail read.
     if looks_like_debug_log_path_request(question) {
         return true;
@@ -46682,6 +46872,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only launchd.stderr.log path asks (v0.1.1002) — config only; no dump/tail.
     if looks_like_launchd_stderr_path_request(question) {
+        return true;
+    }
+    // Read-only launchd.stdout.log path asks (v0.1.1005) — config only; no dump/tail.
+    if looks_like_launchd_stdout_path_request(question) {
         return true;
     }
     // Read-only Ori vault size asks (v0.1.923) — recursive file bytes; no list/MCP.
@@ -54709,6 +54903,7 @@ mod tests {
         assert!(!looks_like_launchd_stderr_path_request(
             "launchd.stdout.log path"
         ));
+        assert!(!looks_like_launchd_stdout_path_request("launchd stderr path"));
         assert!(!looks_like_launchd_stderr_path_request(
             "tail launchd.stderr.log"
         ));
@@ -54732,6 +54927,80 @@ mod tests {
             !reply.contains("Harness loop stderr:")
                 || reply.contains("harness loop stderr path"),
             "must not steal harness loop stderr path lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Debug Log:") || reply.contains("debug.log path"),
+            "must not steal debug.log path lane: {reply}"
+        );
+    }
+
+    #[test]
+    fn launchd_stdout_path_request_detected() {
+        assert!(looks_like_launchd_stdout_path_request("launchd stdout path"));
+        assert!(looks_like_launchd_stdout_path_request(
+            "launchd.stdout.log path"
+        ));
+        assert!(looks_like_launchd_stdout_path_request(
+            "where is launchd.stdout.log"
+        ));
+        assert!(looks_like_launchd_stdout_path_request(
+            "where is the launchd stdout log"
+        ));
+        assert!(looks_like_launchd_stdout_path_request(
+            "mac-stats launchd stdout path"
+        ));
+        assert!(looks_like_launchd_stdout_path_request("launchd.stdout.log"));
+        assert!(!looks_like_launchd_stdout_path_request("launchd stdout size"));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "how big is launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request("launchd stdout age"));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "how old is launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "harness loop stdout path"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "where is overnight_harness_loop.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request("debug.log path"));
+        assert!(!looks_like_launchd_stdout_path_request("launchagent path"));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "where is mac-stats.plist"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "launchd.stderr.log path"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request(
+            "tail launchd.stdout.log"
+        ));
+        assert!(!looks_like_launchd_stdout_path_request("dump launchd stdout"));
+        assert!(!looks_like_launchd_stderr_path_request("launchd stdout path"));
+        assert!(!looks_like_harness_loop_stdout_path_request(
+            "launchd stdout path"
+        ));
+        assert!(!looks_like_debug_log_path_request("launchd stdout path"));
+        assert!(!looks_like_launchagent_path_request("launchd stdout path"));
+        let reply = try_operator_instant_reply("launchd stdout path")
+            .expect("launchd stdout path instant");
+        assert!(
+            reply.contains("Launchd stdout") || reply.contains("launchd.stdout.log"),
+            "expected launchd stdout path reply: {reply}"
+        );
+        assert!(
+            reply.contains("launchd.stdout.log"),
+            "expected launchd.stdout.log filename in path: {reply}"
+        );
+        assert!(
+            !reply.contains("Launchd stderr:")
+                || reply.contains("launchd stderr path"),
+            "must not steal launchd stderr path lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Harness loop stdout:")
+                || reply.contains("harness loop stdout path"),
+            "must not steal harness loop stdout path lane: {reply}"
         );
         assert!(
             !reply.contains("Debug Log:") || reply.contains("debug.log path"),
