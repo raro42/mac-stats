@@ -13288,6 +13288,194 @@ pub fn format_launchd_stderr_path_gateway() -> String {
     )
 }
 
+/// True for short “how big is launchd.stderr.log / launchd stderr size…” asks.
+/// Stat only — does not dump/tail or steal path / age / harness loop stderr / stdout /
+/// overnight_agent.log / debug.log / LaunchAgent plist / launchd.stdout / morning surprise /
+/// improvements / loop backlog / sibling / standing.
+pub fn looks_like_launchd_stderr_size_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 88 {
+        return false;
+    }
+    // Path/age reserved — keyword-only (no nest).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains(".log age")
+        || n.contains("log age")
+        || n.contains("file age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("size")
+            && !n.contains("big")
+            && !n.contains("large")
+            && !n.contains("bytes"))
+    {
+        return false;
+    }
+    // String-only sibling excludes (do not nest looks_like_* — exponential).
+    if n.contains("stdout")
+        || n.contains("overnight_agent")
+        || n.contains("overnight-agent")
+        || (n.contains("overnight")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("launchd"))
+        || (n.contains("harness")
+            && n.contains("agent")
+            && n.contains("log")
+            && !n.contains("launchd"))
+        || n.contains("overnight_harness_loop")
+        || n.contains("overnight-harness-loop")
+        || n.contains("harness_loop")
+        || n.contains("harness-loop")
+        || n.contains("harness loop")
+        || (n.contains("harness") && n.contains("stderr"))
+        || n.contains("debug.log")
+        || (n.contains("debug") && n.contains("log") && !n.contains("launchd"))
+        || n == "log size"
+        || n == "log file size"
+        || n == "how big is the log"
+        || n.contains("morning_surprise")
+        || n.contains("morning-surprise")
+        || n.contains("morning surprise")
+        || (n.contains("morning") && n.contains("surprise"))
+        || n.contains("results.tsv")
+        || n.contains("results tsv")
+        || n.contains("autoresearch results")
+        || n.contains("ratchet results")
+        || n.contains("keep discard")
+        || n.contains("loop_backlog")
+        || n.contains("loop-backlog")
+        || n.contains("loop backlog")
+        || n.contains("tick log")
+        || n.contains("backlog")
+        || n.contains("sibling_harness")
+        || n.contains("sibling-harness")
+        || n.contains("sibling harness")
+        || (n.contains("sibling") && n.contains("harness"))
+        || n.contains("standing_backlog")
+        || n.contains("standing-backlog")
+        || n.contains("standing backlog")
+        || (n.contains("standing") && n.contains("backlog"))
+        || n.contains("launchagent")
+        || n.contains("launch agent")
+        || n.contains("launch-agent")
+        || n.contains("launch_agent")
+        || n.contains(".plist")
+        || n.contains("runs.jsonl")
+        || n.contains("runs size")
+        || n.contains("runs path")
+        || n.contains("config.env")
+        || n.contains("improvements size")
+        || n.contains("improvements folder")
+        || n.contains("improvements dir")
+        || n == "improvements"
+    {
+        return false;
+    }
+    if n.contains("how many")
+        || n.contains("number of")
+        || n == "count"
+        || n.starts_with("count ")
+        || n.ends_with(" count")
+        || n.contains(" count ")
+        || n == "list"
+        || n.starts_with("list ")
+        || n.contains(" list ")
+        || n.ends_with(" list")
+        || n.contains("listing")
+        || n.contains("show ")
+        || n.contains("open ")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("http://")
+        || n.contains("https://")
+    {
+        return false;
+    }
+    if matches!(
+        n.as_str(),
+        "launchd stderr size"
+            | "launchd stderr log size"
+            | "launchd.stderr.log size"
+            | "launchd.stderr size"
+            | "launchd-stderr size"
+            | "launchd-stderr.log size"
+            | "mac-stats launchd stderr size"
+            | "mac stats launchd stderr size"
+            | "mac-stats launchd stderr log size"
+            | "how big is launchd.stderr.log"
+            | "how big is the launchd.stderr.log"
+            | "how big is launchd stderr"
+            | "how big is the launchd stderr"
+            | "how big is launchd stderr log"
+            | "how big is the launchd stderr log"
+            | "how large is launchd.stderr.log"
+            | "how large is the launchd stderr"
+            | "launchd.stderr.log bytes"
+            | "launchd stderr bytes"
+    ) {
+        return true;
+    }
+    let launchd_ctx = n.contains("launchd.stderr")
+        || n.contains("launchd stderr")
+        || n.contains("launchd-stderr")
+        || (n.contains("launchd") && n.contains("stderr"));
+    let sizeish = n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi");
+    launchd_ctx && sizeish
+}
+
+/// Zero-LLM launchd.stderr.log file size (stat only; no dump/tail).
+pub fn format_launchd_stderr_size_gateway() -> String {
+    let path = crate::config::Config::launchd_stderr_log_path();
+    if !path.exists() {
+        return "**Launchd stderr:** no file yet · LaunchAgent creates it when the app runs · `launchd stderr path` for the file.".to_string();
+    }
+    match std::fs::metadata(&path).map(|m| m.len()) {
+        Ok(0) => {
+            "**Launchd stderr:** empty · `launchd stderr path` for the file.".to_string()
+        }
+        Ok(bytes) => {
+            let label = crate::commands::disk_cleanup::format_bytes(bytes);
+            format!(
+                "**Launchd stderr:** **{label}** on disk · app LaunchAgent stderr redirect · `launchd stderr path` for the file · `launchd stderr age` for last write · `harness loop stderr size` for Track B loop stderr · `debug.log size` for the app log."
+            )
+        }
+        Err(e) => format!("**Launchd stderr** — could not stat file: {e}"),
+    }
+}
+
 /// True for short “how old is the session folder / session age…” asks.
 /// Newest file mtime under session dir — no list dump / path / size / Live/Files / session-memory lanes.
 pub fn looks_like_session_age_request(content: &str) -> bool {
@@ -43452,7 +43640,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_harness_loop_stderr_path_request(content) {
         return Some(format_harness_loop_stderr_path_gateway());
     }
-    // launchd.stderr.log path (app LaunchAgent stderr redirect; no dump/tail).
+    // launchd.stderr.log size before path (app LaunchAgent stderr redirect; no dump/tail).
+    if looks_like_launchd_stderr_size_request(content) {
+        return Some(format_launchd_stderr_size_gateway());
+    }
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
@@ -43884,7 +44075,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_harness_loop_stderr_path_request(content) {
         return Some(format_harness_loop_stderr_path_gateway());
     }
-    // launchd.stderr.log path (app LaunchAgent stderr redirect; no dump/tail).
+    // launchd.stderr.log size before path (app LaunchAgent stderr redirect; no dump/tail).
+    if looks_like_launchd_stderr_size_request(content) {
+        return Some(format_launchd_stderr_size_gateway());
+    }
     if looks_like_launchd_stderr_path_request(content) {
         return Some(format_launchd_stderr_path_gateway());
     }
@@ -44302,6 +44496,7 @@ pub fn format_ops_help_gateway() -> String {
 • `harness loop stdout age` · `how old is overnight_harness_loop.stdout.log` · `overnight_harness_loop.stdout.log age` · `harness stdout age` · `when was harness loop stdout updated` — overnight_harness_loop.stdout.log last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stderr / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr path` · `where is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log path` · `harness stderr path` — `~/.mac-stats/improvements/overnight_harness_loop.stderr.log` path only (no dump/tail; does not steal overnight_agent.log / stdout / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `harness loop stderr size` for bytes · `harness loop stderr age` for mtime)\n\
 • `launchd stderr path` · `where is launchd.stderr.log` · `launchd.stderr.log path` · `mac-stats launchd stderr path` — `~/.mac-stats/launchd.stderr.log` path only (no dump/tail; does not steal harness loop stderr / LaunchAgent plist / `debug.log path` / morning surprise / improvements / loop backlog / sibling / standing; `launchd stderr size` / `launchd stderr age` for bytes / mtime)\n\
+• `launchd stderr size` · `how big is launchd.stderr.log` · `launchd.stderr.log size` · `mac-stats launchd stderr size` — `~/.mac-stats/launchd.stderr.log` size on disk (stat only; no dump/tail; does not steal path / age / harness loop stderr / LaunchAgent plist / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr size` · `how big is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log size` · `harness stderr size` — overnight_harness_loop.stderr.log size on disk (stat only; no dump/tail; does not steal path / age / overnight_agent.log / stdout / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `harness loop stderr age` · `how old is overnight_harness_loop.stderr.log` · `overnight_harness_loop.stderr.log age` · `harness stderr age` · `when was harness loop stderr updated` — overnight_harness_loop.stderr.log last write age (mtime; no dump/tail; does not steal path / size / overnight_agent.log / stdout / `debug.log age` / morning surprise / improvements / loop backlog / sibling / standing)\n\
 • `credential accounts size` · `credential_accounts.json size` · `how big is credential accounts` · `keychain accounts size` — credential_accounts.json file size on disk (stat only; no dump; does not steal `credential accounts path` / `credential accounts age` / browser credentials)\n\
@@ -45896,6 +46091,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if looks_like_harness_loop_stderr_path_request(question) {
         return true;
     }
+    // Read-only launchd.stderr.log size asks (v0.1.1003) — stat only; no dump/tail.
+    if looks_like_launchd_stderr_size_request(question) {
+        return true;
+    }
     // Read-only launchd.stderr.log path asks (v0.1.1002) — config only; no dump/tail.
     if looks_like_launchd_stderr_path_request(question) {
         return true;
@@ -46262,6 +46461,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only harness loop stderr path asks (v0.1.999) — config only; no dump/tail.
     if looks_like_harness_loop_stderr_path_request(question) {
+        return true;
+    }
+    // Read-only launchd.stderr.log size asks (v0.1.1003) — stat only; no dump/tail.
+    if looks_like_launchd_stderr_size_request(question) {
         return true;
     }
     // Read-only launchd.stderr.log path asks (v0.1.1002) — config only; no dump/tail.
@@ -54324,6 +54527,80 @@ mod tests {
     }
 
     #[test]
+    fn launchd_stderr_size_request_detected() {
+        assert!(looks_like_launchd_stderr_size_request("launchd stderr size"));
+        assert!(looks_like_launchd_stderr_size_request(
+            "launchd.stderr.log size"
+        ));
+        assert!(looks_like_launchd_stderr_size_request(
+            "how big is launchd.stderr.log"
+        ));
+        assert!(looks_like_launchd_stderr_size_request(
+            "how big is the launchd stderr log"
+        ));
+        assert!(looks_like_launchd_stderr_size_request(
+            "mac-stats launchd stderr size"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request("launchd stderr path"));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "where is launchd.stderr.log"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request("launchd stderr age"));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "how old is launchd.stderr.log"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "harness loop stderr size"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "how big is overnight_harness_loop.stderr.log"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request("debug.log size"));
+        assert!(!looks_like_launchd_stderr_size_request("log file size"));
+        assert!(!looks_like_launchd_stderr_size_request("how big is the log"));
+        assert!(!looks_like_launchd_stderr_size_request("morning surprise size"));
+        assert!(!looks_like_launchd_stderr_size_request("improvements size"));
+        assert!(!looks_like_launchd_stderr_size_request("loop backlog size"));
+        assert!(!looks_like_launchd_stderr_size_request("standing backlog size"));
+        assert!(!looks_like_launchd_stderr_size_request("sibling harness size"));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "launchd.stdout.log size"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request(
+            "tail launchd.stderr.log"
+        ));
+        assert!(!looks_like_launchd_stderr_size_request("dump launchd stderr"));
+        assert!(!looks_like_harness_loop_stderr_size_request(
+            "launchd stderr size"
+        ));
+        assert!(!looks_like_debug_log_size_request("launchd stderr size"));
+        assert!(!looks_like_launchd_stderr_path_request("launchd stderr size"));
+        assert!(!looks_like_launchagent_path_request("launchd stderr size"));
+        let reply = try_operator_instant_reply("how big is launchd.stderr.log")
+            .expect("launchd stderr size instant");
+        assert!(
+            reply.contains("Launchd stderr") || reply.contains("launchd.stderr"),
+            "expected launchd stderr size reply: {reply}"
+        );
+        assert!(
+            reply.contains("on disk")
+                || reply.contains("empty")
+                || reply.contains("no file yet")
+                || reply.contains("could not stat"),
+            "expected size reply: {reply}"
+        );
+        assert!(
+            !reply.contains("Harness loop stderr:")
+                || reply.contains("harness loop stderr size"),
+            "must not steal harness loop stderr size lane: {reply}"
+        );
+        assert!(
+            !reply.contains("Debug Log:") || reply.contains("debug.log size"),
+            "must not steal debug.log size lane: {reply}"
+        );
+    }
+
+    #[test]
     fn harness_loop_stderr_size_request_detected() {
         assert!(looks_like_harness_loop_stderr_size_request(
             "harness loop stderr size"
@@ -54381,6 +54658,12 @@ mod tests {
         ));
         assert!(!looks_like_harness_loop_stderr_size_request(
             "dump harness loop stderr"
+        ));
+        assert!(!looks_like_harness_loop_stderr_size_request(
+            "launchd stderr size"
+        ));
+        assert!(!looks_like_harness_loop_stderr_size_request(
+            "how big is launchd.stderr.log"
         ));
         assert!(!looks_like_overnight_agent_log_size_request(
             "harness loop stderr size"

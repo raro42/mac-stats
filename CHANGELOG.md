@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1003] - 2026-09-11
+
+### Added
+- Instant lane: launchd stderr size (`launchd stderr size`, `how big is launchd.stderr.log`, `launchd.stderr.log size`, `mac-stats launchd stderr size`) — `~/.mac-stats/launchd.stderr.log` size on disk (stat only; no dump/tail; does not steal path / age / harness loop stderr / LaunchAgent plist / `debug.log size` / morning surprise / improvements / loop backlog / sibling / standing).
+
 ## [0.1.1002] - 2026-09-11
 
 ### Added
