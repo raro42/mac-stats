@@ -15,6 +15,7 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 | **v0.1.1023** | `/knowledge` NL expand |
 | **v0.1.1024** | `/agents` NL expand (exact `open agents` only; path/size/age safe) |
 | **v0.1.1025** | `/skills` NL expand (exact `open skills` only; path/size/age safe) |
+| **v0.1.1026** | `/tasks` NL expand (exact `open tasks` / `open the tasks` only; path/size/age safe) |
 
 ## Fuel notes
 
@@ -24,8 +25,8 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 
 ## Try in Discord / AI Chat
 
-- `view skills` · `show me the skills` · `open skills` · `list the skills`
-- Still works: `/skills` · `list skills` · `skills catalog`
-- Still separate: `skills path` · `skills size` · `skills age` · `SKILL: …`
+- `view tasks` · `show me the tasks` · `open tasks` · `list the tasks`
+- Still works: `/tasks` · `/tasks all` · `list tasks` · `all tasks`
+- Still separate: `task path` · `task size` · `task age` · `TASK_CREATE:` · `TASK_SHOW: <id>` · singular `open task …`
 
-Updated: 2026-09-12 ~03:05
+Updated: 2026-09-12 ~03:35
