@@ -42789,6 +42789,8 @@ pub fn format_browser_ready_chip() -> String {
 
 /// True for focused agent-judge Ready/config asks (`/judge`) —
 /// not “run the judge”, score this turn, or enable/disable how-tos.
+/// View/see/show me/open/list-the NL (v0.1.1029). Exact `open judge` / `open the judge` /
+/// `open agent judge` only — not `judge this` / run / score / enable.
 pub fn looks_like_judge_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -42840,8 +42842,32 @@ pub fn looks_like_judge_ready_request(content: &str) -> bool {
             | "agent judge configured"
             | "agent judge health"
             | "agent judge mode"
+            | "list judge"
+            | "list the judge"
+            | "list agent judge"
+            | "list the agent judge"
             | "show judge"
+            | "show the judge"
+            | "show me judge"
+            | "show me the judge"
             | "show agent judge"
+            | "show the agent judge"
+            | "show me agent judge"
+            | "show me the agent judge"
+            | "view judge"
+            | "view the judge"
+            | "view agent judge"
+            | "view the agent judge"
+            | "see judge"
+            | "see the judge"
+            | "see agent judge"
+            | "see the agent judge"
+            | "open judge"
+            | "open the judge"
+            | "open agent judge"
+            | "open the agent judge"
+            | "the judge"
+            | "the agent judge"
             | "is judge ready"
             | "is judge online"
             | "is judge offline"
@@ -42882,6 +42908,9 @@ pub fn format_judge_ready_chip() -> String {
 
 /// True for focused product AI On/Off asks (`/ai` · `/ai-agent`) —
 /// not enable/disable how-tos, `/agents` catalog, or chat-with-AI tasks.
+/// View/see/show me/open/list-the NL (v0.1.1029). Exact `open ai` / `open the ai` /
+/// `open ai agent` / `open the ai agent` / `open ai-agent` only — not OpenAI / ask / chat /
+/// `/agents` catalog.
 pub fn looks_like_ai_agent_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -42899,6 +42928,8 @@ pub fn looks_like_ai_agent_ready_request(content: &str) -> bool {
         || n.starts_with("/agents")
         || n == "agents"
         || n.contains("list agents")
+        || n.contains("openai")
+        || n.contains("open ai api")
         || n.contains("chat with")
         || n.contains("talk to")
         || n.contains("ask ai")
@@ -42943,8 +42974,37 @@ pub fn looks_like_ai_agent_ready_request(content: &str) -> bool {
             | "local ai status"
             | "local ai agent"
             | "local ai ready"
+            | "list ai"
+            | "list the ai"
+            | "list ai agent"
+            | "list the ai agent"
+            | "list ai-agent"
             | "show ai"
+            | "show the ai"
+            | "show me ai"
+            | "show me the ai"
             | "show ai agent"
+            | "show the ai agent"
+            | "show me ai agent"
+            | "show me the ai agent"
+            | "show ai-agent"
+            | "view ai"
+            | "view the ai"
+            | "view ai agent"
+            | "view the ai agent"
+            | "view ai-agent"
+            | "see ai"
+            | "see the ai"
+            | "see ai agent"
+            | "see the ai agent"
+            | "see ai-agent"
+            | "open ai"
+            | "open the ai"
+            | "open ai agent"
+            | "open the ai agent"
+            | "open ai-agent"
+            | "the ai"
+            | "the ai agent"
             | "is ai ready"
             | "is ai online"
             | "is ai offline"
@@ -45743,8 +45803,8 @@ pub fn format_ops_help_gateway() -> String {
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
-• `/judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
-• `/ai` · `/ai-agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
+• `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
+• `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
@@ -46291,12 +46351,24 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/judge` Ready chip asks (v0.1.735).
+    // `/judge` Ready chip asks (v0.1.735); view/see/show me/open/list-the NL (v0.1.1029).
     if (q.contains("/judge")
         || q == "judge"
         || q.contains("judge status")
         || q.contains("judge ready")
         || q.contains("agent judge")
+        || q.contains("list judge")
+        || q.contains("list the judge")
+        || q.contains("list agent judge")
+        || q.contains("view judge")
+        || q.contains("see judge")
+        || q.contains("show me the judge")
+        || q.contains("show me judge")
+        || q.contains("show judge")
+        || q == "open judge"
+        || q == "open the judge"
+        || q == "open agent judge"
+        || q == "open the agent judge"
         || q.contains("is judge ready")
         || q.contains("is judge enabled")
         || q.contains("is agent judge ready")
@@ -46318,7 +46390,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/ai` · `/ai-agent` Ready chip asks (v0.1.736).
+    // `/ai` · `/ai-agent` Ready chip asks (v0.1.736); view/see/show me/open/list-the NL (v0.1.1029).
     if (q.contains("/ai")
         || q.contains("/ai-agent")
         || q == "ai"
@@ -46326,6 +46398,19 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("ai ready")
         || q.contains("ai agent status")
         || q.contains("ai agent ready")
+        || q.contains("list ai")
+        || q.contains("list the ai")
+        || q.contains("list ai agent")
+        || q.contains("view ai")
+        || q.contains("see ai")
+        || q.contains("show me the ai")
+        || q.contains("show me ai")
+        || q.contains("show ai")
+        || q == "open ai"
+        || q == "open the ai"
+        || q == "open ai agent"
+        || q == "open the ai agent"
+        || q == "open ai-agent"
         || q.contains("is ai ready")
         || q.contains("is ai enabled")
         || q.contains("is ai on")
@@ -46338,6 +46423,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("local ai"))
         && !q.contains("/agents")
         && !q.contains("list agents")
+        && !q.contains("openai")
         && !q.contains("enable ai")
         && !q.contains("disable ai")
         && !q.contains("turn on")
@@ -60979,6 +61065,14 @@ mod tests {
         assert!(looks_like_judge_ready_request("/judge"));
         assert!(looks_like_judge_ready_request("judge"));
         assert!(looks_like_judge_ready_request("judge status"));
+        assert!(looks_like_judge_ready_request("list the judge"));
+        assert!(looks_like_judge_ready_request("view judge"));
+        assert!(looks_like_judge_ready_request("see judge"));
+        assert!(looks_like_judge_ready_request("show me the judge"));
+        assert!(looks_like_judge_ready_request("show judge"));
+        assert!(looks_like_judge_ready_request("open judge"));
+        assert!(looks_like_judge_ready_request("open the judge"));
+        assert!(looks_like_judge_ready_request("the judge"));
         assert!(looks_like_judge_ready_request("is judge ready"));
         assert!(looks_like_judge_ready_request("is agent judge enabled"));
         assert!(looks_like_judge_ready_request("how's judge"));
@@ -60987,12 +61081,32 @@ mod tests {
         assert!(!looks_like_judge_ready_request("run the judge"));
         assert!(!looks_like_judge_ready_request("enable judge"));
         assert!(!looks_like_judge_ready_request("how to use judge"));
+        let view_judge = try_operator_instant_reply("view judge").expect("view judge instant");
+        assert!(
+            view_judge.to_lowercase().contains("judge"),
+            "{view_judge}"
+        );
+        let show_me_judge =
+            try_operator_instant_reply("show me the judge").expect("show me the judge");
+        assert!(
+            show_me_judge.to_lowercase().contains("judge"),
+            "{show_me_judge}"
+        );
         let judge_chip = format_judge_ready_chip();
         assert!(judge_chip.to_lowercase().contains("judge"), "{judge_chip}");
         assert!(looks_like_ai_agent_ready_request("/ai"));
         assert!(looks_like_ai_agent_ready_request("/ai-agent"));
         assert!(looks_like_ai_agent_ready_request("ai"));
         assert!(looks_like_ai_agent_ready_request("ai status"));
+        assert!(looks_like_ai_agent_ready_request("list the ai"));
+        assert!(looks_like_ai_agent_ready_request("view ai"));
+        assert!(looks_like_ai_agent_ready_request("see ai"));
+        assert!(looks_like_ai_agent_ready_request("show me the ai"));
+        assert!(looks_like_ai_agent_ready_request("show ai"));
+        assert!(looks_like_ai_agent_ready_request("open ai"));
+        assert!(looks_like_ai_agent_ready_request("open the ai"));
+        assert!(looks_like_ai_agent_ready_request("open ai agent"));
+        assert!(looks_like_ai_agent_ready_request("the ai"));
         assert!(looks_like_ai_agent_ready_request("is ai ready"));
         assert!(looks_like_ai_agent_ready_request("is ai on"));
         assert!(looks_like_ai_agent_ready_request("is the ai enabled"));
@@ -61004,10 +61118,18 @@ mod tests {
         assert!(!looks_like_ai_agent_ready_request("turn on ai"));
         assert!(!looks_like_ai_agent_ready_request("/agents"));
         assert!(!looks_like_ai_agent_ready_request("list agents"));
+        assert!(!looks_like_ai_agent_ready_request("openai"));
         assert!(!looks_like_ai_agent_ready_request("chat with ai"));
         assert!(!looks_like_ai_agent_ready_request("ask ai about weather"));
         assert!(!looks_like_ai_agent_ready_request("how to enable ai"));
-        assert!(looks_like_compact_ready_request("/compact"));
+        let view_ai = try_operator_instant_reply("view ai").expect("view ai instant");
+        assert!(view_ai.contains("AI") || view_ai.to_lowercase().contains("ai"), "{view_ai}");
+        let open_ai_agent =
+            try_operator_instant_reply("open ai agent").expect("open ai agent instant");
+        assert!(
+            open_ai_agent.contains("AI") || open_ai_agent.to_lowercase().contains("ai"),
+            "{open_ai_agent}"
+        );        assert!(looks_like_compact_ready_request("/compact"));
         assert!(looks_like_compact_ready_request("/menu-bar"));
         assert!(looks_like_compact_ready_request("/cpu-window"));
         assert!(looks_like_compact_ready_request("compact"));

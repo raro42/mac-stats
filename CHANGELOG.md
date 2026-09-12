@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1029] - 2026-09-12
+
+### Added
+- Instant lane: more Judge / AI NL for `/judge` · `/ai` · `/ai-agent` — `view judge`, `see judge`, `show me the judge`, `open judge` / `open the judge`, `list the judge`, and `view ai`, `see ai`, `show me the ai`, `open ai` / `open the ai`, `open ai agent`, `list the ai` (and close variants) join Ready / Off / On. Exact open only — not run/score/enable judge, OpenAI, ask/chat, or `/agents`. Config only; no judge run or AI toggle.
+
 ## [0.1.1028] - 2026-09-12
 
 ### Added
