@@ -40741,9 +40741,10 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
 }
 
 /// True for `/skills` / `list skills` — Hermes skills_list catalog; not SKILL: / SKILL_VIEW / manage.
+/// View/see/show me/open/list-the NL (v0.1.1025). Exact `open skills` only — not `open skill …`.
 pub fn looks_like_skills_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     // Tool invocations and manage/run asks stay with the agent / tool loop.
@@ -40772,6 +40773,13 @@ pub fn looks_like_skills_request(content: &str) -> bool {
         || n.contains("directory")
         || n.contains("where")
         || n.contains("location")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("skills age")
+        || n.contains("skill age")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -40781,10 +40789,32 @@ pub fn looks_like_skills_request(content: &str) -> bool {
         "/skills"
             | "skills"
             | "list skills"
+            | "list the skills"
+            | "list skill"
+            | "list the skill"
+            | "show skills"
+            | "show the skills"
+            | "show me skills"
+            | "show me the skills"
+            | "show skill"
+            | "show the skill"
+            | "show me skill"
+            | "show me the skill"
+            | "view skills"
+            | "view the skills"
+            | "view skill"
+            | "view the skill"
+            | "see skills"
+            | "see the skills"
+            | "see skill"
+            | "see the skill"
+            | "open skills"
+            | "open the skills"
             | "my skills"
             | "which skills"
             | "what skills"
             | "all skills"
+            | "the skills"
             | "skill list"
             | "skills list"
             | "skills catalog"
@@ -45616,7 +45646,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
-• `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
+• `/skills` · `view skills` · `see skills` · `show me the skills` · `open skills` · `list the skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list\n\
@@ -45980,10 +46010,18 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/skills` catalog operator asks (v0.1.731).
+    // `/skills` catalog operator asks (v0.1.731); view/see/show me/open/list-the NL (v0.1.1025).
     if (q.contains("/skills")
         || q == "skills"
         || q.contains("list skills")
+        || q.contains("list the skills")
+        || q.contains("view skills")
+        || q.contains("see skills")
+        || q.contains("show me the skills")
+        || q.contains("show me skills")
+        || q.contains("show skills")
+        || q == "open skills"
+        || q == "open the skills"
         || q.contains("skills catalog")
         || q.contains("skill catalog")
         || q.contains("installed skills")
@@ -45995,6 +46033,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains("create")
         && !q.contains("run skill")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("how big")
+        && !q.contains("how old")
+        && !q.contains("skills age")
+        && !q.contains("skill age")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -49493,6 +49538,12 @@ mod tests {
     fn skills_request_detected() {
         assert!(looks_like_skills_request("/skills"));
         assert!(looks_like_skills_request("list skills"));
+        assert!(looks_like_skills_request("list the skills"));
+        assert!(looks_like_skills_request("view skills"));
+        assert!(looks_like_skills_request("see skills"));
+        assert!(looks_like_skills_request("show me the skills"));
+        assert!(looks_like_skills_request("open skills"));
+        assert!(looks_like_skills_request("the skills"));
         assert!(looks_like_skills_request("skills catalog"));
         assert!(looks_like_skills_request("installed skills"));
         assert!(looks_like_skills_request("@Werner skills"));
@@ -49502,7 +49553,17 @@ mod tests {
         assert!(!looks_like_skills_request("run skill code"));
         assert!(!looks_like_skills_request("why are skills empty"));
         assert!(!looks_like_skills_request("skills path"));
+        assert!(!looks_like_skills_request("skills size"));
+        assert!(!looks_like_skills_request("skills age"));
         assert!(!looks_like_skills_request("where is the skills folder"));
+        // Singular "open skill …" stays with the agent (run/view flow).
+        assert!(!looks_like_skills_request("open skill"));
+        assert!(!looks_like_skills_request("open this skill"));
+        let view = try_operator_instant_reply("view skills").expect("view skills instant");
+        assert!(view.contains("Skills"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the skills").expect("show me the skills");
+        assert!(show_me.contains("Skills"), "{show_me}");
         assert!(looks_like_tasks_request("/tasks"));
         assert!(looks_like_tasks_request("list tasks"));
         assert!(looks_like_tasks_request("open tasks"));

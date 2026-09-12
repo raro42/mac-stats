@@ -14,6 +14,7 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 | **v0.1.1022** | `/sessions` NL expand (exact `open sessions` only) |
 | **v0.1.1023** | `/knowledge` NL expand |
 | **v0.1.1024** | `/agents` NL expand (exact `open agents` only; path/size/age safe) |
+| **v0.1.1025** | `/skills` NL expand (exact `open skills` only; path/size/age safe) |
 
 ## Fuel notes
 
@@ -23,8 +24,8 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 
 ## Try in Discord / AI Chat
 
-- `view agents` · `show me the agents` · `open agents` · `list the agents`
-- Still works: `/agents on` · `/agents off`
-- Still separate: `agents path` · `agents size` · `agents age`
+- `view skills` · `show me the skills` · `open skills` · `list the skills`
+- Still works: `/skills` · `list skills` · `skills catalog`
+- Still separate: `skills path` · `skills size` · `skills age` · `SKILL: …`
 
-Updated: 2026-09-12 ~02:41
+Updated: 2026-09-12 ~03:05
