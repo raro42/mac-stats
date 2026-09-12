@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1031] - 2026-09-12
+
+### Added
+- Instant lane: more Downloads organizer NL for `/downloads` · `/organizer` — `view downloads`, `see downloads`, `show me the downloads`, `open downloads` / `open the downloads`, `list the downloads`, and the same for organizer / downloads organizer (and close variants) join On/Off Ready. Exact open only — not run-now, enable/disable, `/disk`, or BROWSER_DOWNLOAD. Path/size/age and rules/state lanes stay separate.
+
 ## [0.1.1030] - 2026-09-12
 
 ### Added

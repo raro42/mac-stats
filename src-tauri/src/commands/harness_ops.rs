@@ -43226,6 +43226,8 @@ pub fn format_compact_ready_chip() -> String {
 
 /// True for focused Downloads organizer Ready/config asks (`/downloads` · `/organizer`) —
 /// not Disk Cleanup `/disk`, BROWSER_DOWNLOAD, run-now, or enable/disable how-tos.
+/// View/see/show me/open/list-the NL (v0.1.1031). Exact `open downloads` / `open organizer`
+/// (and close variants) only — not `open download …`, run-now, or path/size/age lanes.
 pub fn looks_like_downloads_organizer_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -43303,8 +43305,44 @@ pub fn looks_like_downloads_organizer_ready_request(content: &str) -> bool {
             | "organizer health"
             | "organizer on"
             | "organizer off"
+            | "list downloads"
+            | "list the downloads"
+            | "list organizer"
+            | "list the organizer"
+            | "list downloads organizer"
+            | "list the downloads organizer"
+            | "view downloads"
+            | "view the downloads"
+            | "view organizer"
+            | "view the organizer"
+            | "view downloads organizer"
+            | "view the downloads organizer"
+            | "see downloads"
+            | "see the downloads"
+            | "see organizer"
+            | "see the organizer"
+            | "see downloads organizer"
+            | "see the downloads organizer"
             | "show downloads"
+            | "show the downloads"
+            | "show me downloads"
+            | "show me the downloads"
             | "show organizer"
+            | "show the organizer"
+            | "show me organizer"
+            | "show me the organizer"
+            | "show downloads organizer"
+            | "show the downloads organizer"
+            | "show me downloads organizer"
+            | "show me the downloads organizer"
+            | "open downloads"
+            | "open the downloads"
+            | "open organizer"
+            | "open the organizer"
+            | "open downloads organizer"
+            | "open the downloads organizer"
+            | "the downloads"
+            | "the organizer"
             | "is downloads ready"
             | "is downloads on"
             | "is downloads off"
@@ -45883,7 +45921,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
-• `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
+• `/downloads` · `/organizer` · `view downloads` · `see downloads` · `show me the downloads` · `open downloads` · `list the downloads` · `view organizer` · `see organizer` · `show me the organizer` · `open organizer` · `list the organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
 • `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
@@ -46580,7 +46618,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/downloads` · `/organizer` Ready chip asks (v0.1.741).
+    // `/downloads` · `/organizer` Ready chip asks (v0.1.741);
+    // view/see/show me/open/list-the NL (v0.1.1031).
     if (q.contains("/downloads")
         || q.contains("/organizer")
         || q.contains("downloads-organizer")
@@ -46589,6 +46628,24 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("downloads organizer")
         || q.contains("downloads status")
         || q.contains("organizer status")
+        || q.contains("list downloads")
+        || q.contains("list the downloads")
+        || q.contains("list organizer")
+        || q.contains("list the organizer")
+        || q.contains("view downloads")
+        || q.contains("see downloads")
+        || q.contains("show me the downloads")
+        || q.contains("show me downloads")
+        || q.contains("view organizer")
+        || q.contains("see organizer")
+        || q.contains("show me the organizer")
+        || q.contains("show me organizer")
+        || q == "open downloads"
+        || q == "open the downloads"
+        || q == "open organizer"
+        || q == "open the organizer"
+        || q == "open downloads organizer"
+        || q == "open the downloads organizer"
         || q.contains("is downloads ready")
         || q.contains("is downloads on")
         || q.contains("is organizer ready")
@@ -61295,6 +61352,17 @@ mod tests {
         assert!(looks_like_downloads_organizer_ready_request("/organizer"));
         assert!(looks_like_downloads_organizer_ready_request("downloads"));
         assert!(looks_like_downloads_organizer_ready_request("downloads status"));
+        assert!(looks_like_downloads_organizer_ready_request("list the downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("view downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("see downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("show me the downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("open downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("open the downloads"));
+        assert!(looks_like_downloads_organizer_ready_request("view organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("see organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("show me the organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("open organizer"));
+        assert!(looks_like_downloads_organizer_ready_request("open the organizer"));
         assert!(looks_like_downloads_organizer_ready_request("is downloads ready"));
         assert!(looks_like_downloads_organizer_ready_request("how's organizer"));
         assert!(looks_like_downloads_organizer_ready_request("downloads organizer"));
@@ -61315,6 +61383,19 @@ mod tests {
         assert!(!looks_like_downloads_organizer_ready_request(
             "where is downloads-organizer-state.json"
         ));
+        let view_downloads =
+            try_operator_instant_reply("view downloads").expect("view downloads instant");
+        assert!(
+            view_downloads.to_lowercase().contains("download"),
+            "{view_downloads}"
+        );
+        let open_organizer =
+            try_operator_instant_reply("open organizer").expect("open organizer instant");
+        assert!(
+            open_organizer.to_lowercase().contains("download")
+                || open_organizer.to_lowercase().contains("organizer"),
+            "{open_organizer}"
+        );
         let downloads_chip = format_downloads_organizer_ready_chip();
         assert!(
             downloads_chip.to_lowercase().contains("download"),
