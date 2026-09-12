@@ -42017,7 +42017,6 @@ pub fn looks_like_redmine_ready_request(content: &str) -> bool {
         || n.contains("update")
         || n.contains("comment")
         || n.contains("search")
-        || n.contains("list ")
         || n.contains("review")
         || n.contains("journal")
         || n.contains("attachment")
@@ -42044,6 +42043,18 @@ pub fn looks_like_redmine_ready_request(content: &str) -> bool {
             | "redmine configured"
             | "redmine health"
             | "show redmine"
+            | "show the redmine"
+            | "show me redmine"
+            | "show me the redmine"
+            | "view redmine"
+            | "view the redmine"
+            | "see redmine"
+            | "see the redmine"
+            | "open redmine"
+            | "open the redmine"
+            | "list redmine"
+            | "list the redmine"
+            | "the redmine"
             | "is redmine ready"
             | "is redmine online"
             | "is redmine connected"
@@ -42146,6 +42157,31 @@ pub fn looks_like_brave_ready_request(content: &str) -> bool {
             | "brave health"
             | "brave key"
             | "show brave"
+            | "show the brave"
+            | "show me brave"
+            | "show me the brave"
+            | "show brave search"
+            | "show the brave search"
+            | "show me brave search"
+            | "show me the brave search"
+            | "view brave"
+            | "view the brave"
+            | "view brave search"
+            | "view the brave search"
+            | "see brave"
+            | "see the brave"
+            | "see brave search"
+            | "see the brave search"
+            | "open brave"
+            | "open the brave"
+            | "open brave search"
+            | "open the brave search"
+            | "list brave"
+            | "list the brave"
+            | "list brave search"
+            | "list the brave search"
+            | "the brave"
+            | "the brave search"
             | "is brave ready"
             | "is brave online"
             | "is brave connected"
@@ -42346,6 +42382,18 @@ pub fn looks_like_mastodon_ready_request(content: &str) -> bool {
             | "mastodon token"
             | "mastodon url"
             | "show mastodon"
+            | "show the mastodon"
+            | "show me mastodon"
+            | "show me the mastodon"
+            | "view mastodon"
+            | "view the mastodon"
+            | "see mastodon"
+            | "see the mastodon"
+            | "open mastodon"
+            | "open the mastodon"
+            | "list mastodon"
+            | "list the mastodon"
+            | "the mastodon"
             | "is mastodon ready"
             | "is mastodon online"
             | "is mastodon connected"
@@ -42391,11 +42439,12 @@ pub fn looks_like_mcp_ready_request(content: &str) -> bool {
         return false;
     }
     // Tool invocations and how-to stay with pre-route / agent.
+    // Exact `list mcp` / `list the mcp` stay Ready chips (allow list); tool dumps stay out.
     if n.starts_with("mcp:")
         || n.contains("mcp:")
         || n.contains("mcp tool")
         || n.contains("list tools")
-        || n.contains("list mcp")
+        || n.contains("list mcp tool")
         || n.contains("call mcp")
         || n.contains("use mcp")
         || n.contains("invoke")
@@ -42431,6 +42480,31 @@ pub fn looks_like_mcp_ready_request(content: &str) -> bool {
             | "mcp server"
             | "mcp connection"
             | "show mcp"
+            | "show the mcp"
+            | "show me mcp"
+            | "show me the mcp"
+            | "show mcp server"
+            | "show the mcp server"
+            | "show me mcp server"
+            | "show me the mcp server"
+            | "view mcp"
+            | "view the mcp"
+            | "view mcp server"
+            | "view the mcp server"
+            | "see mcp"
+            | "see the mcp"
+            | "see mcp server"
+            | "see the mcp server"
+            | "open mcp"
+            | "open the mcp"
+            | "open mcp server"
+            | "open the mcp server"
+            | "list mcp"
+            | "list the mcp"
+            | "list mcp server"
+            | "list the mcp server"
+            | "the mcp"
+            | "the mcp server"
             | "is mcp ready"
             | "is mcp online"
             | "is mcp connected"
@@ -46246,11 +46320,11 @@ pub fn format_ops_help_gateway() -> String {
 • `/status` · `/health` · `/version` — one-screen health\n\
 • `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
-• `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
-• `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
+• `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
+• `/brave` · `view brave` · `see brave` · `show me the brave` · `open brave` · `list the brave` · `view brave search` · `open brave search` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
-• `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
-• `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
+• `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
+• `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
@@ -47704,7 +47778,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/redmine` Ready/Not-set chip asks (v0.1.724).
+    // `/redmine` Ready/Not-set chip asks (v0.1.724); view/see/show me/open/list-the NL (v0.1.1036).
     if (q.contains("/redmine")
         || q == "redmine"
         || q.contains("redmine status")
@@ -47725,7 +47799,14 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's the redmine"
         || q == "hows the redmine"
         || q.contains("redmine url")
-        || q.contains("redmine key"))
+        || q.contains("redmine key")
+        || q.contains("view redmine")
+        || q.contains("see redmine")
+        || q.contains("show me the redmine")
+        || q.contains("list the redmine")
+        || q == "open redmine"
+        || q == "open the redmine"
+        || q == "the redmine")
         && !q.contains("ticket")
         && !q.contains("issue")
         && !q.contains("time entr")
@@ -47739,7 +47820,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/brave` Ready/Not-set chip asks (v0.1.725).
+    // `/brave` Ready/Not-set chip asks (v0.1.725); view/see/show me/open/list-the NL (v0.1.1036).
     if (q.contains("/brave")
         || q == "brave"
         || q.contains("brave status")
@@ -47770,7 +47851,17 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is brave search set up")
         || q.contains("is brave search setup")
         || q == "how's brave search"
-        || q == "hows brave search")
+        || q == "hows brave search"
+        || q.contains("view brave")
+        || q.contains("see brave")
+        || q.contains("show me the brave")
+        || q.contains("list the brave")
+        || q == "open brave"
+        || q == "open the brave"
+        || q == "open brave search"
+        || q == "open the brave search"
+        || q == "the brave"
+        || q == "the brave search")
         && !q.contains("search for")
         && !q.contains("look up")
         && !q.contains("google")
@@ -47828,7 +47919,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/mastodon` Ready/Not-set chip asks (v0.1.727).
+    // `/mastodon` Ready/Not-set chip asks (v0.1.727); view/see/show me/open/list-the NL (v0.1.1036).
     if (q.contains("/mastodon")
         || q == "mastodon"
         || q.contains("mastodon status")
@@ -47850,7 +47941,14 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's mastodon"
         || q == "hows mastodon"
         || q == "how's the mastodon"
-        || q == "hows the mastodon")
+        || q == "hows the mastodon"
+        || q.contains("view mastodon")
+        || q.contains("see mastodon")
+        || q.contains("show me the mastodon")
+        || q.contains("list the mastodon")
+        || q == "open mastodon"
+        || q == "open the mastodon"
+        || q == "the mastodon")
         && !q.contains("toot")
         && !q.contains("post ")
         && !q.contains("publish")
@@ -47863,7 +47961,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/mcp` Ready/Not-set chip asks (v0.1.728).
+    // `/mcp` Ready/Not-set chip asks (v0.1.728); view/see/show me/open/list-the NL (v0.1.1036).
     if (q.contains("/mcp")
         || q == "mcp"
         || q.contains("mcp status")
@@ -47886,10 +47984,21 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's mcp"
         || q == "hows mcp"
         || q == "how's the mcp"
-        || q == "hows the mcp")
+        || q == "hows the mcp"
+        || q.contains("view mcp")
+        || q.contains("see mcp")
+        || q.contains("show me the mcp")
+        || q.contains("list the mcp")
+        || q == "open mcp"
+        || q == "open the mcp"
+        || q == "open mcp server"
+        || q == "open the mcp server"
+        || q == "the mcp"
+        || q == "the mcp server")
         && !q.contains("mcp:")
         && !q.contains("mcp tool")
         && !q.contains("list tools")
+        && !q.contains("list mcp tool")
         && !q.contains("call mcp")
         && !q.contains("use mcp")
         && !q.contains("invoke")
@@ -61598,6 +61707,12 @@ mod tests {
         assert!(looks_like_redmine_ready_request("is redmine ready"));
         assert!(looks_like_redmine_ready_request("is redmine configured"));
         assert!(looks_like_redmine_ready_request("how's redmine"));
+        assert!(looks_like_redmine_ready_request("list the redmine"));
+        assert!(looks_like_redmine_ready_request("view redmine"));
+        assert!(looks_like_redmine_ready_request("see redmine"));
+        assert!(looks_like_redmine_ready_request("show me the redmine"));
+        assert!(looks_like_redmine_ready_request("open redmine"));
+        assert!(looks_like_redmine_ready_request("open the redmine"));
         assert!(!looks_like_redmine_ready_request("status of the redmine ticket"));
         assert!(!looks_like_redmine_ready_request("review ticket 7736"));
         assert!(!looks_like_redmine_ready_request("redmine issue 12"));
@@ -61606,6 +61721,12 @@ mod tests {
         assert!(!looks_like_redmine_ready_request("talk to redmine"));
         let chip = format_redmine_ready_chip();
         assert!(chip.to_lowercase().contains("redmine"), "{chip}");
+        let view_rm =
+            try_operator_instant_reply("view redmine").expect("view redmine instant");
+        assert!(
+            view_rm.to_lowercase().contains("redmine"),
+            "{view_rm}"
+        );
     }
 
     #[test]
@@ -61619,6 +61740,14 @@ mod tests {
         assert!(looks_like_brave_ready_request("brave search status"));
         assert!(looks_like_brave_ready_request("brave search key"));
         assert!(looks_like_brave_ready_request("is brave search ready"));
+        assert!(looks_like_brave_ready_request("list the brave"));
+        assert!(looks_like_brave_ready_request("view brave"));
+        assert!(looks_like_brave_ready_request("see brave"));
+        assert!(looks_like_brave_ready_request("show me the brave"));
+        assert!(looks_like_brave_ready_request("open brave"));
+        assert!(looks_like_brave_ready_request("open the brave"));
+        assert!(looks_like_brave_ready_request("view brave search"));
+        assert!(looks_like_brave_ready_request("open the brave search"));
         assert!(!looks_like_brave_ready_request("brave search"));
         assert!(!looks_like_brave_ready_request("search for weather"));
         assert!(!looks_like_brave_ready_request("brave search for news"));
@@ -61627,6 +61756,8 @@ mod tests {
         assert!(!looks_like_brave_ready_request("research climate"));
         let chip = format_brave_ready_chip();
         assert!(chip.to_lowercase().contains("brave"), "{chip}");
+        let view_br = try_operator_instant_reply("view brave").expect("view brave instant");
+        assert!(view_br.to_lowercase().contains("brave"), "{view_br}");
     }
 
     #[test]
@@ -61662,6 +61793,12 @@ mod tests {
         assert!(looks_like_mastodon_ready_request("is mastodon ready"));
         assert!(looks_like_mastodon_ready_request("is mastodon configured"));
         assert!(looks_like_mastodon_ready_request("how's mastodon"));
+        assert!(looks_like_mastodon_ready_request("list the mastodon"));
+        assert!(looks_like_mastodon_ready_request("view mastodon"));
+        assert!(looks_like_mastodon_ready_request("see mastodon"));
+        assert!(looks_like_mastodon_ready_request("show me the mastodon"));
+        assert!(looks_like_mastodon_ready_request("open mastodon"));
+        assert!(looks_like_mastodon_ready_request("open the mastodon"));
         assert!(!looks_like_mastodon_ready_request("post to mastodon"));
         assert!(!looks_like_mastodon_ready_request("toot hello world"));
         assert!(!looks_like_mastodon_ready_request("mastodon timeline"));
@@ -61669,6 +61806,12 @@ mod tests {
         assert!(!looks_like_mastodon_ready_request("publish on mastodon"));
         let chip = format_mastodon_ready_chip();
         assert!(chip.to_lowercase().contains("mastodon"), "{chip}");
+        let view_md =
+            try_operator_instant_reply("view mastodon").expect("view mastodon instant");
+        assert!(
+            view_md.to_lowercase().contains("mastodon"),
+            "{view_md}"
+        );
     }
 
     #[test]
@@ -61681,6 +61824,14 @@ mod tests {
         assert!(looks_like_mcp_ready_request("how's mcp"));
         assert!(looks_like_mcp_ready_request("mcp server"));
         assert!(looks_like_mcp_ready_request("mcp stdio"));
+        assert!(looks_like_mcp_ready_request("list the mcp"));
+        assert!(looks_like_mcp_ready_request("view mcp"));
+        assert!(looks_like_mcp_ready_request("see mcp"));
+        assert!(looks_like_mcp_ready_request("show me the mcp"));
+        assert!(looks_like_mcp_ready_request("open mcp"));
+        assert!(looks_like_mcp_ready_request("open the mcp"));
+        assert!(looks_like_mcp_ready_request("view mcp server"));
+        assert!(looks_like_mcp_ready_request("open the mcp server"));
         assert!(!looks_like_mcp_ready_request("mcp: get_weather"));
         assert!(!looks_like_mcp_ready_request("MCP: list_tools {}"));
         assert!(!looks_like_mcp_ready_request("call mcp tool"));
@@ -61689,6 +61840,8 @@ mod tests {
         assert!(!looks_like_mcp_ready_request("use mcp for weather"));
         let chip = format_mcp_ready_chip();
         assert!(chip.to_lowercase().contains("mcp"), "{chip}");
+        let view_mcp = try_operator_instant_reply("view mcp").expect("view mcp instant");
+        assert!(view_mcp.to_lowercase().contains("mcp"), "{view_mcp}");
     }
 
     #[test]

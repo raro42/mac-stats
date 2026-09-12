@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1036] - 2026-09-12
+
+### Added
+- Instant lane: more integration NL for `/redmine` · `/brave` · `/mastodon` · `/mcp` — `view redmine`, `see redmine`, `show me the redmine`, `open redmine` / `open the redmine`, `list the redmine`, and the same for brave / brave search / mastodon / mcp / mcp server join Ready / Not set / Partial. Exact open only — not tickets, web search, toot/post, or MCP tool calls. Config only.
+
 ## [0.1.1035] - 2026-09-12
 
 ### Added
