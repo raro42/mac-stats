@@ -3,6 +3,7 @@
 Overnight Track B kept shipping operator instant-lane NL so common view / open / list-the phrasing stays off Ollama.
 
 ## Shipped tonight
+- **v0.1.1039** — /insights · /help · /ops view/see/show me/open/list-the → runs report / command menu (exact open only; not insights-on research, help me/with, path/size/age; day window still works; p50).
 - **v0.1.1038** — /status · /health · /version view/see/show me/open/list-the → one-screen health (exact open only; not ticket status-of / changelog ship; p50).
 - **v0.1.1037** — /discord · /ollama · /llm · /perplexity key · /cursor · /cursor-agent view/see/show me/open/list-the → Ready chips (config/gateway only; Perplexity is **key** phrases only so /perplexity last-search stays).
 - **v0.1.1036** — /redmine · /brave · /mastodon · /mcp NL expand.
@@ -17,4 +18,4 @@ Overnight Track B kept shipping operator instant-lane NL so common view / open /
 - Debug.log: no ERROR/WARN clusters in scan window.
 
 ## Next fuel
-- More slash NL if still thin (`/insights`·`/rings`·`/strip`·`/details`), or design-review recapture / sibling ports when digester stays empty.
+- More slash NL if still thin (`/rings`·`/strip`·`/details`), or design-review recapture / sibling ports when digester stays empty.
