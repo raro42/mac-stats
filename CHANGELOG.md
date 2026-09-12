@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1023] - 2026-09-12
+
+### Added
+- Instant lane: more Knowledge NL for `/knowledge` — `view knowledge`, `see knowledge`, `show me the knowledge`, `open knowledge`, `list the knowledge` (and close variants) join `list knowledge` / Discord · Core filters.
+
 ## [0.1.1022] - 2026-09-12
 
 ### Added

@@ -41371,9 +41371,10 @@ fn knowledge_row_is_core(kind: &str) -> bool {
 }
 
 /// True for `/knowledge` / `list knowledge` — Agent Ops Discord/Core parity; not scrub/edit asks.
+/// View/see/show me/open/list-the NL (v0.1.1023).
 pub fn looks_like_knowledge_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     if n.contains("create")
@@ -41391,6 +41392,13 @@ pub fn looks_like_knowledge_request(content: &str) -> bool {
         || n.contains("ticket")
         || n.contains("redmine")
         || n.contains("pollut")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.contains(" age")
+        || n.ends_with(" age")
     {
         return false;
     }
@@ -41399,10 +41407,34 @@ pub fn looks_like_knowledge_request(content: &str) -> bool {
         "/knowledge"
             | "knowledge"
             | "list knowledge"
+            | "list the knowledge"
+            | "list knowledge files"
+            | "list the knowledge files"
+            | "show knowledge"
+            | "show the knowledge"
+            | "show me knowledge"
+            | "show me the knowledge"
+            | "show knowledge files"
+            | "show the knowledge files"
+            | "show me knowledge files"
+            | "show me the knowledge files"
+            | "view knowledge"
+            | "view the knowledge"
+            | "view knowledge files"
+            | "view the knowledge files"
+            | "see knowledge"
+            | "see the knowledge"
+            | "see knowledge files"
+            | "see the knowledge files"
+            | "open knowledge"
+            | "open the knowledge"
+            | "open knowledge files"
+            | "open the knowledge files"
             | "my knowledge"
             | "which knowledge"
             | "what knowledge"
             | "all knowledge"
+            | "the knowledge"
             | "knowledge list"
             | "knowledge files"
             | "knowledge file"
@@ -45556,7 +45588,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list\n\
-• `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
+• `/knowledge` · `/knowledge discord` · `/knowledge core` · `view knowledge` · `see knowledge` · `show me the knowledge` · `open knowledge` · `list the knowledge` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` · `view schedules` · `see schedules` · `show me the schedules` · `open schedules` · `list the schedules` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` · `view disk` · `see disk` · `show me the disk cleanup` · `open disk` · `list the disk cleanup` — Disk Cleanup list\n\
@@ -46230,10 +46262,18 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/knowledge` operator asks (v0.1.707).
+    // `/knowledge` operator asks (v0.1.707);
+    // view/see/show me/open NL (v0.1.1023).
     if (q.contains("/knowledge")
         || q == "knowledge"
         || q.contains("list knowledge")
+        || q.contains("list the knowledge")
+        || q.contains("show knowledge")
+        || q.contains("show me the knowledge")
+        || q.contains("view knowledge")
+        || q.contains("see knowledge")
+        || q.contains("open knowledge")
+        || q == "the knowledge"
         || q.contains("knowledge files")
         || q.contains("discord knowledge")
         || q.contains("core knowledge")
@@ -46243,6 +46283,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("create")
         && !q.contains("scrub")
         && !q.contains("save ")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -49480,6 +49523,12 @@ mod tests {
     fn knowledge_request_detected() {
         assert!(looks_like_knowledge_request("/knowledge"));
         assert!(looks_like_knowledge_request("list knowledge"));
+        assert!(looks_like_knowledge_request("list the knowledge"));
+        assert!(looks_like_knowledge_request("view knowledge"));
+        assert!(looks_like_knowledge_request("see knowledge"));
+        assert!(looks_like_knowledge_request("show me the knowledge"));
+        assert!(looks_like_knowledge_request("open knowledge"));
+        assert!(looks_like_knowledge_request("the knowledge"));
         assert!(looks_like_knowledge_request("knowledge files"));
         assert!(looks_like_knowledge_request("/knowledge discord"));
         assert!(looks_like_knowledge_request("core knowledge"));
@@ -49487,6 +49536,8 @@ mod tests {
         assert!(!looks_like_knowledge_request("scrub memory"));
         assert!(!looks_like_knowledge_request("save this to knowledge"));
         assert!(!looks_like_knowledge_request("why is knowledge empty"));
+        assert!(!looks_like_knowledge_request("knowledge path"));
+        assert!(!looks_like_knowledge_request("knowledge size"));
         assert_eq!(
             parse_knowledge_list_filter("/knowledge"),
             KnowledgeListFilter::All
@@ -49499,6 +49550,11 @@ mod tests {
             parse_knowledge_list_filter("core knowledge"),
             KnowledgeListFilter::Core
         );
+        let view = try_operator_instant_reply("view knowledge").expect("view knowledge instant");
+        assert!(view.contains("Knowledge"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the knowledge").expect("show me the knowledge");
+        assert!(show_me.contains("Knowledge"), "{show_me}");
     }
 
     #[test]
