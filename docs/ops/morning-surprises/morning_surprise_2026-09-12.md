@@ -20,19 +20,19 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 | **v0.1.1028** | `/browser` · `/cdp` NL expand (exact `open browser` / `open cdp` only; path/size/age / credentials / downloads / cookies safe) |
 | **v0.1.1029** | `/judge` · `/ai` · `/ai-agent` NL expand (exact `open judge` / `open ai` / `open ai agent` only; not run/score/enable judge, OpenAI, ask/chat, `/agents`) |
 | **v0.1.1030** | `/compact` · `/menu-bar` · `/cpu-window` NL expand (exact `open compact` / `open menu-bar` / `open cpu-window` only; not compaction / enable / run compaction) |
+| **v0.1.1031** | `/downloads` · `/organizer` NL expand (exact `open downloads` / `open organizer` only; not run-now / enable / `/disk` / BROWSER_DOWNLOAD; path/size/age / rules/state safe) |
 
 ## Fuel notes
 
 - Digester open stayed empty; standing backlog p50 drove each tick.
-- Design review still in grace (CPU metrics ~5.09d recommended when due).
+- Design review still in grace (CPU metrics ~5.11d recommended when due).
 - No product ERROR/WARN clusters in the last debug.log window.
 
 ## Try in Discord / AI Chat
 
-- `view compact` · `show me the compact` · `open compact` · `list the compact`
-- `view menu bar` · `open menu-bar` · `show me the menu bar`
-- `view cpu window` · `open cpu-window` · `show me the cpu window`
-- Still works: `/compact` · `/menu-bar` · `/cpu-window` · `compact status` · `is menu bar compact`
-- Still separate: `compact memory` · `compact this session` · `enable compact` · `run compaction`
+- `view downloads` · `show me the downloads` · `open downloads` · `list the downloads`
+- `view organizer` · `open organizer` · `show me the organizer` · `list the organizer`
+- Still works: `/downloads` · `/organizer` · `downloads status` · `is downloads ready`
+- Still separate: `run organizer` · `organize my downloads` · `/disk` · `browser downloads path` · `organizer rules path`
 
-Updated: 2026-09-12 ~05:20
+Updated: 2026-09-12 ~05:45
