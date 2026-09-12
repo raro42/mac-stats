@@ -44712,6 +44712,44 @@ pub fn looks_like_telegram_ready_request(content: &str) -> bool {
             | "telegram alert"
             | "telegram alerts"
             | "show telegram"
+            | "show the telegram"
+            | "show me telegram"
+            | "show me the telegram"
+            | "show telegram bot"
+            | "show the telegram bot"
+            | "show me telegram bot"
+            | "show me the telegram bot"
+            | "show telegram alerts"
+            | "show the telegram alerts"
+            | "show me telegram alerts"
+            | "show me the telegram alerts"
+            | "view telegram"
+            | "view the telegram"
+            | "view telegram bot"
+            | "view the telegram bot"
+            | "view telegram alerts"
+            | "view the telegram alerts"
+            | "see telegram"
+            | "see the telegram"
+            | "see telegram bot"
+            | "see the telegram bot"
+            | "see telegram alerts"
+            | "see the telegram alerts"
+            | "open telegram"
+            | "open the telegram"
+            | "open telegram bot"
+            | "open the telegram bot"
+            | "open telegram alerts"
+            | "open the telegram alerts"
+            | "list telegram"
+            | "list the telegram"
+            | "list telegram bot"
+            | "list the telegram bot"
+            | "list telegram alerts"
+            | "list the telegram alerts"
+            | "the telegram"
+            | "the telegram bot"
+            | "the telegram alerts"
             | "is telegram ready"
             | "is telegram online"
             | "is telegram connected"
@@ -44785,6 +44823,44 @@ pub fn looks_like_slack_ready_request(content: &str) -> bool {
             | "slack alert"
             | "slack alerts"
             | "show slack"
+            | "show the slack"
+            | "show me slack"
+            | "show me the slack"
+            | "show slack webhook"
+            | "show the slack webhook"
+            | "show me slack webhook"
+            | "show me the slack webhook"
+            | "show slack alerts"
+            | "show the slack alerts"
+            | "show me slack alerts"
+            | "show me the slack alerts"
+            | "view slack"
+            | "view the slack"
+            | "view slack webhook"
+            | "view the slack webhook"
+            | "view slack alerts"
+            | "view the slack alerts"
+            | "see slack"
+            | "see the slack"
+            | "see slack webhook"
+            | "see the slack webhook"
+            | "see slack alerts"
+            | "see the slack alerts"
+            | "open slack"
+            | "open the slack"
+            | "open slack webhook"
+            | "open the slack webhook"
+            | "open slack alerts"
+            | "open the slack alerts"
+            | "list slack"
+            | "list the slack"
+            | "list slack webhook"
+            | "list the slack webhook"
+            | "list slack alerts"
+            | "list the slack alerts"
+            | "the slack"
+            | "the slack webhook"
+            | "the slack alerts"
             | "is slack ready"
             | "is slack online"
             | "is slack connected"
@@ -44862,6 +44938,44 @@ pub fn looks_like_signal_ready_request(content: &str) -> bool {
             | "signal alert"
             | "signal alerts"
             | "show signal"
+            | "show the signal"
+            | "show me signal"
+            | "show me the signal"
+            | "show signal app"
+            | "show the signal app"
+            | "show me signal app"
+            | "show me the signal app"
+            | "show signal alerts"
+            | "show the signal alerts"
+            | "show me signal alerts"
+            | "show me the signal alerts"
+            | "view signal"
+            | "view the signal"
+            | "view signal app"
+            | "view the signal app"
+            | "view signal alerts"
+            | "view the signal alerts"
+            | "see signal"
+            | "see the signal"
+            | "see signal app"
+            | "see the signal app"
+            | "see signal alerts"
+            | "see the signal alerts"
+            | "open signal"
+            | "open the signal"
+            | "open signal app"
+            | "open the signal app"
+            | "open signal alerts"
+            | "open the signal alerts"
+            | "list signal"
+            | "list the signal"
+            | "list signal app"
+            | "list the signal app"
+            | "list signal alerts"
+            | "list the signal alerts"
+            | "the signal"
+            | "the signal app"
+            | "the signal alerts"
             | "is signal ready"
             | "is signal online"
             | "is signal connected"
@@ -44912,9 +45026,31 @@ pub fn looks_like_alerts_ready_request(content: &str) -> bool {
             | "alerts configured"
             | "alerts health"
             | "show alerts"
+            | "show the alerts"
+            | "show me alerts"
+            | "show me the alerts"
             | "show alert channels"
+            | "show the alert channels"
+            | "show me alert channels"
+            | "show me the alert channels"
+            | "view alerts"
+            | "view the alerts"
+            | "view alert channels"
+            | "view the alert channels"
+            | "see alerts"
+            | "see the alerts"
+            | "see alert channels"
+            | "see the alert channels"
+            | "open alerts"
+            | "open the alerts"
+            | "open alert channels"
+            | "open the alert channels"
             | "list alerts"
+            | "list the alerts"
             | "list alert channels"
+            | "list the alert channels"
+            | "the alerts"
+            | "the alert channels"
             | "is alerts ready"
             | "is alerts configured"
             | "is alerts set up"
@@ -46126,7 +46262,7 @@ pub fn format_ops_help_gateway() -> String {
 • `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
 • `/having_fun` · `/fun` · `/idle` · `view having fun` · `see having fun` · `show me the having fun` · `open having fun` · `list the having fun` · `view fun` · `open fun` · `view idle` · `see idle` · `show me the idle` · `open idle` · `list the idle` · `view idle thoughts` · `open idle thoughts` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` · `view voice` · `see voice` · `show me the voice` · `open voice` · `list the voice` · `view stt` · `see stt` · `show me the stt` · `open stt` · `list the stt` · `view speech` · `open speech to text` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; config only; does not steal transcribe)\n\
-• `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
+• `/telegram` · `/slack` · `/signal` · `/alerts` · `view telegram` · `see telegram` · `show me the telegram` · `open telegram` · `list the telegram` · `view slack` · `see slack` · `show me the slack` · `open slack` · `list the slack` · `view signal` · `see signal` · `show me the signal` · `open signal` · `list the signal` · `view alerts` · `see alerts` · `show me the alerts` · `open alerts` · `list the alerts` — alert channel Ready / Not set (Keychain + registry; config only; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -47824,7 +47960,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/telegram` · `/slack` · `/signal` · `/alerts` Ready chips (v0.1.730).
+    // `/telegram` · `/slack` · `/signal` · `/alerts` Ready chips (v0.1.730);
+    // view/see/show me/open/list-the NL expand (v0.1.1035).
     if (q.contains("/telegram")
         || q == "telegram"
         || q.contains("telegram status")
@@ -47837,6 +47974,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is telegram configured")
         || q == "how's telegram"
         || q == "hows telegram"
+        || q.contains("view telegram")
+        || q.contains("see telegram")
+        || q.contains("show me the telegram")
+        || q.contains("list the telegram")
+        || q == "open telegram"
+        || q == "open the telegram"
+        || q == "the telegram"
+        || q == "the telegram bot"
+        || q == "the telegram alerts"
         || q.contains("/slack")
         || q == "slack"
         || q.contains("slack status")
@@ -47849,6 +47995,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is slack configured")
         || q == "how's slack"
         || q == "hows slack"
+        || q.contains("view slack")
+        || q.contains("see slack")
+        || q.contains("show me the slack")
+        || q.contains("list the slack")
+        || q == "open slack"
+        || q == "open the slack"
+        || q == "the slack"
+        || q == "the slack webhook"
+        || q == "the slack alerts"
         || q.contains("/signal")
         || q == "signal"
         || q.contains("signal status")
@@ -47860,6 +48015,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is signal configured")
         || q == "how's signal"
         || q == "hows signal"
+        || q.contains("view signal")
+        || q.contains("see signal")
+        || q.contains("show me the signal")
+        || q.contains("list the signal")
+        || q == "open signal"
+        || q == "open the signal"
+        || q == "the signal"
+        || q == "the signal app"
+        || q == "the signal alerts"
         || q.contains("/alerts")
         || q == "alerts"
         || q.contains("alert channels")
@@ -47868,7 +48032,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("are alerts ready")
         || q.contains("are alert channels ready")
         || q == "how's alerts"
-        || q == "hows alerts")
+        || q == "hows alerts"
+        || q.contains("view alerts")
+        || q.contains("see alerts")
+        || q.contains("show me the alerts")
+        || q.contains("list the alerts")
+        || q == "open alerts"
+        || q == "open the alerts"
+        || q == "the alerts"
+        || q == "the alert channels")
         && !q.contains("send ")
         && !q.contains("post ")
         && !q.contains("message ")
@@ -61997,10 +62169,25 @@ mod tests {
         assert!(looks_like_telegram_ready_request("is telegram ready"));
         assert!(looks_like_telegram_ready_request("how's telegram"));
         assert!(looks_like_telegram_ready_request("telegram bot status"));
+        assert!(looks_like_telegram_ready_request("list the telegram"));
+        assert!(looks_like_telegram_ready_request("view telegram"));
+        assert!(looks_like_telegram_ready_request("see telegram"));
+        assert!(looks_like_telegram_ready_request("show me the telegram"));
+        assert!(looks_like_telegram_ready_request("open telegram"));
+        assert!(looks_like_telegram_ready_request("open the telegram"));
+        assert!(looks_like_telegram_ready_request("view telegram bot"));
+        assert!(looks_like_telegram_ready_request("open the telegram alerts"));
         assert!(!looks_like_telegram_ready_request("send telegram hello"));
         assert!(!looks_like_telegram_ready_request("how to use telegram"));
+        assert!(!looks_like_telegram_ready_request("chat with telegram"));
         let chip = format_telegram_ready_chip();
         assert!(chip.to_lowercase().contains("telegram"), "{chip}");
+        let view_tg =
+            try_operator_instant_reply("view telegram").expect("view telegram instant");
+        assert!(
+            view_tg.to_lowercase().contains("telegram"),
+            "{view_tg}"
+        );
     }
 
     #[test]
@@ -62011,10 +62198,21 @@ mod tests {
         assert!(looks_like_slack_ready_request("is slack ready"));
         assert!(looks_like_slack_ready_request("how's slack"));
         assert!(looks_like_slack_ready_request("slack webhook status"));
+        assert!(looks_like_slack_ready_request("list the slack"));
+        assert!(looks_like_slack_ready_request("view slack"));
+        assert!(looks_like_slack_ready_request("see slack"));
+        assert!(looks_like_slack_ready_request("show me the slack"));
+        assert!(looks_like_slack_ready_request("open slack"));
+        assert!(looks_like_slack_ready_request("open the slack"));
+        assert!(looks_like_slack_ready_request("view slack webhook"));
+        assert!(looks_like_slack_ready_request("open the slack alerts"));
         assert!(!looks_like_slack_ready_request("post to slack"));
         assert!(!looks_like_slack_ready_request("how to use slack"));
+        assert!(!looks_like_slack_ready_request("notify slack"));
         let chip = format_slack_ready_chip();
         assert!(chip.to_lowercase().contains("slack"), "{chip}");
+        let view_sl = try_operator_instant_reply("view slack").expect("view slack instant");
+        assert!(view_sl.to_lowercase().contains("slack"), "{view_sl}");
     }
 
     #[test]
@@ -62024,6 +62222,14 @@ mod tests {
         assert!(looks_like_signal_ready_request("signal status"));
         assert!(looks_like_signal_ready_request("is signal ready"));
         assert!(looks_like_signal_ready_request("how's signal"));
+        assert!(looks_like_signal_ready_request("list the signal"));
+        assert!(looks_like_signal_ready_request("view signal"));
+        assert!(looks_like_signal_ready_request("see signal"));
+        assert!(looks_like_signal_ready_request("show me the signal"));
+        assert!(looks_like_signal_ready_request("open signal"));
+        assert!(looks_like_signal_ready_request("open the signal"));
+        assert!(looks_like_signal_ready_request("view signal app"));
+        assert!(looks_like_signal_ready_request("open the signal alerts"));
         assert!(!looks_like_signal_ready_request("send signal message"));
         assert!(!looks_like_signal_ready_request("sigterm"));
         assert!(!looks_like_signal_ready_request("how to use signal"));
@@ -62037,6 +62243,9 @@ mod tests {
             chip.to_lowercase().contains("not wired") || chip.to_lowercase().contains("rest api"),
             "chip should stay honest about placeholder: {chip}"
         );
+        let view_sg =
+            try_operator_instant_reply("view signal").expect("view signal instant");
+        assert!(view_sg.to_lowercase().contains("signal"), "{view_sg}");
     }
 
     #[test]
@@ -62046,6 +62255,14 @@ mod tests {
         assert!(looks_like_alerts_ready_request("alert channels"));
         assert!(looks_like_alerts_ready_request("are alerts ready"));
         assert!(looks_like_alerts_ready_request("how's alerts"));
+        assert!(looks_like_alerts_ready_request("list the alerts"));
+        assert!(looks_like_alerts_ready_request("view alerts"));
+        assert!(looks_like_alerts_ready_request("see alerts"));
+        assert!(looks_like_alerts_ready_request("show me the alerts"));
+        assert!(looks_like_alerts_ready_request("open alerts"));
+        assert!(looks_like_alerts_ready_request("open the alerts"));
+        assert!(looks_like_alerts_ready_request("view alert channels"));
+        assert!(looks_like_alerts_ready_request("open the alert channels"));
         assert!(!looks_like_alerts_ready_request("trigger an alert"));
         assert!(!looks_like_alerts_ready_request("create alert"));
         let chip = format_alerts_ready_chip();
@@ -62053,6 +62270,9 @@ mod tests {
         assert!(chip.to_lowercase().contains("telegram"), "{chip}");
         assert!(chip.to_lowercase().contains("slack"), "{chip}");
         assert!(chip.to_lowercase().contains("signal"), "{chip}");
+        let view_al =
+            try_operator_instant_reply("view alerts").expect("view alerts instant");
+        assert!(view_al.to_lowercase().contains("alert"), "{view_al}");
     }
 
     #[test]

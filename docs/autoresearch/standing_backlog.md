@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.1035** — Instant lane: more alert-channel NL (`view telegram`, `see telegram`, `show me the telegram`, `open telegram` / `open the telegram`, `list the telegram`, and the same for slack / signal / alerts + telegram bot / slack webhook / signal app / alert channels) join `/telegram` · `/slack` · `/signal` · `/alerts` Ready / Not set / Partial (exact open only — not send/post/notify/trigger/create; Keychain + registry; p50).
+
 - **v0.1.1034** — Instant lane: more Discord voice STT NL (`view voice`, `see voice`, `show me the voice`, `open voice` / `open the voice`, `list the voice`, and the same for stt / speech / speech to text / voice stt / discord voice / discord stt + close variants) join `/voice` · `/stt` Ready / Off / Partial / Not set (exact open only — not transcribe / voice notes / send voice / enable; config only; p50). Also fixes `/having_fun` · `/fun` · `/idle` `show me …` after normalizer strips `show me` / `show`.
 
 - **v0.1.1033** — Instant lane: more Having fun / idle NL (`view having fun`, `see having fun`, `show me the having fun`, `open having fun` / `open the having fun`, `list the having fun`, and the same for fun / idle / idle thoughts + close variants) join `/having_fun` · `/fun` · `/idle` On/Off Ready (exact open only — not send/post, enable, or free-form “have fun …”; config only; p50).

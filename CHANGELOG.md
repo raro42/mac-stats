@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1035] - 2026-09-12
+
+### Added
+- Instant lane: more alert-channel NL for `/telegram` · `/slack` · `/signal` · `/alerts` — `view telegram`, `see telegram`, `show me the telegram`, `open telegram` / `open the telegram`, `list the telegram`, and the same for slack / signal / alerts (plus telegram bot, slack webhook, signal app, alert channels) join Ready / Not set / Partial. Exact open only — not send/post/notify/trigger/create. Config only (Keychain + registry).
+
 ## [0.1.1034] - 2026-09-12
 
 ### Added
