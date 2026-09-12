@@ -1,6 +1,6 @@
 # Morning surprise — 2026-09-12
 
-Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists without Ollama.
+Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists and Ready chips without Ollama.
 
 ## Shipped tonight (keep)
 
@@ -17,6 +17,7 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 | **v0.1.1025** | `/skills` NL expand (exact `open skills` only; path/size/age safe) |
 | **v0.1.1026** | `/tasks` NL expand (exact `open tasks` / `open the tasks` only; path/size/age safe) |
 | **v0.1.1027** | `/plugins` NL expand (exact `open plugins` / `open the plugins` only; path/size/age safe) |
+| **v0.1.1028** | `/browser` · `/cdp` NL expand (exact `open browser` / `open cdp` only; path/size/age / credentials / downloads / cookies safe) |
 
 ## Fuel notes
 
@@ -26,8 +27,9 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 
 ## Try in Discord / AI Chat
 
-- `view plugins` · `show me the plugins` · `open plugins` · `list the plugins`
-- Still works: `/plugins` · `/plugins on` · `/plugins off` · `list plugins` · `enabled plugins`
-- Still separate: `plugins path` · `plugins size` · `plugins age` · `run plugin …` · singular `open plugin …`
+- `view browser` · `show me the browser` · `open browser` · `list the browser`
+- `view cdp` · `show me the cdp` · `open cdp` · `list the cdp`
+- Still works: `/browser` · `/cdp` · `browser status` · `is browser ready`
+- Still separate: `browser credentials path` · `browser downloads size` · `storage state age` · `open page` · `open url` · `BROWSER_SCREENSHOT: …`
 
-Updated: 2026-09-12 ~04:00
+Updated: 2026-09-12 ~04:25
