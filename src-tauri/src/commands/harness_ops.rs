@@ -42614,6 +42614,9 @@ pub fn format_cursor_agent_ready_chip() -> String {
 
 /// True for focused Browser / CDP Ready asks (`/browser` · `/cdp`) —
 /// not BROWSER_* tools, screenshots, or navigate/click tasks.
+/// View/see/show me/open/list-the NL (v0.1.1028). Exact `open browser` / `open the browser` /
+/// `open cdp` / `open the cdp` only — not `open page` / `open url` (already rejected).
+/// Path/size/age / credentials / downloads / cookies lanes stay separate.
 pub fn looks_like_browser_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -42651,6 +42654,20 @@ pub fn looks_like_browser_ready_request(content: &str) -> bool {
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains(" of ")
+        || n.contains("path")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("credential")
+        || n.contains("download")
+        || n.contains("cookie")
+        || n.contains("storage")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -42675,8 +42692,32 @@ pub fn looks_like_browser_ready_request(content: &str) -> bool {
             | "cdp port"
             | "chromium status"
             | "chromium ready"
+            | "list browser"
+            | "list the browser"
+            | "list cdp"
+            | "list the cdp"
             | "show browser"
+            | "show the browser"
+            | "show me browser"
+            | "show me the browser"
             | "show cdp"
+            | "show the cdp"
+            | "show me cdp"
+            | "show me the cdp"
+            | "view browser"
+            | "view the browser"
+            | "view cdp"
+            | "view the cdp"
+            | "see browser"
+            | "see the browser"
+            | "see cdp"
+            | "see the cdp"
+            | "open browser"
+            | "open the browser"
+            | "open cdp"
+            | "open the cdp"
+            | "the browser"
+            | "the cdp"
             | "is browser ready"
             | "is browser online"
             | "is browser connected"
@@ -45701,7 +45742,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
 • `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
-• `/browser` · `/cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
+• `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
@@ -46195,13 +46236,31 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/browser` · `/cdp` Ready chip asks (v0.1.734).
+    // `/browser` · `/cdp` Ready chip asks (v0.1.734); view/see/show me/open/list-the NL (v0.1.1028).
     if (q.contains("/browser")
         || q.contains("/cdp")
         || q == "browser"
         || q == "cdp"
         || q.contains("browser status")
         || q.contains("cdp status")
+        || q.contains("list browser")
+        || q.contains("list the browser")
+        || q.contains("list cdp")
+        || q.contains("list the cdp")
+        || q.contains("view browser")
+        || q.contains("see browser")
+        || q.contains("show me the browser")
+        || q.contains("show me browser")
+        || q.contains("show browser")
+        || q == "open browser"
+        || q == "open the browser"
+        || q.contains("view cdp")
+        || q.contains("see cdp")
+        || q.contains("show me the cdp")
+        || q.contains("show me cdp")
+        || q.contains("show cdp")
+        || q == "open cdp"
+        || q == "open the cdp"
         || q.contains("is browser ready")
         || q.contains("is cdp ready")
         || q.contains("how's browser")
@@ -46218,6 +46277,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains(" for ")
         && !q.contains(" about ")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("how big")
+        && !q.contains("how old")
+        && !q.contains("credential")
+        && !q.contains("download")
+        && !q.contains("cookie")
+        && !q.contains("storage")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -60861,6 +60929,21 @@ mod tests {
         assert!(looks_like_browser_ready_request("cdp"));
         assert!(looks_like_browser_ready_request("browser status"));
         assert!(looks_like_browser_ready_request("cdp status"));
+        assert!(looks_like_browser_ready_request("list the browser"));
+        assert!(looks_like_browser_ready_request("view browser"));
+        assert!(looks_like_browser_ready_request("see browser"));
+        assert!(looks_like_browser_ready_request("show me the browser"));
+        assert!(looks_like_browser_ready_request("show browser"));
+        assert!(looks_like_browser_ready_request("open browser"));
+        assert!(looks_like_browser_ready_request("open the browser"));
+        assert!(looks_like_browser_ready_request("the browser"));
+        assert!(looks_like_browser_ready_request("list the cdp"));
+        assert!(looks_like_browser_ready_request("view cdp"));
+        assert!(looks_like_browser_ready_request("see cdp"));
+        assert!(looks_like_browser_ready_request("show me the cdp"));
+        assert!(looks_like_browser_ready_request("open cdp"));
+        assert!(looks_like_browser_ready_request("open the cdp"));
+        assert!(looks_like_browser_ready_request("the cdp"));
         assert!(looks_like_browser_ready_request("is browser ready"));
         assert!(looks_like_browser_ready_request("is cdp configured"));
         assert!(looks_like_browser_ready_request("how's browser"));
@@ -60872,6 +60955,27 @@ mod tests {
         assert!(!looks_like_browser_ready_request("click the login button"));
         assert!(!looks_like_browser_ready_request("how to use browser"));
         assert!(!looks_like_browser_ready_request("browse https://example.com"));
+        assert!(!looks_like_browser_ready_request("browser credentials path"));
+        assert!(!looks_like_browser_ready_request("browser downloads size"));
+        assert!(!looks_like_browser_ready_request("storage state age"));
+        assert!(!looks_like_browser_ready_request("open page"));
+        assert!(!looks_like_browser_ready_request("open url"));
+        let view_browser = try_operator_instant_reply("view browser").expect("view browser instant");
+        assert!(
+            view_browser.contains("Browser") || view_browser.contains("browser"),
+            "{view_browser}"
+        );
+        let show_me_browser =
+            try_operator_instant_reply("show me the browser").expect("show me the browser");
+        assert!(
+            show_me_browser.contains("Browser") || show_me_browser.contains("browser"),
+            "{show_me_browser}"
+        );
+        let open_cdp = try_operator_instant_reply("open cdp").expect("open cdp instant");
+        assert!(
+            open_cdp.contains("Browser") || open_cdp.contains("CDP") || open_cdp.contains("cdp"),
+            "{open_cdp}"
+        );
         assert!(looks_like_judge_ready_request("/judge"));
         assert!(looks_like_judge_ready_request("judge"));
         assert!(looks_like_judge_ready_request("judge status"));

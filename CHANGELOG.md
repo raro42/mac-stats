@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1028] - 2026-09-12
+
+### Added
+- Instant lane: more Browser / CDP NL for `/browser` · `/cdp` — `view browser`, `see browser`, `show me the browser`, `open browser` / `open the browser`, `list the browser`, and the same for `cdp` (and close variants) join Ready / Off / Not set. Exact `open browser` / `open cdp` only — not `open page` / `open url`. Path/size/age and credentials / downloads / cookies lanes stay separate.
+
 ## [0.1.1027] - 2026-09-12
 
 ### Added
