@@ -39079,52 +39079,131 @@ fn is_process_pin_action_ask(n: &str) -> bool {
 }
 
 /// Parse Hot/Pinned from `/processes hot`, `/processes pinned`, etc. Default All.
+/// View/see/show me/open/list-the NL (v0.1.1043). Exact `open hot` / `open pinned` only —
+/// not `view hot rings` / `view hot strip` / `view hot details` (those stay on rings/strip/details)
+/// and not pinned path/size/age.
 pub fn parse_processes_list_filter(content: &str) -> ProcessesListFilter {
     let n = normalize_operator_command(content);
     if n.ends_with(" hot")
         || n == "hot"
         || n == "/hot"
+        || n == "the hot"
         || n == "processes hot"
         || n == "/processes hot"
         || n == "process hot"
         || n == "hot processes"
         || n == "hot process"
+        || n == "the hot processes"
+        || n == "the hot process"
         || n == "what's hot"
         || n == "whats hot"
         || n == "what is hot"
         || n == "which processes are hot"
         || n == "which process is hot"
+        || n == "view hot"
+        || n == "view the hot"
+        || n == "see hot"
+        || n == "see the hot"
+        || n == "show hot"
+        || n == "show the hot"
+        || n == "show me hot"
+        || n == "show me the hot"
+        || n == "open hot"
+        || n == "open the hot"
+        || n == "list hot"
+        || n == "list the hot"
+        || n == "view hot processes"
+        || n == "view the hot processes"
+        || n == "see hot processes"
+        || n == "see the hot processes"
+        || n == "show hot processes"
+        || n == "show the hot processes"
+        || n == "show me hot processes"
+        || n == "show me the hot processes"
+        || n == "open hot processes"
+        || n == "open the hot processes"
+        || n == "list hot processes"
+        || n == "list the hot processes"
+        || n == "view processes hot"
+        || n == "see processes hot"
+        || n == "open processes hot"
+        || n == "list processes hot"
     {
-        return ProcessesListFilter::Hot;
+        // Do not steal rings/strip/details Hot (`view hot rings` ends with rings, not hot).
+        if !(n.contains("ring") || n.contains("strip") || n.contains("detail")) {
+            return ProcessesListFilter::Hot;
+        }
     }
     if n.ends_with(" pinned")
         || n == "pinned"
         || n == "/pinned"
+        || n == "the pinned"
         || n == "processes pinned"
         || n == "/processes pinned"
         || n == "process pinned"
         || n == "pinned processes"
         || n == "pinned process"
+        || n == "the pinned processes"
+        || n == "the pinned process"
         || n == "show pinned"
+        || n == "show the pinned"
+        || n == "show me pinned"
+        || n == "show me the pinned"
         || n == "list pinned"
+        || n == "list the pinned"
         || n == "my pinned"
         || n == "pinned favorites"
         || n == "process favorites"
         || n == "favorite processes"
+        || n == "view pinned"
+        || n == "view the pinned"
+        || n == "see pinned"
+        || n == "see the pinned"
+        || n == "open pinned"
+        || n == "open the pinned"
+        || n == "view pinned processes"
+        || n == "view the pinned processes"
+        || n == "see pinned processes"
+        || n == "see the pinned processes"
+        || n == "show pinned processes"
+        || n == "show the pinned processes"
+        || n == "show me pinned processes"
+        || n == "show me the pinned processes"
+        || n == "open pinned processes"
+        || n == "open the pinned processes"
+        || n == "list pinned processes"
+        || n == "list the pinned processes"
+        || n == "view processes pinned"
+        || n == "see processes pinned"
+        || n == "open processes pinned"
+        || n == "list processes pinned"
     {
-        return ProcessesListFilter::Pinned;
+        if !(n.contains(" path")
+            || n.ends_with(" path")
+            || n.contains(" size")
+            || n.ends_with(" size")
+            || n.contains(" age")
+            || n.ends_with(" age"))
+        {
+            return ProcessesListFilter::Pinned;
+        }
     }
     ProcessesListFilter::All
 }
 
 /// True for `/processes` / `top processes` — Hot/Pinned filter parity; not kill/pin-action asks.
+/// View/see/show me/open/list-the Hot·Pinned NL (v0.1.1043). Exact `open hot` / `open pinned`
+/// only — not rings/strip/details Hot, not pinned path/size/age.
 pub fn looks_like_processes_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
         return false;
     }
     // Path-only asks go to pinned_processes.json instant (does not steal `/pinned` list).
-    if looks_like_pinned_processes_path_request(content) {
+    if looks_like_pinned_processes_path_request(content)
+        || looks_like_pinned_processes_size_request(content)
+        || looks_like_pinned_processes_age_request(content)
+    {
         return false;
     }
     if n.contains("why")
@@ -39139,6 +39218,10 @@ pub fn looks_like_processes_request(content: &str) -> bool {
         || n.contains("redmine")
         || n.contains("how to")
         || n.contains("explain")
+        // Rings / strip / details own `view hot rings` / `view hot strip` / `view hot details`.
+        || n.contains("ring")
+        || n.contains("strip")
+        || n.contains("detail")
     {
         return false;
     }
@@ -39185,26 +39268,86 @@ pub fn looks_like_processes_request(content: &str) -> bool {
             | "process hot"
             | "hot processes"
             | "hot process"
+            | "the hot processes"
+            | "the hot process"
             | "/hot"
             | "hot"
+            | "the hot"
             | "what's hot"
             | "whats hot"
             | "what is hot"
             | "which processes are hot"
             | "which process is hot"
+            | "view hot"
+            | "view the hot"
+            | "see hot"
+            | "see the hot"
+            | "show hot"
+            | "show the hot"
+            | "show me hot"
+            | "show me the hot"
+            | "open hot"
+            | "open the hot"
+            | "list hot"
+            | "list the hot"
+            | "view hot processes"
+            | "view the hot processes"
+            | "see hot processes"
+            | "see the hot processes"
+            | "show hot processes"
+            | "show the hot processes"
+            | "show me hot processes"
+            | "show me the hot processes"
+            | "open hot processes"
+            | "open the hot processes"
+            | "list hot processes"
+            | "list the hot processes"
+            | "view processes hot"
+            | "see processes hot"
+            | "open processes hot"
+            | "list processes hot"
             | "/processes pinned"
             | "processes pinned"
             | "process pinned"
             | "pinned processes"
             | "pinned process"
+            | "the pinned processes"
+            | "the pinned process"
             | "/pinned"
             | "pinned"
+            | "the pinned"
             | "show pinned"
+            | "show the pinned"
+            | "show me pinned"
+            | "show me the pinned"
             | "list pinned"
+            | "list the pinned"
             | "my pinned"
             | "pinned favorites"
             | "process favorites"
             | "favorite processes"
+            | "view pinned"
+            | "view the pinned"
+            | "see pinned"
+            | "see the pinned"
+            | "open pinned"
+            | "open the pinned"
+            | "view pinned processes"
+            | "view the pinned processes"
+            | "see pinned processes"
+            | "see the pinned processes"
+            | "show pinned processes"
+            | "show the pinned processes"
+            | "show me pinned processes"
+            | "show me the pinned processes"
+            | "open pinned processes"
+            | "open the pinned processes"
+            | "list pinned processes"
+            | "list the pinned processes"
+            | "view processes pinned"
+            | "see processes pinned"
+            | "open processes pinned"
+            | "list processes pinned"
     )
 }
 
@@ -47121,7 +47264,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info size` · `user-info.json size` · `how big is user info` — user-info.json file size on disk (stat only; no dump; does not steal `user info path` / `user info age` / who-am-i)\n\
 • `user info age` · `user-info.json age` · `how old is user info` · `when was user info updated` — user-info.json last write age (mtime; no dump; does not steal `user info path` / `user info size` / who-am-i)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
-• `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` — Top Processes Hot/Pinned list\n\
+• `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` · `view hot` · `see hot` · `show me the hot` · `open hot` · `list the hot` · `view pinned` · `see pinned` · `show me the pinned` · `open pinned` · `list the pinned` — Top Processes Hot/Pinned list (exact open only — not rings/strip/details Hot · not pinned path/size/age)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
@@ -48929,7 +49072,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         return true;
     }
     // `/processes` Hot/Pinned operator asks (v0.1.712 / v0.1.714);
-    // view/see/show me/open/list-the NL (v0.1.1018).
+    // view/see/show me/open/list-the NL (v0.1.1018); Hot·Pinned extras (v0.1.1043).
     if (q.contains("/processes")
         || q.contains("/process")
         || q.contains("/hot")
@@ -48959,14 +49102,28 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("which processes are hot")
         || q.contains("which process is hot")
         || q.contains("show pinned")
+        || q.contains("show the pinned")
+        || q.contains("show me pinned")
+        || q.contains("show me the pinned")
         || q.contains("list pinned")
+        || q.contains("list the pinned")
         || q.contains("my pinned")
         || q.contains("favorite processes")
+        || q.contains("view hot")
+        || q.contains("see hot")
+        || q.contains("show me the hot")
+        || q.contains("open hot")
+        || q.contains("list the hot")
+        || q.contains("view pinned")
+        || q.contains("see pinned")
+        || q.contains("open pinned")
         || q == "processes"
         || q == "process list"
         || q == "the processes"
         || q == "hot"
+        || q == "the hot"
         || q == "pinned"
+        || q == "the pinned"
         || q == "what's hot"
         || q == "whats hot"
         || q == "what is hot")
@@ -48977,6 +49134,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("unpin")
         && !q.contains(" ticket")
         && !q.contains("redmine")
+        && !q.contains("ring")
+        && !q.contains("strip")
+        && !q.contains("detail")
     {
         return true;
     }
@@ -51225,6 +51385,19 @@ mod tests {
         assert!(
             processes_pinned.to_lowercase().contains("pinned"),
             "{processes_pinned}"
+        );
+        let view_hot = try_operator_instant_reply("view hot").expect("view hot");
+        assert!(view_hot.to_lowercase().contains("hot"), "{view_hot}");
+        let open_pinned = try_operator_instant_reply("open pinned").expect("open pinned");
+        assert!(
+            open_pinned.to_lowercase().contains("pinned"),
+            "{open_pinned}"
+        );
+        let show_me_pinned =
+            try_operator_instant_reply("show me the pinned").expect("show me the pinned");
+        assert!(
+            show_me_pinned.to_lowercase().contains("pinned"),
+            "{show_me_pinned}"
         );
         let rings = try_operator_instant_reply("/rings").expect("rings");
         assert!(rings.to_lowercase().contains("cpu rings"), "{rings}");
@@ -62060,15 +62233,35 @@ mod tests {
         assert!(looks_like_processes_request("what's hot"));
         assert!(looks_like_processes_request("hot processes"));
         assert!(looks_like_processes_request("which processes are hot"));
+        assert!(looks_like_processes_request("view hot"));
+        assert!(looks_like_processes_request("see hot"));
+        assert!(looks_like_processes_request("show me the hot"));
+        assert!(looks_like_processes_request("open hot"));
+        assert!(looks_like_processes_request("list the hot"));
+        assert!(looks_like_processes_request("view hot processes"));
+        assert!(looks_like_processes_request("open the hot processes"));
         assert!(looks_like_processes_request("/processes pinned"));
         assert!(looks_like_processes_request("/pinned"));
         assert!(looks_like_processes_request("pinned processes"));
         assert!(looks_like_processes_request("show pinned"));
+        assert!(looks_like_processes_request("view pinned"));
+        assert!(looks_like_processes_request("see pinned"));
+        assert!(looks_like_processes_request("show me the pinned"));
+        assert!(looks_like_processes_request("open pinned"));
+        assert!(looks_like_processes_request("list the pinned"));
+        assert!(looks_like_processes_request("view pinned processes"));
+        assert!(looks_like_processes_request("open the pinned processes"));
+        assert!(!looks_like_processes_request("view hot rings"));
+        assert!(!looks_like_processes_request("view hot strip"));
+        assert!(!looks_like_processes_request("view hot details"));
         assert!(!looks_like_processes_request("kill that process"));
         assert!(!looks_like_processes_request("force quit chrome"));
         assert!(!looks_like_processes_request("pin this process"));
         assert!(!looks_like_processes_request("unpin chrome"));
         assert!(!looks_like_processes_request("why is chrome hot"));
+        assert!(!looks_like_processes_request("pinned processes path"));
+        assert!(!looks_like_processes_request("pinned processes size"));
+        assert!(!looks_like_processes_request("pinned processes age"));
         assert_eq!(
             parse_processes_list_filter("/processes"),
             ProcessesListFilter::All
@@ -62086,6 +62279,22 @@ mod tests {
             ProcessesListFilter::Hot
         );
         assert_eq!(
+            parse_processes_list_filter("view hot"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("show me the hot"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("open hot"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("list the hot processes"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
             parse_processes_list_filter("/processes pinned"),
             ProcessesListFilter::Pinned
         );
@@ -62095,6 +62304,22 @@ mod tests {
         );
         assert_eq!(
             parse_processes_list_filter("/pinned"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("view pinned"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("show me the pinned"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("open pinned"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("list the pinned"),
             ProcessesListFilter::Pinned
         );
         assert!(process_row_is_hot(&crate::metrics::ProcessUsage {

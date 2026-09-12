@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1043] - 2026-09-13
+
+### Added
+- Instant lane: more Top Processes Hot/Pinned NL for `/hot` · `/pinned` — `view hot`, `see hot`, `show me the hot`, `open hot` / `open the hot`, `list the hot`, and the same for pinned / pinned processes join the Hot or Pinned list. Exact open only — not rings/strip/details Hot (`view hot rings`), and not pinned path/size/age. p50.
+
 ## [0.1.1042] - 2026-09-13
 
 ### Added
