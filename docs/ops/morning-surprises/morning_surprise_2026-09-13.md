@@ -5,22 +5,22 @@ Overnight Track B kept shipping operator instant NL. Digester open stayed empty;
 ## Shipped tonight (local window into 13 Sep)
 
 | Version | What |
-| --- | --- |
-| **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` — `view` / `see` / `show me the …` / `open` / `list the …` → one-chip Bat · Heat · LPM · RAM · SSD · Up replies. Exact open only (not strip / Disk Cleanup `open disk` / details / path·size·age). |
-| **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` — `view` / `see` / `show me the …` / `open` / `list the …` → one-chip ring replies. Exact open only (not rings / details / cpu window / path·size·age). |
-| **v0.1.1040** | `/rings` · `/strip` · `/details` — `view` / `see` / `show me the …` / `open` / `list the …` (+ Hot / power / load) → CPU rings, power strip, or Details Load · RAM · Up. Exact open only. |
-| **v0.1.1039** | `/insights` · `/help` · `/ops` NL expand. |
-| **v0.1.1038** | `/status` · `/health` · `/version` NL expand. |
+|---------|------|
+| **v0.1.1040** | `/rings` · `/strip` · `/details` view/see/show me/open/list-the NL |
+| **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` ring-chip NL |
+| **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` strip-chip NL |
+| **v0.1.1043** | `/hot` · `/pinned` Hot/Pinned view/see/show me/open/list-the NL |
 
-## This tick (~01:10)
+## Latest keep (~01:40)
 
-1. Digester open empty — did not quiet-default.
-2. Design review `due=false` (CPU metrics recommended ~5.9d, still grace).
-3. Experiment: expand `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` strip-chip NL to match ring-chip parity from v0.1.1041.
-4. Ratchet **keep**; push + install/kickstart.
+**v0.1.1043** — Instant lane: `view hot` / `see hot` / `show me the hot` / `open hot` / `list the hot` (and the same for pinned / pinned processes) join `/hot` · `/pinned` Top Processes Hot or Pinned lists. Exact open only — not rings/strip/details Hot, not pinned path/size/age.
 
-## Next fuel
+## Also tried / context
 
-- Digester open / debug.log product errors when present.
-- Design review when due (recapture stale feature screens when TCC allows).
-- Sibling ports (Hermes insights extras / session UX).
+- Digester open empty; no ERROR/WARN/panic clusters in the 180m debug.log window.
+- Design review: due=false (grace); recommended surface still CPU metrics (~5.9d).
+- Sibling harness: OpenClaw/Hermes commits noted; no port this tick (NL p50 first).
+
+## How to poke it
+
+In AI Chat or Discord: `view hot`, `open pinned`, `show me the pinned`, `list the hot`.
