@@ -16,6 +16,7 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 | **v0.1.1024** | `/agents` NL expand (exact `open agents` only; path/size/age safe) |
 | **v0.1.1025** | `/skills` NL expand (exact `open skills` only; path/size/age safe) |
 | **v0.1.1026** | `/tasks` NL expand (exact `open tasks` / `open the tasks` only; path/size/age safe) |
+| **v0.1.1027** | `/plugins` NL expand (exact `open plugins` / `open the plugins` only; path/size/age safe) |
 
 ## Fuel notes
 
@@ -25,8 +26,8 @@ Overnight Track B kept shipping operator NL so Discord/chat hits Agent Ops lists
 
 ## Try in Discord / AI Chat
 
-- `view tasks` · `show me the tasks` · `open tasks` · `list the tasks`
-- Still works: `/tasks` · `/tasks all` · `list tasks` · `all tasks`
-- Still separate: `task path` · `task size` · `task age` · `TASK_CREATE:` · `TASK_SHOW: <id>` · singular `open task …`
+- `view plugins` · `show me the plugins` · `open plugins` · `list the plugins`
+- Still works: `/plugins` · `/plugins on` · `/plugins off` · `list plugins` · `enabled plugins`
+- Still separate: `plugins path` · `plugins size` · `plugins age` · `run plugin …` · singular `open plugin …`
 
-Updated: 2026-09-12 ~03:35
+Updated: 2026-09-12 ~04:00
