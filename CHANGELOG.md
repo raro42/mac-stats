@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1034] - 2026-09-12
+
+### Added
+- Instant lane: more Discord voice STT NL for `/voice` · `/stt` — `view voice`, `see voice`, `show me the voice`, `open voice` / `open the voice`, `list the voice`, and the same for stt / speech / speech to text / voice stt / discord voice / discord stt (and close variants) join Ready / Off / Partial / Not set. Exact open only — not transcribe, voice notes, send voice, or enable/disable. Config only.
+
+### Fixed
+- Instant lane: `/having_fun` · `/fun` · `/idle` `show me …` phrases now match after the operator normalizer strips `show me` / `show` (adds `the having fun` / `the fun` / `the idle` / `the idle thoughts`).
+
 ## [0.1.1033] - 2026-09-12
 
 ### Added

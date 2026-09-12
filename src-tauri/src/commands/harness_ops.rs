@@ -43697,6 +43697,10 @@ pub fn looks_like_having_fun_ready_request(content: &str) -> bool {
             | "list the idle thoughts"
             | "list fun"
             | "list the fun"
+            | "the having fun"
+            | "the fun"
+            | "the idle"
+            | "the idle thoughts"
             | "is having fun ready"
             | "is having fun on"
             | "is having fun off"
@@ -43801,7 +43805,109 @@ pub fn looks_like_voice_stt_ready_request(content: &str) -> bool {
             | "discord voice"
             | "discord stt"
             | "show voice"
+            | "show the voice"
+            | "show me voice"
+            | "show me the voice"
             | "show stt"
+            | "show the stt"
+            | "show me stt"
+            | "show me the stt"
+            | "show speech"
+            | "show the speech"
+            | "show me speech"
+            | "show me the speech"
+            | "show speech to text"
+            | "show the speech to text"
+            | "show me speech to text"
+            | "show me the speech to text"
+            | "show speech-to-text"
+            | "show the speech-to-text"
+            | "show me speech-to-text"
+            | "show me the speech-to-text"
+            | "show voice stt"
+            | "show the voice stt"
+            | "show me voice stt"
+            | "show me the voice stt"
+            | "show discord voice"
+            | "show the discord voice"
+            | "show me discord voice"
+            | "show me the discord voice"
+            | "show discord stt"
+            | "show the discord stt"
+            | "show me discord stt"
+            | "show me the discord stt"
+            | "view voice"
+            | "view the voice"
+            | "view stt"
+            | "view the stt"
+            | "view speech"
+            | "view the speech"
+            | "view speech to text"
+            | "view the speech to text"
+            | "view speech-to-text"
+            | "view the speech-to-text"
+            | "view voice stt"
+            | "view the voice stt"
+            | "view discord voice"
+            | "view the discord voice"
+            | "view discord stt"
+            | "view the discord stt"
+            | "see voice"
+            | "see the voice"
+            | "see stt"
+            | "see the stt"
+            | "see speech"
+            | "see the speech"
+            | "see speech to text"
+            | "see the speech to text"
+            | "see speech-to-text"
+            | "see the speech-to-text"
+            | "see voice stt"
+            | "see the voice stt"
+            | "see discord voice"
+            | "see the discord voice"
+            | "see discord stt"
+            | "see the discord stt"
+            | "open voice"
+            | "open the voice"
+            | "open stt"
+            | "open the stt"
+            | "open speech"
+            | "open the speech"
+            | "open speech to text"
+            | "open the speech to text"
+            | "open speech-to-text"
+            | "open the speech-to-text"
+            | "open voice stt"
+            | "open the voice stt"
+            | "open discord voice"
+            | "open the discord voice"
+            | "open discord stt"
+            | "open the discord stt"
+            | "list voice"
+            | "list the voice"
+            | "list stt"
+            | "list the stt"
+            | "list speech"
+            | "list the speech"
+            | "list speech to text"
+            | "list the speech to text"
+            | "list speech-to-text"
+            | "list the speech-to-text"
+            | "list voice stt"
+            | "list the voice stt"
+            | "list discord voice"
+            | "list the discord voice"
+            | "list discord stt"
+            | "list the discord stt"
+            | "the voice"
+            | "the stt"
+            | "the speech"
+            | "the speech to text"
+            | "the speech-to-text"
+            | "the voice stt"
+            | "the discord voice"
+            | "the discord stt"
             | "is voice ready"
             | "is voice on"
             | "is voice off"
@@ -46019,7 +46125,7 @@ pub fn format_ops_help_gateway() -> String {
 • `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
 • `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
 • `/having_fun` · `/fun` · `/idle` · `view having fun` · `see having fun` · `show me the having fun` · `open having fun` · `list the having fun` · `view fun` · `open fun` · `view idle` · `see idle` · `show me the idle` · `open idle` · `list the idle` · `view idle thoughts` · `open idle thoughts` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
-• `/voice` · `/stt` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; no transcribe)\n\
+• `/voice` · `/stt` · `view voice` · `see voice` · `show me the voice` · `open voice` · `list the voice` · `view stt` · `see stt` · `show me the stt` · `open stt` · `list the stt` · `view speech` · `open speech to text` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; config only; does not steal transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
@@ -46902,7 +47008,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/voice` · `/stt` Ready chip asks (v0.1.744).
+    // `/voice` · `/stt` Ready chip asks (v0.1.744);
+    // view/see/show me/open/list-the NL (v0.1.1034).
     if (q.contains("/voice")
         || q.contains("/stt")
         || q.contains("/speech")
@@ -46920,6 +47027,65 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("voice stt")
         || q.contains("discord voice")
         || q.contains("discord stt")
+        || q.contains("list voice")
+        || q.contains("list the voice")
+        || q.contains("list stt")
+        || q.contains("list the stt")
+        || q.contains("list speech")
+        || q.contains("list the speech")
+        || q.contains("list speech to text")
+        || q.contains("list the speech to text")
+        || q.contains("list speech-to-text")
+        || q.contains("list the speech-to-text")
+        || q.contains("list voice stt")
+        || q.contains("list the voice stt")
+        || q.contains("list discord voice")
+        || q.contains("list the discord voice")
+        || q.contains("list discord stt")
+        || q.contains("list the discord stt")
+        || q.contains("view voice")
+        || q.contains("see voice")
+        || q.contains("show me the voice")
+        || q.contains("show me voice")
+        || q.contains("view stt")
+        || q.contains("see stt")
+        || q.contains("show me the stt")
+        || q.contains("show me stt")
+        || q.contains("view speech")
+        || q.contains("see speech")
+        || q.contains("show me the speech")
+        || q.contains("show me speech")
+        || q.contains("view speech to text")
+        || q.contains("see speech to text")
+        || q.contains("show me the speech to text")
+        || q.contains("view speech-to-text")
+        || q.contains("see speech-to-text")
+        || q.contains("show me the speech-to-text")
+        || q.contains("view voice stt")
+        || q.contains("see voice stt")
+        || q.contains("show me the voice stt")
+        || q.contains("view discord voice")
+        || q.contains("see discord voice")
+        || q.contains("show me the discord voice")
+        || q.contains("view discord stt")
+        || q.contains("see discord stt")
+        || q.contains("show me the discord stt")
+        || q == "open voice"
+        || q == "open the voice"
+        || q == "open stt"
+        || q == "open the stt"
+        || q == "open speech"
+        || q == "open the speech"
+        || q == "open speech to text"
+        || q == "open the speech to text"
+        || q == "open speech-to-text"
+        || q == "open the speech-to-text"
+        || q == "open voice stt"
+        || q == "open the voice stt"
+        || q == "open discord voice"
+        || q == "open the discord voice"
+        || q == "open discord stt"
+        || q == "open the discord stt"
         || q.contains("is voice ready")
         || q.contains("is voice on")
         || q.contains("is stt ready")
@@ -61771,6 +61937,22 @@ mod tests {
         assert!(looks_like_voice_stt_ready_request("/stt"));
         assert!(looks_like_voice_stt_ready_request("voice"));
         assert!(looks_like_voice_stt_ready_request("voice status"));
+        assert!(looks_like_voice_stt_ready_request("list the voice"));
+        assert!(looks_like_voice_stt_ready_request("view voice"));
+        assert!(looks_like_voice_stt_ready_request("see voice"));
+        assert!(looks_like_voice_stt_ready_request("show me the voice"));
+        assert!(looks_like_voice_stt_ready_request("open voice"));
+        assert!(looks_like_voice_stt_ready_request("open the voice"));
+        assert!(looks_like_voice_stt_ready_request("view stt"));
+        assert!(looks_like_voice_stt_ready_request("see stt"));
+        assert!(looks_like_voice_stt_ready_request("show me the stt"));
+        assert!(looks_like_voice_stt_ready_request("open stt"));
+        assert!(looks_like_voice_stt_ready_request("open the stt"));
+        assert!(looks_like_voice_stt_ready_request("view speech"));
+        assert!(looks_like_voice_stt_ready_request("see speech to text"));
+        assert!(looks_like_voice_stt_ready_request("show me the speech to text"));
+        assert!(looks_like_voice_stt_ready_request("open speech to text"));
+        assert!(looks_like_voice_stt_ready_request("list the stt"));
         assert!(looks_like_voice_stt_ready_request("is voice ready"));
         assert!(looks_like_voice_stt_ready_request("how's stt"));
         assert!(looks_like_voice_stt_ready_request("speech to text"));
@@ -61779,6 +61961,14 @@ mod tests {
         assert!(!looks_like_voice_stt_ready_request("send voice message"));
         assert!(!looks_like_voice_stt_ready_request("enable voice"));
         assert!(!looks_like_voice_stt_ready_request("how to enable voice"));
+        assert!(!looks_like_voice_stt_ready_request("open voice chat"));
+        let view_voice = try_operator_instant_reply("view voice").expect("view voice instant");
+        assert!(view_voice.to_lowercase().contains("voice"), "{view_voice}");
+        let open_stt = try_operator_instant_reply("open stt").expect("open stt instant");
+        assert!(
+            open_stt.to_lowercase().contains("voice") || open_stt.to_lowercase().contains("stt"),
+            "{open_stt}"
+        );
         let voice_chip = format_voice_stt_ready_chip();
         assert!(voice_chip.to_lowercase().contains("voice"), "{voice_chip}");
         assert!(
