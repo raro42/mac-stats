@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1039] - 2026-09-12
+
+### Added
+- Instant lane: more operator NL for `/insights` · `/help` · `/ops` — `view insights`, `see insights`, `show me the insights`, `open insights` / `open the insights`, `list the insights` (optional day window still works), and `view help` / `see help` / `show me the help` / `open help` / `list the help` plus the same for ops / commands join the runs report or command menu. Exact open only — not “insights on …”, help me / help with …, or path/size/age. p50.
+
 ## [0.1.1038] - 2026-09-12
 
 ### Added

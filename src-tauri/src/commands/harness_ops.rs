@@ -310,10 +310,34 @@ pub fn parse_insights_days(content: &str) -> Option<u32> {
         .trim_start_matches(',')
         .trim()
         .trim_start_matches("please")
+        .trim()
+        .trim_start_matches("can you")
+        .trim()
+        .trim_start_matches("could you")
+        .trim()
+        .trim_start_matches("show me")
+        .trim()
+        .trim_start_matches("show")
+        .trim()
+        .trim_start_matches("view")
+        .trim()
+        .trim_start_matches("see")
+        .trim()
+        .trim_start_matches("open")
+        .trim()
+        .trim_start_matches("list")
+        .trim()
+        .trim_start_matches("the")
+        .trim()
+        .trim_end_matches('?')
         .trim();
     let rest = if let Some(r) = n.strip_prefix("/insights") {
         r.trim()
     } else if let Some(r) = n.strip_prefix("insights") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("usage insights") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("usage analytics") {
         r.trim()
     } else if let Some(r) = n.strip_prefix("/failed") {
         r.trim()
@@ -45325,20 +45349,50 @@ pub fn format_alerts_ready_chip() -> String {
 }
 
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
+/// View/see/show me/open/list-the NL (v0.1.1039). Exact `open help` / `open the help` only
+/// (same for ops). After normalize strips `show me` / `show`, prefer `the help` / `the ops`
+/// so `show me the help` still matches.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
     // Free-form help (“help me write…”) stays with the agent.
-    if n.starts_with("help me") || n.starts_with("help with") || n.contains(" write ") {
+    if n.starts_with("help me")
+        || n.starts_with("help with")
+        || n.contains(" write ")
+        || n.contains(" about ")
+        || n.contains(" for ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+    {
         return false;
     }
     matches!(
         n.as_str(),
         "/ops"
             | "ops"
+            | "the ops"
             | "/ops help"
             | "ops help"
+            | "view ops"
+            | "view the ops"
+            | "see ops"
+            | "see the ops"
+            | "show ops"
+            | "show the ops"
+            | "show me ops"
+            | "show me the ops"
+            | "open ops"
+            | "open the ops"
+            | "list ops"
+            | "list the ops"
             | "/help"
             | "help"
+            | "the help"
             | "operator help"
             | "operator commands"
             | "bot commands"
@@ -45350,6 +45404,25 @@ pub fn looks_like_ops_help_request(content: &str) -> bool {
             | "what commands"
             | "what can you do"
             | "available commands"
+            | "view help"
+            | "view the help"
+            | "see help"
+            | "see the help"
+            | "show help"
+            | "show the help"
+            | "show me help"
+            | "show me the help"
+            | "open help"
+            | "open the help"
+            | "list help"
+            | "list the help"
+            | "view commands"
+            | "view the commands"
+            | "see commands"
+            | "see the commands"
+            | "open commands"
+            | "open the commands"
+            | "list the commands"
     )
 }
 
@@ -46505,7 +46578,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/having_fun` · `/fun` · `/idle` · `view having fun` · `see having fun` · `show me the having fun` · `open having fun` · `list the having fun` · `view fun` · `open fun` · `view idle` · `see idle` · `show me the idle` · `open idle` · `list the idle` · `view idle thoughts` · `open idle thoughts` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` · `view voice` · `see voice` · `show me the voice` · `open voice` · `list the voice` · `view stt` · `see stt` · `show me the stt` · `open stt` · `list the stt` · `view speech` · `open speech to text` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; config only; does not steal transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` · `view telegram` · `see telegram` · `show me the telegram` · `open telegram` · `list the telegram` · `view slack` · `see slack` · `show me the slack` · `open slack` · `list the slack` · `view signal` · `see signal` · `show me the signal` · `open signal` · `list the signal` · `view alerts` · `see alerts` · `show me the alerts` · `open alerts` · `list the alerts` — alert channel Ready / Not set (Keychain + registry; config only; no live send)\n\
-• `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
+• `/insights` · `/insights 7` · `view insights` · `see insights` · `show me the insights` · `open insights` · `list the insights` — runs.jsonl report (+ optional day window; exact open only — not insights on …)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
@@ -46711,7 +46784,7 @@ pub fn format_ops_help_gateway() -> String {
 • `digest.md age` · `latest.md age` · `how old is digest.md` · `when was latest.md updated` — digest `latest.md` last write age (mtime; no digester spawn; does not steal `digest age`)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
-• `/ops` · `/help` — this menu\n\
+• `/ops` · `/help` · `view help` · `see help` · `show me the help` · `open help` · `list the help` · `view ops` · `open ops` · `list the ops` — this menu (exact open only — not help me / help with …)\n\
 \n\
 **Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)",
         slow_ms = OPS_RUNS_SLOW_MS,
@@ -50372,38 +50445,35 @@ pub fn looks_like_failed_runs_request(content: &str) -> bool {
 }
 
 /// True for `/insights` / `insights` (Hermes parity) and short NL equivalents.
+/// View/see/show me/open/list-the NL (v0.1.1039). Exact `open insights` / `open the insights`
+/// only. After normalize strips `show me` / `show`, prefer `the insights` so
+/// `show me the insights` still matches. Topic research (“insights on …”) stays with the agent.
 pub fn looks_like_insights_request(content: &str) -> bool {
-    let n = content
-        .trim()
-        .trim_start_matches('@')
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-        .to_lowercase();
-    let n = n
-        .trim_start_matches("werner")
-        .trim_start_matches(',')
-        .trim()
-        .trim_start_matches("please")
-        .trim()
-        .trim_start_matches("can you")
-        .trim()
-        .trim_start_matches("could you")
-        .trim()
-        .trim_start_matches("show me")
-        .trim()
-        .trim_start_matches("show")
-        .trim()
-        .trim_end_matches('?')
-        .trim();
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     // Topic research ("insights on weather") stays with the agent.
-    if n.contains(" on ") || n.contains(" about ") || n.contains("weather") || n.contains("http")
+    if n.contains(" on ")
+        || n.contains(" about ")
+        || n.contains("weather")
+        || n.contains("http")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("age")
     {
         return false;
     }
     matches!(
-        n,
+        n.as_str(),
         "insights"
+            | "the insights"
             | "/insights"
             | "usage insights"
             | "run insights"
@@ -50415,10 +50485,34 @@ pub fn looks_like_insights_request(content: &str) -> bool {
             | "latency report"
             | "p50"
             | "p50 report"
+            | "view insights"
+            | "view the insights"
+            | "see insights"
+            | "see the insights"
+            | "show insights"
+            | "show the insights"
+            | "show me insights"
+            | "show me the insights"
+            | "open insights"
+            | "open the insights"
+            | "list insights"
+            | "list the insights"
+            | "view usage insights"
+            | "see usage insights"
+            | "open usage insights"
+            | "list usage insights"
+            | "view usage analytics"
+            | "see usage analytics"
+            | "open usage analytics"
+            | "list usage analytics"
     ) || n.starts_with("/insights ")
         || (n.starts_with("insights ") && parse_insights_days(content).is_some())
         || (n.starts_with("usage insights ") && parse_insights_days(content).is_some())
         || (n.starts_with("usage analytics ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view insights ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see insights ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open insights ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list insights ") && parse_insights_days(content).is_some())
 }
 
 fn sanitize_under_dir(path: &str, root: &Path) -> Result<PathBuf, String> {
@@ -51089,9 +51183,28 @@ mod tests {
         assert!(looks_like_insights_request("show me usage analytics"));
         assert!(looks_like_insights_request("usage stats"));
         assert!(looks_like_insights_request("latency report"));
+        assert!(looks_like_insights_request("view insights"));
+        assert!(looks_like_insights_request("see insights"));
+        assert!(looks_like_insights_request("show me the insights"));
+        assert!(looks_like_insights_request("open insights"));
+        assert!(looks_like_insights_request("open the insights"));
+        assert!(looks_like_insights_request("list the insights"));
+        assert!(looks_like_insights_request("view insights 7"));
+        assert!(looks_like_insights_request("open insights 3"));
         assert!(!looks_like_insights_request("any insights on weather?"));
         assert!(!looks_like_insights_request("insights on weather"));
         assert!(!looks_like_insights_request("show insights about Barcelona"));
+        assert!(!looks_like_insights_request("insights path"));
+        assert!(!looks_like_insights_request("insights size"));
+        let view_ins =
+            try_operator_instant_reply("view insights").expect("view insights instant");
+        assert!(
+            view_ins.to_lowercase().contains("run")
+                || view_ins.to_lowercase().contains("insight")
+                || view_ins.to_lowercase().contains("p50")
+                || view_ins.to_lowercase().contains("lane"),
+            "{view_ins}"
+        );
     }
 
     #[test]
@@ -51101,6 +51214,9 @@ mod tests {
         assert_eq!(parse_insights_days("/insights --days 14"), Some(14));
         assert_eq!(parse_insights_days("@Werner insights 3"), Some(3));
         assert_eq!(parse_insights_days("/insights 999"), Some(90)); // clamp
+        assert_eq!(parse_insights_days("view insights 7"), Some(7));
+        assert_eq!(parse_insights_days("open insights 3"), Some(3));
+        assert_eq!(parse_insights_days("see the insights 14"), Some(14));
         assert_eq!(parse_insights_days("/failed 7"), Some(7));
         assert_eq!(parse_insights_days("/slow 3"), Some(3));
         assert_eq!(parse_insights_days("/instant 7"), Some(7));
@@ -62741,8 +62857,25 @@ mod tests {
         assert!(looks_like_ops_help_request("help"));
         assert!(looks_like_ops_help_request("what can you do"));
         assert!(looks_like_ops_help_request("command list"));
+        assert!(looks_like_ops_help_request("view help"));
+        assert!(looks_like_ops_help_request("see help"));
+        assert!(looks_like_ops_help_request("show me the help"));
+        assert!(looks_like_ops_help_request("open help"));
+        assert!(looks_like_ops_help_request("open the help"));
+        assert!(looks_like_ops_help_request("list the help"));
+        assert!(looks_like_ops_help_request("view ops"));
+        assert!(looks_like_ops_help_request("see the ops"));
+        assert!(looks_like_ops_help_request("open ops"));
+        assert!(looks_like_ops_help_request("list the ops"));
+        assert!(looks_like_ops_help_request("view commands"));
+        assert!(looks_like_ops_help_request("open the commands"));
         assert!(!looks_like_ops_help_request("help me write a cron"));
         assert!(!looks_like_ops_help_request("help with weather"));
+        assert!(!looks_like_ops_help_request("help about tickets"));
+        let view_help =
+            try_operator_instant_reply("view help").expect("view help instant");
+        assert!(view_help.contains("/status"), "{view_help}");
+        assert!(view_help.contains("/insights"), "{view_help}");
     }
 
     #[test]
