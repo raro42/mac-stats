@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1037] - 2026-09-12
+
+### Added
+- Instant lane: more gateway/config NL for `/discord` · `/ollama` · `/llm` · `/perplexity key` · `/cursor` · `/cursor-agent` — `view discord`, `see discord`, `show me the discord`, `open discord` / `open the discord`, `list the discord`, and the same for ollama / llm; key-only phrases for Perplexity (`view perplexity key`, not bare `view perplexity`); cursor / cursor agent / cursor-agent variants join Ready / Offline / Not set. Exact open only — not post/send, pull/list models/chat, last-search `/perplexity`, or CURSOR_AGENT: / ask/run. Config / gateway glance only.
+
 ## [0.1.1036] - 2026-09-12
 
 ### Added

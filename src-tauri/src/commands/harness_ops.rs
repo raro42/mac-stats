@@ -41776,6 +41776,7 @@ pub fn format_status_gateway() -> String {
 
 /// True for focused Discord gateway asks (`/discord` · Ready/Offline) — not Knowledge Discord,
 /// not free-form “post to Discord…”.
+/// View/see/show me/open/list-the NL (v0.1.1037). Exact `open discord` / `open the discord` only.
 pub fn looks_like_discord_gateway_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -41821,7 +41822,18 @@ pub fn looks_like_discord_gateway_request(content: &str) -> bool {
             | "gateway ready"
             | "bot gateway"
             | "show discord"
+            | "show the discord"
+            | "show me discord"
+            | "show me the discord"
+            | "view discord"
+            | "view the discord"
+            | "see discord"
+            | "see the discord"
+            | "open discord"
+            | "open the discord"
             | "list discord"
+            | "list the discord"
+            | "the discord"
             | "is discord ready"
             | "is discord online"
             | "is discord connected"
@@ -41883,12 +41895,15 @@ pub fn format_discord_gateway_chip() -> String {
 
 /// True for focused Ollama Ready/Offline asks (`/ollama` · menu-bar ✕ / AI Chat glance parity) —
 /// not pull/list/chat/API free-form.
+/// View/see/show me/open/list-the NL (v0.1.1037). Exact `open ollama` / `open the ollama` /
+/// `open llm` / `open the llm` only — not pull/list models/chat.
 pub fn looks_like_ollama_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
         return false;
     }
     // Pull / list / chat / configure stay with agent or OLLAMA_API pre-route.
+    // Exact `list ollama` / `list the ollama` / `list llm` stay Ready chips (allow list).
     if n.contains("pull")
         || n.contains("push")
         || n.contains("list model")
@@ -41929,7 +41944,31 @@ pub fn looks_like_ollama_ready_request(content: &str) -> bool {
             | "llm ready"
             | "llm offline"
             | "show ollama"
+            | "show the ollama"
+            | "show me ollama"
+            | "show me the ollama"
+            | "show llm"
+            | "show the llm"
+            | "show me llm"
+            | "show me the llm"
+            | "view ollama"
+            | "view the ollama"
+            | "view llm"
+            | "view the llm"
+            | "see ollama"
+            | "see the ollama"
+            | "see llm"
+            | "see the llm"
+            | "open ollama"
+            | "open the ollama"
+            | "open llm"
+            | "open the llm"
             | "list ollama"
+            | "list the ollama"
+            | "list llm"
+            | "list the llm"
+            | "the ollama"
+            | "the llm"
             | "is ollama ready"
             | "is ollama online"
             | "is ollama connected"
@@ -42218,6 +42257,8 @@ pub fn format_brave_ready_chip() -> String {
 
 /// True for focused Perplexity API key/config asks (`/perplexity key` · Settings key parity) —
 /// not last-search Top/Snippet (`/perplexity`) or new search free-form.
+/// View/see/show me/open/list-the NL (v0.1.1037) — key phrases only (`view perplexity key`,
+/// not bare `view perplexity` / `list perplexity` which stay last-search).
 pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -42302,6 +42343,19 @@ pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
             | "perplexity offline"
             | "perplexity configured"
             | "perplexity health"
+            | "show perplexity key"
+            | "show the perplexity key"
+            | "show me perplexity key"
+            | "show me the perplexity key"
+            | "view perplexity key"
+            | "view the perplexity key"
+            | "see perplexity key"
+            | "see the perplexity key"
+            | "open perplexity key"
+            | "open the perplexity key"
+            | "list perplexity key"
+            | "list the perplexity key"
+            | "the perplexity key"
             | "is perplexity ready"
             | "is perplexity online"
             | "is perplexity connected"
@@ -42319,6 +42373,17 @@ pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
             | "perplexity search ready"
             | "perplexity search health"
             | "perplexity search configured"
+            | "show perplexity search key"
+            | "show the perplexity search key"
+            | "view perplexity search key"
+            | "view the perplexity search key"
+            | "see perplexity search key"
+            | "see the perplexity search key"
+            | "open perplexity search key"
+            | "open the perplexity search key"
+            | "list perplexity search key"
+            | "list the perplexity search key"
+            | "the perplexity search key"
             | "is perplexity search ready"
             | "is perplexity search configured"
             | "is perplexity search set up"
@@ -42561,6 +42626,8 @@ pub fn format_mcp_ready_chip() -> String {
 
 /// True for focused Cursor agent Ready/PATH asks (`/cursor` · `/cursor-agent`) —
 /// not `CURSOR_AGENT:` tool invocations or coding handoffs.
+/// View/see/show me/open/list-the NL (v0.1.1037). Exact `open cursor` / `open the cursor` /
+/// `open cursor agent` / `open cursor-agent` only — not CURSOR_AGENT: / ask/run/use.
 pub fn looks_like_cursor_agent_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -42622,8 +42689,44 @@ pub fn looks_like_cursor_agent_ready_request(content: &str) -> bool {
             | "cursor agent path"
             | "cursor-agent path"
             | "show cursor"
+            | "show the cursor"
+            | "show me cursor"
+            | "show me the cursor"
             | "show cursor agent"
+            | "show the cursor agent"
+            | "show me cursor agent"
+            | "show me the cursor agent"
             | "show cursor-agent"
+            | "show the cursor-agent"
+            | "show me cursor-agent"
+            | "show me the cursor-agent"
+            | "view cursor"
+            | "view the cursor"
+            | "view cursor agent"
+            | "view the cursor agent"
+            | "view cursor-agent"
+            | "view the cursor-agent"
+            | "see cursor"
+            | "see the cursor"
+            | "see cursor agent"
+            | "see the cursor agent"
+            | "see cursor-agent"
+            | "see the cursor-agent"
+            | "open cursor"
+            | "open the cursor"
+            | "open cursor agent"
+            | "open the cursor agent"
+            | "open cursor-agent"
+            | "open the cursor-agent"
+            | "list cursor"
+            | "list the cursor"
+            | "list cursor agent"
+            | "list the cursor agent"
+            | "list cursor-agent"
+            | "list the cursor-agent"
+            | "the cursor"
+            | "the cursor agent"
+            | "the cursor-agent"
             | "is cursor ready"
             | "is cursor online"
             | "is cursor connected"
@@ -46318,14 +46421,14 @@ pub fn format_ops_help_gateway() -> String {
     format!(
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` — one-screen health\n\
-• `/discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
-• `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
+• `/discord` · `view discord` · `see discord` · `show me the discord` · `open discord` · `list the discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
+• `/ollama` · `/llm` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
 • `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` · `view brave` · `see brave` · `show me the brave` · `open brave` · `list the brave` · `view brave search` · `open brave search` — Brave Search Ready / Not set (API key; no live probe)\n\
-• `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
+• `/perplexity key` · `view perplexity key` · `see perplexity key` · `show me the perplexity key` · `open perplexity key` · `list the perplexity key` — Perplexity Ready / Not set (API key; no live probe; does not steal `/perplexity` last-search)\n\
 • `/mastodon` · `view mastodon` · `see mastodon` · `show me the mastodon` · `open mastodon` · `list the mastodon` — Mastodon Ready / Not set (instance URL + token; Settings or .config.env; no live probe)\n\
 • `/mcp` · `view mcp` · `see mcp` · `show me the mcp` · `open mcp` · `list the mcp` · `view mcp server` · `open mcp server` — MCP Ready / Not set (MCP_SERVER_URL or MCP_SERVER_STDIO; Settings or .config.env; no live probe)\n\
-• `/cursor` · `/cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
+• `/cursor` · `/cursor-agent` · `view cursor` · `see cursor` · `show me the cursor` · `open cursor` · `list the cursor` · `view cursor agent` · `open cursor-agent` — Cursor agent Ready / Not set (`cursor-agent` on PATH or Settings path; no CLI probe)\n\
 • `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
@@ -47699,7 +47802,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/discord` gateway Ready/Offline chip asks (v0.1.722).
+    // `/discord` gateway Ready/Offline chip asks (v0.1.722); view/see/show me/open/list-the NL (v0.1.1037).
     if (q.contains("/discord")
         || q == "discord"
         || q.contains("discord status")
@@ -47725,7 +47828,14 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's the discord"
         || q == "hows the discord"
         || q == "how's the gateway"
-        || q == "hows the gateway")
+        || q == "hows the gateway"
+        || q.contains("view discord")
+        || q.contains("see discord")
+        || q.contains("show me the discord")
+        || q.contains("list the discord")
+        || q == "open discord"
+        || q == "open the discord"
+        || q == "the discord")
         && !q.contains("knowledge")
         && !q.contains("memory")
         && !q.contains("post")
@@ -47737,7 +47847,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/ollama` · `/llm` Ready/Offline chip asks (v0.1.723).
+    // `/ollama` · `/llm` Ready/Offline chip asks (v0.1.723); view/see/show me/open/list-the NL (v0.1.1037).
     if (q.contains("/ollama")
         || q.contains("/llm")
         || q == "ollama"
@@ -47766,7 +47876,21 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's the llm"
         || q == "hows the llm"
         || q == "how's ollama doing"
-        || q == "hows ollama doing")
+        || q == "hows ollama doing"
+        || q.contains("view ollama")
+        || q.contains("see ollama")
+        || q.contains("show me the ollama")
+        || q.contains("list the ollama")
+        || q.contains("view llm")
+        || q.contains("see llm")
+        || q.contains("show me the llm")
+        || q.contains("list the llm")
+        || q == "open ollama"
+        || q == "open the ollama"
+        || q == "open llm"
+        || q == "open the llm"
+        || q == "the ollama"
+        || q == "the llm")
         && !q.contains("pull")
         && !q.contains("list model")
         && !q.contains("chat with")
@@ -47874,7 +47998,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/perplexity key` Ready/Not-set chip asks (v0.1.726).
+    // `/perplexity key` Ready/Not-set chip asks (v0.1.726); view/see/show me/open/list-the NL (v0.1.1037).
     if (q.contains("/perplexity key")
         || q.contains("perplexity key")
         || q.contains("perplexity status")
@@ -47904,7 +48028,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is perplexity search set up")
         || q.contains("is perplexity search setup")
         || q == "how's perplexity search"
-        || q == "hows perplexity search")
+        || q == "hows perplexity search"
+        || q.contains("view perplexity key")
+        || q.contains("see perplexity key")
+        || q.contains("show me the perplexity key")
+        || q.contains("list the perplexity key")
+        || q == "open perplexity key"
+        || q == "open the perplexity key"
+        || q == "the perplexity key"
+        || q.contains("view perplexity search key")
+        || q.contains("see perplexity search key")
+        || q.contains("list the perplexity search key")
+        || q == "open perplexity search key"
+        || q == "open the perplexity search key"
+        || q == "the perplexity search key")
         && !q.contains("search for")
         && !q.contains("look up")
         && !q.contains("research")
@@ -48009,7 +48146,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/cursor` · `/cursor-agent` Ready/Not-set chip asks (v0.1.729).
+    // `/cursor` · `/cursor-agent` Ready/Not-set chip asks (v0.1.729); view/see/show me/open/list-the NL (v0.1.1037).
     if (q.contains("/cursor")
         || q.contains("/cursor-agent")
         || q == "cursor"
@@ -48054,7 +48191,26 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "how's cursor agent"
         || q == "hows cursor agent"
         || q == "how's cursor-agent"
-        || q == "hows cursor-agent")
+        || q == "hows cursor-agent"
+        || q.contains("view cursor")
+        || q.contains("see cursor")
+        || q.contains("show me the cursor")
+        || q.contains("list the cursor")
+        || q.contains("view cursor agent")
+        || q.contains("see cursor agent")
+        || q.contains("list the cursor agent")
+        || q.contains("view cursor-agent")
+        || q.contains("see cursor-agent")
+        || q.contains("list the cursor-agent")
+        || q == "open cursor"
+        || q == "open the cursor"
+        || q == "open cursor agent"
+        || q == "open the cursor agent"
+        || q == "open cursor-agent"
+        || q == "open the cursor-agent"
+        || q == "the cursor"
+        || q == "the cursor agent"
+        || q == "the cursor-agent")
         && !q.contains("cursor_agent:")
         && !q.contains("cursor-agent:")
         && !q.contains("run cursor")
@@ -61673,6 +61829,12 @@ mod tests {
         assert!(looks_like_discord_gateway_request("is discord ready"));
         assert!(looks_like_discord_gateway_request("gateway status"));
         assert!(looks_like_discord_gateway_request("how's discord"));
+        assert!(looks_like_discord_gateway_request("list the discord"));
+        assert!(looks_like_discord_gateway_request("view discord"));
+        assert!(looks_like_discord_gateway_request("see discord"));
+        assert!(looks_like_discord_gateway_request("show me the discord"));
+        assert!(looks_like_discord_gateway_request("open discord"));
+        assert!(looks_like_discord_gateway_request("open the discord"));
         assert!(!looks_like_discord_gateway_request("/knowledge discord"));
         assert!(!looks_like_discord_gateway_request("discord knowledge"));
         assert!(!looks_like_discord_gateway_request("post to discord"));
@@ -61680,6 +61842,12 @@ mod tests {
         assert!(!looks_like_discord_gateway_request("why is discord offline"));
         let chip = format_discord_gateway_chip();
         assert!(chip.to_lowercase().contains("discord"), "{chip}");
+        let view_dc =
+            try_operator_instant_reply("view discord").expect("view discord instant");
+        assert!(
+            view_dc.to_lowercase().contains("discord"),
+            "{view_dc}"
+        );
     }
 
     #[test]
@@ -61690,6 +61858,14 @@ mod tests {
         assert!(looks_like_ollama_ready_request("ollama status"));
         assert!(looks_like_ollama_ready_request("is ollama ready"));
         assert!(looks_like_ollama_ready_request("how's ollama"));
+        assert!(looks_like_ollama_ready_request("list the ollama"));
+        assert!(looks_like_ollama_ready_request("view ollama"));
+        assert!(looks_like_ollama_ready_request("see ollama"));
+        assert!(looks_like_ollama_ready_request("show me the ollama"));
+        assert!(looks_like_ollama_ready_request("open ollama"));
+        assert!(looks_like_ollama_ready_request("open the ollama"));
+        assert!(looks_like_ollama_ready_request("view llm"));
+        assert!(looks_like_ollama_ready_request("open the llm"));
         assert!(!looks_like_ollama_ready_request("pull llama3"));
         assert!(!looks_like_ollama_ready_request("list models"));
         assert!(!looks_like_ollama_ready_request("chat with ollama about weather"));
@@ -61697,6 +61873,8 @@ mod tests {
         assert!(!looks_like_ollama_ready_request("install ollama"));
         let chip = format_ollama_ready_chip();
         assert!(chip.to_lowercase().contains("ollama"), "{chip}");
+        let view_ol = try_operator_instant_reply("view ollama").expect("view ollama instant");
+        assert!(view_ol.to_lowercase().contains("ollama"), "{view_ol}");
     }
 
     #[test]
@@ -61770,6 +61948,14 @@ mod tests {
         assert!(looks_like_perplexity_ready_request("how's perplexity"));
         assert!(looks_like_perplexity_ready_request("perplexity search status"));
         assert!(looks_like_perplexity_ready_request("perplexity search key"));
+        assert!(looks_like_perplexity_ready_request("list the perplexity key"));
+        assert!(looks_like_perplexity_ready_request("view perplexity key"));
+        assert!(looks_like_perplexity_ready_request("see perplexity key"));
+        assert!(looks_like_perplexity_ready_request("show me the perplexity key"));
+        assert!(looks_like_perplexity_ready_request("open perplexity key"));
+        assert!(looks_like_perplexity_ready_request("open the perplexity key"));
+        assert!(looks_like_perplexity_ready_request("view perplexity search key"));
+        assert!(looks_like_perplexity_ready_request("open the perplexity search key"));
         assert!(!looks_like_perplexity_ready_request("/perplexity"));
         assert!(!looks_like_perplexity_ready_request("perplexity"));
         assert!(!looks_like_perplexity_ready_request("/perplexity top"));
@@ -61777,8 +61963,17 @@ mod tests {
         assert!(!looks_like_perplexity_ready_request("perplexity search for news"));
         assert!(!looks_like_perplexity_ready_request("how to use perplexity"));
         assert!(!looks_like_perplexity_ready_request("search for barcelona"));
+        assert!(!looks_like_perplexity_ready_request("view perplexity"));
+        assert!(!looks_like_perplexity_ready_request("list the perplexity"));
+        assert!(!looks_like_perplexity_ready_request("open perplexity"));
         let chip = format_perplexity_ready_chip();
         assert!(chip.to_lowercase().contains("perplexity"), "{chip}");
+        let view_pk =
+            try_operator_instant_reply("view perplexity key").expect("view perplexity key instant");
+        assert!(
+            view_pk.to_lowercase().contains("perplexity"),
+            "{view_pk}"
+        );
         // Last-search list still owns bare `/perplexity`.
         assert!(looks_like_perplexity_request("/perplexity"));
         assert!(!looks_like_perplexity_request("perplexity status"));
@@ -61857,6 +62052,14 @@ mod tests {
         assert!(looks_like_cursor_agent_ready_request("is cursor-agent configured"));
         assert!(looks_like_cursor_agent_ready_request("how's cursor"));
         assert!(looks_like_cursor_agent_ready_request("how's cursor-agent"));
+        assert!(looks_like_cursor_agent_ready_request("list the cursor"));
+        assert!(looks_like_cursor_agent_ready_request("view cursor"));
+        assert!(looks_like_cursor_agent_ready_request("see cursor"));
+        assert!(looks_like_cursor_agent_ready_request("show me the cursor"));
+        assert!(looks_like_cursor_agent_ready_request("open cursor"));
+        assert!(looks_like_cursor_agent_ready_request("open the cursor"));
+        assert!(looks_like_cursor_agent_ready_request("view cursor agent"));
+        assert!(looks_like_cursor_agent_ready_request("open the cursor-agent"));
         assert!(!looks_like_cursor_agent_ready_request("CURSOR_AGENT: fix the bug"));
         assert!(!looks_like_cursor_agent_ready_request("cursor_agent: commit and push"));
         assert!(!looks_like_cursor_agent_ready_request("ask cursor to refactor auth"));
@@ -61865,6 +62068,8 @@ mod tests {
         assert!(!looks_like_cursor_agent_ready_request("use cursor for weather"));
         let chip = format_cursor_agent_ready_chip();
         assert!(chip.to_lowercase().contains("cursor"), "{chip}");
+        let view_cu = try_operator_instant_reply("view cursor").expect("view cursor instant");
+        assert!(view_cu.to_lowercase().contains("cursor"), "{view_cu}");
     }
 
     #[test]
