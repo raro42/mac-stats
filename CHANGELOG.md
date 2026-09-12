@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1024] - 2026-09-12
+
+### Added
+- Instant lane: more Agents NL for `/agents` — `view agents`, `see agents`, `show me the agents`, `open agents`, `list the agents` (and close variants) join `list agents` / On · Off filters. Exact `open agents` only — singular `open agent …` stays with the agent. Path/size/age lanes stay separate.
+
 ## [0.1.1023] - 2026-09-12
 
 ### Added

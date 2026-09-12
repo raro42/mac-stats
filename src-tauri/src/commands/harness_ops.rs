@@ -40581,9 +40581,10 @@ pub fn parse_agents_list_filter(content: &str) -> AgentsListFilter {
 }
 
 /// True for `/agents` / `list agents` — Agent Ops On/Off parity; not create/edit asks.
+/// View/see/show me/open/list-the NL (v0.1.1024). Exact `open agents` only — not `open agent …`.
 pub fn looks_like_agents_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     if n.contains("create")
@@ -40599,6 +40600,15 @@ pub fn looks_like_agents_request(content: &str) -> bool {
         || n.contains("why")
         || n.contains("ticket")
         || n.contains("redmine")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("agents age")
+        || n.contains("agent age")
         || n.starts_with("agent:")
         || (n.starts_with("agent ") && !n.starts_with("agent list"))
     {
@@ -40609,10 +40619,32 @@ pub fn looks_like_agents_request(content: &str) -> bool {
         "/agents"
             | "agents"
             | "list agents"
+            | "list the agents"
+            | "list agent"
+            | "list the agent"
+            | "show agents"
+            | "show the agents"
+            | "show me agents"
+            | "show me the agents"
+            | "show agent"
+            | "show the agent"
+            | "show me agent"
+            | "show me the agent"
+            | "view agents"
+            | "view the agents"
+            | "view agent"
+            | "view the agent"
+            | "see agents"
+            | "see the agents"
+            | "see agent"
+            | "see the agent"
+            | "open agents"
+            | "open the agents"
             | "my agents"
             | "which agents"
             | "what agents"
             | "all agents"
+            | "the agents"
             | "agent list"
             | "agents list"
             | "/agents on"
@@ -45583,7 +45615,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
-• `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
+• `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
 • `/skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
@@ -45918,16 +45950,31 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/agents` operator asks (v0.1.705).
+    // `/agents` operator asks (v0.1.705); view/see/show me/open/list-the NL (v0.1.1024).
     if (q.contains("/agents")
         || q == "agents"
         || q.contains("list agents")
+        || q.contains("list the agents")
+        || q.contains("view agents")
+        || q.contains("see agents")
+        || q.contains("show me the agents")
+        || q.contains("show me agents")
+        || q.contains("show agents")
+        || q == "open agents"
+        || q == "open the agents"
         || q.contains("enabled agents")
         || q.contains("disabled agents")
         || q == "agents on"
         || q == "agents off")
         && !q.contains("why")
         && !q.contains("create")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("how big")
+        && !q.contains("how old")
+        && !q.contains("agents age")
+        && !q.contains("agent age")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -49410,6 +49457,12 @@ mod tests {
     fn agents_request_detected() {
         assert!(looks_like_agents_request("/agents"));
         assert!(looks_like_agents_request("list agents"));
+        assert!(looks_like_agents_request("list the agents"));
+        assert!(looks_like_agents_request("view agents"));
+        assert!(looks_like_agents_request("see agents"));
+        assert!(looks_like_agents_request("show me the agents"));
+        assert!(looks_like_agents_request("open agents"));
+        assert!(looks_like_agents_request("the agents"));
         assert!(looks_like_agents_request("agents on"));
         assert!(looks_like_agents_request("/agents off"));
         assert!(looks_like_agents_request("enabled agents"));
@@ -49417,12 +49470,23 @@ mod tests {
         assert!(!looks_like_agents_request("create an agent"));
         assert!(!looks_like_agents_request("agent: research weather"));
         assert!(!looks_like_agents_request("why are agents offline"));
+        assert!(!looks_like_agents_request("agents path"));
+        assert!(!looks_like_agents_request("agents size"));
+        assert!(!looks_like_agents_request("agents age"));
+        // Singular "open agent …" stays with the agent (open/edit flow).
+        assert!(!looks_like_agents_request("open agent"));
+        assert!(!looks_like_agents_request("open this agent"));
         assert_eq!(parse_agents_list_filter("/agents"), AgentsListFilter::All);
         assert_eq!(parse_agents_list_filter("/agents on"), AgentsListFilter::On);
         assert_eq!(
             parse_agents_list_filter("disabled agents"),
             AgentsListFilter::Off
         );
+        let view = try_operator_instant_reply("view agents").expect("view agents instant");
+        assert!(view.contains("Agents"), "{view}");
+        let show_me =
+            try_operator_instant_reply("show me the agents").expect("show me the agents");
+        assert!(show_me.contains("Agents"), "{show_me}");
     }
 
     #[test]
