@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1033] - 2026-09-12
+
+### Added
+- Instant lane: more Having fun / idle NL for `/having_fun` · `/fun` · `/idle` — `view having fun`, `see having fun`, `show me the having fun`, `open having fun` / `open the having fun`, `list the having fun`, and the same for fun / idle / idle thoughts (and close variants) join On/Off Ready. Exact open only — not send/post idle thoughts, enable/disable, or free-form “have fun …”. Config only.
+
 ## [0.1.1032] - 2026-09-12
 
 ### Added

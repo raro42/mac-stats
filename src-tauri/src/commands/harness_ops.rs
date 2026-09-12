@@ -43650,8 +43650,53 @@ pub fn looks_like_having_fun_ready_request(content: &str) -> bool {
             | "fun on"
             | "fun off"
             | "show having fun"
+            | "show the having fun"
+            | "show me having fun"
+            | "show me the having fun"
             | "show idle"
+            | "show the idle"
+            | "show me idle"
+            | "show me the idle"
             | "show idle thoughts"
+            | "show the idle thoughts"
+            | "show me idle thoughts"
+            | "show me the idle thoughts"
+            | "show fun"
+            | "show the fun"
+            | "show me fun"
+            | "show me the fun"
+            | "view having fun"
+            | "view the having fun"
+            | "view idle"
+            | "view the idle"
+            | "view idle thoughts"
+            | "view the idle thoughts"
+            | "view fun"
+            | "view the fun"
+            | "see having fun"
+            | "see the having fun"
+            | "see idle"
+            | "see the idle"
+            | "see idle thoughts"
+            | "see the idle thoughts"
+            | "see fun"
+            | "see the fun"
+            | "open having fun"
+            | "open the having fun"
+            | "open idle"
+            | "open the idle"
+            | "open idle thoughts"
+            | "open the idle thoughts"
+            | "open fun"
+            | "open the fun"
+            | "list having fun"
+            | "list the having fun"
+            | "list idle"
+            | "list the idle"
+            | "list idle thoughts"
+            | "list the idle thoughts"
+            | "list fun"
+            | "list the fun"
             | "is having fun ready"
             | "is having fun on"
             | "is having fun off"
@@ -45973,7 +46018,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/ori` · `/mnemos` · `view ori` · `see ori` · `show me the ori` · `open ori` · `list the ori` · `view mnemos` · `see mnemos` · `show me the mnemos` · `open mnemos` · `list the mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub / vault path·size·age)\n\
 • `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
 • `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
-• `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
+• `/having_fun` · `/fun` · `/idle` · `view having fun` · `see having fun` · `show me the having fun` · `open having fun` · `list the having fun` · `view fun` · `open fun` · `view idle` · `see idle` · `show me the idle` · `open idle` · `list the idle` · `view idle thoughts` · `open idle thoughts` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
 • `/voice` · `/stt` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; no transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` — alert channel Ready / Not set (Keychain + registry; no live send)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
@@ -46787,7 +46832,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/having_fun` · `/fun` · `/idle` Ready chip asks (v0.1.743).
+    // `/having_fun` · `/fun` · `/idle` Ready chip asks (v0.1.743);
+    // view/see/show me/open/list-the NL (v0.1.1033).
     if (q.contains("/having_fun")
         || q.contains("/having-fun")
         || q.contains("/fun")
@@ -46800,6 +46846,40 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("idle ready")
         || q.contains("fun status")
         || q.contains("fun ready")
+        || q.contains("list having fun")
+        || q.contains("list the having fun")
+        || q.contains("list idle")
+        || q.contains("list the idle")
+        || q.contains("list idle thoughts")
+        || q.contains("list the idle thoughts")
+        || q == "list fun"
+        || q == "list the fun"
+        || q.contains("view having fun")
+        || q.contains("see having fun")
+        || q.contains("show me the having fun")
+        || q.contains("show me having fun")
+        || q.contains("view idle")
+        || q.contains("see idle")
+        || q.contains("show me the idle")
+        || q.contains("show me idle")
+        || q.contains("view idle thoughts")
+        || q.contains("see idle thoughts")
+        || q.contains("show me the idle thoughts")
+        || q.contains("show me idle thoughts")
+        || q == "view fun"
+        || q == "see fun"
+        || q == "show fun"
+        || q == "show the fun"
+        || q == "show me fun"
+        || q == "show me the fun"
+        || q == "open having fun"
+        || q == "open the having fun"
+        || q == "open idle"
+        || q == "open the idle"
+        || q == "open idle thoughts"
+        || q == "open the idle thoughts"
+        || q == "open fun"
+        || q == "open the fun"
         || q.contains("is having fun")
         || q.contains("how's having fun")
         || q.contains("hows having fun")
@@ -49824,9 +49904,15 @@ mod tests {
         assert!(try_operator_instant_reply("is having fun ready").is_some());
         assert!(try_operator_instant_reply("how's idle").is_some());
         assert!(try_operator_instant_reply("idle thoughts").is_some());
+        assert!(try_operator_instant_reply("view having fun").is_some());
+        assert!(try_operator_instant_reply("see fun").is_some());
+        assert!(try_operator_instant_reply("show me the idle").is_some());
+        assert!(try_operator_instant_reply("open idle thoughts").is_some());
+        assert!(try_operator_instant_reply("list the having fun").is_some());
         assert!(try_operator_instant_reply("have fun tonight").is_none());
         assert!(try_operator_instant_reply("send idle thought").is_none());
         assert!(try_operator_instant_reply("enable having fun").is_none());
+        assert!(try_operator_instant_reply("view funny meme").is_none());
         assert!(try_operator_instant_reply("/discord").is_some()); // gateway, not having_fun
         let voice = try_operator_instant_reply("/voice").expect("voice");
         assert!(voice.to_lowercase().contains("voice"), "{voice}");
@@ -61631,6 +61717,27 @@ mod tests {
         assert!(looks_like_having_fun_ready_request("/idle"));
         assert!(looks_like_having_fun_ready_request("having fun"));
         assert!(looks_like_having_fun_ready_request("having fun status"));
+        assert!(looks_like_having_fun_ready_request("list the having fun"));
+        assert!(looks_like_having_fun_ready_request("view having fun"));
+        assert!(looks_like_having_fun_ready_request("see having fun"));
+        assert!(looks_like_having_fun_ready_request("show me the having fun"));
+        assert!(looks_like_having_fun_ready_request("open having fun"));
+        assert!(looks_like_having_fun_ready_request("open the having fun"));
+        assert!(looks_like_having_fun_ready_request("view fun"));
+        assert!(looks_like_having_fun_ready_request("see fun"));
+        assert!(looks_like_having_fun_ready_request("show me the fun"));
+        assert!(looks_like_having_fun_ready_request("open fun"));
+        assert!(looks_like_having_fun_ready_request("open the fun"));
+        assert!(looks_like_having_fun_ready_request("view idle"));
+        assert!(looks_like_having_fun_ready_request("see idle"));
+        assert!(looks_like_having_fun_ready_request("show me the idle"));
+        assert!(looks_like_having_fun_ready_request("open idle"));
+        assert!(looks_like_having_fun_ready_request("open the idle"));
+        assert!(looks_like_having_fun_ready_request("view idle thoughts"));
+        assert!(looks_like_having_fun_ready_request("see idle thoughts"));
+        assert!(looks_like_having_fun_ready_request("show me the idle thoughts"));
+        assert!(looks_like_having_fun_ready_request("open idle thoughts"));
+        assert!(looks_like_having_fun_ready_request("list the idle"));
         assert!(looks_like_having_fun_ready_request("is having fun ready"));
         assert!(looks_like_having_fun_ready_request("how's idle"));
         assert!(looks_like_having_fun_ready_request("idle thoughts"));
@@ -61638,6 +61745,19 @@ mod tests {
         assert!(!looks_like_having_fun_ready_request("send idle thought"));
         assert!(!looks_like_having_fun_ready_request("enable having fun"));
         assert!(!looks_like_having_fun_ready_request("how to enable idle"));
+        assert!(!looks_like_having_fun_ready_request("view funny meme"));
+        let view_having_fun =
+            try_operator_instant_reply("view having fun").expect("view having fun instant");
+        assert!(
+            view_having_fun.to_lowercase().contains("having fun"),
+            "{view_having_fun}"
+        );
+        let open_idle = try_operator_instant_reply("open idle").expect("open idle instant");
+        assert!(
+            open_idle.to_lowercase().contains("having fun")
+                || open_idle.to_lowercase().contains("idle"),
+            "{open_idle}"
+        );
         let having_fun_chip = format_having_fun_ready_chip();
         assert!(
             having_fun_chip.to_lowercase().contains("having fun"),
