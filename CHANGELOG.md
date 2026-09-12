@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1038] - 2026-09-12
+
+### Added
+- Instant lane: more health NL for `/status` · `/health` · `/version` — `view status`, `see status`, `show me the status`, `open status` / `open the status`, `list the status`, and the same for health / version join the one-screen health reply. Exact open only — not ticket “status of …”, changelog/ship/bump/release, or path/size/age. p50.
+
 ## [0.1.1037] - 2026-09-12
 
 ### Added

@@ -41692,31 +41692,96 @@ pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
     out
 }
 
-/// True for short `/status` / `/health` operator asks — not free-form “status of …”.
+/// True for short `/status` / `/health` / `/version` operator asks — not free-form “status of …”.
+/// View/see/show me/open/list-the NL (v0.1.1038). Exact `open status` / `open the status` only
+/// (same for health / version). After normalize strips `show me` / `show`, prefer `the status`
+/// etc. so `show me the status` still matches.
 pub fn looks_like_status_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.contains(" of ") || n.contains(" for ") || n.contains("ticket") || n.contains("redmine")
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains(" of ")
+        || n.contains(" for ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" about ")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("age")
+        || n.contains("changelog")
+        || n.contains("ship")
+        || n.contains("bump")
+        || n.contains("release")
     {
         return false;
     }
     matches!(
         n.as_str(),
         "/status"
+            | "status"
+            | "the status"
             | "bot status"
             | "app status"
             | "mac-stats status"
             | "system status"
+            | "view status"
+            | "view the status"
+            | "see status"
+            | "see the status"
+            | "show status"
+            | "show the status"
+            | "show me status"
+            | "show me the status"
+            | "open status"
+            | "open the status"
+            | "list status"
+            | "list the status"
             | "/health"
+            | "health"
+            | "the health"
             | "health check"
             | "bot health"
             | "system health"
+            | "app health"
+            | "mac-stats health"
             | "how healthy"
             | "are you healthy"
-            |         "/version"
+            | "view health"
+            | "view the health"
+            | "see health"
+            | "see the health"
+            | "show health"
+            | "show the health"
+            | "show me health"
+            | "show me the health"
+            | "open health"
+            | "open the health"
+            | "list health"
+            | "list the health"
+            | "/version"
+            | "version"
+            | "the version"
             | "app version"
             | "mac-stats version"
             | "what version"
             | "which version"
+            | "view version"
+            | "view the version"
+            | "see version"
+            | "see the version"
+            | "show version"
+            | "show the version"
+            | "show me version"
+            | "show me the version"
+            | "open version"
+            | "open the version"
+            | "list version"
+            | "list the version"
             | "is everything ok"
             | "everything ok"
             | "everything working"
@@ -46420,7 +46485,7 @@ pub fn format_ops_help_gateway() -> String {
     let version = crate::config::Config::version();
     format!(
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
-• `/status` · `/health` · `/version` — one-screen health\n\
+• `/status` · `/health` · `/version` · `view status` · `see status` · `show me the status` · `open status` · `list the status` · `view health` · `open health` · `view version` · `open version` — one-screen health (exact open only; not ticket/status-of …)\n\
 • `/discord` · `view discord` · `see discord` · `show me the discord` · `open discord` · `list the discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
 • `/ollama` · `/llm` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
 • `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
@@ -61816,9 +61881,33 @@ mod tests {
         assert!(looks_like_status_request("bot status"));
         assert!(looks_like_status_request("system health"));
         assert!(looks_like_status_request("what version"));
+        assert!(looks_like_status_request("list the status"));
+        assert!(looks_like_status_request("view status"));
+        assert!(looks_like_status_request("see status"));
+        assert!(looks_like_status_request("show me the status"));
+        assert!(looks_like_status_request("open status"));
+        assert!(looks_like_status_request("open the status"));
+        assert!(looks_like_status_request("view health"));
+        assert!(looks_like_status_request("open the health"));
+        assert!(looks_like_status_request("list the health"));
+        assert!(looks_like_status_request("view version"));
+        assert!(looks_like_status_request("see the version"));
+        assert!(looks_like_status_request("open version"));
+        assert!(looks_like_status_request("list the version"));
         assert!(!looks_like_status_request("status of the redmine ticket"));
+        assert!(!looks_like_status_request("why is the status wrong"));
+        assert!(!looks_like_status_request("ship version bump"));
+        assert!(!looks_like_status_request("changelog version"));
         assert!(looks_like_status_request("is everything ok"));
         assert!(looks_like_status_request("everything working"));
+        let view_st =
+            try_operator_instant_reply("view status").expect("view status instant");
+        assert!(
+            view_st.to_lowercase().contains("mac-stats")
+                || view_st.to_lowercase().contains("digest")
+                || view_st.to_lowercase().contains("schedule"),
+            "{view_st}"
+        );
     }
 
     #[test]
