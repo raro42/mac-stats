@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1042] - 2026-09-13
+
+### Added
+- Instant lane: more power-strip chip NL for `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` — `view battery`, `see battery`, `show me the battery`, `open battery` / `open the battery`, `list the battery`, and the same for heat / thermal / lpm / low power mode / ram / memory / ssd / uptime join the one-chip Bat · Heat · LPM · RAM · SSD · Up reply. Exact open only — not `/strip`, Disk Cleanup `open disk`, `/details`, or path/size/age. p50.
+
 ## [0.1.1041] - 2026-09-13
 
 ### Added

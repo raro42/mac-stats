@@ -40086,6 +40086,10 @@ pub enum StripChipAsk {
 }
 
 /// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` (and short NL). None when not a chip ask.
+/// View/see/show me/open/list-the NL (v0.1.1042). Exact `open battery` / `open the battery` only
+/// (same for heat / lpm / ram / ssd / uptime). After normalize strips `show me` / `show`, prefer
+/// `the battery` etc. so `show me the battery` still matches. Does not steal `/strip`, `/disk`
+/// Disk Cleanup (`open disk`), `/details`, or path/size/age.
 pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -40108,6 +40112,22 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         || n.contains("search")
         || n.contains("weather")
         || n.contains("detail")
+        || n.contains(" path")
+        || n.ends_with(" path")
+        || n.contains(" size")
+        || n.ends_with(" size")
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.starts_with("where ")
+        // Disk Cleanup owns bare `open disk` / `view disk` (not SSD %).
+        || n == "open disk"
+        || n == "open the disk"
+        || n == "view disk"
+        || n == "view the disk"
+        || n == "see disk"
+        || n == "see the disk"
+        || n == "list disk"
+        || n == "list the disk"
     {
         return None;
     }
@@ -40117,13 +40137,33 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         "/battery"
             | "/bat"
             | "battery"
+            | "the battery"
             | "bat"
+            | "the bat"
             | "battery level"
             | "battery percent"
             | "battery percentage"
             | "battery %"
             | "show battery"
+            | "show the battery"
+            | "show me battery"
+            | "show me the battery"
             | "list battery"
+            | "list the battery"
+            | "list bat"
+            | "list the bat"
+            | "view battery"
+            | "view the battery"
+            | "view bat"
+            | "view the bat"
+            | "see battery"
+            | "see the battery"
+            | "see bat"
+            | "see the bat"
+            | "open battery"
+            | "open the battery"
+            | "open bat"
+            | "open the bat"
             | "battery status"
             | "what's the battery"
             | "whats the battery"
@@ -40141,12 +40181,36 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         "/heat"
             | "/thermal"
             | "heat"
+            | "the heat"
             | "thermal"
+            | "the thermal"
             | "thermal state"
             | "thermal pressure"
             | "heat state"
             | "show heat"
+            | "show the heat"
+            | "show me heat"
+            | "show me the heat"
+            | "show thermal"
+            | "show the thermal"
+            | "show me thermal"
+            | "show me the thermal"
             | "list heat"
+            | "list the heat"
+            | "list thermal"
+            | "list the thermal"
+            | "view heat"
+            | "view the heat"
+            | "view thermal"
+            | "view the thermal"
+            | "see heat"
+            | "see the heat"
+            | "see thermal"
+            | "see the thermal"
+            | "open heat"
+            | "open the heat"
+            | "open thermal"
+            | "open the thermal"
             | "heat status"
             | "what's the heat"
             | "whats the heat"
@@ -40164,12 +40228,41 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         n.as_str(),
         "/lpm"
             | "lpm"
+            | "the lpm"
             | "low power"
             | "low power mode"
+            | "the low power mode"
             | "low-power mode"
             | "low-power"
             | "show lpm"
+            | "show the lpm"
+            | "show me lpm"
+            | "show me the lpm"
+            | "show low power"
+            | "show low power mode"
+            | "show me low power"
+            | "show me low power mode"
+            | "show me the low power mode"
             | "list lpm"
+            | "list the lpm"
+            | "list low power"
+            | "list low power mode"
+            | "list the low power mode"
+            | "view lpm"
+            | "view the lpm"
+            | "view low power"
+            | "view low power mode"
+            | "view the low power mode"
+            | "see lpm"
+            | "see the lpm"
+            | "see low power"
+            | "see low power mode"
+            | "see the low power mode"
+            | "open lpm"
+            | "open the lpm"
+            | "open low power"
+            | "open low power mode"
+            | "open the low power mode"
             | "lpm status"
             | "is lpm on"
             | "is lpm off"
@@ -40188,8 +40281,11 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         n.as_str(),
         "/ram"
             | "ram"
+            | "the ram"
             | "memory"
+            | "the memory"
             | "mem"
+            | "the mem"
             | "/memory"
             | "/mem"
             | "ram percent"
@@ -40198,7 +40294,29 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "memory percent"
             | "memory %"
             | "show ram"
+            | "show the ram"
+            | "show me ram"
+            | "show me the ram"
+            | "show memory"
+            | "show the memory"
+            | "show me memory"
+            | "show me the memory"
             | "list ram"
+            | "list the ram"
+            | "list memory"
+            | "list the memory"
+            | "view ram"
+            | "view the ram"
+            | "view memory"
+            | "view the memory"
+            | "see ram"
+            | "see the ram"
+            | "see memory"
+            | "see the memory"
+            | "open ram"
+            | "open the ram"
+            | "open memory"
+            | "open the memory"
             | "ram status"
             | "what's the ram"
             | "whats the ram"
@@ -40211,11 +40329,12 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     ) {
         return Some(StripChipAsk::Ram);
     }
-    // SSD chip — not `/disk` Disk Cleanup (cleanup/reclaim rejected above).
+    // SSD chip — not `/disk` Disk Cleanup (cleanup/reclaim / open disk rejected above).
     if matches!(
         n.as_str(),
         "/ssd"
             | "ssd"
+            | "the ssd"
             | "disk percent"
             | "disk percentage"
             | "disk %"
@@ -40224,7 +40343,17 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "disk usage"
             | "ssd usage"
             | "show ssd"
+            | "show the ssd"
+            | "show me ssd"
+            | "show me the ssd"
             | "list ssd"
+            | "list the ssd"
+            | "view ssd"
+            | "view the ssd"
+            | "see ssd"
+            | "see the ssd"
+            | "open ssd"
+            | "open the ssd"
             | "ssd status"
             | "what's the ssd"
             | "whats the ssd"
@@ -40245,10 +40374,21 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
         "/uptime"
             | "/up"
             | "uptime"
+            | "the uptime"
             | "up time"
             | "system uptime"
             | "show uptime"
+            | "show the uptime"
+            | "show me uptime"
+            | "show me the uptime"
             | "list uptime"
+            | "list the uptime"
+            | "view uptime"
+            | "view the uptime"
+            | "see uptime"
+            | "see the uptime"
+            | "open uptime"
+            | "open the uptime"
             | "uptime status"
             | "what's the uptime"
             | "whats the uptime"
@@ -46985,7 +47125,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
@@ -48138,7 +48278,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` chip asks (v0.1.719–721).
+    // `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` chip asks (v0.1.719–721);
+    // view/see/show me/open/list-the NL (v0.1.1042).
     if (q.contains("/battery")
         || q.contains("/bat")
         || q.contains("/heat")
@@ -48161,6 +48302,34 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("disk usage")
         || q.contains("ssd usage")
         || q.contains("system uptime")
+        || q.contains("view battery")
+        || q.contains("see battery")
+        || q.contains("open battery")
+        || q.contains("list the battery")
+        || q.contains("view bat")
+        || q.contains("open bat")
+        || q.contains("view heat")
+        || q.contains("see heat")
+        || q.contains("open heat")
+        || q.contains("view thermal")
+        || q.contains("open thermal")
+        || q.contains("view lpm")
+        || q.contains("see lpm")
+        || q.contains("open lpm")
+        || q.contains("view low power")
+        || q.contains("open low power")
+        || q.contains("view ram")
+        || q.contains("see ram")
+        || q.contains("open ram")
+        || q.contains("view memory")
+        || q.contains("open memory")
+        || q.contains("view ssd")
+        || q.contains("see ssd")
+        || q.contains("open ssd")
+        || q.contains("view uptime")
+        || q.contains("see uptime")
+        || q.contains("open uptime")
+        || q.contains("list the uptime")
         || q == "battery"
         || q == "bat"
         || q == "heat"
@@ -48196,6 +48365,12 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("detail")
         && !q.contains(" ticket")
         && !q.contains("redmine")
+        && !q.contains(" path")
+        && !q.contains(" size")
+        && !q.contains(" age")
+        && q != "open disk"
+        && q != "view disk"
+        && q != "see disk"
     {
         return true;
     }
@@ -62170,6 +62345,30 @@ mod tests {
             Some(StripChipAsk::Battery)
         );
         assert_eq!(parse_strip_chip_ask("/bat"), Some(StripChipAsk::Battery));
+        assert_eq!(
+            parse_strip_chip_ask("view battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("see battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("show me the battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open the battery"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("list the battery"),
+            Some(StripChipAsk::Battery)
+        );
         assert_eq!(parse_strip_chip_ask("/heat"), Some(StripChipAsk::Heat));
         assert_eq!(
             parse_strip_chip_ask("thermal state"),
@@ -62177,6 +62376,18 @@ mod tests {
         );
         assert_eq!(
             parse_strip_chip_ask("what's the heat"),
+            Some(StripChipAsk::Heat)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("view heat"),
+            Some(StripChipAsk::Heat)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open thermal"),
+            Some(StripChipAsk::Heat)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("list the heat"),
             Some(StripChipAsk::Heat)
         );
         assert_eq!(parse_strip_chip_ask("/lpm"), Some(StripChipAsk::Lpm));
@@ -62188,15 +62399,42 @@ mod tests {
             parse_strip_chip_ask("is lpm on"),
             Some(StripChipAsk::Lpm)
         );
+        assert_eq!(parse_strip_chip_ask("view lpm"), Some(StripChipAsk::Lpm));
+        assert_eq!(
+            parse_strip_chip_ask("open low power mode"),
+            Some(StripChipAsk::Lpm)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("see the low power mode"),
+            Some(StripChipAsk::Lpm)
+        );
         assert_eq!(parse_strip_chip_ask("/ram"), Some(StripChipAsk::Ram));
         assert_eq!(
             parse_strip_chip_ask("what's the ram"),
             Some(StripChipAsk::Ram)
         );
         assert_eq!(parse_strip_chip_ask("memory"), Some(StripChipAsk::Ram));
+        assert_eq!(parse_strip_chip_ask("view ram"), Some(StripChipAsk::Ram));
+        assert_eq!(
+            parse_strip_chip_ask("open memory"),
+            Some(StripChipAsk::Ram)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("list the ram"),
+            Some(StripChipAsk::Ram)
+        );
         assert_eq!(parse_strip_chip_ask("/ssd"), Some(StripChipAsk::Ssd));
         assert_eq!(
             parse_strip_chip_ask("disk usage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(parse_strip_chip_ask("view ssd"), Some(StripChipAsk::Ssd));
+        assert_eq!(
+            parse_strip_chip_ask("open the ssd"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("list the ssd"),
             Some(StripChipAsk::Ssd)
         );
         assert_eq!(
@@ -62208,14 +62446,31 @@ mod tests {
             Some(StripChipAsk::Uptime)
         );
         assert_eq!(parse_strip_chip_ask("/up"), Some(StripChipAsk::Uptime));
+        assert_eq!(
+            parse_strip_chip_ask("view uptime"),
+            Some(StripChipAsk::Uptime)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("open uptime"),
+            Some(StripChipAsk::Uptime)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("show me the uptime"),
+            Some(StripChipAsk::Uptime)
+        );
         assert!(parse_strip_chip_ask("battery strip").is_none());
         assert!(parse_strip_chip_ask("/strip").is_none());
         assert!(parse_strip_chip_ask("/power").is_none());
         assert!(parse_strip_chip_ask("/disk").is_none());
         assert!(parse_strip_chip_ask("disk cleanup").is_none());
+        assert!(parse_strip_chip_ask("open disk").is_none());
+        assert!(parse_strip_chip_ask("view disk").is_none());
         assert!(parse_strip_chip_ask("/details").is_none());
         assert!(parse_strip_chip_ask("what's hot").is_none());
         assert!(parse_strip_chip_ask("why is the battery low").is_none());
+        assert!(parse_strip_chip_ask("battery path").is_none());
+        assert!(parse_strip_chip_ask("memory size").is_none());
+        assert!(parse_strip_chip_ask("uptime age").is_none());
         assert!(looks_like_strip_chip_request("/thermal"));
         let heat = format_strip_chip_gateway(StripChipAsk::Heat);
         assert!(heat.to_lowercase().contains("heat"), "{heat}");
@@ -62229,6 +62484,10 @@ mod tests {
         assert!(ssd.to_lowercase().contains("ssd"), "{ssd}");
         let up = format_strip_chip_gateway(StripChipAsk::Uptime);
         assert!(up.to_lowercase().contains("up"), "{up}");
+        let view = try_operator_instant_reply("view battery").expect("view battery instant");
+        assert!(view.to_lowercase().contains("bat"), "{view}");
+        let open_ssd = try_operator_instant_reply("open ssd").expect("open ssd instant");
+        assert!(open_ssd.to_lowercase().contains("ssd"), "{open_ssd}");
     }
 
     #[test]
