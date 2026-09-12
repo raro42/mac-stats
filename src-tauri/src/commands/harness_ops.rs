@@ -39540,6 +39540,9 @@ pub enum RingChipAsk {
 }
 
 /// Parse `/cpu` · `/gpu` · `/freq` · `/temp` (and short NL). None when not a chip ask.
+/// View/see/show me/open/list-the NL (v0.1.1041). Exact `open cpu` / `open the cpu` only
+/// (same for gpu / freq / temp). After normalize strips `show me` / `show`, prefer `the cpu`
+/// etc. so `show me the cpu` still matches. Does not steal `/rings`, `/details`, or `cpu window`.
 pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -39562,6 +39565,14 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
         || n.contains("weather")
         || n.contains("detail")
         || n.contains("pin")
+        || n.contains("window")
+        || n.contains(" path")
+        || n.ends_with(" path")
+        || n.contains(" size")
+        || n.ends_with(" size")
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.starts_with("where ")
     {
         return None;
     }
@@ -39569,12 +39580,23 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
         n.as_str(),
         "/cpu"
             | "cpu"
+            | "the cpu"
             | "cpu usage"
             | "cpu percent"
             | "cpu percentage"
             | "cpu %"
             | "show cpu"
+            | "show the cpu"
+            | "show me cpu"
+            | "show me the cpu"
             | "list cpu"
+            | "list the cpu"
+            | "view cpu"
+            | "view the cpu"
+            | "see cpu"
+            | "see the cpu"
+            | "open cpu"
+            | "open the cpu"
             | "cpu status"
             | "what's the cpu"
             | "whats the cpu"
@@ -39588,12 +39610,23 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
         n.as_str(),
         "/gpu"
             | "gpu"
+            | "the gpu"
             | "gpu usage"
             | "gpu percent"
             | "gpu percentage"
             | "gpu %"
             | "show gpu"
+            | "show the gpu"
+            | "show me gpu"
+            | "show me the gpu"
             | "list gpu"
+            | "list the gpu"
+            | "view gpu"
+            | "view the gpu"
+            | "see gpu"
+            | "see the gpu"
+            | "open gpu"
+            | "open the gpu"
             | "gpu status"
             | "what's the gpu"
             | "whats the gpu"
@@ -39609,13 +39642,40 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
             | "/frequency"
             | "/ghz"
             | "freq"
+            | "the freq"
             | "frequency"
+            | "the frequency"
             | "ghz"
+            | "the ghz"
             | "cpu frequency"
             | "cpu freq"
             | "cpu ghz"
             | "show freq"
+            | "show the freq"
+            | "show me freq"
+            | "show me the freq"
+            | "show frequency"
+            | "show the frequency"
+            | "show me frequency"
+            | "show me the frequency"
             | "list freq"
+            | "list the freq"
+            | "list frequency"
+            | "list the frequency"
+            | "view freq"
+            | "view the freq"
+            | "view frequency"
+            | "view the frequency"
+            | "see freq"
+            | "see the freq"
+            | "see frequency"
+            | "see the frequency"
+            | "open freq"
+            | "open the freq"
+            | "open frequency"
+            | "open the frequency"
+            | "open ghz"
+            | "open the ghz"
             | "freq status"
             | "what's the frequency"
             | "whats the frequency"
@@ -39633,11 +39693,35 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
         "/temp"
             | "/temperature"
             | "temp"
+            | "the temp"
             | "temperature"
+            | "the temperature"
             | "cpu temp"
             | "cpu temperature"
             | "show temp"
+            | "show the temp"
+            | "show me temp"
+            | "show me the temp"
+            | "show temperature"
+            | "show the temperature"
+            | "show me temperature"
+            | "show me the temperature"
             | "list temp"
+            | "list the temp"
+            | "list temperature"
+            | "list the temperature"
+            | "view temp"
+            | "view the temp"
+            | "view temperature"
+            | "view the temperature"
+            | "see temp"
+            | "see the temp"
+            | "see temperature"
+            | "see the temperature"
+            | "open temp"
+            | "open the temp"
+            | "open temperature"
+            | "open the temperature"
             | "temp status"
             | "what's the temp"
             | "whats the temp"
@@ -46899,7 +46983,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` — Top Processes Hot/Pinned list\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
-• `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
+• `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
@@ -47933,7 +48017,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/cpu` · `/gpu` · `/freq` · `/temp` chip asks (v0.1.720).
+    // `/cpu` · `/gpu` · `/freq` · `/temp` chip asks (v0.1.720);
+    // view/see/show me/open/list-the NL (v0.1.1041). Exact open only — not rings / details / cpu window.
     if (q.contains("/cpu")
         || q.contains("/gpu")
         || q.contains("/freq")
@@ -47948,13 +48033,55 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("cpu frequency")
         || q.contains("cpu temp")
         || q.contains("cpu temperature")
+        || q.contains("list the cpu")
+        || q.contains("list the gpu")
+        || q.contains("list the freq")
+        || q.contains("list the frequency")
+        || q.contains("list the temp")
+        || q.contains("list the temperature")
+        || q.contains("view cpu")
+        || q.contains("see cpu")
+        || q.contains("show me the cpu")
+        || q.contains("view gpu")
+        || q.contains("see gpu")
+        || q.contains("show me the gpu")
+        || q.contains("view freq")
+        || q.contains("see freq")
+        || q.contains("view frequency")
+        || q.contains("see frequency")
+        || q.contains("show me the freq")
+        || q.contains("show me the frequency")
+        || q.contains("view temp")
+        || q.contains("see temp")
+        || q.contains("view temperature")
+        || q.contains("see temperature")
+        || q.contains("show me the temp")
+        || q.contains("show me the temperature")
+        || q == "open cpu"
+        || q == "open the cpu"
+        || q == "open gpu"
+        || q == "open the gpu"
+        || q == "open freq"
+        || q == "open the freq"
+        || q == "open frequency"
+        || q == "open the frequency"
+        || q == "open temp"
+        || q == "open the temp"
+        || q == "open temperature"
+        || q == "open the temperature"
         || q == "cpu"
+        || q == "the cpu"
         || q == "gpu"
+        || q == "the gpu"
         || q == "freq"
+        || q == "the freq"
         || q == "frequency"
+        || q == "the frequency"
         || q == "ghz"
         || q == "temp"
+        || q == "the temp"
         || q == "temperature"
+        || q == "the temperature"
         || q == "what's the cpu"
         || q == "whats the cpu"
         || q == "what is the cpu"
@@ -47972,6 +48099,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("ring")
         && !q.contains("strip")
         && !q.contains("detail")
+        && !q.contains("window")
+        && !q.contains(" path")
+        && !q.contains(" size")
+        && !q.contains(" age")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -61894,9 +62025,30 @@ mod tests {
             Some(RingChipAsk::Cpu)
         );
         assert_eq!(parse_ring_chip_ask("cpu usage"), Some(RingChipAsk::Cpu));
+        assert_eq!(parse_ring_chip_ask("view cpu"), Some(RingChipAsk::Cpu));
+        assert_eq!(parse_ring_chip_ask("see cpu"), Some(RingChipAsk::Cpu));
+        assert_eq!(
+            parse_ring_chip_ask("show me the cpu"),
+            Some(RingChipAsk::Cpu)
+        );
+        assert_eq!(parse_ring_chip_ask("open cpu"), Some(RingChipAsk::Cpu));
+        assert_eq!(
+            parse_ring_chip_ask("open the cpu"),
+            Some(RingChipAsk::Cpu)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("list the cpu"),
+            Some(RingChipAsk::Cpu)
+        );
         assert_eq!(parse_ring_chip_ask("/gpu"), Some(RingChipAsk::Gpu));
         assert_eq!(
             parse_ring_chip_ask("what's the gpu"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert_eq!(parse_ring_chip_ask("view gpu"), Some(RingChipAsk::Gpu));
+        assert_eq!(parse_ring_chip_ask("open gpu"), Some(RingChipAsk::Gpu));
+        assert_eq!(
+            parse_ring_chip_ask("list the gpu"),
             Some(RingChipAsk::Gpu)
         );
         assert_eq!(parse_ring_chip_ask("/freq"), Some(RingChipAsk::Freq));
@@ -61905,16 +62057,48 @@ mod tests {
             parse_ring_chip_ask("cpu frequency"),
             Some(RingChipAsk::Freq)
         );
+        assert_eq!(
+            parse_ring_chip_ask("view frequency"),
+            Some(RingChipAsk::Freq)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("open freq"),
+            Some(RingChipAsk::Freq)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("show me the frequency"),
+            Some(RingChipAsk::Freq)
+        );
         assert_eq!(parse_ring_chip_ask("/temp"), Some(RingChipAsk::Temp));
         assert_eq!(
             parse_ring_chip_ask("what's the temperature"),
             Some(RingChipAsk::Temp)
         );
+        assert_eq!(
+            parse_ring_chip_ask("view temp"),
+            Some(RingChipAsk::Temp)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("see temperature"),
+            Some(RingChipAsk::Temp)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("open the temperature"),
+            Some(RingChipAsk::Temp)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("list the temp"),
+            Some(RingChipAsk::Temp)
+        );
         assert!(parse_ring_chip_ask("/rings").is_none());
         assert!(parse_ring_chip_ask("cpu rings").is_none());
         assert!(parse_ring_chip_ask("hot rings").is_none());
+        assert!(parse_ring_chip_ask("view cpu rings").is_none());
         assert!(parse_ring_chip_ask("why is the cpu hot").is_none());
         assert!(parse_ring_chip_ask("cpu details").is_none());
+        assert!(parse_ring_chip_ask("view cpu window").is_none());
+        assert!(parse_ring_chip_ask("open cpu-window").is_none());
+        assert!(parse_ring_chip_ask("cpu path").is_none());
         assert!(looks_like_ring_chip_request("/temperature"));
         let cpu = format_ring_chip_gateway(RingChipAsk::Cpu);
         assert!(cpu.to_lowercase().contains("cpu"), "{cpu}");
@@ -61924,6 +62108,11 @@ mod tests {
         assert!(freq.to_lowercase().contains("freq"), "{freq}");
         let temp = format_ring_chip_gateway(RingChipAsk::Temp);
         assert!(temp.to_lowercase().contains("temp"), "{temp}");
+        let view = try_operator_instant_reply("view cpu").expect("view cpu instant");
+        assert!(view.to_lowercase().contains("cpu"), "{view}");
+        let open_temp =
+            try_operator_instant_reply("open temp").expect("open temp instant");
+        assert!(open_temp.to_lowercase().contains("temp"), "{open_temp}");
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1041] - 2026-09-13
+
+### Added
+- Instant lane: more ring-chip NL for `/cpu` · `/gpu` · `/freq` · `/temp` — `view cpu`, `see cpu`, `show me the cpu`, `open cpu` / `open the cpu`, `list the cpu`, and the same for gpu / freq / frequency / temp / temperature join the one-chip CPU · GPU · Freq · Temp reply. Exact open only — not `/rings`, `/details`, `cpu window`, or path/size/age. p50.
+
 ## [0.1.1040] - 2026-09-13
 
 ### Added
