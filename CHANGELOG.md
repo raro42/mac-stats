@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1040] - 2026-09-13
+
+### Added
+- Instant lane: more metrics NL for `/rings` · `/strip` · `/details` — `view rings`, `see rings`, `show me the rings`, `open rings` / `open the rings`, `list the rings` (Hot variants too), and the same for strip / power plus details / load join the CPU rings, power strip, or Details Load · RAM · Up reply. Exact open only — not process details, disk cleanup, path/size/age, or “about …”. p50.
+
 ## [0.1.1039] - 2026-09-12
 
 ### Added

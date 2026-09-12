@@ -39354,6 +39354,10 @@ pub fn parse_rings_list_filter(content: &str) -> RingsListFilter {
         || n == "which ring is hot"
         || n == "show hot rings"
         || n == "list hot rings"
+        || n == "view hot rings"
+        || n == "see hot rings"
+        || n == "open hot rings"
+        || n == "list the hot rings"
         || n == "what's hot on rings"
         || n == "whats hot on rings"
     {
@@ -39363,6 +39367,9 @@ pub fn parse_rings_list_filter(content: &str) -> RingsListFilter {
 }
 
 /// True for `/rings` / `cpu rings` — Hot filter parity; not process `/hot` asks.
+/// View/see/show me/open/list-the NL (v0.1.1040). Exact `open rings` / `open the rings`
+/// only. After normalize strips `show me` / `show`, prefer `the rings` so
+/// `show me the rings` still matches.
 pub fn looks_like_rings_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -39377,6 +39384,10 @@ pub fn looks_like_rings_request(content: &str) -> bool {
         || n.contains("redmine")
         || n.contains("how to")
         || n.contains("explain")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("age")
     {
         return false;
     }
@@ -39384,22 +39395,48 @@ pub fn looks_like_rings_request(content: &str) -> bool {
         n.as_str(),
         "/rings"
             | "rings"
+            | "the rings"
             | "cpu rings"
+            | "the cpu rings"
             | "ring gauges"
             | "ring gauge"
             | "metric rings"
             | "list rings"
+            | "list the rings"
             | "show rings"
+            | "show the rings"
+            | "show me rings"
+            | "show me the rings"
+            | "view rings"
+            | "view the rings"
+            | "see rings"
+            | "see the rings"
+            | "open rings"
+            | "open the rings"
+            | "view cpu rings"
+            | "see cpu rings"
+            | "open cpu rings"
+            | "list cpu rings"
+            | "list the cpu rings"
             | "rings status"
             | "/rings hot"
             | "rings hot"
             | "cpu rings hot"
             | "hot rings"
             | "hot ring"
+            | "the hot rings"
             | "which rings are hot"
             | "which ring is hot"
             | "show hot rings"
             | "list hot rings"
+            | "view hot rings"
+            | "see hot rings"
+            | "open hot rings"
+            | "list the hot rings"
+            | "view rings hot"
+            | "see rings hot"
+            | "open rings hot"
+            | "list rings hot"
             | "what's hot on rings"
             | "whats hot on rings"
     )
@@ -39718,6 +39755,10 @@ pub fn parse_strip_list_filter(content: &str) -> StripListFilter {
         || n == "which chips are hot"
         || n == "show hot strip"
         || n == "list hot strip"
+        || n == "view hot strip"
+        || n == "see hot strip"
+        || n == "open hot strip"
+        || n == "list the hot strip"
         || n == "what's hot on strip"
         || n == "whats hot on strip"
         || n == "what's hot on the strip"
@@ -39729,6 +39770,9 @@ pub fn parse_strip_list_filter(content: &str) -> StripListFilter {
 }
 
 /// True for `/strip` / `power strip` — not process `/hot` or `/rings`.
+/// View/see/show me/open/list-the NL (v0.1.1040). Exact `open strip` / `open the strip`
+/// only. After normalize strips `show me` / `show`, prefer `the strip` so
+/// `show me the strip` still matches.
 pub fn looks_like_strip_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -39746,6 +39790,10 @@ pub fn looks_like_strip_request(content: &str) -> bool {
         || n.contains("explain")
         || n.contains("cleanup")
         || n.contains("clean up")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("age")
     {
         return false;
     }
@@ -39753,13 +39801,39 @@ pub fn looks_like_strip_request(content: &str) -> bool {
         n.as_str(),
         "/strip"
             | "strip"
+            | "the strip"
             | "power strip"
+            | "the power strip"
             | "powerstrip"
             | "/power"
             | "power"
+            | "the power"
             | "battery strip"
             | "list strip"
+            | "list the strip"
             | "show strip"
+            | "show the strip"
+            | "show me strip"
+            | "show me the strip"
+            | "view strip"
+            | "view the strip"
+            | "see strip"
+            | "see the strip"
+            | "open strip"
+            | "open the strip"
+            | "view power"
+            | "view the power"
+            | "see power"
+            | "see the power"
+            | "open power"
+            | "open the power"
+            | "list power"
+            | "list the power"
+            | "view power strip"
+            | "see power strip"
+            | "open power strip"
+            | "list power strip"
+            | "list the power strip"
             | "strip status"
             | "power status"
             | "/strip hot"
@@ -39768,11 +39842,20 @@ pub fn looks_like_strip_request(content: &str) -> bool {
             | "powerstrip hot"
             | "/power hot"
             | "hot strip"
+            | "the hot strip"
             | "hot power strip"
             | "which strip is hot"
             | "which chips are hot"
             | "show hot strip"
             | "list hot strip"
+            | "view hot strip"
+            | "see hot strip"
+            | "open hot strip"
+            | "list the hot strip"
+            | "view strip hot"
+            | "see strip hot"
+            | "open strip hot"
+            | "list strip hot"
             | "what's hot on strip"
             | "whats hot on strip"
             | "what's hot on the strip"
@@ -40196,6 +40279,10 @@ pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
         || n == "which detail is hot"
         || n == "show hot details"
         || n == "list hot details"
+        || n == "view hot details"
+        || n == "see hot details"
+        || n == "open hot details"
+        || n == "list the hot details"
         || n == "what's hot on details"
         || n == "whats hot on details"
     {
@@ -40205,6 +40292,9 @@ pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
 }
 
 /// True for `/details` / `/load` / load average — not process details or strip/rings.
+/// View/see/show me/open/list-the NL (v0.1.1040). Exact `open details` / `open the details`
+/// only. After normalize strips `show me` / `show`, prefer `the details` / `the load` so
+/// `show me the details` still matches.
 pub fn looks_like_details_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -40223,6 +40313,10 @@ pub fn looks_like_details_request(content: &str) -> bool {
         || n.contains("explain")
         || n.contains("more detail")
         || n.contains("full detail")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("size")
+        || n.contains("age")
     {
         return false;
     }
@@ -40230,28 +40324,62 @@ pub fn looks_like_details_request(content: &str) -> bool {
         n.as_str(),
         "/details"
             | "details"
+            | "the details"
             | "system details"
+            | "the system details"
             | "cpu details"
             | "list details"
+            | "list the details"
             | "show details"
+            | "show the details"
+            | "show me details"
+            | "show me the details"
+            | "view details"
+            | "view the details"
+            | "see details"
+            | "see the details"
+            | "open details"
+            | "open the details"
+            | "view system details"
+            | "see system details"
+            | "open system details"
+            | "list system details"
             | "details status"
             | "/details hot"
             | "details hot"
             | "hot details"
+            | "the hot details"
             | "which details are hot"
             | "which detail is hot"
             | "show hot details"
             | "list hot details"
+            | "view hot details"
+            | "see hot details"
+            | "open hot details"
+            | "list the hot details"
+            | "view details hot"
+            | "see details hot"
+            | "open details hot"
+            | "list details hot"
             | "what's hot on details"
             | "whats hot on details"
             | "/load"
             | "load"
+            | "the load"
             | "load average"
             | "load avg"
             | "system load"
             | "cpu load"
             | "show load"
+            | "show the load"
             | "list load"
+            | "list the load"
+            | "view load"
+            | "view the load"
+            | "see load"
+            | "see the load"
+            | "open load"
+            | "open the load"
             | "what's the load"
             | "whats the load"
             | "what is the load"
@@ -46770,11 +46898,11 @@ pub fn format_ops_help_gateway() -> String {
 • `user info age` · `user-info.json age` · `how old is user info` · `when was user info updated` — user-info.json last write age (mtime; no dump; does not steal `user info path` / `user info size` / who-am-i)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` — Top Processes Hot/Pinned list\n\
-• `/rings` · `/rings hot` — CPU rings All/Hot list (menu-bar amber thresholds)\n\
+• `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` — CPU · GPU · Freq · Temp ring chips\n\
-• `/strip` · `/strip hot` · `/power` — power strip All/Hot list (menu-bar amber / attention cues)\n\
+• `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips\n\
-• `/details` · `/details hot` · `/load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot)\n\
+• `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `digest open` — cached open candidates (no digester spawn)\n\
@@ -61712,10 +61840,20 @@ mod tests {
         assert!(looks_like_rings_request("hot rings"));
         assert!(looks_like_rings_request("which rings are hot"));
         assert!(looks_like_rings_request("show hot rings"));
+        assert!(looks_like_rings_request("view rings"));
+        assert!(looks_like_rings_request("see rings"));
+        assert!(looks_like_rings_request("show me the rings"));
+        assert!(looks_like_rings_request("open rings"));
+        assert!(looks_like_rings_request("open the rings"));
+        assert!(looks_like_rings_request("list the rings"));
+        assert!(looks_like_rings_request("view hot rings"));
+        assert!(looks_like_rings_request("open rings hot"));
         assert!(!looks_like_rings_request("/hot"));
         assert!(!looks_like_rings_request("what's hot"));
         assert!(!looks_like_rings_request("hot processes"));
         assert!(!looks_like_rings_request("why are rings hot"));
+        assert!(!looks_like_rings_request("rings path"));
+        assert!(!looks_like_rings_request("rings about weather"));
         assert_eq!(parse_rings_list_filter("/rings"), RingsListFilter::All);
         assert_eq!(parse_rings_list_filter("/rings hot"), RingsListFilter::Hot);
         assert_eq!(parse_rings_list_filter("hot rings"), RingsListFilter::Hot);
@@ -61723,11 +61861,21 @@ mod tests {
             parse_rings_list_filter("which rings are hot"),
             RingsListFilter::Hot
         );
+        assert_eq!(
+            parse_rings_list_filter("view rings hot"),
+            RingsListFilter::Hot
+        );
+        assert_eq!(
+            parse_rings_list_filter("open hot rings"),
+            RingsListFilter::Hot
+        );
         assert!(ring_cpu_is_hot(OPS_RING_HOT_CPU_PCT));
         assert!(ring_gpu_is_hot(OPS_RING_HOT_GPU_PCT));
         assert!(ring_freq_is_hot(OPS_RING_HOT_FREQ_GHZ));
         assert!(ring_temp_is_hot(OPS_RING_HOT_TEMP_C));
         assert!(!ring_cpu_is_hot(OPS_RING_HOT_CPU_PCT - 1.0));
+        let view = try_operator_instant_reply("view rings").expect("view rings instant");
+        assert!(view.to_lowercase().contains("ring"), "{view}");
     }
 
     #[test]
@@ -61787,12 +61935,23 @@ mod tests {
         assert!(looks_like_strip_request("hot strip"));
         assert!(looks_like_strip_request("which strip is hot"));
         assert!(looks_like_strip_request("/power"));
+        assert!(looks_like_strip_request("view strip"));
+        assert!(looks_like_strip_request("see strip"));
+        assert!(looks_like_strip_request("show me the strip"));
+        assert!(looks_like_strip_request("open strip"));
+        assert!(looks_like_strip_request("open the strip"));
+        assert!(looks_like_strip_request("list the strip"));
+        assert!(looks_like_strip_request("view power"));
+        assert!(looks_like_strip_request("open power"));
+        assert!(looks_like_strip_request("view hot strip"));
+        assert!(looks_like_strip_request("open strip hot"));
         assert!(!looks_like_strip_request("/hot"));
         assert!(!looks_like_strip_request("what's hot"));
         assert!(!looks_like_strip_request("/rings"));
         assert!(!looks_like_strip_request("hot rings"));
         assert!(!looks_like_strip_request("why is the strip hot"));
         assert!(!looks_like_strip_request("disk cleanup"));
+        assert!(!looks_like_strip_request("strip path"));
         assert_eq!(parse_strip_list_filter("/strip"), StripListFilter::All);
         assert_eq!(parse_strip_list_filter("/strip hot"), StripListFilter::Hot);
         assert_eq!(parse_strip_list_filter("hot strip"), StripListFilter::Hot);
@@ -61800,9 +61959,15 @@ mod tests {
             parse_strip_list_filter("what's hot on the strip"),
             StripListFilter::Hot
         );
+        assert_eq!(
+            parse_strip_list_filter("view strip hot"),
+            StripListFilter::Hot
+        );
         assert!(strip_heat_is_attention("Fair"));
         assert!(strip_heat_is_attention("Serious"));
         assert!(!strip_heat_is_attention("Nominal"));
+        let view = try_operator_instant_reply("view strip").expect("view strip instant");
+        assert!(view.to_lowercase().contains("strip") || view.to_lowercase().contains("power"), "{view}");
     }
 
     #[test]
@@ -61895,6 +62060,17 @@ mod tests {
         assert!(looks_like_details_request("/load"));
         assert!(looks_like_details_request("load average"));
         assert!(looks_like_details_request("what's the load"));
+        assert!(looks_like_details_request("view details"));
+        assert!(looks_like_details_request("see details"));
+        assert!(looks_like_details_request("show me the details"));
+        assert!(looks_like_details_request("open details"));
+        assert!(looks_like_details_request("open the details"));
+        assert!(looks_like_details_request("list the details"));
+        assert!(looks_like_details_request("view load"));
+        assert!(looks_like_details_request("open load"));
+        assert!(looks_like_details_request("show me the load"));
+        assert!(looks_like_details_request("view hot details"));
+        assert!(looks_like_details_request("open details hot"));
         assert!(!looks_like_details_request("/hot"));
         assert!(!looks_like_details_request("what's hot"));
         assert!(!looks_like_details_request("/strip"));
@@ -61902,6 +62078,7 @@ mod tests {
         assert!(!looks_like_details_request("process details"));
         assert!(!looks_like_details_request("more details about weather"));
         assert!(!looks_like_details_request("why is the load high"));
+        assert!(!looks_like_details_request("details path"));
         assert_eq!(
             parse_details_list_filter("/details"),
             DetailsListFilter::All
@@ -61914,10 +62091,16 @@ mod tests {
             parse_details_list_filter("hot details"),
             DetailsListFilter::Hot
         );
+        assert_eq!(
+            parse_details_list_filter("view details hot"),
+            DetailsListFilter::Hot
+        );
         assert!(details_load_is_hot(OPS_DETAILS_LOAD_HOT));
         assert!(!details_load_is_hot(OPS_DETAILS_LOAD_HOT - 0.1));
         assert!(details_ram_is_hot(OPS_STRIP_RAM_HOT_PCT));
         assert!(!details_ram_is_hot(OPS_STRIP_RAM_HOT_PCT - 1.0));
+        let view = try_operator_instant_reply("view details").expect("view details instant");
+        assert!(view.to_lowercase().contains("detail") || view.to_lowercase().contains("load"), "{view}");
     }
 
     #[test]
