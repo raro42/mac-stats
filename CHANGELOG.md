@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1032] - 2026-09-12
+
+### Added
+- Instant lane: more Ori Mnemos NL for `/ori` · `/mnemos` — `view ori`, `see ori`, `show me the ori`, `open ori` / `open the ori`, `list the ori`, and the same for mnemos / ori mnemos / ori-mnemos (and close variants) join Ready / Off / Partial. Exact open only — not MCP `ori_*`, MEMORY_APPEND, scrub, enable/disable, or vault path/size/age. Config only.
+
 ## [0.1.1031] - 2026-09-12
 
 ### Added

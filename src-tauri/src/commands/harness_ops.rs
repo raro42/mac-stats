@@ -43502,8 +43502,56 @@ pub fn looks_like_ori_ready_request(content: &str) -> bool {
             | "mnemos on"
             | "mnemos off"
             | "mnemos vault"
+            | "list ori"
+            | "list the ori"
+            | "list mnemos"
+            | "list the mnemos"
+            | "list ori mnemos"
+            | "list the ori mnemos"
+            | "list ori-mnemos"
+            | "list the ori-mnemos"
+            | "view ori"
+            | "view the ori"
+            | "view mnemos"
+            | "view the mnemos"
+            | "view ori mnemos"
+            | "view the ori mnemos"
+            | "view ori-mnemos"
+            | "view the ori-mnemos"
+            | "see ori"
+            | "see the ori"
+            | "see mnemos"
+            | "see the mnemos"
+            | "see ori mnemos"
+            | "see the ori mnemos"
+            | "see ori-mnemos"
+            | "see the ori-mnemos"
             | "show ori"
+            | "show the ori"
+            | "show me ori"
+            | "show me the ori"
             | "show mnemos"
+            | "show the mnemos"
+            | "show me mnemos"
+            | "show me the mnemos"
+            | "show ori mnemos"
+            | "show the ori mnemos"
+            | "show me ori mnemos"
+            | "show me the ori mnemos"
+            | "show ori-mnemos"
+            | "show the ori-mnemos"
+            | "show me ori-mnemos"
+            | "show me the ori-mnemos"
+            | "open ori"
+            | "open the ori"
+            | "open mnemos"
+            | "open the mnemos"
+            | "open ori mnemos"
+            | "open the ori mnemos"
+            | "open ori-mnemos"
+            | "open the ori-mnemos"
+            | "the ori"
+            | "the mnemos"
             | "is ori ready"
             | "is ori on"
             | "is ori off"
@@ -45922,7 +45970,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
 • `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` · `view downloads` · `see downloads` · `show me the downloads` · `open downloads` · `list the downloads` · `view organizer` · `see organizer` · `show me the organizer` · `open organizer` · `list the organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
-• `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
+• `/ori` · `/mnemos` · `view ori` · `see ori` · `show me the ori` · `open ori` · `list the ori` · `view mnemos` · `see mnemos` · `show me the mnemos` · `open mnemos` · `list the mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub / vault path·size·age)\n\
 • `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
 • `ori vault path` · `where is ori vault` · `ORI_VAULT path` — Ori vault root path (config/env only; `ori vault size` for on-disk bytes; no list/MCP; does not steal `/ori` Ready)\n\
 • `/having_fun` · `/fun` · `/idle` — Having fun / idle thoughts On/Off (Settings Product · channel count · idle · reply delays; config only; does not steal send/post)\n\
@@ -46663,6 +46711,72 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("organize my")
         && !q.contains("enable download")
         && !q.contains("disable download")
+        && !q.contains("turn on")
+        && !q.contains("turn off")
+        && !q.contains("why")
+        && !q.contains(" for ")
+        && !q.contains(" about ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/ori` · `/mnemos` Ready chip asks (v0.1.742);
+    // view/see/show me/open/list-the NL (v0.1.1032).
+    if (q.contains("/ori")
+        || q.contains("/mnemos")
+        || q.contains("/ori-mnemos")
+        || q == "ori"
+        || q == "mnemos"
+        || q.contains("ori mnemos")
+        || q.contains("ori-mnemos")
+        || q.contains("ori status")
+        || q.contains("mnemos status")
+        || q.contains("ori ready")
+        || q.contains("mnemos ready")
+        || q.contains("list ori")
+        || q.contains("list the ori")
+        || q.contains("list mnemos")
+        || q.contains("list the mnemos")
+        || q.contains("view ori")
+        || q.contains("see ori")
+        || q.contains("show me the ori")
+        || q.contains("show me ori")
+        || q.contains("view mnemos")
+        || q.contains("see mnemos")
+        || q.contains("show me the mnemos")
+        || q.contains("show me mnemos")
+        || q == "open ori"
+        || q == "open the ori"
+        || q == "open mnemos"
+        || q == "open the mnemos"
+        || q == "open ori mnemos"
+        || q == "open the ori mnemos"
+        || q == "open ori-mnemos"
+        || q == "open the ori-mnemos"
+        || q.contains("is ori ready")
+        || q.contains("is ori on")
+        || q.contains("is mnemos ready")
+        || q.contains("how's ori")
+        || q.contains("hows ori")
+        || q.contains("how's mnemos")
+        || q.contains("hows mnemos"))
+        && !q.contains("ori_")
+        && !q.contains("mcp:")
+        && !q.contains("memory_append")
+        && !q.contains("memory append")
+        && !q.contains("scrub memory")
+        && !q.contains("ori query")
+        && !q.contains("ori orient")
+        && !q.contains("enable ori")
+        && !q.contains("disable ori")
+        && !q.contains("enable mnemos")
+        && !q.contains("disable mnemos")
+        && !q.contains("vault path")
+        && !q.contains("vault size")
+        && !q.contains("vault age")
+        && !q.contains("where is ori")
+        && !q.contains("where is the ori")
         && !q.contains("turn on")
         && !q.contains("turn off")
         && !q.contains("why")
@@ -61410,6 +61524,17 @@ mod tests {
         assert!(looks_like_ori_ready_request("ori"));
         assert!(looks_like_ori_ready_request("mnemos"));
         assert!(looks_like_ori_ready_request("ori status"));
+        assert!(looks_like_ori_ready_request("list the ori"));
+        assert!(looks_like_ori_ready_request("view ori"));
+        assert!(looks_like_ori_ready_request("see ori"));
+        assert!(looks_like_ori_ready_request("show me the ori"));
+        assert!(looks_like_ori_ready_request("open ori"));
+        assert!(looks_like_ori_ready_request("open the ori"));
+        assert!(looks_like_ori_ready_request("view mnemos"));
+        assert!(looks_like_ori_ready_request("see mnemos"));
+        assert!(looks_like_ori_ready_request("show me the mnemos"));
+        assert!(looks_like_ori_ready_request("open mnemos"));
+        assert!(looks_like_ori_ready_request("open the mnemos"));
         assert!(looks_like_ori_ready_request("is ori ready"));
         assert!(looks_like_ori_ready_request("how's mnemos"));
         assert!(looks_like_ori_ready_request("ori vault"));
@@ -61423,6 +61548,18 @@ mod tests {
         assert!(!looks_like_ori_ready_request("scrub memory"));
         assert!(!looks_like_ori_ready_request("memory append note"));
         assert!(!looks_like_ori_ready_request("how to use ori"));
+        let view_ori = try_operator_instant_reply("view ori").expect("view ori instant");
+        assert!(
+            view_ori.to_lowercase().contains("ori"),
+            "{view_ori}"
+        );
+        let open_mnemos =
+            try_operator_instant_reply("open mnemos").expect("open mnemos instant");
+        assert!(
+            open_mnemos.to_lowercase().contains("ori")
+                || open_mnemos.to_lowercase().contains("mnemos"),
+            "{open_mnemos}"
+        );
         assert!(looks_like_ori_vault_path_request("ori vault path"));
         assert!(looks_like_ori_vault_path_request("where is ori vault"));
         assert!(looks_like_ori_vault_path_request("mnemos vault path"));
