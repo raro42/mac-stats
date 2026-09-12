@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1027] - 2026-09-12
+
+### Added
+- Instant lane: more Plugins NL for `/plugins` — `view plugins`, `see plugins`, `show me the plugins`, `open plugins` / `open the plugins`, `list the plugins` (and close variants) join `list plugins` / On · Off. Exact `open plugins` / `open the plugins` only — singular `open plugin …` stays with the agent. Path/size/age lanes stay separate.
+
 ## [0.1.1026] - 2026-09-12
 
 ### Added

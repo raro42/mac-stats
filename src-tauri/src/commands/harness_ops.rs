@@ -41037,9 +41037,11 @@ pub fn parse_plugins_list_filter(content: &str) -> PluginsListFilter {
 }
 
 /// True for `/plugins` / `list plugins` — registered script plugins; not run/add/remove.
+/// View/see/show me/open/list-the NL (v0.1.1027). Exact `open plugins` / `open the plugins` only —
+/// not `open plugin …` (singular stays with the agent). Path/size/age lanes stay separate.
 pub fn looks_like_plugins_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     if n.contains("plugin:")
@@ -41058,6 +41060,18 @@ pub fn looks_like_plugins_request(content: &str) -> bool {
         || n.contains("ticket")
         || n.contains("redmine")
         || n.contains("tauri")
+        || n.contains("path")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("plugins age")
+        || n.contains("plugin age")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -41067,10 +41081,32 @@ pub fn looks_like_plugins_request(content: &str) -> bool {
         "/plugins"
             | "plugins"
             | "list plugins"
+            | "list the plugins"
+            | "list plugin"
+            | "list the plugin"
+            | "show plugins"
+            | "show the plugins"
+            | "show me plugins"
+            | "show me the plugins"
+            | "show plugin"
+            | "show the plugin"
+            | "show me plugin"
+            | "show me the plugin"
+            | "view plugins"
+            | "view the plugins"
+            | "view plugin"
+            | "view the plugin"
+            | "see plugins"
+            | "see the plugins"
+            | "see plugin"
+            | "see the plugin"
+            | "open plugins"
+            | "open the plugins"
             | "my plugins"
             | "which plugins"
             | "what plugins"
             | "all plugins"
+            | "the plugins"
             | "plugin list"
             | "plugins list"
             | "plugins catalog"
@@ -45683,7 +45719,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
 • `/skills` · `view skills` · `see skills` · `show me the skills` · `open skills` · `list the skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` · `view tasks` · `see tasks` · `show me the tasks` · `open tasks` · `list the tasks` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
-• `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
+• `/plugins` · `/plugins on` · `/plugins off` · `view plugins` · `see plugins` · `show me the plugins` · `open plugins` · `list the plugins` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` · `view knowledge` · `see knowledge` · `show me the knowledge` · `open knowledge` · `list the knowledge` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` · `view schedules` · `see schedules` · `show me the schedules` · `open schedules` · `list the schedules` — Agent Ops Jobs/Deliveries list\n\
@@ -46119,10 +46155,18 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/plugins` catalog operator asks (v0.1.733).
+    // `/plugins` catalog operator asks (v0.1.733); view/see/show me/open/list-the NL (v0.1.1027).
     if (q.contains("/plugins")
         || q == "plugins"
         || q.contains("list plugins")
+        || q.contains("list the plugins")
+        || q.contains("view plugins")
+        || q.contains("see plugins")
+        || q.contains("show me the plugins")
+        || q.contains("show me plugins")
+        || q.contains("show plugins")
+        || q == "open plugins"
+        || q == "open the plugins"
         || q.contains("plugins catalog")
         || q.contains("installed plugins")
         || q.contains("available plugins")
@@ -46139,6 +46183,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("add ")
         && !q.contains("install")
         && !q.contains("tauri")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("how big")
+        && !q.contains("how old")
+        && !q.contains("plugins age")
+        && !q.contains("plugin age")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -49653,6 +49704,14 @@ mod tests {
         );
         assert!(looks_like_plugins_request("/plugins"));
         assert!(looks_like_plugins_request("list plugins"));
+        assert!(looks_like_plugins_request("list the plugins"));
+        assert!(looks_like_plugins_request("view plugins"));
+        assert!(looks_like_plugins_request("see plugins"));
+        assert!(looks_like_plugins_request("show me the plugins"));
+        assert!(looks_like_plugins_request("show plugins"));
+        assert!(looks_like_plugins_request("open plugins"));
+        assert!(looks_like_plugins_request("open the plugins"));
+        assert!(looks_like_plugins_request("the plugins"));
         assert!(looks_like_plugins_request("plugins catalog"));
         assert!(looks_like_plugins_request("/plugins on"));
         assert!(looks_like_plugins_request("disabled plugins"));
@@ -49661,6 +49720,13 @@ mod tests {
         assert!(!looks_like_plugins_request("add a plugin"));
         assert!(!looks_like_plugins_request("search for tauri plugins"));
         assert!(!looks_like_plugins_request("why are plugins empty"));
+        assert!(!looks_like_plugins_request("plugins path"));
+        assert!(!looks_like_plugins_request("plugins size"));
+        assert!(!looks_like_plugins_request("plugins age"));
+        assert!(!looks_like_plugins_request("where is the plugins folder"));
+        // Singular "open plugin …" stays with the agent (run/add flow).
+        assert!(!looks_like_plugins_request("open plugin"));
+        assert!(!looks_like_plugins_request("open this plugin"));
         assert_eq!(parse_plugins_list_filter("/plugins"), PluginsListFilter::All);
         assert_eq!(parse_plugins_list_filter("/plugins on"), PluginsListFilter::On);
         assert_eq!(
@@ -49676,6 +49742,17 @@ mod tests {
         assert!(
             plugins_report.contains("**Plugins**"),
             "{plugins_report}"
+        );
+        let view_plugins = try_operator_instant_reply("view plugins").expect("view plugins instant");
+        assert!(
+            view_plugins.contains("Plugins") || view_plugins.contains("plugins"),
+            "{view_plugins}"
+        );
+        let show_me_plugins =
+            try_operator_instant_reply("show me the plugins").expect("show me the plugins");
+        assert!(
+            show_me_plugins.contains("Plugins") || show_me_plugins.contains("plugins"),
+            "{show_me_plugins}"
         );
     }
 
