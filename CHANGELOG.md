@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1026] - 2026-09-12
+
+### Added
+- Instant lane: more Tasks NL for `/tasks` — `view tasks`, `see tasks`, `show me the tasks`, `open the tasks`, `list the tasks` (and close variants) join `list tasks` / Active · All. Exact `open tasks` / `open the tasks` only — singular `open task …` stays with the agent. Path/size/age lanes stay separate.
+
 ## [0.1.1025] - 2026-09-12
 
 ### Added

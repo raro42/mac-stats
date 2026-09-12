@@ -40889,9 +40889,11 @@ pub fn parse_tasks_list_filter(content: &str) -> TasksListFilter {
 }
 
 /// True for `/tasks` / `list tasks` — TASK_LIST catalog; not create/show/status/append.
+/// View/see/show me/open/list-the NL (v0.1.1026). Exact `open tasks` / `open the tasks` only —
+/// not `open task …` (singular stays with the agent). Path/size/age lanes stay separate.
 pub fn looks_like_tasks_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 40 {
+    if n.chars().count() > 48 {
         return false;
     }
     if n.contains("task:")
@@ -40911,6 +40913,18 @@ pub fn looks_like_tasks_request(content: &str) -> bool {
         || n.contains("ticket")
         || n.contains("redmine")
         || n.contains("schedule")
+        || n.contains("path")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("size")
+        || n.contains("how big")
+        || n.contains("how old")
+        || n.ends_with(" age")
+        || n.contains(" age ")
+        || n.contains("tasks age")
+        || n.contains("task age")
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return false;
@@ -40925,11 +40939,31 @@ pub fn looks_like_tasks_request(content: &str) -> bool {
             | "/tasks active"
             | "tasks"
             | "list tasks"
+            | "list the tasks"
+            | "list task"
+            | "list the task"
+            | "show tasks"
+            | "show the tasks"
+            | "show me tasks"
+            | "show me the tasks"
+            | "show task"
+            | "show the task"
+            | "show me task"
+            | "show me the task"
+            | "view tasks"
+            | "view the tasks"
+            | "view task"
+            | "view the task"
+            | "see tasks"
+            | "see the tasks"
+            | "see task"
+            | "see the task"
+            | "open tasks"
+            | "open the tasks"
             | "my tasks"
             | "which tasks"
             | "what tasks"
             | "all tasks"
-            | "open tasks"
             | "active tasks"
             | "wip tasks"
             | "task list"
@@ -40941,6 +40975,7 @@ pub fn looks_like_tasks_request(content: &str) -> bool {
             | "tasks all"
             | "tasks open"
             | "tasks active"
+            | "the tasks"
     )
 }
 
@@ -45647,7 +45682,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
 • `/skills` · `view skills` · `see skills` · `show me the skills` · `open skills` · `list the skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
-• `/tasks` · `/tasks all` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
+• `/tasks` · `/tasks all` · `view tasks` · `see tasks` · `show me the tasks` · `open tasks` · `list the tasks` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
 • `/plugins` · `/plugins on` · `/plugins off` — registered script plugins On/Off list (no script run)\n\
 • `/sessions` · `/sessions live` · `/sessions files` · `view sessions` · `see sessions` · `show me the sessions` · `open sessions` · `list the sessions` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` · `view knowledge` · `see knowledge` · `show me the knowledge` · `open knowledge` · `list the knowledge` — Agent Ops Knowledge list\n\
@@ -46045,13 +46080,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/tasks` catalog operator asks (v0.1.732).
+    // `/tasks` catalog operator asks (v0.1.732); view/see/show me/open/list-the NL (v0.1.1026).
     if (q.contains("/tasks")
         || q == "tasks"
         || q.contains("list tasks")
+        || q.contains("list the tasks")
         || q.contains("list open tasks")
         || q.contains("list all tasks")
-        || q.contains("open tasks")
+        || q.contains("view tasks")
+        || q.contains("see tasks")
+        || q.contains("show me the tasks")
+        || q.contains("show me tasks")
+        || q.contains("show tasks")
+        || q == "open tasks"
+        || q == "open the tasks"
         || q.contains("active tasks")
         || q.contains("all tasks")
         || q.contains("my tasks")
@@ -46065,6 +46107,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("create")
         && !q.contains("append")
         && !q.contains("assign")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("how big")
+        && !q.contains("how old")
+        && !q.contains("tasks age")
+        && !q.contains("task age")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -49566,17 +49615,42 @@ mod tests {
         assert!(show_me.contains("Skills"), "{show_me}");
         assert!(looks_like_tasks_request("/tasks"));
         assert!(looks_like_tasks_request("list tasks"));
+        assert!(looks_like_tasks_request("list the tasks"));
+        assert!(looks_like_tasks_request("view tasks"));
+        assert!(looks_like_tasks_request("see tasks"));
+        assert!(looks_like_tasks_request("show me the tasks"));
+        assert!(looks_like_tasks_request("show tasks"));
         assert!(looks_like_tasks_request("open tasks"));
+        assert!(looks_like_tasks_request("open the tasks"));
         assert!(looks_like_tasks_request("all tasks"));
+        assert!(looks_like_tasks_request("the tasks"));
         assert!(looks_like_tasks_request("@Werner tasks"));
         assert!(!looks_like_tasks_request("TASK_CREATE: demo"));
         assert!(!looks_like_tasks_request("create a task"));
         assert!(!looks_like_tasks_request("show task 12"));
         assert!(!looks_like_tasks_request("why are tasks empty"));
+        assert!(!looks_like_tasks_request("task path"));
+        assert!(!looks_like_tasks_request("task size"));
+        assert!(!looks_like_tasks_request("task age"));
+        assert!(!looks_like_tasks_request("where is the task folder"));
+        // Singular "open task …" stays with the agent (create/show flow).
+        assert!(!looks_like_tasks_request("open task"));
+        assert!(!looks_like_tasks_request("open this task"));
         assert_eq!(parse_tasks_list_filter("/tasks"), TasksListFilter::Active);
         assert_eq!(parse_tasks_list_filter("list tasks"), TasksListFilter::Active);
         assert_eq!(parse_tasks_list_filter("/tasks all"), TasksListFilter::All);
         assert_eq!(parse_tasks_list_filter("all tasks"), TasksListFilter::All);
+        let view_tasks = try_operator_instant_reply("view tasks").expect("view tasks instant");
+        assert!(
+            view_tasks.contains("tasks") || view_tasks.contains("Tasks"),
+            "{view_tasks}"
+        );
+        let show_me_tasks =
+            try_operator_instant_reply("show me the tasks").expect("show me the tasks");
+        assert!(
+            show_me_tasks.contains("tasks") || show_me_tasks.contains("Tasks"),
+            "{show_me_tasks}"
+        );
         assert!(looks_like_plugins_request("/plugins"));
         assert!(looks_like_plugins_request("list plugins"));
         assert!(looks_like_plugins_request("plugins catalog"));
