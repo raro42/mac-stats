@@ -1,18 +1,24 @@
 # Morning surprise — 2026-09-12
 
-Overnight Track B kept shipping operator instant NL so casual “open …” phrasing hits the Ready chip without a full agent turn.
+Overnight Track B kept shipping operator instant-lane NL. Digester open stayed empty; design review stayed in grace. Standing backlog p50 drove the night.
 
 ## Shipped tonight
+
 | Version | What |
 |---------|------|
-| **v0.1.1034** | `/voice` · `/stt` — view/see/show me/open/list-the (+ speech · speech to text · discord voice/stt) → Ready/Off/Partial/Not set; also `/having_fun` `show me …` normalize fix |
-| **v0.1.1033** | `/having_fun` · `/fun` · `/idle` — view/see/show me/open/list-the (+ fun · idle thoughts) → On/Off Ready (exact open; no send/post/enable) |
-| **v0.1.1032** | `/ori` · `/mnemos` — view/see/show me/open/list-the → Ready/Off/Partial (earlier tick) |
+| **v0.1.1035** | `/telegram` · `/slack` · `/signal` · `/alerts` — `view` / `see` / `show me the` / `open` / `list the` (+ bot / webhook / app / alert channels) → Ready / Not set / Partial (config only; no live send) |
+| **v0.1.1034** | `/voice` · `/stt` NL expand + `/having_fun` show-me normalizer fix |
+| **v0.1.1033** | `/having_fun` · `/fun` · `/idle` NL expand |
+| **v0.1.1032** | `/ori` · `/mnemos` NL expand |
+| **v0.1.1031** | `/downloads` · `/organizer` NL expand (earlier window) |
 
-## Digester / design review
-- Digester open: empty (11 turns, mostly instant noise).
-- Design review: not due (CPU metrics recommended ~5.77d in grace).
+## Fuel notes
 
-## Try in AI Chat
-- `view voice` · `open stt` · `show me the voice` · `list the speech to text`
-- `view having fun` · `open idle` · `show me the fun`
+- Digester: open empty all ticks (do not quiet-default).
+- Design review: `due=false`; recommended `feature-cpu-metrics.png` (~5.8d) still in grace.
+- debug.log: no ERROR/WARN/panic clusters in scan window.
+- Next: digester/debug when present; design review when due; `/mastodon` · `/mcp` · `/brave` · `/redmine` NL parity if still thin.
+
+## Ratchet
+
+Keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv` for each ship (nightly minimum met).
