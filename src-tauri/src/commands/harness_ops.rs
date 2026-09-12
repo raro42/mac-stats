@@ -43046,6 +43046,8 @@ pub fn format_ai_agent_ready_chip() -> String {
 
 /// True for focused Settings Product compact asks (`/compact` · `/menu-bar` · `/cpu-window`) —
 /// not session compaction, enable/disable how-tos, or layout redesign tasks.
+/// View/see/show me/open/list-the NL (v0.1.1030). Exact `open compact` / `open menu-bar` /
+/// `open cpu-window` (and close variants) only — not compaction / enable / open-page tasks.
 pub fn looks_like_compact_ready_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -43062,6 +43064,8 @@ pub fn looks_like_compact_ready_request(content: &str) -> bool {
         || n.contains("make compact")
         || n.contains("enable compact")
         || n.contains("disable compact")
+        || n.contains("run compact")
+        || n.contains("run compaction")
         || n.contains("turn on")
         || n.contains("turn off")
         || n.contains("switch on")
@@ -43098,13 +43102,76 @@ pub fn looks_like_compact_ready_request(content: &str) -> bool {
             | "compact health"
             | "compact on"
             | "compact off"
+            | "menu bar status"
+            | "menu bar ready"
             | "menu bar compact"
+            | "menubar status"
             | "menubar compact"
+            | "cpu window status"
+            | "cpu window ready"
             | "cpu window compact"
+            | "cpu-window status"
             | "cpu-window compact"
+            | "list compact"
+            | "list the compact"
+            | "list menu bar"
+            | "list the menu bar"
+            | "list menu-bar"
+            | "list menubar"
+            | "list cpu window"
+            | "list the cpu window"
+            | "list cpu-window"
+            | "view compact"
+            | "view the compact"
+            | "view menu bar"
+            | "view the menu bar"
+            | "view menu-bar"
+            | "view menubar"
+            | "view cpu window"
+            | "view the cpu window"
+            | "view cpu-window"
+            | "see compact"
+            | "see the compact"
+            | "see menu bar"
+            | "see the menu bar"
+            | "see menu-bar"
+            | "see menubar"
+            | "see cpu window"
+            | "see the cpu window"
+            | "see cpu-window"
             | "show compact"
+            | "show the compact"
+            | "show me compact"
+            | "show me the compact"
+            | "show menu bar"
+            | "show the menu bar"
+            | "show me menu bar"
+            | "show me the menu bar"
+            | "show menu-bar"
+            | "show menubar"
+            | "show me menu-bar"
+            | "show me menubar"
+            | "show cpu window"
+            | "show the cpu window"
+            | "show me cpu window"
+            | "show me the cpu window"
+            | "show cpu-window"
+            | "show me cpu-window"
             | "show menu bar compact"
             | "show cpu window compact"
+            | "open compact"
+            | "open the compact"
+            | "open menu bar"
+            | "open the menu bar"
+            | "open menu-bar"
+            | "open menubar"
+            | "open cpu window"
+            | "open the cpu window"
+            | "open cpu-window"
+            | "open the cpu-window"
+            | "the compact"
+            | "the menu bar"
+            | "the cpu window"
             | "is compact on"
             | "is compact off"
             | "is menu bar compact"
@@ -43113,8 +43180,18 @@ pub fn looks_like_compact_ready_request(content: &str) -> bool {
             | "is cpu-window compact"
             | "how's compact"
             | "hows compact"
+            | "how's the compact"
+            | "hows the compact"
+            | "how's menu bar"
+            | "hows menu bar"
+            | "how's the menu bar"
+            | "hows the menu bar"
             | "how's menu bar compact"
             | "hows menu bar compact"
+            | "how's cpu window"
+            | "hows cpu window"
+            | "how's the cpu window"
+            | "hows the cpu window"
             | "how's cpu window compact"
             | "hows cpu window compact"
             | "compact menu bar"
@@ -45805,7 +45882,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/browser` · `/cdp` · `view browser` · `see browser` · `show me the browser` · `open browser` · `list the browser` · `view cdp` · `see cdp` · `show me the cdp` · `open cdp` · `list the cdp` — Browser / CDP Ready / Off / Not set (Chromium path + port; Settings or config.json; no live probe)\n\
 • `/judge` · `view judge` · `see judge` · `show me the judge` · `open judge` · `list the judge` — Judge Ready / Off (Settings Product · agentJudgeEnabled · failure-only; config only, no judge run)\n\
 • `/ai` · `/ai-agent` · `view ai` · `see ai` · `show me the ai` · `open ai` · `list the ai` · `view ai agent` · `open ai agent` — AI On / Off (Settings Product · aiAgentEnabled; config only, no toggle; does not steal `/agents`)\n\
-• `/compact` · `/menu-bar` · `/cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
+• `/compact` · `/menu-bar` · `/cpu-window` · `view compact` · `see compact` · `show me the compact` · `open compact` · `list the compact` · `view menu bar` · `open menu-bar` · `view cpu window` · `open cpu-window` — Compact Menu bar / CPU window On/Off (menuBarCompact · cpuWindowCompact; config only; does not steal compaction)\n\
 • `/downloads` · `/organizer` — Downloads organizer On/Off (Settings Product · interval · dry-run · path · last run; config only; does not steal `/disk` or BROWSER_DOWNLOAD)\n\
 • `/ori` · `/mnemos` — Ori Mnemos lifecycle Ready / Off / Partial (Settings Product · ORI_VAULT · orient · prefetch · capture; config only; does not steal MCP `ori_*` / MEMORY_APPEND / scrub)\n\
 • `ori vault size` · `how big is ori vault` · `mnemos vault size` — Ori vault folder size on disk (recursive file bytes; no list/MCP; does not steal `ori vault path` / `/ori` Ready)\n\
@@ -46438,7 +46515,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/compact` · `/menu-bar` · `/cpu-window` Ready chip asks (v0.1.740).
+    // `/compact` · `/menu-bar` · `/cpu-window` Ready chip asks (v0.1.740);
+    // view/see/show me/open/list-the NL (v0.1.1030).
     if (q.contains("/compact")
         || q.contains("/menu-bar")
         || q.contains("/menubar")
@@ -46448,16 +46526,50 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("compact mode")
         || q.contains("menu bar compact")
         || q.contains("cpu window compact")
+        || q.contains("list compact")
+        || q.contains("list the compact")
+        || q.contains("list menu bar")
+        || q.contains("list the menu bar")
+        || q.contains("list cpu window")
+        || q.contains("list the cpu window")
+        || q.contains("view compact")
+        || q.contains("see compact")
+        || q.contains("show me the compact")
+        || q.contains("show me compact")
+        || q.contains("view menu bar")
+        || q.contains("see menu bar")
+        || q.contains("show me the menu bar")
+        || q.contains("show me menu bar")
+        || q.contains("view cpu window")
+        || q.contains("see cpu window")
+        || q.contains("show me the cpu window")
+        || q.contains("show me cpu window")
+        || q == "open compact"
+        || q == "open the compact"
+        || q == "open menu bar"
+        || q == "open the menu bar"
+        || q == "open menu-bar"
+        || q == "open menubar"
+        || q == "open cpu window"
+        || q == "open the cpu window"
+        || q == "open cpu-window"
+        || q == "open the cpu-window"
         || q.contains("is menu bar compact")
         || q.contains("is cpu window compact")
         || q.contains("how's compact")
-        || q.contains("hows compact"))
+        || q.contains("hows compact")
+        || q.contains("how's menu bar")
+        || q.contains("hows menu bar")
+        || q.contains("how's cpu window")
+        || q.contains("hows cpu window"))
         && !q.contains("compaction")
         && !q.contains("compact memory")
         && !q.contains("compact session")
         && !q.contains("compact context")
         && !q.contains("enable compact")
         && !q.contains("disable compact")
+        && !q.contains("run compact")
+        && !q.contains("run compaction")
         && !q.contains("turn on")
         && !q.contains("turn off")
         && !q.contains("why")
@@ -61129,11 +61241,28 @@ mod tests {
         assert!(
             open_ai_agent.contains("AI") || open_ai_agent.to_lowercase().contains("ai"),
             "{open_ai_agent}"
-        );        assert!(looks_like_compact_ready_request("/compact"));
+        );
+        assert!(looks_like_compact_ready_request("/compact"));
         assert!(looks_like_compact_ready_request("/menu-bar"));
         assert!(looks_like_compact_ready_request("/cpu-window"));
         assert!(looks_like_compact_ready_request("compact"));
         assert!(looks_like_compact_ready_request("compact status"));
+        assert!(looks_like_compact_ready_request("list the compact"));
+        assert!(looks_like_compact_ready_request("view compact"));
+        assert!(looks_like_compact_ready_request("see compact"));
+        assert!(looks_like_compact_ready_request("show me the compact"));
+        assert!(looks_like_compact_ready_request("open compact"));
+        assert!(looks_like_compact_ready_request("open the compact"));
+        assert!(looks_like_compact_ready_request("view menu bar"));
+        assert!(looks_like_compact_ready_request("see menu bar"));
+        assert!(looks_like_compact_ready_request("show me the menu bar"));
+        assert!(looks_like_compact_ready_request("open menu-bar"));
+        assert!(looks_like_compact_ready_request("open the menu bar"));
+        assert!(looks_like_compact_ready_request("view cpu window"));
+        assert!(looks_like_compact_ready_request("see cpu window"));
+        assert!(looks_like_compact_ready_request("show me the cpu window"));
+        assert!(looks_like_compact_ready_request("open cpu-window"));
+        assert!(looks_like_compact_ready_request("open the cpu window"));
         assert!(looks_like_compact_ready_request("is menu bar compact"));
         assert!(looks_like_compact_ready_request("is cpu window compact"));
         assert!(looks_like_compact_ready_request("how's compact"));
@@ -61142,6 +61271,26 @@ mod tests {
         assert!(!looks_like_compact_ready_request("enable compact"));
         assert!(!looks_like_compact_ready_request("how to enable compact"));
         assert!(!looks_like_compact_ready_request("run compaction"));
+        let view_compact =
+            try_operator_instant_reply("view compact").expect("view compact instant");
+        assert!(
+            view_compact.to_lowercase().contains("compact"),
+            "{view_compact}"
+        );
+        let open_menu_bar =
+            try_operator_instant_reply("open menu-bar").expect("open menu-bar instant");
+        assert!(
+            open_menu_bar.to_lowercase().contains("compact")
+                || open_menu_bar.to_lowercase().contains("menu"),
+            "{open_menu_bar}"
+        );
+        let open_cpu_window =
+            try_operator_instant_reply("open cpu-window").expect("open cpu-window instant");
+        assert!(
+            open_cpu_window.to_lowercase().contains("compact")
+                || open_cpu_window.to_lowercase().contains("cpu"),
+            "{open_cpu_window}"
+        );
         assert!(looks_like_downloads_organizer_ready_request("/downloads"));
         assert!(looks_like_downloads_organizer_ready_request("/organizer"));
         assert!(looks_like_downloads_organizer_ready_request("downloads"));

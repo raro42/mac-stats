@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1030] - 2026-09-12
+
+### Added
+- Instant lane: more Compact NL for `/compact` · `/menu-bar` · `/cpu-window` — `view compact`, `see compact`, `show me the compact`, `open compact` / `open the compact`, `list the compact`, and the same for menu bar / menu-bar / cpu window / cpu-window (and close variants) join Menu bar / CPU window On/Off. Exact open only — not compaction, enable/disable, or run compaction. Config only.
+
 ## [0.1.1029] - 2026-09-12
 
 ### Added
