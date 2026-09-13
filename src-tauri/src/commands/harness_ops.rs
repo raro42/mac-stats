@@ -9656,6 +9656,9 @@ pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
         || n.contains("loop_backlog")
         || n.contains("sibling")
         || n.contains("standing")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
     {
         return false;
     }
@@ -9742,7 +9745,7 @@ pub fn format_results_tsv_count_gateway() -> String {
         Ok((keep_night, discard_night, keep_all, discard_all)) => {
             let night_total = keep_night + discard_night;
             format!(
-                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `/recent-keeps` for a short tonight list · `/last-keep` · `/last-discard` for the newest row · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
+                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `/keep-rate` for hit rate · `/recent-keeps` for a short tonight list · `/last-keep` · `/last-discard` for the newest row · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -9850,6 +9853,9 @@ pub fn looks_like_results_tsv_last_request(content: &str) -> bool {
         || n.contains("how many")
         || n.contains("count")
         || n.contains("summary")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
         // Recent list owns plural "recent keeps" / "/recent-keeps" (not a single-row glance).
         || n.contains("recent keeps")
         || n.contains("recent discards")
@@ -10066,6 +10072,9 @@ pub fn looks_like_results_tsv_recent_request(content: &str) -> bool {
         || n.contains("how many")
         || n.contains("count")
         || n.contains("summary")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
         // Single-row last glance owns singular "most recent keep" / "last keep".
         || n == "most recent keep"
         || n == "the most recent keep"
@@ -10158,9 +10167,183 @@ pub fn format_results_tsv_recent_gateway(content: &str) -> String {
                 ));
             }
             lines.push(format!(
-                "capped at {RESULTS_TSV_RECENT_CAP} · does not dump the full log · `/keeps` for counts · `/last-keep` for the newest row · ask *morning surprise?* for ship notes."
+                "capped at {RESULTS_TSV_RECENT_CAP} · does not dump the full log · `/keeps` for counts · `/keep-rate` for hit rate · `/last-keep` for the newest row · ask *morning surprise?* for ship notes."
             ));
             lines.join("\n")
+        }
+    }
+}
+
+fn format_keep_rate_pct(part: u64, total: u64) -> String {
+    if total == 0 {
+        "n/a".to_string()
+    } else {
+        let pct = ((part as f64) * 100.0 / (total as f64)).round() as u64;
+        format!("{pct}%")
+    }
+}
+
+/// True for short keep-rate / hit-rate asks (`/keep-rate`, `keep rate`, `ratchet hit rate`…).
+/// Percentages only — does not dump TSV rows or steal counts / last-row / recent list / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_rate_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        // Bare "age" also matches "percentage" — keep rate owns percent phrases.
+        || (n.contains("age") && !n.contains("percent"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("last keep")
+        || n.contains("last discard")
+        || n.contains("latest keep")
+        || n.contains("latest discard")
+        || n.starts_with("/last-")
+        || n.starts_with("/recent-")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-rate"
+            | "/keeprate"
+            | "/discard-rate"
+            | "/discardrate"
+            | "/hit-rate"
+            | "/hitrate"
+            | "keep rate"
+            | "the keep rate"
+            | "keep percentage"
+            | "the keep percentage"
+            | "keep percent"
+            | "the keep percent"
+            | "discard rate"
+            | "the discard rate"
+            | "discard percentage"
+            | "the discard percentage"
+            | "discard percent"
+            | "the discard percent"
+            | "ratchet rate"
+            | "the ratchet rate"
+            | "ratchet hit rate"
+            | "the ratchet hit rate"
+            | "hit rate"
+            | "the hit rate"
+            | "hit rate tonight"
+            | "tonight hit rate"
+            | "keep hit rate"
+            | "the keep hit rate"
+            | "keep success rate"
+            | "the keep success rate"
+            | "overnight keep rate"
+            | "tonight keep rate"
+            | "keep rate tonight"
+            | "view keep rate"
+            | "see keep rate"
+            | "show the keep rate"
+            | "show me the keep rate"
+            | "open keep rate"
+            | "open the keep rate"
+            | "list keep rate"
+            | "list the keep rate"
+            | "view discard rate"
+            | "see discard rate"
+            | "show the discard rate"
+            | "show me the discard rate"
+            | "open discard rate"
+            | "open the discard rate"
+            | "list discard rate"
+            | "list the discard rate"
+            | "view hit rate"
+            | "see hit rate"
+            | "show the hit rate"
+            | "show me the hit rate"
+            | "open hit rate"
+            | "open the hit rate"
+            | "list hit rate"
+            | "list the hit rate"
+            | "view ratchet rate"
+            | "see ratchet rate"
+            | "open ratchet rate"
+            | "list ratchet rate"
+            | "what is the keep rate"
+            | "whats the keep rate"
+            | "what's the keep rate"
+            | "what is the hit rate"
+            | "whats the hit rate"
+            | "what's the hit rate"
+    )
+}
+
+/// Zero-LLM keep/discard hit rate from results.tsv (tonight + all-time percentages; no row dump).
+pub fn format_results_tsv_rate_gateway() -> String {
+    match count_results_tsv_outcomes() {
+        Err(_) => {
+            "**Keep rate:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+                .to_string()
+        }
+        Ok((keep_night, discard_night, keep_all, discard_all)) => {
+            let night_total = keep_night + discard_night;
+            let all_total = keep_all + discard_all;
+            let night_pct = format_keep_rate_pct(keep_night, night_total);
+            let all_pct = format_keep_rate_pct(keep_all, all_total);
+            let discard_night_pct = format_keep_rate_pct(discard_night, night_total);
+            format!(
+                "**Keep rate:** tonight **{night_pct}** keep ({keep_night}/{night_total} since 20:00) · discard **{discard_night_pct}** · all-time **{all_pct}** keep ({keep_all}/{all_total}) · rate only · does not dump rows · `/keeps` for counts · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
         }
     }
 }
@@ -46952,9 +47135,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_last_request(content) {
         return Some(format_results_tsv_last_gateway(content));
     }
-    // results.tsv recent tonight list (capped) before counts / size/age/path.
+    // results.tsv recent tonight list (capped) before rate / counts / size/age/path.
     if looks_like_results_tsv_recent_request(content) {
         return Some(format_results_tsv_recent_gateway(content));
+    }
+    // results.tsv keep/discard hit rate before counts / size/age/path (percentages only).
+    if looks_like_results_tsv_rate_request(content) {
+        return Some(format_results_tsv_rate_gateway());
     }
     // results.tsv keep/discard counts before size/age/path (no row dump).
     if looks_like_results_tsv_count_request(content) {
@@ -47452,9 +47639,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_last_request(content) {
         return Some(format_results_tsv_last_gateway(content));
     }
-    // results.tsv recent tonight list (capped) before counts / size/age/path.
+    // results.tsv recent tonight list (capped) before rate / counts / size/age/path.
     if looks_like_results_tsv_recent_request(content) {
         return Some(format_results_tsv_recent_gateway(content));
+    }
+    // results.tsv keep/discard hit rate before counts / size/age/path (percentages only).
+    if looks_like_results_tsv_rate_request(content) {
+        return Some(format_results_tsv_rate_gateway());
     }
     // results.tsv keep/discard counts before size/age/path (no row dump).
     if looks_like_results_tsv_count_request(content) {
@@ -47953,6 +48144,7 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
 • `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; counts only — no row dump; not path/size/age / morning surprise)\n\
+• `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
@@ -48272,6 +48464,46 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("age")
         && !q.contains("count")
         && !q.contains("how many")
+        && !q.contains("rate")
+        && !q.contains("percent")
+        && !q.contains("last keep")
+        && !q.contains("last discard")
+    {
+        return true;
+    }
+    // `/keep-rate` / hit-rate percentages (v0.1.1050).
+    if (q.contains("/keep-rate")
+        || q.contains("/keeprate")
+        || q.contains("/discard-rate")
+        || q.contains("/discardrate")
+        || q.contains("/hit-rate")
+        || q.contains("/hitrate")
+        || q.contains("keep rate")
+        || q.contains("discard rate")
+        || q.contains("hit rate")
+        || q.contains("ratchet rate")
+        || q.contains("ratchet hit rate")
+        || q.contains("keep percentage")
+        || q.contains("keep percent")
+        || q.contains("discard percentage")
+        || q.contains("keep hit rate")
+        || q.contains("keep success rate")
+        || q.contains("view keep rate")
+        || q.contains("open keep rate")
+        || q.contains("view hit rate")
+        || q.contains("open hit rate")
+        || q.contains("what is the keep rate")
+        || q.contains("what's the keep rate")
+        || q.contains("whats the keep rate"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
         && !q.contains("last keep")
         && !q.contains("last discard")
     {
@@ -48303,6 +48535,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("path")
         && !q.contains("size")
         && !q.contains("age")
+        && !q.contains("rate")
+        && !q.contains("percent")
         && !q.contains("last keep")
         && !q.contains("last discard")
         && !q.contains("latest keep")
@@ -50658,6 +50892,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv recent tonight list asks (v0.1.1049) — capped; no full dump.
     if looks_like_results_tsv_recent_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard hit-rate asks (v0.1.1050) — percentages only; no dump.
+    if looks_like_results_tsv_rate_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard count asks (v0.1.1047) — counts only; no dump.
@@ -58573,6 +58811,8 @@ mod tests {
         assert!(!looks_like_results_tsv_last_request("/recent-keeps"));
         assert!(!looks_like_results_tsv_last_request("recent keeps"));
         assert!(!looks_like_results_tsv_last_request("most recent keeps"));
+        assert!(!looks_like_results_tsv_last_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_last_request("keep rate"));
         assert!(!looks_like_results_tsv_count_request("last keep"));
         assert!(!looks_like_results_tsv_count_request("/last-discard"));
         assert!(!looks_like_results_tsv_size_request("last keep"));
@@ -58619,6 +58859,8 @@ mod tests {
         assert!(!looks_like_results_tsv_recent_request("results.tsv path"));
         assert!(!looks_like_results_tsv_recent_request("dump results.tsv"));
         assert!(!looks_like_results_tsv_recent_request("morning surprise"));
+        assert!(!looks_like_results_tsv_recent_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_recent_request("keep rate"));
         assert!(!looks_like_results_tsv_count_request("/recent-keeps"));
         assert!(!looks_like_results_tsv_count_request("recent keeps"));
         assert!(!looks_like_results_tsv_last_request("recent keeps"));
@@ -58640,6 +58882,57 @@ mod tests {
         assert!(
             discard.contains("Recent discards") || discard.contains("none tonight"),
             "{discard}"
+        );
+    }
+
+    #[test]
+    fn results_tsv_rate_request_detected() {
+        assert!(looks_like_results_tsv_rate_request("/keep-rate"));
+        assert!(looks_like_results_tsv_rate_request("keep rate"));
+        assert!(looks_like_results_tsv_rate_request("the keep rate"));
+        assert!(looks_like_results_tsv_rate_request("hit rate"));
+        assert!(looks_like_results_tsv_rate_request("ratchet hit rate"));
+        assert!(looks_like_results_tsv_rate_request("keep percentage"));
+        assert!(looks_like_results_tsv_rate_request("view keep rate"));
+        assert!(looks_like_results_tsv_rate_request("show me the keep rate"));
+        assert!(looks_like_results_tsv_rate_request("open keep rate"));
+        assert!(looks_like_results_tsv_rate_request("what is the keep rate"));
+        assert!(looks_like_results_tsv_rate_request("/discard-rate"));
+        assert!(looks_like_results_tsv_rate_request("discard rate"));
+        assert!(looks_like_results_tsv_rate_request("tonight keep rate"));
+        // Count / last / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_rate_request("/keeps"));
+        assert!(!looks_like_results_tsv_rate_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_rate_request("keep count"));
+        assert!(!looks_like_results_tsv_rate_request("ratchet summary"));
+        assert!(!looks_like_results_tsv_rate_request("/last-keep"));
+        assert!(!looks_like_results_tsv_rate_request("last keep"));
+        assert!(!looks_like_results_tsv_rate_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_rate_request("recent keeps"));
+        assert!(!looks_like_results_tsv_rate_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_rate_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_rate_request("morning surprise"));
+        assert!(!looks_like_results_tsv_count_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_count_request("keep rate"));
+        assert!(!looks_like_results_tsv_count_request("hit rate"));
+        assert!(!looks_like_results_tsv_last_request("keep rate"));
+        assert!(!looks_like_results_tsv_recent_request("keep rate"));
+        let reply = try_operator_instant_reply("keep rate").expect("keep rate instant");
+        assert!(
+            reply.contains("Keep rate") || reply.contains("no `results.tsv`"),
+            "expected keep-rate reply: {reply}"
+        );
+        assert!(
+            reply.contains("rate only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`"),
+            "must stay rate glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-rate").expect("/keep-rate instant");
+        assert!(
+            slash.contains("Keep rate") || slash.contains("no `results.tsv`"),
+            "{slash}"
         );
     }
 
@@ -58677,6 +58970,10 @@ mod tests {
         assert!(!looks_like_results_tsv_count_request("/recent-keeps"));
         assert!(!looks_like_results_tsv_count_request("recent keeps"));
         assert!(!looks_like_results_tsv_count_request("tonight keep list"));
+        assert!(!looks_like_results_tsv_count_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_count_request("keep rate"));
+        assert!(!looks_like_results_tsv_count_request("hit rate"));
+        assert!(!looks_like_results_tsv_count_request("ratchet hit rate"));
         assert!(!looks_like_results_tsv_size_request("keeps tonight"));
         assert!(!looks_like_results_tsv_age_request("keeps tonight"));
         assert!(!looks_like_results_tsv_path_request("keeps tonight"));

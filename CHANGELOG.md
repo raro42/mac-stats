@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.1050] - 2026-09-13
+
+### Added
+- Instant lane: `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` (and discard-rate variants) — keep/discard hit rate from `results.tsv` (tonight since 20:00 + all-time percentages only; no row dump). Does not steal `/keeps` counts, `/recent-keeps` list, `/last-keep` single row, path/size/age, or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1049] - 2026-09-13
 
 ### Added
