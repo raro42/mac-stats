@@ -1,33 +1,31 @@
 # Morning surprise — 2026-09-13
 
-Overnight Track B kept shipping Perplexity / Runs / metrics instant-lane NL so operator chat stays off the full Ollama path.
+Overnight Track B kept shipping instant-lane NL so operator Discord asks stay off the slow direct lane.
 
-## Shipped tonight
+## Shipped tonight (keep)
 
 | Version | What |
-|---------|------|
-| **v0.1.1045** | `/perplexity` · top · snippet — `view` / `see` / `show me` / `open` / `list the` (+ last search / top results / snippet results) → last-search Top/Snippet list (exact open only; not key / live search / path·size·age) |
-| **v0.1.1044** | `/failed` · `/slow` · `/instant` · `/lite` · `/direct` — same NL family → Runs lane reports |
-| **v0.1.1043** | `/hot` · `/pinned` → Top Processes Hot/Pinned lists |
-| **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` → strip chips |
-| **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` → ring chips |
-| **v0.1.1040** | `/rings` · `/strip` · `/details` → metrics gateways |
+| --- | --- |
+| **v0.1.1046** | Digest open NL: `view digest` / `see digest` / `show me the digest` / `open digest` / `list the digest` (+ open-candidates variants) → cached open-candidate snapshot (no digester spawn). Bare `digest` / `/digest` / `show me digest` / `refresh` / `rescan` still refresh. |
+| **v0.1.1045** | Perplexity last-search NL: view/see/show me/open/list-the + top/snippet variants. |
+| **v0.1.1044** | Runs-lane NL: `/failed` · `/slow` · `/instant` · `/lite` · `/direct` view/see/show me/open/list-the. |
+| **v0.1.1043** | Hot/Pinned NL: `/hot` · `/pinned` view/see/show me/open/list-the. |
+| **v0.1.1042** | Power-strip chips: battery/heat/lpm/ram/ssd/uptime NL expand. |
+| **v0.1.1041** | Ring chips: cpu/gpu/freq/temp NL expand. |
+| **v0.1.1040** | Rings/strip/details NL expand. |
+| **v0.1.1039** | Insights/help/ops NL expand. |
+| **v0.1.1038** | Status/health/version NL expand. |
+| **v0.1.1037** | Discord/ollama/perplexity key/cursor NL expand. |
+| **v0.1.1036** | Redmine/brave/mastodon/mcp NL expand. |
 
 ## Fuel notes
 
-- Digester **open** stayed empty all night — standing backlog p50 NL expand (not quiet-default).
-- Design review still in grace (`due=false`); CPU metrics screen ~6d, others much older (TCC / recapture when due).
-- No product-owned `debug.log` ERROR/WARN clusters in the scan window.
+- Digester **open** stayed empty all night — ticks pulled standing-backlog p50 NL expands (not quiet-default).
+- Design review: `due=false` (grace); recommended surface CPU metrics ~6.0d when TCC allows a fresh shot.
+- `debug.log`: no ERROR/WARN/panic clusters in the scan window.
 
-## Try it
+## Try in Discord / AI Chat
 
-In AI Chat or Discord:
-
-- `view perplexity` · `open the perplexity` · `list the last search` · `see top results` · `show me the snippet results`
-- Still works: `/perplexity` · `/perplexity top` · `/perplexity snippet` · `/perplexity key`
-
-## Next night
-
-- Remaining thin NL (`/digest` refresh/open) or digester Slowest filters if new Perplexity phrases show as noise.
-- Design review when due (prefer stale feature screens).
-- Sibling ports only when they clearly map (Hermes insights extras / session UX).
+- `view digest` / `show me the digest` / `list the digest` → open candidates (read-only)
+- `/digest` or `rescan digest` → refresh digester
+- `view perplexity` / `open top results` → last-search list
