@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1047] - 2026-09-13
+
+### Added
+- Instant lane: `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` / `see keeps` / `show me the keeps` / `open keeps` / `list the keeps` (and discard variants) — keep/discard counts from `results.tsv` (tonight since 20:00 + all-time). Counts only — no row dump; does not steal path/size/age or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1046] - 2026-09-13
 
 ### Added

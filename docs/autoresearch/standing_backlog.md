@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.1047** — Instant lane: `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · view/see/show me/open/list-the keeps (and discard variants) — keep/discard counts from `results.tsv` (tonight since 20:00 + all-time; counts only — not path·size·age / morning surprise; Hermes-style ratchet glance; p50).
+
 - **v0.1.1046** — Instant lane: more Digest open NL (`view digest` / `see digest` / `show me the digest` / `open digest` / `list the digest` + open candidates variants) join `digest open` cached snapshot; refresh phrases (`/digest` · `rescan digest` · `show me digest`) still re-run digester (exact open only — not path·size·age; p50).
 
 - **v0.1.1045** — Instant lane: more Perplexity last-search NL (`view perplexity` / `see perplexity` / `show me the perplexity` / `open perplexity` / `list the perplexity` + last search / top results / snippet results) join `/perplexity` · `/perplexity top` · `/perplexity snippet` (exact open only — not key / live search / path·size·age; p50).

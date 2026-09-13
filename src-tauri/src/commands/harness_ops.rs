@@ -9210,7 +9210,7 @@ pub fn format_results_tsv_size_gateway() -> String {
         Ok(bytes) => {
             let label = crate::commands::disk_cleanup::format_bytes(bytes);
             format!(
-                "**Autoresearch results:** **{label}** on disk · keep/discard log · `results.tsv path` for the file · `results.tsv age` for last write."
+                "**Autoresearch results:** **{label}** on disk · keep/discard log · `/keeps` · `keeps tonight` for counts · `results.tsv path` for the file · `results.tsv age` for last write."
             )
         }
         Err(e) => format!("**Autoresearch results** — could not stat `results.tsv`: {e}"),
@@ -9530,8 +9530,222 @@ pub fn format_results_tsv_path_gateway() -> String {
     let path = crate::config::Config::autoresearch_results_tsv();
     let display = path.display().to_string();
     format!(
-        "**Autoresearch results:** `{display}` · keep/discard log · path only · does not dump rows · `improvements path` for the parent folder · `loop backlog path` for the tick log."
+        "**Autoresearch results:** `{display}` · keep/discard log · path only · does not dump rows · `/keeps` · `keeps tonight` for keep/discard counts · `improvements path` for the parent folder · `loop backlog path` for the tick log."
     )
+}
+
+/// Local start of the current overnight window (20:00 previous calendar day when before 20:00).
+fn overnight_window_start_local() -> chrono::DateTime<chrono::Local> {
+    use chrono::Timelike;
+    let now = chrono::Local::now();
+    let today = now.date_naive();
+    let start_date = if now.hour() >= 20 {
+        today
+    } else {
+        today - chrono::Duration::days(1)
+    };
+    start_date
+        .and_hms_opt(20, 0, 0)
+        .and_then(|naive| naive.and_local_timezone(chrono::Local).single())
+        .unwrap_or(now)
+}
+
+/// Parse keep/discard row counts from results.tsv (tab: ts, sha, outcome, description).
+fn count_results_tsv_outcomes() -> Result<(u64, u64, u64, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let mut keep_all = 0u64;
+    let mut discard_all = 0u64;
+    let mut keep_night = 0u64;
+    let mut discard_night = 0u64;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if !is_keep && !is_discard {
+            continue;
+        }
+        if is_keep {
+            keep_all += 1;
+        } else {
+            discard_all += 1;
+        }
+        if let Some(parsed) = parse_run_ts(ts) {
+            if parsed >= window_start {
+                if is_keep {
+                    keep_night += 1;
+                } else {
+                    discard_night += 1;
+                }
+            }
+        }
+    }
+    Ok((keep_night, discard_night, keep_all, discard_all))
+}
+
+/// True for short keep/discard count asks (`/keeps`, `keeps tonight`, `ratchet summary`…).
+/// Counts only — does not dump TSV rows or steal path/size/age / morning surprise / what-shipped.
+pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    // Path / size / age / dump stay on their lanes (keyword-only; no nest).
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || ((n.contains("when") || n.contains("updated") || n.contains("modified"))
+            && !n.contains("keep")
+            && !n.contains("discard")
+            && !n.contains("ratchet"))
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keeps"
+            | "keeps"
+            | "the keeps"
+            | "keep count"
+            | "keeps count"
+            | "how many keeps"
+            | "how many keep"
+            | "number of keeps"
+            | "keeps tonight"
+            | "keep tonight"
+            | "tonight keeps"
+            | "overnight keeps"
+            | "overnight keep count"
+            | "keeps last night"
+            | "keep last night"
+            | "last night keeps"
+            | "keeps this night"
+            | "/discards"
+            | "discards"
+            | "the discards"
+            | "discard count"
+            | "discards count"
+            | "how many discards"
+            | "how many discard"
+            | "number of discards"
+            | "discards tonight"
+            | "discard tonight"
+            | "tonight discards"
+            | "overnight discards"
+            | "discards last night"
+            | "discard last night"
+            | "ratchet summary"
+            | "ratchet count"
+            | "ratchet counts"
+            | "ratchet keep count"
+            | "ratchet discard count"
+            | "keep discard count"
+            | "keep discard counts"
+            | "keep discard summary"
+            | "results keep count"
+            | "results discard count"
+            | "results.tsv keep count"
+            | "results.tsv discard count"
+            | "results tsv keep count"
+            | "view keeps"
+            | "see keeps"
+            | "show the keeps"
+            | "show me the keeps"
+            | "open keeps"
+            | "open the keeps"
+            | "list keeps"
+            | "list the keeps"
+            | "view discards"
+            | "see discards"
+            | "show the discards"
+            | "show me the discards"
+            | "open discards"
+            | "open the discards"
+            | "list discards"
+            | "list the discards"
+            | "view ratchet"
+            | "see ratchet"
+            | "open ratchet"
+            | "list ratchet"
+            | "view ratchet summary"
+            | "see ratchet summary"
+            | "open ratchet summary"
+            | "list the ratchet summary"
+    )
+}
+
+/// Zero-LLM keep/discard counts from results.tsv (tonight window + all-time; no row dump).
+pub fn format_results_tsv_count_gateway() -> String {
+    match count_results_tsv_outcomes() {
+        Err(_) => {
+            "**Ratchet:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+                .to_string()
+        }
+        Ok((keep_night, discard_night, keep_all, discard_all)) => {
+            let night_total = keep_night + discard_night;
+            format!(
+                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
 }
 
 /// True for short “where is loop_backlog.md / loop backlog path…” asks.
@@ -46317,6 +46531,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
+    // results.tsv keep/discard counts before size/age/path (no row dump).
+    if looks_like_results_tsv_count_request(content) {
+        return Some(format_results_tsv_count_gateway());
+    }
     // results.tsv size before age/path (stat only; no dump); path before improvements-dir.
     if looks_like_results_tsv_size_request(content) {
         return Some(format_results_tsv_size_gateway());
@@ -46804,6 +47022,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // LaunchAgent plist paths (path-only; no load/unload).
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
+    }
+    // results.tsv keep/discard counts before size/age/path (no row dump).
+    if looks_like_results_tsv_count_request(content) {
+        return Some(format_results_tsv_count_gateway());
     }
     // results.tsv size before age/path (stat only; no dump); path before improvements-dir.
     if looks_like_results_tsv_size_request(content) {
@@ -47297,6 +47519,7 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path` / `improvements age`)\n\
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
+• `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; counts only — no row dump; not path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -47555,6 +47778,35 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("explain")
         && !q.contains("ticket")
         && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/keeps` / ratchet keep-discard counts (v0.1.1047).
+    if (q.contains("/keeps")
+        || q.contains("keeps tonight")
+        || q.contains("keep count")
+        || q.contains("how many keeps")
+        || q.contains("discard count")
+        || q.contains("discards tonight")
+        || q.contains("how many discards")
+        || q.contains("ratchet summary")
+        || q.contains("ratchet count")
+        || q.contains("keep discard count")
+        || q.contains("view keeps")
+        || q.contains("see keeps")
+        || q.contains("open keeps")
+        || q.contains("list the keeps")
+        || q.contains("view discards")
+        || q.contains("open discards")
+        || q == "keeps"
+        || q == "the keeps"
+        || q == "discards"
+        || q == "the discards")
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("age")
     {
         return true;
     }
@@ -49896,6 +50148,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard count asks (v0.1.1047) — counts only; no dump.
+    if looks_like_results_tsv_count_request(question) {
         return true;
     }
     // Read-only results.tsv size asks (v0.1.869) — stat only; no dump.
@@ -57762,6 +58018,10 @@ mod tests {
         assert!(!looks_like_results_tsv_path_request("results.tsv size"));
         assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
         assert!(!looks_like_results_tsv_path_request("loop backlog path"));
+        assert!(!looks_like_results_tsv_path_request("/keeps"));
+        assert!(!looks_like_results_tsv_path_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_path_request("keep count"));
+        assert!(!looks_like_results_tsv_path_request("ratchet summary"));
         assert!(!looks_like_improvements_path_request("results.tsv path"));
         assert!(!looks_like_improvements_path_request("autoresearch results path"));
         assert!(looks_like_improvements_path_request("autoresearch path"));
@@ -57770,6 +58030,58 @@ mod tests {
         assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
         assert!(reply.contains("results.tsv"));
         assert!(reply.contains("improvements path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn results_tsv_count_request_detected() {
+        assert!(looks_like_results_tsv_count_request("/keeps"));
+        assert!(looks_like_results_tsv_count_request("keeps"));
+        assert!(looks_like_results_tsv_count_request("keeps tonight"));
+        assert!(looks_like_results_tsv_count_request("keep count"));
+        assert!(looks_like_results_tsv_count_request("how many keeps"));
+        assert!(looks_like_results_tsv_count_request("discard count"));
+        assert!(looks_like_results_tsv_count_request("discards tonight"));
+        assert!(looks_like_results_tsv_count_request("overnight keeps"));
+        assert!(looks_like_results_tsv_count_request("keeps last night"));
+        assert!(looks_like_results_tsv_count_request("ratchet summary"));
+        assert!(looks_like_results_tsv_count_request("ratchet count"));
+        assert!(looks_like_results_tsv_count_request("keep discard count"));
+        assert!(looks_like_results_tsv_count_request("view keeps"));
+        assert!(looks_like_results_tsv_count_request("see keeps"));
+        assert!(looks_like_results_tsv_count_request("show me the keeps"));
+        assert!(looks_like_results_tsv_count_request("open keeps"));
+        assert!(looks_like_results_tsv_count_request("list the keeps"));
+        assert!(looks_like_results_tsv_count_request("view discards"));
+        assert!(looks_like_results_tsv_count_request("open the discards"));
+        assert!(!looks_like_results_tsv_count_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_count_request("where is results.tsv"));
+        assert!(!looks_like_results_tsv_count_request("results.tsv size"));
+        assert!(!looks_like_results_tsv_count_request("how big is results.tsv"));
+        assert!(!looks_like_results_tsv_count_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_count_request("how old is results.tsv"));
+        assert!(!looks_like_results_tsv_count_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_count_request("what shipped last night"));
+        assert!(!looks_like_results_tsv_count_request("morning surprise"));
+        assert!(!looks_like_results_tsv_count_request("any improvements from last night"));
+        assert!(!looks_like_results_tsv_size_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_age_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_path_request("keeps tonight"));
+        let reply = try_operator_instant_reply("keeps tonight").expect("keeps tonight instant");
+        assert!(
+            reply.contains("Ratchet") || reply.contains("tonight"),
+            "expected ratchet count reply: {reply}"
+        );
+        assert!(
+            reply.contains("keep") && reply.contains("discard"),
+            "expected keep/discard counts: {reply}"
+        );
+        assert!(
+            !reply.to_lowercase().contains("dump rows")
+                || reply.contains("does not dump"),
+            "must stay counts-only: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keeps").expect("/keeps instant");
+        assert!(slash.contains("Ratchet") || slash.contains("tonight"), "{slash}");
     }
 
     #[test]
@@ -59431,6 +59743,10 @@ mod tests {
         assert!(!looks_like_results_tsv_size_request("how big is the digest"));
         assert!(!looks_like_results_tsv_size_request("digest.md size"));
         assert!(!looks_like_results_tsv_size_request("latest.md size"));
+        assert!(!looks_like_results_tsv_size_request("/keeps"));
+        assert!(!looks_like_results_tsv_size_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_size_request("keep count"));
+        assert!(!looks_like_results_tsv_size_request("ratchet summary"));
         assert!(!looks_like_results_tsv_path_request("how big is results.tsv"));
         assert!(!looks_like_results_tsv_age_request("results.tsv size"));
         let reply =
@@ -59463,6 +59779,10 @@ mod tests {
         assert!(!looks_like_results_tsv_age_request("improvements path"));
         assert!(!looks_like_results_tsv_age_request("runs age"));
         assert!(!looks_like_results_tsv_age_request("log age"));
+        assert!(!looks_like_results_tsv_age_request("/keeps"));
+        assert!(!looks_like_results_tsv_age_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_age_request("keep count"));
+        assert!(!looks_like_results_tsv_age_request("ratchet summary"));
         assert!(!looks_like_results_tsv_path_request("how old is results.tsv"));
         let reply =
             try_operator_instant_reply("how old is results.tsv").expect("results.tsv age instant");
