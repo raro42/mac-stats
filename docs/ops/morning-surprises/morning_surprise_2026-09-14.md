@@ -1,19 +1,21 @@
 # Morning surprise — 2026-09-14
 
-Overnight Track B (started 2026-09-13 ~20:00).
+Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.1053** | Instant `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` (+ discard) — age since newest keep/discard from `results.tsv` (age only). Digester Slowest filters for the ratchet glance family. |
+| **v0.1.1054** | Instant `/first-keep` · `first keep tonight` · `earliest keep` (+ discard) — earliest keep/discard row tonight since 20:00 from `results.tsv` (one description; digester Slowest filters). |
+| **v0.1.1053** | Instant `/since-keep` — age since newest keep/discard (age only). |
+| **v0.1.1052** | Instant `/longest-streak` — record keep/discard streak. |
 
-## Tried / notes
+## Context
 
-- Digester open empty; design review not due (grace).
-- Fuel: standing backlog p50 after `/longest-streak` — age-only since-last-keep glance.
+- Digester open was empty; design review not due (grace).
+- Fuel: standing backlog p50 / Hermes-style ratchet glances.
+- Nightly keep minimum met (results.tsv keep rows).
 
-## Ask Werner
+## Try it
 
-- `since last keep` or `/since-keep`
-- `longest streak` · `keep streak` · `keep rate` · `recent keeps`
+In AI Chat or Discord: `/first-keep` or `first keep tonight`.
