@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1052] - 2026-09-13
+
+### Added
+- Instant lane: `/longest-streak` · `longest streak` · `best streak` · `record streak` · `view longest streak` / `open longest streak` (and max-streak / longest-discard variants) — longest keep/discard streak from `results.tsv` (all-time + tonight since 20:00 only; no row dump). Does not steal `/keep-streak` current streak, `/keeps` counts, `/keep-rate` percentages, `/recent-keeps` list, `/last-keep` single row, path/size/age, or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1051] - 2026-09-13
 
 ### Added

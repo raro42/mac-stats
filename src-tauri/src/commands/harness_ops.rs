@@ -9746,7 +9746,7 @@ pub fn format_results_tsv_count_gateway() -> String {
         Ok((keep_night, discard_night, keep_all, discard_all)) => {
             let night_total = keep_night + discard_night;
             format!(
-                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `/last-keep` · `/last-discard` for the newest row · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
+                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/longest-streak` for the record · `/recent-keeps` for a short tonight list · `/last-keep` · `/last-discard` for the newest row · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -10346,7 +10346,7 @@ pub fn format_results_tsv_rate_gateway() -> String {
             let all_pct = format_keep_rate_pct(keep_all, all_total);
             let discard_night_pct = format_keep_rate_pct(discard_night, night_total);
             format!(
-                "**Keep rate:** tonight **{night_pct}** keep ({keep_night}/{night_total} since 20:00) · discard **{discard_night_pct}** · all-time **{all_pct}** keep ({keep_all}/{all_total}) · rate only · does not dump rows · `/keeps` for counts · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**Keep rate:** tonight **{night_pct}** keep ({keep_night}/{night_total} since 20:00) · discard **{discard_night_pct}** · all-time **{all_pct}** keep ({keep_all}/{all_total}) · rate only · does not dump rows · `/keeps` for counts · `/keep-streak` for consecutive keeps · `/longest-streak` for the record · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -10484,11 +10484,22 @@ pub fn looks_like_results_tsv_streak_request(content: &str) -> bool {
         || n.contains("last discard")
         || n.contains("latest keep")
         || n.contains("latest discard")
+        || n.contains("longest")
+        || n.contains("best streak")
+        || n.contains("record streak")
+        || n.contains("max streak")
+        || n.contains("best keep streak")
+        || n.contains("record keep streak")
+        || n.contains("max keep streak")
         || n.starts_with("/last-")
         || n.starts_with("/recent-")
         || n.starts_with("/keep-rate")
         || n.starts_with("/keeprate")
         || n.starts_with("/hit-rate")
+        || n.starts_with("/longest")
+        || n.starts_with("/best-streak")
+        || n.starts_with("/record-streak")
+        || n.starts_with("/max-streak")
     {
         return false;
     }
@@ -10557,7 +10568,241 @@ pub fn format_results_tsv_streak_gateway() -> String {
         }
         Ok((keep_streak, discard_streak, keep_tonight)) => {
             format!(
-                "**Keep streak:** current **{keep_streak}** keep(s) in a row · tonight **{keep_tonight}** since 20:00 · discard streak **{discard_streak}** · streak only · does not dump rows · `/keeps` for counts · `/keep-rate` for hit rate · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**Keep streak:** current **{keep_streak}** keep(s) in a row · tonight **{keep_tonight}** since 20:00 · discard streak **{discard_streak}** · streak only · does not dump rows · `/longest-streak` for the record · `/keeps` for counts · `/keep-rate` for hit rate · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// Longest keep/discard streak across results.tsv.
+/// Returns `(longest_keep_all, longest_discard_all, longest_keep_tonight)`.
+fn count_results_tsv_longest_streaks() -> Result<(u64, u64, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let mut longest_keep = 0u64;
+    let mut longest_discard = 0u64;
+    let mut cur_keep = 0u64;
+    let mut cur_discard = 0u64;
+    let mut longest_keep_tonight = 0u64;
+    let mut cur_keep_tonight = 0u64;
+    let mut saw_row = false;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if !is_keep && !is_discard {
+            continue;
+        }
+        saw_row = true;
+        let in_night = parse_run_ts(ts)
+            .map(|parsed| parsed >= window_start)
+            .unwrap_or(false);
+        if is_keep {
+            cur_keep += 1;
+            cur_discard = 0;
+            longest_keep = longest_keep.max(cur_keep);
+            if in_night {
+                cur_keep_tonight += 1;
+                longest_keep_tonight = longest_keep_tonight.max(cur_keep_tonight);
+            } else {
+                cur_keep_tonight = 0;
+            }
+        } else {
+            cur_discard += 1;
+            cur_keep = 0;
+            cur_keep_tonight = 0;
+            longest_discard = longest_discard.max(cur_discard);
+        }
+    }
+    if !saw_row {
+        return Ok((0, 0, 0));
+    }
+    Ok((longest_keep, longest_discard, longest_keep_tonight))
+}
+
+/// True for short longest-streak asks (`/longest-streak`, `longest streak`, `best streak`…).
+/// Record max only — does not dump TSV rows or steal current streak / rate / counts / last-row / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_longest_streak_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("last keep")
+        || n.contains("last discard")
+        || n.contains("latest keep")
+        || n.contains("latest discard")
+        || n.contains("current streak")
+        || n.contains("current keep streak")
+        || n.contains("ratchet streak")
+        || n == "/keep-streak"
+        || n == "/keepstreak"
+        || n == "/discard-streak"
+        || n == "/discardstreak"
+        || n == "/streak"
+        || n == "keep streak"
+        || n == "the keep streak"
+        || n.starts_with("/last-")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/longest-streak"
+            | "/longeststreak"
+            | "/longest-keep-streak"
+            | "/longestkeepstreak"
+            | "/best-streak"
+            | "/beststreak"
+            | "/record-streak"
+            | "/recordstreak"
+            | "/max-streak"
+            | "/maxstreak"
+            | "/longest-discard-streak"
+            | "/longestdiscardstreak"
+            | "longest streak"
+            | "the longest streak"
+            | "longest keep streak"
+            | "the longest keep streak"
+            | "longest discard streak"
+            | "the longest discard streak"
+            | "best streak"
+            | "the best streak"
+            | "best keep streak"
+            | "the best keep streak"
+            | "record streak"
+            | "the record streak"
+            | "record keep streak"
+            | "the record keep streak"
+            | "max streak"
+            | "the max streak"
+            | "max keep streak"
+            | "the max keep streak"
+            | "longest streak tonight"
+            | "tonight longest streak"
+            | "longest keep streak tonight"
+            | "view longest streak"
+            | "see longest streak"
+            | "show the longest streak"
+            | "show me the longest streak"
+            | "open longest streak"
+            | "open the longest streak"
+            | "list longest streak"
+            | "list the longest streak"
+            | "view best streak"
+            | "see best streak"
+            | "show the best streak"
+            | "show me the best streak"
+            | "open best streak"
+            | "open the best streak"
+            | "list best streak"
+            | "list the best streak"
+            | "view record streak"
+            | "see record streak"
+            | "show the record streak"
+            | "show me the record streak"
+            | "open record streak"
+            | "open the record streak"
+            | "what is the longest streak"
+            | "whats the longest streak"
+            | "what's the longest streak"
+            | "what is the best streak"
+            | "whats the best streak"
+            | "what's the best streak"
+            | "what is the record streak"
+            | "whats the record streak"
+            | "what's the record streak"
+    )
+}
+
+/// Zero-LLM longest keep/discard streak from results.tsv (all-time + tonight; no row dump).
+pub fn format_results_tsv_longest_streak_gateway() -> String {
+    match count_results_tsv_longest_streaks() {
+        Err(_) => {
+            "**Longest streak:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+                .to_string()
+        }
+        Ok((longest_keep, longest_discard, longest_keep_tonight)) => {
+            format!(
+                "**Longest streak:** all-time keep **{longest_keep}** in a row · tonight keep **{longest_keep_tonight}** since 20:00 · longest discard **{longest_discard}** · record only · does not dump rows · `/keep-streak` for the current streak · `/keeps` for counts · `/keep-rate` for hit rate · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -47354,6 +47599,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_recent_request(content) {
         return Some(format_results_tsv_recent_gateway(content));
     }
+    // results.tsv longest keep/discard streak before current streak / rate / counts (record only).
+    if looks_like_results_tsv_longest_streak_request(content) {
+        return Some(format_results_tsv_longest_streak_gateway());
+    }
     // results.tsv keep/discard streak before rate / counts / size/age/path (consecutive only).
     if looks_like_results_tsv_streak_request(content) {
         return Some(format_results_tsv_streak_gateway());
@@ -47862,6 +48111,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_recent_request(content) {
         return Some(format_results_tsv_recent_gateway(content));
     }
+    // results.tsv longest keep/discard streak before current streak / rate / counts (record only).
+    if looks_like_results_tsv_longest_streak_request(content) {
+        return Some(format_results_tsv_longest_streak_gateway());
+    }
     // results.tsv keep/discard streak before rate / counts / size/age/path (consecutive only).
     if looks_like_results_tsv_streak_request(content) {
         return Some(format_results_tsv_streak_gateway());
@@ -48367,6 +48620,7 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
 • `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; counts only — no row dump; not path/size/age / morning surprise)\n\
+• `/longest-streak` · `longest streak` · `best streak` · `record streak` · `view longest streak` / `open longest streak` — longest keep/discard streak from results.tsv (all-time + tonight since 20:00 only — no row dump; not current streak / counts / rate / last-row / recent list / path/size/age / morning surprise)\n\
 • `/keep-streak` · `keep streak` · `current streak` · `ratchet streak` · `view keep streak` / `open keep streak` — consecutive keep/discard streak from results.tsv (current + tonight since 20:00 only — no row dump; not counts / rate / last-row / recent list / path/size/age / morning surprise)\n\
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
@@ -48695,6 +48949,49 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
+    // `/longest-streak` / record keep streak (v0.1.1052).
+    if (q.contains("/longest-streak")
+        || q.contains("/longeststreak")
+        || q.contains("/longest-keep-streak")
+        || q.contains("/best-streak")
+        || q.contains("/beststreak")
+        || q.contains("/record-streak")
+        || q.contains("/recordstreak")
+        || q.contains("/max-streak")
+        || q.contains("/maxstreak")
+        || q.contains("longest streak")
+        || q.contains("longest keep streak")
+        || q.contains("best streak")
+        || q.contains("best keep streak")
+        || q.contains("record streak")
+        || q.contains("record keep streak")
+        || q.contains("max streak")
+        || q.contains("max keep streak")
+        || q.contains("view longest streak")
+        || q.contains("open longest streak")
+        || q.contains("view best streak")
+        || q.contains("open best streak")
+        || q.contains("what is the longest streak")
+        || q.contains("what's the longest streak")
+        || q.contains("whats the longest streak"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("rate")
+        && !q.contains("percent")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("last keep")
+        && !q.contains("last discard")
+        && !q.contains("current streak")
+        && !q.contains("ratchet streak")
+    {
+        return true;
+    }
     // `/keep-streak` / consecutive keep streak (v0.1.1051).
     if (q.contains("/keep-streak")
         || q.contains("/keepstreak")
@@ -48729,6 +49026,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("/recent-")
         && !q.contains("last keep")
         && !q.contains("last discard")
+        && !q.contains("longest")
+        && !q.contains("best streak")
+        && !q.contains("record streak")
+        && !q.contains("max streak")
     {
         return true;
     }
@@ -51155,6 +51456,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv recent tonight list asks (v0.1.1049) — capped; no full dump.
     if looks_like_results_tsv_recent_request(question) {
+        return true;
+    }
+    // Read-only results.tsv longest keep/discard streak asks (v0.1.1052) — record only; no dump.
+    if looks_like_results_tsv_longest_streak_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard streak asks (v0.1.1051) — consecutive only; no dump.
@@ -59224,7 +59529,7 @@ mod tests {
         assert!(looks_like_results_tsv_streak_request("discard streak"));
         assert!(looks_like_results_tsv_streak_request("tonight keep streak"));
         assert!(looks_like_results_tsv_streak_request("/streak"));
-        // Count / rate / last / recent / path-size-age stay elsewhere.
+        // Count / rate / last / recent / longest / path-size-age stay elsewhere.
         assert!(!looks_like_results_tsv_streak_request("/keeps"));
         assert!(!looks_like_results_tsv_streak_request("keeps tonight"));
         assert!(!looks_like_results_tsv_streak_request("keep count"));
@@ -59236,6 +59541,10 @@ mod tests {
         assert!(!looks_like_results_tsv_streak_request("last keep"));
         assert!(!looks_like_results_tsv_streak_request("/recent-keeps"));
         assert!(!looks_like_results_tsv_streak_request("recent keeps"));
+        assert!(!looks_like_results_tsv_streak_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_streak_request("longest streak"));
+        assert!(!looks_like_results_tsv_streak_request("best streak"));
+        assert!(!looks_like_results_tsv_streak_request("record streak"));
         assert!(!looks_like_results_tsv_streak_request("results.tsv path"));
         assert!(!looks_like_results_tsv_streak_request("dump results.tsv"));
         assert!(!looks_like_results_tsv_streak_request("morning surprise"));
@@ -59260,6 +59569,73 @@ mod tests {
         assert!(
             slash.contains("Keep streak") || slash.contains("no `results.tsv`"),
             "{slash}"
+        );
+    }
+
+    #[test]
+    fn results_tsv_longest_streak_request_detected() {
+        assert!(looks_like_results_tsv_longest_streak_request("/longest-streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("the longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("longest keep streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("best streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("record streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("max streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("view longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("show me the longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("open longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("what is the longest streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("/best-streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("/record-streak"));
+        assert!(looks_like_results_tsv_longest_streak_request("longest discard streak"));
+        // Current streak / count / rate / last / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_longest_streak_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep streak"));
+        assert!(!looks_like_results_tsv_longest_streak_request("current streak"));
+        assert!(!looks_like_results_tsv_longest_streak_request("ratchet streak"));
+        assert!(!looks_like_results_tsv_longest_streak_request("/streak"));
+        assert!(!looks_like_results_tsv_longest_streak_request("/keeps"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_longest_streak_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep rate"));
+        assert!(!looks_like_results_tsv_longest_streak_request("/last-keep"));
+        assert!(!looks_like_results_tsv_longest_streak_request("last keep"));
+        assert!(!looks_like_results_tsv_longest_streak_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_longest_streak_request("recent keeps"));
+        assert!(!looks_like_results_tsv_longest_streak_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_longest_streak_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_longest_streak_request("morning surprise"));
+        assert!(!looks_like_results_tsv_streak_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_streak_request("longest streak"));
+        assert!(!looks_like_results_tsv_streak_request("best streak"));
+        assert!(!looks_like_results_tsv_count_request("longest streak"));
+        assert!(!looks_like_results_tsv_rate_request("longest streak"));
+        assert!(!looks_like_results_tsv_last_request("longest streak"));
+        assert!(!looks_like_results_tsv_recent_request("longest streak"));
+        let reply = try_operator_instant_reply("longest streak").expect("longest streak instant");
+        assert!(
+            reply.contains("Longest streak") || reply.contains("no `results.tsv`"),
+            "expected longest-streak reply: {reply}"
+        );
+        assert!(
+            reply.contains("record only")
+                || reply.contains("does not dump")
+                || reply.contains("/keep-streak")
+                || reply.contains("no `results.tsv`"),
+            "must stay longest-streak glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/longest-streak").expect("/longest-streak instant");
+        assert!(
+            slash.contains("Longest streak") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        // "longest keep streak" must not steal current keep-streak lane.
+        assert!(!looks_like_results_tsv_streak_request("longest keep streak"));
+        let long_keep =
+            try_operator_instant_reply("longest keep streak").expect("longest keep streak");
+        assert!(
+            long_keep.contains("Longest streak") || long_keep.contains("no `results.tsv`"),
+            "{long_keep}"
         );
     }
 
@@ -59304,6 +59680,9 @@ mod tests {
         assert!(!looks_like_results_tsv_count_request("/keep-streak"));
         assert!(!looks_like_results_tsv_count_request("keep streak"));
         assert!(!looks_like_results_tsv_count_request("ratchet streak"));
+        assert!(!looks_like_results_tsv_count_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_count_request("longest streak"));
+        assert!(!looks_like_results_tsv_count_request("best streak"));
         assert!(!looks_like_results_tsv_size_request("keeps tonight"));
         assert!(!looks_like_results_tsv_age_request("keeps tonight"));
         assert!(!looks_like_results_tsv_path_request("keeps tonight"));
