@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+
+## [0.1.1051] - 2026-09-13
+
+### Added
+- Instant lane: `/keep-streak` · `keep streak` · `current streak` · `ratchet streak` · `view keep streak` / `open keep streak` (and discard-streak / `/streak` variants) — consecutive keep/discard streak from `results.tsv` (current row + tonight since 20:00 only; no row dump). Does not steal `/keeps` counts, `/keep-rate` percentages, `/recent-keeps` list, `/last-keep` single row, path/size/age, or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1050] - 2026-09-13
 
 ### Added
