@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1055] - 2026-09-13
+
+### Added
+- Instant lane: `/keep-pace` · `keep pace` · `keep gap` · `time between keeps` · `average keep gap` · `average time between keeps` · `view keep pace` / `open keep pace` (and discard / gap variants) — average gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; pace only; no row dump). Does not steal `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1054] - 2026-09-13
 
 ### Added

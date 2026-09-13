@@ -9660,6 +9660,12 @@ pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
         || n.contains("percent")
         || n.contains("hit rate")
         || n.contains("streak")
+        || n.contains("pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between")
+        || n.contains("between keeps")
+        || n.contains("between discards")
     {
         return false;
     }
@@ -9888,6 +9894,22 @@ pub fn looks_like_results_tsv_last_request(content: &str) -> bool {
         || n.starts_with("/earliest-")
         || n.starts_with("/earliestkeep")
         || n.starts_with("/earliestdiscard")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/keep-gap")
+        || n.starts_with("/discard-gap")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between keeps")
+        || n.contains("time between discards")
+        || n.contains("between keeps")
+        || n.contains("between discards")
+        || n.contains("keep interval")
+        || n.contains("discard interval")
     {
         return false;
     }
@@ -10115,6 +10137,17 @@ pub fn looks_like_results_tsv_recent_request(content: &str) -> bool {
         || n.contains("earliest discard")
         || n.starts_with("/first-")
         || n.starts_with("/earliest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/keep-gap")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("time between keeps")
+        || n.contains("time between discards")
+        || n.contains("between keeps")
+        || n.contains("between discards")
     {
         return false;
     }
@@ -10284,6 +10317,19 @@ pub fn looks_like_results_tsv_rate_request(content: &str) -> bool {
         || n.contains("streak")
         || n.starts_with("/last-")
         || n.starts_with("/recent-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/keep-gap")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("time between keeps")
+        || n.contains("time between discards")
+        || n.contains("between keeps")
+        || n.contains("between discards")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
     {
         return false;
     }
@@ -10518,6 +10564,12 @@ pub fn looks_like_results_tsv_streak_request(content: &str) -> bool {
         || n.contains("best keep streak")
         || n.contains("record keep streak")
         || n.contains("max keep streak")
+        || n.contains("pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between")
+        || n.contains("between keeps")
+        || n.contains("between discards")
         || n.starts_with("/last-")
         || n.starts_with("/recent-")
         || n.starts_with("/keep-rate")
@@ -10750,6 +10802,12 @@ pub fn looks_like_results_tsv_longest_streak_request(content: &str) -> bool {
         || n == "/streak"
         || n == "keep streak"
         || n == "the keep streak"
+        || n.contains("pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between")
+        || n.contains("between keeps")
+        || n.contains("between discards")
         || n.starts_with("/last-")
         || n.starts_with("/recent-")
         || n.starts_with("/keep-rate")
@@ -10917,6 +10975,22 @@ pub fn looks_like_results_tsv_since_request(content: &str) -> bool {
         || n.starts_with("/hit-rate")
         || n.starts_with("/keep-streak")
         || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/keep-gap")
+        || n.starts_with("/discard-gap")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between keeps")
+        || n.contains("time between discards")
+        || n.contains("between keeps")
+        || n.contains("between discards")
+        || n.contains("keep interval")
+        || n.contains("discard interval")
         // Exact last-row glances (description) stay on `/last-keep`.
         || n == "last keep"
         || n == "the last keep"
@@ -11040,7 +11114,7 @@ pub fn format_results_tsv_since_gateway(content: &str) -> String {
                 })
                 .unwrap_or_else(|| "unknown".to_string());
             format!(
-                "**{label}:** **{age}** ago · age only · does not dump the row · `/last-keep` for description · `/first-keep` for tonight's first · `/keeps` for counts · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** **{age}** ago · age only · does not dump the row · `/last-keep` for description · `/first-keep` for tonight's first · `/keep-pace` for avg gap · `/keeps` for counts · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -11173,6 +11247,22 @@ pub fn looks_like_results_tsv_first_request(content: &str) -> bool {
         || n.starts_with("/hit-rate")
         || n.starts_with("/keep-streak")
         || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/keep-gap")
+        || n.starts_with("/discard-gap")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("keep gap")
+        || n.contains("discard gap")
+        || n.contains("time between keeps")
+        || n.contains("time between discards")
+        || n.contains("between keeps")
+        || n.contains("between discards")
+        || n.contains("keep interval")
+        || n.contains("discard interval")
         || n == "last keep"
         || n == "the last keep"
         || n == "last discard"
@@ -11296,7 +11386,319 @@ pub fn format_results_tsv_first_gateway(content: &str) -> String {
                 desc = "(no description)".to_string();
             }
             format!(
-                "**{label}:** **{age}** ago · `{short_sha}` · {desc} · first tonight since 20:00 only · does not dump the log · `/last-keep` for the newest row · `/since-keep` for age since newest · `/keeps` for counts · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** **{age}** ago · `{short_sha}` · {desc} · first tonight since 20:00 only · does not dump the log · `/last-keep` for the newest row · `/since-keep` for age since newest · `/keep-pace` for avg gap · `/keeps` for counts · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// Human label for a duration (gap / pace), not an "ago" age from now.
+fn duration_label_secs(secs: u64) -> String {
+    if secs < 60 {
+        format!("{secs}s")
+    } else if secs < 3600 {
+        format!("{}m", secs / 60)
+    } else if secs < 86400 {
+        let h = secs / 3600;
+        let m = (secs % 3600) / 60;
+        if m == 0 {
+            format!("{h}h")
+        } else {
+            format!("{h}h{m}m")
+        }
+    } else {
+        format!("{}d", secs / 86400)
+    }
+}
+
+/// Average gap between consecutive matching keep/discard rows.
+/// Returns `(avg_secs_night, gaps_night, avg_secs_all, gaps_all)`.
+fn count_results_tsv_pace(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn avg_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut sum = 0u64;
+        let mut gaps = 0u64;
+        for w in ts.windows(2) {
+            let d = (w[1] - w[0]).num_seconds().max(0) as u64;
+            sum = sum.saturating_add(d);
+            gaps += 1;
+        }
+        if gaps == 0 {
+            return (None, 0);
+        }
+        (Some(sum / gaps), gaps)
+    }
+    let (avg_all, gaps_all) = avg_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (avg_night, gaps_night) = avg_gap_secs(&night_ts);
+    Ok((avg_night, gaps_night, avg_all, gaps_all))
+}
+
+/// True for short keep-pace asks (`/keep-pace`, `keep pace`, `time between keeps`…).
+/// Average gap only — does not dump TSV or steal first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_pace_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        // File mtime lane owns bare "age" / "how old" — allow "average" (contains "age").
+        || (n.contains("age") && !n.contains("average") && !n.contains("avg"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("percent")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        // Bare "rate" without pace/gap stays on `/keep-rate`.
+        || (n.contains("rate") && !n.contains("pace") && !n.contains("gap") && !n.contains("between"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-pace"
+            | "/keeppace"
+            | "/discard-pace"
+            | "/discardpace"
+            | "/keep-gap"
+            | "/keepgap"
+            | "/discard-gap"
+            | "/discardgap"
+            | "/avg-keep-gap"
+            | "/avgkeepgap"
+            | "/average-keep-gap"
+            | "/averagekeepgap"
+            | "/time-between-keeps"
+            | "/timebetweenkeeps"
+            | "/time-between-discards"
+            | "/timebetweendiscards"
+            | "keep pace"
+            | "the keep pace"
+            | "keep pace tonight"
+            | "tonight keep pace"
+            | "ratchet pace"
+            | "the ratchet pace"
+            | "overnight keep pace"
+            | "keep gap"
+            | "the keep gap"
+            | "average keep gap"
+            | "the average keep gap"
+            | "avg keep gap"
+            | "the avg keep gap"
+            | "mean keep gap"
+            | "the mean keep gap"
+            | "average gap between keeps"
+            | "avg gap between keeps"
+            | "mean gap between keeps"
+            | "time between keeps"
+            | "the time between keeps"
+            | "average time between keeps"
+            | "avg time between keeps"
+            | "mean time between keeps"
+            | "interval between keeps"
+            | "keep interval"
+            | "the keep interval"
+            | "average keep interval"
+            | "view keep pace"
+            | "see keep pace"
+            | "show the keep pace"
+            | "show me the keep pace"
+            | "open keep pace"
+            | "open the keep pace"
+            | "list keep pace"
+            | "list the keep pace"
+            | "what is the keep pace"
+            | "whats the keep pace"
+            | "what's the keep pace"
+            | "discard pace"
+            | "the discard pace"
+            | "discard pace tonight"
+            | "tonight discard pace"
+            | "discard gap"
+            | "the discard gap"
+            | "average discard gap"
+            | "avg discard gap"
+            | "mean discard gap"
+            | "time between discards"
+            | "the time between discards"
+            | "average time between discards"
+            | "avg time between discards"
+            | "mean time between discards"
+            | "interval between discards"
+            | "discard interval"
+            | "view discard pace"
+            | "see discard pace"
+            | "show the discard pace"
+            | "show me the discard pace"
+            | "open discard pace"
+            | "open the discard pace"
+            | "list discard pace"
+            | "list the discard pace"
+            | "what is the discard pace"
+            | "whats the discard pace"
+            | "what's the discard pace"
+    )
+}
+
+/// Zero-LLM average gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+pub fn format_results_tsv_pace_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep pace",
+        ResultsTsvLastWant::Discard => "Discard pace",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_pace(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((avg_night, gaps_night, avg_all, gaps_all)) => {
+            let night_part = match avg_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight avg **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure pace"),
+            };
+            let all_part = match avg_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time avg **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -48093,6 +48495,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
     }
+    // results.tsv keep/discard average gap (pace) before last-row / recent / counts.
+    if looks_like_results_tsv_pace_request(content) {
+        return Some(format_results_tsv_pace_gateway(content));
+    }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
         return Some(format_results_tsv_last_gateway(content));
@@ -48612,6 +49018,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
+    }
+    // results.tsv keep/discard average gap (pace) before last-row / recent / counts.
+    if looks_like_results_tsv_pace_request(content) {
+        return Some(format_results_tsv_pace_gateway(content));
     }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
@@ -49135,8 +49545,9 @@ pub fn format_ops_help_gateway() -> String {
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
-• `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
-• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / `/first-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
+• `/keep-pace` · `keep pace` · `keep gap` · `time between keeps` · `average keep gap` · `average time between keeps` · `view keep pace` / `open keep pace` · `/discard-pace` · `discard pace` · `time between discards` — average gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; pace only — no row dump; not `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / `/first-keep` / `/keep-pace` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -49549,6 +49960,55 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("/last-discard")
         && !q.contains("since last")
         && !q.contains("/since-")
+        && !q.contains("pace")
+        && !q.contains("keep gap")
+        && !q.contains("time between")
+    {
+        return true;
+    }
+    // `/keep-pace` / average gap between keeps (v0.1.1055).
+    if (q.contains("/keep-pace")
+        || q.contains("/keeppace")
+        || q.contains("/discard-pace")
+        || q.contains("/discardpace")
+        || q.contains("/keep-gap")
+        || q.contains("/keepgap")
+        || q.contains("/discard-gap")
+        || q.contains("/time-between-keeps")
+        || q.contains("keep pace")
+        || q.contains("discard pace")
+        || q.contains("ratchet pace")
+        || q.contains("keep gap")
+        || q.contains("discard gap")
+        || q.contains("time between keeps")
+        || q.contains("time between discards")
+        || q.contains("average keep gap")
+        || q.contains("avg keep gap")
+        || q.contains("average time between keeps")
+        || q.contains("view keep pace")
+        || q.contains("open keep pace")
+        || q.contains("view discard pace")
+        || q.contains("open discard pace"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("percent")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("first keep")
+        && !q.contains("first discard")
+        && !q.contains("/first-")
+        && !q.contains("since last")
+        && !q.contains("/since-")
     {
         return true;
     }
@@ -49594,6 +50054,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("ratchet streak")
         && !q.contains("since last")
         && !q.contains("/since-")
+        && !q.contains("pace")
+        && !q.contains("time between")
     {
         return true;
     }
@@ -52061,6 +52523,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
     if looks_like_results_tsv_first_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard pace asks (v0.1.1055) — avg gap only; no dump.
+    if looks_like_results_tsv_pace_request(question) {
         return true;
     }
     // Read-only results.tsv last keep/discard asks (v0.1.1048) — one row; no dump.
@@ -60379,6 +60845,77 @@ mod tests {
         let discard = try_operator_instant_reply("first discard tonight").expect("first discard");
         assert!(
             discard.contains("First discard tonight") || discard.contains("none tonight"),
+            "{discard}"
+        );
+        assert!(!looks_like_results_tsv_first_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_first_request("keep pace"));
+        assert!(!looks_like_results_tsv_first_request("time between keeps"));
+    }
+
+    #[test]
+    fn results_tsv_pace_request_detected() {
+        assert!(looks_like_results_tsv_pace_request("/keep-pace"));
+        assert!(looks_like_results_tsv_pace_request("keep pace"));
+        assert!(looks_like_results_tsv_pace_request("keep pace tonight"));
+        assert!(looks_like_results_tsv_pace_request("time between keeps"));
+        assert!(looks_like_results_tsv_pace_request("average keep gap"));
+        assert!(looks_like_results_tsv_pace_request("average time between keeps"));
+        assert!(looks_like_results_tsv_pace_request("view keep pace"));
+        assert!(looks_like_results_tsv_pace_request("show me the keep pace"));
+        assert!(looks_like_results_tsv_pace_request("open keep pace"));
+        assert!(looks_like_results_tsv_pace_request("/discard-pace"));
+        assert!(looks_like_results_tsv_pace_request("discard pace"));
+        assert!(looks_like_results_tsv_pace_request("time between discards"));
+        // First / last / since / counts / rate / streak / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_pace_request("/first-keep"));
+        assert!(!looks_like_results_tsv_pace_request("first keep tonight"));
+        assert!(!looks_like_results_tsv_pace_request("/last-keep"));
+        assert!(!looks_like_results_tsv_pace_request("last keep"));
+        assert!(!looks_like_results_tsv_pace_request("/since-keep"));
+        assert!(!looks_like_results_tsv_pace_request("since last keep"));
+        assert!(!looks_like_results_tsv_pace_request("/keeps"));
+        assert!(!looks_like_results_tsv_pace_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_pace_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_pace_request("keep rate"));
+        assert!(!looks_like_results_tsv_pace_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_pace_request("keep streak"));
+        assert!(!looks_like_results_tsv_pace_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_pace_request("longest streak"));
+        assert!(!looks_like_results_tsv_pace_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_pace_request("recent keeps"));
+        assert!(!looks_like_results_tsv_pace_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_pace_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_pace_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_pace_request("morning surprise"));
+        assert!(!looks_like_results_tsv_first_request("keep pace"));
+        assert!(!looks_like_results_tsv_last_request("keep pace"));
+        assert!(!looks_like_results_tsv_since_request("keep pace"));
+        assert!(!looks_like_results_tsv_count_request("keep pace"));
+        assert!(!looks_like_results_tsv_rate_request("keep pace"));
+        assert!(!looks_like_results_tsv_streak_request("keep pace"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep pace"));
+        assert!(!looks_like_results_tsv_recent_request("keep pace"));
+        let reply = try_operator_instant_reply("keep pace").expect("keep pace instant");
+        assert!(
+            reply.contains("Keep pace") || reply.contains("no `results.tsv`"),
+            "expected keep-pace reply: {reply}"
+        );
+        assert!(
+            reply.contains("pace only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥2"),
+            "must stay keep-pace glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-pace").expect("/keep-pace instant");
+        assert!(
+            slash.contains("Keep pace") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard pace").expect("discard pace");
+        assert!(
+            discard.contains("Discard pace") || discard.contains("no `results.tsv`"),
             "{discard}"
         );
     }
