@@ -11766,7 +11766,7 @@ pub fn format_results_tsv_pace_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -11989,6 +11989,13 @@ pub fn looks_like_results_tsv_median_request(content: &str) -> bool {
         || n.contains("std keep")
         || n.contains("std discard")
         || n.contains("std gap")
+        // MAD owns mad / median absolute (not plain median).
+        || n.contains("mad")
+        || n.contains("median absolute")
+        || n.starts_with("/keep-mad")
+        || n.starts_with("/keepmad")
+        || n.starts_with("/discard-mad")
+        || n.starts_with("/discardmad")
         || n == "last keep"
         || n == "the last keep"
         || n == "last discard"
@@ -12127,7 +12134,7 @@ pub fn format_results_tsv_median_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -12509,7 +12516,7 @@ pub fn format_results_tsv_range_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13101,6 +13108,13 @@ pub fn looks_like_results_tsv_iqr_request(content: &str) -> bool {
         || n.contains("std keep")
         || n.contains("std discard")
         || n.contains("std gap")
+        // MAD owns mad / median absolute.
+        || n.contains("mad")
+        || n.contains("median absolute")
+        || n.starts_with("/keep-mad")
+        || n.starts_with("/keepmad")
+        || n.starts_with("/discard-mad")
+        || n.starts_with("/discardmad")
         // Other gap stats own these words (not IQR).
         || n.contains("median")
         || (n.contains("range")
@@ -13265,7 +13279,7 @@ pub fn format_results_tsv_iqr_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13499,7 +13513,7 @@ pub fn looks_like_results_tsv_std_request(content: &str) -> bool {
             && !n.contains("pace")
             && !n.contains("gap")
             && !n.contains("between"))
-        // MAD owns mad / median absolute (later lane).
+        // MAD owns mad / median absolute.
         || n.contains("mad")
         || n.contains("median absolute")
         || n.starts_with("/keep-mad")
@@ -13651,7 +13665,414 @@ pub fn format_results_tsv_std_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// MAD (median absolute deviation) gap between consecutive matching keep/discard rows.
+/// Returns `(mad_night, med_night, gaps_night, mad_all, med_all, gaps_all)`.
+fn count_results_tsv_mad(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, Option<u64>, u64, Option<u64>, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn median_u64(vals: &mut [u64]) -> Option<u64> {
+        if vals.is_empty() {
+            return None;
+        }
+        vals.sort_unstable();
+        let n = vals.len();
+        Some(if n % 2 == 1 {
+            vals[n / 2]
+        } else {
+            let a = vals[n / 2 - 1];
+            let b = vals[n / 2];
+            a.saturating_add(b) / 2
+        })
+    }
+    fn mad_gap_secs(
+        ts: &[chrono::DateTime<chrono::Utc>],
+    ) -> (Option<u64>, Option<u64>, u64) {
+        // Need ≥2 gaps (≥3 rows) for a meaningful MAD (median of |gap − median|).
+        if ts.len() < 3 {
+            let gaps = ts.len().saturating_sub(1) as u64;
+            return (None, None, gaps);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n < 2 {
+            return (None, None, n);
+        }
+        let mut gaps_for_med = gaps.clone();
+        let Some(med) = median_u64(&mut gaps_for_med) else {
+            return (None, None, n);
+        };
+        let mut absdevs: Vec<u64> = gaps
+            .iter()
+            .map(|g| if *g >= med { *g - med } else { med - *g })
+            .collect();
+        let Some(mad) = median_u64(&mut absdevs) else {
+            return (None, None, n);
+        };
+        (Some(mad), Some(med), n)
+    }
+    let (mad_all, med_all, gaps_all) = mad_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (mad_night, med_night, gaps_night) = mad_gap_secs(&night_ts);
+    Ok((mad_night, med_night, gaps_night, mad_all, med_all, gaps_all))
+}
+
+/// True for short keep-mad asks (`/keep-mad`, `keep mad`, `median absolute deviation keep gap`…).
+/// MAD only — does not dump TSV or steal std / iqr / p90 / range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_mad_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (n.contains("age") && !n.contains("average") && !n.contains("avg"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        // Other gap stats own these words (not MAD).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("percentile")
+        || (n.contains("percent") && !n.contains("mad"))
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        // Plain median gap (not median absolute).
+        || (n.contains("median")
+            && !n.contains("median absolute")
+            && !n.contains("medianabsolute")
+            && !n.contains("mad"))
+        || (n.contains("rate")
+            && !n.contains("mad")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+    {
+        return false;
+    }
+    // Must say mad / median absolute (or /keep-mad slash).
+    if !(n.contains("median absolute")
+        || n.contains("medianabsolute")
+        || n.contains("keep mad")
+        || n.contains("discard mad")
+        || n.contains("mad keep")
+        || n.contains("mad discard")
+        || n.contains("mad gap")
+        || n.contains("keep-mad")
+        || n.contains("discard-mad")
+        || n.starts_with("/keep-mad")
+        || n.starts_with("/keepmad")
+        || n.starts_with("/discard-mad")
+        || n.starts_with("/discardmad")
+        || n.starts_with("/mad-")
+        || n.starts_with("/madkeep")
+        || n.starts_with("/maddiscard")
+        || n == "mad"
+        || n == "the mad"
+        || n == "keepmad"
+        || n == "discardmad")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-mad"
+            | "/keepmad"
+            | "/discard-mad"
+            | "/discardmad"
+            | "/mad-keep-gap"
+            | "/madkeepgap"
+            | "/mad-discard-gap"
+            | "/maddiscardgap"
+            | "/mad-gap"
+            | "/madgap"
+            | "/mad-keep"
+            | "/madkeep"
+            | "/mad-discard"
+            | "/maddiscard"
+            | "/keep-median-absolute-deviation"
+            | "/keepmedianabsolutedeviation"
+            | "/discard-median-absolute-deviation"
+            | "/discardmedianabsolutedeviation"
+            | "keep mad"
+            | "the keep mad"
+            | "keep mad tonight"
+            | "tonight keep mad"
+            | "mad keep"
+            | "the mad keep"
+            | "mad keep gap"
+            | "the mad keep gap"
+            | "mad gap between keeps"
+            | "mad time between keeps"
+            | "median absolute deviation keep gap"
+            | "the median absolute deviation keep gap"
+            | "median absolute keep gap"
+            | "keep gap mad"
+            | "ratchet mad"
+            | "the ratchet mad"
+            | "overnight keep mad"
+            | "view keep mad"
+            | "see keep mad"
+            | "show the keep mad"
+            | "show me the keep mad"
+            | "open keep mad"
+            | "open the keep mad"
+            | "list keep mad"
+            | "list the keep mad"
+            | "what is the keep mad"
+            | "whats the keep mad"
+            | "what's the keep mad"
+            | "what is the mad keep gap"
+            | "whats the mad keep gap"
+            | "what's the mad keep gap"
+            | "discard mad"
+            | "the discard mad"
+            | "discard mad tonight"
+            | "tonight discard mad"
+            | "mad discard"
+            | "the mad discard"
+            | "mad discard gap"
+            | "the mad discard gap"
+            | "mad gap between discards"
+            | "median absolute deviation discard gap"
+            | "view discard mad"
+            | "see discard mad"
+            | "show the discard mad"
+            | "show me the discard mad"
+            | "open discard mad"
+            | "open the discard mad"
+            | "list discard mad"
+            | "list the discard mad"
+            | "what is the discard mad"
+            | "whats the discard mad"
+            | "what's the discard mad"
+    )
+}
+
+/// Zero-LLM MAD gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+pub fn format_results_tsv_mad_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep mad",
+        ResultsTsvLastWant::Discard => "Discard mad",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_mad(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((mad_night, med_night, gaps_night, mad_all, med_all, gaps_all)) => {
+            let night_part = match (mad_night, med_night) {
+                (Some(mad), Some(med)) => {
+                    let dm = duration_label_secs(mad);
+                    let dmed = duration_label_secs(med);
+                    format!(
+                        "tonight MAD **{dm}** (median {dmed} · {gaps_night} gaps between {unit} since 20:00)"
+                    )
+                }
+                _ => format!("tonight need ≥3 {unit} (2 gaps) since 20:00 to measure MAD"),
+            };
+            let all_part = match (mad_all, med_all) {
+                (Some(mad), Some(med)) => {
+                    let dm = duration_label_secs(mad);
+                    let dmed = duration_label_secs(med);
+                    format!("all-time MAD **{dm}** (median {dmed} · {gaps_all} gaps)")
+                }
+                _ => format!("all-time need ≥3 {unit} (2 gaps)"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · MAD only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -50448,6 +50869,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
     }
+    // results.tsv keep/discard MAD gap before sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_mad_request(content) {
+        return Some(format_results_tsv_mad_gateway(content));
+    }
     // results.tsv keep/discard sample-std gap before IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_std_request(content) {
         return Some(format_results_tsv_std_gateway(content));
@@ -50991,6 +51416,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
+    }
+    // results.tsv keep/discard MAD gap before sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_mad_request(content) {
+        return Some(format_results_tsv_mad_gateway(content));
     }
     // results.tsv keep/discard sample-std gap before IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_std_request(content) {
@@ -51539,7 +51968,8 @@ pub fn format_ops_help_gateway() -> String {
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
 • `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / `/keep-median` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
-• `/keep-std` · `keep std` · `std keep gap` · `standard deviation keep gap` · `std gap between keeps` · `view keep std` / `open keep std` · `/discard-std` · `discard std` · `std discard gap` — sample std gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; std only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-mad` · `keep mad` · `mad keep gap` · `median absolute deviation keep gap` · `mad gap between keeps` · `view keep mad` / `open keep mad` · `/discard-mad` · `discard mad` · `mad discard gap` — MAD (median absolute deviation) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; MAD only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-std` · `keep std` · `std keep gap` · `standard deviation keep gap` · `std gap between keeps` · `view keep std` / `open keep std` · `/discard-std` · `discard std` · `std discard gap` — sample std gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; std only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-mad` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-iqr` · `keep iqr` · `iqr keep gap` · `interquartile keep gap` · `iqr gap between keeps` · `view keep iqr` / `open keep iqr` · `/discard-iqr` · `discard iqr` · `iqr discard gap` — IQR (Q3−Q1) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; IQR only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p90` · `keep p90` · `p90 keep gap` · `90th percentile keep gap` · `p90 gap between keeps` · `view keep p90` / `open keep p90` · `/discard-p90` · `discard p90` · `p90 discard gap` — p90 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p90 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-iqr` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-range` · `keep range` · `keep gap range` · `min max keep gap` · `shortest and longest keep gap` · `view keep range` / `open keep range` · `/discard-range` · `discard range` · `discard gap range` — min–max gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; range only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-p90` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
@@ -51962,6 +52392,47 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("keep gap")
         && !q.contains("time between")
         && !q.contains("median")
+    {
+        return true;
+    }
+    // `/keep-mad` / MAD gap between keeps (v0.1.1061).
+    if (q.contains("/keep-mad")
+        || q.contains("/keepmad")
+        || q.contains("/discard-mad")
+        || q.contains("/discardmad")
+        || q.contains("/mad-keep-gap")
+        || q.contains("/mad-gap")
+        || q.contains("/keep-median-absolute")
+        || q.contains("keep mad")
+        || q.contains("discard mad")
+        || q.contains("mad keep")
+        || q.contains("mad discard")
+        || q.contains("mad keep gap")
+        || q.contains("mad discard gap")
+        || q.contains("mad gap between keeps")
+        || q.contains("median absolute deviation keep gap")
+        || q.contains("median absolute keep gap")
+        || q.contains("view keep mad")
+        || q.contains("open keep mad")
+        || q.contains("view discard mad")
+        || q.contains("open discard mad"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("iqr")
+        && !q.contains("p90")
+        && !q.contains("range")
+        && !q.contains("pace")
+        && !q.contains("std")
+        && !(q.contains("median") && !q.contains("median absolute") && !q.contains("mad"))
     {
         return true;
     }
@@ -54781,6 +55252,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
     if looks_like_results_tsv_first_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard MAD gap asks (v0.1.1061) — MAD only; no dump.
+    if looks_like_results_tsv_mad_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard sample-std gap asks (v0.1.1060) — std only; no dump.
@@ -63602,6 +64077,9 @@ mod tests {
         assert!(!looks_like_results_tsv_streak_request("keep std"));
         assert!(!looks_like_results_tsv_longest_streak_request("keep std"));
         assert!(!looks_like_results_tsv_recent_request("keep std"));
+        assert!(!looks_like_results_tsv_std_request("/keep-mad"));
+        assert!(!looks_like_results_tsv_std_request("keep mad"));
+        assert!(!looks_like_results_tsv_mad_request("keep std"));
         let reply = try_operator_instant_reply("keep std").expect("keep std instant");
         assert!(
             reply.contains("Keep std") || reply.contains("no `results.tsv`"),
@@ -63626,6 +64104,83 @@ mod tests {
             "{discard}"
         );
     }
+
+    #[test]
+    fn results_tsv_mad_request_detected() {
+        assert!(looks_like_results_tsv_mad_request("/keep-mad"));
+        assert!(looks_like_results_tsv_mad_request("keep mad"));
+        assert!(looks_like_results_tsv_mad_request("keep mad tonight"));
+        assert!(looks_like_results_tsv_mad_request("mad keep gap"));
+        assert!(looks_like_results_tsv_mad_request("mad gap between keeps"));
+        assert!(looks_like_results_tsv_mad_request("median absolute deviation keep gap"));
+        assert!(looks_like_results_tsv_mad_request("view keep mad"));
+        assert!(looks_like_results_tsv_mad_request("show me the keep mad"));
+        assert!(looks_like_results_tsv_mad_request("open keep mad"));
+        assert!(looks_like_results_tsv_mad_request("/discard-mad"));
+        assert!(looks_like_results_tsv_mad_request("discard mad"));
+        assert!(looks_like_results_tsv_mad_request("mad discard gap"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_mad_request("keep pace"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-median"));
+        assert!(!looks_like_results_tsv_mad_request("keep median"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-range"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-p90"));
+        assert!(!looks_like_results_tsv_mad_request("keep p90"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-iqr"));
+        assert!(!looks_like_results_tsv_mad_request("keep iqr"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-std"));
+        assert!(!looks_like_results_tsv_mad_request("keep std"));
+        assert!(!looks_like_results_tsv_mad_request("/first-keep"));
+        assert!(!looks_like_results_tsv_mad_request("/last-keep"));
+        assert!(!looks_like_results_tsv_mad_request("/since-keep"));
+        assert!(!looks_like_results_tsv_mad_request("/keeps"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_mad_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_mad_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_mad_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_mad_request("morning surprise"));
+        assert!(!looks_like_results_tsv_pace_request("keep mad"));
+        assert!(!looks_like_results_tsv_median_request("keep mad"));
+        assert!(!looks_like_results_tsv_median_request("median absolute deviation keep gap"));
+        assert!(!looks_like_results_tsv_range_request("keep mad"));
+        assert!(!looks_like_results_tsv_p90_request("keep mad"));
+        assert!(!looks_like_results_tsv_iqr_request("keep mad"));
+        assert!(!looks_like_results_tsv_std_request("keep mad"));
+        assert!(!looks_like_results_tsv_std_request("/keep-mad"));
+        assert!(!looks_like_results_tsv_first_request("keep mad"));
+        assert!(!looks_like_results_tsv_last_request("keep mad"));
+        assert!(!looks_like_results_tsv_since_request("keep mad"));
+        assert!(!looks_like_results_tsv_count_request("keep mad"));
+        assert!(!looks_like_results_tsv_rate_request("keep mad"));
+        assert!(!looks_like_results_tsv_streak_request("keep mad"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep mad"));
+        assert!(!looks_like_results_tsv_recent_request("keep mad"));
+        let reply = try_operator_instant_reply("keep mad").expect("keep mad instant");
+        assert!(
+            reply.contains("Keep mad") || reply.contains("no `results.tsv`"),
+            "expected keep-mad reply: {reply}"
+        );
+        assert!(
+            reply.contains("MAD only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥3"),
+            "must stay keep-mad glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-mad").expect("/keep-mad instant");
+        assert!(
+            slash.contains("Keep mad") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard mad").expect("discard mad");
+        assert!(
+            discard.contains("Discard mad") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+    }
+
 
     #[test]
     fn results_tsv_count_request_detected() {
