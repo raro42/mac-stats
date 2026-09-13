@@ -6,6 +6,7 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1058** | Instant `/keep-p90` · `keep p90` · `p90 keep gap` · `90th percentile keep gap` · `p90 gap between keeps` (+ discard) — p90 gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1057** | Instant `/keep-range` · `keep range` · `keep gap range` · `min max keep gap` · `shortest and longest keep gap` (+ discard) — min–max gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1056** | Instant `/keep-median` · `keep median` · `median keep gap` · `median gap between keeps` (+ discard) — median gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1055** | Instant `/keep-pace` · `keep pace` · `time between keeps` · `average keep gap` (+ discard) — average gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
@@ -20,4 +21,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Try it
 
-In AI Chat or Discord: `/keep-range` or `min max keep gap` (beside `/keep-pace` average and `/keep-median` median).
+In AI Chat or Discord: `/keep-p90` or `90th percentile keep gap` (beside `/keep-pace` average, `/keep-median` median, and `/keep-range` min–max).
