@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1058] - 2026-09-13
+
+### Added
+- Instant lane: `/keep-p90` · `keep p90` · `p90 keep gap` · `90th percentile keep gap` · `p90 gap between keeps` · `view keep p90` / `open keep p90` (and discard / percentile variants) — p90 gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; p90 only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1057] - 2026-09-13
 
 ### Added
