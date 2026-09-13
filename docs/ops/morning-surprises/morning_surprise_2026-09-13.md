@@ -1,13 +1,14 @@
 # Morning surprise — 2026-09-13
 
-Overnight Track B kept shipping Runs / metrics instant-lane NL so operator chat stays off the full Ollama path.
+Overnight Track B kept shipping Perplexity / Runs / metrics instant-lane NL so operator chat stays off the full Ollama path.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1044** | `/failed` · `/slow` · `/instant` · `/lite` · `/direct` — `view` / `see` / `show me` / `open` / `list the` (+ day window) → Runs lane reports (exact open only) |
-| **v0.1.1043** | `/hot` · `/pinned` — same NL family → Top Processes Hot/Pinned lists |
+| **v0.1.1045** | `/perplexity` · top · snippet — `view` / `see` / `show me` / `open` / `list the` (+ last search / top results / snippet results) → last-search Top/Snippet list (exact open only; not key / live search / path·size·age) |
+| **v0.1.1044** | `/failed` · `/slow` · `/instant` · `/lite` · `/direct` — same NL family → Runs lane reports |
+| **v0.1.1043** | `/hot` · `/pinned` → Top Processes Hot/Pinned lists |
 | **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` → strip chips |
 | **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` → ring chips |
 | **v0.1.1040** | `/rings` · `/strip` · `/details` → metrics gateways |
@@ -22,11 +23,11 @@ Overnight Track B kept shipping Runs / metrics instant-lane NL so operator chat 
 
 In AI Chat or Discord:
 
-- `view failed` · `open slow 7` · `list the instant` · `see lite` · `show me the direct`
-- Still works: `/failed` · `/slow` · `/instant 3` · `/lite` · `/direct`
+- `view perplexity` · `open the perplexity` · `list the last search` · `see top results` · `show me the snippet results`
+- Still works: `/perplexity` · `/perplexity top` · `/perplexity snippet` · `/perplexity key`
 
 ## Next night
 
-- Digester Slowest filters for the new Runs-lane phrases if they show up as noise.
+- Remaining thin NL (`/digest` refresh/open) or digester Slowest filters if new Perplexity phrases show as noise.
 - Design review when due (prefer stale feature screens).
 - Sibling ports only when they clearly map (Hermes insights extras / session UX).
