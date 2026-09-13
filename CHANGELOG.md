@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1059] - 2026-09-13
+
+### Added
+- Instant lane: `/keep-iqr` · `keep iqr` · `iqr keep gap` · `interquartile keep gap` · `iqr gap between keeps` · `view keep iqr` / `open keep iqr` (and discard / interquartile variants) — IQR (Q3−Q1) gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; IQR only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1058] - 2026-09-13
 
 ### Added
