@@ -1,31 +1,24 @@
 # Morning surprise — 2026-09-13
 
-Overnight Track B kept shipping instant-lane NL so operator Discord asks stay off the slow direct lane.
+Overnight Track B (mac-stats autoresearch). Digester open stayed empty; design review not due (grace). Fuel: standing backlog p50 + Hermes insights-style ratchet glance.
 
-## Shipped tonight (keep)
+## Shipped tonight
 
 | Version | What |
-| --- | --- |
-| **v0.1.1046** | Digest open NL: `view digest` / `see digest` / `show me the digest` / `open digest` / `list the digest` (+ open-candidates variants) → cached open-candidate snapshot (no digester spawn). Bare `digest` / `/digest` / `show me digest` / `refresh` / `rescan` still refresh. |
-| **v0.1.1045** | Perplexity last-search NL: view/see/show me/open/list-the + top/snippet variants. |
-| **v0.1.1044** | Runs-lane NL: `/failed` · `/slow` · `/instant` · `/lite` · `/direct` view/see/show me/open/list-the. |
-| **v0.1.1043** | Hot/Pinned NL: `/hot` · `/pinned` view/see/show me/open/list-the. |
-| **v0.1.1042** | Power-strip chips: battery/heat/lpm/ram/ssd/uptime NL expand. |
-| **v0.1.1041** | Ring chips: cpu/gpu/freq/temp NL expand. |
-| **v0.1.1040** | Rings/strip/details NL expand. |
-| **v0.1.1039** | Insights/help/ops NL expand. |
-| **v0.1.1038** | Status/health/version NL expand. |
-| **v0.1.1037** | Discord/ollama/perplexity key/cursor NL expand. |
-| **v0.1.1036** | Redmine/brave/mastodon/mcp NL expand. |
+|---------|------|
+| **v0.1.1047** | Instant `/keeps` · `keeps tonight` · `keep count` · `discard count` · `ratchet summary` (+ view/see/show me/open/list-the) — keep/discard counts from `results.tsv` (tonight since 20:00 + all-time; counts only) |
+| **v0.1.1046** | Digest open NL (`view digest` / `show me the digest` / …) → cached open candidates |
+| **v0.1.1045** | Perplexity last-search NL expand |
+| **v0.1.1044** | Runs-lane `/failed`·`/slow`·`/instant`·`/lite`·`/direct` NL expand |
+| **v0.1.1043–1040** | Hot/Pinned · strip chips · ring chips · rings/strip/details NL |
 
-## Fuel notes
+## Tried / notes
 
-- Digester **open** stayed empty all night — ticks pulled standing-backlog p50 NL expands (not quiet-default).
-- Design review: `due=false` (grace); recommended surface CPU metrics ~6.0d when TCC allows a fresh shot.
-- `debug.log`: no ERROR/WARN/panic clusters in the scan window.
+- Digester open empty; `scan_debug_log_errors` quiet; sibling scan noted Hermes insights / session UX (port lens).
+- This tick: product instant for ratchet keep/discard counts (operator glance without dumping TSV).
 
-## Try in Discord / AI Chat
+## Next fuel
 
-- `view digest` / `show me the digest` / `list the digest` → open candidates (read-only)
-- `/digest` or `rescan digest` → refresh digester
-- `view perplexity` / `open top results` → last-search list
+- Digester open / debug.log product errors when present.
+- Design review when due (CPU metrics polish ~6d; recapture when TCC allows).
+- Remaining thin NL or digester Slowest filters for new Digest/Perplexity phrases.
