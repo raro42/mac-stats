@@ -359,6 +359,18 @@ pub fn parse_insights_days(content: &str) -> Option<u32> {
         r.trim()
     } else if let Some(r) = n.strip_prefix("lite runs") {
         r.trim()
+    } else if let Some(r) = n.strip_prefix("failed") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("failures") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("slow") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("instant") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("direct") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("lite") {
+        r.trim()
     } else {
         return None;
     };
@@ -47074,9 +47086,9 @@ pub fn format_ops_help_gateway() -> String {
 • `/voice` · `/stt` · `view voice` · `see voice` · `show me the voice` · `open voice` · `list the voice` · `view stt` · `see stt` · `show me the stt` · `open stt` · `list the stt` · `view speech` · `open speech to text` — Discord voice STT Ready / Off / Partial / Not set (Settings Product · model · ffmpeg · Ollama; config only; does not steal transcribe)\n\
 • `/telegram` · `/slack` · `/signal` · `/alerts` · `view telegram` · `see telegram` · `show me the telegram` · `open telegram` · `list the telegram` · `view slack` · `see slack` · `show me the slack` · `open slack` · `list the slack` · `view signal` · `see signal` · `show me the signal` · `open signal` · `list the signal` · `view alerts` · `see alerts` · `show me the alerts` · `open alerts` · `list the alerts` — alert channel Ready / Not set (Keychain + registry; config only; no live send)\n\
 • `/insights` · `/insights 7` · `view insights` · `see insights` · `show me the insights` · `open insights` · `list the insights` — runs.jsonl report (+ optional day window; exact open only — not insights on …)\n\
-• `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
-• `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
-• `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
+• `/failed` · `/failed 7` · `view failed` · `see failed` · `show me the failed` · `open failed` · `list the failed` — recent failed turns from runs.jsonl (exact open only — not why-did / ticket)\n\
+• `/slow` · `/slow 7` · `view slow` · `see slow` · `show me the slow` · `open slow` · `list the slow` — recent slow turns (≥{slow_ms} ms wall time; exact open only — not why-is / monitor)\n\
+• `/instant` · `/lite` · `/direct` · `/instant 7` · `view instant` · `see instant` · `open instant` · `list the instant` · `view lite` · `open lite` · `view direct` · `open direct` — recent instant-, lite-, or direct-lane turns (exact open only — not make-it)\n\
 • `/agents` · `/agents on` · `/agents off` · `view agents` · `see agents` · `show me the agents` · `open agents` · `list the agents` — Agent Ops On/Off list\n\
 • `/skills` · `view skills` · `see skills` · `show me the skills` · `open skills` · `list the skills` — installed skills catalog (Hermes skills_list; no SKILL: run)\n\
 • `/tasks` · `/tasks all` · `view tasks` · `see tasks` · `show me the tasks` · `open tasks` · `list the tasks` — Active (open·WIP) or All task files under `~/.mac-stats/task/`\n\
@@ -47339,13 +47351,21 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/failed` / failed-runs operator asks (v0.1.695).
+    // `/failed` / failed-runs operator asks (v0.1.695); view/see/show me/open/list-the NL (v0.1.1044).
     if (q.contains("failed run")
         || q.contains("what failed")
         || q.contains("any failures")
         || q.contains("/failed")
+        || q.contains("view failed")
+        || q.contains("see failed")
+        || q.contains("open failed")
+        || q.contains("list the failed")
+        || q.contains("list failed")
+        || q.contains("show me the failed")
+        || q.contains("show the failed")
         || q == "failures"
-        || q == "failed")
+        || q == "failed"
+        || q == "the failed")
         && !q.contains("why did")
         && !q.contains("why ")
         && !q.contains("explain")
@@ -47354,14 +47374,22 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/slow` / slow-runs operator asks (v0.1.696).
+    // `/slow` / slow-runs operator asks (v0.1.696); view/see/show me/open/list-the NL (v0.1.1044).
     if (q.contains("slow run")
         || q.contains("what's slow")
         || q.contains("whats slow")
         || q.contains("what is slow")
         || q.contains("/slow")
         || q.contains("slowest runs")
-        || q == "slow")
+        || q.contains("view slow")
+        || q.contains("see slow")
+        || q.contains("open slow")
+        || q.contains("list the slow")
+        || q.contains("list slow")
+        || q.contains("show me the slow")
+        || q.contains("show the slow")
+        || q == "slow"
+        || q == "the slow")
         && !q.contains("why ")
         && !q.contains("why is")
         && !q.contains("explain")
@@ -47372,12 +47400,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/instant` / instant-lane operator asks (v0.1.697).
+    // `/instant` / instant-lane operator asks (v0.1.697); view/see/show me/open/list-the NL (v0.1.1044).
     if (q.contains("instant run")
         || q.contains("instant lane")
         || q.contains("instant turns")
         || q.contains("/instant")
-        || q == "instant")
+        || q.contains("view instant")
+        || q.contains("see instant")
+        || q.contains("open instant")
+        || q.contains("list the instant")
+        || q.contains("list instant")
+        || q.contains("show me the instant")
+        || q.contains("show the instant")
+        || q == "instant"
+        || q == "the instant")
         && !q.contains("why ")
         && !q.contains("explain")
         && !q.contains("make ")
@@ -47386,12 +47422,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/direct` / direct-lane operator asks (v0.1.697).
+    // `/direct` / direct-lane operator asks (v0.1.697); view/see/show me/open/list-the NL (v0.1.1044).
     if (q.contains("direct run")
         || q.contains("direct lane")
         || q.contains("direct turns")
         || q.contains("/direct")
-        || q == "direct")
+        || q.contains("view direct")
+        || q.contains("see direct")
+        || q.contains("open direct")
+        || q.contains("list the direct")
+        || q.contains("list direct")
+        || q.contains("show me the direct")
+        || q.contains("show the direct")
+        || q == "direct"
+        || q == "the direct")
         && !q.contains("why ")
         && !q.contains("explain")
         && !q.contains(" ticket")
@@ -47399,12 +47443,20 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/lite` / lite-lane operator asks (v0.1.704).
+    // `/lite` / lite-lane operator asks (v0.1.704); view/see/show me/open/list-the NL (v0.1.1044).
     if (q.contains("lite run")
         || q.contains("lite lane")
         || q.contains("lite turns")
         || q.contains("/lite")
-        || q == "lite")
+        || q.contains("view lite")
+        || q.contains("see lite")
+        || q.contains("open lite")
+        || q.contains("list the lite")
+        || q.contains("list lite")
+        || q.contains("show me the lite")
+        || q.contains("show the lite")
+        || q == "lite"
+        || q == "the lite")
         && !q.contains("why ")
         && !q.contains("explain")
         && !q.contains(" ticket")
@@ -50900,8 +50952,13 @@ pub fn format_lite_runs_gateway(days: Option<u32>) -> String {
 }
 
 /// True for `/slow` / `slow runs` — not "why is X slow" or monitor latency asks.
+/// View/see/show me/open/list-the NL (v0.1.1044). Exact `open slow` / `open the slow` only.
+/// After normalize strips `show me` / `show`, prefer `the slow` so `show me the slow` still matches.
 pub fn looks_like_slow_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
         return false;
     }
@@ -50910,6 +50967,9 @@ pub fn looks_like_slow_runs_request(content: &str) -> bool {
     }
     if n.contains(" why ") || n.contains("why is") || n.contains("why did") || n.contains("explain")
     {
+        return false;
+    }
+    if n.contains("path") || n.contains("where") || n.contains("size") || n.contains("age") {
         return false;
     }
     matches!(
@@ -50925,13 +50985,41 @@ pub fn looks_like_slow_runs_request(content: &str) -> bool {
             | "recent slow runs"
             | "slow turns"
             | "slow"
+            | "the slow"
+            | "view slow"
+            | "view the slow"
+            | "see slow"
+            | "see the slow"
+            | "show slow"
+            | "show the slow"
+            | "show me slow"
+            | "show me the slow"
+            | "open slow"
+            | "open the slow"
+            | "list slow"
+            | "list the slow"
+            | "view slow runs"
+            | "see slow runs"
+            | "open slow runs"
+            | "list slow runs"
+            | "list the slow runs"
+            | "show me the slow runs"
     ) || n.starts_with("/slow ")
         || (n.starts_with("slow runs ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view slow ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see slow ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open slow ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list slow ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list the slow ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/instant` / `instant runs` — not creative "make it instant" asks.
+/// View/see/show me/open/list-the NL (v0.1.1044). Exact `open instant` / `open the instant` only.
 pub fn looks_like_instant_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
         return false;
     }
@@ -50940,6 +51028,9 @@ pub fn looks_like_instant_runs_request(content: &str) -> bool {
         return false;
     }
     if n.contains("make ") || n.contains("make it") || n.contains("instantly") {
+        return false;
+    }
+    if n.contains("path") || n.contains("where") || n.contains("size") || n.contains("age") {
         return false;
     }
     matches!(
@@ -50952,18 +51043,53 @@ pub fn looks_like_instant_runs_request(content: &str) -> bool {
             | "show instant runs"
             | "recent instant runs"
             | "instant"
+            | "the instant"
+            | "view instant"
+            | "view the instant"
+            | "see instant"
+            | "see the instant"
+            | "show instant"
+            | "show the instant"
+            | "show me instant"
+            | "show me the instant"
+            | "open instant"
+            | "open the instant"
+            | "list instant"
+            | "list the instant"
+            | "view instant runs"
+            | "see instant runs"
+            | "open instant runs"
+            | "list instant runs"
+            | "list the instant runs"
+            | "show me the instant runs"
+            | "view instant lane"
+            | "see instant lane"
+            | "open instant lane"
+            | "list the instant lane"
     ) || n.starts_with("/instant ")
         || (n.starts_with("instant runs ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view instant ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see instant ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open instant ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list instant ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list the instant ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/direct` / `direct runs` — not free-form routing asks.
+/// View/see/show me/open/list-the NL (v0.1.1044). Exact `open direct` / `open the direct` only.
 pub fn looks_like_direct_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
         return false;
     }
     if n.contains(" why ") || n.contains("why is") || n.contains("why did") || n.contains("explain")
     {
+        return false;
+    }
+    if n.contains("path") || n.contains("where") || n.contains("size") || n.contains("age") {
         return false;
     }
     matches!(
@@ -50976,13 +51102,45 @@ pub fn looks_like_direct_runs_request(content: &str) -> bool {
             | "show direct runs"
             | "recent direct runs"
             | "direct"
+            | "the direct"
+            | "view direct"
+            | "view the direct"
+            | "see direct"
+            | "see the direct"
+            | "show direct"
+            | "show the direct"
+            | "show me direct"
+            | "show me the direct"
+            | "open direct"
+            | "open the direct"
+            | "list direct"
+            | "list the direct"
+            | "view direct runs"
+            | "see direct runs"
+            | "open direct runs"
+            | "list direct runs"
+            | "list the direct runs"
+            | "show me the direct runs"
+            | "view direct lane"
+            | "see direct lane"
+            | "open direct lane"
+            | "list the direct lane"
     ) || n.starts_with("/direct ")
         || (n.starts_with("direct runs ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view direct ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see direct ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open direct ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list direct ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list the direct ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/lite` / `lite runs` — not free-form “make it lite” asks.
+/// View/see/show me/open/list-the NL (v0.1.1044). Exact `open lite` / `open the lite` only.
 pub fn looks_like_lite_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
         return false;
     }
@@ -50991,6 +51149,9 @@ pub fn looks_like_lite_runs_request(content: &str) -> bool {
         return false;
     }
     if n.contains("make ") || n.contains("make it") || n.contains("lightweight") {
+        return false;
+    }
+    if n.contains("path") || n.contains("where") || n.contains("size") || n.contains("age") {
         return false;
     }
     matches!(
@@ -51003,17 +51164,53 @@ pub fn looks_like_lite_runs_request(content: &str) -> bool {
             | "show lite runs"
             | "recent lite runs"
             | "lite"
+            | "the lite"
+            | "view lite"
+            | "view the lite"
+            | "see lite"
+            | "see the lite"
+            | "show lite"
+            | "show the lite"
+            | "show me lite"
+            | "show me the lite"
+            | "open lite"
+            | "open the lite"
+            | "list lite"
+            | "list the lite"
+            | "view lite runs"
+            | "see lite runs"
+            | "open lite runs"
+            | "list lite runs"
+            | "list the lite runs"
+            | "show me the lite runs"
+            | "view lite lane"
+            | "see lite lane"
+            | "open lite lane"
+            | "list the lite lane"
     ) || n.starts_with("/lite ")
         || (n.starts_with("lite runs ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view lite ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see lite ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open lite ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list lite ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list the lite ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/failed` / `failed runs` — not "why did X fail".
+/// View/see/show me/open/list-the NL (v0.1.1044). Exact `open failed` / `open the failed` only.
+/// After normalize strips `show me` / `show`, prefer `the failed` so `show me the failed` still matches.
 pub fn looks_like_failed_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.chars().count() > 64 {
+        return false;
+    }
     if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
         return false;
     }
     if n.contains(" why ") || n.contains("why did") || n.contains("explain") {
+        return false;
+    }
+    if n.contains("path") || n.contains("where") || n.contains("size") || n.contains("age") {
         return false;
     }
     matches!(
@@ -51032,10 +51229,43 @@ pub fn looks_like_failed_runs_request(content: &str) -> bool {
             | "run errors"
             | "failures"
             | "failed"
+            | "the failed"
+            | "the failures"
             | "what went wrong tonight"
             | "what went wrong today"
+            | "view failed"
+            | "view the failed"
+            | "see failed"
+            | "see the failed"
+            | "show failed"
+            | "show the failed"
+            | "show me failed"
+            | "show me the failed"
+            | "open failed"
+            | "open the failed"
+            | "list failed"
+            | "list the failed"
+            | "view failures"
+            | "see failures"
+            | "open failures"
+            | "list failures"
+            | "list the failures"
+            | "show me the failures"
+            | "view failed runs"
+            | "see failed runs"
+            | "open failed runs"
+            | "list failed runs"
+            | "list the failed runs"
+            | "show me the failed runs"
     ) || n.starts_with("/failed ")
         || (n.starts_with("failed runs ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view failed ") && parse_insights_days(content).is_some())
+        || (n.starts_with("see failed ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open failed ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list failed ") && parse_insights_days(content).is_some())
+        || (n.starts_with("list the failed ") && parse_insights_days(content).is_some())
+        || (n.starts_with("view failures ") && parse_insights_days(content).is_some())
+        || (n.starts_with("open failures ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/insights` / `insights` (Hermes parity) and short NL equivalents.
@@ -51732,8 +51962,22 @@ mod tests {
         assert!(looks_like_instant_runs_request("instant lane"));
         assert!(looks_like_instant_runs_request("@Werner instant runs 3"));
         assert!(looks_like_instant_runs_request("/instant 7"));
+        assert!(looks_like_instant_runs_request("view instant"));
+        assert!(looks_like_instant_runs_request("see instant"));
+        assert!(looks_like_instant_runs_request("show me the instant"));
+        assert!(looks_like_instant_runs_request("open instant"));
+        assert!(looks_like_instant_runs_request("open the instant"));
+        assert!(looks_like_instant_runs_request("list the instant"));
+        assert!(looks_like_instant_runs_request("view instant 7"));
+        assert!(looks_like_instant_runs_request("open instant runs"));
         assert!(!looks_like_instant_runs_request("make it instant"));
         assert!(!looks_like_instant_runs_request("why is instant lane broken"));
+        assert!(!looks_like_instant_runs_request("instant path"));
+        let view = try_operator_instant_reply("view instant").expect("view instant");
+        assert!(
+            view.to_lowercase().contains("instant") || view.to_lowercase().contains("lane"),
+            "{view}"
+        );
     }
 
     #[test]
@@ -51743,7 +51987,20 @@ mod tests {
         assert!(looks_like_direct_runs_request("direct lane"));
         assert!(looks_like_direct_runs_request("@Werner direct runs 3"));
         assert!(looks_like_direct_runs_request("/direct 7"));
+        assert!(looks_like_direct_runs_request("view direct"));
+        assert!(looks_like_direct_runs_request("see direct"));
+        assert!(looks_like_direct_runs_request("show me the direct"));
+        assert!(looks_like_direct_runs_request("open direct"));
+        assert!(looks_like_direct_runs_request("open the direct"));
+        assert!(looks_like_direct_runs_request("list the direct"));
+        assert!(looks_like_direct_runs_request("view direct 7"));
         assert!(!looks_like_direct_runs_request("why did direct lane fail"));
+        assert!(!looks_like_direct_runs_request("direct path"));
+        let view = try_operator_instant_reply("view direct").expect("view direct");
+        assert!(
+            view.to_lowercase().contains("direct") || view.to_lowercase().contains("lane"),
+            "{view}"
+        );
     }
 
     #[test]
@@ -51753,8 +52010,21 @@ mod tests {
         assert!(looks_like_lite_runs_request("lite lane"));
         assert!(looks_like_lite_runs_request("@Werner lite runs 3"));
         assert!(looks_like_lite_runs_request("/lite 7"));
+        assert!(looks_like_lite_runs_request("view lite"));
+        assert!(looks_like_lite_runs_request("see lite"));
+        assert!(looks_like_lite_runs_request("show me the lite"));
+        assert!(looks_like_lite_runs_request("open lite"));
+        assert!(looks_like_lite_runs_request("open the lite"));
+        assert!(looks_like_lite_runs_request("list the lite"));
+        assert!(looks_like_lite_runs_request("view lite 7"));
         assert!(!looks_like_lite_runs_request("make it lite"));
         assert!(!looks_like_lite_runs_request("why is lite lane broken"));
+        assert!(!looks_like_lite_runs_request("lite path"));
+        let view = try_operator_instant_reply("view lite").expect("view lite");
+        assert!(
+            view.to_lowercase().contains("lite") || view.to_lowercase().contains("lane"),
+            "{view}"
+        );
     }
 
     #[test]
@@ -51764,8 +52034,21 @@ mod tests {
         assert!(looks_like_slow_runs_request("slow runs"));
         assert!(looks_like_slow_runs_request("@Werner slow runs 3"));
         assert!(looks_like_slow_runs_request("/slow 7"));
+        assert!(looks_like_slow_runs_request("view slow"));
+        assert!(looks_like_slow_runs_request("see slow"));
+        assert!(looks_like_slow_runs_request("show me the slow"));
+        assert!(looks_like_slow_runs_request("open slow"));
+        assert!(looks_like_slow_runs_request("open the slow"));
+        assert!(looks_like_slow_runs_request("list the slow"));
+        assert!(looks_like_slow_runs_request("view slow 7"));
         assert!(!looks_like_slow_runs_request("why is the build slow"));
         assert!(!looks_like_slow_runs_request("slow monitor for example.com"));
+        assert!(!looks_like_slow_runs_request("slow path"));
+        let view = try_operator_instant_reply("view slow").expect("view slow");
+        assert!(
+            view.to_lowercase().contains("slow") || view.contains("ms"),
+            "{view}"
+        );
     }
 
     #[test]
@@ -51775,8 +52058,22 @@ mod tests {
         assert!(looks_like_failed_runs_request("failed runs"));
         assert!(looks_like_failed_runs_request("@Werner failed runs 3"));
         assert!(looks_like_failed_runs_request("/failed 7"));
+        assert!(looks_like_failed_runs_request("view failed"));
+        assert!(looks_like_failed_runs_request("see failed"));
+        assert!(looks_like_failed_runs_request("show me the failed"));
+        assert!(looks_like_failed_runs_request("open failed"));
+        assert!(looks_like_failed_runs_request("open the failed"));
+        assert!(looks_like_failed_runs_request("list the failed"));
+        assert!(looks_like_failed_runs_request("view failed 7"));
+        assert!(looks_like_failed_runs_request("list the failures"));
         assert!(!looks_like_failed_runs_request("why did the deploy fail"));
         assert!(!looks_like_failed_runs_request("explain the failed ticket"));
+        assert!(!looks_like_failed_runs_request("failed path"));
+        let view = try_operator_instant_reply("view failed").expect("view failed");
+        assert!(
+            view.to_lowercase().contains("fail") || view.to_lowercase().contains("run"),
+            "{view}"
+        );
     }
 
     #[test]
@@ -51829,6 +52126,11 @@ mod tests {
         assert_eq!(parse_insights_days("/instant 7"), Some(7));
         assert_eq!(parse_insights_days("/direct 3"), Some(3));
         assert_eq!(parse_insights_days("/lite 7"), Some(7));
+        assert_eq!(parse_insights_days("view failed 7"), Some(7));
+        assert_eq!(parse_insights_days("open slow 3"), Some(3));
+        assert_eq!(parse_insights_days("see instant 7"), Some(7));
+        assert_eq!(parse_insights_days("list the direct 3"), Some(3));
+        assert_eq!(parse_insights_days("view lite 7"), Some(7));
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1044] - 2026-09-13
+
+### Added
+- Instant lane: more Runs-lane NL for `/failed` · `/slow` · `/instant` · `/lite` · `/direct` — `view failed`, `see failed`, `show me the failed`, `open failed` / `open the failed`, `list the failed`, and the same for slow / instant / lite / direct join the failed / slow / lane reports (+ optional day window). Exact open only — not why-did / why-is / make-it / monitor / ticket / path/size/age. p50.
+
 ## [0.1.1043] - 2026-09-13
 
 ### Added
