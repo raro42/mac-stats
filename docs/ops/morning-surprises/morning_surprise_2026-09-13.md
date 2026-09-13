@@ -6,6 +6,7 @@ Overnight Track B (autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1050** | Instant `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` (+ discard-rate variants) — tonight + all-time keep % from `results.tsv` (rate only; no dump) |
 | **v0.1.1049** | Instant `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` (+ discard variants) — short tonight keep/discard list from `results.tsv` (newest first; capped at 5) |
 | **v0.1.1048** | Instant `/last-keep` · `last keep` · `latest keep` · `what was the last keep` (+ discard variants) — newest keep/discard row from `results.tsv` (one description; no dump) |
 | **v0.1.1047** | Instant `/keeps` · `keeps tonight` · `keep count` · `discard count` · `ratchet summary` — keep/discard counts (tonight + all-time) |
@@ -17,20 +18,22 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.1041** | Instant ring-chip NL |
 | **v0.1.1040** | Instant `/rings` · `/strip` · `/details` NL |
 
-## This tick (~04:30)
+## This tick (~05:00)
 
 - Digester open empty; design review not due (grace).
-- Experiment: Hermes-style ratchet **tonight list** after counts + last-row.
+- Experiment: Hermes-style ratchet **hit rate** after counts + last-row + tonight list.
 - Keep in `results.tsv`; install + kickstart.
 
 ## Try it
 
 ```text
+/keep-rate
+keep rate
+hit rate
+ratchet hit rate
+keep percentage
+/discard-rate
 /recent-keeps
-recent keeps
-list recent keeps
-tonight keep list
-/recent-discards
 /last-keep
 /keeps
 ```
