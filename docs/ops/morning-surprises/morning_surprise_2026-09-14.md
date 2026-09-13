@@ -6,6 +6,7 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 | Version | What |
 | --- | --- |
+| **v0.1.1064** | Instant `/keep-kurtosis` · `keep kurtosis` · `kurtosis keep gap` · `excess kurtosis keep gap` · `kurtosis gap between keeps` (+ discard) — Fisher excess kurtosis G2 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1063** | Instant `/keep-skew` · `keep skew` · `skew keep gap` · `skewness keep gap` · `skew gap between keeps` (+ discard) — Fisher–Pearson G1 skewness of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1062** | Instant `/keep-cv` · `keep cv` · `cv keep gap` · `coefficient of variation keep gap` · `cv gap between keeps` (+ discard) — CV (sample std/mean %) of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1061** | Instant `/keep-mad` · `keep mad` · `mad keep gap` · `median absolute deviation keep gap` · `mad gap between keeps` (+ discard) — MAD of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
@@ -20,10 +21,10 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 ## Try it
 
-In AI Chat or Discord: `/keep-skew` or `skewness keep gap` (beside `/keep-cv` CV, `/keep-mad` MAD, `/keep-std` sample std, `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, and `/keep-iqr` IQR).
+In AI Chat or Discord: `/keep-kurtosis` or `excess kurtosis keep gap` (beside `/keep-skew` skewness, `/keep-cv` CV, `/keep-mad` MAD, `/keep-std` sample std, `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, and `/keep-iqr` IQR).
 
 ## Notes
 
 - Digester open stayed empty; fuel from standing backlog + Hermes insights lens.
 - Design review still in grace (CPU metrics ~6.9d recommended when due).
-- Install/kickstart after v0.1.1063; Discord Ready.
+- Install/kickstart after v0.1.1064; Discord Ready.
