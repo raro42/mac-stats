@@ -219,9 +219,9 @@ def looks_like_debug_log_list_ask(q: str) -> bool:
 
 
 def looks_like_ratchet_results_glance_ask(q: str) -> bool:
-    """Short results.tsv ratchet glances now Instant (v0.1.1047–1053).
+    """Short results.tsv ratchet glances now Instant (v0.1.1047–1054).
 
-    Keep/discard counts, last row, recent list, rate, streak, longest, since-age.
+    Keep/discard counts, last row, first tonight, recent list, rate, streak, longest, since-age.
     Historical tool-heavy turns must not inflate Slowest/p50.
     """
     n = (q or "").strip().lower().rstrip("?").strip()
@@ -261,6 +261,13 @@ def looks_like_ratchet_results_glance_ask(q: str) -> bool:
         "latest keep",
         "/last-discard",
         "last discard",
+        "/first-keep",
+        "first keep",
+        "first keep tonight",
+        "earliest keep",
+        "/first-discard",
+        "first discard",
+        "first discard tonight",
         "/recent-keeps",
         "recent keeps",
         "tonight keep list",

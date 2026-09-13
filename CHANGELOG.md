@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1054] - 2026-09-13
+
+### Added
+- Instant lane: `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `when was the first keep` · `view first keep` / `open first keep` (and discard / opening variants) — earliest keep or discard row tonight since 20:00 from `results.tsv` (one description only; no full dump). Does not steal `/last-keep` newest row, `/since-keep` age, `/keeps` counts, `/keep-rate` percentages, `/keep-streak` / `/longest-streak`, `/recent-keeps` list, path/size/age, or morning-surprise / what-shipped. Digester Slowest filters for ratchet glances (keeps / last / first / recent / rate / streak / longest / since). Hermes-style ratchet glance; p50.
+
 ## [0.1.1053] - 2026-09-13
 
 ### Added

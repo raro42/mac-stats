@@ -9875,6 +9875,19 @@ pub fn looks_like_results_tsv_last_request(content: &str) -> bool {
         || n.starts_with("/since-")
         || n.starts_with("/timesince")
         || n.starts_with("/time-since")
+        // First-tonight lane owns "first keep" / "earliest keep" (not newest last-row).
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/earliest-")
+        || n.starts_with("/earliestkeep")
+        || n.starts_with("/earliestdiscard")
     {
         return false;
     }
@@ -10096,6 +10109,12 @@ pub fn looks_like_results_tsv_recent_request(content: &str) -> bool {
         || n == "last discard"
         || n == "the last discard"
         || n.starts_with("/last-")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.starts_with("/first-")
+        || n.starts_with("/earliest-")
     {
         return false;
     }
@@ -10907,6 +10926,19 @@ pub fn looks_like_results_tsv_since_request(content: &str) -> bool {
         || n == "latest discard"
         || n == "what was the last keep"
         || n == "what was the last discard"
+        // First-tonight lane owns "first keep" / "earliest keep".
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/earliest-")
+        || n.starts_with("/earliestkeep")
+        || n.starts_with("/earliestdiscard")
     {
         return false;
     }
@@ -11008,7 +11040,263 @@ pub fn format_results_tsv_since_gateway(content: &str) -> String {
                 })
                 .unwrap_or_else(|| "unknown".to_string());
             format!(
-                "**{label}:** **{age}** ago · age only · does not dump the row · `/last-keep` for description · `/keeps` for counts · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** **{age}** ago · age only · does not dump the row · `/last-keep` for description · `/first-keep` for tonight's first · `/keeps` for counts · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// Earliest matching keep or discard row tonight (since 20:00 local; one row only).
+fn first_results_tsv_row_tonight(
+    want: ResultsTsvLastWant,
+) -> Result<(String, String, String), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let sha = cols.next().unwrap_or("").trim();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        if parsed < window_start {
+            continue;
+        }
+        let desc = cols.next().unwrap_or("").trim();
+        // Append order is chronological — first in-window match is earliest tonight.
+        return Ok((ts.to_string(), sha.to_string(), desc.to_string()));
+    }
+    Err("empty".into())
+}
+
+/// True for short first-keep / first-discard asks (`/first-keep`, `first keep tonight`…).
+/// Earliest tonight row only — does not dump TSV or steal last-row / since-age / recent / counts / rate / streak / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_first_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/first-keep"
+            | "/firstkeep"
+            | "/first-discard"
+            | "/firstdiscard"
+            | "/earliest-keep"
+            | "/earliestkeep"
+            | "/earliest-discard"
+            | "/earliestdiscard"
+            | "/opening-keep"
+            | "/openingkeep"
+            | "/opening-discard"
+            | "/openingdiscard"
+            | "first keep"
+            | "the first keep"
+            | "first keep tonight"
+            | "the first keep tonight"
+            | "tonight first keep"
+            | "first keep of tonight"
+            | "first keep of the night"
+            | "earliest keep"
+            | "the earliest keep"
+            | "earliest keep tonight"
+            | "opening keep"
+            | "the opening keep"
+            | "opening keep tonight"
+            | "what was the first keep"
+            | "what is the first keep"
+            | "whats the first keep"
+            | "what's the first keep"
+            | "when was the first keep"
+            | "view first keep"
+            | "see first keep"
+            | "show the first keep"
+            | "show me the first keep"
+            | "open first keep"
+            | "open the first keep"
+            | "list first keep"
+            | "list the first keep"
+            | "view first keep tonight"
+            | "see first keep tonight"
+            | "show the first keep tonight"
+            | "show me the first keep tonight"
+            | "open first keep tonight"
+            | "open the first keep tonight"
+            | "list first keep tonight"
+            | "list the first keep tonight"
+            | "first discard"
+            | "the first discard"
+            | "first discard tonight"
+            | "the first discard tonight"
+            | "tonight first discard"
+            | "first discard of tonight"
+            | "first discard of the night"
+            | "earliest discard"
+            | "the earliest discard"
+            | "earliest discard tonight"
+            | "opening discard"
+            | "the opening discard"
+            | "opening discard tonight"
+            | "what was the first discard"
+            | "what is the first discard"
+            | "whats the first discard"
+            | "what's the first discard"
+            | "when was the first discard"
+            | "view first discard"
+            | "see first discard"
+            | "show the first discard"
+            | "show me the first discard"
+            | "open first discard"
+            | "open the first discard"
+            | "list first discard"
+            | "list the first discard"
+            | "view first discard tonight"
+            | "see first discard tonight"
+            | "show the first discard tonight"
+            | "show me the first discard tonight"
+            | "open first discard tonight"
+            | "open the first discard tonight"
+            | "list first discard tonight"
+            | "list the first discard tonight"
+    )
+}
+
+/// Zero-LLM earliest keep or discard row tonight from results.tsv (one description; no full dump).
+pub fn format_results_tsv_first_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "First keep tonight",
+        ResultsTsvLastWant::Discard => "First discard tonight",
+    };
+    match first_results_tsv_row_tonight(want) {
+        Err(_) => format!(
+            "**{label}:** none tonight since 20:00 · overnight keep/discard will create it · `/last-keep` for the newest row · `/keeps` for counts · `results.tsv path` for the file."
+        ),
+        Ok((ts, sha, desc)) => {
+            let age = parse_run_ts(&ts)
+                .map(|dt| {
+                    let ms = dt.timestamp_millis().max(0) as u64;
+                    age_from_ms(ms)
+                })
+                .unwrap_or_else(|| "unknown".to_string());
+            let short_sha = if sha.len() > 7 { &sha[..7] } else { sha.as_str() };
+            let mut desc = desc;
+            if desc.chars().count() > 160 {
+                desc = desc.chars().take(157).collect::<String>() + "…";
+            }
+            if desc.is_empty() {
+                desc = "(no description)".to_string();
+            }
+            format!(
+                "**{label}:** **{age}** ago · `{short_sha}` · {desc} · first tonight since 20:00 only · does not dump the log · `/last-keep` for the newest row · `/since-keep` for age since newest · `/keeps` for counts · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -47797,9 +48085,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv age since last keep/discard before last-row description / recent / streaks.
+    // results.tsv age since last keep/discard before first-tonight / last-row / recent / streaks.
     if looks_like_results_tsv_since_request(content) {
         return Some(format_results_tsv_since_gateway(content));
+    }
+    // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
+    if looks_like_results_tsv_first_request(content) {
+        return Some(format_results_tsv_first_gateway(content));
     }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
@@ -48313,9 +48605,13 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
-    // results.tsv age since last keep/discard before last-row description / recent / streaks.
+    // results.tsv age since last keep/discard before first-tonight / last-row / recent / streaks.
     if looks_like_results_tsv_since_request(content) {
         return Some(format_results_tsv_since_gateway(content));
+    }
+    // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
+    if looks_like_results_tsv_first_request(content) {
+        return Some(format_results_tsv_first_gateway(content));
     }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
@@ -48839,7 +49135,8 @@ pub fn format_ops_help_gateway() -> String {
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
-• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
+• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / `/first-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -49206,6 +49503,52 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("/recent-")
         && !q.contains("/last-keep")
         && !q.contains("/last-discard")
+        && !q.contains("first keep")
+        && !q.contains("first discard")
+        && !q.contains("/first-")
+    {
+        return true;
+    }
+    // `/first-keep` / earliest tonight keep (v0.1.1054).
+    if (q.contains("/first-keep")
+        || q.contains("/firstkeep")
+        || q.contains("/first-discard")
+        || q.contains("/firstdiscard")
+        || q.contains("/earliest-keep")
+        || q.contains("/earliestkeep")
+        || q.contains("/earliest-discard")
+        || q.contains("/earliestdiscard")
+        || q.contains("first keep")
+        || q.contains("first keep tonight")
+        || q.contains("earliest keep")
+        || q.contains("opening keep")
+        || q.contains("what was the first keep")
+        || q.contains("when was the first keep")
+        || q.contains("view first keep")
+        || q.contains("open first keep")
+        || q.contains("first discard")
+        || q.contains("first discard tonight")
+        || q.contains("earliest discard")
+        || q.contains("opening discard")
+        || q.contains("what was the first discard")
+        || q.contains("view first discard")
+        || q.contains("open first discard"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("rate")
+        && !q.contains("percent")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("since last")
+        && !q.contains("/since-")
     {
         return true;
     }
@@ -51714,6 +52057,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv since-last-keep asks (v0.1.1053) — age only; no dump.
     if looks_like_results_tsv_since_request(question) {
+        return true;
+    }
+    // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
+    if looks_like_results_tsv_first_request(question) {
         return true;
     }
     // Read-only results.tsv last keep/discard asks (v0.1.1048) — one row; no dump.
@@ -59964,6 +60311,74 @@ mod tests {
         let discard = try_operator_instant_reply("since last discard").expect("since discard");
         assert!(
             discard.contains("Since last discard") || discard.contains("no matching row"),
+            "{discard}"
+        );
+        assert!(!looks_like_results_tsv_since_request("/first-keep"));
+        assert!(!looks_like_results_tsv_since_request("first keep tonight"));
+    }
+
+    #[test]
+    fn results_tsv_first_request_detected() {
+        assert!(looks_like_results_tsv_first_request("/first-keep"));
+        assert!(looks_like_results_tsv_first_request("first keep"));
+        assert!(looks_like_results_tsv_first_request("first keep tonight"));
+        assert!(looks_like_results_tsv_first_request("earliest keep"));
+        assert!(looks_like_results_tsv_first_request("what was the first keep"));
+        assert!(looks_like_results_tsv_first_request("when was the first keep"));
+        assert!(looks_like_results_tsv_first_request("view first keep"));
+        assert!(looks_like_results_tsv_first_request("show me the first keep"));
+        assert!(looks_like_results_tsv_first_request("open first keep tonight"));
+        assert!(looks_like_results_tsv_first_request("/first-discard"));
+        assert!(looks_like_results_tsv_first_request("first discard tonight"));
+        assert!(looks_like_results_tsv_first_request("earliest discard"));
+        // Last / since / counts / rate / streak / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_first_request("/last-keep"));
+        assert!(!looks_like_results_tsv_first_request("last keep"));
+        assert!(!looks_like_results_tsv_first_request("what was the last keep"));
+        assert!(!looks_like_results_tsv_first_request("/since-keep"));
+        assert!(!looks_like_results_tsv_first_request("since last keep"));
+        assert!(!looks_like_results_tsv_first_request("/keeps"));
+        assert!(!looks_like_results_tsv_first_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_first_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_first_request("keep rate"));
+        assert!(!looks_like_results_tsv_first_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_first_request("keep streak"));
+        assert!(!looks_like_results_tsv_first_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_first_request("longest streak"));
+        assert!(!looks_like_results_tsv_first_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_first_request("recent keeps"));
+        assert!(!looks_like_results_tsv_first_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_first_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_first_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_first_request("morning surprise"));
+        assert!(!looks_like_results_tsv_last_request("first keep"));
+        assert!(!looks_like_results_tsv_last_request("first keep tonight"));
+        assert!(!looks_like_results_tsv_since_request("first keep"));
+        assert!(!looks_like_results_tsv_count_request("first keep tonight"));
+        assert!(!looks_like_results_tsv_rate_request("first keep"));
+        assert!(!looks_like_results_tsv_streak_request("first keep"));
+        assert!(!looks_like_results_tsv_longest_streak_request("first keep"));
+        assert!(!looks_like_results_tsv_recent_request("first keep"));
+        let reply = try_operator_instant_reply("first keep tonight").expect("first keep instant");
+        assert!(
+            reply.contains("First keep tonight") || reply.contains("none tonight"),
+            "expected first-keep reply: {reply}"
+        );
+        assert!(
+            reply.contains("first tonight")
+                || reply.contains("does not dump")
+                || reply.contains("/last-keep")
+                || reply.contains("none tonight"),
+            "must stay first-keep glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/first-keep").expect("/first-keep instant");
+        assert!(
+            slash.contains("First keep tonight") || slash.contains("none tonight"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("first discard tonight").expect("first discard");
+        assert!(
+            discard.contains("First discard tonight") || discard.contains("none tonight"),
             "{discard}"
         );
     }
