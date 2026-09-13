@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1046] - 2026-09-13
+
+### Added
+- Instant lane: more Digest open NL for `digest open` — `view digest`, `see digest`, `show me the digest`, `open digest` / `open the digest`, `list the digest`, plus open-candidates variants join the cached open-candidate snapshot (no digester spawn). Exact open only — not path/size/age. Bare `digest` / `/digest` / `show me digest` / `refresh digest` / `rescan digest` still refresh. p50.
+
 ## [0.1.1045] - 2026-09-13
 
 ### Added

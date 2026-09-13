@@ -1024,27 +1024,86 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
 }
 
 /// True for read-only digest open/candidate asks — cached summary only, no digester spawn.
+/// View/see/show me/open/list-the NL (v0.1.1046). Exact `open digest` / `open the digest`
+/// only for open. After normalize strips `show me` / `show`, prefer `the digest` so
+/// `show me the digest` stays read-only (bare `show me digest` → `digest` still refreshes).
+/// Does not steal `/digest` refresh, path/size/age, or digester spawn.
 pub fn looks_like_digest_open_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 48 || n.contains(" this ") || n.contains("research") {
+    if n.chars().count() > 64 || n.contains(" this ") || n.contains("research") {
+        return false;
+    }
+    // Refresh / path / size / age stay on their lanes (keyword-only; no nested looks_like_*).
+    if n.contains("refresh")
+        || n.contains("rerun")
+        || n.contains("rescan")
+        || n.contains("recompute")
+        || n.contains("run digester")
+        || n.contains("run digest")
+        || n.contains("update digest")
+        || n.contains("update digester")
+        || n == "digest"
+        || n == "/digest"
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("when")
+        || n.contains("path")
+        || n.contains("where")
+        || n.contains("why")
+        || n.contains("explain")
+        || n.contains("fix")
+    {
         return false;
     }
     matches!(
         n.as_str(),
         "digest open"
             | "open digest"
+            | "open the digest"
+            | "the digest"
+            | "view digest"
+            | "view the digest"
+            | "see digest"
+            | "see the digest"
+            | "show the digest"
+            | "show me the digest"
+            | "list digest"
+            | "list the digest"
             | "open candidates"
             | "digest candidates"
             | "open digest hints"
             | "any open candidates"
             | "show open candidates"
+            | "view open candidates"
+            | "see open candidates"
+            | "list open candidates"
+            | "list the open candidates"
+            | "show me the open candidates"
+            | "the open candidates"
+            | "view digest open"
+            | "see digest open"
+            | "list digest open"
+            | "view digest candidates"
+            | "see digest candidates"
+            | "list digest candidates"
+            | "list the digest candidates"
+            | "view open digest"
+            | "see open digest"
+            | "list open digest"
     )
 }
 
 /// True for `/digest` / `run digest` operator asks that re-run the digester.
+/// View/see/list-the stay on open (read-only). Refresh phrases + bare `digest` / `/digest`
+/// (and `show me digest` after normalize → `digest`) still re-run the digester.
 pub fn looks_like_digest_refresh_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 48 || n.contains(" this ") || n.contains("research") {
+    if n.chars().count() > 64 || n.contains(" this ") || n.contains("research") {
         return false;
     }
     if looks_like_digest_open_request(content) {
@@ -1069,12 +1128,25 @@ pub fn looks_like_digest_refresh_request(content: &str) -> bool {
         "digest"
             | "/digest"
             | "run digest"
+            | "run the digest"
             | "refresh digest"
+            | "refresh the digest"
             | "agent digest"
             | "run digester"
+            | "run the digester"
             | "refresh digester"
+            | "refresh the digester"
             | "update digest"
+            | "update the digest"
+            | "update digester"
             | "rerun digest"
+            | "rerun the digest"
+            | "rerun digester"
+            | "rescan digest"
+            | "rescan the digest"
+            | "rescan digester"
+            | "scan digester"
+            | "recompute digest"
     )
 }
 
@@ -47395,8 +47467,8 @@ pub fn format_ops_help_gateway() -> String {
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
-• `/digest` — refresh digester (latest.md/json)\n\
-• `digest open` — cached open candidates (no digester spawn)\n\
+• `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
+• `digest open` · `view digest` · `see digest` · `show me the digest` · `open digest` · `list the digest` · `view open candidates` — cached open candidates (exact open only — no digester spawn; not path/size/age; bare `digest` / `show me digest` still refreshes)\n\
 • `digest age` — cached digest timestamp (no digester spawn)\n\
 • `digest size` · `how big is the digest` · `latest.json size` — digest `latest.json` size on disk (stat only; no digester spawn)\n\
 • `digest.md size` · `latest.md size` · `how big is digest.md` — digest `latest.md` size on disk (stat only; no digester spawn; does not steal `digest size`)\n\
@@ -52367,10 +52439,16 @@ mod tests {
     fn digest_request_detected() {
         assert!(looks_like_digest_refresh_request("/digest"));
         assert!(looks_like_digest_refresh_request("refresh digest"));
+        assert!(looks_like_digest_refresh_request("refresh the digest"));
         assert!(looks_like_digest_refresh_request("run digester"));
+        assert!(looks_like_digest_refresh_request("run the digester"));
+        assert!(looks_like_digest_refresh_request("rescan digest"));
         assert!(looks_like_digest_refresh_request("show me digest"));
         assert!(!looks_like_digest_refresh_request("digest this long research report please"));
         assert!(!looks_like_digest_refresh_request("digest open"));
+        assert!(!looks_like_digest_refresh_request("view digest"));
+        assert!(!looks_like_digest_refresh_request("show me the digest"));
+        assert!(!looks_like_digest_refresh_request("list the digest"));
     }
 
     #[test]
@@ -52378,14 +52456,38 @@ mod tests {
         assert!(looks_like_digest_open_request("digest open"));
         assert!(looks_like_digest_open_request("open candidates"));
         assert!(looks_like_digest_open_request("any open candidates"));
+        assert!(looks_like_digest_open_request("view digest"));
+        assert!(looks_like_digest_open_request("see digest"));
+        assert!(looks_like_digest_open_request("show me the digest"));
+        assert!(looks_like_digest_open_request("open the digest"));
+        assert!(looks_like_digest_open_request("list the digest"));
+        assert!(looks_like_digest_open_request("view open candidates"));
+        assert!(looks_like_digest_open_request("list the open candidates"));
         assert!(!looks_like_digest_open_request("/digest"));
         assert!(!looks_like_digest_open_request("refresh digest"));
+        assert!(!looks_like_digest_open_request("show me digest"));
+        assert!(!looks_like_digest_open_request("digest size"));
+        assert!(!looks_like_digest_open_request("digest age"));
         assert!(looks_like_digest_request("digest open"));
+        assert!(looks_like_digest_request("view digest"));
         let reply = try_digest_instant_reply("digest open").expect("digest open instant");
         assert!(reply.contains("open candidate"), "{reply}");
         assert!(
             !reply.to_lowercase().contains("refreshed"),
             "read-only must not re-run digester: {reply}"
+        );
+        let view = try_digest_instant_reply("view digest").expect("view digest instant");
+        assert!(view.contains("open candidate"), "{view}");
+        assert!(
+            !view.to_lowercase().contains("refreshed"),
+            "view digest must stay read-only: {view}"
+        );
+        let show_the =
+            try_digest_instant_reply("show me the digest").expect("show me the digest instant");
+        assert!(show_the.contains("open candidate"), "{show_the}");
+        assert!(
+            !show_the.to_lowercase().contains("refreshed"),
+            "show me the digest must stay read-only: {show_the}"
         );
     }
 
@@ -64187,7 +64289,11 @@ mod tests {
         assert!(looks_like_digest_open_request("digest open"));
         assert!(looks_like_digest_open_request("open candidates"));
         assert!(looks_like_digest_open_request("any open candidates"));
+        assert!(looks_like_digest_open_request("view digest"));
+        assert!(looks_like_digest_open_request("list the digest"));
+        assert!(looks_like_digest_open_request("show me the digest"));
         assert!(!looks_like_digest_refresh_request("digest open"));
+        assert!(!looks_like_digest_refresh_request("view digest"));
         assert!(!looks_like_digest_request("digest this long research report please"));
     }
 
