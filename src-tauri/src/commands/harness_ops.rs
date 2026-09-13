@@ -11766,7 +11766,7 @@ pub fn format_results_tsv_pace_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -11996,6 +11996,19 @@ pub fn looks_like_results_tsv_median_request(content: &str) -> bool {
         || n.starts_with("/keepmad")
         || n.starts_with("/discard-mad")
         || n.starts_with("/discardmad")
+        // CV owns cv / coefficient of variation.
+        || n.contains("coefficient of variation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/keepcv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/discardcv")
+        || n.starts_with("/cv-")
         || n == "last keep"
         || n == "the last keep"
         || n == "last discard"
@@ -12134,7 +12147,7 @@ pub fn format_results_tsv_median_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -12516,7 +12529,7 @@ pub fn format_results_tsv_range_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13115,6 +13128,19 @@ pub fn looks_like_results_tsv_iqr_request(content: &str) -> bool {
         || n.starts_with("/keepmad")
         || n.starts_with("/discard-mad")
         || n.starts_with("/discardmad")
+        // CV owns cv / coefficient of variation.
+        || n.contains("coefficient of variation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/keepcv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/discardcv")
+        || n.starts_with("/cv-")
         // Other gap stats own these words (not IQR).
         || n.contains("median")
         || (n.contains("range")
@@ -13279,7 +13305,7 @@ pub fn format_results_tsv_iqr_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13518,6 +13544,20 @@ pub fn looks_like_results_tsv_std_request(content: &str) -> bool {
         || n.contains("median absolute")
         || n.starts_with("/keep-mad")
         || n.starts_with("/discard-mad")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/cv-")
+        // CV owns cv / coefficient of variation.
+        || n.contains("coefficient of variation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/cv-")
     {
         return false;
     }
@@ -13665,7 +13705,7 @@ pub fn format_results_tsv_std_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13935,6 +13975,17 @@ pub fn looks_like_results_tsv_mad_request(content: &str) -> bool {
             && !n.contains("pace")
             && !n.contains("gap")
             && !n.contains("between"))
+        // CV owns cv / coefficient of variation.
+        || n.contains("coefficient of variation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/cv-")
     {
         return false;
     }
@@ -13952,6 +14003,19 @@ pub fn looks_like_results_tsv_mad_request(content: &str) -> bool {
         || n.starts_with("/keepmad")
         || n.starts_with("/discard-mad")
         || n.starts_with("/discardmad")
+        // CV owns cv / coefficient of variation.
+        || n.contains("coefficient of variation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/keepcv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/discardcv")
+        || n.starts_with("/cv-")
         || n.starts_with("/mad-")
         || n.starts_with("/madkeep")
         || n.starts_with("/maddiscard")
@@ -14072,7 +14136,422 @@ pub fn format_results_tsv_mad_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · MAD only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · MAD only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// CV (coefficient of variation = sample std / mean) of gaps between consecutive matching keep/discard rows.
+/// Returns `(cv_pct_night, std_night, mean_night, gaps_night, cv_pct_all, std_all, mean_all, gaps_all)`.
+/// `cv_pct` is rounded percent (0–…); None when <2 gaps or mean≈0.
+fn count_results_tsv_cv(
+    want: ResultsTsvLastWant,
+) -> Result<
+    (
+        Option<u64>,
+        Option<u64>,
+        Option<u64>,
+        u64,
+        Option<u64>,
+        Option<u64>,
+        Option<u64>,
+        u64,
+    ),
+    String,
+> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn cv_gap_secs(
+        ts: &[chrono::DateTime<chrono::Utc>],
+    ) -> (Option<u64>, Option<u64>, Option<u64>, u64) {
+        // Need ≥2 gaps (≥3 rows) for sample std / mean.
+        if ts.len() < 3 {
+            let gaps = ts.len().saturating_sub(1) as u64;
+            return (None, None, None, gaps);
+        }
+        let mut gaps: Vec<f64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as f64);
+        }
+        let n = gaps.len() as f64;
+        if n < 2.0 {
+            return (None, None, None, gaps.len() as u64);
+        }
+        let mean = gaps.iter().sum::<f64>() / n;
+        if mean <= 0.0 {
+            return (None, None, None, gaps.len() as u64);
+        }
+        let var = gaps.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0);
+        let std = var.sqrt();
+        let cv_pct = ((std / mean) * 100.0).round().max(0.0) as u64;
+        let std_u = std.round().max(0.0) as u64;
+        let mean_u = mean.round().max(0.0) as u64;
+        (Some(cv_pct), Some(std_u), Some(mean_u), gaps.len() as u64)
+    }
+    let (cv_all, std_all, mean_all, gaps_all) = cv_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (cv_night, std_night, mean_night, gaps_night) = cv_gap_secs(&night_ts);
+    Ok((
+        cv_night, std_night, mean_night, gaps_night, cv_all, std_all, mean_all, gaps_all,
+    ))
+}
+
+/// True for short keep-cv asks (`/keep-cv`, `keep cv`, `coefficient of variation keep gap`…).
+/// CV only — does not dump TSV or steal mad / std / iqr / p90 / range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_cv_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (n.contains("age") && !n.contains("average") && !n.contains("avg"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n.starts_with("/keep-mad")
+        || n.starts_with("/keepmad")
+        || n.starts_with("/discard-mad")
+        || n.starts_with("/discardmad")
+        || n.starts_with("/mad-")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        // Other gap stats own these words (not CV).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("percentile")
+        || (n.contains("percent") && !n.contains("cv") && !n.contains("coefficient"))
+        || n.contains("mad")
+        || n.contains("median absolute")
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        || (n.contains("median")
+            && !n.contains("cv")
+            && !n.contains("coefficient"))
+        || (n.contains("rate")
+            && !n.contains("cv")
+            && !n.contains("coefficient")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between")
+            && !n.contains("variation"))
+    {
+        return false;
+    }
+    // Must say cv / coefficient of variation (or /keep-cv slash).
+    if !(n.contains("coefficient of variation")
+        || n.contains("coefficientofvariation")
+        || n.contains("coeff of variation")
+        || n.contains("keep cv")
+        || n.contains("discard cv")
+        || n.contains("cv keep")
+        || n.contains("cv discard")
+        || n.contains("cv gap")
+        || n.contains("keep-cv")
+        || n.contains("discard-cv")
+        || n.starts_with("/keep-cv")
+        || n.starts_with("/keepcv")
+        || n.starts_with("/discard-cv")
+        || n.starts_with("/discardcv")
+        || n.starts_with("/cv-")
+        || n.starts_with("/cvkeep")
+        || n.starts_with("/cvdiscard")
+        || n == "cv"
+        || n == "the cv"
+        || n == "keepcv"
+        || n == "discardcv")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-cv"
+            | "/keepcv"
+            | "/discard-cv"
+            | "/discardcv"
+            | "/cv-keep-gap"
+            | "/cvkeepgap"
+            | "/cv-discard-gap"
+            | "/cvdiscardgap"
+            | "/cv-gap"
+            | "/cvgap"
+            | "/cv-keep"
+            | "/cvkeep"
+            | "/cv-discard"
+            | "/cvdiscard"
+            | "/keep-coefficient-of-variation"
+            | "/keepcoefficientofvariation"
+            | "/discard-coefficient-of-variation"
+            | "/discardcoefficientofvariation"
+            | "keep cv"
+            | "the keep cv"
+            | "keep cv tonight"
+            | "tonight keep cv"
+            | "cv keep"
+            | "the cv keep"
+            | "cv keep gap"
+            | "the cv keep gap"
+            | "cv gap between keeps"
+            | "cv time between keeps"
+            | "coefficient of variation keep gap"
+            | "the coefficient of variation keep gap"
+            | "coeff of variation keep gap"
+            | "keep gap cv"
+            | "keep gap coefficient of variation"
+            | "ratchet cv"
+            | "the ratchet cv"
+            | "overnight keep cv"
+            | "view keep cv"
+            | "see keep cv"
+            | "show the keep cv"
+            | "show me the keep cv"
+            | "open keep cv"
+            | "open the keep cv"
+            | "list keep cv"
+            | "list the keep cv"
+            | "what is the keep cv"
+            | "whats the keep cv"
+            | "what's the keep cv"
+            | "what is the cv keep gap"
+            | "whats the cv keep gap"
+            | "what's the cv keep gap"
+            | "discard cv"
+            | "the discard cv"
+            | "discard cv tonight"
+            | "tonight discard cv"
+            | "cv discard"
+            | "the cv discard"
+            | "cv discard gap"
+            | "the cv discard gap"
+            | "cv gap between discards"
+            | "coefficient of variation discard gap"
+            | "view discard cv"
+            | "see discard cv"
+            | "show the discard cv"
+            | "show me the discard cv"
+            | "open discard cv"
+            | "open the discard cv"
+            | "list discard cv"
+            | "list the discard cv"
+            | "what is the discard cv"
+            | "whats the discard cv"
+            | "what's the discard cv"
+    )
+}
+
+/// Zero-LLM CV (std/mean %) gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+pub fn format_results_tsv_cv_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep cv",
+        ResultsTsvLastWant::Discard => "Discard cv",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_cv(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((cv_night, std_night, mean_night, gaps_night, cv_all, std_all, mean_all, gaps_all)) => {
+            let night_part = match (cv_night, std_night, mean_night) {
+                (Some(cv), Some(std), Some(mean)) => {
+                    let ds = duration_label_secs(std);
+                    let dm = duration_label_secs(mean);
+                    format!(
+                        "tonight CV **{cv}%** (std {ds} · mean {dm} · {gaps_night} gaps between {unit} since 20:00)"
+                    )
+                }
+                _ => format!("tonight need ≥3 {unit} (2 gaps) since 20:00 to measure CV"),
+            };
+            let all_part = match (cv_all, std_all, mean_all) {
+                (Some(cv), Some(std), Some(mean)) => {
+                    let ds = duration_label_secs(std);
+                    let dm = duration_label_secs(mean);
+                    format!("all-time CV **{cv}%** (std {ds} · mean {dm} · {gaps_all} gaps)")
+                }
+                _ => format!("all-time need ≥3 {unit} (2 gaps)"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · CV only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -50869,6 +51348,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
     }
+    // results.tsv keep/discard CV (std/mean %) before MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_cv_request(content) {
+        return Some(format_results_tsv_cv_gateway(content));
+    }
     // results.tsv keep/discard MAD gap before sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_mad_request(content) {
         return Some(format_results_tsv_mad_gateway(content));
@@ -51416,6 +51899,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
+    }
+    // results.tsv keep/discard CV (std/mean %) before MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_cv_request(content) {
+        return Some(format_results_tsv_cv_gateway(content));
     }
     // results.tsv keep/discard MAD gap before sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_mad_request(content) {
@@ -51968,8 +52455,9 @@ pub fn format_ops_help_gateway() -> String {
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
 • `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / `/keep-median` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
-• `/keep-mad` · `keep mad` · `mad keep gap` · `median absolute deviation keep gap` · `mad gap between keeps` · `view keep mad` / `open keep mad` · `/discard-mad` · `discard mad` · `mad discard gap` — MAD (median absolute deviation) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; MAD only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
-• `/keep-std` · `keep std` · `std keep gap` · `standard deviation keep gap` · `std gap between keeps` · `view keep std` / `open keep std` · `/discard-std` · `discard std` · `std discard gap` — sample std gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; std only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-mad` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-cv` · `keep cv` · `cv keep gap` · `coefficient of variation keep gap` · `cv gap between keeps` · `view keep cv` / `open keep cv` · `/discard-cv` · `discard cv` · `cv discard gap` — CV (coefficient of variation = std/mean %) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; CV only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-mad` · `keep mad` · `mad keep gap` · `median absolute deviation keep gap` · `mad gap between keeps` · `view keep mad` / `open keep mad` · `/discard-mad` · `discard mad` · `mad discard gap` — MAD (median absolute deviation) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; MAD only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-cv` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-std` · `keep std` · `std keep gap` · `standard deviation keep gap` · `std gap between keeps` · `view keep std` / `open keep std` · `/discard-std` · `discard std` · `std discard gap` — sample std gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; std only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-mad` / `/keep-cv` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-iqr` · `keep iqr` · `iqr keep gap` · `interquartile keep gap` · `iqr gap between keeps` · `view keep iqr` / `open keep iqr` · `/discard-iqr` · `discard iqr` · `iqr discard gap` — IQR (Q3−Q1) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; IQR only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-p90` · `keep p90` · `p90 keep gap` · `90th percentile keep gap` · `p90 gap between keeps` · `view keep p90` / `open keep p90` · `/discard-p90` · `discard p90` · `p90 discard gap` — p90 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p90 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-iqr` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-range` · `keep range` · `keep gap range` · `min max keep gap` · `shortest and longest keep gap` · `view keep range` / `open keep range` · `/discard-range` · `discard range` · `discard gap range` — min–max gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; range only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-p90` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
@@ -52395,6 +52883,61 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
+    // `/keep-cv` / CV gap between keeps (v0.1.1062).
+    if (q.contains("/keep-cv")
+        || q.contains("/keepcv")
+        || q.contains("/discard-cv")
+        || q.contains("/discardcv")
+        || q.contains("/cv-keep-gap")
+        || q.contains("/cv-gap")
+        || q.contains("/keep-coefficient-of-variation")
+        || q.contains("keep cv")
+        || q.contains("discard cv")
+        || q.contains("cv keep")
+        || q.contains("cv discard")
+        || q.contains("cv keep gap")
+        || q.contains("cv discard gap")
+        || q.contains("cv gap between keeps")
+        || q.contains("coefficient of variation keep gap")
+        || q.contains("coeff of variation keep gap")
+        || q.contains("view keep cv")
+        || q.contains("open keep cv")
+        || q.contains("view discard cv")
+        || q.contains("open discard cv"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("since last")
+        && !q.contains("/since-")
+        && !q.contains("iqr")
+        && !q.contains("p90")
+        && !q.contains("range")
+        && !q.contains("pace")
+        && !q.contains("mad")
+        && !(q.contains("std")
+            && !q.contains("cv")
+            && !q.contains("coefficient")
+            && !q.contains("/keep-cv")
+            && !q.contains("keep cv"))
+        && !(q.contains("median")
+            && !q.contains("cv")
+            && !q.contains("coefficient")
+            && !q.contains("/keep-cv")
+            && !q.contains("keep cv"))
+    {
+        return true;
+    }
     // `/keep-mad` / MAD gap between keeps (v0.1.1061).
     if (q.contains("/keep-mad")
         || q.contains("/keepmad")
@@ -52432,6 +52975,9 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("range")
         && !q.contains("pace")
         && !q.contains("std")
+        && !q.contains("keep cv")
+        && !q.contains("/keep-cv")
+        && !q.contains("coefficient of variation")
         && !(q.contains("median") && !q.contains("median absolute") && !q.contains("mad"))
     {
         return true;
@@ -55252,6 +55798,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
     if looks_like_results_tsv_first_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard CV gap asks (v0.1.1062) — CV only; no dump.
+    if looks_like_results_tsv_cv_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard MAD gap asks (v0.1.1061) — MAD only; no dump.
@@ -64079,7 +64629,10 @@ mod tests {
         assert!(!looks_like_results_tsv_recent_request("keep std"));
         assert!(!looks_like_results_tsv_std_request("/keep-mad"));
         assert!(!looks_like_results_tsv_std_request("keep mad"));
+        assert!(!looks_like_results_tsv_std_request("/keep-cv"));
+        assert!(!looks_like_results_tsv_std_request("keep cv"));
         assert!(!looks_like_results_tsv_mad_request("keep std"));
+        assert!(!looks_like_results_tsv_cv_request("keep std"));
         let reply = try_operator_instant_reply("keep std").expect("keep std instant");
         assert!(
             reply.contains("Keep std") || reply.contains("no `results.tsv`"),
@@ -64148,6 +64701,8 @@ mod tests {
         assert!(!looks_like_results_tsv_iqr_request("keep mad"));
         assert!(!looks_like_results_tsv_std_request("keep mad"));
         assert!(!looks_like_results_tsv_std_request("/keep-mad"));
+        assert!(!looks_like_results_tsv_cv_request("keep mad"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-mad"));
         assert!(!looks_like_results_tsv_first_request("keep mad"));
         assert!(!looks_like_results_tsv_last_request("keep mad"));
         assert!(!looks_like_results_tsv_since_request("keep mad"));
@@ -64177,6 +64732,85 @@ mod tests {
         let discard = try_operator_instant_reply("discard mad").expect("discard mad");
         assert!(
             discard.contains("Discard mad") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+    }
+
+    #[test]
+    fn results_tsv_cv_request_detected() {
+        assert!(looks_like_results_tsv_cv_request("/keep-cv"));
+        assert!(looks_like_results_tsv_cv_request("keep cv"));
+        assert!(looks_like_results_tsv_cv_request("keep cv tonight"));
+        assert!(looks_like_results_tsv_cv_request("cv keep gap"));
+        assert!(looks_like_results_tsv_cv_request("cv gap between keeps"));
+        assert!(looks_like_results_tsv_cv_request("coefficient of variation keep gap"));
+        assert!(looks_like_results_tsv_cv_request("view keep cv"));
+        assert!(looks_like_results_tsv_cv_request("show me the keep cv"));
+        assert!(looks_like_results_tsv_cv_request("open keep cv"));
+        assert!(looks_like_results_tsv_cv_request("/discard-cv"));
+        assert!(looks_like_results_tsv_cv_request("discard cv"));
+        assert!(looks_like_results_tsv_cv_request("cv discard gap"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_cv_request("keep pace"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-median"));
+        assert!(!looks_like_results_tsv_cv_request("keep median"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-range"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-p90"));
+        assert!(!looks_like_results_tsv_cv_request("keep p90"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-iqr"));
+        assert!(!looks_like_results_tsv_cv_request("keep iqr"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-std"));
+        assert!(!looks_like_results_tsv_cv_request("keep std"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-mad"));
+        assert!(!looks_like_results_tsv_cv_request("keep mad"));
+        assert!(!looks_like_results_tsv_cv_request("/first-keep"));
+        assert!(!looks_like_results_tsv_cv_request("/last-keep"));
+        assert!(!looks_like_results_tsv_cv_request("/since-keep"));
+        assert!(!looks_like_results_tsv_cv_request("/keeps"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_cv_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_cv_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_cv_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_cv_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_cv_request("morning surprise"));
+        assert!(!looks_like_results_tsv_pace_request("keep cv"));
+        assert!(!looks_like_results_tsv_median_request("keep cv"));
+        assert!(!looks_like_results_tsv_range_request("keep cv"));
+        assert!(!looks_like_results_tsv_p90_request("keep cv"));
+        assert!(!looks_like_results_tsv_iqr_request("keep cv"));
+        assert!(!looks_like_results_tsv_std_request("keep cv"));
+        assert!(!looks_like_results_tsv_std_request("/keep-cv"));
+        assert!(!looks_like_results_tsv_mad_request("keep cv"));
+        assert!(!looks_like_results_tsv_mad_request("/keep-cv"));
+        assert!(!looks_like_results_tsv_first_request("keep cv"));
+        assert!(!looks_like_results_tsv_last_request("keep cv"));
+        assert!(!looks_like_results_tsv_since_request("keep cv"));
+        assert!(!looks_like_results_tsv_count_request("keep cv"));
+        assert!(!looks_like_results_tsv_rate_request("keep cv"));
+        assert!(!looks_like_results_tsv_streak_request("keep cv"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep cv"));
+        assert!(!looks_like_results_tsv_recent_request("keep cv"));
+        let reply = try_operator_instant_reply("keep cv").expect("keep cv instant");
+        assert!(
+            reply.contains("Keep cv") || reply.contains("no `results.tsv`"),
+            "expected keep-cv reply: {reply}"
+        );
+        assert!(
+            reply.contains("CV only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥3"),
+            "must stay keep-cv glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-cv").expect("/keep-cv instant");
+        assert!(
+            slash.contains("Keep cv") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard cv").expect("discard cv");
+        assert!(
+            discard.contains("Discard cv") || discard.contains("no `results.tsv`"),
             "{discard}"
         );
     }

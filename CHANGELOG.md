@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1062] - 2026-09-14
+
+### Added
+- Instant lane: `/keep-cv` · `keep cv` · `cv keep gap` · `coefficient of variation keep gap` · `cv gap between keeps` · `view keep cv` / `open keep cv` (and discard / CV variants) — CV (coefficient of variation = sample std / mean, as %) of gaps between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; CV only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, `/keep-iqr` IQR, `/keep-std` std, `/keep-mad` MAD, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1061] - 2026-09-14
 
 ### Added
