@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1045] - 2026-09-13
+
+### Added
+- Instant lane: more Perplexity last-search NL for `/perplexity` · `/perplexity top` · `/perplexity snippet` — `view perplexity`, `see perplexity`, `show me the perplexity`, `open perplexity` / `open the perplexity`, `list the perplexity`, plus last search / top results / snippet results variants join the Top/Snippet list. Exact open only — not `/perplexity key`, live search, or path/size/age. p50.
+
 ## [0.1.1044] - 2026-09-13
 
 ### Added

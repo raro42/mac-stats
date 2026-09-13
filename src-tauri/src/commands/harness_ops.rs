@@ -40868,6 +40868,13 @@ pub fn parse_perplexity_list_filter(content: &str) -> PerplexityListFilter {
         || n == "top result"
         || n == "last search top"
         || n == "last perplexity top"
+        || n == "view top results"
+        || n == "see top results"
+        || n == "open top results"
+        || n == "list top results"
+        || n == "list the top results"
+        || n == "show me the top results"
+        || n == "the top results"
     {
         return PerplexityListFilter::Top;
     }
@@ -40883,6 +40890,13 @@ pub fn parse_perplexity_list_filter(content: &str) -> PerplexityListFilter {
         || n == "results with snippets"
         || n == "last search snippet"
         || n == "last perplexity snippet"
+        || n == "view snippet results"
+        || n == "see snippet results"
+        || n == "open snippet results"
+        || n == "list snippet results"
+        || n == "list the snippet results"
+        || n == "show me the snippet results"
+        || n == "the snippet results"
     {
         return PerplexityListFilter::Snippet;
     }
@@ -40890,9 +40904,12 @@ pub fn parse_perplexity_list_filter(content: &str) -> PerplexityListFilter {
 }
 
 /// True for `/perplexity` / `last search` — Top/Snippet filter parity; not new search asks.
+/// View/see/show me/open/list-the NL (v0.1.1045). Exact `open perplexity` / `open the perplexity`
+/// only. After normalize strips `show me` / `show`, prefer `the perplexity` so
+/// `show me the perplexity` still matches. Does not steal `/perplexity key`, path/size/age, or live search.
 pub fn looks_like_perplexity_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
-    if n.chars().count() > 48 {
+    if n.chars().count() > 64 {
         return false;
     }
     // Path/size/age asks go to perplexity_last.json instant (inline — avoid calling path/size/age detectors).
@@ -40964,24 +40981,78 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
         n.as_str(),
         "/perplexity"
             | "perplexity"
+            | "the perplexity"
             | "last search"
+            | "the last search"
             | "last perplexity"
+            | "the last perplexity"
             | "perplexity results"
             | "search results"
             | "list perplexity"
+            | "list the perplexity"
             | "show perplexity"
+            | "show the perplexity"
+            | "show me perplexity"
+            | "show me the perplexity"
+            | "view perplexity"
+            | "view the perplexity"
+            | "see perplexity"
+            | "see the perplexity"
+            | "open perplexity"
+            | "open the perplexity"
+            | "view last search"
+            | "see last search"
+            | "open last search"
+            | "list last search"
+            | "list the last search"
+            | "show me the last search"
+            | "view last perplexity"
+            | "see last perplexity"
+            | "open last perplexity"
+            | "list the last perplexity"
+            | "view perplexity results"
+            | "see perplexity results"
+            | "open perplexity results"
+            | "list the perplexity results"
+            | "show me the perplexity results"
+            | "view search results"
+            | "see search results"
+            | "open search results"
+            | "list the search results"
             | "perplexity search"
             | "/perplexity top"
             | "perplexity top"
+            | "view perplexity top"
+            | "see perplexity top"
+            | "open perplexity top"
+            | "list the perplexity top"
             | "top results"
             | "top result"
+            | "the top results"
+            | "view top results"
+            | "see top results"
+            | "open top results"
+            | "list top results"
+            | "list the top results"
+            | "show me the top results"
             | "last search top"
             | "last perplexity top"
             | "/top"
             | "/perplexity snippet"
             | "perplexity snippet"
+            | "view perplexity snippet"
+            | "see perplexity snippet"
+            | "open perplexity snippet"
+            | "list the perplexity snippet"
             | "snippet results"
             | "snippets results"
+            | "the snippet results"
+            | "view snippet results"
+            | "see snippet results"
+            | "open snippet results"
+            | "list snippet results"
+            | "list the snippet results"
+            | "show me the snippet results"
             | "results with snippets"
             | "last search snippet"
             | "last perplexity snippet"
@@ -42906,26 +42977,67 @@ pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
     {
         return false;
     }
-    // Bare `/perplexity` / `perplexity` / `perplexity search` stay last-search list.
+    // Bare `/perplexity` / `perplexity` / `perplexity search` + view/see/open NL stay last-search list.
     if matches!(
         n.as_str(),
         "/perplexity"
             | "perplexity"
+            | "the perplexity"
             | "perplexity search"
             | "/perplexity top"
             | "perplexity top"
+            | "view perplexity top"
+            | "see perplexity top"
+            | "open perplexity top"
+            | "list the perplexity top"
             | "/perplexity snippet"
             | "perplexity snippet"
+            | "view perplexity snippet"
+            | "see perplexity snippet"
+            | "open perplexity snippet"
+            | "list the perplexity snippet"
             | "/top"
             | "/snippet"
             | "snippet"
             | "snippets"
             | "last search"
+            | "the last search"
             | "last perplexity"
+            | "the last perplexity"
             | "list perplexity"
+            | "list the perplexity"
             | "show perplexity"
+            | "show the perplexity"
+            | "show me perplexity"
+            | "show me the perplexity"
+            | "view perplexity"
+            | "view the perplexity"
+            | "see perplexity"
+            | "see the perplexity"
+            | "open perplexity"
+            | "open the perplexity"
+            | "view last search"
+            | "see last search"
+            | "open last search"
+            | "list the last search"
             | "search results"
             | "perplexity results"
+            | "view perplexity results"
+            | "see perplexity results"
+            | "open perplexity results"
+            | "list the perplexity results"
+            | "top results"
+            | "the top results"
+            | "view top results"
+            | "see top results"
+            | "open top results"
+            | "list the top results"
+            | "snippet results"
+            | "the snippet results"
+            | "view snippet results"
+            | "see snippet results"
+            | "open snippet results"
+            | "list the snippet results"
     ) {
         return false;
     }
@@ -47282,7 +47394,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
-• `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
+• `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `digest open` — cached open candidates (no digester spawn)\n\
 • `digest age` — cached digest timestamp (no digester spawn)\n\
@@ -49192,7 +49304,7 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/perplexity` Top/Snippet operator asks (v0.1.713).
+    // `/perplexity` Top/Snippet operator asks (v0.1.713); view/see/show me/open/list-the NL (v0.1.1045).
     if (q.contains("/perplexity")
         || q.contains("last search")
         || q.contains("last perplexity")
@@ -49201,7 +49313,25 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("top results")
         || q.contains("snippet results")
         || q.contains("results with snippets")
+        || q.contains("view perplexity")
+        || q.contains("see perplexity")
+        || q.contains("open perplexity")
+        || q.contains("list the perplexity")
+        || q.contains("list perplexity")
+        || q.contains("show me the perplexity")
+        || q.contains("show the perplexity")
+        || q.contains("view last search")
+        || q.contains("see last search")
+        || q.contains("open last search")
+        || q.contains("list the last search")
+        || q.contains("view top results")
+        || q.contains("open top results")
+        || q.contains("list the top results")
+        || q.contains("view snippet results")
+        || q.contains("open snippet results")
+        || q.contains("list the snippet results")
         || q == "perplexity"
+        || q == "the perplexity"
         || q == "perplexity search"
         || q == "perplexity top"
         || q == "perplexity snippet"
@@ -49222,6 +49352,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.starts_with("perplexity search ")
         && !q.contains(" ticket")
         && !q.contains("redmine")
+        && !q.contains("path")
+        && !q.contains("where")
+        && !q.contains("size")
+        && !q.contains("age")
     {
         return true;
     }
@@ -63097,12 +63231,34 @@ mod tests {
         assert!(looks_like_perplexity_request("/perplexity snippet"));
         assert!(looks_like_perplexity_request("snippet results"));
         assert!(looks_like_perplexity_request("results with snippets"));
+        assert!(looks_like_perplexity_request("view perplexity"));
+        assert!(looks_like_perplexity_request("see perplexity"));
+        assert!(looks_like_perplexity_request("show me the perplexity"));
+        assert!(looks_like_perplexity_request("open perplexity"));
+        assert!(looks_like_perplexity_request("open the perplexity"));
+        assert!(looks_like_perplexity_request("list the perplexity"));
+        assert!(looks_like_perplexity_request("view last search"));
+        assert!(looks_like_perplexity_request("open top results"));
+        assert!(looks_like_perplexity_request("list the snippet results"));
+        assert!(looks_like_perplexity_request("view perplexity top"));
+        assert!(looks_like_perplexity_request("see perplexity snippet"));
         assert!(!looks_like_perplexity_request("search for barcelona"));
         assert!(!looks_like_perplexity_request("perplexity search weather"));
         assert!(!looks_like_perplexity_request("look up the news"));
         assert!(!looks_like_perplexity_request("why is search slow"));
+        assert!(!looks_like_perplexity_request("view perplexity key"));
+        assert!(!looks_like_perplexity_request("open the perplexity key"));
+        assert!(!looks_like_perplexity_request("perplexity last path"));
+        assert!(!looks_like_perplexity_request("perplexity last size"));
+        assert!(!looks_like_perplexity_ready_request("view perplexity"));
+        assert!(!looks_like_perplexity_ready_request("open perplexity"));
+        assert!(!looks_like_perplexity_ready_request("list the perplexity"));
         assert_eq!(
             parse_perplexity_list_filter("/perplexity"),
+            PerplexityListFilter::All
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("view perplexity"),
             PerplexityListFilter::All
         );
         assert_eq!(
@@ -63114,6 +63270,14 @@ mod tests {
             PerplexityListFilter::Top
         );
         assert_eq!(
+            parse_perplexity_list_filter("view perplexity top"),
+            PerplexityListFilter::Top
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("open top results"),
+            PerplexityListFilter::Top
+        );
+        assert_eq!(
             parse_perplexity_list_filter("/perplexity snippet"),
             PerplexityListFilter::Snippet
         );
@@ -63121,6 +63285,28 @@ mod tests {
             parse_perplexity_list_filter("snippet results"),
             PerplexityListFilter::Snippet
         );
+        assert_eq!(
+            parse_perplexity_list_filter("see perplexity snippet"),
+            PerplexityListFilter::Snippet
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("list the snippet results"),
+            PerplexityListFilter::Snippet
+        );
+        let view = try_operator_instant_reply("view perplexity").expect("view perplexity");
+        assert!(view.to_lowercase().contains("perplexity"), "{view}");
+        let open = try_operator_instant_reply("open the perplexity").expect("open the perplexity");
+        assert!(open.to_lowercase().contains("perplexity"), "{open}");
+        let top = try_operator_instant_reply("view perplexity top").expect("view perplexity top");
+        assert!(
+            top.to_lowercase().contains("top") || top.to_lowercase().contains("perplexity"),
+            "{top}"
+        );
+        assert!(try_operator_instant_reply("view perplexity key")
+            .expect("view perplexity key")
+            .to_lowercase()
+            .contains("perplexity"));
+        assert!(try_operator_instant_reply("search for barcelona with perplexity").is_none());
     }
 
     #[test]

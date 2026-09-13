@@ -1743,6 +1743,13 @@ mod tests {
             "perplexity status",
             "last search",
             "top results",
+            "view perplexity",
+            "see perplexity",
+            "show me the perplexity",
+            "open perplexity",
+            "list the perplexity",
+            "view last search",
+            "open top results",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
