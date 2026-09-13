@@ -6,11 +6,11 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1057** | Instant `/keep-range` · `keep range` · `keep gap range` · `min max keep gap` · `shortest and longest keep gap` (+ discard) — min–max gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1056** | Instant `/keep-median` · `keep median` · `median keep gap` · `median gap between keeps` (+ discard) — median gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1055** | Instant `/keep-pace` · `keep pace` · `time between keeps` · `average keep gap` (+ discard) — average gap between consecutive keep/discard rows from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1054** | Instant `/first-keep` · `first keep tonight` · `earliest keep` (+ discard) — earliest keep/discard row tonight since 20:00 from `results.tsv` (one description; digester Slowest filters). |
 | **v0.1.1053** | Instant `/since-keep` — age since newest keep/discard (age only). |
-| **v0.1.1052** | Instant `/longest-streak` — record keep/discard streak. |
 
 ## Context
 
@@ -20,4 +20,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Try it
 
-In AI Chat or Discord: `/keep-median` or `median keep gap` (beside `/keep-pace` for the average).
+In AI Chat or Discord: `/keep-range` or `min max keep gap` (beside `/keep-pace` average and `/keep-median` median).
