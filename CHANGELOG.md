@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1063] - 2026-09-14
+
+### Added
+- Instant lane: `/keep-skew` · `keep skew` · `skew keep gap` · `skewness keep gap` · `skew gap between keeps` · `view keep skew` / `open keep skew` (and discard / skewness variants) — skewness (Fisher–Pearson adjusted G1) of gaps between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; skew only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, `/keep-iqr` IQR, `/keep-std` std, `/keep-mad` MAD, `/keep-cv` CV, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1062] - 2026-09-14
 
 ### Added
