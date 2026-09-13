@@ -9742,7 +9742,203 @@ pub fn format_results_tsv_count_gateway() -> String {
         Ok((keep_night, discard_night, keep_all, discard_all)) => {
             let night_total = keep_night + discard_night;
             format!(
-                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
+                "**Ratchet:** tonight keep **{keep_night}** · discard **{discard_night}** ({night_total} rows since 20:00) · all-time keep **{keep_all}** · discard **{discard_all}** · counts only · does not dump rows · `/last-keep` · `/last-discard` for the newest row · `results.tsv path` for the file · `results.tsv age` for last write · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// Wanted outcome for a single-row last keep/discard glance.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ResultsTsvLastWant {
+    Keep,
+    Discard,
+}
+
+/// Last matching keep or discard row from results.tsv (append order; one row only).
+fn last_results_tsv_row(want: ResultsTsvLastWant) -> Result<(String, String, String), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut last: Option<(String, String, String)> = None;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let sha = cols.next().unwrap_or("").trim();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let desc = cols.next().unwrap_or("").trim();
+        last = Some((ts.to_string(), sha.to_string(), desc.to_string()));
+    }
+    last.ok_or_else(|| "empty".into())
+}
+
+/// True for short last-keep / last-discard asks (`/last-keep`, `last discard`…).
+/// One newest matching row only — does not dump TSV, steal counts / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_last_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        // Count lane owns "last night keeps" / "keeps last night" (not a single-row glance).
+        || n.contains("last night")
+        || n.contains("tonight")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/last-keep"
+            | "/lastkeep"
+            | "/last-discard"
+            | "/lastdiscard"
+            | "last keep"
+            | "the last keep"
+            | "latest keep"
+            | "the latest keep"
+            | "most recent keep"
+            | "the most recent keep"
+            | "last keep description"
+            | "latest keep description"
+            | "what was the last keep"
+            | "what is the last keep"
+            | "whats the last keep"
+            | "what's the last keep"
+            | "view last keep"
+            | "see last keep"
+            | "show the last keep"
+            | "show me the last keep"
+            | "open last keep"
+            | "open the last keep"
+            | "list last keep"
+            | "list the last keep"
+            | "last discard"
+            | "the last discard"
+            | "latest discard"
+            | "the latest discard"
+            | "most recent discard"
+            | "the most recent discard"
+            | "last discard description"
+            | "latest discard description"
+            | "what was the last discard"
+            | "what is the last discard"
+            | "whats the last discard"
+            | "what's the last discard"
+            | "view last discard"
+            | "see last discard"
+            | "show the last discard"
+            | "show me the last discard"
+            | "open last discard"
+            | "open the last discard"
+            | "list last discard"
+            | "list the last discard"
+    )
+}
+
+fn results_tsv_last_want(content: &str) -> ResultsTsvLastWant {
+    let n = normalize_operator_command(content);
+    if n.contains("discard") {
+        ResultsTsvLastWant::Discard
+    } else {
+        ResultsTsvLastWant::Keep
+    }
+}
+
+/// Zero-LLM newest keep or discard row from results.tsv (one description; no full dump).
+pub fn format_results_tsv_last_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Last keep",
+        ResultsTsvLastWant::Discard => "Last discard",
+    };
+    match last_results_tsv_row(want) {
+        Err(_) => format!(
+            "**{label}:** no matching row yet · overnight keep/discard will create it · `/keeps` for counts · `results.tsv path` for the file."
+        ),
+        Ok((ts, sha, desc)) => {
+            let age = parse_run_ts(&ts)
+                .map(|dt| {
+                    let ms = dt.timestamp_millis().max(0) as u64;
+                    age_from_ms(ms)
+                })
+                .unwrap_or_else(|| "unknown".to_string());
+            let short_sha = if sha.len() > 7 { &sha[..7] } else { sha.as_str() };
+            let mut desc = desc;
+            if desc.chars().count() > 160 {
+                desc = desc.chars().take(157).collect::<String>() + "…";
+            }
+            if desc.is_empty() {
+                desc = "(no description)".to_string();
+            }
+            format!(
+                "**{label}:** **{age}** ago · `{short_sha}` · {desc} · one row only · does not dump the log · `/keeps` for counts · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -46531,6 +46727,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
+    // results.tsv last keep/discard (one row) before counts / size/age/path.
+    if looks_like_results_tsv_last_request(content) {
+        return Some(format_results_tsv_last_gateway(content));
+    }
     // results.tsv keep/discard counts before size/age/path (no row dump).
     if looks_like_results_tsv_count_request(content) {
         return Some(format_results_tsv_count_gateway());
@@ -47022,6 +47222,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // LaunchAgent plist paths (path-only; no load/unload).
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
+    }
+    // results.tsv last keep/discard (one row) before counts / size/age/path.
+    if looks_like_results_tsv_last_request(content) {
+        return Some(format_results_tsv_last_gateway(content));
     }
     // results.tsv keep/discard counts before size/age/path (no row dump).
     if looks_like_results_tsv_count_request(content) {
@@ -47520,6 +47724,7 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
 • `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; counts only — no row dump; not path/size/age / morning surprise)\n\
+• `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -47781,6 +47986,35 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
+    // `/last-keep` / `/last-discard` newest row (v0.1.1048).
+    if (q.contains("/last-keep")
+        || q.contains("/lastkeep")
+        || q.contains("/last-discard")
+        || q.contains("/lastdiscard")
+        || q.contains("last keep")
+        || q.contains("latest keep")
+        || q.contains("most recent keep")
+        || q.contains("last discard")
+        || q.contains("latest discard")
+        || q.contains("most recent discard")
+        || q.contains("what was the last keep")
+        || q.contains("what was the last discard")
+        || q.contains("view last keep")
+        || q.contains("open last keep")
+        || q.contains("view last discard")
+        || q.contains("open last discard"))
+        && !q.contains("last night")
+        && !q.contains("tonight")
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("age")
+        && !q.contains("count")
+        && !q.contains("how many")
+    {
+        return true;
+    }
     // `/keeps` / ratchet keep-discard counts (v0.1.1047).
     if (q.contains("/keeps")
         || q.contains("keeps tonight")
@@ -47807,6 +48041,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("path")
         && !q.contains("size")
         && !q.contains("age")
+        && !q.contains("last keep")
+        && !q.contains("last discard")
+        && !q.contains("latest keep")
+        && !q.contains("latest discard")
     {
         return true;
     }
@@ -50148,6 +50386,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv last keep/discard asks (v0.1.1048) — one row; no dump.
+    if looks_like_results_tsv_last_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard count asks (v0.1.1047) — counts only; no dump.
@@ -58022,6 +58264,9 @@ mod tests {
         assert!(!looks_like_results_tsv_path_request("keeps tonight"));
         assert!(!looks_like_results_tsv_path_request("keep count"));
         assert!(!looks_like_results_tsv_path_request("ratchet summary"));
+        assert!(!looks_like_results_tsv_path_request("/last-keep"));
+        assert!(!looks_like_results_tsv_path_request("last keep"));
+        assert!(!looks_like_results_tsv_path_request("last discard"));
         assert!(!looks_like_improvements_path_request("results.tsv path"));
         assert!(!looks_like_improvements_path_request("autoresearch results path"));
         assert!(looks_like_improvements_path_request("autoresearch path"));
@@ -58030,6 +58275,52 @@ mod tests {
         assert!(reply.contains("Autoresearch results") || reply.contains("results.tsv"));
         assert!(reply.contains("results.tsv"));
         assert!(reply.contains("improvements path") || reply.contains("does not dump"));
+    }
+
+    #[test]
+    fn results_tsv_last_request_detected() {
+        assert!(looks_like_results_tsv_last_request("/last-keep"));
+        assert!(looks_like_results_tsv_last_request("last keep"));
+        assert!(looks_like_results_tsv_last_request("the last keep"));
+        assert!(looks_like_results_tsv_last_request("latest keep"));
+        assert!(looks_like_results_tsv_last_request("most recent keep"));
+        assert!(looks_like_results_tsv_last_request("what was the last keep"));
+        assert!(looks_like_results_tsv_last_request("view last keep"));
+        assert!(looks_like_results_tsv_last_request("open the last keep"));
+        assert!(looks_like_results_tsv_last_request("/last-discard"));
+        assert!(looks_like_results_tsv_last_request("last discard"));
+        assert!(looks_like_results_tsv_last_request("latest discard"));
+        assert!(looks_like_results_tsv_last_request("what was the last discard"));
+        assert!(looks_like_results_tsv_last_request("view last discard"));
+        // Count lane / path-size-age / night window stay elsewhere.
+        assert!(!looks_like_results_tsv_last_request("/keeps"));
+        assert!(!looks_like_results_tsv_last_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_last_request("keeps last night"));
+        assert!(!looks_like_results_tsv_last_request("last night keeps"));
+        assert!(!looks_like_results_tsv_last_request("keep count"));
+        assert!(!looks_like_results_tsv_last_request("ratchet summary"));
+        assert!(!looks_like_results_tsv_last_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_last_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_last_request("morning surprise"));
+        assert!(!looks_like_results_tsv_count_request("last keep"));
+        assert!(!looks_like_results_tsv_count_request("/last-discard"));
+        assert!(!looks_like_results_tsv_size_request("last keep"));
+        assert!(!looks_like_results_tsv_age_request("last discard"));
+        assert!(!looks_like_results_tsv_path_request("last keep"));
+        let reply = try_operator_instant_reply("last keep").expect("last keep instant");
+        assert!(
+            reply.contains("Last keep") || reply.contains("no matching"),
+            "expected last-keep reply: {reply}"
+        );
+        assert!(
+            reply.contains("one row") || reply.contains("does not dump") || reply.contains("/keeps"),
+            "must stay single-row: {reply}"
+        );
+        let discard = try_operator_instant_reply("/last-discard").expect("/last-discard instant");
+        assert!(
+            discard.contains("Last discard") || discard.contains("no matching"),
+            "{discard}"
+        );
     }
 
     #[test]

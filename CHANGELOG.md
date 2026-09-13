@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1048] - 2026-09-13
+
+### Added
+- Instant lane: `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` / `open last keep` (and discard variants) — newest keep or discard row from `results.tsv` (one description only — no full dump). Does not steal `/keeps` counts, path/size/age, or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1047] - 2026-09-13
 
 ### Added
