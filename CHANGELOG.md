@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1049] - 2026-09-13
+
+### Added
+- Instant lane: `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `view recent keeps` / `open recent keeps` (and discard variants) — short tonight keep/discard list from `results.tsv` (newest first; capped at 5; no full dump). Does not steal `/keeps` counts, `/last-keep` single row, path/size/age, or morning-surprise / what-shipped. Hermes-style ratchet glance; p50.
+
 ## [0.1.1048] - 2026-09-13
 
 ### Added
