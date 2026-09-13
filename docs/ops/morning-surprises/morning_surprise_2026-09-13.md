@@ -6,6 +6,7 @@ Overnight Track B (autoresearch) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1052** | Instant `/longest-streak` · `longest streak` · `best streak` · `record streak` (+ max-streak / longest-discard) — longest keep/discard streak from `results.tsv` (all-time + tonight since 20:00; record only; no dump) |
 | **v0.1.1051** | Instant `/keep-streak` · `keep streak` · `current streak` · `ratchet streak` (+ discard-streak / `/streak`) — consecutive keep/discard streak from `results.tsv` (current + tonight since 20:00; streak only; no dump) |
 | **v0.1.1050** | Instant `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` (+ discard-rate variants) — tonight + all-time keep % from `results.tsv` (rate only; no dump) |
 | **v0.1.1049** | Instant `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` (+ discard variants) — short tonight keep/discard list from `results.tsv` (newest first; capped at 5) |
@@ -19,19 +20,19 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.1041** | Instant ring-chip NL |
 | **v0.1.1040** | Instant `/rings` · `/strip` · `/details` NL |
 
-## This tick (~05:30)
+## This tick (~06:00)
 
 - Digester open empty; design review not due (grace).
-- Experiment: Hermes-style ratchet **keep streak** after counts + last-row + tonight list + hit rate.
+- Experiment: Hermes-style ratchet **longest streak** after counts + last-row + tonight list + hit rate + current streak.
 - Keep in `results.tsv`; install + kickstart.
 
 ## Try it
 
 ```text
-/keep-streak
-keep streak
-current streak
-ratchet streak
+/longest-streak
+longest streak
+best streak
+record streak
 ```
 
 ## Night status
