@@ -11578,6 +11578,15 @@ pub fn looks_like_results_tsv_pace_request(content: &str) -> bool {
         || n == "what was the last discard"
         // Bare "rate" without pace/gap stays on `/keep-rate`.
         || (n.contains("rate") && !n.contains("pace") && !n.contains("gap") && !n.contains("between"))
+        // Median gap owns `/keep-median` (not average pace).
+        || n.contains("median")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/mediankeep")
+        || n.starts_with("/mediandiscard")
     {
         return false;
     }
@@ -11698,7 +11707,317 @@ pub fn format_results_tsv_pace_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// Median gap between consecutive matching keep/discard rows.
+/// Returns `(median_secs_night, gaps_night, median_secs_all, gaps_all)`.
+fn count_results_tsv_median(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn median_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n == 0 {
+            return (None, 0);
+        }
+        gaps.sort_unstable();
+        let med = if gaps.len() % 2 == 1 {
+            gaps[gaps.len() / 2]
+        } else {
+            let a = gaps[gaps.len() / 2 - 1];
+            let b = gaps[gaps.len() / 2];
+            a.saturating_add(b) / 2
+        };
+        (Some(med), n)
+    }
+    let (med_all, gaps_all) = median_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (med_night, gaps_night) = median_gap_secs(&night_ts);
+    Ok((med_night, gaps_night, med_all, gaps_all))
+}
+
+/// True for short keep-median asks (`/keep-median`, `median keep gap`…).
+/// Median gap only — does not dump TSV or steal pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_median_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (n.contains("age") && !n.contains("average") && !n.contains("avg"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("percent")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        // Average pace owns "keep pace" / "average keep gap" / bare "time between keeps".
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        || (n.contains("rate")
+            && !n.contains("median")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+    {
+        return false;
+    }
+    // Must say median (or /keep-median slash) — do not steal bare pace / keep gap.
+    if !(n.contains("median")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/mediankeep")
+        || n.starts_with("/mediandiscard"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-median"
+            | "/keepmedian"
+            | "/discard-median"
+            | "/discardmedian"
+            | "/median-keep-gap"
+            | "/mediankeepgap"
+            | "/median-discard-gap"
+            | "/mediandiscardgap"
+            | "/median-gap"
+            | "/mediangap"
+            | "/median-keep"
+            | "/mediankeep"
+            | "/median-discard"
+            | "/mediandiscard"
+            | "keep median"
+            | "the keep median"
+            | "keep median tonight"
+            | "tonight keep median"
+            | "median keep"
+            | "the median keep"
+            | "median keep gap"
+            | "the median keep gap"
+            | "median gap between keeps"
+            | "median time between keeps"
+            | "median keep interval"
+            | "the median keep interval"
+            | "ratchet median"
+            | "the ratchet median"
+            | "overnight keep median"
+            | "view keep median"
+            | "see keep median"
+            | "show the keep median"
+            | "show me the keep median"
+            | "open keep median"
+            | "open the keep median"
+            | "list keep median"
+            | "list the keep median"
+            | "what is the keep median"
+            | "whats the keep median"
+            | "what's the keep median"
+            | "what is the median keep gap"
+            | "whats the median keep gap"
+            | "what's the median keep gap"
+            | "discard median"
+            | "the discard median"
+            | "discard median tonight"
+            | "tonight discard median"
+            | "median discard"
+            | "the median discard"
+            | "median discard gap"
+            | "the median discard gap"
+            | "median gap between discards"
+            | "median time between discards"
+            | "median discard interval"
+            | "view discard median"
+            | "see discard median"
+            | "show the discard median"
+            | "show me the discard median"
+            | "open discard median"
+            | "open the discard median"
+            | "list discard median"
+            | "list the discard median"
+            | "what is the discard median"
+            | "whats the discard median"
+            | "what's the discard median"
+    )
+}
+
+/// Zero-LLM median gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+pub fn format_results_tsv_median_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep median",
+        ResultsTsvLastWant::Discard => "Discard median",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_median(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((med_night, gaps_night, med_all, gaps_all)) => {
+            let night_part = match med_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight median **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure median"),
+            };
+            let all_part = match med_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time median **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -48495,6 +48814,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
     }
+    // results.tsv keep/discard median gap before average pace / last-row / recent / counts.
+    if looks_like_results_tsv_median_request(content) {
+        return Some(format_results_tsv_median_gateway(content));
+    }
     // results.tsv keep/discard average gap (pace) before last-row / recent / counts.
     if looks_like_results_tsv_pace_request(content) {
         return Some(format_results_tsv_pace_gateway(content));
@@ -49018,6 +49341,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
+    }
+    // results.tsv keep/discard median gap before average pace / last-row / recent / counts.
+    if looks_like_results_tsv_median_request(content) {
+        return Some(format_results_tsv_median_gateway(content));
     }
     // results.tsv keep/discard average gap (pace) before last-row / recent / counts.
     if looks_like_results_tsv_pace_request(content) {
@@ -49545,9 +49872,10 @@ pub fn format_ops_help_gateway() -> String {
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
-• `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
-• `/keep-pace` · `keep pace` · `keep gap` · `time between keeps` · `average keep gap` · `average time between keeps` · `view keep pace` / `open keep pace` · `/discard-pace` · `discard pace` · `time between discards` — average gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; pace only — no row dump; not `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
-• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / `/first-keep` / `/keep-pace` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / `/keep-median` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
+• `/keep-median` · `keep median` · `median keep gap` · `median gap between keeps` · `median time between keeps` · `view keep median` / `open keep median` · `/discard-median` · `discard median` · `median discard gap` — median gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; median only — no row dump; not `/keep-pace` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/keep-pace` · `keep pace` · `keep gap` · `time between keeps` · `average keep gap` · `average time between keeps` · `view keep pace` / `open keep pace` · `/discard-pace` · `discard pace` · `time between discards` — average gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; pace only — no row dump; not `/keep-median` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
+• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / `/first-keep` / `/keep-pace` / `/keep-median` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -49963,6 +50291,55 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("pace")
         && !q.contains("keep gap")
         && !q.contains("time between")
+        && !q.contains("median")
+    {
+        return true;
+    }
+    // `/keep-median` / median gap between keeps (v0.1.1056).
+    if (q.contains("/keep-median")
+        || q.contains("/keepmedian")
+        || q.contains("/discard-median")
+        || q.contains("/discardmedian")
+        || q.contains("/median-keep-gap")
+        || q.contains("/median-discard-gap")
+        || q.contains("/median-gap")
+        || q.contains("keep median")
+        || q.contains("discard median")
+        || q.contains("median keep")
+        || q.contains("median discard")
+        || q.contains("median keep gap")
+        || q.contains("median discard gap")
+        || q.contains("median gap between keeps")
+        || q.contains("median time between keeps")
+        || q.contains("median gap between discards")
+        || q.contains("median time between discards")
+        || q.contains("view keep median")
+        || q.contains("open keep median")
+        || q.contains("view discard median")
+        || q.contains("open discard median"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("percent")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("first keep")
+        && !q.contains("first discard")
+        && !q.contains("/first-")
+        && !q.contains("since last")
+        && !q.contains("/since-")
+        && !q.contains("keep pace")
+        && !q.contains("average keep gap")
+        && !q.contains("/keep-pace")
     {
         return true;
     }
@@ -50009,6 +50386,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("/first-")
         && !q.contains("since last")
         && !q.contains("/since-")
+        && !q.contains("median")
+        && !q.contains("/keep-median")
     {
         return true;
     }
@@ -52523,6 +52902,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
     if looks_like_results_tsv_first_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard median gap asks (v0.1.1056) — median only; no dump.
+    if looks_like_results_tsv_median_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard pace asks (v0.1.1055) — avg gap only; no dump.
@@ -60916,6 +61299,83 @@ mod tests {
         let discard = try_operator_instant_reply("discard pace").expect("discard pace");
         assert!(
             discard.contains("Discard pace") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+        assert!(!looks_like_results_tsv_pace_request("/keep-median"));
+        assert!(!looks_like_results_tsv_pace_request("median keep gap"));
+        assert!(!looks_like_results_tsv_pace_request("keep median"));
+    }
+
+    #[test]
+    fn results_tsv_median_request_detected() {
+        assert!(looks_like_results_tsv_median_request("/keep-median"));
+        assert!(looks_like_results_tsv_median_request("keep median"));
+        assert!(looks_like_results_tsv_median_request("keep median tonight"));
+        assert!(looks_like_results_tsv_median_request("median keep gap"));
+        assert!(looks_like_results_tsv_median_request("median gap between keeps"));
+        assert!(looks_like_results_tsv_median_request("median time between keeps"));
+        assert!(looks_like_results_tsv_median_request("view keep median"));
+        assert!(looks_like_results_tsv_median_request("show me the keep median"));
+        assert!(looks_like_results_tsv_median_request("open keep median"));
+        assert!(looks_like_results_tsv_median_request("/discard-median"));
+        assert!(looks_like_results_tsv_median_request("discard median"));
+        assert!(looks_like_results_tsv_median_request("median discard gap"));
+        // Pace / first / last / since / counts / rate / streak / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_median_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_median_request("keep pace"));
+        assert!(!looks_like_results_tsv_median_request("time between keeps"));
+        assert!(!looks_like_results_tsv_median_request("average keep gap"));
+        assert!(!looks_like_results_tsv_median_request("/first-keep"));
+        assert!(!looks_like_results_tsv_median_request("first keep tonight"));
+        assert!(!looks_like_results_tsv_median_request("/last-keep"));
+        assert!(!looks_like_results_tsv_median_request("last keep"));
+        assert!(!looks_like_results_tsv_median_request("/since-keep"));
+        assert!(!looks_like_results_tsv_median_request("since last keep"));
+        assert!(!looks_like_results_tsv_median_request("/keeps"));
+        assert!(!looks_like_results_tsv_median_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_median_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_median_request("keep rate"));
+        assert!(!looks_like_results_tsv_median_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_median_request("keep streak"));
+        assert!(!looks_like_results_tsv_median_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_median_request("longest streak"));
+        assert!(!looks_like_results_tsv_median_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_median_request("recent keeps"));
+        assert!(!looks_like_results_tsv_median_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_median_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_median_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_median_request("morning surprise"));
+        assert!(!looks_like_results_tsv_pace_request("keep median"));
+        assert!(!looks_like_results_tsv_pace_request("median keep gap"));
+        assert!(!looks_like_results_tsv_first_request("keep median"));
+        assert!(!looks_like_results_tsv_last_request("keep median"));
+        assert!(!looks_like_results_tsv_since_request("keep median"));
+        assert!(!looks_like_results_tsv_count_request("keep median"));
+        assert!(!looks_like_results_tsv_rate_request("keep median"));
+        assert!(!looks_like_results_tsv_streak_request("keep median"));
+        assert!(!looks_like_results_tsv_longest_streak_request("keep median"));
+        assert!(!looks_like_results_tsv_recent_request("keep median"));
+        let reply = try_operator_instant_reply("keep median").expect("keep median instant");
+        assert!(
+            reply.contains("Keep median") || reply.contains("no `results.tsv`"),
+            "expected keep-median reply: {reply}"
+        );
+        assert!(
+            reply.contains("median only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥2"),
+            "must stay keep-median glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-median").expect("/keep-median instant");
+        assert!(
+            slash.contains("Keep median") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard median").expect("discard median");
+        assert!(
+            discard.contains("Discard median") || discard.contains("no `results.tsv`"),
             "{discard}"
         );
     }
