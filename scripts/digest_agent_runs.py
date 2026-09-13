@@ -218,6 +218,78 @@ def looks_like_debug_log_list_ask(q: str) -> bool:
     return n in exact
 
 
+def looks_like_ratchet_results_glance_ask(q: str) -> bool:
+    """Short results.tsv ratchet glances now Instant (v0.1.1047–1053).
+
+    Keep/discard counts, last row, recent list, rate, streak, longest, since-age.
+    Historical tool-heavy turns must not inflate Slowest/p50.
+    """
+    n = (q or "").strip().lower().rstrip("?").strip()
+    if not n or len(n) > 72:
+        return False
+    if any(
+        x in n
+        for x in (
+            "why",
+            "fix",
+            "explain",
+            "path",
+            "where is",
+            "how big",
+            "how old",
+            "results.tsv age",
+            "results.tsv size",
+            "results.tsv path",
+            "morning surprise",
+            "what shipped",
+            "dump",
+            "ticket",
+            "redmine",
+        )
+    ):
+        return False
+    needles = (
+        "/keeps",
+        "keeps tonight",
+        "keep count",
+        "how many keeps",
+        "discard count",
+        "discards tonight",
+        "ratchet summary",
+        "/last-keep",
+        "last keep",
+        "latest keep",
+        "/last-discard",
+        "last discard",
+        "/recent-keeps",
+        "recent keeps",
+        "tonight keep list",
+        "/recent-discards",
+        "recent discards",
+        "/keep-rate",
+        "keep rate",
+        "hit rate",
+        "ratchet hit rate",
+        "/keep-streak",
+        "keep streak",
+        "current streak",
+        "ratchet streak",
+        "/longest-streak",
+        "longest streak",
+        "best streak",
+        "record streak",
+        "/since-keep",
+        "since last keep",
+        "time since last keep",
+        "how long since last keep",
+        "how long ago was the last keep",
+        "/since-discard",
+        "since last discard",
+        "time since last discard",
+        "how long since last discard",
+    )
+    return any(x in n for x in needles)
+
 def looks_like_overnight_improvements(q: str) -> bool:
     ql = (q or "").lower()
     if ("mac-stats" in ql or "mac stats" in ql) and (
@@ -1028,6 +1100,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_topic_dump(q)
         # `/logs` NL (v0.1.888+) — historical Review logs + BRAVE must not inflate p50.
         or looks_like_debug_log_list_ask(q)
+        # Ratchet results.tsv glances (v0.1.1047–1053) — historical tool-heavy must not inflate p50.
+        or looks_like_ratchet_results_glance_ask(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency

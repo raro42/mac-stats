@@ -9867,6 +9867,14 @@ pub fn looks_like_results_tsv_last_request(content: &str) -> bool {
         || n.contains("recentdiscards")
         || n.contains("keep list")
         || n.contains("discard list")
+        // Age-only since lane owns "since last keep" / "how long since…" (not a description row).
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
     {
         return false;
     }
@@ -10709,6 +10717,13 @@ pub fn looks_like_results_tsv_longest_streak_request(content: &str) -> bool {
         || n.contains("current streak")
         || n.contains("current keep streak")
         || n.contains("ratchet streak")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
         || n == "/keep-streak"
         || n == "/keepstreak"
         || n == "/discard-streak"
@@ -10803,6 +10818,197 @@ pub fn format_results_tsv_longest_streak_gateway() -> String {
         Ok((longest_keep, longest_discard, longest_keep_tonight)) => {
             format!(
                 "**Longest streak:** all-time keep **{longest_keep}** in a row · tonight keep **{longest_keep_tonight}** since 20:00 · longest discard **{longest_discard}** · record only · does not dump rows · `/keep-streak` for the current streak · `/keeps` for counts · `/keep-rate` for hit rate · `/recent-keeps` for a short tonight list · `/last-keep` for the newest row · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
+
+/// True for short since-last-keep asks (`/since-keep`, `time since last keep`…).
+/// Age of newest keep/discard row only — does not dump description or steal last-row / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_since_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains(" kb")
+        || n.contains(" gi")
+        // File mtime lane owns bare "age" / "how old" / "stale" (results.tsv age).
+        || n.contains("age")
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("rate")
+        || n.contains("percent")
+        || n.contains("hit rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.starts_with("/last-")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        // Exact last-row glances (description) stay on `/last-keep`.
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/since-keep"
+            | "/sincekeep"
+            | "/since-last-keep"
+            | "/sincelastkeep"
+            | "/time-since-keep"
+            | "/timesincekeep"
+            | "/since-discard"
+            | "/sincediscard"
+            | "/since-last-discard"
+            | "/sincelastdiscard"
+            | "/time-since-discard"
+            | "/timesincediscard"
+            | "since last keep"
+            | "the since last keep"
+            | "time since last keep"
+            | "the time since last keep"
+            | "how long since last keep"
+            | "how long since the last keep"
+            | "how long ago was the last keep"
+            | "how long ago was last keep"
+            | "since keep"
+            | "the since keep"
+            | "time since keep"
+            | "how long since keep"
+            | "view since keep"
+            | "see since keep"
+            | "show the since keep"
+            | "show me the since keep"
+            | "open since keep"
+            | "open the since keep"
+            | "list since keep"
+            | "list the since keep"
+            | "view since last keep"
+            | "see since last keep"
+            | "show the since last keep"
+            | "show me the since last keep"
+            | "open since last keep"
+            | "open the since last keep"
+            | "list since last keep"
+            | "list the since last keep"
+            | "what is the time since last keep"
+            | "whats the time since last keep"
+            | "what's the time since last keep"
+            | "since last discard"
+            | "the since last discard"
+            | "time since last discard"
+            | "the time since last discard"
+            | "how long since last discard"
+            | "how long since the last discard"
+            | "how long ago was the last discard"
+            | "how long ago was last discard"
+            | "since discard"
+            | "the since discard"
+            | "time since discard"
+            | "how long since discard"
+            | "view since discard"
+            | "see since discard"
+            | "show the since discard"
+            | "show me the since discard"
+            | "open since discard"
+            | "open the since discard"
+            | "list since discard"
+            | "list the since discard"
+            | "view since last discard"
+            | "see since last discard"
+            | "show the since last discard"
+            | "show me the since last discard"
+            | "open since last discard"
+            | "open the since last discard"
+            | "list since last discard"
+            | "list the since last discard"
+            | "what is the time since last discard"
+            | "whats the time since last discard"
+            | "what's the time since last discard"
+    )
+}
+
+/// Zero-LLM age since newest keep or discard row (age only; no description dump).
+pub fn format_results_tsv_since_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Since last keep",
+        ResultsTsvLastWant::Discard => "Since last discard",
+    };
+    match last_results_tsv_row(want) {
+        Err(_) => format!(
+            "**{label}:** no matching row yet · overnight keep/discard will create it · `/last-keep` for the newest row · `/keeps` for counts · `results.tsv path` for the file."
+        ),
+        Ok((ts, _sha, _desc)) => {
+            let age = parse_run_ts(&ts)
+                .map(|dt| {
+                    let ms = dt.timestamp_millis().max(0) as u64;
+                    age_from_ms(ms)
+                })
+                .unwrap_or_else(|| "unknown".to_string());
+            format!(
+                "**{label}:** **{age}** ago · age only · does not dump the row · `/last-keep` for description · `/keeps` for counts · `/keep-rate` for hit rate · `/keep-streak` for consecutive keeps · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -47591,6 +47797,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
     }
+    // results.tsv age since last keep/discard before last-row description / recent / streaks.
+    if looks_like_results_tsv_since_request(content) {
+        return Some(format_results_tsv_since_gateway(content));
+    }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
         return Some(format_results_tsv_last_gateway(content));
@@ -48102,6 +48312,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // LaunchAgent plist paths (path-only; no load/unload).
     if looks_like_launchagent_path_request(content) {
         return Some(format_launchagent_path_gateway());
+    }
+    // results.tsv age since last keep/discard before last-row description / recent / streaks.
+    if looks_like_results_tsv_since_request(content) {
+        return Some(format_results_tsv_since_gateway(content));
     }
     // results.tsv last keep/discard (one row) before recent list / counts / size/age/path.
     if looks_like_results_tsv_last_request(content) {
@@ -48625,6 +48839,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
+• `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` · `/since-discard` · `since last discard` — age since newest keep or discard row (age only — no description dump; not `/last-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `results.tsv size` · `how big is results.tsv` · `results file size` — results.tsv size on disk (stat only; no dump)\n\
 • `results.tsv age` · `how old is results.tsv` · `when was results.tsv updated` — results.tsv last write age (mtime; no dump)\n\
 • `loop backlog path` · `where is loop_backlog.md` · `harness tick log path` — `~/.mac-stats/improvements/loop_backlog.md` path only (no dump; does not steal `improvements path` / `results.tsv path`; `loop backlog size` for bytes · `loop backlog age` for mtime)\n\
@@ -48949,6 +49164,51 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
+    // `/since-keep` / age since last keep (v0.1.1053).
+    if (q.contains("/since-keep")
+        || q.contains("/sincekeep")
+        || q.contains("/since-last-keep")
+        || q.contains("/sincelastkeep")
+        || q.contains("/time-since-keep")
+        || q.contains("/timesincekeep")
+        || q.contains("/since-discard")
+        || q.contains("/sincediscard")
+        || q.contains("/since-last-discard")
+        || q.contains("/sincelastdiscard")
+        || q.contains("/time-since-discard")
+        || q.contains("/timesincediscard")
+        || q.contains("since last keep")
+        || q.contains("time since last keep")
+        || q.contains("how long since last keep")
+        || q.contains("how long ago was the last keep")
+        || q.contains("how long ago was last keep")
+        || q.contains("view since keep")
+        || q.contains("open since keep")
+        || q.contains("view since last keep")
+        || q.contains("open since last keep")
+        || q.contains("since last discard")
+        || q.contains("time since last discard")
+        || q.contains("how long since last discard")
+        || q.contains("how long ago was the last discard")
+        || q.contains("view since discard")
+        || q.contains("open since discard"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("rate")
+        && !q.contains("percent")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+    {
+        return true;
+    }
     // `/longest-streak` / record keep streak (v0.1.1052).
     if (q.contains("/longest-streak")
         || q.contains("/longeststreak")
@@ -48989,6 +49249,8 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("last discard")
         && !q.contains("current streak")
         && !q.contains("ratchet streak")
+        && !q.contains("since last")
+        && !q.contains("/since-")
     {
         return true;
     }
@@ -51448,6 +51710,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only LaunchAgent plist path asks (v0.1.864) — config only; no load/unload.
     if looks_like_launchagent_path_request(question) {
+        return true;
+    }
+    // Read-only results.tsv since-last-keep asks (v0.1.1053) — age only; no dump.
+    if looks_like_results_tsv_since_request(question) {
         return true;
     }
     // Read-only results.tsv last keep/discard asks (v0.1.1048) — one row; no dump.
@@ -59636,6 +59902,69 @@ mod tests {
         assert!(
             long_keep.contains("Longest streak") || long_keep.contains("no `results.tsv`"),
             "{long_keep}"
+        );
+    }
+
+    #[test]
+    fn results_tsv_since_request_detected() {
+        assert!(looks_like_results_tsv_since_request("/since-keep"));
+        assert!(looks_like_results_tsv_since_request("since last keep"));
+        assert!(looks_like_results_tsv_since_request("time since last keep"));
+        assert!(looks_like_results_tsv_since_request("how long since last keep"));
+        assert!(looks_like_results_tsv_since_request("how long ago was the last keep"));
+        assert!(looks_like_results_tsv_since_request("view since keep"));
+        assert!(looks_like_results_tsv_since_request("show me the since keep"));
+        assert!(looks_like_results_tsv_since_request("open since last keep"));
+        assert!(looks_like_results_tsv_since_request("/since-discard"));
+        assert!(looks_like_results_tsv_since_request("since last discard"));
+        assert!(looks_like_results_tsv_since_request("how long since last discard"));
+        // Last-row / counts / rate / streak / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_since_request("/last-keep"));
+        assert!(!looks_like_results_tsv_since_request("last keep"));
+        assert!(!looks_like_results_tsv_since_request("what was the last keep"));
+        assert!(!looks_like_results_tsv_since_request("/keeps"));
+        assert!(!looks_like_results_tsv_since_request("keeps tonight"));
+        assert!(!looks_like_results_tsv_since_request("/keep-rate"));
+        assert!(!looks_like_results_tsv_since_request("keep rate"));
+        assert!(!looks_like_results_tsv_since_request("/keep-streak"));
+        assert!(!looks_like_results_tsv_since_request("keep streak"));
+        assert!(!looks_like_results_tsv_since_request("/longest-streak"));
+        assert!(!looks_like_results_tsv_since_request("longest streak"));
+        assert!(!looks_like_results_tsv_since_request("/recent-keeps"));
+        assert!(!looks_like_results_tsv_since_request("recent keeps"));
+        assert!(!looks_like_results_tsv_since_request("results.tsv path"));
+        assert!(!looks_like_results_tsv_since_request("results.tsv age"));
+        assert!(!looks_like_results_tsv_since_request("dump results.tsv"));
+        assert!(!looks_like_results_tsv_since_request("morning surprise"));
+        assert!(!looks_like_results_tsv_last_request("since last keep"));
+        assert!(!looks_like_results_tsv_last_request("how long since last keep"));
+        assert!(!looks_like_results_tsv_last_request("how long ago was the last keep"));
+        assert!(!looks_like_results_tsv_count_request("since last keep"));
+        assert!(!looks_like_results_tsv_rate_request("since last keep"));
+        assert!(!looks_like_results_tsv_streak_request("since last keep"));
+        assert!(!looks_like_results_tsv_longest_streak_request("since last keep"));
+        assert!(!looks_like_results_tsv_recent_request("since last keep"));
+        let reply = try_operator_instant_reply("since last keep").expect("since last keep instant");
+        assert!(
+            reply.contains("Since last keep") || reply.contains("no matching row"),
+            "expected since-keep reply: {reply}"
+        );
+        assert!(
+            reply.contains("age only")
+                || reply.contains("does not dump")
+                || reply.contains("/last-keep")
+                || reply.contains("no matching row"),
+            "must stay since-keep glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/since-keep").expect("/since-keep instant");
+        assert!(
+            slash.contains("Since last keep") || slash.contains("no matching row"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("since last discard").expect("since discard");
+        assert!(
+            discard.contains("Since last discard") || discard.contains("no matching row"),
+            "{discard}"
         );
     }
 

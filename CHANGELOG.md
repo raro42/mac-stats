@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1053] - 2026-09-13
+
+### Added
+- Instant lane: `/since-keep` · `since last keep` · `time since last keep` · `how long since last keep` · `how long ago was the last keep` · `view since keep` / `open since keep` (and discard variants) — age since newest keep or discard row from `results.tsv` (age only; no description dump). Does not steal `/last-keep` description row, `/keeps` counts, `/keep-rate` percentages, `/keep-streak` / `/longest-streak`, `/recent-keeps` list, path/size/age, or morning-surprise / what-shipped. Digester Slowest filters for ratchet glances (keeps / last / recent / rate / streak / longest / since). Hermes-style ratchet glance; p50.
+
 ## [0.1.1052] - 2026-09-13
 
 ### Added
