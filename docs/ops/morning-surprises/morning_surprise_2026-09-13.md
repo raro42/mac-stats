@@ -1,26 +1,32 @@
 # Morning surprise — 2026-09-13
 
-Overnight Track B kept shipping operator instant NL. Digester open stayed empty; design review stayed in grace. Fuel came from standing backlog p50.
+Overnight Track B kept shipping Runs / metrics instant-lane NL so operator chat stays off the full Ollama path.
 
-## Shipped tonight (local window into 13 Sep)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1040** | `/rings` · `/strip` · `/details` view/see/show me/open/list-the NL |
-| **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` ring-chip NL |
-| **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` strip-chip NL |
-| **v0.1.1043** | `/hot` · `/pinned` Hot/Pinned view/see/show me/open/list-the NL |
+| **v0.1.1044** | `/failed` · `/slow` · `/instant` · `/lite` · `/direct` — `view` / `see` / `show me` / `open` / `list the` (+ day window) → Runs lane reports (exact open only) |
+| **v0.1.1043** | `/hot` · `/pinned` — same NL family → Top Processes Hot/Pinned lists |
+| **v0.1.1042** | `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` → strip chips |
+| **v0.1.1041** | `/cpu` · `/gpu` · `/freq` · `/temp` → ring chips |
+| **v0.1.1040** | `/rings` · `/strip` · `/details` → metrics gateways |
 
-## Latest keep (~01:40)
+## Fuel notes
 
-**v0.1.1043** — Instant lane: `view hot` / `see hot` / `show me the hot` / `open hot` / `list the hot` (and the same for pinned / pinned processes) join `/hot` · `/pinned` Top Processes Hot or Pinned lists. Exact open only — not rings/strip/details Hot, not pinned path/size/age.
+- Digester **open** stayed empty all night — standing backlog p50 NL expand (not quiet-default).
+- Design review still in grace (`due=false`); CPU metrics screen ~6d, others much older (TCC / recapture when due).
+- No product-owned `debug.log` ERROR/WARN clusters in the scan window.
 
-## Also tried / context
+## Try it
 
-- Digester open empty; no ERROR/WARN/panic clusters in the 180m debug.log window.
-- Design review: due=false (grace); recommended surface still CPU metrics (~5.9d).
-- Sibling harness: OpenClaw/Hermes commits noted; no port this tick (NL p50 first).
+In AI Chat or Discord:
 
-## How to poke it
+- `view failed` · `open slow 7` · `list the instant` · `see lite` · `show me the direct`
+- Still works: `/failed` · `/slow` · `/instant 3` · `/lite` · `/direct`
 
-In AI Chat or Discord: `view hot`, `open pinned`, `show me the pinned`, `list the hot`.
+## Next night
+
+- Digester Slowest filters for the new Runs-lane phrases if they show up as noise.
+- Design review when due (prefer stale feature screens).
+- Sibling ports only when they clearly map (Hermes insights extras / session UX).
