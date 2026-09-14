@@ -6,6 +6,7 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 | Version | What |
 | --- | --- |
+| **v0.1.1068** | Instant `/keep-gini` · `keep gini` · `gini keep gap` · `gini coefficient keep gap` · `gini gap between keeps` (+ discard) — Gini coefficient (0–1) of consecutive keep/discard gap lengths from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1067** | Design review / CPU metrics: Temp ring + TEMP sparkline Fair thermal wash (Apple thermal Fair below ≥70°C hot pulse). Serious/Critical thermal marks Temp hot under 70°C — power-strip Heat parity. Recapture deferred (Screen Recording TCC); polish grace marked. |
 | **v0.1.1066** | Instant `/keep-mode` · `keep mode` · `mode keep gap` · `modal keep gap` · `mode gap between keeps` (+ discard) — modal (most frequent minute-bucketed) consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1065** | Instant `/keep-entropy` · `keep entropy` · `entropy keep gap` · `shannon entropy keep gap` · `entropy gap between keeps` (+ discard) — Shannon entropy (bits) of minute-bucketed consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
@@ -24,10 +25,9 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 ## Try it
 
-Open the CPU window: when Heat is Fair and Temp is under 70°C, the Temperature ring and TEMP sparkline show a soft amber wash (no pulse). Serious/Critical still pulse hot. Instant ratchet: `/keep-mode` or `modal keep gap`.
+Open the CPU window: when Heat is Fair and Temp is under 70°C, the Temperature ring and TEMP sparkline show a soft amber wash (no pulse). Serious/Critical still pulse hot. Instant ratchet: `/keep-gini` or `gini keep gap` (inequality of gap lengths; 0 = even pace).
 
 ## Notes
 
-- Digester open pointed at design review (stale `feature-cpu-metrics.png`); fuel = overnight design review (due=true).
-- Recapture blocked by Screen Recording TCC (`screencapture -l` could not create image); prior Sep 7 PNG kept; `--mark-polished feature-cpu-metrics`.
-- Install/kickstart after v0.1.1067; Discord Ready (Werner_Amvara).
+- Digester open empty this tick; design review due=false (grace). Fuel = standing backlog `/keep-gini` after keep-mode.
+- Install/kickstart after v0.1.1068; confirm Discord Ready.
