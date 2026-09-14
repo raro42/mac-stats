@@ -9082,7 +9082,10 @@ function renderOpsMemory(files) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'memory'
+        );
         paintOpsFilterMatch('ops-memory-filter', kindPool.length, 0, opsMemoryFilterQ);
         return;
     }
@@ -9137,7 +9140,10 @@ function renderOpsMemory(files) {
     });
     paintOpsFilterMatch('ops-memory-filter', kindPool.length, filtered.length, opsMemoryFilterQ);
     if ((opsMemoryFilterQ || opsMemoryKindFilter !== 'all') && !el.querySelector('.ops-row')) {
-        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'memory'
+        );
     }
 }
 
