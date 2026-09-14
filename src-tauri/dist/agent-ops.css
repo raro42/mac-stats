@@ -1942,54 +1942,14 @@ textarea.ops-agent-editor.is-dirty {
   transition: box-shadow 0.25s ease;
 }
 
-/* History sparklines — Hot attention glance (power-strip / Details Hot parity; not under gauges) */
+/* History Hot · … glance — removed (KISS; card/chart wash is enough). */
 .history-hot-attention-glance {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 4px 0 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #ff9500 26%, transparent);
-  background: color-mix(in srgb, #ff9500 6%, transparent);
-  font-size: 13px;
-  font-weight: 520;
-  line-height: 1.35;
-  cursor: pointer;
-  width: 100%;
-  box-sizing: border-box;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease;
-}
-
-.history-hot-attention-glance[hidden] {
   display: none !important;
 }
 
-.history-hot-attention-glance:hover {
-  background: color-mix(in srgb, #ff9500 10%, transparent);
-  border-color: color-mix(in srgb, #ff9500 36%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
-}
-
-.history-hot-attention-glance:focus-visible {
-  outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
-}
-
-.history-hot-attention-glance.has-hot {
-  color: color-mix(in srgb, #ff9500 72%, currentColor);
-}
-
-.history-hot-attention-glance.is-hot-attention-flash {
-  background: color-mix(in srgb, #ff9500 14%, transparent);
-  border-color: color-mix(in srgb, #ff9500 42%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);
+/* Power strip Hot · … bar — removed (KISS). */
+.power-strip-hot-attention-glance {
+  display: none !important;
 }
 
 .processes-filter-chips {
@@ -3522,64 +3482,11 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
-/* Power strip — Hot attention glance (rings Hot / Monitors Down/Slow parity) */
+/* Power strip Hot · … bar — removed (KISS). */
 .power-strip-hot-attention-glance {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 6px 0 2px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
-  font-size: 13px;
-  font-weight: 520;
-  line-height: 1.35;
-  cursor: pointer;
-  width: 100%;
-  box-sizing: border-box;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease;
-}
-
-.power-strip-hot-attention-glance[hidden] {
   display: none !important;
 }
 
-.power-strip-hot-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
-}
-
-.power-strip-hot-attention-glance:focus-visible {
-  outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
-}
-
-.power-strip-hot-attention-glance.has-hot {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
-}
-
-.power-strip-hot-attention-glance.has-bat {
-  border-color: color-mix(in srgb, #ff9f0a 40%, transparent);
-  background: color-mix(in srgb, #ff9f0a 12%, transparent);
-}
-
-.power-strip-hot-attention-glance.has-lpm {
-  border-color: color-mix(in srgb, #30d158 34%, transparent);
-  background: color-mix(in srgb, #30d158 8%, transparent);
-  color: color-mix(in srgb, #30d158 45%, currentColor);
-}
-
-.power-strip-hot-attention-glance.is-hot-attention-flash,
 #battery-power-strip .battery-info.is-hot-attention-flash,
 #lpm-strip.is-hot-attention-flash {
   box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);

@@ -1,0 +1,41 @@
+---
+description: Keep CPU window UI sleek, simple, KISS — no redundant Hot chrome
+alwaysApply: true
+---
+
+# UI KISS — sleek and simple
+
+Keep the CPU window **sleek**, **simple**, and **KISS**. Do not add chrome that fights the layout or repeats a cue that is already visible.
+
+## Do
+
+- Prefer **one** clear signal (card wash, sparkline tint, icon status).
+- Keep sparklines aligned under their gauges (CPU · GPU · FREQ · TEMP).
+- Prefer in-place washes (`.is-hot` on the card or chart) over extra bars or chips.
+- When in doubt, leave the control out.
+
+## Do not
+
+- Insert **Hot · …** attention bars that sit in the sparkline flex row or under the power strip (they shift layout and duplicate the card wash).
+- Add full-width “Hot” banners, redundant summary chips, or second labels for the same metric.
+- Trade alignment for “operator parity” glances on the main metrics surface.
+
+## Hot metrics
+
+Ring cards and matching history charts may use `.is-hot` / `.is-fair` washes. That is enough.
+
+Do **not** bring back:
+
+- `#history-hot-attention-glance` (e.g. “Hot · GPU”)
+- `#power-strip-hot-attention-glance` (e.g. “Hot · Up”)
+
+Process-list Hot filter chips and section glances (Top Processes) are separate — keep those if they help filtering.
+
+## Examples
+
+```text
+❌ Hot · GPU chip beside sparklines (pushes TEMP to the next row)
+❌ Full-width Hot · Up under the battery strip
+✅ GPU metric card amber wash only
+✅ History chart `.is-hot` wash only
+```

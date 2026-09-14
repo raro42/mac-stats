@@ -3582,128 +3582,33 @@ function collectPowerStripHotKeys(data) {
 }
 
 /**
- * Hot attention glance under the battery/power strip (rings Hot / Monitors Down/Slow parity).
- * Summarizes Bat low · LPM On · Heat Fair+ · Up≥7d · RAM/SSD≥85% without restoring slimmed chips.
+ * Hot attention glance under the battery/power strip — removed (KISS).
+ * Ring/card washes and strip cell cues stay; no full-width Hot · … bar.
  */
-function ensurePowerStripHotAttentionGlance() {
-  const strip = document.getElementById('battery-power-strip');
-  if (!strip || !strip.parentNode) return null;
-  let glance = document.getElementById('power-strip-hot-attention-glance');
-  if (!glance) {
-    glance = document.createElement('div');
-    glance.id = 'power-strip-hot-attention-glance';
-    glance.className = 'power-strip-hot-attention-glance';
-    glance.hidden = true;
-    glance.innerHTML = '<span id="power-strip-hot-attention-glance-text"></span>';
-    strip.insertAdjacentElement('afterend', glance);
-    wirePowerStripHotAttentionGlanceClick(glance);
-  } else if (glance.previousElementSibling !== strip) {
-    strip.insertAdjacentElement('afterend', glance);
-  }
-  return glance;
+function removePowerStripHotAttentionGlance() {
+  document.getElementById('power-strip-hot-attention-glance')?.remove();
 }
 
-function applyPowerStripHotAttentionGlanceState(hotKeys) {
-  const glance = ensurePowerStripHotAttentionGlance();
-  if (!glance) return;
-  const text = document.getElementById('power-strip-hot-attention-glance-text');
-  const keys = Array.isArray(hotKeys) ? hotKeys.filter(Boolean) : [];
-  if (keys.length <= 0) {
-    glance.hidden = true;
-    glance.classList.remove('has-hot', 'has-bat', 'has-lpm');
-    return;
-  }
-  glance.hidden = false;
-  glance.classList.add('has-hot');
-  glance.classList.toggle('has-bat', keys.includes('bat'));
-  glance.classList.toggle('has-lpm', keys.includes('lpm') && !keys.includes('bat'));
-  const parts = keys.map((k) => STRIP_HOT_LABELS[k] || k);
-  const label = parts.join(' · ');
-  if (text) text.textContent = `Hot · ${label}`;
-  glance.setAttribute('role', 'button');
-  glance.tabIndex = 0;
-  glance.title =
-    'Open the first hot power-strip cue (Bat≤20% · LPM On · Heat Fair+ · Up≥7d · RAM/SSD≥85%)';
-  glance.setAttribute(
-    'aria-label',
-    `Power strip hot: ${label} — click to open the first hot cue`
-  );
+function ensurePowerStripHotAttentionGlance() {
+  removePowerStripHotAttentionGlance();
+  return null;
+}
+
+function applyPowerStripHotAttentionGlanceState(_hotKeys) {
+  removePowerStripHotAttentionGlance();
 }
 
 function activatePowerStripHotAttentionGlance() {
-  const keys = Array.isArray(window._powerStripHotKeys)
-    ? window._powerStripHotKeys
-    : [];
-  const first = keys[0];
-  if (!first) {
-    document.getElementById('power-strip-hot-attention-glance')?.focus?.();
-    return;
-  }
-  const glance = document.getElementById('power-strip-hot-attention-glance');
-  glance?.classList.add('is-hot-attention-flash');
-  window.setTimeout(() => glance?.classList.remove('is-hot-attention-flash'), 900);
-  switch (first) {
-    case 'bat':
-      openBatterySettingsFromStrip();
-      {
-        const info = document.querySelector('#battery-power-strip .battery-info');
-        info?.classList.add('is-hot-attention-flash');
-        window.setTimeout(() => info?.classList.remove('is-hot-attention-flash'), 900);
-        const bat = document.getElementById('battery-level');
-        if (bat && typeof bat.focus === 'function') {
-          refreshPowerStripRovingTabindex(bat);
-          bat.focus();
-        }
-      }
-      break;
-    case 'lpm': {
-      const cell = document.getElementById('lpm-strip');
-      if (cell) {
-        cell.classList.add('is-hot-attention-flash');
-        window.setTimeout(() => cell.classList.remove('is-hot-attention-flash'), 900);
-        refreshPowerStripRovingTabindex(cell);
-        if (typeof cell.focus === 'function') cell.focus();
-      }
-      break;
-    }
-    case 'heat':
-      openTempRingFromStrip();
-      break;
-    case 'up':
-      openUptimeFromStrip();
-      break;
-    case 'ram':
-      openRamDetailsFromStrip();
-      break;
-    case 'ssd':
-      openDiskCleanupFromStrip();
-      break;
-    default:
-      break;
-  }
+  /* no-op: Hot · Up chrome removed */
 }
 
-function wirePowerStripHotAttentionGlanceClick(glance) {
-  if (!glance || glance.dataset.powerStripHotAttentionWired === '1') return;
-  glance.dataset.powerStripHotAttentionWired = '1';
-  const activate = () => activatePowerStripHotAttentionGlance();
-  glance.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
-  });
-  glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
-  });
+function wirePowerStripHotAttentionGlanceClick(_glance) {
+  /* no-op */
 }
 
 function updatePowerStripHotAttention(data) {
-  const keys = collectPowerStripHotKeys(data);
-  window._powerStripHotKeys = keys;
-  applyPowerStripHotAttentionGlanceState(keys);
+  window._powerStripHotKeys = collectPowerStripHotKeys(data);
+  removePowerStripHotAttentionGlance();
 }
 
 function getRingMetricCardEntries() {
@@ -3744,10 +3649,12 @@ function historyChartContainerForRingKey(key) {
 function removeRingsFilterChips() {
   document.getElementById('rings-filter-chips')?.remove();
   document.getElementById('rings-hot-attention-glance')?.remove();
+  document.getElementById('history-hot-attention-glance')?.remove();
+  document.getElementById('power-strip-hot-attention-glance')?.remove();
   document.querySelectorAll('.rings-filter-miss').forEach((el) => el.remove());
 }
 
-/** History Hot attention labels (menu-bar amber / `/rings hot` parity). */
+/** History Hot attention labels kept for `/rings hot` / digester parity (no UI chrome). */
 const HISTORY_HOT_ORDER = ['cpu', 'gpu', 'freq', 'temp'];
 const HISTORY_HOT_LABELS = {
   cpu: 'CPU',
@@ -3756,134 +3663,26 @@ const HISTORY_HOT_LABELS = {
   temp: 'Temp',
 };
 
-/**
- * Hot attention glance above history sparklines (power-strip / Details Hot parity).
- * Lives on the history section — not under the gauges — so rings keep the pulse-only cue.
- */
-function ensureHistoryHotAttentionGlance() {
-  const section = getHistorySparklineSection();
-  if (!section) return null;
-  let glance = document.getElementById('history-hot-attention-glance');
-  if (!glance) {
-    glance = document.createElement('div');
-    glance.id = 'history-hot-attention-glance';
-    glance.className = 'history-hot-attention-glance';
-    glance.hidden = true;
-    glance.innerHTML =
-      '<span id="history-hot-attention-glance-text"></span>';
-    const firstChart = section.querySelector('.history-chart-container');
-    const controls = document.getElementById('history-controls');
-    if (firstChart) {
-      firstChart.insertAdjacentElement('beforebegin', glance);
-    } else if (controls) {
-      controls.insertAdjacentElement('afterend', glance);
-    } else {
-      section.insertAdjacentElement('afterbegin', glance);
-    }
-    wireHistoryHotAttentionGlanceClick(glance);
-  } else {
-    const firstChart = section.querySelector('.history-chart-container');
-    if (firstChart && glance.nextElementSibling !== firstChart) {
-      firstChart.insertAdjacentElement('beforebegin', glance);
-    }
-  }
-  return glance;
+/** History Hot · … glance above sparklines — removed (KISS; card wash is enough). */
+function removeHistoryHotAttentionGlance() {
+  document.getElementById('history-hot-attention-glance')?.remove();
 }
 
-function applyHistoryHotAttentionGlanceState(hotKeys) {
-  const glance = ensureHistoryHotAttentionGlance();
-  if (!glance) return;
-  const text = document.getElementById('history-hot-attention-glance-text');
-  const keys = Array.isArray(hotKeys) ? hotKeys.filter(Boolean) : [];
-  window._historyHotKeys = keys;
-  if (keys.length <= 0) {
-    glance.hidden = true;
-    glance.classList.remove('has-hot');
-    return;
-  }
-  glance.hidden = false;
-  glance.classList.add('has-hot');
-  const parts = keys.map((k) => HISTORY_HOT_LABELS[k] || k);
-  const label = parts.join(' · ');
-  if (text) text.textContent = `Hot · ${label}`;
-  glance.setAttribute('role', 'button');
-  glance.tabIndex = 0;
-  glance.title =
-    'Open the first hot history chart (CPU≥50% · GPU≥15% · Freq≥3.5 GHz · Temp≥70°C)';
-  glance.setAttribute(
-    'aria-label',
-    `History hot: ${label} — click to open the first hot chart`
-  );
+function ensureHistoryHotAttentionGlance() {
+  removeHistoryHotAttentionGlance();
+  return null;
+}
+
+function applyHistoryHotAttentionGlanceState(_hotKeys) {
+  removeHistoryHotAttentionGlance();
 }
 
 function activateHistoryHotAttentionGlance() {
-  const keys = Array.isArray(window._historyHotKeys)
-    ? window._historyHotKeys
-    : [];
-  const first = keys[0];
-  const glance = document.getElementById('history-hot-attention-glance');
-  glance?.classList.add('is-hot-attention-flash');
-  window.setTimeout(
-    () => glance?.classList.remove('is-hot-attention-flash'),
-    900
-  );
-  if (!first) {
-    glance?.focus?.();
-    return;
-  }
-  const chart = historyChartContainerForRingKey(first);
-  if (chart) {
-    if (typeof chart.scrollIntoView === 'function') {
-      chart.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-    chart.classList.add('is-hot-attention-flash');
-    window.setTimeout(
-      () => chart.classList.remove('is-hot-attention-flash'),
-      900
-    );
-    refreshHistorySparklineRovingTabindex(chart);
-    if (typeof chart.focus === 'function') chart.focus();
-    activateHistorySparkline(chart);
-    return;
-  }
-  glance?.focus?.();
+  /* no-op */
 }
 
-function wireHistoryHotAttentionGlanceClick(glance) {
-  if (!glance || glance.dataset.historyHotAttentionWired === '1') return;
-  glance.dataset.historyHotAttentionWired = '1';
-  const activate = () => activateHistoryHotAttentionGlance();
-  glance.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
-  });
-  glance.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      e.stopPropagation();
-      activate();
-      return;
-    }
-    const down = e.key === 'ArrowDown' || e.key === 'j';
-    const up = e.key === 'ArrowUp' || e.key === 'k';
-    if (down) {
-      const chips = getHistorySparklineChips();
-      if (!chips.length) return;
-      e.preventDefault();
-      e.stopPropagation();
-      refreshHistorySparklineRovingTabindex(chips[0]);
-      chips[0].focus();
-      return;
-    }
-    if (up) {
-      if (tryChainSparklineToRingLastDirect()) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
-  });
+function wireHistoryHotAttentionGlanceClick(_glance) {
+  /* no-op */
 }
 
 /** Last ring gauge focus (skip history Hot glance). */
@@ -3960,8 +3759,8 @@ function updateRingHotStates(data) {
     gpuChart.dataset.ringsHot = hot ? '1' : '0';
     gpuChart.dataset.ringsFair = '0';
   }
-  const hotKeys = HISTORY_HOT_ORDER.filter((k) => hotByKey[k]);
-  applyHistoryHotAttentionGlanceState(hotKeys);
+  window._historyHotKeys = HISTORY_HOT_ORDER.filter((k) => hotByKey[k]);
+  removeHistoryHotAttentionGlance();
   refreshRingGaugeRovingTabindex();
   refreshHistorySparklineRovingTabindex();
 }
@@ -20718,11 +20517,6 @@ function tryChainRingGaugeToHeaderSettings() {
 }
 
 function tryChainRingGaugeToSparklineFirst() {
-  const glance = document.getElementById('history-hot-attention-glance');
-  if (glance && !glance.hidden) {
-    glance.focus();
-    return true;
-  }
   const chips = getHistorySparklineChips();
   if (!chips.length) return false;
   refreshHistorySparklineRovingTabindex(chips[0]);
@@ -20757,11 +20551,6 @@ function tryChainRingGaugeToDetailsFirst() {
 }
 
 function tryChainSparklineToRingLast() {
-  const glance = document.getElementById('history-hot-attention-glance');
-  if (glance && !glance.hidden) {
-    glance.focus();
-    return true;
-  }
   return tryChainSparklineToRingLastDirect();
 }
 

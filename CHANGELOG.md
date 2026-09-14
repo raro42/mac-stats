@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1074] - 2026-09-14
+
+### Fixed
+- **CPU window Hot chrome** — removed the history “Hot · …” chip (it sat in the sparkline row and pushed TEMP onto a second line) and the full-width power-strip “Hot · …” bar. Ring cards and sparklines keep the amber wash only (KISS). Rule: `.cursor/rules/ui-kiss-sleek.mdc`.
+
 ## [0.1.1073] - 2026-09-14
 
 ### Changed
