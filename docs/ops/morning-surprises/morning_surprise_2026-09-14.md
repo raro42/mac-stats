@@ -6,6 +6,7 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 | Version | What |
 | --- | --- |
+| **v0.1.1072** | Instant `/keep-p25` · `keep p25` · `p25 keep gap` · `25th percentile keep gap` · `p25 gap between keeps` (+ discard) — nearest-rank p25 (floor quartile) of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1071** | Instant `/keep-p10` · `keep p10` · `p10 keep gap` · `10th percentile keep gap` · `p10 gap between keeps` (+ discard) — nearest-rank p10 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1070** | Instant `/keep-p95` · `keep p95` · `p95 keep gap` · `95th percentile keep gap` · `p95 gap between keeps` (+ discard) — nearest-rank p95 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1069** | Instant `/keep-histogram` · `keep histogram` · `gap histogram` · `keep gap histogram` · `histogram keep gap` (+ discard) — minute-bucket histogram (`<5m` · `5–10m` · `10–20m` · `20–30m` · `30–60m` · `≥60m`) of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
@@ -28,9 +29,9 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 ## Try it
 
-Open the CPU window: when Heat is Fair and Temp is under 70°C, the Temperature ring and TEMP sparkline show a soft amber wash (no pulse). Serious/Critical still pulse hot. Instant ratchet: `/keep-p10` or `10th percentile keep gap` (floor gap); `/keep-p95` for the tail. Also `/keep-histogram` for minute buckets; `/keep-gini` for inequality (0 = even pace).
+Open the CPU window: when Heat is Fair and Temp is under 70°C, the Temperature ring and TEMP sparkline show a soft amber wash (no pulse). Serious/Critical still pulse hot. Instant ratchet: `/keep-p25` or `25th percentile keep gap` (floor quartile); `/keep-p10` for the floor; `/keep-p95` for the tail. Also `/keep-histogram` for minute buckets; `/keep-gini` for inequality (0 = even pace).
 
 ## Notes
 
-- Digester open empty this tick; design review due=false (grace). Fuel = standing backlog `/keep-p10` after keep-p95.
-- Install/kickstart after v0.1.1071; confirm Discord Ready.
+- Digester open empty this tick; design review due=false (grace). Fuel = standing backlog `/keep-p25` after keep-p10.
+- Install/kickstart after v0.1.1072; confirm Discord Ready.
