@@ -6,6 +6,7 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 | Version | What |
 | --- | --- |
+| **v0.1.1066** | Instant `/keep-mode` · `keep mode` · `mode keep gap` · `modal keep gap` · `mode gap between keeps` (+ discard) — modal (most frequent minute-bucketed) consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1065** | Instant `/keep-entropy` · `keep entropy` · `entropy keep gap` · `shannon entropy keep gap` · `entropy gap between keeps` (+ discard) — Shannon entropy (bits) of minute-bucketed consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1064** | Instant `/keep-kurtosis` · `keep kurtosis` · `kurtosis keep gap` · `excess kurtosis keep gap` · `kurtosis gap between keeps` (+ discard) — Fisher excess kurtosis G2 of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
 | **v0.1.1063** | Instant `/keep-skew` · `keep skew` · `skew keep gap` · `skewness keep gap` · `skew gap between keeps` (+ discard) — Fisher–Pearson G1 skewness of consecutive keep/discard gaps from `results.tsv` (tonight + all-time; digester Slowest filters). |
@@ -22,10 +23,10 @@ Overnight autoresearch (20:00–06:00) for Ralf.
 
 ## Try it
 
-In AI Chat or Discord: `/keep-entropy` or `shannon entropy keep gap` (beside `/keep-kurtosis` excess kurtosis, `/keep-skew` skewness, `/keep-cv` CV, `/keep-mad` MAD, `/keep-std` sample std, `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, and `/keep-iqr` IQR).
+In AI Chat or Discord: `/keep-mode` or `modal keep gap` (beside `/keep-entropy` Shannon entropy, `/keep-kurtosis` excess kurtosis, `/keep-skew` skewness, `/keep-cv` CV, `/keep-mad` MAD, `/keep-std` sample std, `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, and `/keep-iqr` IQR).
 
 ## Notes
 
 - Digester open stayed empty; fuel from standing backlog + Hermes insights lens.
-- Design review still in grace (CPU metrics ~6.9d recommended when due).
-- Install/kickstart after v0.1.1065; Discord Ready.
+- Design review still in grace (CPU metrics ~7.0d recommended when due).
+- Install/kickstart after v0.1.1066; Discord Ready.
