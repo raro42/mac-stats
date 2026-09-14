@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1067] - 2026-09-14
+
+### Changed
+- CPU metrics: Temperature ring and TEMP sparkline show a soft Fair thermal wash when Apple thermal pressure is Fair (below the ≥70°C hot pulse). Serious/Critical thermal marks the Temp ring hot even under 70°C — matches power-strip Heat cues (design review / `feature-cpu-metrics`).
+
 ## [0.1.1066] - 2026-09-14
 
 ### Added
