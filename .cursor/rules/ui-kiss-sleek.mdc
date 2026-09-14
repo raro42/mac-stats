@@ -28,14 +28,19 @@ Do **not** bring back:
 
 - `#history-hot-attention-glance` (e.g. “Hot · GPU”)
 - `#power-strip-hot-attention-glance` (e.g. “Hot · Up”)
+- `#details-hot-attention-glance` (e.g. “Hot · Load”)
 
 Process-list Hot filter chips and section glances (Top Processes) are separate — keep those if they help filtering.
+
+When Details is **collapsed**, the keep-header glance may use `.is-hot` wash for Load/RAM. That is enough. Do not add a second Hot bar when Details is open — the numbers are already on screen.
 
 ## Examples
 
 ```text
 ❌ Hot · GPU chip beside sparklines (pushes TEMP to the next row)
 ❌ Full-width Hot · Up under the battery strip
+❌ Full-width Hot · Load above Details rows (only focuses Load 1m you can already see)
 ✅ GPU metric card amber wash only
 ✅ History chart `.is-hot` wash only
+✅ Details collapsed glance `.is-hot` when Load/RAM is high
 ```

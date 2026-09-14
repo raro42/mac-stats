@@ -3651,6 +3651,7 @@ function removeRingsFilterChips() {
   document.getElementById('rings-hot-attention-glance')?.remove();
   document.getElementById('history-hot-attention-glance')?.remove();
   document.getElementById('power-strip-hot-attention-glance')?.remove();
+  document.getElementById('details-hot-attention-glance')?.remove();
   document.querySelectorAll('.rings-filter-miss').forEach((el) => el.remove());
 }
 
@@ -11789,34 +11790,14 @@ const DETAILS_HOT_LOAD = 4;
 const DETAILS_HOT_RAM_PCT = 85;
 const DETAILS_HOT_LABELS = { load: "Load", ram: "RAM" };
 
-/**
- * Hot attention glance above the Details grid (rings Hot / `/details hot` parity).
- * Visible when Details is open and Load ≥4 or RAM ≥85%.
- */
+/** Details Hot · … bar — removed (KISS; numbers + collapsed glance wash are enough). */
+function removeDetailsHotAttentionGlance() {
+  document.getElementById("details-hot-attention-glance")?.remove();
+}
+
 function ensureDetailsHotAttentionGlance() {
-  const grid =
-    document.getElementById("details-content") ||
-    document.querySelector(".details-grid");
-  const header = document.getElementById("details-header");
-  let glance = document.getElementById("details-hot-attention-glance");
-  if (!glance) {
-    glance = document.createElement("div");
-    glance.id = "details-hot-attention-glance";
-    glance.className = "details-hot-attention-glance";
-    glance.hidden = true;
-    glance.innerHTML = '<span id="details-hot-attention-glance-text"></span>';
-    if (grid) {
-      grid.insertAdjacentElement("beforebegin", glance);
-    } else if (header) {
-      header.insertAdjacentElement("afterend", glance);
-    } else {
-      return null;
-    }
-    wireDetailsHotAttentionGlanceClick(glance);
-  } else if (grid && glance.nextElementSibling !== grid) {
-    grid.insertAdjacentElement("beforebegin", glance);
-  }
-  return glance;
+  removeDetailsHotAttentionGlance();
+  return null;
 }
 
 function detailsHotKeysFromMetrics({ load1, ramPct }) {
@@ -11835,81 +11816,16 @@ function detailsHotKeysFromMetrics({ load1, ramPct }) {
 }
 
 function applyDetailsHotAttentionGlanceState({ load1, ramPct }) {
-  const glance = ensureDetailsHotAttentionGlance();
-  if (!glance) return;
-  const text = document.getElementById("details-hot-attention-glance-text");
-  const keys = detailsHotKeysFromMetrics({ load1, ramPct });
-  window._detailsHotKeys = keys;
-  if (isDetailsSectionCollapsed() || keys.length <= 0) {
-    glance.hidden = true;
-    glance.classList.remove("has-hot");
-    return;
-  }
-  glance.hidden = false;
-  glance.classList.add("has-hot");
-  const parts = keys.map((k) => DETAILS_HOT_LABELS[k] || k);
-  const label = parts.join(" · ");
-  if (text) text.textContent = `Hot · ${label}`;
-  glance.setAttribute("role", "button");
-  glance.tabIndex = 0;
-  glance.title =
-    "Focus the first hot Details row (Load≥4 · RAM≥85%; `/details hot` parity)";
-  glance.setAttribute(
-    "aria-label",
-    `Details hot: ${label} — click to focus the first hot value`
-  );
+  window._detailsHotKeys = detailsHotKeysFromMetrics({ load1, ramPct });
+  removeDetailsHotAttentionGlance();
 }
 
 function activateDetailsHotAttentionGlance() {
-  if (isDetailsSectionCollapsed()) {
-    if (typeof window.showCpuDetailsSection === "function") {
-      window.showCpuDetailsSection();
-    } else if (typeof window.showDetailsProcessesSections === "function") {
-      window.showDetailsProcessesSections();
-    }
-  }
-  const keys = Array.isArray(window._detailsHotKeys)
-    ? window._detailsHotKeys
-    : [];
-  const first = keys[0];
-  const glance = document.getElementById("details-hot-attention-glance");
-  glance?.classList.add("is-hot-attention-flash");
-  window.setTimeout(() => glance?.classList.remove("is-hot-attention-flash"), 900);
-  if (first === "load") {
-    const loadEl = document.getElementById("load-1");
-    if (loadEl && typeof loadEl.scrollIntoView === "function") {
-      loadEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-    flashLoadDetails();
-    const grid = document.getElementById("details-content");
-    if (loadEl && grid) {
-      syncDetailsValuesTabOrder(grid, loadEl);
-      if (typeof loadEl.focus === "function") loadEl.focus();
-    }
-    return;
-  }
-  if (first === "ram") {
-    openRamDetailsFromStrip();
-    return;
-  }
-  glance?.focus?.();
+  /* no-op */
 }
 
-function wireDetailsHotAttentionGlanceClick(glance) {
-  if (!glance || glance.dataset.detailsHotAttentionWired === "1") return;
-  glance.dataset.detailsHotAttentionWired = "1";
-  const activate = () => activateDetailsHotAttentionGlance();
-  glance.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
-  });
-  glance.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
-  });
+function wireDetailsHotAttentionGlanceClick(_glance) {
+  /* no-op */
 }
 
 function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
@@ -12106,11 +12022,7 @@ function initCollapsibleSections() {
     syncDetailsCollapseA11y();
     const glance = document.getElementById("details-collapsed-glance");
     if (glance) glance.hidden = true;
-    const hotAtt = document.getElementById("details-hot-attention-glance");
-    if (hotAtt) {
-      hotAtt.hidden = true;
-      hotAtt.classList.remove("has-hot");
-    }
+    removeDetailsHotAttentionGlance();
   }
   
   // Show Details section (full grid)
@@ -12250,7 +12162,7 @@ function initCollapsibleSections() {
         e.target &&
         e.target.closest &&
         e.target.closest(
-          '#details-collapsed-glance, #details-hot-attention-glance'
+          '#details-collapsed-glance'
         )
       ) {
         return;

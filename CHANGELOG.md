@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1075] - 2026-09-14
+
+### Fixed
+- **Details Hot · Load bar** — removed the full-width Hot attention strip above Details. It only focused Load/RAM you can already see and pushed the metrics down. Collapsed Details still uses the amber glance wash when Load/RAM is high (KISS).
+
 ## [0.1.1074] - 2026-09-14
 
 ### Fixed
