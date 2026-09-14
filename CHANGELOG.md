@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1066] - 2026-09-14
+
+### Added
+
+- Instant lane: `/keep-mode` · `keep mode` · `mode keep gap` · `modal keep gap` · `mode gap between keeps` · `view keep mode` / `open keep mode` (and discard / modal variants) — modal (most frequent minute-bucketed) gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; mode only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, `/keep-iqr` IQR, `/keep-std` std, `/keep-mad` MAD, `/keep-cv` CV, `/keep-skew` skewness, `/keep-kurtosis` excess kurtosis, `/keep-entropy` Shannon entropy, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1065] - 2026-09-14
 
 ### Added
