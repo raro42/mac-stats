@@ -6448,22 +6448,46 @@ let diskCleanupGlanceInterval = null;
 // Cache for monitor status data (to avoid polling backend when opening settings)
 const monitorStatusCache = new Map(); // Map<monitorId, {is_up, response_time_ms, error, checked_at}>
 
-// Monitor history storage (last 24 hours)
+// Monitor history storage (last 24 hours) — filled from backend real checks.
 // Structure: Map<monitorId, Array<{timestamp: number, is_up: boolean}>>
 const monitorHistory = new Map();
 
-// Initialize monitor history from localStorage
-function initMonitorHistory() {
+/** Replace in-memory history from backend (`monitor_history.json` — works with window closed). */
+async function refreshMonitorHistoryFromBackend() {
+  try {
+    const all = await invoke('get_all_monitor_check_histories');
+    monitorHistory.clear();
+    if (all && typeof all === 'object') {
+      for (const [monitorId, entries] of Object.entries(all)) {
+        if (!Array.isArray(entries) || entries.length === 0) continue;
+        const mapped = entries
+          .map((e) => ({
+            timestamp: Number(e.timestamp),
+            is_up: !!e.is_up,
+          }))
+          .filter((e) => Number.isFinite(e.timestamp));
+        if (mapped.length) monitorHistory.set(monitorId, mapped);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load monitor check history from backend:', err);
+  }
+}
+
+// Initialize monitor history (prefer backend; fall back to legacy localStorage once).
+async function initMonitorHistory() {
+  await refreshMonitorHistoryFromBackend();
+  if (monitorHistory.size > 0) return;
   try {
     const stored = localStorage.getItem('monitor_history');
     if (stored) {
       const parsed = JSON.parse(stored);
       const now = Date.now();
-      const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-      
-      // Filter out entries older than 24 hours
+      const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
       for (const [monitorId, history] of Object.entries(parsed)) {
-        const filtered = history.filter(entry => entry.timestamp >= twentyFourHoursAgo);
+        const filtered = (history || []).filter(
+          (entry) => entry.timestamp >= twentyFourHoursAgo
+        );
         if (filtered.length > 0) {
           monitorHistory.set(monitorId, filtered);
         }
@@ -6474,44 +6498,39 @@ function initMonitorHistory() {
   }
 }
 
-// Save monitor history to localStorage
+// Save monitor history to localStorage (legacy cache only; backend is source of truth).
 function saveMonitorHistory() {
   try {
     const now = Date.now();
-    const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-    
-    // Clean up old entries before saving
+    const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
     const toSave = {};
     for (const [monitorId, history] of monitorHistory.entries()) {
-      const filtered = history.filter(entry => entry.timestamp >= twentyFourHoursAgo);
+      const filtered = history.filter((entry) => entry.timestamp >= twentyFourHoursAgo);
       if (filtered.length > 0) {
         toSave[monitorId] = filtered;
       }
     }
-    
     localStorage.setItem('monitor_history', JSON.stringify(toSave));
   } catch (err) {
     console.error('Failed to save monitor history:', err);
   }
 }
 
-// Add a history entry for a monitor
+// Legacy helper — real ticks are recorded in Rust on each check_monitor.
 function addMonitorHistoryEntry(monitorId, isUp) {
   const now = Date.now();
-  const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-  
+  const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
   if (!monitorHistory.has(monitorId)) {
     monitorHistory.set(monitorId, []);
   }
-  
   const history = monitorHistory.get(monitorId);
+  const last = history[history.length - 1];
+  if (last && last.is_up === isUp && Math.abs(now - last.timestamp) < 5000) {
+    return;
+  }
   history.push({ timestamp: now, is_up: isUp });
-  
-  // Remove entries older than 24 hours
-  const filtered = history.filter(entry => entry.timestamp >= twentyFourHoursAgo);
+  const filtered = history.filter((entry) => entry.timestamp >= twentyFourHoursAgo);
   monitorHistory.set(monitorId, filtered);
-  
-  // Save to localStorage (throttled)
   if (!window._monitorHistorySaveTimeout) {
     window._monitorHistorySaveTimeout = setTimeout(() => {
       saveMonitorHistory();
@@ -6523,10 +6542,9 @@ function addMonitorHistoryEntry(monitorId, isUp) {
 // Get monitor history for the last 24 hours
 function getMonitorHistory(monitorId) {
   const now = Date.now();
-  const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-  
+  const twentyFourHoursAgo = now - 24 * 60 * 60 * 1000;
   const history = monitorHistory.get(monitorId) || [];
-  return history.filter(entry => entry.timestamp >= twentyFourHoursAgo);
+  return history.filter((entry) => entry.timestamp >= twentyFourHoursAgo);
 }
 
 function wireCollapsibleHeaderA11y(header, options = {}) {
@@ -6577,7 +6595,7 @@ function initMonitorsSection() {
   
   console.log('Initializing monitors section', { header: !!header, content: !!content });
 
-  // Initialize monitor history from localStorage
+  // Initialize monitor history from backend (real checks, including window-closed)
   initMonitorHistory();
   wireMonitorRemoveDelegation();
   wireMonitorsListKeyboard();
@@ -9149,6 +9167,9 @@ async function loadMonitors() {
   if (!monitorsList) return;
 
   try {
+    // Pull real background-check ticks (not UI poll stamps).
+    await refreshMonitorHistoryFromBackend();
+
     const monitorIds = await invoke('list_monitors');
     
     // Create a map of existing monitor items by their data-monitor-id attribute
@@ -9192,9 +9213,6 @@ async function loadMonitors() {
           continue;
         }
         monitorStatusCache.set(monitorId, status);
-        
-        // Add to history
-        addMonitorHistoryEntry(monitorId, status.is_up);
         
         // Check if we already have an item for this monitor
         const existingItem = existingItems.get(monitorId);
@@ -9636,7 +9654,7 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
     const status = await invoke('check_monitor', { monitorId });
     if (status) {
       monitorStatusCache.set(monitorId, status);
-      addMonitorHistoryEntry(monitorId, status.is_up);
+      await refreshMonitorHistoryFromBackend();
       let monitorUrl = monitorId;
       try {
         const details = await invoke('get_monitor_details', { monitorId });

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1076] - 2026-09-14
+
+### Fixed
+- **Monitor history bars** — green/red ticks now come from real background checks (`~/.mac-stats/monitor_history.json`), including while the CPU window is closed. Opening the window no longer invents ticks from UI status polls, so a morning of monitoring fills the bar instead of a few lines after open.
+
 ## [0.1.1075] - 2026-09-14
 
 ### Fixed

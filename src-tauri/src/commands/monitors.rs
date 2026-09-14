@@ -25,6 +25,100 @@ const DOWN_BACKOFF_SECS: u64 = 180;
 const DNS_DOWN_BACKOFF_SECS: u64 = 300;
 /// While outcome is unchanged, rewrite `monitors.json` at most this often (last_check checkpoint).
 const STATS_DISK_CHECKPOINT_SECS: i64 = 300;
+/// Keep per-check history bars for this long (matches CPU window localStorage window).
+const MONITOR_HISTORY_RETENTION_MS: i64 = 24 * 60 * 60 * 1000;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MonitorHistoryEntry {
+    /// Unix epoch milliseconds (CPU window history bars).
+    pub timestamp: i64,
+    pub is_up: bool,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+struct MonitorHistoryFile {
+    /// monitor_id → check ticks (oldest → newest after prune).
+    #[serde(default)]
+    monitors: HashMap<String, Vec<MonitorHistoryEntry>>,
+}
+
+fn monitor_history_path() -> std::path::PathBuf {
+    Config::monitor_history_file_path()
+}
+
+fn prune_monitor_history_entries(entries: &mut Vec<MonitorHistoryEntry>, now_ms: i64) {
+    let cutoff = now_ms - MONITOR_HISTORY_RETENTION_MS;
+    entries.retain(|e| e.timestamp >= cutoff);
+}
+
+fn load_monitor_history_file() -> MonitorHistoryFile {
+    let path = monitor_history_path();
+    match fs::read_to_string(&path) {
+        Ok(s) => serde_json::from_str(&s).unwrap_or_default(),
+        Err(_) => MonitorHistoryFile::default(),
+    }
+}
+
+fn save_monitor_history_file(file: &MonitorHistoryFile) -> Result<(), String> {
+    if let Some(parent) = monitor_history_path().parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let path = monitor_history_path();
+    let pretty = serde_json::to_string_pretty(file).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(&path, &pretty)
+}
+
+/// Record one real HTTP check for the green/red history bars (works with CPU window closed).
+fn record_monitor_history_tick(monitor_id: &str, is_up: bool, at: chrono::DateTime<chrono::Utc>) {
+    let now_ms = at.timestamp_millis();
+    let mut file = load_monitor_history_file();
+    let entries = file.monitors.entry(monitor_id.to_string()).or_default();
+    // Dedup same-second spam if check_monitor is invoked twice quickly.
+    if let Some(last) = entries.last() {
+        if last.is_up == is_up && (now_ms - last.timestamp).abs() < 5_000 {
+            return;
+        }
+    }
+    entries.push(MonitorHistoryEntry {
+        timestamp: now_ms,
+        is_up,
+    });
+    prune_monitor_history_entries(entries, now_ms);
+    if let Err(e) = save_monitor_history_file(&file) {
+        tracing::debug!("Monitor history: save failed for {}: {}", monitor_id, e);
+    }
+}
+
+fn clear_monitor_history_for(monitor_id: &str) {
+    let mut file = load_monitor_history_file();
+    if file.monitors.remove(monitor_id).is_some() {
+        let _ = save_monitor_history_file(&file);
+    }
+}
+
+/// Last 24h of real background/manual checks for one monitor (history bars).
+#[tauri::command]
+pub fn get_monitor_check_history(monitor_id: String) -> Result<Vec<MonitorHistoryEntry>, String> {
+    let now_ms = chrono::Utc::now().timestamp_millis();
+    let mut file = load_monitor_history_file();
+    let Some(entries) = file.monitors.get_mut(&monitor_id) else {
+        return Ok(Vec::new());
+    };
+    prune_monitor_history_entries(entries, now_ms);
+    Ok(entries.clone())
+}
+
+/// Last 24h of real checks for all monitors (one round-trip for the CPU window).
+#[tauri::command]
+pub fn get_all_monitor_check_histories() -> Result<HashMap<String, Vec<MonitorHistoryEntry>>, String>
+{
+    let now_ms = chrono::Utc::now().timestamp_millis();
+    let mut file = load_monitor_history_file();
+    for entries in file.monitors.values_mut() {
+        prune_monitor_history_entries(entries, now_ms);
+    }
+    Ok(file.monitors)
+}
 
 /// True when up/down or error text changed (ignore response-time jitter).
 fn monitor_outcome_changed(
@@ -762,6 +856,9 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         }
     }
 
+    // Persist up/down tick for history bars even when the CPU window is closed.
+    record_monitor_history_tick(&monitor_id, result.is_up, now);
+
     // Persist on outcome change, else ~5 min last_check checkpoint (cuts SSD + log thrash).
     // `save_monitors` uses try_lock on each map — skip quietly if busy.
     if should_persist_monitor_stats(prev_status.as_ref(), &result, last_disk, now) {
@@ -833,6 +930,7 @@ pub fn remove_monitor(monitor_id: String) -> Result<(), String> {
     if let Ok(mut stats) = get_monitor_stats().lock() {
         found |= stats.remove(&monitor_id).is_some();
     }
+    clear_monitor_history_for(&monitor_id);
 
     if !found {
         debug!(
@@ -961,7 +1059,8 @@ mod monitor_interval_tests {
     use super::{
         attach_down_since, background_interval_secs, clamp_monitor_check_interval_secs,
         enrich_status_with_backoff, is_monitor_due_for_background, monitor_outcome_changed,
-        should_persist_monitor_stats, DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
+        prune_monitor_history_entries, should_persist_monitor_stats, MonitorHistoryEntry,
+        DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS, MONITOR_HISTORY_RETENTION_MS,
         STATS_DISK_CHECKPOINT_SECS,
     };
     use chrono::{TimeZone, Utc};
@@ -1166,6 +1265,29 @@ mod monitor_interval_tests {
             lib_rs.contains("run_due_monitor_checks()"),
             "lib.rs should call run_due_monitor_checks from the 30s monitor thread"
         );
+    }
+
+    #[test]
+    fn prune_monitor_history_drops_older_than_24h() {
+        let now = 1_700_000_000_000i64;
+        let mut entries = vec![
+            MonitorHistoryEntry {
+                timestamp: now - MONITOR_HISTORY_RETENTION_MS - 1,
+                is_up: true,
+            },
+            MonitorHistoryEntry {
+                timestamp: now - 60_000,
+                is_up: false,
+            },
+            MonitorHistoryEntry {
+                timestamp: now,
+                is_up: true,
+            },
+        ];
+        prune_monitor_history_entries(&mut entries, now);
+        assert_eq!(entries.len(), 2);
+        assert!(!entries[0].is_up);
+        assert!(entries[1].is_up);
     }
 
     #[test]

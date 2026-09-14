@@ -26,7 +26,7 @@ HTTP(S) uptime checks in the CPU window — part of the core monitor (no AI requ
 |--------|--------|
 | Summary | *N / M sites up · Avg … ms* |
 | Per site | Status dot, URL, latency, error text when down |
-| History bars | Recent check history (green up / red down) |
+| History bars | Last 24h of **real** checks (green up / red down), including while the CPU window is closed |
 | Menu bar | Red **Mon ✕** cue when any site is down |
 | Manage | `…` menu on the section — add / remove / check |
 

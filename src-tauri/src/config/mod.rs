@@ -686,6 +686,14 @@ impl Config {
         std::env::temp_dir().join("mac-stats-monitors.json")
     }
 
+    /// Per-check up/down ticks for External / Monitors history bars (24h): `$HOME/.mac-stats/monitor_history.json`.
+    pub fn monitor_history_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join("monitor_history.json");
+        }
+        std::env::temp_dir().join("mac-stats-monitor_history.json")
+    }
+
     /// Last Perplexity Search results for `/perplexity` instant: `$HOME/.mac-stats/perplexity_last.json`.
     pub fn perplexity_last_file_path() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
