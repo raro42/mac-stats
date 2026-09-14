@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1070] - 2026-09-14
+
+### Added
+
+- Instant lane: `/keep-p95` · `keep p95` · `p95 keep gap` · `95th percentile keep gap` · `p95 gap between keeps` · `view keep p95` / `open keep p95` (and discard variants) — p95 gap between consecutive keep or discard rows from `results.tsv` (tonight since 20:00 + all-time; p95 only; no row dump). Does not steal `/keep-pace` average, `/keep-median` median, `/keep-range` min–max, `/keep-p90` p90, `/keep-iqr` IQR, `/keep-std` std, `/keep-mad` MAD, `/keep-cv` CV, `/keep-skew` skewness, `/keep-kurtosis` excess kurtosis, `/keep-entropy` Shannon entropy, `/keep-mode` modal gap, `/keep-gini` Gini, `/keep-histogram` histogram, `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning-surprise. Digester Slowest filters for ratchet glances. Hermes-style ratchet glance; p50.
+
 ## [0.1.1069] - 2026-09-14
 
 ### Added

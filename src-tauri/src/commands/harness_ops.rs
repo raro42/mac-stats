@@ -11619,6 +11619,19 @@ pub fn looks_like_results_tsv_pace_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/p90keep")
         || n.starts_with("/p90discard")
         // IQR owns `/keep-iqr` (not this gap glance).
@@ -11766,7 +11779,7 @@ pub fn format_results_tsv_pace_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · pace only · does not dump rows · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -11962,6 +11975,19 @@ pub fn looks_like_results_tsv_median_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/p90keep")
         || n.starts_with("/p90discard")
         // IQR owns `/keep-iqr` (not this gap glance).
@@ -12181,7 +12207,7 @@ pub fn format_results_tsv_median_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · median only · does not dump rows · `/keep-pace` for average gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -12362,6 +12388,19 @@ pub fn looks_like_results_tsv_range_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/p90keep")
         || n.starts_with("/p90discard")
         // IQR owns `/keep-iqr` (not this gap glance).
@@ -12563,7 +12602,7 @@ pub fn format_results_tsv_range_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · range only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -12801,6 +12840,18 @@ pub fn looks_like_results_tsv_p90_request(content: &str) -> bool {
             && !n.contains("pace")
             && !n.contains("gap")
             && !n.contains("between"))
+        // p95 owns `/keep-p95` (not p90).
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("95 th")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.starts_with("/p95keep")
+        || n.starts_with("/p95discard")
     {
         return false;
     }
@@ -13133,6 +13184,19 @@ pub fn looks_like_results_tsv_iqr_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n == "last keep"
         || n == "the last keep"
         || n == "last discard"
@@ -13373,7 +13437,7 @@ pub fn format_results_tsv_iqr_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · IQR only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -13562,6 +13626,19 @@ pub fn looks_like_results_tsv_std_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -13818,7 +13895,7 @@ pub fn format_results_tsv_std_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · std only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -14027,6 +14104,19 @@ pub fn looks_like_results_tsv_mad_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -14294,7 +14384,7 @@ pub fn format_results_tsv_mad_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · MAD only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · MAD only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -14502,6 +14592,19 @@ pub fn looks_like_results_tsv_cv_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -14746,7 +14849,7 @@ pub fn format_results_tsv_cv_gateway(content: &str) -> String {
                 _ => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · CV only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · CV only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -14943,6 +15046,19 @@ pub fn looks_like_results_tsv_skew_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -15181,7 +15297,7 @@ pub fn format_results_tsv_skew_gateway(content: &str) -> String {
                 None => format!("all-time need ≥4 {unit} (3 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · skew only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · skew only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -15378,6 +15494,19 @@ pub fn looks_like_results_tsv_kurtosis_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -15665,7 +15794,7 @@ pub fn format_results_tsv_kurtosis_gateway(content: &str) -> String {
                 None => format!("all-time need ≥5 {unit} (4 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · kurtosis only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · kurtosis only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -15872,6 +16001,19 @@ pub fn looks_like_results_tsv_mode_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -16179,7 +16321,7 @@ pub fn format_results_tsv_mode_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · mode only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · mode only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -16381,6 +16523,19 @@ pub fn looks_like_results_tsv_gini_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -16678,7 +16833,7 @@ pub fn format_results_tsv_gini_gateway(content: &str) -> String {
                 None => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · Gini only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · Gini only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -16894,6 +17049,19 @@ pub fn looks_like_results_tsv_histogram_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -17185,13 +17353,402 @@ pub fn format_results_tsv_histogram_gateway(content: &str) -> String {
                 None => format!("all-time need ≥2 {unit}"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · histogram only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · histogram only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
 }
 
 
+
+
+
+
+
+/// p95 gap between consecutive matching keep/discard rows (nearest-rank).
+fn count_results_tsv_p95(
+    want: ResultsTsvLastWant,
+) -> Result<(Option<u64>, u64, Option<u64>, u64), String> {
+    let path = crate::config::Config::autoresearch_results_tsv();
+    if !path.exists() {
+        return Err("missing".into());
+    }
+    let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let window_start = overnight_window_start_local().with_timezone(&chrono::Utc);
+    let want_keep = matches!(want, ResultsTsvLastWant::Keep);
+    let mut all_ts: Vec<chrono::DateTime<chrono::Utc>> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.splitn(4, '\t');
+        let Some(ts) = cols.next() else {
+            continue;
+        };
+        let _sha = cols.next();
+        let Some(outcome) = cols.next() else {
+            continue;
+        };
+        let outcome = outcome.trim().to_ascii_lowercase();
+        let is_keep = outcome == "keep";
+        let is_discard = outcome == "discard";
+        if want_keep && !is_keep {
+            continue;
+        }
+        if !want_keep && !is_discard {
+            continue;
+        }
+        let Some(parsed) = parse_run_ts(ts) else {
+            continue;
+        };
+        all_ts.push(parsed);
+    }
+    fn p95_gap_secs(ts: &[chrono::DateTime<chrono::Utc>]) -> (Option<u64>, u64) {
+        if ts.len() < 2 {
+            return (None, 0);
+        }
+        let mut gaps: Vec<u64> = Vec::with_capacity(ts.len() - 1);
+        for w in ts.windows(2) {
+            gaps.push((w[1] - w[0]).num_seconds().max(0) as u64);
+        }
+        let n = gaps.len() as u64;
+        if n == 0 {
+            return (None, 0);
+        }
+        gaps.sort_unstable();
+        // Nearest-rank: ceil(0.95 * N), 1-indexed → 0-based index.
+        let rank = ((n as f64) * 0.95).ceil() as usize;
+        let idx = rank.saturating_sub(1).min(gaps.len() - 1);
+        (Some(gaps[idx]), n)
+    }
+    let (p95_all, gaps_all) = p95_gap_secs(&all_ts);
+    let night_ts: Vec<_> = all_ts
+        .into_iter()
+        .filter(|t| *t >= window_start)
+        .collect();
+    let (p95_night, gaps_night) = p95_gap_secs(&night_ts);
+    Ok((p95_night, gaps_night, p95_all, gaps_all))
+}
+
+/// True for short keep-p95 asks (`/keep-p95`, `p95 keep gap`, `95th percentile keep gap`…).
+/// P95 gap only — does not dump TSV or steal range / median / pace / first / last / since / counts / rate / streak / recent / path/size/age / morning surprise.
+pub fn looks_like_results_tsv_p95_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 72 {
+        return false;
+    }
+    if n.contains("path")
+        || n.contains("where")
+        || n.contains("location")
+        || n.contains("folder")
+        || n.contains("directory")
+        || n.contains("dir")
+        || n.contains("size")
+        || n.contains("big")
+        || n.contains("large")
+        || n.contains("bytes")
+        || n.contains(" mb")
+        || n.contains("kb")
+        || n.contains(" gi")
+        || (n.contains("age") && !n.contains("average") && !n.contains("avg") && !n.contains("percentile"))
+        || n.contains("how old")
+        || n.contains("stale")
+        || n.contains("dump")
+        || n.contains("tail")
+        || n.contains("read ")
+        || n.contains("print ")
+        || n.contains("cat ")
+        || n.contains("contents")
+        || n.contains("what is in")
+        || n.contains("what's in")
+        || n.contains("whats in")
+        || n.contains("what shipped")
+        || n.contains("morning surprise")
+        || n.contains("any improvements")
+        || n.contains("improvements from")
+        || n.contains("changelog")
+        || n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("prune")
+        || n.contains("http://")
+        || n.contains("https://")
+        || n.contains("runs.jsonl")
+        || n.contains("debug.log")
+        || n.contains("loop backlog")
+        || n.contains("loop_backlog")
+        || n.contains("sibling")
+        || n.contains("standing")
+        || n.contains("how many")
+        || n.contains("count")
+        || n.contains("summary")
+        || n.contains("hit rate")
+        || n.contains("keep rate")
+        || n.contains("discard rate")
+        || n.contains("streak")
+        || n.contains("recent keeps")
+        || n.contains("recent discards")
+        || n.contains("recent-keeps")
+        || n.contains("recentkeeps")
+        || n.contains("recent-discards")
+        || n.contains("recentdiscards")
+        || n.contains("keep list")
+        || n.contains("discard list")
+        || n.contains("first keep")
+        || n.contains("first discard")
+        || n.contains("earliest keep")
+        || n.contains("earliest discard")
+        || n.contains("opening keep")
+        || n.contains("opening discard")
+        || n.contains("since last")
+        || n.contains("how long since")
+        || n.contains("how long ago")
+        || n.contains("time since")
+        || n.starts_with("/since-")
+        || n.starts_with("/timesince")
+        || n.starts_with("/time-since")
+        || n.starts_with("/last-")
+        || n.starts_with("/first-")
+        || n.starts_with("/firstkeep")
+        || n.starts_with("/firstdiscard")
+        || n.starts_with("/recent-")
+        || n.starts_with("/keep-rate")
+        || n.starts_with("/keeprate")
+        || n.starts_with("/hit-rate")
+        || n.starts_with("/keep-streak")
+        || n.starts_with("/longest-")
+        || n.starts_with("/keep-pace")
+        || n.starts_with("/keeppace")
+        || n.starts_with("/discard-pace")
+        || n.starts_with("/discardpace")
+        || n.starts_with("/keep-median")
+        || n.starts_with("/keepmedian")
+        || n.starts_with("/discard-median")
+        || n.starts_with("/discardmedian")
+        || n.starts_with("/median-")
+        || n.starts_with("/keep-range")
+        || n.starts_with("/keeprange")
+        || n.starts_with("/discard-range")
+        || n.starts_with("/discardrange")
+        || n.starts_with("/gap-range")
+        || n.starts_with("/keep-spread")
+        || n.starts_with("/discard-spread")
+        || n == "last keep"
+        || n == "the last keep"
+        || n == "last discard"
+        || n == "the last discard"
+        || n == "latest keep"
+        || n == "latest discard"
+        || n == "what was the last keep"
+        || n == "what was the last discard"
+        || n.starts_with("/keep-std")
+        || n.starts_with("/keepstd")
+        || n.starts_with("/discard-std")
+        || n.starts_with("/discardstd")
+        || n.starts_with("/std-")
+        || n.contains("stddev")
+        || n.contains("std-dev")
+        || n.contains("std deviation")
+        || n.contains("standard deviation")
+        || n.contains("keep std")
+        || n.contains("discard std")
+        || n.contains("std keep")
+        || n.contains("std discard")
+        || n.contains("std gap")
+        // Other gap stats own these words (not p95).
+        || n.contains("iqr")
+        || n.contains("interquartile")
+        || n.contains("inter quartile")
+        || n.starts_with("/keep-iqr")
+        || n.starts_with("/keepiqr")
+        || n.starts_with("/discard-iqr")
+        || n.starts_with("/discardiqr")
+        || n.starts_with("/iqr-")
+        || n.contains("median")
+        || n.contains("range")
+        || n.contains("spread")
+        || n.contains("min max")
+        || n.contains("minmax")
+        || n.contains("min-max")
+        || n.contains("shortest and longest")
+        || n.contains("longest and shortest")
+        || n.contains("keep pace")
+        || n.contains("discard pace")
+        || n.contains("ratchet pace")
+        || n.contains("average")
+        || n.contains("avg ")
+        || n.starts_with("avg ")
+        || n.contains(" mean ")
+        || n.starts_with("mean ")
+        // Hit-rate owns bare percent without p95.
+        || (n.contains("percent")
+            && !n.contains("percentile")
+            && !n.contains("p95")
+            && !n.contains("95th"))
+        || (n.contains("rate")
+            && !n.contains("p95")
+            && !n.contains("95th")
+            && !n.contains("pace")
+            && !n.contains("gap")
+            && !n.contains("between"))
+        // Do not steal p90 / bare percentile / other gap stats.
+        || n.contains("p90")
+        || n.contains("p-90")
+        || n.contains("90th")
+        || n.contains("90 th")
+        || n.starts_with("/keep-p90")
+        || n.starts_with("/keepp90")
+        || n.starts_with("/discard-p90")
+        || n.starts_with("/discardp90")
+        || n.starts_with("/p90-")
+        || n.starts_with("/keep-percentile")
+        || n.starts_with("/keeppercentile")
+        || n.contains("keep percentile")
+        || n.contains("discard percentile")
+        || n.contains("histogram")
+        || n.starts_with("/keep-histogram")
+        || n.starts_with("/keephistogram")
+        || n.contains("gini")
+        || n.starts_with("/keep-gini")
+        || n.contains("entropy")
+        || n.contains("kurtosis")
+        || n.contains("skew")
+        || n.contains("keep cv")
+        || n.starts_with("/keep-cv")
+        || n.contains("mad")
+        || n.starts_with("/keep-mad")
+        || n.contains("mode")
+        || n.starts_with("/keep-mode")
+    {
+        return false;
+    }
+    // Must say p95 / 95th (or /keep-p95 slash).
+    if !(n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("95 th")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.starts_with("/p95keep")
+        || n.starts_with("/p95discard"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/keep-p95"
+            | "/keepp95"
+            | "/discard-p95"
+            | "/discardp95"
+            | "/p95-keep-gap"
+            | "/p95keepgap"
+            | "/p95-discard-gap"
+            | "/p95discardgap"
+            | "/p95-gap"
+            | "/p95gap"
+            | "/p95-keep"
+            | "/p95keep"
+            | "/p95-discard"
+            | "/p95discard"
+            | "keep p95"
+            | "the keep p95"
+            | "keep p95 tonight"
+            | "tonight keep p95"
+            | "p95 keep"
+            | "the p95 keep"
+            | "p95 keep gap"
+            | "the p95 keep gap"
+            | "p95 gap between keeps"
+            | "p95 time between keeps"
+            | "95th percentile keep gap"
+            | "the 95th percentile keep gap"
+            | "95th percentile gap between keeps"
+            | "95th keep gap"
+            | "keep gap p95"
+            | "ratchet p95"
+            | "the ratchet p95"
+            | "overnight keep p95"
+            | "view keep p95"
+            | "see keep p95"
+            | "show the keep p95"
+            | "show me the keep p95"
+            | "open keep p95"
+            | "open the keep p95"
+            | "list keep p95"
+            | "list the keep p95"
+            | "what is the keep p95"
+            | "whats the keep p95"
+            | "what's the keep p95"
+            | "what is the p95 keep gap"
+            | "whats the p95 keep gap"
+            | "what's the p95 keep gap"
+            | "discard p95"
+            | "the discard p95"
+            | "discard p95 tonight"
+            | "tonight discard p95"
+            | "p95 discard"
+            | "the p95 discard"
+            | "p95 discard gap"
+            | "the p95 discard gap"
+            | "p95 gap between discards"
+            | "95th percentile discard gap"
+            | "view discard p95"
+            | "see discard p95"
+            | "show the discard p95"
+            | "show me the discard p95"
+            | "open discard p95"
+            | "open the discard p95"
+            | "list discard p95"
+            | "list the discard p95"
+            | "what is the discard p95"
+            | "whats the discard p95"
+            | "what's the discard p95"
+    )
+}
+
+/// Zero-LLM p95 gap between keep/discard rows from results.tsv (tonight + all-time; no row dump).
+pub fn format_results_tsv_p95_gateway(content: &str) -> String {
+    let want = results_tsv_last_want(content);
+    let label = match want {
+        ResultsTsvLastWant::Keep => "Keep p95",
+        ResultsTsvLastWant::Discard => "Discard p95",
+    };
+    let unit = match want {
+        ResultsTsvLastWant::Keep => "keeps",
+        ResultsTsvLastWant::Discard => "discards",
+    };
+    match count_results_tsv_p95(want) {
+        Err(_) => format!(
+            "**{label}:** no `results.tsv` yet · overnight keep/discard will create it · `results.tsv path` for the file."
+        ),
+        Ok((p95_night, gaps_night, p95_all, gaps_all)) => {
+            let night_part = match p95_night {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("tonight p95 **{d}** between {unit} ({gaps_night} gaps since 20:00)")
+                }
+                None => format!("tonight need ≥2 {unit} since 20:00 to measure p95"),
+            };
+            let all_part = match p95_all {
+                Some(secs) => {
+                    let d = duration_label_secs(secs);
+                    format!("all-time p95 **{d}** ({gaps_all} gaps)")
+                }
+                None => format!("all-time need ≥2 {unit}"),
+            };
+            format!(
+                "**{label}:** {night_part} · {all_part} · p95 only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+            )
+        }
+    }
+}
 
 
 
@@ -17394,6 +17951,19 @@ pub fn looks_like_results_tsv_entropy_request(content: &str) -> bool {
         || n.starts_with("/discard-p90")
         || n.starts_with("/discardp90")
         || n.starts_with("/p90-")
+        || n.starts_with("/keep-p95")
+        || n.starts_with("/keepp95")
+        || n.starts_with("/discard-p95")
+        || n.starts_with("/discardp95")
+        || n.starts_with("/p95-")
+        || n.contains("p95")
+        || n.contains("p-95")
+        || n.contains("95th")
+        || n.contains("keep p95")
+        || n.contains("discard p95")
+        || n.contains("p95 keep")
+        || n.contains("p95 discard")
+        || n.contains("p95 gap")
         || n.starts_with("/keep-iqr")
         || n.starts_with("/keepiqr")
         || n.starts_with("/discard-iqr")
@@ -17660,7 +18230,7 @@ pub fn format_results_tsv_entropy_gateway(content: &str) -> String {
                 None => format!("all-time need ≥3 {unit} (2 gaps)"),
             };
             format!(
-                "**{label}:** {night_part} · {all_part} · entropy only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
+                "**{label}:** {night_part} · {all_part} · entropy only · does not dump rows · `/keep-pace` for average gap · `/keep-median` for median gap · `/keep-range` for min–max gap · `/keep-p90` for p90 gap · `/keep-p95` for p95 gap · `/keep-iqr` for IQR · `/keep-std` for std · `/keep-mad` for MAD · `/keep-cv` for CV · `/keep-skew` for skew · `/keep-kurtosis` for kurtosis · `/keep-entropy` for entropy · `/keep-mode` for mode · `/keep-gini` for Gini · `/keep-histogram` for histogram · `/keeps` for counts · `/keep-rate` for hit rate · `/since-keep` for age since newest · `/first-keep` for tonight's first · `/last-keep` for the newest row · `/recent-keeps` for a short tonight list · `results.tsv path` for the file · ask *morning surprise?* for ship notes."
             )
         }
     }
@@ -54458,6 +55028,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
     }
+    // results.tsv keep/discard p95 gap before histogram / Gini / modal / Shannon entropy / excess kurtosis / skewness / CV / MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_p95_request(content) {
+        return Some(format_results_tsv_p95_gateway(content));
+    }
     // results.tsv keep/discard gap histogram before Gini / modal / Shannon entropy / excess kurtosis / skewness / CV / MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_histogram_request(content) {
         return Some(format_results_tsv_histogram_gateway(content));
@@ -55033,6 +55607,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     // results.tsv first keep/discard tonight (one row) before last-row / recent / counts.
     if looks_like_results_tsv_first_request(content) {
         return Some(format_results_tsv_first_gateway(content));
+    }
+    // results.tsv keep/discard p95 gap before histogram / Gini / modal / Shannon entropy / excess kurtosis / skewness / CV / MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
+    if looks_like_results_tsv_p95_request(content) {
+        return Some(format_results_tsv_p95_gateway(content));
     }
     // results.tsv keep/discard gap histogram before Gini / modal / Shannon entropy / excess kurtosis / skewness / CV / MAD / sample-std / IQR / p90 / range / median / average pace / last-row / recent / counts.
     if looks_like_results_tsv_histogram_request(content) {
@@ -55613,6 +56191,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/recent-keeps` · `recent keeps` · `list recent keeps` · `tonight keep list` · `/recent-discards` · `recent discards` — short tonight keep/discard list from results.tsv (newest first; capped at 5; not counts / last-row / path/size/age / morning surprise)\n\
 • `/last-keep` · `last keep` · `latest keep` · `what was the last keep` · `view last keep` · `/last-discard` · `last discard` · `latest discard` · `what was the last discard` — newest keep or discard row from results.tsv (one description only — no full dump; not counts / path/size/age / morning surprise)\n\
 • `/first-keep` · `first keep` · `first keep tonight` · `earliest keep` · `what was the first keep` · `view first keep` / `open first keep` · `/first-discard` · `first discard tonight` — earliest keep or discard row tonight since 20:00 (one description only — no full dump; not `/last-keep` / `/since-keep` / `/keep-pace` / `/keep-median` / recent / counts / rate / streak / path/size/age / morning surprise)\n\
+• `/keep-p95` · `keep p95` · `p95 keep gap` · `95th percentile keep gap` · `p95 gap between keeps` · `view keep p95` / `open keep p95` · `/discard-p95` · `discard p95` · `p95 discard gap` — p95 gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; p95 only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-histogram` · `keep histogram` · `gap histogram` · `keep gap histogram` · `histogram keep gap` · `view keep histogram` / `open keep histogram` · `/discard-histogram` · `discard histogram` · `discard gap histogram` — minute-bucket histogram (<5m · 5–10m · 10–20m · 20–30m · 30–60m · ≥60m) of gaps between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; histogram only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-gini` · `keep gini` · `gini keep gap` · `gini coefficient keep gap` · `gini gap between keeps` · `view keep gini` / `open keep gini` · `/discard-gini` · `discard gini` · `gini discard gap` — Gini coefficient (0–1) of gap lengths between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; Gini only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-mode` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
 • `/keep-mode` · `keep mode` · `mode keep gap` · `modal keep gap` · `mode gap between keeps` · `view keep mode` / `open keep mode` · `/discard-mode` · `discard mode` · `mode discard gap` — modal (most frequent minute-bucketed) gap between consecutive keep or discard rows from results.tsv (tonight since 20:00 + all-time; mode only — no row dump; not `/keep-pace` / `/keep-median` / `/keep-range` / `/keep-p90` / `/keep-iqr` / `/keep-std` / `/keep-mad` / `/keep-cv` / `/keep-skew` / `/keep-kurtosis` / `/keep-entropy` / `/keep-gini` / `/keep-histogram` / `/first-keep` / `/last-keep` / `/since-keep` / counts / rate / streak / recent / path/size/age / morning surprise)\n\
@@ -56044,6 +56623,54 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("keep gap")
         && !q.contains("time between")
         && !q.contains("median")
+    {
+        return true;
+    }
+    // `/keep-p95` / p95 gap between keeps (v0.1.1070).
+    if (q.contains("/keep-p95")
+        || q.contains("/keepp95")
+        || q.contains("/discard-p95")
+        || q.contains("/discardp95")
+        || q.contains("/p95-keep-gap")
+        || q.contains("/p95-gap")
+        || q.contains("keep p95")
+        || q.contains("discard p95")
+        || q.contains("p95 keep")
+        || q.contains("p95 discard")
+        || q.contains("p95 keep gap")
+        || q.contains("p95 discard gap")
+        || q.contains("p95 gap between keeps")
+        || q.contains("95th percentile keep gap")
+        || q.contains("95th percentile discard gap")
+        || q.contains("view keep p95")
+        || q.contains("open keep p95")
+        || q.contains("view discard p95")
+        || q.contains("open discard p95"))
+        && !q.contains("what shipped")
+        && !q.contains("morning surprise")
+        && !q.contains("path")
+        && !q.contains("size")
+        && !q.contains("results.tsv age")
+        && !q.contains("count")
+        && !q.contains("how many")
+        && !q.contains("hit rate")
+        && !q.contains("keep rate")
+        && !q.contains("streak")
+        && !q.contains("recent")
+        && !q.contains("/recent-")
+        && !q.contains("/last-keep")
+        && !q.contains("/last-discard")
+        && !q.contains("since last")
+        && !q.contains("/since-")
+        && !q.contains("p90")
+        && !q.contains("/keep-p90")
+        && !q.contains("90th")
+        && !q.contains("iqr")
+        && !q.contains("histogram")
+        && !q.contains("gini")
+        && !q.contains("pace")
+        && !q.contains("median")
+        && !q.contains("range")
     {
         return true;
     }
@@ -56665,7 +57292,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("iqr")
         && !q.contains("interquartile")
         && !q.contains("/keep-iqr")
-    {
+            && !q.contains("p95")
+        && !q.contains("/keep-p95")
+        && !q.contains("95th")
+{
         return true;
     }
     // `/keep-range` / min–max gap between keeps (v0.1.1057).
@@ -59339,6 +59969,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Read-only results.tsv first keep/discard tonight asks (v0.1.1054) — one row; no dump.
     if looks_like_results_tsv_first_request(question) {
+        return true;
+    }
+    // Read-only results.tsv keep/discard p95 gap asks (v0.1.1070) — p95 only; no dump.
+    if looks_like_results_tsv_p95_request(question) {
         return true;
     }
     // Read-only results.tsv keep/discard gap histogram asks (v0.1.1069) — histogram only; no dump.
@@ -67984,6 +68618,9 @@ mod tests {
         assert!(looks_like_results_tsv_p90_request("discard p90"));
         assert!(looks_like_results_tsv_p90_request("p90 discard gap"));
         // Pace / median / range / first / last / since / counts / rate / streak / recent / path-size-age stay elsewhere.
+        assert!(!looks_like_results_tsv_p90_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_p90_request("keep p95"));
+        assert!(!looks_like_results_tsv_p90_request("95th percentile keep gap"));
         assert!(!looks_like_results_tsv_p90_request("/keep-pace"));
         assert!(!looks_like_results_tsv_p90_request("keep pace"));
         assert!(!looks_like_results_tsv_p90_request("time between keeps"));
@@ -68504,6 +69141,63 @@ mod tests {
     }
 
     #[test]
+    fn results_tsv_p95_request_detected() {
+        assert!(looks_like_results_tsv_p95_request("/keep-p95"));
+        assert!(looks_like_results_tsv_p95_request("keep p95"));
+        assert!(looks_like_results_tsv_p95_request("keep p95 tonight"));
+        assert!(looks_like_results_tsv_p95_request("p95 keep gap"));
+        assert!(looks_like_results_tsv_p95_request("p95 gap between keeps"));
+        assert!(looks_like_results_tsv_p95_request("95th percentile keep gap"));
+        assert!(looks_like_results_tsv_p95_request("view keep p95"));
+        assert!(looks_like_results_tsv_p95_request("show me the keep p95"));
+        assert!(looks_like_results_tsv_p95_request("open keep p95"));
+        assert!(looks_like_results_tsv_p95_request("/discard-p95"));
+        assert!(looks_like_results_tsv_p95_request("discard p95"));
+        assert!(looks_like_results_tsv_p95_request("p95 discard gap"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-p90"));
+        assert!(!looks_like_results_tsv_p95_request("keep p90"));
+        assert!(!looks_like_results_tsv_p95_request("90th percentile keep gap"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-pace"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-median"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-range"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-iqr"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-histogram"));
+        assert!(!looks_like_results_tsv_p95_request("/keep-gini"));
+        assert!(!looks_like_results_tsv_p90_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_p90_request("keep p95"));
+        assert!(!looks_like_results_tsv_p90_request("95th percentile keep gap"));
+        assert!(!looks_like_results_tsv_histogram_request("keep p95"));
+        assert!(!looks_like_results_tsv_histogram_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_pace_request("keep p95"));
+        assert!(!looks_like_results_tsv_median_request("keep p95"));
+        assert!(!looks_like_results_tsv_range_request("keep p95"));
+        assert!(!looks_like_results_tsv_iqr_request("keep p95"));
+        let reply = try_operator_instant_reply("keep p95").expect("keep p95 instant");
+        assert!(
+            reply.contains("Keep p95") || reply.contains("no `results.tsv`"),
+            "expected keep-p95 reply: {reply}"
+        );
+        assert!(
+            reply.contains("p95 only")
+                || reply.contains("does not dump")
+                || reply.contains("/keeps")
+                || reply.contains("no `results.tsv`")
+                || reply.contains("need ≥2"),
+            "must stay keep-p95 glance: {reply}"
+        );
+        let slash = try_operator_instant_reply("/keep-p95").expect("/keep-p95 instant");
+        assert!(
+            slash.contains("Keep p95") || slash.contains("no `results.tsv`"),
+            "{slash}"
+        );
+        let discard = try_operator_instant_reply("discard p95").expect("discard p95");
+        assert!(
+            discard.contains("Discard p95") || discard.contains("no `results.tsv`"),
+            "{discard}"
+        );
+    }
+
+    #[test]
     fn results_tsv_histogram_request_detected() {
         assert!(looks_like_results_tsv_histogram_request("/keep-histogram"));
         assert!(looks_like_results_tsv_histogram_request("keep histogram"));
@@ -68535,6 +69229,8 @@ mod tests {
         assert!(!looks_like_results_tsv_histogram_request("keep mode"));
         assert!(!looks_like_results_tsv_histogram_request("/keep-gini"));
         assert!(!looks_like_results_tsv_histogram_request("keep gini"));
+        assert!(!looks_like_results_tsv_histogram_request("/keep-p95"));
+        assert!(!looks_like_results_tsv_histogram_request("keep p95"));
         assert!(!looks_like_results_tsv_pace_request("keep histogram"));
         assert!(!looks_like_results_tsv_median_request("keep histogram"));
         assert!(!looks_like_results_tsv_range_request("keep histogram"));
