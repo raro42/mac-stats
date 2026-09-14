@@ -249,11 +249,22 @@
     if (filterInputId) paintOpsFilterMatch(filterInputId, total, shown, q);
   }
 
-  /** Empty state when a filter is active but no rows match — includes Clear filter action. */
-  function opsFilterMissHtml(message, filterKind) {
+  /** Empty state when a filter is active but no rows match — warm title + Clear filter (AI Chat filter-miss calm). */
+  function opsFilterMissHtml(message, filterKind, opts) {
     const kind = String(filterKind || '').replace(/[^a-z]/gi, '');
+    const title = (opts && opts.title) || 'Nothing here yet';
+    const calmClass =
+      (opts && opts.calmClass) ||
+      (kind === 'runs' && typeof opsRunsLaneFilter === 'string' && opsRunsLaneFilter === 'fail'
+        ? 'is-fail-empty'
+        : 'is-calm');
+    const tip =
+      calmClass === 'is-fail-empty'
+        ? 'No failed turns — click Clear filter for All'
+        : 'Nothing matches this filter — click Clear filter for All';
     return (
-      `<div class="ops-empty ops-empty-filter-miss">` +
+      `<div class="ops-empty ops-empty-filter-miss ${calmClass}" role="status" title="${escapeHtml(tip)}">` +
+      `<div class="ops-empty-filter-title">${escapeHtml(title)}</div>` +
       `<div class="ops-empty-filter-msg">${escapeHtml(message)}</div>` +
       `<button type="button" class="ops-clear-filter" data-ops-clear-filter="${kind}">Clear filter</button>` +
       `</div>`
@@ -7011,7 +7022,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
               'Create one via Discord SCHEDULE tools or the scheduler API'
             );
         } else if (!schedFiltered.length) {
-            list.innerHTML = opsFilterMissHtml('No schedules match filter', 'schedules');
+            list.innerHTML = opsFilterMissHtml(
+              'Nothing matches this filter — Clear filter for All',
+              'schedules'
+            );
         } else {
             schedFiltered.forEach((s) => {
                 const btn = document.createElement('button');
@@ -7049,7 +7063,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
               'Results appear here after a schedule runs'
             );
         } else if (!delFiltered.length) {
-            delList.innerHTML = opsFilterMissHtml('No deliveries match filter', 'schedules');
+            delList.innerHTML = opsFilterMissHtml(
+              'Nothing matches this filter — Clear filter for All',
+              'schedules'
+            );
         } else {
             delFiltered.slice(0, 8).forEach((d) => {
                 const btn = document.createElement('button');
@@ -7459,7 +7476,10 @@ function renderOpsAgents(agents) {
         return;
     }
     if (!filtered.length) {
-        list.innerHTML = opsFilterMissHtml('No agents match filter', 'agents');
+        list.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'agents'
+        );
         paintOpsFilterMatch('ops-agents-filter', kindPool.length, 0, opsAgentsFilterQ);
         paintOpsAgentsEnabledChips();
         return;
@@ -8918,7 +8938,10 @@ function renderOpsLive(rows) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = opsFilterMissHtml('No live sessions match filter', 'sessions');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'sessions'
+        );
         paintOpsSessionFilterFromCaches();
         return;
     }
@@ -8984,7 +9007,10 @@ function renderOpsSessionFiles(files) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = opsFilterMissHtml('No session files match filter', 'sessions');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'sessions'
+        );
         paintOpsSessionFilterFromCaches();
         return;
     }
@@ -9056,7 +9082,10 @@ function renderOpsMemory(files) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'memory'
+        );
         paintOpsFilterMatch('ops-memory-filter', kindPool.length, 0, opsMemoryFilterQ);
         return;
     }
@@ -9111,7 +9140,10 @@ function renderOpsMemory(files) {
     });
     paintOpsFilterMatch('ops-memory-filter', kindPool.length, filtered.length, opsMemoryFilterQ);
     if ((opsMemoryFilterQ || opsMemoryKindFilter !== 'all') && !el.querySelector('.ops-row')) {
-        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+        el.innerHTML = opsFilterMissHtml(
+          'Nothing matches this filter — Clear filter for All',
+          'memory'
+        );
     }
 }
 
@@ -9791,7 +9823,17 @@ function renderOpsRuns(insights) {
     paintOpsFilterMatch('ops-runs-filter', kindPool.length, shown, opsRunsFilterQ);
     paintOpsRunsLaneChips();
     if ((opsRunsFilterQ || opsRunsLaneFilter !== 'all') && !el.querySelector('.ops-row')) {
-        el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
+        const failEmpty = opsRunsLaneFilter === 'fail' && !opsRunsFilterQ;
+        el.innerHTML = opsFilterMissHtml(
+          failEmpty
+            ? 'No failed turns — Clear filter for All'
+            : 'Nothing matches this filter — Clear filter for All',
+          'runs',
+          {
+            title: 'Nothing here yet',
+            calmClass: failEmpty ? 'is-fail-empty' : 'is-calm',
+          }
+        );
         showOpsRunPreview('');
     }
     ensureOpsInsightsToolbarKeyboard();

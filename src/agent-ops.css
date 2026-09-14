@@ -1437,6 +1437,32 @@ textarea.ops-agent-editor.is-dirty {
   gap: 10px;
 }
 
+/* Filter-miss calm (AI Chat filter-miss parity) — solid accent wash, not dashed muted. */
+.ops-empty-filter-miss.is-calm {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  opacity: 1;
+  color: inherit;
+}
+
+/* Fail lane empty = good news (Errors-empty green wash parity). */
+.ops-empty-filter-miss.is-fail-empty {
+  border-style: solid;
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  opacity: 1;
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.ops-empty-filter-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
 .ops-empty-tab {
   display: flex;
   flex-direction: column;

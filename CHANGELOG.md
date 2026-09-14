@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1073] - 2026-09-14
+
+### Changed
+
+- **Agent Ops filter-miss calm** — When a list filter finds no rows (Agents / Sessions / Schedules / Knowledge / Runs), the empty pane uses a warm title (“Nothing here yet”), solid accent wash, and Clear-filter cue instead of a dashed muted box. Fail lane empty uses a soft green wash (“No failed turns”) — AI Chat Errors-empty parity; design review / `feature-agent-ops`.
+
 ## [0.1.1072] - 2026-09-14
 
 ### Added
