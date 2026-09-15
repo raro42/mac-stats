@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1078] - 2026-09-15
+
+### Changed
+- **Disk Cleanup Add scope** — the control is a full pressable button (padding, border, hover, press) instead of a tiny unstyled control beside the path fields.
+
 ## [0.1.1077] - 2026-09-15
 
 ### Added
