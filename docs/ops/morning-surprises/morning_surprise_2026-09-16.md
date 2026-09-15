@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog + Slowest drove filter-miss calm, then a real latency fix.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog + Slowest drove filter-miss calm, a take-note latency fix, then Details glance calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1090** | Details collapsed glance calm — soft green when Load/RAM fine (Monitors/Disk parity) |
 | **v0.1.1089** | Take note instant — `Take note:` / `note to self:` / `remember this:` → curated MEMORY_APPEND (no Brave) |
 | **v0.1.1088** | Debug Log filter-miss calm — warm “Nothing here yet” + soft-green wash (Error/Warn empty) |
 | **v0.1.1087** | Perplexity filter-miss calm — warm title + accent wash (Top/Snippet) |
@@ -17,10 +18,10 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details now shows a calm green wash when Load and RAM are fine — same glance language as Monitors all-up and Disk clean.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace
+- Design review when screens age past grace (AI Chat / Processes / Monitors still old)
 - Sibling Hermes/OpenClaw ports with clear user fitness
