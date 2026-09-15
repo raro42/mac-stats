@@ -1490,6 +1490,29 @@ function processesFilterMissHint() {
   return "Clear the filter to show every process.";
 }
 
+function processesFilterMissTitle() {
+  if (processesFilterMode === "hot") {
+    return "Nothing here yet — nothing hot";
+  }
+  if (processesFilterMode === "pinned") {
+    return "Nothing here yet — no pins";
+  }
+  return "Nothing here yet";
+}
+
+function syncProcessesFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove("is-hot-empty", "is-pinned-empty");
+  if (processesFilterMode === "hot") wrap.classList.add("is-hot-empty");
+  else if (processesFilterMode === "pinned") wrap.classList.add("is-pinned-empty");
+  const title = wrap.querySelector(".processes-filter-miss-title");
+  if (title) title.textContent = processesFilterMissTitle();
+  wrap.title =
+    processesFilterMode === "hot"
+      ? "Nothing hot — click Clear filter for All"
+      : "Nothing matches this filter — click Clear filter for All";
+}
+
 function ensureProcessesFilterMissState(processList, show) {
   if (!processList) return;
   const existing = processList.querySelector(".processes-filter-miss");
@@ -1503,7 +1526,7 @@ function ensureProcessesFilterMissState(processList, show) {
     wrap.className = "process-empty processes-filter-miss";
     wrap.setAttribute("role", "status");
     wrap.innerHTML =
-      `<div class="processes-filter-miss-msg">Nothing matches this filter</div>` +
+      `<div class="processes-filter-miss-title"></div>` +
       `<div class="processes-filter-miss-hint"></div>` +
       `<button type="button" class="processes-filter-miss-cta processes-clear-filter">Clear filter</button>`;
     processList.appendChild(wrap);
@@ -1514,6 +1537,7 @@ function ensureProcessesFilterMissState(processList, show) {
       flashProcessesFilterClearBtn(document.getElementById("processes-filter-clear"));
     });
   }
+  syncProcessesFilterMissCalmState(wrap);
   const hint = wrap.querySelector(".processes-filter-miss-hint");
   if (hint) hint.textContent = processesFilterMissHint();
 }

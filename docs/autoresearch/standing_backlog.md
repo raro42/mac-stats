@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1084
+
+- Top Processes filter-miss calm: warm “Nothing here yet” title + solid wash (Hot empty soft green; Pinned accent). AI Chat / Agent Ops filter-miss parity.
+
 ## Overnight merge — v0.1.1083
 
 - Having-fun idle Ollama soft timeout: 120s wall budget, no outer Discord retry after chat timeout, rate-limited WARN (not ERROR), +15m next-idle backoff so the global Ollama queue recovers under load.
@@ -37,6 +41,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1084** — Top Processes filter-miss calm (warm title + solid wash; Hot empty green; Pinned accent).
 
 - **v0.1.1083** — Having-fun idle Ollama soft timeout (120s wall · no outer Discord retry · rate-limited WARN · +15m idle backoff).
 

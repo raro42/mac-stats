@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1084] - 2026-09-15
+
+### Changed
+- **Top Processes filter-miss calm** — Hot/Pinned empty panes use a warm “Nothing here yet” title and solid wash (Hot empty soft green — nothing hot is good news; Pinned accent). Matches AI Chat / Agent Ops filter-miss calm.
+
 ## [0.1.1083] - 2026-09-15
 
 ### Fixed
