@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1081] - 2026-09-15
+
+### Fixed
+- **Instant-lane CPU spin** — path matchers no longer call sibling `looks_like_*_path_request` excludes (that graph was exponential on short Discord / chat strings and beachballed the UI). Sibling excludes stay string-only. See `docs/ops/2026-09-15-instant-lane-path-nesting-hang.md`.
+
 ## [0.1.1080] - 2026-09-15
 
 ### Fixed

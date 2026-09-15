@@ -3662,7 +3662,8 @@ pub fn format_debug_log_size_gateway() -> String {
 }
 
 /// True for short “where is the log / log file path…” asks.
-pub fn looks_like_debug_log_path_request(content: &str) -> bool {
+pub fn looks_like_debug_log_path_request(content: &str) -> bool {    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
+
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
         return false;
@@ -3763,7 +3764,6 @@ pub fn looks_like_debug_log_age_request(content: &str) -> bool {
     }
     if looks_like_debug_log_count_request(content)
         || looks_like_debug_log_size_request(content)
-        || looks_like_debug_log_path_request(content)
     {
         return false;
     }
@@ -3856,7 +3856,8 @@ pub fn format_debug_log_age_gateway() -> String {
 }
 
 /// True for short “where is config / mac-stats home / data directory…” asks.
-pub fn looks_like_config_path_request(content: &str) -> bool {
+pub fn looks_like_config_path_request(content: &str) -> bool {    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
+
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
         return false;
@@ -3864,7 +3865,6 @@ pub fn looks_like_config_path_request(content: &str) -> bool {
     // Do not steal debug.log path / size / age / list lanes.
     if looks_like_debug_log_count_request(content)
         || looks_like_debug_log_size_request(content)
-        || looks_like_debug_log_path_request(content)
         || looks_like_debug_log_age_request(content)
         || looks_like_debug_log_request(content)
     {
@@ -25114,9 +25114,7 @@ pub fn looks_like_agents_path_request(content: &str) -> bool {
         return false;
     }
     // Notes / memory / skills / prompts paths stay on their own lanes.
-    if looks_like_memory_path_request(content) {
-        return false;
-    }
+
     // Per-agent agent.json file path is its own lane (not the agents/ directory).
     if n.contains("agent.json")
         || n.contains("agent config")
@@ -25253,6 +25251,7 @@ pub fn looks_like_skills_size_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -25665,9 +25664,7 @@ pub fn looks_like_skills_path_request(content: &str) -> bool {
     if looks_like_skills_request(content) {
         return false;
     }
-    if looks_like_agents_path_request(content) || looks_like_memory_path_request(content) {
-        return false;
-    }
+
     // Per-agent skill.md file path is its own lane (not the Hermes skills/ directory).
     if n.contains("skill.md")
         || n.contains("skill file")
@@ -25806,6 +25803,7 @@ pub fn looks_like_plugins_size_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -26296,12 +26294,7 @@ pub fn looks_like_plugins_path_request(content: &str) -> bool {
     if looks_like_plugins_request(content) {
         return false;
     }
-    if looks_like_skills_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_memory_path_request(content)
-    {
-        return false;
-    }
+
     // Age asks use the plugins directory age lane (v0.1.957).
     if n.contains("how old")
         || n.contains("stale")
@@ -26463,6 +26456,7 @@ pub fn looks_like_prompts_age_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -26871,13 +26865,7 @@ pub fn looks_like_prompts_path_request(content: &str) -> bool {
     if n.chars().count() > 56 {
         return false;
     }
-    if looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_plugins_path_request(content)
-    {
-        return false;
-    }
+
     // Age asks use the prompts directory age lane (v0.1.958).
     if n.contains("how old")
         || n.contains("stale")
@@ -27006,6 +26994,7 @@ pub fn looks_like_tmp_age_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -27214,20 +27203,7 @@ pub fn looks_like_tmp_path_request(content: &str) -> bool {
         return false;
     }
     // Do not steal temperature / thermal / disk-cleanup / config-home asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-    {
-        return false;
-    }
+
     // Size/big/large asks use the tmp size lane (v0.1.875).
     // Age/how-old asks use the tmp age lane (v0.1.962).
     if n.contains("temperature")
@@ -27383,6 +27359,7 @@ pub fn looks_like_tmp_size_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -27935,19 +27912,7 @@ pub fn looks_like_uploads_path_request(content: &str) -> bool {
         return false;
     }
     // Do not steal sibling path / browser-status / disk-cleanup asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_browser_ready_request(content)
+    if looks_like_browser_ready_request(content)
     {
         return false;
     }
@@ -28087,6 +28052,7 @@ pub fn looks_like_traces_age_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -28476,20 +28442,7 @@ pub fn looks_like_traces_path_request(content: &str) -> bool {
         return false;
     }
     // Do not steal sibling path / browser-status / disk-cleanup / stack-trace asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_browser_ready_request(content)
+    if looks_like_browser_ready_request(content)
     {
         return false;
     }
@@ -28639,6 +28592,7 @@ pub fn looks_like_pdfs_age_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Keyword-only sibling excludes (no nested looks_like_* — exponential).
     if n.contains("path")
         || n.contains("where")
@@ -29018,27 +28972,14 @@ pub fn format_pdfs_size_gateway() -> String {
 
 /// True for short “where is the pdfs folder / pdfs path…” asks.
 /// Config path only — does not list, prune, or run BROWSER_SAVE_PDF under `~/.mac-stats/pdfs/`.
-pub fn looks_like_pdfs_path_request(content: &str) -> bool {
+pub fn looks_like_pdfs_path_request(content: &str) -> bool {    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
+
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
         return false;
     }
     // Do not steal sibling path / browser-status / disk-cleanup / save-PDF asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_browser_ready_request(content)
+    if looks_like_browser_ready_request(content)
     {
         return false;
     }
@@ -29177,7 +29118,8 @@ pub fn format_pdfs_path_gateway() -> String {
 /// Config path only — does not list, edit, or dump secrets from `~/.mac-stats/browser-credentials.toml`.
 /// Size asks use the browser-credentials.toml size lane (v0.1.916).
 /// Age asks use the browser-credentials.toml age lane (v0.1.971).
-pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
+pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
+
     let n = normalize_operator_command(content);
     if n.chars().count() > 64 {
         return false;
@@ -29198,21 +29140,6 @@ pub fn looks_like_browser_credentials_path_request(content: &str) -> bool {
         || n.contains("when")
         || n.contains("updated")
         || n.contains("modified")
-        || looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
         || looks_like_browser_ready_request(content)
     {
         return false;
@@ -30375,6 +30302,7 @@ pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / browser-status / disk-cleanup / cookie-mutate / size / age asks.
     // String-only cookie_reject exclude (do not nest looks_like_*_path_request — exponential).
     // Age asks: avoid bare `age` (matches inside `storage`).
@@ -30409,22 +30337,6 @@ pub fn looks_like_browser_storage_state_path_request(content: &str) -> bool {
             && !n.contains("path")
             && !n.contains("where")
             && !n.contains("size"))
-        || looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
         || looks_like_browser_ready_request(content)
     {
         return false;
@@ -30974,25 +30886,9 @@ pub fn looks_like_browser_downloads_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / organizer / browser-status / disk-cleanup / download-action asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_downloads_organizer_ready_request(content)
+    if looks_like_downloads_organizer_ready_request(content)
         || looks_like_browser_ready_request(content)
     {
         return false;
@@ -31593,26 +31489,9 @@ pub fn looks_like_cleanup_quarantine_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / disk-cleanup list / clean-now asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_disk_cleanup_request(content)
+    if looks_like_disk_cleanup_request(content)
         || looks_like_downloads_organizer_ready_request(content)
         || looks_like_browser_ready_request(content)
     {
@@ -32219,29 +32098,9 @@ pub fn looks_like_pinned_processes_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / Top Processes list / pin-action asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -32391,28 +32250,9 @@ pub fn looks_like_schedules_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / schedules list / count / next-fire asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedule_count_request(content)
+    if looks_like_schedule_count_request(content)
         || looks_like_next_schedule_request(content)
         || looks_like_last_delivery_request(content)
     {
@@ -33348,31 +33188,9 @@ pub fn looks_like_monitors_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path / monitors list / add-check asks.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -33882,32 +33700,9 @@ pub fn looks_like_history_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path asks or chat/metrics history dumps.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-        || looks_like_monitors_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -34541,32 +34336,9 @@ pub fn looks_like_disk_cleanup_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path asks. Avoid calling quarantine (it calls disk list → us).
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-        || looks_like_monitors_path_request(content)
-        || looks_like_history_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("quarantine")
         || n.contains("how many")
         || n.contains("count")
@@ -35219,34 +34991,9 @@ pub fn looks_like_perplexity_last_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path asks or `/perplexity` last-search / key Ready.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-        || looks_like_monitors_path_request(content)
-        || looks_like_history_path_request(content)
-        || looks_like_disk_cleanup_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -35838,35 +35585,9 @@ pub fn looks_like_discord_channels_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // Do not steal sibling path asks or `/discord` gateway Ready.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-        || looks_like_monitors_path_request(content)
-        || looks_like_history_path_request(content)
-        || looks_like_disk_cleanup_path_request(content)
-        || looks_like_perplexity_last_path_request(content)
-    {
-        return false;
-    }
+
     if n.contains("how many")
         || n.contains("count")
         || n.contains("number of")
@@ -36473,39 +36194,14 @@ pub fn format_scheduler_delivery_awareness_age_gateway() -> String {
 /// Config path only — does not list deliveries or run `/schedules` / last delivery.
 /// Size asks use the scheduler_delivery_awareness.json size lane (v0.1.897).
 /// Age asks use the scheduler_delivery_awareness.json age lane (v0.1.932).
-pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bool {
+pub fn looks_like_scheduler_delivery_awareness_path_request(content: &str) -> bool {    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
+
     let n = normalize_operator_command(content);
     if n.chars().count() > 80 {
         return false;
     }
     // Do not steal sibling path asks or schedules/last-delivery live chips.
-    if looks_like_config_path_request(content)
-        || looks_like_debug_log_path_request(content)
-        || looks_like_screenshots_path_request(content)
-        || looks_like_runs_path_request(content)
-        || looks_like_task_path_request(content)
-        || looks_like_memory_path_request(content)
-        || looks_like_session_path_request(content)
-        || looks_like_agents_path_request(content)
-        || looks_like_skills_path_request(content)
-        || looks_like_plugins_path_request(content)
-        || looks_like_prompts_path_request(content)
-        || looks_like_tmp_path_request(content)
-        || looks_like_uploads_path_request(content)
-        || looks_like_traces_path_request(content)
-        || looks_like_pdfs_path_request(content)
-        || looks_like_browser_credentials_path_request(content)
-        || looks_like_browser_storage_state_path_request(content)
-        || looks_like_browser_downloads_path_request(content)
-        || looks_like_cleanup_quarantine_path_request(content)
-        || looks_like_pinned_processes_path_request(content)
-        || looks_like_schedules_path_request(content)
-        || looks_like_monitors_path_request(content)
-        || looks_like_history_path_request(content)
-        || looks_like_disk_cleanup_path_request(content)
-        || looks_like_perplexity_last_path_request(content)
-        || looks_like_discord_channels_path_request(content)
-        || looks_like_schedule_count_request(content)
+    if looks_like_schedule_count_request(content)
         || looks_like_next_schedule_request(content)
         || looks_like_last_delivery_request(content)
     {
@@ -48613,6 +48309,7 @@ pub fn looks_like_soul_path_request(content: &str) -> bool {
     if n.chars().count() > 72 {
         return false;
     }
+    // Sibling excludes must stay string-only — nested looks_like_*_path_request is exponential.
     // String-only sibling excludes (do not nest looks_like_*_path_request — exponential).
     if n.contains("mood")
         || n.contains("skill.md")
@@ -48963,8 +48660,7 @@ pub fn looks_like_processes_request(content: &str) -> bool {
         return false;
     }
     // Path-only asks go to pinned_processes.json instant (does not steal `/pinned` list).
-    if looks_like_pinned_processes_path_request(content)
-        || looks_like_pinned_processes_size_request(content)
+    if looks_like_pinned_processes_size_request(content)
         || looks_like_pinned_processes_age_request(content)
     {
         return false;
@@ -75040,6 +74736,25 @@ mod tests {
         assert!(
             reply.to_lowercase().contains("disk cleanup size") || reply.contains("on-disk"),
             "{reply}"
+        );
+    }
+
+    #[test]
+    fn path_request_matchers_stay_fast_without_sibling_nesting() {
+        // Nested looks_like_*_path_request excludes explode on short strings (CPU beachball).
+        let t0 = std::time::Instant::now();
+        for _ in 0..300 {
+            let _ = looks_like_disk_cleanup_path_request("where is disk_cleanup.json");
+            let _ = looks_like_history_path_request("history path");
+            let _ = looks_like_monitors_path_request("monitors path");
+            let _ = looks_like_config_path_request("where is config");
+            let _ = try_operator_instant_reply("where is disk_cleanup.json");
+            let _ = try_operator_instant_reply("history path");
+        }
+        assert!(
+            t0.elapsed().as_millis() < 2_000,
+            "path matchers too slow ({:?}) — nested sibling path excludes?",
+            t0.elapsed()
         );
     }
 
