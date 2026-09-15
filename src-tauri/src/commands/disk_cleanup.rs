@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::time::{Duration, SystemTime};
+use std::process::{Command, Stdio};
+use std::sync::mpsc;
+use std::time::{Duration, Instant, SystemTime};
 
 use crate::commands::screenshot_lifecycle::parse_screenshot_filename_timestamp;
 use crate::config::Config;
@@ -15,6 +17,10 @@ const DEFAULT_INTERVAL_HOURS: u64 = 24;
 const MAX_SCAN_FILES: usize = 50_000;
 const GIB: u64 = 1024 * 1024 * 1024;
 const DEFAULT_REBUILD_BYTES: u64 = 20 * GIB;
+/// Cap rebuild-dir walks so status / Clean now cannot beachball the CPU window.
+const DIR_SIZE_BUDGET: Duration = Duration::from_millis(1500);
+/// Cap external helpers (`tmutil`, `docker`) — thinlocalsnapshots can take 20–40s.
+const EXTERNAL_CMD_BUDGET: Duration = Duration::from_secs(8);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -913,7 +919,9 @@ fn rebuild_root_allowed(path: &Path) -> bool {
     canon.starts_with(&home) && canon != home
 }
 
-/// Walk until `stop_at` bytes (or the tree ends). Does not follow symlinks.
+/// Walk until `stop_at` bytes, the tree ends, or `DIR_SIZE_BUDGET` elapses.
+/// Does not follow symlinks. On budget expiry returns `total.max(stop_at)` so
+/// reclaim UI can treat the tree as at least the threshold (safe for wipe gate).
 fn dir_size_at_least(root: &Path, stop_at: u64) -> u64 {
     if root.is_file() {
         return fs::metadata(root).map(|m| m.len()).unwrap_or(0);
@@ -921,16 +929,20 @@ fn dir_size_at_least(root: &Path, stop_at: u64) -> u64 {
     if !root.is_dir() {
         return 0;
     }
+    let deadline = Instant::now() + DIR_SIZE_BUDGET;
     let mut total = 0u64;
     let mut stack = vec![root.to_path_buf()];
     let mut visited = 0usize;
     while let Some(dir) = stack.pop() {
+        if Instant::now() >= deadline {
+            return total.max(stop_at);
+        }
         let Ok(rd) = fs::read_dir(&dir) else {
             continue;
         };
         for ent in rd.flatten() {
             visited += 1;
-            if visited > MAX_SCAN_FILES * 40 {
+            if visited > MAX_SCAN_FILES * 40 || Instant::now() >= deadline {
                 return total.max(stop_at);
             }
             let path = ent.path();
@@ -957,7 +969,32 @@ fn dir_size_at_least(root: &Path, stop_at: u64) -> u64 {
     total
 }
 
-fn preview_rebuild_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+/// Run an external command with a hard wall-clock budget. On timeout, SIGKILL the child.
+fn command_output_timeout(mut cmd: Command, timeout: Duration) -> Option<std::process::Output> {
+    let mut child = match cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
+        Ok(c) => c,
+        Err(_) => return None,
+    };
+    let pid = child.id();
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(child.wait_with_output());
+    });
+    match rx.recv_timeout(timeout) {
+        Ok(Ok(out)) => Some(out),
+        Ok(Err(_)) => None,
+        Err(_) => {
+            // SAFETY: pid is from spawn(); SIGKILL is best-effort cleanup after timeout.
+            unsafe {
+                libc::kill(pid as i32, libc::SIGKILL);
+            }
+            let _ = rx.recv_timeout(Duration::from_secs(2));
+            None
+        }
+    }
+}
+
+fn preview_rebuild_scope(scope: &DiskCleanupScope, allow_expensive: bool) -> CleanupCategory {
     let threshold = scope.max_bytes.unwrap_or(DEFAULT_REBUILD_BYTES).max(1);
     let path_hint = scope.path.clone().unwrap_or_default();
     let policy = if !scope.enabled {
@@ -976,6 +1013,17 @@ fn preview_rebuild_scope(scope: &DiskCleanupScope) -> CleanupCategory {
             &policy,
             &scope.id,
             false,
+        );
+    }
+    // Shallow status / glance polls must not walk multi-GB trees (UI beachball).
+    if !allow_expensive {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &format!("{policy} · not scanned (Refresh or Clean now)"),
+            &scope.id,
+            true,
         );
     }
     let roots = resolve_scope_roots(scope);
@@ -1073,7 +1121,7 @@ fn apply_rebuild_scope(scope: &DiskCleanupScope) -> (u64, u64) {
     (deleted, freed)
 }
 
-fn preview_docker_prune_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+fn preview_docker_prune_scope(scope: &DiskCleanupScope, allow_expensive: bool) -> CleanupCategory {
     let path_hint = "docker image prune -f".to_string();
     let policy = if !scope.enabled {
         "disabled".into()
@@ -1088,6 +1136,16 @@ fn preview_docker_prune_scope(scope: &DiskCleanupScope) -> CleanupCategory {
             &policy,
             &scope.id,
             false,
+        );
+    }
+    if !allow_expensive {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &format!("{policy} · not scanned (Refresh or Clean now)"),
+            &scope.id,
+            true,
         );
     }
     let count = docker_dangling_image_count();
@@ -1105,10 +1163,9 @@ fn preview_docker_prune_scope(scope: &DiskCleanupScope) -> CleanupCategory {
 }
 
 fn docker_dangling_image_count() -> u64 {
-    let output = std::process::Command::new("docker")
-        .args(["images", "-f", "dangling=true", "-q"])
-        .output();
-    let Ok(out) = output else {
+    let mut cmd = Command::new("docker");
+    cmd.args(["images", "-f", "dangling=true", "-q"]);
+    let Some(out) = command_output_timeout(cmd, EXTERNAL_CMD_BUDGET) else {
         return 0;
     };
     if !out.status.success() {
@@ -1128,11 +1185,10 @@ fn apply_docker_prune_scope(scope: &DiskCleanupScope) -> (u64, u64) {
     if before == 0 {
         return (0, 0);
     }
-    let output = std::process::Command::new("docker")
-        .args(["image", "prune", "-f"])
-        .output();
-    match output {
-        Ok(out) if out.status.success() => {
+    let mut cmd = Command::new("docker");
+    cmd.args(["image", "prune", "-f"]);
+    match command_output_timeout(cmd, EXTERNAL_CMD_BUDGET) {
+        Some(out) if out.status.success() => {
             let after = docker_dangling_image_count();
             let removed = before.saturating_sub(after);
             mac_stats_info!(
@@ -1143,7 +1199,7 @@ fn apply_docker_prune_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             );
             (removed.max(1), 0)
         }
-        Ok(out) => {
+        Some(out) => {
             crate::mac_stats_debug!(
                 "disk_cleanup",
                 "docker image prune failed: {}",
@@ -1151,18 +1207,21 @@ fn apply_docker_prune_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             );
             (0, 0)
         }
-        Err(err) => {
-            crate::mac_stats_debug!("disk_cleanup", "docker not available: {}", err);
+        None => {
+            crate::mac_stats_debug!(
+                "disk_cleanup",
+                "docker image prune timed out after {:?}",
+                EXTERNAL_CMD_BUDGET
+            );
             (0, 0)
         }
     }
 }
 
 fn tmutil_local_snapshot_count() -> u64 {
-    let output = std::process::Command::new("tmutil")
-        .args(["listlocalsnapshots", "/"])
-        .output();
-    let Ok(out) = output else {
+    let mut cmd = Command::new("tmutil");
+    cmd.args(["listlocalsnapshots", "/"]);
+    let Some(out) = command_output_timeout(cmd, EXTERNAL_CMD_BUDGET) else {
         return 0;
     };
     if !out.status.success() {
@@ -1174,7 +1233,7 @@ fn tmutil_local_snapshot_count() -> u64 {
         .count() as u64
 }
 
-fn preview_tmutil_thin_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+fn preview_tmutil_thin_scope(scope: &DiskCleanupScope, allow_expensive: bool) -> CleanupCategory {
     let path_hint = "tmutil thinlocalsnapshots /".to_string();
     let policy = if !scope.enabled {
         "disabled".into()
@@ -1189,6 +1248,16 @@ fn preview_tmutil_thin_scope(scope: &DiskCleanupScope) -> CleanupCategory {
             &policy,
             &scope.id,
             false,
+        );
+    }
+    if !allow_expensive {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &format!("{policy} · not scanned (Refresh or Clean now)"),
+            &scope.id,
+            true,
         );
     }
     let count = tmutil_local_snapshot_count();
@@ -1213,11 +1282,11 @@ fn apply_tmutil_thin_scope(scope: &DiskCleanupScope) -> (u64, u64) {
     if before == 0 {
         return (0, 0);
     }
-    let output = std::process::Command::new("tmutil")
-        .args(["thinlocalsnapshots", "/", "21474836480", "4"])
-        .output();
-    match output {
-        Ok(out) if out.status.success() => {
+    let mut cmd = Command::new("tmutil");
+    // Ask for up to ~20 GiB purgeable; wall-clock is capped so startup cannot stall.
+    cmd.args(["thinlocalsnapshots", "/", "21474836480", "4"]);
+    match command_output_timeout(cmd, EXTERNAL_CMD_BUDGET) {
+        Some(out) if out.status.success() => {
             let after = tmutil_local_snapshot_count();
             let removed = before.saturating_sub(after);
             mac_stats_info!(
@@ -1228,7 +1297,7 @@ fn apply_tmutil_thin_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             );
             (removed.max(1), 0)
         }
-        Ok(out) => {
+        Some(out) => {
             crate::mac_stats_debug!(
                 "disk_cleanup",
                 "tmutil thinlocalsnapshots failed: {}",
@@ -1236,8 +1305,12 @@ fn apply_tmutil_thin_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             );
             (0, 0)
         }
-        Err(err) => {
-            crate::mac_stats_debug!("disk_cleanup", "tmutil not available: {}", err);
+        None => {
+            crate::mac_stats_debug!(
+                "disk_cleanup",
+                "tmutil thinlocalsnapshots timed out after {:?} (killed)",
+                EXTERNAL_CMD_BUDGET
+            );
             (0, 0)
         }
     }
@@ -1969,9 +2042,10 @@ fn build_preview_categories(
             "trash" | "downloads" | "temp" | "path" => {
                 out.push(preview_aged_scope(scope, touch_user_folders))
             }
-            "rebuild-dir" => out.push(preview_rebuild_scope(scope)),
-            "docker-prune" => out.push(preview_docker_prune_scope(scope)),
-            "tmutil-thin" => out.push(preview_tmutil_thin_scope(scope)),
+            // rebuild / docker / tmutil can stall for tens of seconds — only on deep Refresh / Clean now.
+            "rebuild-dir" => out.push(preview_rebuild_scope(scope, touch_user_folders)),
+            "docker-prune" => out.push(preview_docker_prune_scope(scope, touch_user_folders)),
+            "tmutil-thin" => out.push(preview_tmutil_thin_scope(scope, touch_user_folders)),
             _ => {}
         }
     }

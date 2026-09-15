@@ -34,6 +34,8 @@ Disk Cleanup (launch + every 24h + **Clean now**) includes builtin scopes from t
 
 Turn a scope off in the Disk Cleanup panel if a rebuild cost is too high that week.
 
+**UI note (2026-09-15):** Shallow status / glance polls do **not** walk rebuild trees or call `tmutil`/`docker` (they beachballed the CPU window). Use **Refresh** or **Clean now** for a deep scan. Dir walks cap at 1.5s; `tmutil`/`docker` at 8s.
+
 ## Do not start with Docker logs
 
 Container JSON logs were ~0.5 GB. Dangling images matter more. Do **not** run `docker system prune -a --volumes` without review.

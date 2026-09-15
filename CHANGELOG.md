@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1079] - 2026-09-15
+
+### Fixed
+- **Disk Cleanup UI hang** — shallow status / glance polls no longer walk multi-GB rebuild trees or call `tmutil`/`docker`. Dir walks are capped at 1.5s; external helpers at 8s (SIGKILL on timeout). Stops the CPU window going “not responding” after the weekly reclaim scopes landed. See `docs/ops/2026-09-15-disk-cleanup-ui-hang.md`.
+
 ## [0.1.1078] - 2026-09-15
 
 ### Changed
