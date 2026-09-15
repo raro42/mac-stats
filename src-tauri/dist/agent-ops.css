@@ -1859,6 +1859,23 @@ textarea.ops-agent-editor.is-dirty {
   animation: ring-gauge-hot-stroke 2.4s ease-in-out infinite;
 }
 
+/* Temp ring — Nominal thermal calm (Details is-ok / Monitors all-up parity). */
+.metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
+  border-radius: 12px;
+}
+
+.metric-card.is-ok:not(.is-hot):not(.is-fair) .ring-progress {
+  filter: drop-shadow(0 0 2px color-mix(in srgb, #34c759 22%, transparent));
+}
+
+.metric-card.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
+.metric-card.is-ok:not(.is-hot):not(.is-fair) [id$="-subtext"] {
+  color: color-mix(in srgb, #34c759 68%, var(--text, currentColor));
+  font-weight: 650;
+}
+
 /* Temp ring — Fair thermal (power-strip Heat parity); soft static wash, no pulse. */
 .metric-card.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, transparent);
@@ -1931,6 +1948,18 @@ textarea.ops-agent-editor.is-dirty {
 .history-chart-container.is-hot .history-chart-caption {
   color: color-mix(in srgb, #ff9500 75%, var(--text, currentColor));
   font-weight: 700;
+}
+
+/* TEMP sparkline — Nominal thermal calm (Temp ring is-ok parity). */
+.history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 5%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 14%, transparent);
+  border-radius: 10px;
+}
+
+.history-chart-container.is-ok:not(.is-hot):not(.is-fair) .history-chart-caption {
+  color: color-mix(in srgb, #34c759 58%, var(--text, currentColor));
+  font-weight: 650;
 }
 
 /* TEMP sparkline — Fair thermal cue (Temp ring Fair wash parity; quieter than Hot). */

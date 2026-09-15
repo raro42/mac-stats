@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1095] - 2026-09-16
+
+### Changed
+- **Temp ring Nominal calm** — when Apple thermal (or °C band) is Nominal and Temp is below hot, the Temperature ring and TEMP sparkline use a soft green wash (Details is-ok / Monitors all-up parity). Fair stays amber; Serious/Critical stay hot.
+
 ## [0.1.1094] - 2026-09-16
 
 ### Changed

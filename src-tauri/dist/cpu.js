@@ -3754,13 +3754,16 @@ function updateRingHotStates(data) {
     Number.isFinite(data.temperature)
       ? data.temperature
       : null;
-  // Match power-strip Heat: Fair → soft wash; Serious/Critical → hot even below 70°C.
+  // Match power-strip Heat: Nominal → soft green; Fair → soft amber; Serious/Critical → hot even below 70°C.
   const thermal = thermalLevelFromCpuDetails(data);
   const tempHotByC = temp != null && temp >= RING_HOT_TEMP_C;
   const tempHotByThermal =
     thermal === 'Serious' || thermal === 'Critical';
   const tempFair =
     thermal === 'Fair' && !tempHotByC && !tempHotByThermal;
+  // Calm when Heat is Nominal (Details is-ok / Monitors all-up parity).
+  const tempOk =
+    thermal === 'Nominal' && !tempHotByC && !tempHotByThermal;
   const hotByKey = {
     cpu: usage != null && usage >= RING_HOT_CPU_PCT,
     gpu: gpu != null && gpu >= RING_HOT_GPU_PCT,
@@ -3770,18 +3773,23 @@ function updateRingHotStates(data) {
   for (const entry of getRingMetricCardEntries()) {
     const hot = !!hotByKey[entry.key];
     const fair = entry.key === 'temp' && tempFair;
+    const ok = entry.key === 'temp' && tempOk;
     entry.card.classList.toggle('is-hot', hot);
     entry.card.classList.toggle('is-fair', fair);
+    entry.card.classList.toggle('is-ok', ok);
     entry.card.dataset.ringsHot = hot ? '1' : '0';
     entry.card.dataset.ringsFair = fair ? '1' : '0';
+    entry.card.dataset.ringsOk = ok ? '1' : '0';
     entry.card.style.display = '';
     entry.card.hidden = false;
     const chart = historyChartContainerForRingKey(entry.key);
     if (chart) {
       chart.classList.toggle('is-hot', hot);
       chart.classList.toggle('is-fair', fair);
+      chart.classList.toggle('is-ok', ok);
       chart.dataset.ringsHot = hot ? '1' : '0';
       chart.dataset.ringsFair = fair ? '1' : '0';
+      chart.dataset.ringsOk = ok ? '1' : '0';
       chart.style.display = '';
       chart.hidden = false;
     }
@@ -3792,8 +3800,10 @@ function updateRingHotStates(data) {
     const hot = !!hotByKey.gpu;
     gpuChart.classList.toggle('is-hot', hot);
     gpuChart.classList.remove('is-fair');
+    gpuChart.classList.remove('is-ok');
     gpuChart.dataset.ringsHot = hot ? '1' : '0';
     gpuChart.dataset.ringsFair = '0';
+    gpuChart.dataset.ringsOk = '0';
   }
   window._historyHotKeys = HISTORY_HOT_ORDER.filter((k) => hotByKey[k]);
   removeHistoryHotAttentionGlance();
