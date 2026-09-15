@@ -943,6 +943,31 @@ def looks_like_dump_saved_notes(q: str) -> bool:
     return bool(asks) and ("saved" in n or "memory" in n or "note" in n)
 
 
+def looks_like_take_note_ask(q: str) -> bool:
+    """v0.1.1089+ instant MEMORY_APPEND — historical BRAVE_SEARCH take-notes inflate p50."""
+    n = (q or "").strip().lower()
+    if "http" in n or "skill:" in n or "cursor_agent:" in n or "redmine" in n:
+        return False
+    prefixes = (
+        "take note:",
+        "take note -",
+        "take note —",
+        "take note –",
+        "take a note:",
+        "take a note -",
+        "note to self:",
+        "note to self -",
+        "please note:",
+        "please note -",
+        "remember this:",
+        "remember this -",
+        "make a note:",
+        "make a note -",
+        "make a note that ",
+    )
+    return any(n.startswith(p) for p in prefixes) and len(n) >= 16
+
+
 def looks_like_scheduled_skill(q: str) -> bool:
     n = (q or "").strip().lower()
     return n.startswith("skill:")
@@ -1229,6 +1254,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_how_solved_task(q)
         or looks_like_exact_saved_note_read(q)
         or looks_like_dump_saved_notes(q)
+        or looks_like_take_note_ask(q)
         or looks_like_task_create_ask(q)
         or looks_like_lighthouse_pagespeed(q)
         or looks_like_research_using_perplexity(q)

@@ -134,6 +134,10 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_itinerary_preference_statement(&n) {
         return Some(format_itinerary_preference_reply(&n));
     }
+    // Prefer take-note append before note-read / dump (digester: BRAVE_SEARCH on “Take note:”).
+    if let Some(body) = crate::commands::curated_memory::extract_take_note_body(q) {
+        return Some(crate::commands::curated_memory::instant_take_note(&body));
+    }
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
     }
@@ -2668,6 +2672,30 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "casual wake-up chat should not be forced instant"
+        );
+    }
+
+    #[test]
+    fn take_note_ask_is_instant() {
+        match classify_turn_lane(
+            "Take note: we want to have a skill tester and autoimprove skill loop",
+            None,
+        ) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("noted") || lower.contains("memory"),
+                    "expected take-note confirmation: {reply}"
+                );
+            }
+            other => panic!("expected Instant for take-note, got {:?}", other),
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Did you take note of the flight times?", None),
+                TurnLane::Instant { .. }
+            ),
+            "question about notes must not be forced instant"
         );
     }
 

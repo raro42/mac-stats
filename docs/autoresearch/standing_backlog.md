@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1089
+
+- Take note instant: `Take note:` / `note to self:` / `remember this:` / `make a note:` append curated memory on the instant lane (digester Slowest had a 23s BRAVE_SEARCH miss). Digester Slowest filter for historical take-note+Brave turns.
+
 ## Overnight merge — v0.1.1088
 
 - Debug Log filter-miss calm: warm “Nothing here yet” title + solid soft-green wash (Error/Warn empty — no ERROR/WARN in the tail is good news). Perplexity / Disk / Monitors / Processes / AI Chat / Ops parity.
@@ -57,6 +61,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1089** — Take note instant (`Take note:` / `note to self:` / `remember this:`) → curated MEMORY_APPEND; digester Slowest filter.
 
 - **v0.1.1088** — Debug Log filter-miss calm (warm title + soft-green wash; Error/Warn empty).
 

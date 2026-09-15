@@ -345,6 +345,75 @@ pub fn instant_read_saved_note(slug_raw: &str) -> String {
     }
 }
 
+/// Digester Slowest: “Take note: …” burned BRAVE_SEARCH (~23s) instead of MEMORY_APPEND.
+/// Returns the body to store when the ask is clearly a take-note prefix + content.
+pub fn extract_take_note_body(q: &str) -> Option<String> {
+    let trimmed = q.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("brave_search")
+        || lower.contains("perplexity")
+        || lower.contains("memory:")
+        || lower.contains("memory_append")
+        || lower.contains("redmine")
+    {
+        return None;
+    }
+    const PREFIXES: &[&str] = &[
+        "take note:",
+        "take note -",
+        "take note —",
+        "take note –",
+        "take a note:",
+        "take a note -",
+        "note to self:",
+        "note to self -",
+        "note to self —",
+        "please note:",
+        "please note -",
+        "remember this:",
+        "remember this -",
+        "make a note:",
+        "make a note -",
+        "make a note that ",
+    ];
+    for prefix in PREFIXES {
+        if !lower.starts_with(prefix) {
+            continue;
+        }
+        let prefix_chars = prefix.chars().count();
+        let body: String = trimmed.chars().skip(prefix_chars).collect::<String>();
+        let body = body.trim();
+        let len = body.chars().count();
+        if !(3..=500).contains(&len) {
+            return None;
+        }
+        // Pure questions about note-taking stay with the agent.
+        if body.ends_with('?') && body.chars().count() < 48 {
+            return None;
+        }
+        return Some(body.to_string());
+    }
+    None
+}
+
+/// Instant lane: append take-note body to curated memory (no Ollama / no web search).
+pub fn instant_take_note(body: &str) -> String {
+    let result = handle_memory(body.trim(), None);
+    if result.starts_with("Memory updated") || result.starts_with("Already present") {
+        format!("Noted — saved to curated memory.\n{result}")
+    } else if result.starts_with("Blocked") || result.starts_with("MEMORY") {
+        result
+    } else {
+        format!("Noted.\n{result}")
+    }
+}
+
 /// Dump all saved note bodies (verbatim) for “extract what you saved” style asks.
 pub fn instant_dump_saved_notes(max_chars: usize) -> String {
     let max_chars = max_chars.max(500);
@@ -883,6 +952,20 @@ mod tests {
     fn slugify_basic() {
         assert_eq!(slugify_note_id("txc26"), "txc26");
         assert_eq!(slugify_note_id("TXC 26 Travel!"), "txc-26-travel");
+    }
+
+    #[test]
+    fn take_note_extracts_body() {
+        let body = extract_take_note_body(
+            "Take note: we want to have a skill tester and autoimprove skill loop",
+        )
+        .expect("take note body");
+        assert!(body.contains("skill tester"), "{body}");
+        assert!(extract_take_note_body("note to self: ship the DMG tomorrow").is_some());
+        assert!(extract_take_note_body("remember this: prefer window-only screenshots").is_some());
+        assert!(extract_take_note_body("Take note:").is_none());
+        assert!(extract_take_note_body("search for skill tester").is_none());
+        assert!(extract_take_note_body("Take note: see https://example.com").is_none());
     }
 
     #[test]

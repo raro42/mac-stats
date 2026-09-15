@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty; design review not due. Standing backlog drove filter-miss calm parity across CPU sections.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog + Slowest drove filter-miss calm, then a real latency fix.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1089** | Take note instant — `Take note:` / `note to self:` / `remember this:` → curated MEMORY_APPEND (no Brave) |
 | **v0.1.1088** | Debug Log filter-miss calm — warm “Nothing here yet” + soft-green wash (Error/Warn empty) |
 | **v0.1.1087** | Perplexity filter-miss calm — warm title + accent wash (Top/Snippet) |
 | **v0.1.1086** | Disk Cleanup filter-miss calm — warm title + solid wash |
@@ -16,7 +17,7 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty; design revi
 
 ## Why it matters
 
-Empty filter panes no longer feel like a cold miss. Error/Warn empty on Debug Log reads as good news (soft green), same idea as Hot/Down/Fail empty elsewhere.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet.
 
 ## Next
 

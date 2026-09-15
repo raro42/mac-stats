@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1089] - 2026-09-15
+
+### Fixed
+- **Take note instant** — asks like `Take note: …` / `note to self: …` / `remember this: …` append to curated memory on the instant lane (no Ollama, no Brave). Stops a ~23s direct+BRAVE_SEARCH miss when the user only wanted a memory bullet.
+
 ## [0.1.1088] - 2026-09-15
 
 ### Changed
