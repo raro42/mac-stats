@@ -4837,7 +4837,32 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .disk-cleanup-scope-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
   margin: 4px 0 8px;
+  padding: 18px 14px 16px;
+  opacity: 1;
+  font-style: normal;
+  text-align: center;
+  /* Filter-miss calm (Monitors / Top Processes / AI Chat / Agent Ops parity). */
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+/* Off empty = all scopes on (soft green — nothing disabled is calm). */
+.disk-cleanup-scope-filter-miss.is-off-empty {
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.disk-cleanup-scope-filter-miss.is-on-empty {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
 }
 
 .disk-cleanup-filter-chip {
@@ -7361,6 +7386,44 @@ button.monitor-detail-url.is-just-saved {
   padding: 18px 14px 16px;
 }
 
+.disk-cleanup-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 18px 14px 16px;
+  opacity: 1;
+  font-style: normal;
+  text-align: center;
+  /* Filter-miss calm (Monitors / Top Processes / AI Chat / Agent Ops parity). */
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+/* Reclaim / Big empty = good news (Hot-empty / Down-empty green wash parity). */
+.disk-cleanup-filter-miss.is-reclaim-empty,
+.disk-cleanup-filter-miss.is-big-empty {
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.disk-cleanup-filter-miss.is-clean-empty {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+.disk-cleanup-filter-miss-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: inherit;
+  margin-bottom: 4px;
+  opacity: 1;
+  line-height: 1.3;
+}
+
 .disk-cleanup-empty-msg {
   font-size: 13px;
   font-weight: 560;
@@ -7368,12 +7431,14 @@ button.monitor-detail-url.is-just-saved {
   margin-bottom: 4px;
 }
 
-.disk-cleanup-empty-hint {
+.disk-cleanup-empty-hint,
+.disk-cleanup-filter-miss-hint {
   font-size: 12px;
   color: var(--muted);
   margin-bottom: 10px;
   line-height: 1.4;
   max-width: 28em;
+  opacity: 0.9;
 }
 
 .disk-cleanup-empty-cta {

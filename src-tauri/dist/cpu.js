@@ -18068,6 +18068,39 @@ function setDiskCleanupScopeFilterMode(mode) {
   applyDiskCleanupScopeFilter();
 }
 
+function diskCleanupScopeFilterMissHint() {
+  if (diskCleanupScopeFilterMode === 'on') {
+    return 'No scope is enabled right now.';
+  }
+  if (diskCleanupScopeFilterMode === 'off') {
+    return 'No scope is disabled right now.';
+  }
+  return 'Try All, or clear the scope filter.';
+}
+
+function diskCleanupScopeFilterMissTitle() {
+  if (diskCleanupScopeFilterMode === 'on') {
+    return 'Nothing here yet — nothing on';
+  }
+  if (diskCleanupScopeFilterMode === 'off') {
+    return 'Nothing here yet — nothing off';
+  }
+  return 'Nothing here yet';
+}
+
+function syncDiskCleanupScopeFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-on-empty', 'is-off-empty');
+  if (diskCleanupScopeFilterMode === 'on') wrap.classList.add('is-on-empty');
+  else if (diskCleanupScopeFilterMode === 'off') wrap.classList.add('is-off-empty');
+  const title = wrap.querySelector('.disk-cleanup-filter-miss-title');
+  if (title) title.textContent = diskCleanupScopeFilterMissTitle();
+  wrap.title =
+    diskCleanupScopeFilterMode === 'off'
+      ? 'Nothing off — click Clear filter for All'
+      : 'Nothing matches this filter — click Clear filter for All';
+}
+
 function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
   if (!scopesEl || !scopesEl.parentNode) return;
   const existing = scopesEl.parentNode.querySelector(
@@ -18083,8 +18116,8 @@ function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
     wrap.className = 'disk-cleanup-empty disk-cleanup-scope-filter-miss';
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
-      `<div class="disk-cleanup-empty-msg">Nothing matches this filter</div>` +
-      `<div class="disk-cleanup-empty-hint">Try All, or clear the scope filter.</div>` +
+      `<div class="disk-cleanup-filter-miss-title"></div>` +
+      `<div class="disk-cleanup-empty-hint disk-cleanup-filter-miss-hint"></div>` +
       `<button type="button" class="disk-cleanup-empty-cta disk-cleanup-clear-scope-filter">Clear filter</button>`;
     scopesEl.parentNode.insertBefore(wrap, scopesEl.nextSibling);
     wrap
@@ -18098,6 +18131,11 @@ function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
         );
       });
   }
+  syncDiskCleanupScopeFilterMissCalmState(wrap);
+  const hint = wrap.querySelector(
+    '.disk-cleanup-filter-miss-hint, .disk-cleanup-empty-hint'
+  );
+  if (hint) hint.textContent = diskCleanupScopeFilterMissHint();
 }
 
 function applyDiskCleanupScopeFilter() {
@@ -18508,6 +18546,48 @@ function setDiskCleanupFilterMode(mode) {
   applyDiskCleanupListFilter();
 }
 
+function diskCleanupFilterMissHint() {
+  if (diskCleanupFilterMode === 'reclaim') {
+    return 'No category has reclaimable space right now.';
+  }
+  if (diskCleanupFilterMode === 'big') {
+    return `No category is big right now (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}).`;
+  }
+  if (diskCleanupFilterMode === 'clean') {
+    return 'No category is already clean right now.';
+  }
+  return 'Try All, or clear the category filter.';
+}
+
+function diskCleanupFilterMissTitle() {
+  if (diskCleanupFilterMode === 'reclaim') {
+    return 'Nothing here yet — nothing to reclaim';
+  }
+  if (diskCleanupFilterMode === 'big') {
+    return 'Nothing here yet — nothing big';
+  }
+  if (diskCleanupFilterMode === 'clean') {
+    return 'Nothing here yet — nothing clean';
+  }
+  return 'Nothing here yet';
+}
+
+function syncDiskCleanupFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-reclaim-empty', 'is-big-empty', 'is-clean-empty');
+  if (diskCleanupFilterMode === 'reclaim') wrap.classList.add('is-reclaim-empty');
+  else if (diskCleanupFilterMode === 'big') wrap.classList.add('is-big-empty');
+  else if (diskCleanupFilterMode === 'clean') wrap.classList.add('is-clean-empty');
+  const title = wrap.querySelector('.disk-cleanup-filter-miss-title');
+  if (title) title.textContent = diskCleanupFilterMissTitle();
+  wrap.title =
+    diskCleanupFilterMode === 'reclaim'
+      ? 'Nothing to reclaim — click Clear filter for All'
+      : diskCleanupFilterMode === 'big'
+        ? 'Nothing big — click Clear filter for All'
+        : 'Nothing matches this filter — click Clear filter for All';
+}
+
 function ensureDiskCleanupFilterMissState(listEl, show) {
   if (!listEl) return;
   const existing = listEl.querySelector('.disk-cleanup-filter-miss');
@@ -18521,8 +18601,8 @@ function ensureDiskCleanupFilterMissState(listEl, show) {
     wrap.className = 'disk-cleanup-empty disk-cleanup-filter-miss';
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
-      `<div class="disk-cleanup-empty-msg">Nothing matches this filter</div>` +
-      `<div class="disk-cleanup-empty-hint">Try All, or clear the category filter.</div>` +
+      `<div class="disk-cleanup-filter-miss-title"></div>` +
+      `<div class="disk-cleanup-empty-hint disk-cleanup-filter-miss-hint"></div>` +
       `<button type="button" class="disk-cleanup-empty-cta disk-cleanup-clear-filter">Clear filter</button>`;
     listEl.appendChild(wrap);
     wrap.querySelector('.disk-cleanup-clear-filter')?.addEventListener('click', (e) => {
@@ -18532,6 +18612,11 @@ function ensureDiskCleanupFilterMissState(listEl, show) {
       flashDiskCleanupFilterClearBtn(document.getElementById('disk-cleanup-filter-clear'));
     });
   }
+  syncDiskCleanupFilterMissCalmState(wrap);
+  const hint = wrap.querySelector(
+    '.disk-cleanup-filter-miss-hint, .disk-cleanup-empty-hint'
+  );
+  if (hint) hint.textContent = diskCleanupFilterMissHint();
 }
 
 function applyDiskCleanupListFilter() {

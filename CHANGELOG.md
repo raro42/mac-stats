@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1086] - 2026-09-15
+
+### Changed
+- **Disk Cleanup filter-miss calm** — Reclaim/Big/Clean and On/Off scope empty panes use a warm “Nothing here yet” title and solid wash (Reclaim/Big and Off empty soft green — nothing to reclaim, nothing big, or nothing off is calm; Clean/On accent). Matches Monitors / Top Processes / AI Chat / Agent Ops filter-miss calm.
+
 ## [0.1.1085] - 2026-09-15
 
 ### Changed
