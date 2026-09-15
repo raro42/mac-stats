@@ -971,7 +971,7 @@ fn dir_size_at_least(root: &Path, stop_at: u64) -> u64 {
 
 /// Run an external command with a hard wall-clock budget. On timeout, SIGKILL the child.
 fn command_output_timeout(mut cmd: Command, timeout: Duration) -> Option<std::process::Output> {
-    let mut child = match cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
+    let child = match cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn() {
         Ok(c) => c,
         Err(_) => return None,
     };
