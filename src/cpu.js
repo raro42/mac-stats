@@ -16730,6 +16730,41 @@ function renderLogsViewerLines(viewer, prefix, text, preferScrollEnd) {
   }
 }
 
+function logsFilterMissTitle() {
+  if (logsFilterMode === 'error') {
+    return 'Nothing here yet — no ERROR lines in this tail';
+  }
+  if (logsFilterMode === 'warn') {
+    return 'Nothing here yet — no WARN lines in this tail';
+  }
+  return 'Nothing here yet';
+}
+
+function logsFilterMissHint() {
+  if (logsFilterMode === 'error') {
+    return 'No ERROR lines in this tail. Clear filter for All.';
+  }
+  if (logsFilterMode === 'warn') {
+    return 'No WARN lines in this tail. Clear filter for All.';
+  }
+  return 'Try All, or clear the level filter.';
+}
+
+function syncLogsFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-error-empty', 'is-warn-empty');
+  if (logsFilterMode === 'error') wrap.classList.add('is-error-empty');
+  else if (logsFilterMode === 'warn') wrap.classList.add('is-warn-empty');
+  const title = wrap.querySelector('.logs-filter-miss-title');
+  if (title) title.textContent = logsFilterMissTitle();
+  wrap.title =
+    logsFilterMode === 'error'
+      ? 'No ERROR lines — click Clear filter for All'
+      : logsFilterMode === 'warn'
+        ? 'No WARN lines — click Clear filter for All'
+        : 'Nothing matches this filter — click Clear filter for All';
+}
+
 function applyLogsFilter(scrollToEnd) {
   const viewer = document.getElementById('logs-viewer');
   if (!viewer) return;
@@ -16769,11 +16804,9 @@ function applyLogsFilter(scrollToEnd) {
 
   const filtered = filterLogsBody(body, logsFilterMode);
   if (logsFilterMode !== 'all' && !filtered.trim()) {
-    const empty =
-      logsFilterMode === 'error'
-        ? 'Nothing here yet — no ERROR lines in this tail'
-        : 'Nothing here yet — no WARN lines in this tail';
-    const key = `miss|${logsFilterMode}|${prefix}|${empty}|clear`;
+    const titleText = logsFilterMissTitle();
+    const hintText = logsFilterMissHint();
+    const key = `miss|${logsFilterMode}|${prefix}|${titleText}|calm`;
     if (
       key === logsViewerRenderKey &&
       viewer.querySelector('.logs-viewer-empty.logs-filter-miss')
@@ -16785,28 +16818,28 @@ function applyLogsFilter(scrollToEnd) {
     logsViewerRenderKey = key;
     logsSelectedLineText = '';
     viewer.replaceChildren();
+    if (prefix) {
+      const pre = document.createElement('div');
+      pre.className = 'logs-viewer-prefix';
+      pre.textContent = prefix.replace(/\n+$/, '');
+      viewer.appendChild(pre);
+    }
     const emptyEl = document.createElement('div');
     emptyEl.className = 'logs-viewer-empty logs-filter-miss';
     emptyEl.setAttribute('role', 'status');
-    const msg = document.createElement('div');
-    msg.className = 'logs-filter-miss-msg';
-    msg.textContent = prefix + empty;
-    const hint = document.createElement('div');
-    hint.className = 'logs-filter-miss-hint';
-    hint.textContent = 'Try All, or clear the level filter.';
-    const cta = document.createElement('button');
-    cta.type = 'button';
-    cta.className = 'logs-filter-miss-cta logs-clear-filter';
-    cta.textContent = 'Clear filter';
-    cta.addEventListener('click', (e) => {
+    emptyEl.innerHTML =
+      `<div class="logs-filter-miss-title"></div>` +
+      `<div class="logs-filter-miss-hint"></div>` +
+      `<button type="button" class="logs-filter-miss-cta logs-clear-filter">Clear filter</button>`;
+    emptyEl.querySelector('.logs-filter-miss-title').textContent = titleText;
+    emptyEl.querySelector('.logs-filter-miss-hint').textContent = hintText;
+    syncLogsFilterMissCalmState(emptyEl);
+    emptyEl.querySelector('.logs-clear-filter')?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       setLogsFilterMode('all');
       flashLogsFilterClearBtn(document.getElementById('logs-filter-clear'));
     });
-    emptyEl.appendChild(msg);
-    emptyEl.appendChild(hint);
-    emptyEl.appendChild(cta);
     viewer.appendChild(emptyEl);
     viewer.classList.add('is-empty');
     ensureLogsKbHint(viewer, false);

@@ -3026,9 +3026,35 @@ textarea.ops-agent-editor.is-dirty {
 .logs-viewer-empty.logs-filter-miss {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 12px 4px;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 18px 14px 16px;
+  opacity: 1;
+  font-style: normal;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  color: inherit;
+}
+
+/* Error/Warn empty = calm (soft green) — nothing noisy in the tail is good news. */
+.logs-viewer-empty.logs-filter-miss.is-error-empty,
+.logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+}
+
+.logs-filter-miss-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: inherit;
+  margin-bottom: 4px;
+  opacity: 1;
+  line-height: 1.3;
 }
 
 .logs-filter-miss-msg {
@@ -3037,24 +3063,27 @@ textarea.ops-agent-editor.is-dirty {
 
 .logs-filter-miss-hint {
   font-size: 12px;
-  opacity: 0.78;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  opacity: 0.9;
 }
 
 .logs-filter-miss-cta {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
-  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  color: var(--text);
   font: inherit;
   font-size: 12px;
-  font-weight: 600;
-  padding: 6px 10px;
+  font-weight: 560;
+  padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .logs-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
 .logs-filter-miss-cta:focus-visible {

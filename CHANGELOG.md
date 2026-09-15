@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1088] - 2026-09-15
+
+### Changed
+- **Debug Log filter-miss calm** — Error/Warn empty panes use a warm “Nothing here yet” title and solid wash (soft green — no ERROR/WARN in the tail is good news; Clear filter CTA). Matches Perplexity / Disk Cleanup / Monitors / Top Processes / AI Chat / Agent Ops filter-miss calm.
+
 ## [0.1.1087] - 2026-09-15
 
 ### Changed
