@@ -22,7 +22,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Overnight merge — v0.1.1082
 
-- Design review / Agent Ops Overview empty calm: warm “Nothing here yet” + solid accent wash on empty overview cards (filter-miss parity). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC; polish grace marked.
+- Design review / Agent Ops Overview empty calm: warm “Nothing here yet” + solid accent wash on empty overview cards (filter-miss parity). Recaptured `feature-agent-ops.png` (window-only).
 
 ## Overnight merge — v0.1.1073
 
