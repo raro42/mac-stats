@@ -3404,6 +3404,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 6%, transparent);
 }
 
+/* Calm wash when Load/RAM are fine (Monitors is-all-up / Disk is-clean parity). */
+.details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
 /* Details Hot · … bar — removed (KISS; collapsed glance wash + numbers are enough). */
 .details-hot-attention-glance {
   display: none !important;

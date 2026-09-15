@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1090] - 2026-09-15
+
+### Changed
+- **Details collapsed glance calm** — when Load and RAM are below hot thresholds, the collapsed Details glance uses a soft green wash (Monitors all-up / Disk clean parity). Hot Load/RAM still use amber.
+
 ## [0.1.1089] - 2026-09-15
 
 ### Fixed

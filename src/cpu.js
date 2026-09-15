@@ -11906,7 +11906,7 @@ function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
   const text = document.getElementById("details-collapsed-glance-text");
   const collapsed = isDetailsSectionCollapsed();
   if (waiting) {
-    glance.classList.remove("is-hot");
+    glance.classList.remove("is-hot", "is-ok");
     if (collapsed) {
       glance.hidden = false;
       if (text) text.textContent = "Waiting · details";
@@ -11935,10 +11935,19 @@ function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
       : "—";
   const upStr = uptime && String(uptime).trim() ? String(uptime).trim() : "—";
   if (text) text.textContent = `Load · ${loadStr} · RAM · ${ramStr} · Up · ${upStr}`;
+  const loadOk =
+    typeof load1 === "number" && Number.isFinite(load1) && load1 < DETAILS_HOT_LOAD;
+  const ramOk =
+    typeof ramPct === "number" &&
+    Number.isFinite(ramPct) &&
+    ramPct < DETAILS_HOT_RAM_PCT;
   const hot =
-    (typeof load1 === "number" && load1 >= 4) ||
-    (typeof ramPct === "number" && ramPct >= 85);
+    (typeof load1 === "number" && load1 >= DETAILS_HOT_LOAD) ||
+    (typeof ramPct === "number" && ramPct >= DETAILS_HOT_RAM_PCT);
+  // Soft green when both Load and RAM are known and below hot thresholds (Monitors all-up parity).
+  const ok = !hot && loadOk && ramOk;
   glance.classList.toggle("is-hot", hot);
+  glance.classList.toggle("is-ok", ok);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = "Show Details · ↑ → power strip · ↓ → Top Processes";
