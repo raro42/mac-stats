@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, then Temp ring Nominal calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1095** | Temp ring Nominal calm — soft green on Temperature ring + TEMP sparkline when Heat is Nominal below hot (Details/Monitors parity) |
 | **v0.1.1094** | Perplexity collapsed glance calm — soft green when Ready · search (Monitors/Disk/Debug Log parity) |
 | **v0.1.1093** | Debug Log collapsed glance calm — soft green when Quiet · clean (Monitors/Disk/Details parity) |
 | **v0.1.1092** | Disk Cleanup collapsed glance calm — soft green when clean (Monitors/Details parity) |
@@ -22,11 +23,11 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances now share the same calm green language when things are fine — hot / reclaim / errors / needs-key still amber or red.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances now share the same calm green language when things are fine — and the Temp ring joins that calm when Heat is Nominal. Hot / Fair / reclaim / errors / needs-key still amber or red.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (AI Chat / Processes / Monitors still old)
 - Sibling Hermes/OpenClaw ports with clear user fitness
-- Next calm: power-strip Heat Nominal, or AI Chat collapsed online wash
+- Next calm: CPU/GPU/Freq ring soft green when below hot, or battery strip healthy (not low)
