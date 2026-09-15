@@ -906,7 +906,7 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   const text = document.getElementById("processes-top-glance-text");
   if (waiting || topPid == null || !topName) {
     window.__processesTopPid = null;
-    glance.classList.remove("is-hot");
+    glance.classList.remove("is-hot", "is-ok");
     // Collapsed: always show a glance so keep-header is useful (Debug Log / Perplexity parity).
     if (isProcessesSectionCollapsed()) {
       glance.hidden = false;
@@ -927,10 +927,15 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   glance.hidden = false;
   const cpuStr = typeof topCpu === "number" ? `${topCpu.toFixed(1)}%` : "—";
   if (text) text.textContent = `Top CPU · ${topName} ${cpuStr}`;
-  glance.classList.toggle(
-    "is-hot",
-    typeof topCpu === "number" && topCpu >= PROCESS_HOT_CPU_PCT
-  );
+  const cpuHot =
+    typeof topCpu === "number" && topCpu >= PROCESS_HOT_CPU_PCT;
+  const cpuOk =
+    typeof topCpu === "number" &&
+    Number.isFinite(topCpu) &&
+    topCpu < PROCESS_HOT_CPU_PCT;
+  glance.classList.toggle("is-hot", cpuHot);
+  // Soft green when top CPU is known and below hot (Details Load/RAM parity).
+  glance.classList.toggle("is-ok", cpuOk);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;
@@ -1030,7 +1035,7 @@ function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
   if (waiting || topPid == null || !topName) {
     glance.hidden = true;
     window.__processesTopGpuPid = null;
-    glance.classList.remove("is-hot");
+    glance.classList.remove("is-hot", "is-ok");
     return;
   }
   window.__processesTopGpuPid = String(topPid);
@@ -1038,7 +1043,10 @@ function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
   const gpuNum = Number(topGpu) || 0;
   const gpuStr = gpuNum >= 0.1 ? `${gpuNum.toFixed(1)}%` : "—";
   if (text) text.textContent = `Top GPU · ${topName} ${gpuStr}`;
-  glance.classList.toggle("is-hot", gpuNum >= PROCESS_HOT_GPU_PCT);
+  const gpuHot = gpuNum >= PROCESS_HOT_GPU_PCT;
+  glance.classList.toggle("is-hot", gpuHot);
+  // Soft green when top GPU is below hot (Details / Top CPU calm parity).
+  glance.classList.toggle("is-ok", !gpuHot);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;
@@ -1109,7 +1117,7 @@ function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
   if (waiting || topPid == null || !topName) {
     glance.hidden = true;
     window.__processesTopRamPid = null;
-    glance.classList.remove("is-hot");
+    glance.classList.remove("is-hot", "is-ok");
     return;
   }
   window.__processesTopRamPid = String(topPid);
@@ -1118,7 +1126,10 @@ function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
   const memStr = memNum > 0 ? formatBytes(memNum) : "—";
   if (text) text.textContent = `Top RAM · ${topName} ${memStr}`;
   // Amber wash when resident ≥ 1 GiB (heavy process).
-  glance.classList.toggle("is-hot", memNum >= PROCESS_HOT_RAM_BYTES);
+  const ramHot = memNum >= PROCESS_HOT_RAM_BYTES;
+  glance.classList.toggle("is-hot", ramHot);
+  // Soft green when top RAM is below hot (Details / Top CPU calm parity).
+  glance.classList.toggle("is-ok", !ramHot);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;

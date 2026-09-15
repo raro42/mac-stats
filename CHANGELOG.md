@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1091] - 2026-09-15
+
+### Changed
+- **Top Processes glance calm** — Top CPU · GPU · RAM glances use a soft green wash when below hot thresholds (Details Load/RAM / Monitors all-up parity). Hot still amber.
+
 ## [0.1.1090] - 2026-09-15
 
 ### Changed

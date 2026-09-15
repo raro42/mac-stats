@@ -3458,6 +3458,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 6%, transparent);
 }
 
+/* Calm wash when top CPU is below hot (Details is-ok / Monitors all-up parity). */
+.processes-top-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
 /* External / Monitors — Down/Slow attention glance (Agent Ops Fail/Slow / Hot parity) */
 .monitors-attention-glance {
   display: flex;
@@ -3845,6 +3851,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 6%, transparent);
 }
 
+/* Calm wash when top GPU is below hot (Top CPU / Details is-ok parity). */
+.processes-top-gpu-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
 /* Top Processes — top RAM glance (Top CPU / Top GPU parity) */
 .processes-top-ram-glance {
   display: flex;
@@ -3886,6 +3898,12 @@ textarea.ops-agent-editor.is-dirty {
 .processes-top-ram-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, transparent);
   background: color-mix(in srgb, #ff9500 6%, transparent);
+}
+
+/* Calm wash when top RAM is below hot (Top CPU / Details is-ok parity). */
+.processes-top-ram-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 /* Agent Ops — Discord Ready collapsed glance under header (AI Chat / Monitors parity) */
