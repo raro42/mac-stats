@@ -4713,9 +4713,10 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 6%, transparent);
 }
 
+/* Calm wash when Quiet · clean (Monitors all-up / Disk is-clean / Details is-ok parity). */
 .logs-error-glance.is-quiet {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 3.5%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 .monitors-filter-chips {

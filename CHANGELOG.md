@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1093] - 2026-09-16
+
+### Changed
+- **Debug Log collapsed glance calm** — when the tail has no ERROR/WARN (`Quiet · clean`), the collapsed Debug Log glance uses a soft green wash (Monitors all-up / Disk is-clean / Details is-ok parity). Errors still red; warns-only still amber.
+
 ## [0.1.1092] - 2026-09-16
 
 ### Changed
