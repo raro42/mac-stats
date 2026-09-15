@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1087] - 2026-09-15
+
+### Changed
+- **Perplexity filter-miss calm** — Top/Snippet empty panes use a warm “Nothing here yet” title and solid accent wash (Clear filter CTA). Matches Disk Cleanup / Monitors / Top Processes / AI Chat / Agent Ops filter-miss calm.
+
 ## [0.1.1086] - 2026-09-15
 
 ### Changed

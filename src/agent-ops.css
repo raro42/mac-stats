@@ -2683,6 +2683,75 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff3b30 8%, transparent);
 }
 
+/* Filter-miss calm (Monitors / Disk Cleanup / Top Processes / AI Chat / Agent Ops parity). */
+.perplexity-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 18px 14px 16px;
+  opacity: 1;
+  font-style: normal;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  color: inherit;
+}
+
+.perplexity-filter-miss.is-top-empty,
+.perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+.perplexity-filter-miss-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: inherit;
+  margin-bottom: 4px;
+  opacity: 1;
+  line-height: 1.3;
+}
+
+.perplexity-empty-hint,
+.perplexity-filter-miss-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.perplexity-empty-cta {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 560;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+}
+
+.perplexity-empty-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
 /* Perplexity results — keyboard hint + selected wash (Monitors / AI Chat parity) */
 .perplexity-kb-hint {
   margin: 6px 0 8px;

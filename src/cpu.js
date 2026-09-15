@@ -13722,6 +13722,41 @@ function setPerplexityFilterMode(mode) {
   applyPerplexityLastGlanceState();
 }
 
+function perplexityFilterMissHint() {
+  if (perplexityFilterMode === 'top') {
+    return `No top ${PERPLEXITY_TOP_N} hits in this list.`;
+  }
+  if (perplexityFilterMode === 'snippet') {
+    return 'No results have preview text.';
+  }
+  return 'Try All, or clear the result filter.';
+}
+
+function perplexityFilterMissTitle() {
+  if (perplexityFilterMode === 'top') {
+    return 'Nothing here yet — no top hits';
+  }
+  if (perplexityFilterMode === 'snippet') {
+    return 'Nothing here yet — no snippets';
+  }
+  return 'Nothing here yet';
+}
+
+function syncPerplexityFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-top-empty', 'is-snippet-empty');
+  if (perplexityFilterMode === 'top') wrap.classList.add('is-top-empty');
+  else if (perplexityFilterMode === 'snippet') wrap.classList.add('is-snippet-empty');
+  const title = wrap.querySelector('.perplexity-filter-miss-title');
+  if (title) title.textContent = perplexityFilterMissTitle();
+  wrap.title =
+    perplexityFilterMode === 'top'
+      ? 'No top hits — click Clear filter for All'
+      : perplexityFilterMode === 'snippet'
+        ? 'No snippets — click Clear filter for All'
+        : 'Nothing matches this filter — click Clear filter for All';
+}
+
 function ensurePerplexityFilterMissState(resultsEl, show) {
   if (!resultsEl) return;
   const existing = resultsEl.querySelector('.perplexity-filter-miss');
@@ -13735,8 +13770,8 @@ function ensurePerplexityFilterMissState(resultsEl, show) {
     wrap.className = 'perplexity-empty perplexity-filter-miss';
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
-      `<div class="perplexity-empty-msg">Nothing matches this filter</div>` +
-      `<div class="perplexity-empty-hint">Try All, or clear the result filter.</div>` +
+      `<div class="perplexity-filter-miss-title"></div>` +
+      `<div class="perplexity-empty-hint perplexity-filter-miss-hint"></div>` +
       `<button type="button" class="perplexity-empty-cta perplexity-clear-filter">Clear filter</button>`;
     resultsEl.appendChild(wrap);
     wrap.querySelector('.perplexity-clear-filter')?.addEventListener('click', (e) => {
@@ -13746,6 +13781,11 @@ function ensurePerplexityFilterMissState(resultsEl, show) {
       flashPerplexityFilterClearBtn(document.getElementById('perplexity-filter-clear'));
     });
   }
+  syncPerplexityFilterMissCalmState(wrap);
+  const hint = wrap.querySelector(
+    '.perplexity-filter-miss-hint, .perplexity-empty-hint'
+  );
+  if (hint) hint.textContent = perplexityFilterMissHint();
 }
 
 function applyPerplexityResultsFilter() {

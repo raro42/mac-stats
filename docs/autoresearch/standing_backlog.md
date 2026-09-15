@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1087
+
+- Perplexity filter-miss calm: warm “Nothing here yet” title + solid accent wash (Top/Snippet). Disk Cleanup / Monitors / Top Processes / AI Chat / Agent Ops parity.
+
 ## Overnight merge — v0.1.1086
 
 - Disk Cleanup filter-miss calm: warm “Nothing here yet” title + solid wash (Reclaim/Big and Off empty soft green; Clean/On accent). Monitors / Top Processes / AI Chat / Agent Ops parity.
@@ -49,6 +53,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1087** — Perplexity filter-miss calm (warm title + solid accent wash; Top/Snippet).
 
 - **v0.1.1086** — Disk Cleanup filter-miss calm (warm title + solid wash; Reclaim/Big/Off empty green; Clean/On accent).
 
