@@ -7746,6 +7746,35 @@ function monitorsFilterMissHint() {
   return 'Try All, or clear the status filter.';
 }
 
+function monitorsFilterMissTitle() {
+  if (monitorsFilterMode === 'down') {
+    return 'Nothing here yet — nothing down';
+  }
+  if (monitorsFilterMode === 'slow') {
+    return 'Nothing here yet — nothing slow';
+  }
+  if (monitorsFilterMode === 'up') {
+    return 'Nothing here yet — nothing up';
+  }
+  return 'Nothing here yet';
+}
+
+function syncMonitorsFilterMissCalmState(wrap) {
+  if (!wrap) return;
+  wrap.classList.remove('is-down-empty', 'is-slow-empty', 'is-up-empty');
+  if (monitorsFilterMode === 'down') wrap.classList.add('is-down-empty');
+  else if (monitorsFilterMode === 'slow') wrap.classList.add('is-slow-empty');
+  else if (monitorsFilterMode === 'up') wrap.classList.add('is-up-empty');
+  const title = wrap.querySelector('.monitors-filter-miss-title');
+  if (title) title.textContent = monitorsFilterMissTitle();
+  wrap.title =
+    monitorsFilterMode === 'down'
+      ? 'Nothing down — click Clear filter for All'
+      : monitorsFilterMode === 'slow'
+        ? 'Nothing slow — click Clear filter for All'
+        : 'Nothing matches this filter — click Clear filter for All';
+}
+
 function ensureMonitorsFilterMissState(monitorsList, show) {
   if (!monitorsList) return;
   const existing = monitorsList.querySelector('.monitors-filter-miss');
@@ -7759,8 +7788,8 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
     wrap.className = 'monitors-empty monitors-filter-miss';
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
-      `<div class="monitors-empty-msg">Nothing matches this filter</div>` +
-      `<div class="monitors-empty-hint"></div>` +
+      `<div class="monitors-filter-miss-title"></div>` +
+      `<div class="monitors-empty-hint monitors-filter-miss-hint"></div>` +
       `<button type="button" class="monitors-empty-cta monitors-clear-filter">Clear filter</button>`;
     monitorsList.appendChild(wrap);
     wrap.querySelector('.monitors-clear-filter')?.addEventListener('click', (e) => {
@@ -7770,7 +7799,8 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
       flashMonitorsFilterClearBtn(document.getElementById('monitors-filter-clear'));
     });
   }
-  const hint = wrap.querySelector('.monitors-empty-hint');
+  syncMonitorsFilterMissCalmState(wrap);
+  const hint = wrap.querySelector('.monitors-filter-miss-hint, .monitors-empty-hint');
   if (hint) hint.textContent = monitorsFilterMissHint();
 }
 

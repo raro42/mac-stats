@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1085] - 2026-09-15
+
+### Changed
+- **Monitors filter-miss calm** — Up/Down/Slow empty panes use a warm “Nothing here yet” title and solid wash (Down/Slow empty soft green — nothing down or slow is good news; Up accent). Matches Top Processes / AI Chat / Agent Ops filter-miss calm.
+
 ## [0.1.1084] - 2026-09-15
 
 ### Changed
