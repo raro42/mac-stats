@@ -4,13 +4,20 @@
 //! `IOUserClientCreator` (`pid N, name`) and `AppUsage` (`accumulatedGPUTime` ns).
 //! Sample twice and divide delta by wall time → estimated GPU % (best-effort).
 //! No sudo. Same family of data Activity Monitor uses.
+//!
+//! **UI safety:** `ioreg -rl` can hang or dump huge trees. Never block the Tauri
+//! main-thread invoke path waiting forever — timeout + serve stale cache.
 
 use std::collections::HashMap;
-use std::process::Command;
-use std::sync::Mutex;
-use std::time::Instant;
+use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{mpsc, Mutex};
+use std::time::{Duration, Instant};
 
 use crate::debug3;
+
+/// Hard wall-clock for `ioreg` so a stuck dump cannot beachball the CPU window.
+const IOREG_BUDGET: Duration = Duration::from_millis(800);
 
 #[derive(Clone, Debug)]
 struct GpuSample {
@@ -20,6 +27,15 @@ struct GpuSample {
 
 static PREV_SAMPLES: Mutex<Option<(HashMap<u32, GpuSample>, Instant)>> = Mutex::new(None);
 static CACHED_PCT: Mutex<Option<(HashMap<u32, f32>, Instant)>> = Mutex::new(None);
+static SAMPLE_IN_FLIGHT: AtomicBool = AtomicBool::new(false);
+
+fn cached_pct_clone() -> HashMap<u32, f32> {
+    CACHED_PCT
+        .lock()
+        .ok()
+        .and_then(|g| g.as_ref().map(|(m, _)| m.clone()))
+        .unwrap_or_default()
+}
 
 /// Latest per-PID estimated GPU utilization % (0–100+; may exceed 100 if multi-queue).
 pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
@@ -30,7 +46,7 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
         .and_then(|g| g.as_ref().map(|(_, at)| at.elapsed().as_millis()))
         .unwrap_or(u128::MAX);
 
-    // Rate-limit ioreg (~20ms each). Allow a quick second sample for deltas,
+    // Rate-limit ioreg. Allow a quick second sample for deltas,
     // then hold ~3s so process-list + details refresh do not stack dumps.
     let have_prev = prev_age_ms != u128::MAX;
     let need_second = have_prev && prev_age_ms >= 50 && prev_age_ms < 2000;
@@ -46,7 +62,22 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
         }
     }
 
+    // Another invoke already running ioreg — do not stack on the UI thread.
+    if SAMPLE_IN_FLIGHT.swap(true, Ordering::SeqCst) {
+        return cached_pct_clone();
+    }
+
     let raw = sample_accumulated_ns_by_pid();
+    SAMPLE_IN_FLIGHT.store(false, Ordering::SeqCst);
+
+    // Timed-out / failed sample: keep serving cache instead of clearing %.
+    if raw.is_empty() {
+        let stale = cached_pct_clone();
+        if !stale.is_empty() {
+            return stale;
+        }
+    }
+
     let now = Instant::now();
     let mut pct: HashMap<u32, f32> = HashMap::new();
 
@@ -112,15 +143,40 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
     pct
 }
 
+fn command_output_timeout(mut cmd: Command, timeout: Duration) -> Option<std::process::Output> {
+    let child = match cmd.stdout(Stdio::piped()).stderr(Stdio::null()).spawn() {
+        Ok(c) => c,
+        Err(_) => return None,
+    };
+    let pid = child.id();
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(child.wait_with_output());
+    });
+    match rx.recv_timeout(timeout) {
+        Ok(Ok(out)) => Some(out),
+        Ok(Err(_)) => None,
+        Err(_) => {
+            // SAFETY: pid from spawn(); SIGKILL cleans a wedged ioreg so UI can paint.
+            unsafe {
+                libc::kill(pid as i32, libc::SIGKILL);
+            }
+            let _ = rx.recv_timeout(Duration::from_secs(1));
+            None
+        }
+    }
+}
+
 fn sample_accumulated_ns_by_pid() -> HashMap<u32, u64> {
     // `-l` lists properties on children (AGXDeviceUserClient). Without it, some
     // macOS builds omit AppUsage / IOUserClientCreator on the text dump.
-    let output = Command::new("/usr/sbin/ioreg")
-        .args(["-r", "-l", "-w", "0", "-c", "AGXAccelerator"])
-        .stderr(std::process::Stdio::null())
-        .output();
-
-    let Ok(output) = output else {
+    let mut cmd = Command::new("/usr/sbin/ioreg");
+    cmd.args(["-r", "-l", "-w", "0", "-c", "AGXAccelerator"]);
+    let Some(output) = command_output_timeout(cmd, IOREG_BUDGET) else {
+        debug3!(
+            "GPU processes: ioreg timed out after {:?} (killed)",
+            IOREG_BUDGET
+        );
         return HashMap::new();
     };
     if !output.status.success() {

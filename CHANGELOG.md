@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1080] - 2026-09-15
+
+### Fixed
+- **CPU window beachball** — `get_cpu_details` was blocking the main thread on `ioreg -rl` for per-process GPU %. Cap that dump at 800ms (SIGKILL), skip stacked samples, and serve the last good cache so the UI keeps painting. See `docs/ops/2026-09-15-gpu-ioreg-ui-hang.md`.
+
 ## [0.1.1079] - 2026-09-15
 
 ### Fixed
