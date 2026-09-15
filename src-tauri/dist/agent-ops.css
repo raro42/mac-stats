@@ -8256,9 +8256,10 @@ button.monitor-detail-url.is-just-saved {
   background: color-mix(in srgb, #ff9f0a 7%, transparent);
 }
 
+/* Calm wash when Ready · search (Monitors all-up / Disk is-clean / Debug Log quiet parity). */
 .perplexity-last-glance.is-ready {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 3.5%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 /* Perplexity — Key-not-set attention glance (AI Chat Offline parity; expanded) */

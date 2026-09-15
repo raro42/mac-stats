@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1094] - 2026-09-16
+
+### Changed
+- **Perplexity collapsed glance calm** — when ready (`Ready · search`), the collapsed Perplexity glance uses a soft green wash (Monitors all-up / Disk is-clean / Debug Log quiet parity). Needs-key still amber; errors still red; last-results still accent.
+
 ## [0.1.1093] - 2026-09-16
 
 ### Changed
