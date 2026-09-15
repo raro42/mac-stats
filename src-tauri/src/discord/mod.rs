@@ -1489,13 +1489,66 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
         .await;
 }
 
-/// Idle-thought Discord send timeouts are best-effort noise when the gateway is slow.
+/// Idle-thought Discord send / Ollama timeouts are best-effort noise.
 /// Emit at most one WARN per interval; further timeouts stay DEBUG (single-instance busy parity).
 const IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS: u64 = 5 * 60;
 static LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS: AtomicU64 = AtomicU64::new(0);
 
+/// Cap idle-thought Ollama wall clock so a quiet channel cannot hog the global queue for
+/// 2× `ollamaChatTimeoutSecs` (inner chat already retries once; Discord must not retry again).
+const IDLE_THOUGHT_OLLAMA_WALL_SECS: u64 = 120;
+/// Extra delay after an Ollama timeout/wall budget so we do not burn the queue again soon.
+const IDLE_THOUGHT_TIMEOUT_BACKOFF_SECS: u64 = 15 * 60;
+
 fn should_warn_idle_thought_timeout(prev_secs: u64, now_secs: u64, interval_secs: u64) -> bool {
     prev_secs == 0 || now_secs.saturating_sub(prev_secs) >= interval_secs
+}
+
+fn idle_thought_ollama_wall_secs() -> u64 {
+    crate::config::Config::ollama_chat_timeout_secs().min(IDLE_THOUGHT_OLLAMA_WALL_SECS)
+}
+
+/// Next idle wait after a timeout: existing schedule plus backoff (at least idle_min).
+fn idle_thought_next_after_timeout(current_next_secs: u64, idle_min_secs: u64) -> u64 {
+    let extra = IDLE_THOUGHT_TIMEOUT_BACKOFF_SECS.max(idle_min_secs);
+    current_next_secs.saturating_add(extra)
+}
+
+fn apply_idle_thought_timeout_backoff(channel_id: u64) {
+    if let Ok(mut map) = having_fun_states().lock() {
+        if let Some(state) = map.get_mut(&channel_id) {
+            let params = get_having_fun_params();
+            let before = state.next_idle_thought_after_secs;
+            state.next_idle_thought_after_secs =
+                idle_thought_next_after_timeout(before, params.idle_thought_secs_min);
+            info!(
+                "Having fun: idle thought Ollama timeout backoff channel {} — next idle in {} (was {})",
+                channel_id,
+                format_secs_min_sec(state.next_idle_thought_after_secs),
+                format_secs_min_sec(before)
+            );
+        }
+    }
+}
+
+fn log_idle_thought_ollama_timeout(channel_id: u64, detail: &str) {
+    let now = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let prev = LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.load(Ordering::Relaxed);
+    if should_warn_idle_thought_timeout(prev, now, IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS) {
+        LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.store(now, Ordering::Relaxed);
+        warn!(
+            "Having fun: idle thought skipped for channel {} (Ollama timeout; best-effort): {}",
+            channel_id, detail
+        );
+    } else {
+        debug!(
+            "Having fun: idle thought skipped for channel {} (Ollama timeout; rate-limited): {}",
+            channel_id, detail
+        );
+    }
 }
 
 fn log_idle_thought_send_timeout(part_index: usize, total: usize) {
@@ -1593,38 +1646,29 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
     let channel = serenity::model::id::ChannelId::new(channel_id);
     let _ = channel.broadcast_typing(&ctx).await;
 
-    const IDLE_RETRY_DELAY_SECS: u64 = 2;
-    let mut result = crate::commands::ollama::send_ollama_chat_messages(
-        ollama_msgs.clone(),
-        model_override.clone(),
-        None,
-        crate::commands::ollama::OllamaHttpQueue::Acquire {
-            key: format!("discord:{}", channel_id),
-            wait_hook: None,
-        },
+    // Best-effort: one Ollama call (inner path already retries once). Cap wall clock so idle
+    // thoughts cannot pin the global Ollama queue for ~20 minutes under load.
+    let wall_secs = idle_thought_ollama_wall_secs();
+    let result = match tokio::time::timeout(
+        tokio::time::Duration::from_secs(wall_secs),
+        crate::commands::ollama::send_ollama_chat_messages(
+            ollama_msgs,
+            model_override,
+            None,
+            crate::commands::ollama::OllamaHttpQueue::Acquire {
+                key: format!("discord:{}", channel_id),
+                wait_hook: None,
+            },
+        ),
     )
-    .await;
-    // One extra retry for idle thought on timeout (non-critical; reduces visible failures).
-    if let Err(ref e) = result {
-        let err_lower = e.to_string().to_lowercase();
-        if err_lower.contains("timed out") || err_lower.contains("timeout") {
-            info!(
-                "Having fun: idle thought timeout for channel {}, retrying once in {}s",
-                channel_id, IDLE_RETRY_DELAY_SECS
-            );
-            tokio::time::sleep(tokio::time::Duration::from_secs(IDLE_RETRY_DELAY_SECS)).await;
-            result = crate::commands::ollama::send_ollama_chat_messages(
-                ollama_msgs,
-                model_override,
-                None,
-                crate::commands::ollama::OllamaHttpQueue::Acquire {
-                    key: format!("discord:{}", channel_id),
-                    wait_hook: None,
-                },
-            )
-            .await;
-        }
-    }
+    .await
+    {
+        Ok(inner) => inner,
+        Err(_) => Err(format!(
+            "Limit: idle thought Ollama wall budget ({}s) — skipped (best-effort; raise `ollamaChatTimeoutSecs` only if real chats need more)",
+            wall_secs
+        )),
+    };
     match result {
         Ok(response) => {
             let reply = strip_leading_label(response.message.content.trim());
@@ -1721,10 +1765,20 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
             }
         }
         Err(e) => {
-            error!(
-                "Having fun: idle thought failed for channel {}: {}",
-                channel_id, e
-            );
+            let err_str = e.to_string();
+            let err_lower = err_str.to_lowercase();
+            let is_timeout = err_lower.contains("timeout")
+                || err_lower.contains("timed out")
+                || err_lower.contains("wall budget");
+            if is_timeout {
+                apply_idle_thought_timeout_backoff(channel_id);
+                log_idle_thought_ollama_timeout(channel_id, &err_str);
+            } else {
+                warn!(
+                    "Having fun: idle thought failed for channel {}: {}",
+                    channel_id, err_str
+                );
+            }
         }
     }
 }
@@ -4232,6 +4286,20 @@ mod tests {
             1000 + interval,
             interval
         ));
+    }
+
+    #[test]
+    fn idle_thought_ollama_wall_caps_below_full_chat_timeout() {
+        // Wall budget is a hard cap; must stay ≤ IDLE_THOUGHT_OLLAMA_WALL_SECS.
+        assert!(super::IDLE_THOUGHT_OLLAMA_WALL_SECS <= 120);
+        assert_eq!(
+            super::idle_thought_next_after_timeout(600, 300),
+            600 + super::IDLE_THOUGHT_TIMEOUT_BACKOFF_SECS
+        );
+        assert_eq!(
+            super::idle_thought_next_after_timeout(60, 20 * 60),
+            60 + 20 * 60
+        );
     }
 
     #[test]

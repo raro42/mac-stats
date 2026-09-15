@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1083] - 2026-09-15
+
+### Fixed
+- **Having-fun idle thoughts** — quiet Discord idle no longer retries a full second Ollama chat after timeout (that could pin the global queue ~20 minutes). Idle calls get a 120s wall budget, timeout noise is rate-limited WARN (not ERROR), and the next idle is pushed out ~15+ minutes so load can recover.
+
 ## [0.1.1082] - 2026-09-15
 
 ### Changed
