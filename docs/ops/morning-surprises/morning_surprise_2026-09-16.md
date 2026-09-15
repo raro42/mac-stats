@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details and Top Processes glance calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup glance calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1092** | Disk Cleanup collapsed glance calm — soft green when clean (Monitors/Details parity) |
 | **v0.1.1091** | Top Processes glance calm — Top CPU · GPU · RAM soft green when below hot (Details/Monitors parity) |
 | **v0.1.1090** | Details collapsed glance calm — soft green when Load/RAM fine (Monitors/Disk parity) |
 | **v0.1.1089** | Take note instant — `Take note:` / `note to self:` / `remember this:` → curated MEMORY_APPEND (no Brave) |
@@ -19,7 +20,7 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details and Top Processes glances now share the same calm green language when metrics are fine — hot still amber.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, and Disk Cleanup glances now share the same calm green language when things are fine — hot / reclaim still amber.
 
 ## Next
 
