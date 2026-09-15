@@ -13,6 +13,8 @@ use crate::mac_stats_info;
 
 const DEFAULT_INTERVAL_HOURS: u64 = 24;
 const MAX_SCAN_FILES: usize = 50_000;
+const GIB: u64 = 1024 * 1024 * 1024;
+const DEFAULT_REBUILD_BYTES: u64 = 20 * GIB;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -57,7 +59,7 @@ pub struct DiskCleanupLastRun {
 #[serde(rename_all = "camelCase")]
 pub struct DiskCleanupScope {
     pub id: String,
-    /// `mac-stats` | `trash` | `downloads` | `temp` | `path`
+    /// `mac-stats` | `trash` | `downloads` | `temp` | `path` | `rebuild-dir` | `docker-prune` | `tmutil-thin`
     pub kind: String,
     pub label: String,
     pub enabled: bool,
@@ -66,6 +68,9 @@ pub struct DiskCleanupScope {
     /// Age threshold for path-like scopes. `mac-stats` uses its own policies.
     #[serde(default)]
     pub max_age_days: Option<u32>,
+    /// `rebuild-dir`: wipe the tree when its size is at least this many bytes (permanent).
+    #[serde(default)]
+    pub max_bytes: Option<u64>,
     /// Walk subdirectories (path/trash/temp). Downloads default false (top-level files only).
     #[serde(default)]
     pub recursive: bool,
@@ -328,6 +333,26 @@ fn disposal_policy_suffix(soft: bool, force_permanent: bool) -> &'static str {
     }
 }
 
+fn rebuild_scope(
+    id: &str,
+    label: &str,
+    path: &str,
+    enabled: bool,
+    max_bytes: u64,
+) -> DiskCleanupScope {
+    DiskCleanupScope {
+        id: id.into(),
+        kind: "rebuild-dir".into(),
+        label: label.into(),
+        enabled,
+        path: Some(path.into()),
+        max_age_days: None,
+        max_bytes: Some(max_bytes),
+        recursive: true,
+        builtin: true,
+    }
+}
+
 fn default_scopes() -> Vec<DiskCleanupScope> {
     vec![
         DiskCleanupScope {
@@ -337,6 +362,7 @@ fn default_scopes() -> Vec<DiskCleanupScope> {
             enabled: true,
             path: Some("~/.mac-stats".into()),
             max_age_days: None,
+            max_bytes: None,
             recursive: false,
             builtin: true,
         },
@@ -347,6 +373,7 @@ fn default_scopes() -> Vec<DiskCleanupScope> {
             enabled: false,
             path: Some("~/.Trash".into()),
             max_age_days: Some(7),
+            max_bytes: None,
             recursive: true,
             builtin: true,
         },
@@ -357,6 +384,7 @@ fn default_scopes() -> Vec<DiskCleanupScope> {
             enabled: false,
             path: Some("~/Downloads".into()),
             max_age_days: Some(90),
+            max_bytes: None,
             recursive: false,
             builtin: true,
         },
@@ -367,9 +395,117 @@ fn default_scopes() -> Vec<DiskCleanupScope> {
             enabled: false,
             path: None,
             max_age_days: Some(3),
+            max_bytes: None,
             recursive: true,
             builtin: true,
         },
+        // Weekly disk-full cause: incremental Rust debug trees (see docs/ops/disk-weekly-reclaim.md).
+        rebuild_scope(
+            "rust-debug-mac-stats",
+            "Rust debug (mac-stats)",
+            "~/projects/mac-stats/src-tauri/target/debug",
+            true,
+            20 * GIB,
+        ),
+        rebuild_scope(
+            "cache-uv",
+            "uv package cache",
+            "~/.cache/uv",
+            true,
+            3 * GIB,
+        ),
+        rebuild_scope(
+            "cache-npm",
+            "npm cache",
+            "~/.npm/_cacache",
+            true,
+            GIB,
+        ),
+        rebuild_scope(
+            "cache-chrome-cdp-pos",
+            "Chrome CDP (POS marketing)",
+            "~/.cache/pos-marketing-chrome-cdp",
+            true,
+            2 * GIB,
+        ),
+        rebuild_scope(
+            "cache-chrome-cdp-sso",
+            "Chrome CDP (firewall SSO)",
+            "~/.cache/firewall-chrome-sso",
+            true,
+            2 * GIB,
+        ),
+        DiskCleanupScope {
+            id: "cursor-vscdb-backup".into(),
+            kind: "path".into(),
+            label: "Cursor DB backup".into(),
+            enabled: true,
+            path: Some(
+                "~/Library/Application Support/Cursor/User/globalStorage/state.vscdb.backup"
+                    .into(),
+            ),
+            max_age_days: Some(1),
+            max_bytes: None,
+            recursive: false,
+            builtin: true,
+        },
+        DiskCleanupScope {
+            id: "docker-prune".into(),
+            kind: "docker-prune".into(),
+            label: "Docker dangling images".into(),
+            enabled: true,
+            path: Some("docker image prune".into()),
+            max_age_days: None,
+            max_bytes: None,
+            recursive: false,
+            builtin: true,
+        },
+        DiskCleanupScope {
+            id: "tmutil-thin".into(),
+            kind: "tmutil-thin".into(),
+            label: "Local Time Machine snapshots".into(),
+            enabled: true,
+            path: Some("tmutil thinlocalsnapshots".into()),
+            max_age_days: None,
+            max_bytes: None,
+            recursive: false,
+            builtin: true,
+        },
+        rebuild_scope(
+            "cache-huggingface",
+            "Hugging Face cache",
+            "~/.cache/huggingface",
+            false,
+            10 * GIB,
+        ),
+        rebuild_scope(
+            "rust-debug-notepad",
+            "Rust debug (notepad-plus-plus)",
+            "~/projects/notepad-plus-plus/target/debug",
+            false,
+            20 * GIB,
+        ),
+        rebuild_scope(
+            "rust-debug-opensquirrel",
+            "Rust debug (OpenSquirrel)",
+            "~/projects/OpenSquirrel/target/debug",
+            false,
+            20 * GIB,
+        ),
+        rebuild_scope(
+            "rust-debug-agent-d",
+            "Rust debug (agent-d)",
+            "~/projects/agent-d/target/debug",
+            false,
+            20 * GIB,
+        ),
+        rebuild_scope(
+            "rust-debug-claw-code-parity",
+            "Rust debug (claw-code-parity)",
+            "~/projects/claw-code-parity/target/debug",
+            false,
+            20 * GIB,
+        ),
     ]
 }
 
@@ -381,11 +517,38 @@ fn normalize_scope(mut s: DiskCleanupScope) -> Option<DiskCleanupScope> {
         return None;
     }
     match s.kind.as_str() {
-        "mac-stats" | "trash" | "downloads" | "temp" | "path" => {}
+        "mac-stats" | "trash" | "downloads" | "temp" | "path" | "rebuild-dir" | "docker-prune"
+        | "tmutil-thin" => {}
         _ => return None,
     }
     if let Some(days) = s.max_age_days {
         s.max_age_days = Some(days.min(3650));
+    }
+    if let Some(bytes) = s.max_bytes {
+        s.max_bytes = Some(bytes.min(500 * GIB));
+    }
+    if s.kind == "rebuild-dir" {
+        let p = s.path.as_deref().unwrap_or("").trim();
+        if p.is_empty() {
+            return None;
+        }
+        s.path = Some(p.to_string());
+        if s.max_bytes.unwrap_or(0) == 0 {
+            s.max_bytes = Some(DEFAULT_REBUILD_BYTES);
+        }
+        s.recursive = true;
+    }
+    if s.kind == "docker-prune" {
+        s.path = Some("docker image prune".into());
+        s.max_age_days = None;
+        s.max_bytes = None;
+        s.recursive = false;
+    }
+    if s.kind == "tmutil-thin" {
+        s.path = Some("tmutil thinlocalsnapshots".into());
+        s.max_age_days = None;
+        s.max_bytes = None;
+        s.recursive = false;
     }
     if s.kind == "path" {
         let p = s.path.as_deref().unwrap_or("").trim();
@@ -423,6 +586,9 @@ fn merge_scopes(saved: Vec<DiskCleanupScope>) -> Vec<DiskCleanupScope> {
             }
             if s.max_age_days.is_some() {
                 existing.max_age_days = s.max_age_days;
+            }
+            if s.max_bytes.is_some() {
+                existing.max_bytes = s.max_bytes;
             }
             existing.recursive = s.recursive;
         } else if s.kind == "path" {
@@ -546,11 +712,12 @@ fn resolve_scope_roots(scope: &DiskCleanupScope) -> Vec<(PathBuf, String)> {
             }
             roots
         }
-        "path" => {
+        "path" | "rebuild-dir" => {
             let raw = scope.path.clone().unwrap_or_default();
             let p = expand_user_path(&raw);
             vec![(p, raw)]
         }
+        "docker-prune" | "tmutil-thin" => Vec::new(),
         _ => Vec::new(),
     }
 }
@@ -601,10 +768,31 @@ fn empty_cat(id: &str, label: &str, path: &str, policy: &str, scope_id: &str, en
 /// Collect files older than `max_age_days` under `root` (files only; never deletes directories).
 /// Skips root-owned / immutable / unlink-blocked files so preview matches what Clean now can remove.
 fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(PathBuf, u64)> {
-    if max_age_days == 0 || !root.is_dir() || path_is_forbidden(root) {
+    if max_age_days == 0 || path_is_forbidden(root) {
         return Vec::new();
     }
     let cutoff = SystemTime::now() - Duration::from_secs(u64::from(max_age_days) * 24 * 3600);
+    if root.is_file() {
+        let Ok(meta) = fs::symlink_metadata(root) else {
+            return Vec::new();
+        };
+        if meta.file_type().is_symlink() || !meta.is_file() {
+            return Vec::new();
+        }
+        if !file_is_user_reclaimable(root, &meta) {
+            return Vec::new();
+        }
+        let Ok(mtime) = meta.modified() else {
+            return Vec::new();
+        };
+        if mtime < cutoff {
+            return vec![(root.to_path_buf(), meta.len())];
+        }
+        return Vec::new();
+    }
+    if !root.is_dir() {
+        return Vec::new();
+    }
     let mut out = Vec::new();
     let mut stack = vec![root.to_path_buf()];
     let mut visited = 0usize;
@@ -687,6 +875,372 @@ fn file_is_user_reclaimable(path: &Path, meta: &fs::Metadata) -> bool {
         }
     }
     true
+}
+
+/// True when `path` is a rebuildable cache we may wipe (never home, never `/`).
+pub(crate) fn path_looks_like_rebuild_root(path: &Path) -> bool {
+    let names: Vec<&str> = path.iter().filter_map(|c| c.to_str()).collect();
+    if names.is_empty() {
+        return false;
+    }
+    if names.len() >= 2
+        && names[names.len() - 2] == "target"
+        && names[names.len() - 1] == "debug"
+    {
+        return true;
+    }
+    let last = names[names.len() - 1];
+    match last {
+        "huggingface" | "uv" => names.iter().any(|n| *n == ".cache"),
+        "_cacache" => names.iter().any(|n| *n == ".npm"),
+        "pos-marketing-chrome-cdp" | "firewall-chrome-sso" => names.iter().any(|n| *n == ".cache"),
+        "state.vscdb.backup" => true,
+        _ => false,
+    }
+}
+
+fn rebuild_root_allowed(path: &Path) -> bool {
+    if path_is_forbidden(path) || !path_looks_like_rebuild_root(path) {
+        return false;
+    }
+    let home = home_dir();
+    if path == home {
+        return false;
+    }
+    let Ok(canon) = path.canonicalize() else {
+        return path.starts_with(&home);
+    };
+    canon.starts_with(&home) && canon != home
+}
+
+/// Walk until `stop_at` bytes (or the tree ends). Does not follow symlinks.
+fn dir_size_at_least(root: &Path, stop_at: u64) -> u64 {
+    if root.is_file() {
+        return fs::metadata(root).map(|m| m.len()).unwrap_or(0);
+    }
+    if !root.is_dir() {
+        return 0;
+    }
+    let mut total = 0u64;
+    let mut stack = vec![root.to_path_buf()];
+    let mut visited = 0usize;
+    while let Some(dir) = stack.pop() {
+        let Ok(rd) = fs::read_dir(&dir) else {
+            continue;
+        };
+        for ent in rd.flatten() {
+            visited += 1;
+            if visited > MAX_SCAN_FILES * 40 {
+                return total.max(stop_at);
+            }
+            let path = ent.path();
+            let Ok(meta) = fs::symlink_metadata(&path) else {
+                continue;
+            };
+            if meta.file_type().is_symlink() {
+                continue;
+            }
+            if meta.is_dir() {
+                if !path_is_forbidden(&path) {
+                    stack.push(path);
+                }
+                continue;
+            }
+            if meta.is_file() {
+                total = total.saturating_add(meta.len());
+                if total >= stop_at {
+                    return total;
+                }
+            }
+        }
+    }
+    total
+}
+
+fn preview_rebuild_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+    let threshold = scope.max_bytes.unwrap_or(DEFAULT_REBUILD_BYTES).max(1);
+    let path_hint = scope.path.clone().unwrap_or_default();
+    let policy = if !scope.enabled {
+        "disabled".into()
+    } else {
+        format!(
+            "wipe if ≥ {} · permanent (rebuildable cache)",
+            format_bytes(threshold)
+        )
+    };
+    if !scope.enabled {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &policy,
+            &scope.id,
+            false,
+        );
+    }
+    let roots = resolve_scope_roots(scope);
+    let mut bytes = 0u64;
+    let mut blocked = false;
+    let mut samples = Vec::new();
+    for (root, hint) in &roots {
+        if !rebuild_root_allowed(root) {
+            blocked = true;
+            continue;
+        }
+        if !root.exists() {
+            continue;
+        }
+        let sz = dir_size_at_least(root, threshold);
+        if sz >= threshold {
+            bytes = bytes.saturating_add(sz);
+            push_sample(&mut samples, hint.clone());
+        }
+    }
+    let policy = if blocked && bytes == 0 {
+        format!("{policy} · path blocked")
+    } else {
+        policy
+    };
+    CleanupCategory {
+        id: scope.id.clone(),
+        label: scope.label.clone(),
+        path_hint,
+        policy,
+        file_count: if bytes > 0 { 1 } else { 0 },
+        bytes,
+        sample_names: samples,
+        scope_id: Some(scope.id.clone()),
+        enabled: true,
+    }
+}
+
+fn apply_rebuild_scope(scope: &DiskCleanupScope) -> (u64, u64) {
+    if !scope.enabled {
+        return (0, 0);
+    }
+    let threshold = scope.max_bytes.unwrap_or(DEFAULT_REBUILD_BYTES).max(1);
+    let mut deleted = 0u64;
+    let mut freed = 0u64;
+    for (root, _) in resolve_scope_roots(scope) {
+        if !rebuild_root_allowed(&root) {
+            crate::mac_stats_debug!(
+                "disk_cleanup",
+                "rebuild-dir {}: skip blocked path {:?}",
+                scope.id,
+                root
+            );
+            continue;
+        }
+        if !root.exists() {
+            continue;
+        }
+        let sz = dir_size_at_least(&root, threshold);
+        if sz < threshold {
+            continue;
+        }
+        let ok = if root.is_file() {
+            fs::remove_file(&root).is_ok()
+        } else {
+            match fs::remove_dir_all(&root) {
+                Ok(()) => {
+                    let _ = fs::create_dir_all(&root);
+                    true
+                }
+                Err(err) => {
+                    crate::mac_stats_debug!(
+                        "disk_cleanup",
+                        "rebuild-dir {} wipe failed for {:?}: {}",
+                        scope.id,
+                        root,
+                        err
+                    );
+                    false
+                }
+            }
+        };
+        if ok {
+            deleted += 1;
+            freed = freed.saturating_add(sz);
+            mac_stats_info!(
+                "disk_cleanup",
+                "Scope {}: wiped rebuild dir {:?}, ~{} bytes",
+                scope.id,
+                root,
+                sz
+            );
+        }
+    }
+    (deleted, freed)
+}
+
+fn preview_docker_prune_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+    let path_hint = "docker image prune -f".to_string();
+    let policy = if !scope.enabled {
+        "disabled".into()
+    } else {
+        "dangling unused images · permanent (not volumes)".to_string()
+    };
+    if !scope.enabled {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &policy,
+            &scope.id,
+            false,
+        );
+    }
+    let count = docker_dangling_image_count();
+    CleanupCategory {
+        id: scope.id.clone(),
+        label: scope.label.clone(),
+        path_hint,
+        policy,
+        file_count: count,
+        bytes: 0,
+        sample_names: Vec::new(),
+        scope_id: Some(scope.id.clone()),
+        enabled: true,
+    }
+}
+
+fn docker_dangling_image_count() -> u64 {
+    let output = std::process::Command::new("docker")
+        .args(["images", "-f", "dangling=true", "-q"])
+        .output();
+    let Ok(out) = output else {
+        return 0;
+    };
+    if !out.status.success() {
+        return 0;
+    }
+    String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .count() as u64
+}
+
+fn apply_docker_prune_scope(scope: &DiskCleanupScope) -> (u64, u64) {
+    if !scope.enabled {
+        return (0, 0);
+    }
+    let before = docker_dangling_image_count();
+    if before == 0 {
+        return (0, 0);
+    }
+    let output = std::process::Command::new("docker")
+        .args(["image", "prune", "-f"])
+        .output();
+    match output {
+        Ok(out) if out.status.success() => {
+            let after = docker_dangling_image_count();
+            let removed = before.saturating_sub(after);
+            mac_stats_info!(
+                "disk_cleanup",
+                "Scope {}: docker image prune -f removed ~{} dangling image(s)",
+                scope.id,
+                removed.max(1)
+            );
+            (removed.max(1), 0)
+        }
+        Ok(out) => {
+            crate::mac_stats_debug!(
+                "disk_cleanup",
+                "docker image prune failed: {}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            (0, 0)
+        }
+        Err(err) => {
+            crate::mac_stats_debug!("disk_cleanup", "docker not available: {}", err);
+            (0, 0)
+        }
+    }
+}
+
+fn tmutil_local_snapshot_count() -> u64 {
+    let output = std::process::Command::new("tmutil")
+        .args(["listlocalsnapshots", "/"])
+        .output();
+    let Ok(out) = output else {
+        return 0;
+    };
+    if !out.status.success() {
+        return 0;
+    }
+    String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .filter(|l| l.contains("com.apple.TimeMachine."))
+        .count() as u64
+}
+
+fn preview_tmutil_thin_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+    let path_hint = "tmutil thinlocalsnapshots /".to_string();
+    let policy = if !scope.enabled {
+        "disabled".into()
+    } else {
+        "thin local TM snapshots (APFS purgeable) · no backup disk delete".to_string()
+    };
+    if !scope.enabled {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &policy,
+            &scope.id,
+            false,
+        );
+    }
+    let count = tmutil_local_snapshot_count();
+    CleanupCategory {
+        id: scope.id.clone(),
+        label: scope.label.clone(),
+        path_hint,
+        policy,
+        file_count: count,
+        bytes: 0,
+        sample_names: Vec::new(),
+        scope_id: Some(scope.id.clone()),
+        enabled: true,
+    }
+}
+
+fn apply_tmutil_thin_scope(scope: &DiskCleanupScope) -> (u64, u64) {
+    if !scope.enabled {
+        return (0, 0);
+    }
+    let before = tmutil_local_snapshot_count();
+    if before == 0 {
+        return (0, 0);
+    }
+    let output = std::process::Command::new("tmutil")
+        .args(["thinlocalsnapshots", "/", "21474836480", "4"])
+        .output();
+    match output {
+        Ok(out) if out.status.success() => {
+            let after = tmutil_local_snapshot_count();
+            let removed = before.saturating_sub(after);
+            mac_stats_info!(
+                "disk_cleanup",
+                "Scope {}: tmutil thinlocalsnapshots removed ~{} snapshot name(s)",
+                scope.id,
+                removed
+            );
+            (removed.max(1), 0)
+        }
+        Ok(out) => {
+            crate::mac_stats_debug!(
+                "disk_cleanup",
+                "tmutil thinlocalsnapshots failed: {}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            (0, 0)
+        }
+        Err(err) => {
+            crate::mac_stats_debug!("disk_cleanup", "tmutil not available: {}", err);
+            (0, 0)
+        }
+    }
 }
 
 #[cfg(not(unix))]
@@ -1415,6 +1969,9 @@ fn build_preview_categories(
             "trash" | "downloads" | "temp" | "path" => {
                 out.push(preview_aged_scope(scope, touch_user_folders))
             }
+            "rebuild-dir" => out.push(preview_rebuild_scope(scope)),
+            "docker-prune" => out.push(preview_docker_prune_scope(scope)),
+            "tmutil-thin" => out.push(preview_tmutil_thin_scope(scope)),
             _ => {}
         }
     }
@@ -1570,9 +2127,12 @@ fn build_status_from(
         next_run_label,
         interval_hours: hours,
         triggers: vec![
-            "App launch (mac-stats data only; no Downloads/Trash scan)".into(),
+            "App launch (mac-stats data + rebuild caches + Docker dangling + local TM snapshots; no Downloads/Trash scan)".into(),
             if hours > 0 {
-                format!("Every {}h while running (mac-stats data only)", hours)
+                format!(
+                    "Every {}h while running (same as launch; no Downloads/Trash)",
+                    hours
+                )
             } else {
                 "Periodic: off".into()
             },
@@ -1640,6 +2200,40 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
                         d,
                         f,
                         sk
+                    );
+                }
+            }
+            "rebuild-dir" => {
+                let (d, f) = apply_rebuild_scope(scope);
+                if d > 0 {
+                    mac_stats_info!(
+                        "disk_cleanup",
+                        "Scope {}: wiped {} tree(s), ~{} byte(s) (permanent)",
+                        scope.id,
+                        d,
+                        f
+                    );
+                }
+            }
+            "docker-prune" => {
+                let (d, _) = apply_docker_prune_scope(scope);
+                if d > 0 {
+                    mac_stats_info!(
+                        "disk_cleanup",
+                        "Scope {}: pruned ~{} dangling Docker image(s)",
+                        scope.id,
+                        d
+                    );
+                }
+            }
+            "tmutil-thin" => {
+                let (d, _) = apply_tmutil_thin_scope(scope);
+                if d > 0 {
+                    mac_stats_info!(
+                        "disk_cleanup",
+                        "Scope {}: thinned ~{} local TM snapshot(s)",
+                        scope.id,
+                        d
                     );
                 }
             }
@@ -1798,13 +2392,37 @@ mod tests {
             enabled: true,
             path: Some("~/Library/Caches/foo".into()),
             max_age_days: Some(14),
+            max_bytes: None,
             recursive: true,
             builtin: false,
         }];
         let merged = merge_scopes(saved);
         assert!(merged.iter().any(|s| s.id == "mac-stats"));
         assert!(merged.iter().any(|s| s.id == "trash"));
+        assert!(merged.iter().any(|s| s.id == "rust-debug-mac-stats" && s.enabled));
+        assert!(merged.iter().any(|s| s.id == "docker-prune" && s.enabled));
+        assert!(merged.iter().any(|s| s.id == "tmutil-thin" && s.enabled));
         assert!(merged.iter().any(|s| s.id == "my-cache" && s.enabled));
+    }
+
+    #[test]
+    fn rebuild_root_patterns() {
+        assert!(path_looks_like_rebuild_root(Path::new(
+            "/Users/x/projects/mac-stats/src-tauri/target/debug"
+        )));
+        assert!(path_looks_like_rebuild_root(Path::new(
+            "/Users/x/.cache/huggingface"
+        )));
+        assert!(path_looks_like_rebuild_root(Path::new(
+            "/Users/x/.npm/_cacache"
+        )));
+        assert!(!path_looks_like_rebuild_root(Path::new("/Users/x")));
+        assert!(!path_looks_like_rebuild_root(Path::new(
+            "/Users/x/projects/mac-stats"
+        )));
+        assert!(!path_looks_like_rebuild_root(Path::new(
+            "/Users/x/.ollama/models"
+        )));
     }
 
     #[test]

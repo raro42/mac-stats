@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1077] - 2026-09-15
 
+### Added
+- **Disk Cleanup weekly reclaim** — builtin scopes from the host disk-full notes: wipe mac-stats `target/debug` at ≥20 GiB, uv/npm/Chrome CDP caches at smaller caps, Cursor DB backup by age, dangling Docker images (`docker image prune -f`), and local Time Machine snapshot thinning. Hugging Face and other Rust debug trees stay off until you enable them. Rebuild wipes are permanent so space actually returns. See `docs/ops/disk-weekly-reclaim.md`.
 
 ## [0.1.1076] - 2026-09-14
 

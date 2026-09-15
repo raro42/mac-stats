@@ -30,9 +30,9 @@ After editing secrets for LaunchAgent / `/Applications` installs, run:
 
 In `config.json`:
 
-- `diskCleanupScopes` — array of scopes (`mac-stats`, `trash`, `downloads`, `temp`, or `path` with custom `path` / `maxAgeDays` / `recursive`)
+- `diskCleanupScopes` — array of scopes (`mac-stats`, `trash`, `downloads`, `temp`, `path`, `rebuild-dir` with `maxBytes`, `docker-prune`, or `tmutil-thin`)
 - `diskCleanupIntervalHours` — periodic run interval while the app is running (default `24`)
-- `diskCleanupSoftDelete` — `true` (default) moves cleaned files to `~/.Trash`; `false` permanently deletes. Trash-scope cleanup is always permanent.
+- `diskCleanupSoftDelete` — `true` (default) moves age-based files to `~/.Trash`; `false` permanently deletes. Trash-scope cleanup, `rebuild-dir` wipes, Docker prune, and snapshot thinning are always permanent.
 
 See [FEATURES.md](../FEATURES.md#disk-cleanup).
 

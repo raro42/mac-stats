@@ -15,7 +15,7 @@ Screenshots: [docs/screens/](docs/screens/) · [docs/screens/README.md](docs/scr
 | History sparklines | CPU → Frequency → Temperature under the gauges |
 | Top processes | Sortable list, pin favorites, process details, Advanced Force Quit |
 | Website monitors | See below |
-| Disk Cleanup | Scoped reclaim (Trash / Downloads / Temp / custom); soft-delete to Trash by default |
+| Disk Cleanup | Scoped reclaim (Trash / Downloads / Temp / Rust debug + caches / Docker dangling / custom); rebuild wipes are permanent |
 | Low overhead | On the order of ~0.5% idle (menu bar only) |
 
 ## Website monitors (External / Monitors)
@@ -42,6 +42,13 @@ Preview and reclaim reclaimable files with **configurable scopes**:
 | **Trash** | Off | `~/.Trash` — set max age (days) + recurse |
 | **Downloads** | Off | `~/Downloads` — top-level by default; age threshold |
 | **Temp** | Off | System temp + `/tmp` |
+| **Rust debug (mac-stats)** | On | Wipe `src-tauri/target/debug` when ≥ 20 GiB (permanent; rebuild with cargo) |
+| **uv / npm / Chrome CDP caches** | On | Wipe rebuildable caches when over a size cap (permanent) |
+| **Cursor DB backup** | On | `state.vscdb.backup` older than 1 day (live DB kept) |
+| **Docker dangling images** | On | `docker image prune -f` only — not volumes |
+| **Local Time Machine snapshots** | On | `tmutil thinlocalsnapshots` (frees APFS-held blocks; does not delete the backup disk) |
+| **Hugging Face cache** | Off | Opt-in wipe when ≥ 10 GiB |
+| **Other Rust debug trees** | Off | Listed sibling `target/debug` dirs (same 20 GiB rule) |
 | **Custom path** | — | Label + path + age + recursive (saved in config) |
 
 Runs on **app launch**, every **24h while running** (configurable), and **Clean now**. State in `~/.mac-stats/disk_cleanup.json`; scopes in `config.json` → `diskCleanupScopes`.

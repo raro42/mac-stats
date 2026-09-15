@@ -18676,10 +18676,24 @@ async function refreshDiskCleanupPanel(opts) {
           : null;
       scopesEl.innerHTML = scopes
         .map((s, idx) => {
-          const pathHint = s.path || (s.kind === 'temp' ? 'system temp + /tmp' : s.kind);
+          const pathHint =
+            s.path ||
+            (s.kind === 'temp'
+              ? 'system temp + /tmp'
+              : s.kind === 'docker-prune'
+                ? 'docker image prune -f'
+                : s.kind === 'tmutil-thin'
+                  ? 'tmutil thinlocalsnapshots'
+                  : s.kind);
           const pathEsc = escapeDiskHtml(pathHint);
-          const ageDisabled = s.kind === 'mac-stats' ? 'disabled' : '';
+          const ageLocked =
+            s.kind === 'mac-stats' ||
+            s.kind === 'rebuild-dir' ||
+            s.kind === 'docker-prune' ||
+            s.kind === 'tmutil-thin';
+          const ageDisabled = ageLocked ? 'disabled' : '';
           const ageVal = s.maxAgeDays != null ? s.maxAgeDays : '';
+          const recDisabled = ageLocked ? 'disabled' : '';
           const removeBtn = s.builtin
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
@@ -18693,7 +18707,7 @@ async function refreshDiskCleanupPanel(opts) {
               <button type="button" class="disk-cleanup-scope-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>
             </div>
             <input type="number" min="1" max="3650" data-scope-days="${idx}" value="${ageVal}" ${ageDisabled} title="Max age (days)" placeholder="days" />
-            <label class="disk-cleanup-scope-rec"><input type="checkbox" data-scope-rec="${idx}" ${s.recursive ? 'checked' : ''} ${s.kind === 'mac-stats' ? 'disabled' : ''} /> Recurse</label>
+            <label class="disk-cleanup-scope-rec"><input type="checkbox" data-scope-rec="${idx}" ${s.recursive ? 'checked' : ''} ${recDisabled} /> Recurse</label>
             ${removeBtn}
           </div>`;
         })

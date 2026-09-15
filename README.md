@@ -210,8 +210,8 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 Built-in reclaim panel (no AI required):
 
 - Preview reclaimable size; **Clean now**, or automatic runs on **app launch** and every **24h** while running.
-- **Scopes** you can turn on/off: mac-stats data, Trash, Downloads, Temp, plus custom paths (age in days + recurse). Saved in `diskCleanupScopes`.
-- **Soft-delete by default** — cleaned files go to **Trash** so you can recover them. Uncheck *Move cleaned items to Trash* (or set `diskCleanupSoftDelete: false`) for permanent delete. Emptying the Trash scope is always permanent.
+- **Scopes** you can turn on/off: mac-stats data, Trash, Downloads, Temp, rebuildable caches (Rust `target/debug`, uv/npm/CDP), dangling Docker images, local Time Machine snapshots, plus custom paths. Saved in `diskCleanupScopes`.
+- **Soft-delete by default** for age-based files — they go to **Trash**. Rebuild dirs and Docker prune are **permanent** (moving 100+ GB to Trash does not free the disk). Emptying the Trash scope is always permanent.
 - Details: [FEATURES.md](FEATURES.md#disk-cleanup) · screenshot above.
 
 ### Local AI agent (opt-in)
