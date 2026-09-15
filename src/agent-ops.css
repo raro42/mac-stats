@@ -3346,9 +3346,11 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #0a84ff 6%, transparent);
 }
 
+/* Calm wash when nothing to reclaim (Monitors is-all-up / Details is-ok parity). */
 .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
   font-weight: 450;
-  opacity: 0.9;
 }
 
 /* Disk Cleanup: fully hide when collapsed (icon off). */

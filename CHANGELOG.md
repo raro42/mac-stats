@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1092] - 2026-09-16
+
+### Changed
+- **Disk Cleanup collapsed glance calm** — when nothing is reclaimable (and not due / scopes fully on), the collapsed Disk Cleanup glance uses a soft green wash (Monitors all-up / Details is-ok parity). Reclaim / Due / scopes-off still use amber / green-due / accent.
+
 ## [0.1.1091] - 2026-09-15
 
 ### Changed
