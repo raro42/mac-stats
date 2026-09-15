@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1082] - 2026-09-15
+
+### Changed
+- **Agent Ops Overview empty calm** — empty overview cards (Live, Digest, Schedules, …) use the same warm “Nothing here yet” title and solid accent wash as filter-miss empties, so idle Overview feels calm instead of dashed-muted.
+
 ## [0.1.1081] - 2026-09-15
 
 ### Fixed

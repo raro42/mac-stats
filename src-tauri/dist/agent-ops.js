@@ -271,12 +271,14 @@
     );
   }
 
-  /** Overview card empty state with an Open-tab CTA (same affordance as Clear filter). */
+  /** Overview card empty state — filter-miss calm (warm title + solid wash) + Open-tab CTA. */
   function opsOverviewEmptyHtml(message, tab, ctaLabel) {
     const safeTab = String(tab || '').replace(/[^a-z]/gi, '');
     const label = ctaLabel || (safeTab ? `Open ${safeTab}` : 'Open tab');
+    const tip = String(message || '').trim() || 'Nothing here yet — open the linked tab';
     return (
-      `<div class="ops-empty ops-empty-filter-miss ops-empty-overview-cta">` +
+      `<div class="ops-empty ops-empty-filter-miss ops-empty-overview-cta is-calm" role="status" title="${escapeHtml(tip)}">` +
+      `<div class="ops-empty-filter-title">Nothing here yet</div>` +
       `<div class="ops-empty-filter-msg">${escapeHtml(message)}</div>` +
       `<button type="button" class="ops-clear-filter" data-ops-goto-tab="${safeTab}">${escapeHtml(label)}</button>` +
       `</div>`

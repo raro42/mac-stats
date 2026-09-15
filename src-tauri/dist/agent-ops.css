@@ -1534,8 +1534,16 @@ textarea.ops-agent-editor.is-dirty {
 .ops-overview-body > .ops-empty-overview-cta {
   flex-direction: column;
   gap: 10px;
-  min-height: 72px;
+  min-height: 88px;
   padding: 14px 12px;
+}
+
+/* Overview empty CTA calm — solid wash + warm title (filter-miss parity). */
+.ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  opacity: 1;
 }
 
 .ops-empty-compact {

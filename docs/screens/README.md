@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-09-15 (~20:00):** Agent Ops Overview empty calm (v0.1.1082). Recapture of `feature-agent-ops.png` deferred (`screencapture -l` / Screen Recording TCC); prior Aug 12 asset kept; polish grace marked.
 - **2026-09-14 (~06:00):** Agent Ops filter-miss calm (v0.1.1073). Recapture of `feature-agent-ops.png` deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior Aug 12 asset kept; polish grace marked.
 - **2026-09-14 (~03:00):** CPU metrics Temp ring Fair thermal wash (v0.1.1067). Recapture of `feature-cpu-metrics.png` deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior Sep 7 asset kept; polish grace marked.
 - **2026-09-11 (~01:00):** Top Processes filter Clear chip (v0.1.996). Recapture of `feature-processes.png` after install if Screen Recording TCC allows; otherwise prior asset kept; polish grace marked.

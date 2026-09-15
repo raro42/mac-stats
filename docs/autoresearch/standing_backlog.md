@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1082
+
+- Design review / Agent Ops Overview empty calm: warm “Nothing here yet” + solid accent wash on empty overview cards (filter-miss parity). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC; polish grace marked.
+
 ## Overnight merge — v0.1.1073
 
 - Design review / Agent Ops: filter-miss calm (warm title + accent wash; Fail empty green; AI Chat Errors-empty parity). Recapture of `feature-agent-ops.png` deferred (Screen Recording TCC); polish grace marked.
@@ -29,6 +33,9 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1082** — Design review / Agent Ops Overview empty calm (warm title + accent wash; TCC grace).
+
 
 - **v0.1.1073** — Design review / Agent Ops filter-miss calm: warm title (“Nothing here yet”) + solid accent wash on empty filter panes; Fail lane empty uses soft green wash (“No failed turns”) — AI Chat Errors-empty parity. TCC recapture of `feature-agent-ops.png` deferred; polish grace.
 
