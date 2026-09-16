@@ -4102,9 +4102,10 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Calm wash when Ollama is online (collapsed glance / turn is-ok / Monitors all-up parity). */
 .chat-model-glance.is-online {
   border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 6%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 .chat-model-glance.is-online.is-no-model {

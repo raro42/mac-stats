@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1108] - 2026-09-16
+
+### Changed
+- **AI Chat model online calm** — when Ollama is connected, the model glance uses the same soft green wash as the collapsed AI Chat glance and turn glance (Monitors all-up parity). Offline / no-model stays amber.
+
 ## [0.1.1107] - 2026-09-16
 
 ### Fixed
