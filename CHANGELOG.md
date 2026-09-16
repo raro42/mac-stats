@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1106] - 2026-09-16
+
+### Changed
+- **Time-remaining strip calm** — when the battery estimate is ≥2h, the remaining chip uses a soft green wash (battery / LPM / Power parity). Under 1h stays amber; mid-range stays neutral.
+
 ## [0.1.1105] - 2026-09-16
 
 ### Changed

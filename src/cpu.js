@@ -3049,6 +3049,25 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
+    /* Time-remaining healthy calm (battery / LPM / Power strip parity). */
+    .time-remaining.is-ok:not(.is-low) {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      opacity: 1;
+    }
+    .time-remaining.is-low {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      opacity: 1;
+    }
     .lpm-info.is-on {
       background-color: color-mix(in srgb, #30d158 16%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
@@ -3598,6 +3617,10 @@ const STRIP_HOT_RAM_PCT = 85;
 const STRIP_HOT_SSD_PCT = 85;
 /** Combined CPU+GPU watts — above this the Power chip uses amber (low draw stays calm). */
 const STRIP_HOT_POWER_W = 20;
+/** Time-remaining ≥ this many hours → soft green calm. */
+const STRIP_TIME_REMAINING_OK_H = 2;
+/** Time-remaining under this many hours → amber (battery low parity). */
+const STRIP_TIME_REMAINING_LOW_H = 1;
 const STRIP_HOT_ORDER = ['bat', 'lpm', 'heat', 'up', 'ram', 'ssd'];
 const STRIP_HOT_LABELS = {
   bat: 'Bat',
@@ -6484,8 +6507,10 @@ function updateBatteryPower(cpuDetails) {
     if (timeRemaining && !isCharging && level > 0 && totalPower > 0) {
       const hours = (level / 100) * 10 / (totalPower / 20); // Simplified estimate
       timeRemaining.textContent = `~${hours.toFixed(1)}h remaining`;
+      applyTimeRemainingCalm(hours);
     } else if (timeRemaining) {
       timeRemaining.textContent = '';
+      applyTimeRemainingCalm(null);
     }
   } else {
     // No battery (desktop Mac)
@@ -6520,8 +6545,26 @@ function updateBatteryPower(cpuDetails) {
       }
     }
     applyPowerChipCalm(totalPower);
-    if (timeRemaining) timeRemaining.textContent = '';
+    if (timeRemaining) {
+      timeRemaining.textContent = '';
+      applyTimeRemainingCalm(null);
+    }
   }
+}
+
+/** Soft green when remaining estimate is healthy; amber when short. */
+function applyTimeRemainingCalm(hours) {
+  ensureRamStripStyles();
+  const timeRemaining = document.getElementById('time-remaining');
+  if (!timeRemaining) return;
+  if (typeof hours !== 'number' || !Number.isFinite(hours) || hours <= 0) {
+    timeRemaining.classList.remove('is-ok', 'is-low');
+    return;
+  }
+  const low = hours < STRIP_TIME_REMAINING_LOW_H;
+  const ok = hours >= STRIP_TIME_REMAINING_OK_H;
+  timeRemaining.classList.toggle('is-low', low);
+  timeRemaining.classList.toggle('is-ok', ok && !low);
 }
 
 /** Soft green when combined CPU+GPU draw is below hot; amber when elevated. */
