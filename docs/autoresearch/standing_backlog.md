@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1100
+
+- Disk Cleanup Reclaimable calm: soft green wash on the Reclaimable now meta-card when nothing is pending — collapsed is-clean / Details is-ok parity. Reclaimable stays amber.
+
 ## Overnight merge — v0.1.1099
 
 - Power low-draw calm: soft green wash on the Power chip when combined CPU+GPU draw is below 20 W — battery healthy / LPM Off / Details is-ok parity. Elevated (≥20 W) stays amber.
@@ -101,6 +105,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1100** — Disk Cleanup Reclaimable calm (soft green when nothing pending; reclaim stays amber).
 
 - **v0.1.1099** — Power low-draw calm (soft green when combined CPU+GPU under 20 W; ≥20 W amber).
 

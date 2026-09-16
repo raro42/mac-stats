@@ -7188,6 +7188,12 @@ button.monitor-detail-url.is-just-saved {
   font-variant-numeric: tabular-nums;
 }
 
+/* Calm wash when nothing reclaimable (collapsed is-clean / Details is-ok parity). */
+.disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
 /* Reclaimable now — click/keyboard glance (Monitors summary parity) */
 .disk-cleanup-meta-card.is-action {
   cursor: pointer;
@@ -7202,6 +7208,11 @@ button.monitor-detail-url.is-just-saved {
 .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
   border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+}
+
+.disk-cleanup-meta-card.is-action.is-clean:not(.has-reclaim):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
 }
 
 /* Enabled scopes — soft wash when some scopes are off */

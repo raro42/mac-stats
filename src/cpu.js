@@ -17346,6 +17346,8 @@ function applyDiskCleanupReclaimCardState(hasReclaim) {
   const card = reclaimEl?.closest('.disk-cleanup-meta-card');
   if (!card) return;
   card.classList.add('is-action');
+  card.classList.toggle('has-reclaim', !!hasReclaim);
+  card.classList.toggle('is-clean', !hasReclaim);
   card.setAttribute('role', 'button');
   if (hasReclaim) {
     card.title = 'Click to open the first reclaimable category';
@@ -18930,10 +18932,12 @@ async function refreshDiskCleanupPanel(opts) {
         reclaimBytes > 0
           ? `${formatDiskBytes(reclaimBytes)} · ${reclaimFiles} item(s)`
           : 'Nothing pending';
-      reclaimEl.closest('.disk-cleanup-meta-card')?.classList.toggle(
-        'has-reclaim',
-        reclaimBytes > 0
-      );
+      const reclaimCard = reclaimEl.closest('.disk-cleanup-meta-card');
+      if (reclaimCard) {
+        reclaimCard.classList.toggle('has-reclaim', reclaimBytes > 0);
+        // Soft green calm when nothing pending (collapsed is-clean / Details is-ok parity).
+        reclaimCard.classList.toggle('is-clean', reclaimBytes <= 0);
+      }
       applyDiskCleanupReclaimCardState(reclaimBytes > 0);
     }
     if (nextEl) {

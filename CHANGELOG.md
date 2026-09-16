@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1100] - 2026-09-16
+
+### Changed
+- **Disk Cleanup Reclaimable calm** — when nothing is pending, the Reclaimable now meta-card uses a soft green wash (collapsed is-clean / Details is-ok parity). Reclaimable items stay amber.
+
 ## [0.1.1099] - 2026-09-16
 
 ### Changed

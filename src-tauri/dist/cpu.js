@@ -18930,10 +18930,12 @@ async function refreshDiskCleanupPanel(opts) {
         reclaimBytes > 0
           ? `${formatDiskBytes(reclaimBytes)} · ${reclaimFiles} item(s)`
           : 'Nothing pending';
-      reclaimEl.closest('.disk-cleanup-meta-card')?.classList.toggle(
-        'has-reclaim',
-        reclaimBytes > 0
-      );
+      const reclaimCard = reclaimEl.closest('.disk-cleanup-meta-card');
+      if (reclaimCard) {
+        reclaimCard.classList.toggle('has-reclaim', reclaimBytes > 0);
+        // Soft green calm when nothing pending (collapsed is-clean / Details is-ok parity).
+        reclaimCard.classList.toggle('is-clean', reclaimBytes <= 0);
+      }
       applyDiskCleanupReclaimCardState(reclaimBytes > 0);
     }
     if (nextEl) {
