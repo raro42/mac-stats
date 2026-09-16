@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1115
+
+- Disk Cleanup due attention soft parity: Disk · Due glance soft green at 7% / 28% border — Ready calm / collapsed is-due. Louder 8%/34% tint removed; reclaim stays amber.
+
 ## Overnight merge — v0.1.1114
 
 - Chat last-answer attention soft parity: Chat · Last answer glance soft green at 7% / 28% border — Ready calm / chat-answer glance. Louder 8%/32% tint removed; errors / sending stay stronger.
