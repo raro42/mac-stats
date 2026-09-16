@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp ring Nominal calm, CPU · GPU · FREQ ring calm, battery healthy calm, LPM Off calm, Power low-draw calm, then Disk Cleanup Reclaimable meta-card calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp ring Nominal calm, CPU · GPU · FREQ ring calm, battery healthy calm, LPM Off calm, Power low-draw calm, then Disk Cleanup Reclaimable meta-card calm, then Enabled scopes all-on calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1101** | Disk Cleanup Enabled scopes calm — soft green when every scope is on (Reclaimable is-clean / Details parity); scopes off stay amber |
 | **v0.1.1100** | Disk Cleanup Reclaimable calm — soft green on Reclaimable now when nothing pending (collapsed is-clean / Details parity); reclaim stays amber |
 | **v0.1.1099** | Power low-draw calm — soft green on the Power chip when combined CPU+GPU draw is under 20 W (battery/LPM/Details parity); ≥20 W amber |
 | **v0.1.1098** | LPM Off calm — soft green on the LPM chip when Low Power Mode is Off (battery/Details/ring parity); On keeps enabled green |
