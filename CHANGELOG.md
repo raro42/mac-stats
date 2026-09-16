@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1104] - 2026-09-16
+
+### Changed
+- **Disk Cleanup Last run calm** — when a last run exists without skipped files, the Last run panel uses a soft green wash (Reclaimable is-clean / Details is-ok parity). Skips stay amber; not-yet-run stays neutral.
+
 ## [0.1.1103] - 2026-09-16
 
 ### Changed

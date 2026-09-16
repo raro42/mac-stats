@@ -7548,6 +7548,16 @@ button.monitor-detail-url.is-just-saved {
   outline-color: color-mix(in srgb, #ff9f0a 55%, transparent);
 }
 
+/* Calm wash when last run succeeded without skips (Reclaimable is-clean / Details is-ok parity). */
+.disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
+.disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, transparent);
+}
+
 .disk-cleanup-last strong {
   font-weight: 600;
 }

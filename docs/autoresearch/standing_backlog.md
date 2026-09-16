@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1104
+
+- Disk Cleanup Last run calm: soft green wash when a last run exists without skips — Reclaimable is-clean / Details is-ok parity. Skips stay amber; not-yet-run stays neutral.
+
 ## Overnight merge — v0.1.1103
 
 - AI Chat last-answer glance calm: soft green wash when a successful last answer is ready (Perplexity Ready / Debug Quiet / Monitors all-up parity). Failed turns stay red.
@@ -117,6 +121,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1104** — Disk Cleanup Last run calm (soft green when last run exists without skips; skips amber; not-yet-run neutral).
+
+- **v0.1.1103** — AI Chat last-answer glance calm (soft green when successful reply ready; failed turns stay red).
 
 - **v0.1.1102** — Disk Cleanup Next run · Runs when calm (soft green when not due / periodic on; due amber; periodic off cyan).
 

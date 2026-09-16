@@ -18048,6 +18048,8 @@ function applyDiskCleanupLastRunState(last) {
   lastEl.classList.add('is-action');
   lastEl.classList.toggle('has-last-run', !!last);
   lastEl.classList.toggle('has-skip', hadSkip);
+  // Soft green calm when a last run exists without skips (Reclaimable is-clean / Details is-ok parity).
+  lastEl.classList.toggle('is-ok', !!last && !hadSkip);
   lastEl.setAttribute('role', 'button');
   lastEl.setAttribute('tabindex', '0');
   if (!last) {
