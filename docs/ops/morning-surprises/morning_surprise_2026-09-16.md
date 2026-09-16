@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp ring Nominal calm, CPU · GPU · FREQ ring calm, battery healthy calm, LPM Off calm, Power low-draw calm, then Disk Cleanup Reclaimable / Enabled scopes / Next run · Runs when meta-card calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks until design review flagged stale `feature-ai-chat.png`. Standing backlog drove filter-miss calm, a take-note latency fix, Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp · CPU · GPU · FREQ ring calm, battery · LPM · Power calm, Disk Cleanup meta-card calm, then AI Chat last-answer glance calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1103** | AI Chat last-answer glance calm — soft green when a successful last answer is ready to copy (Perplexity Ready / Debug Quiet / Monitors all-up parity); failed turns stay red. Design review; `feature-ai-chat.png` recapture deferred (Screen Recording TCC) |
 | **v0.1.1102** | Disk Cleanup Next run · Runs when calm — soft green when next run is ahead and periodic is on; due amber; periodic off cyan |
 | **v0.1.1101** | Disk Cleanup Enabled scopes calm — soft green when every scope is on (Reclaimable is-clean / Details parity); scopes off stay amber |
 | **v0.1.1100** | Disk Cleanup Reclaimable calm — soft green on Reclaimable now when nothing pending (collapsed is-clean / Details parity); reclaim stays amber |
@@ -30,11 +31,11 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, and Power chip now match that language when charge is healthy, Low Power Mode is off, and draw stays under 20 W. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when share that calm when nothing is pending, every scope is on, the next run is still ahead, and periodic cleanup is on. Hot / Fair / reclaim / due / errors / needs-key / low battery / LPM On / elevated watts / periodic off still use stronger or amber/cyan cues.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, and Power chip now match that language when charge is healthy, Low Power Mode is off, and draw stays under 20 W. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when share that calm when nothing is pending, every scope is on, the next run is still ahead, and periodic cleanup is on. AI Chat’s last-answer glance now matches that calm when a good reply is ready to copy. Hot / Fair / reclaim / due / errors / needs-key / low battery / LPM On / elevated watts / periodic off still use stronger or amber/cyan cues.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace (AI Chat / Processes / Monitors still old)
+- Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
 - Sibling Hermes/OpenClaw ports with clear user fitness
-- Next calm: Monitors summary is-all-up; Heat Nominal / SSD / RAM strip if chips return; Last run panel calm when last run succeeded
+- Next calm: Disk Cleanup Last run panel when last run succeeded; Heat Nominal / SSD / RAM strip if chips return
