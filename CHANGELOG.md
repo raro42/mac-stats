@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1110] - 2026-09-16
+
+### Changed
+- **Good-news filter-miss soft parity** — Fail / Hot / Errors / Warn / Down / Slow / Reclaim / Big / Off-empty panes use the same soft green wash as Ready calm (7% fill, 28% border; no louder tint). Accent empties and real errors stay as they are.
+
 ## [0.1.1109] - 2026-09-16
 
 ### Changed

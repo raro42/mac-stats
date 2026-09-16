@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1110
+
+- Good-news filter-miss soft parity: Fail / Hot / Errors / Warn / Down / Slow / Reclaim / Big / Off-empty soft green at 7% — Ready calm / Monitors all-up parity. Stronger 10%/38% tint removed.
+
 ## Overnight merge — v0.1.1109
 
 - AI Chat Ready calm soft parity: empty Ready pane + Chat · Ready attention glance soft green at 7% — model-online / turn / Monitors all-up parity. Stronger tint removed; offline / no-model / errors stay amber or red.
