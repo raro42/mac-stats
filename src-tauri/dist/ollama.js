@@ -1333,7 +1333,7 @@ function applyChatTurnGlanceState() {
   const preview = getChatTurnGlancePreview();
   if (!turns || !preview) {
     glance.hidden = true;
-    glance.classList.remove('is-active');
+    glance.classList.remove('is-active', 'is-ok');
     return;
   }
   glance.hidden = false;
@@ -1344,6 +1344,8 @@ function applyChatTurnGlanceState() {
       : `${turnLabel} · ${preview}`;
   }
   glance.classList.toggle('is-active', chatSendInFlight);
+  // Soft green calm when history exists and nothing is in flight (last-answer parity).
+  glance.classList.toggle('is-ok', !chatSendInFlight);
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
   glance.title = chatSendInFlight

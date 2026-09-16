@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1105
+
+- AI Chat turn glance calm: soft green wash when turns exist and nothing is sending — last-answer / Monitors all-up parity. Sending keeps accent.
+
 ## Overnight merge — v0.1.1104
 
 - Disk Cleanup Last run calm: soft green wash when a last run exists without skips — Reclaimable is-clean / Details is-ok parity. Skips stay amber; not-yet-run stays neutral.

@@ -4167,6 +4167,12 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
+/* Calm wash when turns exist and nothing is sending (last-answer / Monitors all-up parity). */
+.chat-turn-glance.is-ok:not(.is-active) {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
 /* AI Chat — message list keyboard hint (Monitors / Top Processes parity) */
 .chat-kb-hint {
   margin: 6px 0 8px;

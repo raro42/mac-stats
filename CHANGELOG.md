@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1105] - 2026-09-16
+
+### Changed
+- **AI Chat turn glance calm** — when chat turns exist and nothing is sending, the turn glance uses a soft green wash (last-answer / Monitors all-up parity). Sending keeps the accent wash.
+
 ## [0.1.1104] - 2026-09-16
 
 ### Changed
