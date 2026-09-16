@@ -17395,8 +17395,11 @@ function applyDiskCleanupEnabledScopesCardState(enabledCount, totalCount) {
   const en = Number.isFinite(enabledCount) ? enabledCount : 0;
   const tot = Number.isFinite(totalCount) ? totalCount : 0;
   const off = Math.max(0, tot - en);
+  const allOn = tot > 0 && off === 0;
   card.classList.add('is-action');
   card.classList.toggle('has-scopes-off', off > 0);
+  // Soft green calm when every scope is on (Reclaimable is-clean / Details is-ok parity).
+  card.classList.toggle('is-all-on', allOn);
   card.setAttribute('role', 'button');
   if (off > 0) {
     card.title = 'Click to review scopes — some are off';

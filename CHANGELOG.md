@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1101] - 2026-09-16
+
+### Changed
+- **Disk Cleanup Enabled scopes calm** — when every cleanup scope is on, the Enabled scopes meta-card uses a soft green wash (Reclaimable is-clean / Details is-ok parity). Scopes off stay amber.
+
 ## [0.1.1100] - 2026-09-16
 
 ### Changed
