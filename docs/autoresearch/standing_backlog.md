@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1112
+
+- Power-strip calm soft parity: battery healthy / LPM Off / Power low-draw / time-remaining (≥2h) soft green at 7% — Ready calm / Monitors all-up. Louder 10% tint removed.
+
 ## Overnight merge — v0.1.1111
 
 - Accent filter-miss soft parity: Up / Pinned / Top / Snippet / Clean / On / You / Assistant / Ops calm empties soft accent at 7% — Ready calm / good-news soft parity. Louder 10% tint removed.
