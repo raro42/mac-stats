@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1109
+
+- AI Chat Ready calm soft parity: empty Ready pane + Chat · Ready attention glance soft green at 7% — model-online / turn / Monitors all-up parity. Stronger tint removed; offline / no-model / errors stay amber or red.
+
 ## Overnight merge — v0.1.1108
 
 - AI Chat model online calm: connected model glance soft green at 7% — collapsed AI Chat / turn is-ok / Monitors all-up parity. Offline / no-model stays amber.
@@ -137,6 +141,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1109** — AI Chat Ready calm soft parity (empty Ready + Chat · Ready attention glance soft green at 7%; stronger tint removed).
 
 - **v0.1.1104** — Disk Cleanup Last run calm (soft green when last run exists without skips; skips amber; not-yet-run neutral).
 

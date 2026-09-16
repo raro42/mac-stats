@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks. Standing backlog drove filter-miss calm, a take-note latency fix, Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp · CPU · GPU · FREQ ring calm, battery · LPM · Power · time-remaining calm, Disk Cleanup meta-card calm, AI Chat last-answer / turn / model-online glance calm, then Discord idle-thought 503 retry from tonight’s debug.log.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks. Standing backlog drove filter-miss calm, a take-note latency fix, Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp · CPU · GPU · FREQ ring calm, battery · LPM · Power · time-remaining calm, Disk Cleanup meta-card calm, AI Chat last-answer / turn / model-online / Ready glance calm, then Discord idle-thought 503 retry from tonight’s debug.log.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1109** | AI Chat Ready calm soft parity — empty Ready pane + Chat · Ready attention glance soft green at 7% (model-online / turn / Monitors all-up parity); stronger tint removed; offline / no-model / errors stay amber or red |
 | **v0.1.1108** | AI Chat model online calm — connected model glance soft green at 7% (collapsed AI Chat / turn glance / Monitors all-up parity); offline / no-model stays amber |
 | **v0.1.1107** | Discord idle-thought 503 safe retry — treat `Service Unavailable` as a one-shot safe outbound retry (~1.5s backoff) so brief Discord outages do not drop Having-fun idle sends on the first failure |
 | **v0.1.1106** | Time-remaining strip calm — soft green when the battery estimate is ≥2h (battery / LPM / Power parity); under 1h amber; mid-range neutral |
@@ -36,11 +37,11 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks. 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, Power chip, and time-remaining chip now match that language when charge is healthy, Low Power Mode is off, draw stays under 20 W, and the remaining estimate is ≥2h. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when / Last run share that calm when nothing is pending, every scope is on, the next run is still ahead, periodic cleanup is on, and the last run finished without skips. AI Chat’s last-answer glance, turn glance, and connected model glance now match that calm when a good reply is ready, turns exist with nothing in flight, and Ollama is online. Brief Discord 503 outages no longer drop Having-fun idle thoughts on the first failure — one safe retry with a short backoff. Hot / Fair / reclaim / due / errors / needs-key / low battery / short remaining / LPM On / elevated watts / periodic off / skipped files / sending / offline still use stronger or amber/cyan/accent cues.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, Power chip, and time-remaining chip now match that language when charge is healthy, Low Power Mode is off, draw stays under 20 W, and the remaining estimate is ≥2h. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when / Last run share that calm when nothing is pending, every scope is on, the next run is still ahead, periodic cleanup is on, and the last run finished without skips. AI Chat’s last-answer glance, turn glance, connected model glance, empty Ready pane, and Chat · Ready attention glance now match that calm when a good reply is ready, turns exist with nothing in flight, Ollama is online, or the chat is empty and ready for a starter. Brief Discord 503 outages no longer drop Having-fun idle thoughts on the first failure — one safe retry with a short backoff. Hot / Fair / reclaim / due / errors / needs-key / low battery / short remaining / LPM On / elevated watts / periodic off / skipped files / sending / offline still use stronger or amber/cyan/accent cues.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
 - Sibling Hermes/OpenClaw ports with clear user fitness
-- Next calm: Agent Ops Discord Ready stronger parity if needed; SSD strip calm if reintroduced; chat-offline Ready wash audit
+- Next calm: Agent Ops Discord Ready stronger parity if needed; SSD strip calm if reintroduced; Fail-empty filter-miss soft parity (10%→7%) if still loud
