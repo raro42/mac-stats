@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1114] - 2026-09-16
+
+### Changed
+- **Chat last-answer attention soft parity** — Chat · Last answer attention glance uses the same soft green wash as Ready calm / last-answer glance (7% fill, 28% border). Louder 8%/32% tint removed; errors / sending stay stronger.
+
 ## [0.1.1113] - 2026-09-16
 
 ### Changed
