@@ -3032,6 +3032,23 @@ function ensureRamStripStyles() {
       background-color: color-mix(in srgb, #34c759 10%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
     }
+    /* Power low-draw calm (battery healthy / LPM Off / Details is-ok parity). */
+    .power-info.is-ok:not(.is-hot) {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .power-info.is-hot {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
     .lpm-info.is-on {
       background-color: color-mix(in srgb, #30d158 16%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
@@ -3579,6 +3596,8 @@ const STRIP_HOT_BAT_LOW_PCT = 20;
 const STRIP_HOT_UPTIME_LONG_SECS = 7 * 24 * 3600;
 const STRIP_HOT_RAM_PCT = 85;
 const STRIP_HOT_SSD_PCT = 85;
+/** Combined CPU+GPU watts — above this the Power chip uses amber (low draw stays calm). */
+const STRIP_HOT_POWER_W = 20;
 const STRIP_HOT_ORDER = ['bat', 'lpm', 'heat', 'up', 'ram', 'ssd'];
 const STRIP_HOT_LABELS = {
   bat: 'Bat',
@@ -6460,7 +6479,8 @@ function updateBatteryPower(cpuDetails) {
         powerValue.textContent = '-- W';
       }
     }
-    
+    applyPowerChipCalm(totalPower);
+
     if (timeRemaining && !isCharging && level > 0 && totalPower > 0) {
       const hours = (level / 100) * 10 / (totalPower / 20); // Simplified estimate
       timeRemaining.textContent = `~${hours.toFixed(1)}h remaining`;
@@ -6499,8 +6519,27 @@ function updateBatteryPower(cpuDetails) {
         powerValue.textContent = '-- W';
       }
     }
+    applyPowerChipCalm(totalPower);
     if (timeRemaining) timeRemaining.textContent = '';
   }
+}
+
+/** Soft green when combined CPU+GPU draw is below hot; amber when elevated. */
+function applyPowerChipCalm(totalPower) {
+  const powerValue = document.getElementById('power-value');
+  const powerInfo = powerValue && powerValue.closest
+    ? powerValue.closest('.power-info')
+    : document.querySelector('#battery-power-strip .power-info');
+  if (!powerInfo) return;
+  const watts =
+    typeof totalPower === 'number' && Number.isFinite(totalPower) ? totalPower : 0;
+  if (watts <= 0) {
+    powerInfo.classList.remove('is-ok', 'is-hot');
+    return;
+  }
+  const high = watts >= STRIP_HOT_POWER_W;
+  powerInfo.classList.toggle('is-hot', high);
+  powerInfo.classList.toggle('is-ok', !high);
 }
 
 // Monitors Section

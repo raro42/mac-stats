@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1099
+
+- Power low-draw calm: soft green wash on the Power chip when combined CPU+GPU draw is below 20 W — battery healthy / LPM Off / Details is-ok parity. Elevated (≥20 W) stays amber.
+
 ## Overnight merge — v0.1.1098
 
 - LPM Off calm: soft green wash on the LPM chip when Low Power Mode is Off — battery healthy / Details is-ok / ring calm parity. On keeps the stronger enabled green.
@@ -97,6 +101,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1099** — Power low-draw calm (soft green when combined CPU+GPU under 20 W; ≥20 W amber).
 
 - **v0.1.1098** — LPM Off calm (soft green when Low Power Mode is Off; On keeps enabled green).
 

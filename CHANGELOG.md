@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1099] - 2026-09-16
+
+### Changed
+- **Power low-draw calm** — when combined CPU+GPU draw is below 20 W, the Power chip uses a soft green wash (battery healthy / LPM Off / Details is-ok parity). Elevated draw (≥20 W) stays amber.
+
 ## [0.1.1098] - 2026-09-16
 
 ### Changed
