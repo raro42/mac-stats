@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1098] - 2026-09-16
+
+### Changed
+- **LPM Off calm** — when Low Power Mode is Off, the LPM chip uses a soft green wash (battery healthy / Details is-ok / ring calm parity). On keeps the stronger enabled green.
+
 ## [0.1.1097] - 2026-09-16
 
 ### Changed

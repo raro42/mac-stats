@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1098
+
+- LPM Off calm: soft green wash on the LPM chip when Low Power Mode is Off — battery healthy / Details is-ok / ring calm parity. On keeps the stronger enabled green.
+
 ## Overnight merge — v0.1.1097
 
 - Battery healthy calm: soft green wash on the battery chip when above 20% or charging — Details is-ok / Monitors all-up / ring calm parity. Low (≤20% discharging) stays amber.
@@ -93,6 +97,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1098** — LPM Off calm (soft green when Low Power Mode is Off; On keeps enabled green).
 
 - **v0.1.1097** — Battery healthy calm (soft green when above 20% or charging; low stays amber).
 

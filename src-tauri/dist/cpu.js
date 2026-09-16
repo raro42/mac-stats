@@ -3027,6 +3027,11 @@ function ensureRamStripStyles() {
     .lpm-info:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
     }
+    /* LPM Off calm (battery healthy / Details is-ok / ring calm parity). */
+    .lpm-info.is-ok:not(.is-on):not(.is-lpm-error) {
+      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
+    }
     .lpm-info.is-on {
       background-color: color-mix(in srgb, #30d158 16%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
@@ -3309,6 +3314,8 @@ function updateLpmStripFromData(data, { optimisticOn } = {}) {
     lpmStripEl.textContent = lpmStripText;
   }
   lpmStripCell.classList.toggle('is-on', lpmOn);
+  // Soft green calm when LPM is Off (battery healthy / Details is-ok parity).
+  lpmStripCell.classList.toggle('is-ok', !lpmOn);
   lpmStripCell.dataset.lpmState = lpmOn ? 'on' : 'off';
   const title = 'Toggle Low Power Mode (macOS may ask for your password)';
   lpmStripCell.title = title;
