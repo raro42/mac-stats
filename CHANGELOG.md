@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1117] - 2026-09-17
+
+### Changed
+- **Ops accent filter attention soft parity** — Agent Ops Off / Files / Deliveries / Discord filter attention glances use the same soft accent wash as Ready / `.is-filter` (7% fill, 28% border). Louder 8%/34% tint removed; Fail / Slow stay stronger.
+
 ## [0.1.1116] - 2026-09-17
 
 ### Changed
