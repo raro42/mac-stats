@@ -2995,6 +2995,15 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
+    /* Healthy battery calm (Details is-ok / Monitors all-up / ring calm parity). */
+    .battery-info.is-ok:not(.is-low) {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
     #battery-power-strip.is-lpm-highlight {
       background-color: color-mix(in srgb, #30d158 16%, transparent);
       border-radius: 10px;
@@ -6398,7 +6407,10 @@ function updateBatteryPower(cpuDetails) {
       : document.querySelector('#battery-power-strip .battery-info');
     if (batteryInfo) {
       // Soft amber wash when ≤20% and not charging (menu-bar Bat cue parity).
-      batteryInfo.classList.toggle('is-low', level <= 20 && !isCharging);
+      const low = level <= 20 && !isCharging;
+      batteryInfo.classList.toggle('is-low', low);
+      // Soft green calm when battery is healthy (Details is-ok / ring calm parity).
+      batteryInfo.classList.toggle('is-ok', !low);
     }
 
     if (batteryLevel) batteryLevel.textContent = `${level.toFixed(0)}%`;
@@ -6453,7 +6465,10 @@ function updateBatteryPower(cpuDetails) {
     const batteryInfo = batteryLevel && batteryLevel.closest
       ? batteryLevel.closest('.battery-info')
       : document.querySelector('#battery-power-strip .battery-info');
-    if (batteryInfo) batteryInfo.classList.remove('is-low');
+    if (batteryInfo) {
+      batteryInfo.classList.remove('is-low');
+      batteryInfo.classList.remove('is-ok');
+    }
     if (batteryLevel) batteryLevel.textContent = 'N/A';
     if (batteryStatus) batteryStatus.textContent = 'No battery';
     if (batteryIcon && batteryIcon.tagName === 'svg') {

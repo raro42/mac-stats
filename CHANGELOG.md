@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1097] - 2026-09-16
+
+### Changed
+- **Battery healthy calm** — when battery is above 20% or charging, the battery chip uses a soft green wash (Details is-ok / Monitors all-up / ring calm parity). Low (≤20% discharging) stays amber.
+
 ## [0.1.1096] - 2026-09-16
 
 ### Changed

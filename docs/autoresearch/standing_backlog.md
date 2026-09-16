@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1097
+
+- Battery healthy calm: soft green wash on the battery chip when above 20% or charging — Details is-ok / Monitors all-up / ring calm parity. Low (≤20% discharging) stays amber.
+
 ## Overnight merge — v0.1.1096
 
 - CPU · GPU · FREQ ring calm: soft green wash on rings + sparklines when below hot thresholds — Temp Nominal / Details is-ok parity.
@@ -89,6 +93,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1097** — Battery healthy calm (soft green when above 20% or charging; low stays amber).
 
 - **v0.1.1096** — CPU · GPU · FREQ ring calm (soft green when below hot; Temp Nominal parity).
 
