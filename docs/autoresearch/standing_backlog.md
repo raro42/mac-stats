@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1116
+
+- Ops filter attention soft parity: On / Live / Jobs / Core / Instant / Lite / Direct glances soft green at 7% / 28% border — Ready / Monitors Up. Louder 8%/34% tint removed; Off / Files / Deliveries / Discord stay accent.
+
 ## Overnight merge — v0.1.1115
 
 - Disk Cleanup due attention soft parity: Disk · Due glance soft green at 7% / 28% border — Ready calm / collapsed is-due. Louder 8%/34% tint removed; reclaim stays amber.
