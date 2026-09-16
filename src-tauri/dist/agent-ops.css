@@ -7237,15 +7237,26 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
 }
 
-/* Next automatic run — soft wash when cleanup is due */
+/* Next automatic run — amber when due (Reclaimable has-reclaim parity). */
 .disk-cleanup-meta-card.has-due {
-  border-color: color-mix(in srgb, #30d158 34%, transparent);
-  background: color-mix(in srgb, #30d158 8%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
 }
 
 .disk-cleanup-meta-card.is-action.has-due:focus-visible {
-  border-color: color-mix(in srgb, #30d158 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 22%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+}
+
+/* Calm wash when next run is still ahead (Reclaimable is-clean / Details is-ok parity). */
+.disk-cleanup-meta-card.is-ok:not(.has-due):not(.has-periodic-off) {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
+.disk-cleanup-meta-card.is-action.is-ok:not(.has-due):not(.has-periodic-off):focus-visible {
+  border-color: color-mix(in srgb, #34c759 48%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
 }
 
 /* Runs when — soft wash when periodic cleanup is off */

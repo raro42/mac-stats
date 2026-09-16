@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1102] - 2026-09-16
+
+### Changed
+- **Disk Cleanup Next run · Runs when calm** — when the next automatic run is still ahead, and when periodic cleanup is on, those meta-cards use a soft green wash (Reclaimable is-clean / Details is-ok parity). Due turns amber; periodic off stays cyan.
+
 ## [0.1.1101] - 2026-09-16
 
 ### Changed

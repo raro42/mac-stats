@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1102
+
+- Disk Cleanup Next run · Runs when calm: soft green wash when next run is ahead and when periodic is on — Reclaimable is-clean / Details is-ok parity. Due turns amber; periodic off stays cyan.
+
 ## Overnight merge — v0.1.1101
 
 - Disk Cleanup Enabled scopes calm: soft green wash on the Enabled scopes meta-card when every scope is on — Reclaimable is-clean / Details is-ok parity. Scopes off stay amber.
@@ -109,6 +113,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1102** — Disk Cleanup Next run · Runs when calm (soft green when not due / periodic on; due amber; periodic off cyan).
 
 - **v0.1.1101** — Disk Cleanup Enabled scopes calm (soft green when every scope is on; scopes off stay amber).
 

@@ -17482,6 +17482,8 @@ function applyDiskCleanupNextRunCardState(isDue) {
   if (!card) return;
   card.classList.add('is-action');
   card.classList.toggle('has-due', !!isDue);
+  // Soft green calm when next run is still ahead (Reclaimable is-clean / Details is-ok parity).
+  card.classList.toggle('is-ok', !isDue);
   card.setAttribute('role', 'button');
   if (isDue) {
     card.title = 'Cleanup is due — click to focus Clean now';
@@ -17561,6 +17563,8 @@ function applyDiskCleanupRunsWhenCardState(triggersText) {
   card.setAttribute('role', 'button');
   const periodicOff = (triggersText || '').includes('Periodic: off');
   card.classList.toggle('has-periodic-off', periodicOff);
+  // Soft green calm when periodic cleanup is on (Next run is-ok / Details is-ok parity).
+  card.classList.toggle('is-ok', !periodicOff);
   if (periodicOff) {
     card.title =
       'Periodic cleanup is off — click to review scopes that run on launch';
