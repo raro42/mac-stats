@@ -3770,10 +3770,17 @@ function updateRingHotStates(data) {
     freq: freq != null && freq >= RING_HOT_FREQ_GHZ,
     temp: tempHotByC || tempHotByThermal,
   };
+  // CPU · GPU · FREQ calm when below hot (Temp Nominal parity).
+  const okByKey = {
+    cpu: usage != null && !hotByKey.cpu,
+    gpu: gpu != null && !hotByKey.gpu,
+    freq: freq != null && !hotByKey.freq,
+    temp: tempOk,
+  };
   for (const entry of getRingMetricCardEntries()) {
     const hot = !!hotByKey[entry.key];
     const fair = entry.key === 'temp' && tempFair;
-    const ok = entry.key === 'temp' && tempOk;
+    const ok = !!okByKey[entry.key] && !hot && !fair;
     entry.card.classList.toggle('is-hot', hot);
     entry.card.classList.toggle('is-fair', fair);
     entry.card.classList.toggle('is-ok', ok);
@@ -3798,12 +3805,13 @@ function updateRingHotStates(data) {
   const gpuChart = historyChartContainerForRingKey('gpu');
   if (gpuChart && !getRingMetricCardEntries().some((e) => e.key === 'gpu')) {
     const hot = !!hotByKey.gpu;
+    const ok = !!okByKey.gpu && !hot;
     gpuChart.classList.toggle('is-hot', hot);
     gpuChart.classList.remove('is-fair');
-    gpuChart.classList.remove('is-ok');
+    gpuChart.classList.toggle('is-ok', ok);
     gpuChart.dataset.ringsHot = hot ? '1' : '0';
     gpuChart.dataset.ringsFair = '0';
-    gpuChart.dataset.ringsOk = '0';
+    gpuChart.dataset.ringsOk = ok ? '1' : '0';
   }
   window._historyHotKeys = HISTORY_HOT_ORDER.filter((k) => hotByKey[k]);
   removeHistoryHotAttentionGlance();

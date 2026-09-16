@@ -1859,7 +1859,7 @@ textarea.ops-agent-editor.is-dirty {
   animation: ring-gauge-hot-stroke 2.4s ease-in-out infinite;
 }
 
-/* Temp ring — Nominal thermal calm (Details is-ok / Monitors all-up parity). */
+/* CPU · GPU · FREQ · Temp rings — calm below hot (Temp Nominal / Details is-ok parity). */
 .metric-card.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 7%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
@@ -1950,7 +1950,7 @@ textarea.ops-agent-editor.is-dirty {
   font-weight: 700;
 }
 
-/* TEMP sparkline — Nominal thermal calm (Temp ring is-ok parity). */
+/* CPU · GPU · FREQ · TEMP sparklines — calm below hot (ring is-ok parity). */
 .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
   background-color: color-mix(in srgb, #34c759 5%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 14%, transparent);

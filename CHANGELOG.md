@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1096] - 2026-09-16
+
+### Changed
+- **CPU · GPU · FREQ ring calm** — when usage / frequency is below the hot threshold, the matching ring and sparkline use a soft green wash (Temp Nominal / Details is-ok parity). Hot stays amber.
+
 ## [0.1.1095] - 2026-09-16
 
 ### Changed
