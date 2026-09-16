@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1108
+
+- AI Chat model online calm: connected model glance soft green at 7% — collapsed AI Chat / turn is-ok / Monitors all-up parity. Offline / no-model stays amber.
+
 ## Overnight merge — v0.1.1107
 
 - Discord idle-thought 503 safe retry: treat Service Unavailable as safe to retry once (~1.5s backoff) so brief Discord outages do not drop Having-fun idle sends on the first failure.
