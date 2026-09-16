@@ -9565,10 +9565,11 @@ button.is-just-saved,
   color: color-mix(in srgb, var(--accent, #007aff) 55%, currentColor);
 }
 
+/* Help open calm (Ready / Monitors all-up soft 7% parity). */
 .settings-help-attention-glance.is-open {
-  border-color: color-mix(in srgb, #34c759 38%, transparent);
-  background: color-mix(in srgb, #34c759 10%, transparent);
-  color: color-mix(in srgb, #34c759 55%, currentColor);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+  color: color-mix(in srgb, #34c759 50%, currentColor);
 }
 
 /* Settings Help / cheat sheet — soft green flash after open */

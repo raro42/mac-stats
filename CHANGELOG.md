@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1113] - 2026-09-16
+
+### Changed
+- **Settings Help open calm soft parity** — Help · Open glance uses the same soft green wash as Ready calm / Monitors all-up (7% fill, 28% border). Louder 10%/38% tint removed; Help closed stays accent.
+
 ## [0.1.1112] - 2026-09-16
 
 ### Changed
