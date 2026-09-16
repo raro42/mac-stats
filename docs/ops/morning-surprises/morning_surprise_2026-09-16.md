@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks until design review flagged stale `feature-ai-chat.png`. Standing backlog drove filter-miss calm, a take-note latency fix, Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp · CPU · GPU · FREQ ring calm, battery · LPM · Power calm, Disk Cleanup meta-card calm, AI Chat last-answer glance calm, then Last run panel calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks. Standing backlog drove filter-miss calm, a take-note latency fix, Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp · CPU · GPU · FREQ ring calm, battery · LPM · Power calm, Disk Cleanup meta-card calm, AI Chat last-answer glance calm, Last run panel calm, then AI Chat turn glance calm at the start of the next overnight window.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1105** | AI Chat turn glance calm — soft green when turns exist and nothing is sending (last-answer / Monitors all-up parity); sending keeps accent |
 | **v0.1.1104** | Disk Cleanup Last run calm — soft green when a last run exists without skipped files (Reclaimable is-clean / Details is-ok parity); skips stay amber; not-yet-run stays neutral |
 | **v0.1.1103** | AI Chat last-answer glance calm — soft green when a successful last answer is ready to copy (Perplexity Ready / Debug Quiet / Monitors all-up parity); failed turns stay red. Design review; `feature-ai-chat.png` recapture deferred (Screen Recording TCC) |
 | **v0.1.1102** | Disk Cleanup Next run · Runs when calm — soft green when next run is ahead and periodic is on; due amber; periodic off cyan |
@@ -32,11 +33,11 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks u
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, and Power chip now match that language when charge is healthy, Low Power Mode is off, and draw stays under 20 W. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when / Last run share that calm when nothing is pending, every scope is on, the next run is still ahead, periodic cleanup is on, and the last run finished without skips. AI Chat’s last-answer glance now matches that calm when a good reply is ready to copy. Hot / Fair / reclaim / due / errors / needs-key / low battery / LPM On / elevated watts / periodic off / skipped files still use stronger or amber/cyan cues.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, and Power chip now match that language when charge is healthy, Low Power Mode is off, and draw stays under 20 W. When Disk Cleanup is open, Reclaimable / Enabled scopes / Next run / Runs when / Last run share that calm when nothing is pending, every scope is on, the next run is still ahead, periodic cleanup is on, and the last run finished without skips. AI Chat’s last-answer glance and turn glance now match that calm when a good reply is ready to copy and when turns exist with nothing in flight. Hot / Fair / reclaim / due / errors / needs-key / low battery / LPM On / elevated watts / periodic off / skipped files / sending still use stronger or amber/cyan/accent cues.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
 - Sibling Hermes/OpenClaw ports with clear user fitness
-- Next calm: Heat Nominal / SSD / RAM strip chips if they return; Agent Ops Discord Ready collapsed glance stronger parity if needed
+- Next calm: chat-model online wash parity; Agent Ops Discord Ready stronger parity if needed; time-remaining strip calm when the estimate is healthy
