@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1115] - 2026-09-17
+
+### Changed
+- **Disk Cleanup due attention soft parity** — Disk · Due attention glance uses the same soft green wash as Ready calm / collapsed is-due (7% fill, 28% border). Louder 8%/34% tint removed; reclaim stays amber.
+
 ## [0.1.1114] - 2026-09-16
 
 ### Changed
