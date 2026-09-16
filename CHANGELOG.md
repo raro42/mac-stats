@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1107] - 2026-09-16
+
+### Fixed
+- **Discord idle-thought 503 retry** — Having-fun / idle Discord sends treat `503 Service Unavailable` as safe to retry once (with a short backoff), so brief Discord outages no longer drop the message on the first failure.
+
 ## [0.1.1106] - 2026-09-16
 
 ### Changed

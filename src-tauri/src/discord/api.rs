@@ -52,13 +52,18 @@ pub fn sanitize_discord_api_error(err: &str) -> String {
 /// Whether a failed **non-idempotent** Discord outbound send (HTTP or Gateway) may be retried
 /// without a material risk of posting the same user-visible message twice.
 ///
-/// Safe: rate limit (429), DNS / name resolution failures, connection refused, unreachable host
-/// (request likely never reached Discord). Unsafe: timeouts, connection reset / broken pipe, and
-/// other ambiguous cases where the server may already have stored the message.
+/// Safe: rate limit (429), transient upstream (503 Service Unavailable), DNS / name resolution
+/// failures, connection refused, unreachable host (request likely never reached Discord).
+/// Unsafe: timeouts, connection reset / broken pipe, and other ambiguous cases where the server
+/// may already have stored the message.
 pub fn is_safe_to_retry_discord_outbound_error_message(err_str: &str) -> bool {
     let lower = err_str.to_lowercase();
     if lower.contains("429") || lower.contains("rate limit") || lower.contains("too many requests")
     {
+        return true;
+    }
+    // Discord returned 503 before accepting the message — safe to retry once.
+    if lower.contains("503") || lower.contains("service unavailable") {
         return true;
     }
     // Timeouts may fire after the request body was accepted — do not retry the same content.
@@ -92,12 +97,16 @@ pub fn is_safe_to_retry_discord_outbound_error_message(err_str: &str) -> bool {
 }
 
 /// Sleep duration before a single safe retry for Gateway / string-classified errors.
-/// Rate limits get a longer backoff; other safe errors keep a short delay.
+/// Rate limits and 503 get a longer backoff; other safe errors keep a short delay.
 pub fn discord_outbound_safe_retry_sleep_duration(err_str: &str) -> Duration {
     let lower = err_str.to_lowercase();
     if lower.contains("429") || lower.contains("rate limit") || lower.contains("too many requests")
     {
         return Duration::from_millis(2000 + jitter_millis());
+    }
+    // Brief Discord outages — wait a bit longer than connect refused before one retry.
+    if lower.contains("503") || lower.contains("service unavailable") {
+        return Duration::from_millis(1500 + jitter_millis());
     }
     Duration::from_millis(500)
 }
@@ -480,6 +489,12 @@ mod outbound_retry_tests {
         assert!(is_safe_to_retry_discord_outbound_error_message(
             "failed to resolve host 'discord.com'"
         ));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "503: Service Unavailable"
+        ));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "HTTP 503 service unavailable"
+        ));
     }
 
     #[test]
@@ -499,7 +514,9 @@ mod outbound_retry_tests {
     fn rate_limit_retry_uses_longer_delay() {
         let d_short = discord_outbound_safe_retry_sleep_duration("connection refused");
         let d_rl = discord_outbound_safe_retry_sleep_duration("429 rate limited");
+        let d_503 = discord_outbound_safe_retry_sleep_duration("503: Service Unavailable");
         assert!(d_rl >= Duration::from_millis(2000));
+        assert!(d_503 >= Duration::from_millis(1500));
         assert!(d_short < Duration::from_millis(1500));
     }
 }
