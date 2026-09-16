@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1103] - 2026-09-16
+
+### Changed
+- **AI Chat last-answer glance calm** — when a successful last answer is ready to copy, the answer glance uses a soft green wash (Perplexity Ready / Debug Quiet / Monitors all-up parity). Failed turns stay red.
+
 ## [0.1.1102] - 2026-09-16
 
 ### Changed

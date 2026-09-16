@@ -4271,9 +4271,10 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
-.chat-answer-glance.has-answer {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+/* Calm wash when a successful last answer is ready (Perplexity Ready / Debug Quiet / Monitors all-up parity). */
+.chat-answer-glance.has-answer:not(.has-errors) {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 .chat-answer-glance.has-errors {
