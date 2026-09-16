@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1109] - 2026-09-16
+
+### Changed
+- **AI Chat Ready calm soft parity** — empty Ready pane and Chat · Ready attention glance use the same soft green wash as model-online / turn / Monitors all-up (no stronger tint). Offline / no-model / errors stay amber or red.
+
 ## [0.1.1108] - 2026-09-16
 
 ### Changed

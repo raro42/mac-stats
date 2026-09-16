@@ -1574,12 +1574,12 @@ textarea.ops-agent-editor.is-dirty {
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-/* Ready + model: soft ok wash (Live idle calm / Chat · Ready glance parity). */
+/* Ready + model: soft ok wash (model-online / turn is-ok / Monitors all-up parity). */
 .chat-empty.is-ready {
   border-style: solid;
-  border-color: color-mix(in srgb, #34c759 38%, transparent);
-  background: color-mix(in srgb, #34c759 10%, transparent);
-  color: color-mix(in srgb, #34c759 42%, var(--text, currentColor));
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+  color: inherit;
 }
 
 .chat-empty.is-ready .chat-empty-title {
@@ -4401,10 +4401,11 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
+/* Calm wash when Chat · Ready (model-online / empty Ready / Monitors all-up parity). */
 .chat-offline-attention-glance.is-ready {
-  border-color: color-mix(in srgb, #34c759 38%, transparent);
-  background: color-mix(in srgb, #34c759 10%, transparent);
-  color: color-mix(in srgb, #34c759 55%, currentColor);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+  color: inherit;
 }
 
 .chat-offline-attention-glance.is-continue {
