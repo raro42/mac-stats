@@ -1441,7 +1441,7 @@ textarea.ops-agent-editor.is-dirty {
 .ops-empty-filter-miss.is-calm {
   border-style: solid;
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   opacity: 1;
   color: inherit;
 }
@@ -1542,7 +1542,7 @@ textarea.ops-agent-editor.is-dirty {
 .ops-overview-body > .ops-empty-overview-cta.is-calm {
   border-style: solid;
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   opacity: 1;
 }
 
@@ -2122,10 +2122,10 @@ textarea.ops-agent-editor.is-dirty {
   justify-content: center;
   gap: 0;
   opacity: 1;
-  /* Filter-miss calm (AI Chat / Agent Ops parity) — solid accent wash, not dashed muted. */
+  /* Filter-miss calm (AI Chat / Agent Ops parity) — soft accent wash (Ready calm 7%). */
   border-style: solid;
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 /* Hot filter empty = good news (Fail-empty / Ready calm soft green parity). */
@@ -2137,7 +2137,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .processes-filter-miss.is-pinned-empty {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .processes-filter-miss-title {
@@ -2725,14 +2725,14 @@ textarea.ops-agent-editor.is-dirty {
   text-align: center;
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   color: inherit;
 }
 
 .perplexity-filter-miss.is-top-empty,
 .perplexity-filter-miss.is-snippet-empty {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .perplexity-filter-miss-title {
@@ -3064,7 +3064,7 @@ textarea.ops-agent-editor.is-dirty {
   text-align: center;
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   color: inherit;
 }
 
@@ -4606,7 +4606,7 @@ textarea.ops-agent-editor.is-dirty {
 .chat-filter-miss.is-you,
 .chat-filter-miss.is-assistant {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .chat-filter-miss-title {
@@ -5010,10 +5010,10 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 1;
   font-style: normal;
   text-align: center;
-  /* Filter-miss calm (Monitors / Top Processes / AI Chat / Agent Ops parity). */
+  /* Filter-miss calm — soft accent wash (Ready calm 7%). */
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 /* Off empty = all scopes on (Ready soft green — nothing disabled is calm). */
@@ -5025,7 +5025,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .disk-cleanup-scope-filter-miss.is-on-empty {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .disk-cleanup-filter-chip {
@@ -6651,10 +6651,10 @@ textarea.ops-agent-editor.is-dirty {
   gap: 0;
   padding: 18px 14px 16px;
   opacity: 1;
-  /* Filter-miss calm (Top Processes / AI Chat / Agent Ops parity) — solid accent wash. */
+  /* Filter-miss calm — soft accent wash (Ready calm 7%). */
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   text-align: center;
 }
 
@@ -6668,7 +6668,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .monitors-filter-miss.is-up-empty {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .monitors-filter-miss-title {
@@ -7602,9 +7602,9 @@ button.monitor-detail-url.is-just-saved {
   opacity: 1;
   font-style: normal;
   text-align: center;
-  /* Filter-miss calm (Monitors / Top Processes / AI Chat / Agent Ops parity). */
+  /* Filter-miss calm — soft accent wash (Ready calm 7%). */
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 /* Reclaim / Big empty = good news (Fail-empty / Ready calm soft green parity). */
@@ -7617,7 +7617,7 @@ button.monitor-detail-url.is-just-saved {
 
 .disk-cleanup-filter-miss.is-clean-empty {
   border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .disk-cleanup-filter-miss-title {

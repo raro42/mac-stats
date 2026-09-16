@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1111
+
+- Accent filter-miss soft parity: Up / Pinned / Top / Snippet / Clean / On / You / Assistant / Ops calm empties soft accent at 7% — Ready calm / good-news soft parity. Louder 10% tint removed.
+
 ## Overnight merge — v0.1.1110
 
 - Good-news filter-miss soft parity: Fail / Hot / Errors / Warn / Down / Slow / Reclaim / Big / Off-empty soft green at 7% — Ready calm / Monitors all-up parity. Stronger 10%/38% tint removed.
@@ -145,6 +149,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Instant `/keep-p25` nearest-rank p25 (floor quartile) gap between consecutive keep/discard rows (tonight + all-time; digester Slowest filters; p50).
 
 ## Done recently
+
+- **v0.1.1111** — Accent filter-miss soft parity (Up/Pinned/Top/Snippet/Clean/On/You/Assistant/Ops calm empties soft accent at 7%).
 
 - **v0.1.1109** — AI Chat Ready calm soft parity (empty Ready + Chat · Ready attention glance soft green at 7%; stronger tint removed).
 

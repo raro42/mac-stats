@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1111] - 2026-09-16
+
+### Changed
+- **Accent filter-miss soft parity** — Up / Pinned / Top / Snippet / Clean / On / You / Assistant / Ops calm empties use the same soft accent wash as Ready calm (7% fill). Good-news greens stay at 7%.
+
 ## [0.1.1110] - 2026-09-16
 
 ### Changed
