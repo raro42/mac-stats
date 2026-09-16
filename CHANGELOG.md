@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1118] - 2026-09-17
+
+### Changed
+- **Ops Slow/Fail filter attention soft parity** — Agent Ops Slow / Fail filter attention glances use the same soft alert wash as Monitors Slow / Down (7% fill, 30% border). Louder 8%/34% tint removed; still amber/red vs calm greens.
+
 ## [0.1.1117] - 2026-09-17
 
 ### Changed

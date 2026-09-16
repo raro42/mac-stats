@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1118
+
+- Ops Slow/Fail filter attention soft parity: Slow / Fail glances soft alert at 7% / 30% border — Monitors Slow / Down. Louder 8%/34% tint removed; still amber/red vs calm greens.
+
 ## Overnight merge — v0.1.1117
 
 - Ops accent filter attention soft parity: Off / Files / Deliveries / Discord glances soft accent at 7% / 28% border — Ready / `.is-filter`. Louder 8%/34% tint removed; Fail / Slow stay stronger.
