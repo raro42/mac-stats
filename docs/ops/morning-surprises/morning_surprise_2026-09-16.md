@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-16
 
-Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp ring Nominal calm, CPU · GPU · FREQ ring calm, battery healthy calm, then LPM Off calm.
+Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; design review not due. Standing backlog drove filter-miss calm, a take-note latency fix, then Details / Top Processes / Disk Cleanup / Debug Log / Perplexity glance calm, Temp ring Nominal calm, CPU · GPU · FREQ ring calm, battery healthy calm, LPM Off calm, then Power low-draw calm.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1099** | Power low-draw calm — soft green on the Power chip when combined CPU+GPU draw is under 20 W (battery/LPM/Details parity); ≥20 W amber |
 | **v0.1.1098** | LPM Off calm — soft green on the LPM chip when Low Power Mode is Off (battery/Details/ring parity); On keeps enabled green |
 | **v0.1.1097** | Battery healthy calm — soft green on the battery chip when above 20% or charging (Details/Monitors/ring parity); low stays amber |
 | **v0.1.1096** | CPU · GPU · FREQ ring calm — soft green on rings + sparklines when below hot (Temp Nominal / Details parity) |
@@ -26,11 +27,11 @@ Overnight Track B (20:00–06:00 local). Digester open stayed empty most ticks; 
 
 ## Why it matters
 
-Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip and LPM Off chip now match that language when charge is healthy and Low Power Mode is off. Hot / Fair / reclaim / errors / needs-key / low battery / LPM On still use stronger or amber cues.
+Empty filter panes feel calm instead of cold. Take-note asks no longer burn ~23s on Brave when you only wanted a memory bullet. Collapsed Details, Top Processes, Disk Cleanup, Debug Log, and Perplexity glances share the same calm green language when things are fine — and the CPU · GPU · FREQ · Temp rings join that calm when below hot / Nominal. The battery chip, LPM Off chip, and Power chip now match that language when charge is healthy, Low Power Mode is off, and draw stays under 20 W. Hot / Fair / reclaim / errors / needs-key / low battery / LPM On / elevated watts still use stronger or amber cues.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (AI Chat / Processes / Monitors still old)
 - Sibling Hermes/OpenClaw ports with clear user fitness
-- Next calm: power chip (low draw), or Heat Nominal if strip chips return
+- Next calm: Heat Nominal strip if chips return; SSD/RAM strip calm when below 85%
