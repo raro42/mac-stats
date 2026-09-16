@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1106
+
+- Time-remaining strip calm: soft green when estimate ≥2h — battery / LPM / Power parity. Under 1h amber; mid-range neutral.
+
 ## Overnight merge — v0.1.1105
 
 - AI Chat turn glance calm: soft green wash when turns exist and nothing is sending — last-answer / Monitors all-up parity. Sending keeps accent.
