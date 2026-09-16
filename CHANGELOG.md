@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1112] - 2026-09-16
+
+### Changed
+- **Power-strip calm soft parity** — battery healthy / LPM Off / Power low-draw / time-remaining (≥2h) chips use the same soft green wash as Ready calm (7% fill). Louder 10% tint removed; low / On / elevated stay amber or stronger green.
+
 ## [0.1.1111] - 2026-09-16
 
 ### Changed

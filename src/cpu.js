@@ -2995,12 +2995,12 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
-    /* Healthy battery calm (Details is-ok / Monitors all-up / ring calm parity). */
+    /* Healthy battery calm (Ready / Monitors all-up / ring soft 7% parity). */
     .battery-info.is-ok:not(.is-low) {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      background-color: color-mix(in srgb, #34c759 7%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
@@ -3027,17 +3027,17 @@ function ensureRamStripStyles() {
     .lpm-info:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
     }
-    /* LPM Off calm (battery healthy / Details is-ok / ring calm parity). */
+    /* LPM Off calm (Ready / battery / Monitors all-up soft 7% parity). */
     .lpm-info.is-ok:not(.is-on):not(.is-lpm-error) {
-      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      background-color: color-mix(in srgb, #34c759 7%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
     }
-    /* Power low-draw calm (battery healthy / LPM Off / Details is-ok parity). */
+    /* Power low-draw calm (Ready / battery / LPM Off soft 7% parity). */
     .power-info.is-ok:not(.is-hot) {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      background-color: color-mix(in srgb, #34c759 7%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
@@ -3049,12 +3049,12 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
-    /* Time-remaining healthy calm (battery / LPM / Power strip parity). */
+    /* Time-remaining healthy calm (Ready / battery / LPM / Power soft 7% parity). */
     .time-remaining.is-ok:not(.is-low) {
       border-radius: 8px;
       padding: 2px 6px;
       margin: -2px -6px;
-      background-color: color-mix(in srgb, #34c759 10%, transparent);
+      background-color: color-mix(in srgb, #34c759 7%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 22%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
       opacity: 1;
