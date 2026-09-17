@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1130
+
+- Settings credentials key-not-set soft parity: Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack not-set (and partial) glances soft alert at 7% / 30% border — Monitors Down / Chat Offline Not-set. Louder 8%/34% tint removed.
+
 ## Overnight merge — v0.1.1129
 
 - AI Chat offline/no-model soft parity: empty offline / no-model / circuit + model glance + Offline · No model · Errors · Not-set attention soft alert at 7% / 30% border — Monitors Slow / Down. Louder 8%/34% (circuit 10%/40%) tint removed.

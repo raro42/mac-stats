@@ -8700,9 +8700,10 @@ button.is-just-saved,
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Settings credentials key-not-set — soft alert (Monitors Down / Chat Offline Not-set soft 7%/30% parity). */
 .settings-brave-key-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -8746,8 +8747,8 @@ button.is-just-saved,
 
 .settings-redmine-attention-glance.is-not-set,
 .settings-redmine-attention-glance.is-partial {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -8798,8 +8799,8 @@ button.is-just-saved,
 
 .settings-mastodon-attention-glance.is-not-set,
 .settings-mastodon-attention-glance.is-partial {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -8849,8 +8850,8 @@ button.is-just-saved,
 }
 
 .settings-mcp-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -8900,8 +8901,8 @@ button.is-just-saved,
 }
 
 .settings-browser-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -8951,8 +8952,8 @@ button.is-just-saved,
 }
 
 .settings-cursor-agent-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -9003,8 +9004,8 @@ button.is-just-saved,
 
 .settings-telegram-attention-glance.is-not-set,
 .settings-telegram-attention-glance.is-partial {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -9055,8 +9056,8 @@ button.is-just-saved,
 
 .settings-slack-attention-glance.is-not-set,
 .settings-slack-attention-glance.is-partial {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -9489,8 +9490,8 @@ button.is-just-saved,
 }
 
 .settings-perplexity-key-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -9533,8 +9534,8 @@ button.is-just-saved,
 }
 
 .settings-discord-token-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 

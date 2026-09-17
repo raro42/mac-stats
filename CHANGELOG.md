@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1130] - 2026-09-17
+
+### Changed
+- **Settings credentials key-not-set soft parity** — Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack not-set (and partial) glances use the same soft alert wash as Monitors Down / Chat Offline Not-set (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1129] - 2026-09-17
 
 ### Changed
