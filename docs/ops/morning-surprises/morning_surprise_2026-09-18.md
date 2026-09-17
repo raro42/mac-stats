@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Standing backlog / Next → soft-parity leftovers closed in v0.1.1139.
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan found Disk Cleanup Big list rows still on louder 8%/34%.
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1140** | Disk Cleanup Big list-row soft parity — Big reclaim rows soft alert at 7% / 30% border (Big attention / Monitors Slow); louder 8%/34% tint removed |
 | **v0.1.1139** | Ollama collapsed has-errors + Settings Signal not-wired soft parity — soft alert at 7% / 30% border (Monitors Down / AI Chat Errors); louder 8%/34% tint removed |
 | **v0.1.1138** | AI Chat Errors / last-answer has-errors soft parity — Errors glance + last-answer has-errors soft alert at 7% / 30% border (Monitors Down / Debug Log); louder 8%/34% tint removed |
 | **v0.1.1137** | Debug Log has-errors soft parity — Error attention + collapsed error glances soft alert at 7% / 30% border (Monitors Down); louder 8%/34% tint removed |
@@ -20,10 +21,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Collapsed AI Chat error glances and Settings Signal not-wired now match Monitors Down / AI Chat Errors soft washes (7% fill, 30% border) — the last named soft-parity leftovers from the morning-surprise Next list.
+Big Disk Cleanup reclaim rows now match Big attention / Monitors Slow soft washes (7% fill, 30% border) — the list row no longer shouts louder than the glance.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity scan for any remaining 8%/34% alert washes; sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity scan leftovers: Ops Runs Fail/Slow list rows (8%/22%), AI Chat error bubbles (8%/28%), Perplexity empty-error (8%/35%); sibling Hermes/OpenClaw ports with clear user fitness
