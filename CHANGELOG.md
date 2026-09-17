@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1123] - 2026-09-17
+
+### Changed
+- **Monitors summary/collapsed has-down soft parity** — External / Monitors summary and collapsed glances with Down hosts use the same soft alert wash as Down attention / Down filter (7% fill, 30% border). Louder 8%/34% tint removed; still clearly red vs all-up green.
+
 ## [0.1.1122] - 2026-09-17
 
 ### Changed

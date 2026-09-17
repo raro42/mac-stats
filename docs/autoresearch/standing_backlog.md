@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1123
+
+- Monitors summary/collapsed has-down soft parity: summary + collapsed Down glances soft alert at 7% / 30% border — Down attention / Down filter. Louder 8%/34% tint removed; still red vs all-up green.
+
 ## Overnight merge — v0.1.1122
 
 - Monitors Down/Slow attention soft parity: Down · N / Slow · N glances soft alert at 7% / 30% border — Down/Slow filter. Louder 8%/34% tint removed; still red/amber vs calm greens.

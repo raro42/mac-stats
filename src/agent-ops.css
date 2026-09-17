@@ -3232,10 +3232,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Down summary — soft alert (Down attention / Down filter soft 7%/30% parity). */
 .monitors-summary.has-down {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .monitors-summary.is-all-up {
@@ -3301,10 +3302,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Down collapsed — soft alert (Down attention / Down filter soft 7%/30% parity). */
 .monitors-collapsed-glance.has-down {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .monitors-collapsed-glance.is-all-up {
