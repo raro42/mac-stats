@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1134] - 2026-09-17
+
+### Changed
+- **Ops Digest open soft parity** — Agent Ops Digest open attention glance uses the same soft alert wash as Monitors Slow / Discord Reconnect (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1133] - 2026-09-17
 
 ### Changed
