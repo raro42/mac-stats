@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1129
+
+- AI Chat offline/no-model soft parity: empty offline / no-model / circuit + model glance + Offline · No model · Errors · Not-set attention soft alert at 7% / 30% border — Monitors Slow / Down. Louder 8%/34% (circuit 10%/40%) tint removed.
+
 ## Overnight merge — v0.1.1128
 
 - Settings product attention soft parity: AI Off / Compact On / Judge Off / Downloads Off / Ori Off / Having-fun Off / Voice STT Off soft alert at 7% / 30% border — Monitors Slow / Help open soft. Louder 10%/38% tint removed.

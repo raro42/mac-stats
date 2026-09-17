@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1129] - 2026-09-17
+
+### Changed
+- **AI Chat offline/no-model soft parity** — Chat empty offline / no-model / circuit panes, model glance, and Offline · No model · Errors attention glances use the same soft alert wash as Monitors Slow / Down (7% fill, 30% border). Louder 8%/34% (and circuit 10%/40%) tint removed.
+
 ## [0.1.1128] - 2026-09-17
 
 ### Changed

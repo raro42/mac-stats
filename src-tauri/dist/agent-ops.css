@@ -1590,17 +1590,18 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.88;
 }
 
+/* Soft alert (Monitors Slow / Settings Off soft 7%/30% parity). */
 .chat-empty.is-no-model {
   border-style: solid;
-  border-color: color-mix(in srgb, #ff9500 34%, transparent);
-  background: color-mix(in srgb, #ff9500 8%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
 }
 
 .chat-empty.is-offline,
 .chat-empty.is-circuit {
   border-style: solid;
-  border-color: color-mix(in srgb, #ff9500 34%, transparent);
-  background: color-mix(in srgb, #ff9500 8%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
 }
 
 .chat-empty.is-not-set {
@@ -4116,19 +4117,19 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .chat-model-glance.is-online.is-no-model {
-  border-color: color-mix(in srgb, #ff9500 34%, transparent);
-  background: color-mix(in srgb, #ff9500 8%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
 }
 
 .chat-model-glance.is-offline {
-  border-color: color-mix(in srgb, #ff9500 32%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
   background: color-mix(in srgb, #ff9500 7%, transparent);
 }
 
 .chat-model-glance.is-offline.is-circuit {
-  border-color: color-mix(in srgb, #ff9500 40%, transparent);
-  background: color-mix(in srgb, #ff9500 10%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
   color: color-mix(in srgb, #ff9500 52%, currentColor);
 }
 
@@ -4384,27 +4385,28 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Soft alert (Monitors Slow / Down soft 7%/30% parity). */
 .chat-offline-attention-glance.is-offline {
-  border-color: color-mix(in srgb, #ff9500 34%, transparent);
-  background: color-mix(in srgb, #ff9500 8%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
 }
 
 .chat-offline-attention-glance.is-circuit {
-  border-color: color-mix(in srgb, #ff9500 40%, transparent);
-  background: color-mix(in srgb, #ff9500 10%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
   color: color-mix(in srgb, #ff9500 52%, currentColor);
 }
 
 .chat-offline-attention-glance.is-no-model {
-  border-color: color-mix(in srgb, #ff9500 34%, transparent);
-  background: color-mix(in srgb, #ff9500 8%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
 }
 
 .chat-offline-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
@@ -4434,8 +4436,8 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .chat-offline-attention-glance.is-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
