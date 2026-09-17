@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1119
+
+- Disk Cleanup Big filter attention soft parity: Disk · Big glance soft alert at 7% / 30% border — Monitors Slow. Louder 8%/34% tint removed; Reclaim stays slightly softer; Clean stays green.
+
 ## Overnight merge — v0.1.1118
 
 - Ops Slow/Fail filter attention soft parity: Slow / Fail glances soft alert at 7% / 30% border — Monitors Slow / Down. Louder 8%/34% tint removed; still amber/red vs calm greens.

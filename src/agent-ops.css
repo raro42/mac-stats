@@ -3772,10 +3772,11 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 45%, currentColor);
 }
 
+/* Big — soft alert (Monitors Slow soft 7%/30% parity). */
 .disk-cleanup-filter-attention-glance.is-big-filter {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .disk-cleanup-filter-attention-glance.is-clean-filter {
