@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1135] - 2026-09-17
+
+### Changed
+- **Ops Redmine/Ollama/Brave/Browser soft parity** — Agent Ops Redmine / Ollama / Brave / Browser Not-set / warn / bad attention glances use the same soft alert wash as Discord Offline / Reconnect (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1134] - 2026-09-17
 
 ### Changed

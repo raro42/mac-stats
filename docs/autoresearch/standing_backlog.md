@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1135
+
+- Ops Redmine/Ollama/Brave/Browser soft parity: Not-set / warn / bad attention glances soft alert at 7% / 30% border — Discord Offline / Reconnect. Louder 8%/34% tint removed.
+
 ## Overnight merge — v0.1.1134
 
 - Ops Digest open soft parity: Digest open attention glance soft alert at 7% / 30% border — Monitors Slow / Discord Reconnect. Louder 8%/34% tint removed.
