@@ -4292,10 +4292,11 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
+/* Last-answer errors — soft alert (Monitors Down / Debug Log soft 7%/30% parity). */
 .chat-answer-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .chat-answer-glance.is-just-copied {
@@ -4341,10 +4342,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Errors glance — soft alert (Monitors Down / last-answer has-errors soft 7%/30% parity). */
 .chat-errors-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* AI Chat — Offline / No-model / Ready / Continue attention glance (Errors parity; expanded) */

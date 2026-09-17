@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1138] - 2026-09-17
+
+### Changed
+- **AI Chat Errors / last-answer has-errors soft parity** — AI Chat Errors glance and last-answer has-errors wash use the same soft alert as Monitors Down / Debug Log (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1137] - 2026-09-17
 
 ### Changed
