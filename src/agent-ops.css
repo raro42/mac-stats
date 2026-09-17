@@ -5808,16 +5808,17 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Offline / Reconnect — soft alert (Monitors Down / Slow soft 7%/30% parity). */
 .ops-discord-attention-glance.has-offline {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .ops-discord-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 /* Agent Ops — Redmine Not set/Degraded/Unavailable attention glance (Discord Offline parity) */

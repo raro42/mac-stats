@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1133
+
+- Ops Discord Offline/Reconnect soft parity: Offline / Reconnect attention glances soft alert at 7% / 30% border — Monitors Down / Slow. Louder 8%/34% tint removed.
+
 ## Overnight merge — v0.1.1132
 
 - Perplexity panel has-error soft parity: error attention glance + last-search has-error soft alert at 7% / 30% border — Monitors Down / Key-not-set. Louder 8%/34% (last-glance 8%/35%) tint removed.
