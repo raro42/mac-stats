@@ -7199,9 +7199,10 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
 }
 
+/* Reclaimable now — soft alert (Monitors Slow / Big attention soft 7%/30% parity). */
 .disk-cleanup-meta-card.has-reclaim {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
 }
 
 .disk-cleanup-meta-card.has-reclaim .disk-cleanup-meta-value {
@@ -7258,10 +7259,10 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
 }
 
-/* Next automatic run — amber when due (Reclaimable has-reclaim parity). */
+/* Next automatic run — amber when due (Reclaimable has-reclaim soft 7%/30% parity). */
 .disk-cleanup-meta-card.has-due {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
 }
 
 .disk-cleanup-meta-card.is-action.has-due:focus-visible {

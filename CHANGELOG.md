@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1125] - 2026-09-17
+
+### Changed
+- **Disk Cleanup reclaim soft parity** — Reclaimable now + Next run due meta-cards use the same soft alert wash as Monitors Slow / Big attention (7% fill, 30% border). Louder 8%/34% tint removed; attention reclaim glances stay slightly softer.
+
 ## [0.1.1124] - 2026-09-17
 
 ### Changed
