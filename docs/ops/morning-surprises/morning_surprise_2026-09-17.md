@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Debug Log has-errors soft parity (then leftovers).
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1137** | Debug Log has-errors soft parity — Error attention + collapsed error glances soft alert at 7% / 30% border (Monitors Down); louder 8%/34% tint removed |
 | **v0.1.1136** | Ops MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal soft parity — Not-set / warn / bad attention glances soft alert at 7% / 30% border (Discord Offline / Reconnect); louder 8%/34% tint removed |
 | **v0.1.1135** | Ops Redmine/Ollama/Brave/Browser soft parity — Not-set / warn / bad attention glances soft alert at 7% / 30% border (Discord Offline / Reconnect); louder 8%/34% tint removed |
 | **v0.1.1134** | Ops Digest open soft parity — Digest open attention glance soft alert at 7% / 30% border (Monitors Slow / Discord Reconnect); louder 8%/34% tint removed |
@@ -31,10 +32,10 @@ Overnight Track B (20:00–06:00 local). Digester open empty. Design review not 
 
 ## Why it matters
 
-MCP / Cursor / Perplexity / Mastodon / Telegram / Slack / Signal feature-health glances now match Discord Offline / Reconnect soft washes (7% fill, 30% border) — less shouty when a key is missing or a service is degraded, still clearly actionable.
+Debug Log Error glances now match Monitors Down soft washes (7% fill, 30% border) — less shouty when the log has errors, still clearly actionable.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: other louder attention washes still at 8%/34% or 10%/38% if any remain; or sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity leftovers: AI Chat Errors / last-answer has-errors, Ollama collapsed has-errors, Settings Signal not-wired still at 8%/34%; or sibling Hermes/OpenClaw ports with clear user fitness
