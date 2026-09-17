@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1122] - 2026-09-17
+
+### Changed
+- **Monitors Down/Slow attention soft parity** — External / Monitors Down · N / Slow · N attention glances use the same soft alert wash as Down/Slow filter chips (7% fill, 30% border). Louder 8%/34% tint removed; still red/amber vs calm greens.
+
 ## [0.1.1121] - 2026-09-17
 
 ### Changed
