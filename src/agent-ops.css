@@ -6068,17 +6068,18 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-mcp-attention-glance.has-not-set,
 .ops-mcp-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-mcp-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Cursor agent Not set/Unavailable/Degraded attention glance (feature_health parity) */
@@ -6119,17 +6120,18 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-cursor-attention-glance.has-not-set,
 .ops-cursor-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-cursor-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Perplexity Search Not set/Unavailable/Degraded attention glance (feature_health parity) */
@@ -6170,17 +6172,18 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-perplexity-attention-glance.has-not-set,
 .ops-perplexity-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-perplexity-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Mastodon Not set/Partial attention glance (feature_health parity) */
@@ -6221,18 +6224,19 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-mastodon-attention-glance.has-not-set,
 .ops-mastodon-attention-glance.has-partial,
 .ops-mastodon-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-mastodon-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Telegram Not set/Partial attention glance (feature_health parity) */
@@ -6273,18 +6277,19 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-telegram-attention-glance.has-not-set,
 .ops-telegram-attention-glance.has-partial,
 .ops-telegram-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-telegram-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Slack Not set/Partial attention glance (feature_health parity) */
@@ -6325,18 +6330,19 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-slack-attention-glance.has-not-set,
 .ops-slack-attention-glance.has-partial,
 .ops-slack-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-slack-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops — Signal Not wired/Partial attention glance (feature_health parity) */
@@ -6377,19 +6383,20 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Not-set / warn / bad — soft alert (Discord Offline/Reconnect soft 7%/30% parity). */
 .ops-signal-attention-glance.has-not-wired,
 .ops-signal-attention-glance.has-not-set,
 .ops-signal-attention-glance.has-partial,
 .ops-signal-attention-glance.has-warn {
-  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  color: color-mix(in srgb, #ff9f0a 50%, currentColor);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  color: color-mix(in srgb, #ff9f0a 48%, currentColor);
 }
 
 .ops-signal-attention-glance.has-bad {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Agent Ops Runs — All · Instant · Direct · Slow · Fail (Monitors Slow / AI Chat Errors parity) */

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1136] - 2026-09-17
+
+### Changed
+- Ops MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal soft parity: Not-set / warn / bad attention glances soft alert at 7% / 30% border — Discord Offline / Reconnect. Louder 8%/34% tint removed.
+
+
 ## [0.1.1135] - 2026-09-17
 
 ### Changed
