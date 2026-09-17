@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Disk Cleanup periodic-off soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Disk Cleanup last-run has-skip soft parity.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1127** | Disk Cleanup last-run has-skip soft parity — Last run panel with skips soft alert at 7% / 30% border (Monitors Slow / reclaim); louder 10%/28% tint removed; clean last-run green stays soft |
 | **v0.1.1126** | Disk Cleanup periodic-off soft parity — Runs when meta-card soft accent at 7% / 28% border (Ops Off / Files / Deliveries / Discord); louder 8%/34% cyan tint removed; Enabled scopes-off already soft |
 | **v0.1.1125** | Disk Cleanup reclaim soft parity — Reclaimable now + Next run due meta-cards soft alert at 7% / 30% border (Monitors Slow / Big); louder 8%/34% tint removed; attention reclaim glances stay slightly softer |
 | **v0.1.1124** | Ops Runs has-fail/has-slow soft parity — Fail · N / Slow · N attention glances soft alert at 7% / 30% border (Fail/Slow filter); louder 8%/34% tint removed |
@@ -23,10 +24,10 @@ Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same
 
 ## Why it matters
 
-When periodic Disk Cleanup is off, the Runs when meta-card now matches Ops accent soft washes (7% fill, 28% border) — less shouty cyan beside calm greens, still clearly “periodic off.”
+When a Disk Cleanup last run had skips, the Last run panel now matches Monitors Slow / reclaim soft washes (7% fill, 30% border) — less shouty amber beside calm greens, still clearly “had skips.”
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Next calm: Disk Cleanup last-run has-skip soft parity (10%→7%) if desired; sibling Hermes/OpenClaw ports with clear user fitness
+- Next calm: sibling Hermes/OpenClaw ports with clear user fitness; or soft-parity leftovers if any louder washes remain
