@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1124] - 2026-09-17
+
+### Changed
+- **Ops Runs has-fail/has-slow soft parity** — Agent Ops Runs Fail · N / Slow · N attention glances use the same soft alert wash as Fail/Slow filter chips (7% fill, 30% border). Louder 8%/34% tint removed; still red/amber vs calm greens.
+
 ## [0.1.1123] - 2026-09-17
 
 ### Changed
