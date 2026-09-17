@@ -6553,13 +6553,14 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 36%, transparent);
 }
 
+/* Slow list row — soft alert (Runs has-slow / Slow filter soft 7%/30% parity). */
 #ops-runs-list .ops-row.is-slow:not(.is-selected) {
-  background: color-mix(in srgb, #ff9f0a 8%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 22%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
 }
 
 #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
-  background: color-mix(in srgb, #ff9f0a 12%, transparent);
+  background: color-mix(in srgb, #ff9f0a 10%, transparent);
   border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
 }
 
@@ -6577,13 +6578,14 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff3b30 40%, transparent);
 }
 
+/* Fail list row — soft alert (Runs has-fail / Fail filter soft 7%/30% parity). */
 #ops-runs-list .ops-row.is-fail:not(.is-selected) {
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  border-color: color-mix(in srgb, #ff3b30 22%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
 }
 
 #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
-  background: color-mix(in srgb, #ff3b30 12%, transparent);
+  background: color-mix(in srgb, #ff3b30 10%, transparent);
   border-color: color-mix(in srgb, #ff3b30 28%, transparent);
 }
 

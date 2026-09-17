@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1141] - 2026-09-18
+
+### Changed
+- **Ops Runs Fail/Slow list-row soft parity** — Fail and Slow run list rows use the same soft alert as Runs has-fail / has-slow glances (7% fill, 30% border). Louder 8%/22% tint removed.
+
 ## [0.1.1140] - 2026-09-18
 
 ### Changed
