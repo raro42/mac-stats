@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Settings product attention soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → AI Chat offline/no-model soft parity.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1129** | AI Chat offline/no-model soft parity — empty offline / no-model / circuit panes, model glance, and Offline · No model · Errors · Not-set attention soft alert at 7% / 30% border (Monitors Slow / Down); louder 8%/34% (circuit 10%/40%) tint removed |
 | **v0.1.1128** | Settings product attention soft parity — AI Off / Compact On / Judge Off / Downloads Off / Ori Off / Having-fun Off / Voice STT Off glances soft alert at 7% / 30% border (Monitors Slow / Help open soft); louder 10%/38% tint removed |
 | **v0.1.1127** | Disk Cleanup last-run has-skip soft parity — Last run panel with skips soft alert at 7% / 30% border (Monitors Slow / reclaim); louder 10%/28% tint removed; clean last-run green stays soft |
 | **v0.1.1126** | Disk Cleanup periodic-off soft parity — Runs when meta-card soft accent at 7% / 28% border (Ops Off / Files / Deliveries / Discord); louder 8%/34% cyan tint removed; Enabled scopes-off already soft |
@@ -25,10 +26,10 @@ Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same
 
 ## Why it matters
 
-Settings product Off (and Compact On) glances now match Monitors Slow / Help open soft washes (7% fill, 30% border) — less shouty amber beside calm greens, still clearly “off / compact.”
+AI Chat offline / no-model / errors glances now match Monitors Slow / Down soft washes (7% fill, 30% border) — less shouty amber/red beside calm greens, still clearly “needs attention.”
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: chat offline/no-model / errors attention (8%/34%); Settings key not-set (8%/34%); Ops Discord/Redmine warn glances; or sibling Hermes/OpenClaw ports with clear user fitness
+- Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
+- Soft-parity leftovers: Settings key not-set (8%/34%); Ops Discord/Redmine warn glances; Perplexity key-not-set; or sibling Hermes/OpenClaw ports with clear user fitness
