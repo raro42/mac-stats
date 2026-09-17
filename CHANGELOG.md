@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1132] - 2026-09-17
+
+### Changed
+- **Perplexity panel has-error soft parity** — Perplexity error attention glance and last-search has-error wash use the same soft alert as Monitors Down / Key-not-set (7% fill, 30% border). Louder 8%/34% (last-glance 8%/35%) tint removed.
+
 ## [0.1.1131] - 2026-09-17
 
 ### Changed
