@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Perplexity panel key-not-set soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Perplexity panel has-error soft parity.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1132** | Perplexity panel has-error soft parity — error attention glance + last-search has-error soft alert at 7% / 30% border (Monitors Down / Key-not-set); louder 8%/34% (last-glance 8%/35%) tint removed |
 | **v0.1.1131** | Perplexity panel key-not-set soft parity — Key-not-set attention glance soft alert at 7% / 30% border (Monitors Down / Settings credentials Not-set); louder 8%/34% tint removed |
 | **v0.1.1130** | Settings credentials key-not-set soft parity — Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack not-set (and partial) glances soft alert at 7% / 30% border (Monitors Down / Chat Offline Not-set); louder 8%/34% tint removed |
 | **v0.1.1129** | AI Chat offline/no-model soft parity — empty offline / no-model / circuit panes, model glance, and Offline · No model · Errors · Not-set attention soft alert at 7% / 30% border (Monitors Slow / Down); louder 8%/34% (circuit 10%/40%) tint removed |
@@ -28,10 +29,10 @@ Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same
 
 ## Why it matters
 
-Perplexity panel Key-not-set now matches Settings credentials / Monitors Down soft washes (7% fill, 30% border) — less shouty red beside calm greens, still clearly “needs a key.”
+Perplexity search errors now match Key-not-set / Monitors Down soft washes (7% fill, 30% border) — less shouty red when a search fails, still clearly wrong.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: Perplexity panel has-error glance (8%/34%); Ops Discord/Redmine/Ollama/Brave warn-bad glances; or sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity leftovers: Ops Discord/Redmine/Ollama/Brave warn-bad glances (8%/34%); or sibling Hermes/OpenClaw ports with clear user fitness
