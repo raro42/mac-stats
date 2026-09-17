@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1121] - 2026-09-17
+
+### Changed
+- **Disk Cleanup has-big attention soft parity** — Disk · Big attention glance (large reclaimable files) uses the same soft alert wash as Monitors Slow / Big filter (7% fill, 30% border). Louder 8%/34% tint removed; reclaim stays slightly softer.
+
 ## [0.1.1120] - 2026-09-17
 
 ### Changed
