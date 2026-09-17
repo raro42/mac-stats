@@ -4061,10 +4061,11 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
 }
 
+/* Collapsed has-errors — soft alert (AI Chat Errors / Monitors Down soft 7%/30% parity). */
 .ollama-collapsed-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .ollama-collapsed-glance.is-empty {
@@ -9121,10 +9122,11 @@ button.is-just-saved,
   outline-offset: 2px;
 }
 
+/* Signal not-wired — soft alert (Credentials Not-set / Monitors Down soft 7%/30% parity). */
 .settings-signal-attention-glance.is-not-wired {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 /* Settings Product — AI Off attention glance (Judge / Voice STT parity) */

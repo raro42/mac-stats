@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1139] - 2026-09-18
+
+### Changed
+- **Ollama collapsed has-errors + Settings Signal not-wired soft parity** — Collapsed AI Chat has-errors glance and Settings Signal not-wired glance use the same soft alert as Monitors Down / AI Chat Errors (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1138] - 2026-09-17
 
 ### Changed
