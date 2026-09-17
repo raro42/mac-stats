@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1128] - 2026-09-17
+
+### Changed
+- **Settings product attention soft parity** — AI Off / Compact On / Judge Off / Downloads Off / Ori Off / Having-fun Off / Voice STT Off glances use the same soft alert wash as Monitors Slow / Help open soft (7% fill, 30% border). Louder 10%/38% tint removed.
+
 ## [0.1.1127] - 2026-09-17
 
 ### Changed

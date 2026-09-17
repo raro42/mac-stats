@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1128
+
+- Settings product attention soft parity: AI Off / Compact On / Judge Off / Downloads Off / Ori Off / Having-fun Off / Voice STT Off soft alert at 7% / 30% border — Monitors Slow / Help open soft. Louder 10%/38% tint removed.
+
 ## Overnight merge — v0.1.1127
 
 - Disk Cleanup last-run has-skip soft parity: Last run panel soft alert at 7% / 30% border — Monitors Slow / reclaim. Louder 10%/28% tint removed; clean last-run green stays soft.
