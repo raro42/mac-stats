@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1127] - 2026-09-17
+
+### Changed
+- **Disk Cleanup last-run has-skip soft parity** — Last run panel with skipped files uses the same soft alert wash as Monitors Slow / reclaim (7% fill, 30% border). Louder 10%/28% tint removed; clean last-run green stays soft.
+
 ## [0.1.1126] - 2026-09-17
 
 ### Changed

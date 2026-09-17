@@ -7560,9 +7560,10 @@ button.monitor-detail-url.is-just-saved {
   border-color: color-mix(in srgb, currentColor 18%, transparent);
 }
 
+/* Last run has-skip — soft alert (Monitors Slow / reclaim soft 7%/30% parity). */
 .disk-cleanup-last.is-action.has-skip {
-  background: color-mix(in srgb, #ff9f0a 10%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
 }
 
 .disk-cleanup-last.is-action.has-skip:focus-visible {
