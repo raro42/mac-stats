@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1140] - 2026-09-18
+
+### Changed
+- **Disk Cleanup Big list-row soft parity** — Big reclaim list rows use the same soft alert as Big attention / Monitors Slow (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1139] - 2026-09-18
 
 ### Changed

@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1140
+
+- Disk Cleanup Big list-row soft parity: Big reclaim list rows soft alert at 7% / 30% border — Big attention / Monitors Slow. Louder 8%/34% tint removed.
+
 ## Overnight merge — v0.1.1139
 
 - Ollama collapsed has-errors + Settings Signal not-wired soft parity: collapsed has-errors + Signal not-wired soft alert at 7% / 30% border — Monitors Down / AI Chat Errors. Louder 8%/34% tint removed.

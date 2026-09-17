@@ -7456,9 +7456,10 @@ button.monitor-detail-url.is-just-saved {
     0 0 0 3px color-mix(in srgb, #ff9f0a 18%, transparent);
 }
 
+/* Big list row — soft alert (Big attention / Monitors Slow soft 7%/30% parity). */
 .disk-cleanup-item.has-reclaim.is-big {
-  border-color: color-mix(in srgb, #ff453a 34%, transparent);
-  background: color-mix(in srgb, #ff453a 8%, transparent);
+  border-color: color-mix(in srgb, #ff453a 30%, transparent);
+  background: color-mix(in srgb, #ff453a 7%, transparent);
   box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, transparent);
 }
 
