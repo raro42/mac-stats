@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops Digest open soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops Redmine/Ollama/Brave/Browser soft parity.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1135** | Ops Redmine/Ollama/Brave/Browser soft parity — Not-set / warn / bad attention glances soft alert at 7% / 30% border (Discord Offline / Reconnect); louder 8%/34% tint removed |
 | **v0.1.1134** | Ops Digest open soft parity — Digest open attention glance soft alert at 7% / 30% border (Monitors Slow / Discord Reconnect); louder 8%/34% tint removed |
 | **v0.1.1133** | Ops Discord Offline/Reconnect soft parity — Offline / Reconnect attention glances soft alert at 7% / 30% border (Monitors Down / Slow); louder 8%/34% tint removed |
 | **v0.1.1132** | Perplexity panel has-error soft parity — error attention glance + last-search has-error soft alert at 7% / 30% border (Monitors Down / Key-not-set); louder 8%/34% (last-glance 8%/35%) tint removed |
@@ -31,10 +32,10 @@ Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same
 
 ## Why it matters
 
-Digest open glances now match Monitors Slow / Discord Reconnect soft washes (7% fill, 30% border) — less shouty when digester has work, still clearly actionable.
+Redmine / Ollama / Brave / Browser feature-health glances now match Discord Offline / Reconnect soft washes (7% fill, 30% border) — less shouty when a key is missing or a service is degraded, still clearly actionable.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: Redmine/Ollama/Brave/Browser (and MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal) warn-bad glances (8%/34%); or sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity leftovers: MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal Ops warn-bad glances (8%/34%); or sibling Hermes/OpenClaw ports with clear user fitness
