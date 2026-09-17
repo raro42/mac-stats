@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1131
+
+- Perplexity panel key-not-set soft parity: Key-not-set attention glance soft alert at 7% / 30% border — Monitors Down / Settings credentials Not-set. Louder 8%/34% tint removed.
+
 ## Overnight merge — v0.1.1130
 
 - Settings credentials key-not-set soft parity: Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack not-set (and partial) glances soft alert at 7% / 30% border — Monitors Down / Chat Offline Not-set. Louder 8%/34% tint removed.

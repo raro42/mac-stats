@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1131] - 2026-09-17
+
+### Changed
+- **Perplexity panel key-not-set soft parity** — Perplexity Key-not-set attention glance uses the same soft alert wash as Monitors Down / Settings credentials Not-set (7% fill, 30% border). Louder 8%/34% tint removed.
+
 ## [0.1.1130] - 2026-09-17
 
 ### Changed
