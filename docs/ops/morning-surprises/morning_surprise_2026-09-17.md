@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops Runs has-fail/has-slow soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Disk Cleanup reclaim soft parity.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1125** | Disk Cleanup reclaim soft parity — Reclaimable now + Next run due meta-cards soft alert at 7% / 30% border (Monitors Slow / Big); louder 8%/34% tint removed; attention reclaim glances stay slightly softer |
 | **v0.1.1124** | Ops Runs has-fail/has-slow soft parity — Fail · N / Slow · N attention glances soft alert at 7% / 30% border (Fail/Slow filter); louder 8%/34% tint removed |
 | **v0.1.1123** | Monitors summary/collapsed has-down soft parity — summary + collapsed Down glances soft alert at 7% / 30% border (Down attention / Down filter); louder 8%/34% tint removed |
 | **v0.1.1122** | Monitors Down/Slow attention soft parity — Down · N / Slow · N glances soft alert at 7% / 30% border (Down/Slow filter); louder 8%/34% tint removed |
@@ -21,10 +22,10 @@ Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same
 
 ## Why it matters
 
-When Runs show Fail or Slow, the Agent Ops Runs attention glance now matches the Fail/Slow filter soft alert (7% fill, 30% border) — less shouty beside calm greens, still clearly red/amber.
+When Disk Cleanup shows reclaimable space (or a due next run), the Reclaimable now / Next run meta-cards now match Monitors Slow / Big soft alert (7% fill, 30% border) — less shouty beside calm greens, still clearly amber.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Next calm: Disk Cleanup reclaim soft parity if desired; sibling Hermes/OpenClaw ports with clear user fitness
+- Next calm: Disk Cleanup periodic-off / scopes-off soft parity if desired; sibling Hermes/OpenClaw ports with clear user fitness
