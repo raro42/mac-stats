@@ -1785,10 +1785,11 @@ body {
   border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
   background: color-mix(in srgb, currentColor 4%, transparent);
 }
+/* Soft alert (Monitors Down / Perplexity has-error soft 7%/30% parity). */
 .perplexity-empty-error {
   color: #ff3b30;
-  border-color: color-mix(in srgb, #ff3b30 35%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
 .perplexity-result-item {
   padding: 10px 12px;
