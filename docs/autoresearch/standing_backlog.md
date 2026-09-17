@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1142
+
+- AI Chat error-bubble soft parity: Assistant error message bubbles soft alert at 7% / 30% border — Errors glance / Monitors Down. Louder 8%/28% tint removed.
+
 ## Overnight merge — v0.1.1141
 
 - Ops Runs Fail/Slow list-row soft parity: Fail and Slow run list rows soft alert at 7% / 30% border — Runs has-fail / has-slow. Louder 8%/22% tint removed.

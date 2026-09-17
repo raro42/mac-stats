@@ -4586,9 +4586,10 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff3b30 40%, transparent);
 }
 
+/* Error bubble — soft alert (Errors glance / Monitors Down soft 7%/30% parity). */
 .chat-message.assistant.is-error {
-  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
 
 .chat-filter-count {

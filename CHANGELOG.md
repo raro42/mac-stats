@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1142] - 2026-09-18
+
+### Changed
+- **AI Chat error-bubble soft parity** — Assistant error message bubbles use the same soft alert as Errors glance / Monitors Down (7% fill, 30% border). Louder 8%/28% tint removed.
+
 ## [0.1.1141] - 2026-09-18
 
 ### Changed
