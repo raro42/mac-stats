@@ -4700,10 +4700,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Error count — soft alert (Monitors Down soft 7%/30% parity). */
 .logs-attention-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .logs-attention-glance.has-warns-only {
@@ -4750,10 +4751,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+/* Error count — soft alert (Monitors Down / logs-attention soft 7%/30% parity). */
 .logs-error-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
-  background: color-mix(in srgb, #ff3b30 8%, transparent);
-  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .logs-error-glance.has-warns-only {
