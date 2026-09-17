@@ -7281,10 +7281,10 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
 }
 
-/* Runs when — soft wash when periodic cleanup is off */
+/* Runs when — soft accent when periodic cleanup is off (Ops accent soft 7%/28% parity). */
 .disk-cleanup-meta-card.has-periodic-off {
-  border-color: color-mix(in srgb, #64d2ff 34%, transparent);
-  background: color-mix(in srgb, #64d2ff 8%, transparent);
+  border-color: color-mix(in srgb, #64d2ff 28%, transparent);
+  background: color-mix(in srgb, #64d2ff 7%, transparent);
 }
 
 .disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {

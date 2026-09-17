@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1126
+
+- Disk Cleanup periodic-off soft parity: Runs when meta-card soft accent at 7% / 28% border — Ops Off / Files / Deliveries / Discord. Louder 8%/34% cyan tint removed; scopes-off already soft.
+
 ## Overnight merge — v0.1.1125
 
 - Disk Cleanup reclaim soft parity: Reclaimable now + Next run due meta-cards soft alert at 7% / 30% border — Monitors Slow / Big attention. Louder 8%/34% tint removed; attention reclaim glances stay slightly softer.
