@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-17
 
-Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops Redmine/Ollama/Brave/Browser soft parity.
+Overnight Track B (20:00–06:00 local). Digester open empty. Design review not due. Standing backlog / Next → Ops MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal soft parity.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
-|---------|------|
+| --- | --- |
+| **v0.1.1136** | Ops MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal soft parity — Not-set / warn / bad attention glances soft alert at 7% / 30% border (Discord Offline / Reconnect); louder 8%/34% tint removed |
 | **v0.1.1135** | Ops Redmine/Ollama/Brave/Browser soft parity — Not-set / warn / bad attention glances soft alert at 7% / 30% border (Discord Offline / Reconnect); louder 8%/34% tint removed |
 | **v0.1.1134** | Ops Digest open soft parity — Digest open attention glance soft alert at 7% / 30% border (Monitors Slow / Discord Reconnect); louder 8%/34% tint removed |
 | **v0.1.1133** | Ops Discord Offline/Reconnect soft parity — Offline / Reconnect attention glances soft alert at 7% / 30% border (Monitors Down / Slow); louder 8%/34% tint removed |
@@ -28,14 +29,12 @@ Overnight Track B (20:00–06:00 local). Digester open empty. Design review not 
 | **v0.1.1116** | Ops filter attention soft parity — On / Live / Jobs / Core / Instant / Lite / Direct glances soft green at 7% / 28% border (Ready / Monitors Up); louder 8%/34% tint removed |
 | **v0.1.1115** | Disk Cleanup due attention soft parity — Disk · Due glance soft green at 7% / 28% border (Ready calm / collapsed is-due); louder 8%/34% tint removed |
 
-Also continues from late 2026-09-16 evening keeps (v0.1.1105–1114) in the same overnight window.
-
 ## Why it matters
 
-Redmine / Ollama / Brave / Browser feature-health glances now match Discord Offline / Reconnect soft washes (7% fill, 30% border) — less shouty when a key is missing or a service is degraded, still clearly actionable.
+MCP / Cursor / Perplexity / Mastodon / Telegram / Slack / Signal feature-health glances now match Discord Offline / Reconnect soft washes (7% fill, 30% border) — less shouty when a key is missing or a service is degraded, still clearly actionable.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: MCP/Cursor/Perplexity/Mastodon/Telegram/Slack/Signal Ops warn-bad glances (8%/34%); or sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity leftovers: other louder attention washes still at 8%/34% or 10%/38% if any remain; or sibling Hermes/OpenClaw ports with clear user fitness
