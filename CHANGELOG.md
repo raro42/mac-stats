@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1145] - 2026-09-18
+
+### Changed
+- **Ops health/overview ok·warn·bad soft parity** — Agent Ops health cards and overview cards use the same soft washes as Ready calm / Runs Fail·Slow (ok 7%/28%, warn·bad 7%/30%). Louder ~16%/55% tint removed.
+
 ## [0.1.1144] - 2026-09-18
 
 ### Changed

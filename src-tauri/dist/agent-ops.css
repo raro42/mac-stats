@@ -486,19 +486,22 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
 }
 
+/* Soft ok (Ready calm / Monitors all-up 7%/28% parity). */
 .ops-health-card.ops-health-ok {
-  border-color: rgba(76, 175, 80, 0.45);
-  background: color-mix(in srgb, rgba(76, 175, 80, 0.14) 70%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
+/* Soft alert (Runs has-slow / Monitors Slow 7%/30% parity). */
 .ops-health-card.ops-health-warn {
-  border-color: rgba(255, 180, 0, 0.55);
-  background: color-mix(in srgb, rgba(255, 180, 0, 0.16) 75%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
 }
 
+/* Soft alert (Runs has-fail / Monitors Down 7%/30% parity). */
 .ops-health-card.ops-health-bad {
-  border-color: rgba(255, 80, 80, 0.55);
-  background: color-mix(in srgb, rgba(255, 80, 80, 0.16) 75%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
 
 /* Linked detail tab is active — accent ring keeps ok/warn/bad wash visible. */
@@ -721,20 +724,20 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
-/* Status wash (Schedules parity with health Next schedule / Last delivery). */
+/* Status wash — soft ok/warn/bad (health cards / Ready / Fail·Slow 7%/28–30% parity). */
 .ops-overview-card.ops-health-ok {
-  border-color: rgba(76, 175, 80, 0.45);
-  background: color-mix(in srgb, rgba(76, 175, 80, 0.14) 70%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
 .ops-overview-card.ops-health-warn {
-  border-color: rgba(255, 180, 0, 0.55);
-  background: color-mix(in srgb, rgba(255, 180, 0, 0.16) 75%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
 }
 
 .ops-overview-card.ops-health-bad {
-  border-color: rgba(255, 80, 80, 0.55);
-  background: color-mix(in srgb, rgba(255, 80, 80, 0.16) 75%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
 
 /* Active tab accent ring keeps ok/warn/bad wash visible. */
