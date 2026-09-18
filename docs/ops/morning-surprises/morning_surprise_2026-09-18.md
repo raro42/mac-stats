@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan closed changelog-error / monitors-empty error panes (were 8%/35%).
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity continued into Agent Ops health/overview cards (were ~16%/55%).
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1145** | Ops health/overview ok·warn·bad soft parity — health cards + overview cards soft ok at 7%/28% and warn·bad at 7%/30% (Ready calm / Runs Fail·Slow); louder ~16%/55% tint removed |
 | **v0.1.1144** | Changelog / Monitors empty-error soft parity — Changelog error pane + Monitors empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity empty-error); louder 8%/35% tint removed |
 | **v0.1.1143** | Perplexity empty-error soft parity — empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity has-error); louder 8%/35% tint removed |
 | **v0.1.1142** | AI Chat error-bubble soft parity — Assistant error message bubbles soft alert at 7% / 30% border (Errors glance / Monitors Down); louder 8%/28% tint removed |
@@ -25,10 +26,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Changelog and Monitors empty-error panes now match the soft alert wash (7% fill, 30% border) — error empty states no longer shout louder than Down glances.
+Agent Ops health and overview status cards now match the soft Ready / Fail·Slow washes — warn and bad no longer shout louder than attention glances.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity pane series largely closed; prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (filter-chip louder washes are intentional)
+- Design review when screens age past grace (feature-agent-ops ~2.3d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
+- Soft-parity series largely closed (panes + Ops health/overview); prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (filter-chip louder washes stay intentional)
