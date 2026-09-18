@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1161] - 2026-09-18
+
+### Changed
+- **RAM used instant** — “How much RAM is used?”, “how much memory”, and “is the RAM high” answer from the RAM chip (%, no LLM). “Why is the RAM high” stays with the agent.
+
 ## [0.1.1160] - 2026-09-18
 
 ### Changed

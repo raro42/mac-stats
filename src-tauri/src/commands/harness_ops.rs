@@ -49955,6 +49955,22 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "what's the memory"
             | "whats the memory"
             | "what is the memory"
+            | "ram usage"
+            | "memory usage"
+            | "how much ram"
+            | "how much ram is used"
+            | "how much ram used"
+            | "how much ram do i have"
+            | "ram used"
+            | "how much memory"
+            | "how much memory is used"
+            | "how much memory used"
+            | "how much memory do i have"
+            | "memory used"
+            | "is the ram high"
+            | "is ram high"
+            | "is the memory high"
+            | "is memory high"
     ) {
         return Some(StripChipAsk::Ram);
     }
@@ -57134,7 +57150,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot` stays with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low` stays with the agent)\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low` and `why is the ram high` stay with the agent)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
@@ -59693,7 +59709,17 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("charge left")
         || q.contains("is the battery low")
         || q.contains("is battery low")
-        || q == "low battery")
+        || q == "low battery"
+        || q.contains("how much ram")
+        || q.contains("how much memory")
+        || q.contains("ram used")
+        || q == "memory used"
+        || q.contains("ram usage")
+        || q.contains("memory usage")
+        || q.contains("is the ram high")
+        || q.contains("is ram high")
+        || q.contains("is the memory high")
+        || q.contains("is memory high"))
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("strip")
@@ -76282,6 +76308,20 @@ mod tests {
             Some(StripChipAsk::Battery)
         );
         assert!(parse_strip_chip_ask("why is the battery low").is_none());
+        assert_eq!(
+            parse_strip_chip_ask("how much ram is used?"),
+            Some(StripChipAsk::Ram)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("how much memory"),
+            Some(StripChipAsk::Ram)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("is the ram high"),
+            Some(StripChipAsk::Ram)
+        );
+        assert!(parse_strip_chip_ask("why is the ram high").is_none());
+        assert!(parse_strip_chip_ask("memory path").is_none());
         assert!(parse_strip_chip_ask("battery path").is_none());
         assert!(parse_strip_chip_ask("memory size").is_none());
         assert!(parse_strip_chip_ask("uptime age").is_none());
@@ -76304,6 +76344,10 @@ mod tests {
             .expect("battery left instant");
         assert!(left.to_lowercase().contains("bat"), "{left}");
         assert!(try_operator_instant_reply("why is the battery low").is_none());
+        let ram_used = try_operator_instant_reply("how much ram is used?")
+            .expect("ram used instant");
+        assert!(ram_used.to_lowercase().contains("ram"), "{ram_used}");
+        assert!(try_operator_instant_reply("why is the ram high").is_none());
         let open_ssd = try_operator_instant_reply("open ssd").expect("open ssd instant");
         assert!(open_ssd.to_lowercase().contains("ssd"), "{open_ssd}");
     }
