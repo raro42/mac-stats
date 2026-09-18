@@ -52121,6 +52121,32 @@ pub fn looks_like_ollama_ready_request(content: &str) -> bool {
             | "what model am i using"
             | "which model is configured"
             | "what model is configured"
+            | "ollama endpoint"
+            | "ollama url"
+            | "ollama host"
+            | "ollama address"
+            | "ollama server"
+            | "the ollama endpoint"
+            | "the ollama url"
+            | "the ollama host"
+            | "the ollama server"
+            | "llm endpoint"
+            | "llm url"
+            | "llm host"
+            | "where is ollama"
+            | "where's ollama"
+            | "wheres ollama"
+            | "where is the ollama"
+            | "where is the llm"
+            | "what is the ollama url"
+            | "what's the ollama url"
+            | "whats the ollama url"
+            | "what is the ollama endpoint"
+            | "what's the ollama endpoint"
+            | "whats the ollama endpoint"
+            | "what is the ollama host"
+            | "what's the ollama host"
+            | "whats the ollama host"
     )
 }
 
@@ -56843,7 +56869,7 @@ pub fn format_ops_help_gateway() -> String {
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` · `view status` · `see status` · `show me the status` · `open status` · `list the status` · `view health` · `open health` · `view version` · `open version` — one-screen health (exact open only; not ticket/status-of …)\n\
 • `/discord` · `view discord` · `see discord` · `show me the discord` · `open discord` · `list the discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
-• `/ollama` · `/llm` · `/model` · `which model` · `what model are you` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline, including the configured model name (menu-bar ✕ · AI Chat glance; circuit). Plural `which models` stays a model list, not this chip.\n\
+• `/ollama` · `/llm` · `/model` · `which model` · `what model are you` · `ollama url` · `ollama endpoint` · `where is ollama` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline, including the configured model name and endpoint (menu-bar ✕ · AI Chat glance; circuit). Plural `which models` stays a model list, not this chip. `set url` stays a config change.\n\
 • `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` · `view brave` · `see brave` · `show me the brave` · `open brave` · `list the brave` · `view brave search` · `open brave search` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` · `view perplexity key` · `see perplexity key` · `show me the perplexity key` · `open perplexity key` · `list the perplexity key` — Perplexity Ready / Not set (API key; no live probe; does not steal `/perplexity` last-search)\n\
@@ -59743,7 +59769,37 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "which model am i using"
         || q == "what model am i using"
         || q == "which model is configured"
-        || q == "what model is configured")
+        || q == "what model is configured"
+        || q == "ollama endpoint"
+        || q == "ollama url"
+        || q == "ollama host"
+        || q == "ollama address"
+        || q == "ollama server"
+        || q == "the ollama endpoint"
+        || q == "the ollama url"
+        || q == "the ollama host"
+        || q == "the ollama server"
+        || q == "llm endpoint"
+        || q == "llm url"
+        || q == "llm host"
+        || q == "where is ollama"
+        || q == "where is ollama?"
+        || q == "where's ollama"
+        || q == "where's ollama?"
+        || q == "wheres ollama"
+        || q == "where is the ollama"
+        || q == "where is the llm"
+        || q == "what is the ollama url"
+        || q == "what is the ollama url?"
+        || q == "what's the ollama url"
+        || q == "what's the ollama url?"
+        || q == "whats the ollama url"
+        || q == "what is the ollama endpoint"
+        || q == "what's the ollama endpoint"
+        || q == "whats the ollama endpoint"
+        || q == "what is the ollama host"
+        || q == "what's the ollama host"
+        || q == "whats the ollama host")
         && !q.contains("pull")
         && !q.contains("list model")
         && !q.contains("models")
@@ -62594,6 +62650,11 @@ mod tests {
             try_operator_instant_reply("which model are you?").expect("which model instant");
         assert!(which_model.to_lowercase().contains("ollama"), "{which_model}");
         assert!(try_operator_instant_reply("which models are installed").is_none());
+        let ollama_url =
+            try_operator_instant_reply("what's the ollama url?").expect("ollama url instant");
+        assert!(ollama_url.to_lowercase().contains("ollama"), "{ollama_url}");
+        assert!(try_operator_instant_reply("where is ollama").is_some());
+        assert!(try_operator_instant_reply("set the ollama url").is_none());
         assert!(try_operator_instant_reply("pull llama3").is_none());
         assert!(try_operator_instant_reply("chat with ollama about weather").is_none());
         let redmine = try_operator_instant_reply("/redmine").expect("redmine");
@@ -76431,6 +76492,12 @@ mod tests {
         assert!(looks_like_ollama_ready_request("what model are you using"));
         assert!(looks_like_ollama_ready_request("/model"));
         assert!(looks_like_ollama_ready_request("show me which model"));
+        assert!(looks_like_ollama_ready_request("what's the ollama url?"));
+        assert!(looks_like_ollama_ready_request("ollama endpoint"));
+        assert!(looks_like_ollama_ready_request("where is ollama"));
+        assert!(looks_like_ollama_ready_request("show me the ollama host"));
+        assert!(!looks_like_ollama_ready_request("set the ollama url"));
+        assert!(!looks_like_ollama_ready_request("ollama api"));
         assert!(!looks_like_ollama_ready_request("which models are installed"));
         assert!(!looks_like_ollama_ready_request("what models are available"));
         assert!(!looks_like_ollama_ready_request("change model"));

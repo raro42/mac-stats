@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1158] - 2026-09-18
+
+### Changed
+- **Ollama URL instant** — “What’s the Ollama URL?”, “ollama endpoint”, and “where is ollama” answer from the Ollama Ready chip (host + model, no LLM). “Set the Ollama URL” stays a config change. Plural “which models” still lists models.
+
 ## [0.1.1157] - 2026-09-18
 
 ### Changed
