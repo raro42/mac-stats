@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1144
+
+- Changelog / Monitors empty-error soft parity: Changelog error pane + Monitors empty-error pane soft alert at 7% / 30% border — Monitors Down / Perplexity empty-error. Louder 8%/35% tint removed.
+
 ## Overnight merge — v0.1.1143
 
 - Perplexity empty-error soft parity: empty-error pane soft alert at 7% / 30% border — Monitors Down / Perplexity has-error. Louder 8%/35% tint removed.

@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan found Perplexity empty-error still on louder 8%/35%.
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan closed changelog-error / monitors-empty error panes (were 8%/35%).
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1144** | Changelog / Monitors empty-error soft parity — Changelog error pane + Monitors empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity empty-error); louder 8%/35% tint removed |
 | **v0.1.1143** | Perplexity empty-error soft parity — empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity has-error); louder 8%/35% tint removed |
 | **v0.1.1142** | AI Chat error-bubble soft parity — Assistant error message bubbles soft alert at 7% / 30% border (Errors glance / Monitors Down); louder 8%/28% tint removed |
 | **v0.1.1141** | Ops Runs Fail/Slow list-row soft parity — Fail and Slow run rows soft alert at 7% / 30% border (Runs has-fail / has-slow); louder 8%/22% tint removed |
@@ -24,10 +25,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Perplexity empty-error panes now match the has-error glance wash (7% fill, 30% border) — the empty pane no longer shouts louder than the glance.
+Changelog and Monitors empty-error panes now match the soft alert wash (7% fill, 30% border) — error empty states no longer shout louder than Down glances.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity scan leftovers: changelog-error / monitors-empty error panes (8%/35%); sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity pane series largely closed; prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (filter-chip louder washes are intentional)
