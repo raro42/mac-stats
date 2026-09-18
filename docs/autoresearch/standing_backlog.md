@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1155
+
+- Futuristic theme sidebar icon status soft parity: section icon good / warning / bad soft ok at 7% / 28% border and soft alert at 7% / 30% border — apple Ready calm / Monitors Slow·Down. Louder ~12%/28% tint removed.
+
 ## Overnight merge — v0.1.1154
 
 - Agent Ops active selection soft parity: selected tab, count pill, and overview card wash at 7% / 28% border — Ready calm. Louder 12%/40% tint removed.

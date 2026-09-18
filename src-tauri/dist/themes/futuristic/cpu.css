@@ -1145,15 +1145,20 @@ body {
   filter: brightness(0) saturate(100%) invert(1) opacity(0.75);
 }
 
+/* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
   color: rgba(72, 210, 120, 0.85);
-  background: rgba(52, 199, 89, 0.12);
-  border-color: rgba(52, 199, 89, 0.28);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
   color: rgba(90, 220, 130, 0.95);
-  background: rgba(52, 199, 89, 0.18);
+  background: color-mix(in srgb, #34c759 10%, transparent);
+  border-color: color-mix(in srgb, #34c759 36%, transparent);
+  box-shadow: 0 3px 10px color-mix(in srgb, #34c759 10%, transparent);
+  transform: translateY(-1px);
 }
 
 .icon-line-item.status-good svg {
@@ -1171,15 +1176,18 @@ body {
   opacity: 1;
 }
 
+/* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
   color: rgba(255, 180, 70, 0.8);
-  background: rgba(255, 159, 10, 0.12);
-  border-color: rgba(255, 159, 10, 0.28);
+  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
   color: rgba(255, 190, 90, 0.95);
-  background: rgba(255, 159, 10, 0.18);
+  background: color-mix(in srgb, #ff9f0a 10%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 36%, transparent);
 }
 
 .icon-line-item.status-warning img {
@@ -1191,15 +1199,18 @@ body {
   opacity: 0.95;
 }
 
+/* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
   color: rgba(255, 100, 95, 0.85);
-  background: rgba(255, 69, 58, 0.12);
-  border-color: rgba(255, 69, 58, 0.28);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
   color: rgba(255, 120, 110, 0.95);
-  background: rgba(255, 69, 58, 0.18);
+  background: color-mix(in srgb, #ff3b30 10%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 36%, transparent);
 }
 
 .icon-line-item.status-bad svg {
