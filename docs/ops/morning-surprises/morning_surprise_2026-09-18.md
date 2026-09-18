@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity continued into Agent Ops health/overview cards (were ~16%/55%).
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity continued into sidebar section icons (were ~10%/22%).
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1146** | Sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (Ready calm / Monitors Slow·Down); louder ~10%/22% tint removed |
 | **v0.1.1145** | Ops health/overview ok·warn·bad soft parity — health cards + overview cards soft ok at 7%/28% and warn·bad at 7%/30% (Ready calm / Runs Fail·Slow); louder ~16%/55% tint removed |
 | **v0.1.1144** | Changelog / Monitors empty-error soft parity — Changelog error pane + Monitors empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity empty-error); louder 8%/35% tint removed |
 | **v0.1.1143** | Perplexity empty-error soft parity — empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity has-error); louder 8%/35% tint removed |
@@ -26,10 +27,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Agent Ops health and overview status cards now match the soft Ready / Fail·Slow washes — warn and bad no longer shout louder than attention glances.
+Sidebar section icons (Monitors / Ollama / Agent Ops / …) now match the soft Ready / Slow·Down washes — status no longer shouts louder than the attention glances beside them.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2.3d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity series largely closed (panes + Ops health/overview); prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (filter-chip louder washes stay intentional)
+- Soft-parity series largely closed (panes + Ops health/overview + sidebar icons); other themes still on older icon washes; prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (filter-chip louder washes stay intentional)
