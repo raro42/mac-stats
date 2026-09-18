@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1148] - 2026-09-18
+
+### Changed
+- **Swiss-minimalistic sidebar icon status soft parity** — Swiss-minimalistic section icon good / warning / bad washes match apple Ready calm / Monitors Slow·Down (ok 7%/28%, warn·bad 7%/30%). Louder ~10%/22% tint removed.
+
 ## [0.1.1147] - 2026-09-18
 
 ### Changed
