@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1163] - 2026-09-19
+
+### Changed
+- **CPU used instant** — “How much CPU is used?”, “is the CPU high”, and “is the CPU busy” answer from the CPU ring (%, no LLM). “Why is the CPU high” stays with the agent. “Hot processes” still lists hot processes.
+
 ## [0.1.1162] - 2026-09-19
 
 ### Changed
