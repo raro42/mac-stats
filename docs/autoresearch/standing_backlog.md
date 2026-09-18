@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1147
+
+- Light theme sidebar icon status soft parity: section icon good / warning / bad soft ok at 7% / 28% border and soft alert at 7% / 30% border — apple Ready calm / Monitors Slow·Down. Louder ~10%/22% tint removed.
+
 ## Overnight merge — v0.1.1146
 
 - Sidebar icon status soft parity: section icon good / warning / bad soft ok at 7% / 28% border and soft alert at 7% / 30% border — Ready calm / Monitors Slow·Down. Louder ~10%/22% tint removed.
