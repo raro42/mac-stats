@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1159** | How-hot instant — “how hot is the CPU?”, “is the CPU hot”, and “how hot” answer from the Temp ring (°C, no LLM); “is the GPU hot” uses the GPU ring; “why is the CPU hot” stays with the agent |
 | **v0.1.1158** | Ollama URL instant — “what’s the ollama url?”, “ollama endpoint”, and “where is ollama” answer from the Ollama Ready chip (host + model, no LLM); “set the ollama url” stays a config change |
 | **v0.1.1157** | Which-model instant — “which model are you?” and `/model` answer from the Ollama Ready chip (model name, no LLM); plural “which models” still lists models |
 | **v0.1.1156** | CPU ring and sparkline Hot soft parity — hot metric cards and matching history charts at 7%/30% (Monitors Slow); Fair stays quieter; louder 12%/28% rest and 16%/44% pulse peak removed |
@@ -15,7 +16,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “what’s the Ollama URL?” and you get the configured host at once. The chat model does not have to look that up.
+Ask “how hot is the CPU?” and you get the temperature at once. The chat model does not have to look that up.
 
 ## Next
 
