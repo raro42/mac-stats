@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1150] - 2026-09-18
+
+### Changed
+- **Data-poster sidebar icon status soft parity** — Data-poster section icon good / warning / bad washes match apple Ready calm / Monitors Slow·Down (ok 7%/28%, warn·bad 7%/30%). Louder ~10%/22% tint removed.
+
 ## [0.1.1149] - 2026-09-18
 
 ### Changed
