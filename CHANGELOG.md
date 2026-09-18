@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1154] - 2026-09-18
+
+### Changed
+- **Agent Ops active selection soft parity** — Selected tab, count pill, and overview card wash match Ready calm (7%/28%). Louder 12%/40% tint removed.
+
 ## [0.1.1153] - 2026-09-18
 
 ### Changed

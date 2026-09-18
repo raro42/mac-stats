@@ -510,8 +510,8 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .ops-health-card.is-active.ops-health-clickable:hover {
@@ -719,9 +719,9 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 /* Linked detail tab is active (Agents / Schedules / Sessions / Memory). */
 .ops-overview-card.is-active {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  box-shadow: none;
 }
 
 /* Status wash — soft ok/warn/bad (health cards / Ready / Fail·Slow 7%/28–30% parity). */
@@ -748,9 +748,9 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-overview-card.is-active:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 13%, transparent);
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
 }
 
 .ops-overview-card.is-active.ops-health-ok:hover,
@@ -762,8 +762,8 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 .ops-overview-card.is-active .ops-overview-link {
   opacity: 1;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 40%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
 }
 
 .ops-overview-head {
@@ -816,7 +816,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .ops-overview-card.is-active .ops-overview-head-count {
   opacity: 1;
   color: var(--accent, #007aff);
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
 }
 
@@ -993,7 +993,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .ops-file-tab.active .ops-tab-count {
   opacity: 1;
   color: var(--accent, #007aff);
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
 }
 
@@ -1024,17 +1024,18 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
 }
 
+/* Soft selected tab (Ready calm 7%/28% parity — louder 12%/40% tint removed). */
 .agent-ops-tab.active, .ops-file-tab.active {
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 40%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  box-shadow: none;
   opacity: 1;
   font-weight: 600;
 }
 
 .agent-ops-tab.active:hover, .ops-file-tab.active:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
 }
 
 .agent-ops-panel {
