@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1157** | Which-model instant — “which model are you?” and `/model` answer from the Ollama Ready chip (model name, no LLM); plural “which models” still lists models |
 | **v0.1.1156** | CPU ring and sparkline Hot soft parity — hot metric cards and matching history charts at 7%/30% (Monitors Slow); Fair stays quieter; louder 12%/28% rest and 16%/44% pulse peak removed |
 | **v0.1.1155** | Futuristic theme sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (apple Ready calm / Monitors Slow·Down); louder ~12%/28% tint removed |
 | **v0.1.1154** | Agent Ops active selection soft parity — selected tab, count pill, and overview card wash at 7%/28% (Ready calm); louder 12%/40% tint removed |
@@ -13,10 +14,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Hot CPU, GPU, frequency, and temperature cards now use the same soft wash as Slow. Fair stays quieter. The hot pulse remains, but the old loud peak is gone.
+Ask “which model are you?” and you get the configured model at once. The chat model does not have to answer that itself.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Processes / Monitors; recapture AI Chat and Agent Ops when Screen Recording allows)
-- Ring and sparkline Hot wash is done. Prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness (icon-wash series is done)
+- Icon-wash series is done. Prefer digester / design-review / sibling ports with clear user fitness
