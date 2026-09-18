@@ -49265,6 +49265,17 @@ pub fn parse_ring_chip_ask(content: &str) -> Option<RingChipAsk> {
             | "is gpu hot"
             | "how hot is the gpu"
             | "how hot is gpu"
+            | "how much gpu"
+            | "how much gpu is used"
+            | "how much gpu used"
+            | "how much gpu do i have"
+            | "gpu used"
+            | "is the gpu high"
+            | "is gpu high"
+            | "is the gpu busy"
+            | "is gpu busy"
+            | "how busy is the gpu"
+            | "how busy is gpu"
     ) {
         return Some(RingChipAsk::Gpu);
     }
@@ -57199,7 +57210,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` · `view hot` · `see hot` · `show me the hot` · `open hot` · `list the hot` · `view pinned` · `see pinned` · `show me the pinned` · `open pinned` · `list the pinned` — Top Processes Hot/Pinned list (exact open only — not rings/strip/details Hot · not pinned path/size/age)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
-• `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot` and `why is the cpu high` stay with the agent)\n\
+• `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, and `why is the gpu high` stay with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, and `why is the disk full` stay with the agent)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
@@ -59636,7 +59647,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is the cpu busy")
         || q.contains("is cpu busy")
         || q.contains("how busy is the cpu")
-        || q.contains("how busy is cpu"))
+        || q.contains("how busy is cpu")
+        || q.contains("how much gpu")
+        || q.contains("gpu used")
+        || q.contains("is the gpu high")
+        || q.contains("is gpu high")
+        || q.contains("is the gpu busy")
+        || q.contains("is gpu busy")
+        || q.contains("how busy is the gpu")
+        || q.contains("how busy is gpu"))
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("ring")
@@ -76197,6 +76216,20 @@ mod tests {
             Some(RingChipAsk::Cpu)
         );
         assert!(parse_ring_chip_ask("why is the cpu high").is_none());
+        assert_eq!(
+            parse_ring_chip_ask("how much gpu is used?"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert_eq!(parse_ring_chip_ask("how much gpu"), Some(RingChipAsk::Gpu));
+        assert_eq!(
+            parse_ring_chip_ask("is the gpu high"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert_eq!(
+            parse_ring_chip_ask("is the gpu busy"),
+            Some(RingChipAsk::Gpu)
+        );
+        assert!(parse_ring_chip_ask("why is the gpu high").is_none());
         let how_hot =
             try_operator_instant_reply("how hot is the cpu?").expect("how hot instant");
         assert!(how_hot.to_lowercase().contains("temp"), "{how_hot}");
@@ -76207,6 +76240,10 @@ mod tests {
         let gpu_hot =
             try_operator_instant_reply("is the gpu hot").expect("gpu hot instant");
         assert!(gpu_hot.to_lowercase().contains("gpu"), "{gpu_hot}");
+        let gpu_used = try_operator_instant_reply("how much gpu is used?")
+            .expect("gpu used instant");
+        assert!(gpu_used.to_lowercase().contains("gpu"), "{gpu_used}");
+        assert!(try_operator_instant_reply("why is the gpu high").is_none());
         assert!(try_operator_instant_reply("why is the cpu hot").is_none());
         assert!(try_operator_instant_reply("hot processes").is_some());
     }

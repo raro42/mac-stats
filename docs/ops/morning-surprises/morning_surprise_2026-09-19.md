@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1164** | GPU-used instant — “how much GPU is used?”, “is the GPU high”, and “is the GPU busy” answer from the GPU ring (%, no LLM); “why is the GPU high” stays with the agent; “is the GPU hot” still uses the GPU ring |
 | **v0.1.1163** | CPU-used instant — “how much CPU is used?”, “is the CPU high”, and “is the CPU busy” answer from the CPU ring (%, no LLM); “why is the CPU high” stays with the agent; “hot processes” still lists hot processes |
 | **v0.1.1162** | Disk-used instant — “how much disk is used?”, “how much storage”, and “is the disk full” answer from the SSD chip (%, no LLM); “why is the disk full” stays with the agent; Disk Cleanup stays on `/disk` |
 | **v0.1.1161** | RAM-used instant — “how much RAM is used?”, “how much memory”, and “is the RAM high” answer from the RAM chip (%, no LLM); “why is the RAM high” stays with the agent |
@@ -20,7 +21,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “how much CPU is used?” and you get the percent at once. The chat model does not have to look that up.
+Ask “how much GPU is used?” and you get the percent at once. The chat model does not have to look that up.
 
 ## Next
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1164] - 2026-09-19
+
+### Changed
+- **GPU used instant** — “How much GPU is used?”, “is the GPU high”, and “is the GPU busy” answer from the GPU ring (%, no LLM). “Why is the GPU high” stays with the agent. “Is the GPU hot” still uses the GPU ring.
+
 ## [0.1.1163] - 2026-09-19
 
 ### Changed
