@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1165] - 2026-09-19
+
+### Changed
+- **Clock speed instant** — “How fast is the CPU?”, “clock speed”, and “is the frequency high” answer from the Freq ring (GHz, no LLM). “Why is the frequency high” stays with the agent. “How much CPU” still uses the CPU ring.
+
 ## [0.1.1164] - 2026-09-19
 
 ### Changed
