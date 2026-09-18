@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1159] - 2026-09-18
+
+### Changed
+- **How-hot instant** — “How hot is the CPU?”, “is the CPU hot”, and “how hot” answer from the Temp ring (°C, no LLM). “Is the GPU hot” uses the GPU ring. “Why is the CPU hot” stays with the agent. “Hot processes” still lists hot processes.
+
 ## [0.1.1158] - 2026-09-18
 
 ### Changed
