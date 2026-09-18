@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1144] - 2026-09-18
+
+### Changed
+- **Changelog / Monitors empty-error soft parity** — Changelog error pane and Monitors empty-error pane use the same soft alert as Monitors Down / Perplexity empty-error (7% fill, 30% border). Louder 8%/35% tint removed.
+
 ## [0.1.1143] - 2026-09-18
 
 ### Changed
