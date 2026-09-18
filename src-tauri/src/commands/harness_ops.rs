@@ -52102,6 +52102,25 @@ pub fn looks_like_ollama_ready_request(content: &str) -> bool {
             | "hows the llm"
             | "how's ollama doing"
             | "hows ollama doing"
+            | "/model"
+            | "which model"
+            | "what model"
+            | "current model"
+            | "your model"
+            | "model name"
+            | "ollama model"
+            | "which model are you"
+            | "what model are you"
+            | "which model are you using"
+            | "what model are you using"
+            | "which model are you running"
+            | "what model are you running"
+            | "which model are you running on"
+            | "what model are you running on"
+            | "which model am i using"
+            | "what model am i using"
+            | "which model is configured"
+            | "what model is configured"
     )
 }
 
@@ -56824,7 +56843,7 @@ pub fn format_ops_help_gateway() -> String {
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` · `view status` · `see status` · `show me the status` · `open status` · `list the status` · `view health` · `open health` · `view version` · `open version` — one-screen health (exact open only; not ticket/status-of …)\n\
 • `/discord` · `view discord` · `see discord` · `show me the discord` · `open discord` · `list the discord` — Discord Ready / Offline (Agent Ops glance; reconnect cues)\n\
-• `/ollama` · `/llm` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
+• `/ollama` · `/llm` · `/model` · `which model` · `what model are you` · `view ollama` · `see ollama` · `show me the ollama` · `open ollama` · `list the ollama` · `view llm` · `open llm` — Ollama Ready / Offline, including the configured model name (menu-bar ✕ · AI Chat glance; circuit). Plural `which models` stays a model list, not this chip.\n\
 • `/redmine` · `view redmine` · `see redmine` · `show me the redmine` · `open redmine` · `list the redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` · `view brave` · `see brave` · `show me the brave` · `open brave` · `list the brave` · `view brave search` · `open brave search` — Brave Search Ready / Not set (API key; no live probe)\n\
 • `/perplexity key` · `view perplexity key` · `see perplexity key` · `show me the perplexity key` · `open perplexity key` · `list the perplexity key` — Perplexity Ready / Not set (API key; no live probe; does not steal `/perplexity` last-search)\n\
@@ -59705,9 +59724,29 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "open llm"
         || q == "open the llm"
         || q == "the ollama"
-        || q == "the llm")
+        || q == "the llm"
+        || q == "/model"
+        || q == "which model"
+        || q == "what model"
+        || q == "current model"
+        || q == "your model"
+        || q == "model name"
+        || q == "ollama model"
+        || q == "which model are you"
+        || q == "what model are you"
+        || q == "which model are you using"
+        || q == "what model are you using"
+        || q == "which model are you running"
+        || q == "what model are you running"
+        || q == "which model are you running on"
+        || q == "what model are you running on"
+        || q == "which model am i using"
+        || q == "what model am i using"
+        || q == "which model is configured"
+        || q == "what model is configured")
         && !q.contains("pull")
         && !q.contains("list model")
+        && !q.contains("models")
         && !q.contains("chat with")
         && !q.contains("ask ollama")
         && !q.contains("install")
@@ -62551,6 +62590,10 @@ mod tests {
         assert!(ollama.to_lowercase().contains("ollama"), "{ollama}");
         assert!(try_operator_instant_reply("is ollama ready").is_some());
         assert!(try_operator_instant_reply("/llm").is_some());
+        let which_model =
+            try_operator_instant_reply("which model are you?").expect("which model instant");
+        assert!(which_model.to_lowercase().contains("ollama"), "{which_model}");
+        assert!(try_operator_instant_reply("which models are installed").is_none());
         assert!(try_operator_instant_reply("pull llama3").is_none());
         assert!(try_operator_instant_reply("chat with ollama about weather").is_none());
         let redmine = try_operator_instant_reply("/redmine").expect("redmine");
@@ -76384,6 +76427,13 @@ mod tests {
         assert!(!looks_like_ollama_ready_request("chat with ollama about weather"));
         assert!(!looks_like_ollama_ready_request("why is ollama offline"));
         assert!(!looks_like_ollama_ready_request("install ollama"));
+        assert!(looks_like_ollama_ready_request("which model are you?"));
+        assert!(looks_like_ollama_ready_request("what model are you using"));
+        assert!(looks_like_ollama_ready_request("/model"));
+        assert!(looks_like_ollama_ready_request("show me which model"));
+        assert!(!looks_like_ollama_ready_request("which models are installed"));
+        assert!(!looks_like_ollama_ready_request("what models are available"));
+        assert!(!looks_like_ollama_ready_request("change model"));
         let chip = format_ollama_ready_chip();
         assert!(chip.to_lowercase().contains("ollama"), "{chip}");
         let view_ol = try_operator_instant_reply("view ollama").expect("view ollama instant");
