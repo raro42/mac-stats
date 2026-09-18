@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1146] - 2026-09-18
+
+### Changed
+- **Sidebar icon status soft parity** — Section icon good / warning / bad washes match Ready calm / Monitors Slow·Down (ok 7%/28%, warn·bad 7%/30%). Louder ~10%/22% tint removed.
+
 ## [0.1.1145] - 2026-09-18
 
 ### Changed
