@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1160] - 2026-09-18
+
+### Changed
+- **Battery left instant** — “How much battery is left?”, “battery left”, and “is the battery low” answer from the Bat chip (%, charging, no LLM). “Why is the battery low” stays with the agent.
+
 ## [0.1.1159] - 2026-09-18
 
 ### Changed
