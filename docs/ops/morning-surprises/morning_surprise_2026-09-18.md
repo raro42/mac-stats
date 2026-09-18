@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity theme icon washes continue after apple + light + swiss.
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity theme icon washes continue after apple + light + swiss + material.
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1150** | Data-poster sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (apple Ready calm / Monitors Slow·Down); louder ~10%/22% tint removed |
 | **v0.1.1149** | Material sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (apple Ready calm / Monitors Slow·Down); louder ~10%/22% tint removed |
 | **v0.1.1148** | Swiss-minimalistic sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (apple Ready calm / Monitors Slow·Down); louder ~10%/22% tint removed |
 | **v0.1.1147** | Light theme sidebar icon status soft parity — section icon good / warning / bad soft ok at 7%/28% and warn·bad at 7%/30% (apple Ready calm / Monitors Slow·Down); louder ~10%/22% tint removed |
@@ -30,10 +31,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Material section icons now match apple’s soft Ready / Slow·Down washes — status no longer shouts louder than the attention glances beside them.
+Data-poster section icons now match apple’s soft Ready / Slow·Down washes — status no longer shouts louder than the attention glances beside them.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace (feature-agent-ops ~2.3d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity leftovers: data-poster / dark / neon / architect / futuristic still on older icon washes (~10%/22% or ~12%/28%); prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness when those are quieter
+- Design review when screens age past grace (feature-agent-ops ~2.4d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
+- Soft-parity leftovers: dark / neon / architect / futuristic still on older icon washes (~10%/22% or ~12%/28%); prefer digester / design-review / sibling Hermes/OpenClaw ports with clear user fitness when those are quieter
