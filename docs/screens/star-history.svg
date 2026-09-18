@@ -1,7 +1,7 @@
-<!-- star-fingerprint:cadf444f96aa6d34 -->
+<!-- star-fingerprint:944540812e89db07 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="220"
-  role="img" aria-label="Star growth — 16 ★">
-  <title>Star growth — 16 ★</title>
+  role="img" aria-label="Star growth — 17 ★">
+  <title>Star growth — 17 ★</title>
   <defs>
     <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#0a7ea4" stop-opacity="0.22"/>
@@ -11,24 +11,24 @@
   <rect width="100%" height="100%" fill="#f7f8fa" rx="12"/>
   <text x="48" y="22" fill="#1d1d1f"
     font-family="ui-sans-serif, system-ui, -apple-system, sans-serif"
-    font-size="15" font-weight="600">Star growth — 16 ★</text>
+    font-size="15" font-weight="600">Star growth — 17 ★</text>
   <text x="48" y="40" fill="#6e6e73"
     font-family="ui-sans-serif, system-ui, -apple-system, sans-serif"
-    font-size="11">Since 2026-01-20 · last star 2026-09-16</text>
+    font-size="11">Since 2026-01-20 · last star 2026-09-18</text>
   <line x1="48" y1="180" x2="696" y2="180"
     stroke="#d2d2d7" stroke-width="1"/>
   <line x1="48" y1="36" x2="48" y2="180"
     stroke="#d2d2d7" stroke-width="1"/>
-  <path d="M 48.0 171.0 L 48.1 162.0 L 53.4 153.0 L 129.5 144.0 L 129.8 135.0 L 166.3 126.0 L 200.7 117.0 L 291.5 108.0 L 308.8 99.0 L 399.3 90.0 L 561.2 81.0 L 581.1 72.0 L 596.2 63.0 L 611.6 54.0 L 631.7 45.0 L 696.0 36.0 L 696.0 180.0 L 48.0 180.0 Z" fill="url(#fill)"/>
-  <path d="M 48.0 171.0 L 48.1 162.0 L 53.4 153.0 L 129.5 144.0 L 129.8 135.0 L 166.3 126.0 L 200.7 117.0 L 291.5 108.0 L 308.8 99.0 L 399.3 90.0 L 561.2 81.0 L 581.1 72.0 L 596.2 63.0 L 611.6 54.0 L 631.7 45.0 L 696.0 36.0" fill="none" stroke="#0a7ea4" stroke-width="2.5"
+  <path d="M 48.0 171.5 L 48.1 163.1 L 53.3 154.6 L 128.9 146.1 L 129.2 137.6 L 165.5 129.2 L 199.6 120.7 L 289.7 112.2 L 307.0 103.8 L 396.8 95.3 L 557.5 86.8 L 577.2 78.4 L 592.2 69.9 L 607.5 61.4 L 627.5 52.9 L 691.3 44.5 L 696.0 36.0 L 696.0 180.0 L 48.0 180.0 Z" fill="url(#fill)"/>
+  <path d="M 48.0 171.5 L 48.1 163.1 L 53.3 154.6 L 128.9 146.1 L 129.2 137.6 L 165.5 129.2 L 199.6 120.7 L 289.7 112.2 L 307.0 103.8 L 396.8 95.3 L 557.5 86.8 L 577.2 78.4 L 592.2 69.9 L 607.5 61.4 L 627.5 52.9 L 691.3 44.5 L 696.0 36.0" fill="none" stroke="#0a7ea4" stroke-width="2.5"
     stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="696.0" cy="36.0" r="4.5" fill="#0a7ea4"/>
   <text x="40" y="40" text-anchor="end" fill="#6e6e73"
-    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">16</text>
+    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">17</text>
   <text x="40" y="180" text-anchor="end" fill="#6e6e73"
     font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">0</text>
   <text x="48" y="208" fill="#6e6e73"
     font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">2026-01-20</text>
   <text x="696" y="208" text-anchor="end" fill="#6e6e73"
-    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">2026-09-16</text>
+    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">2026-09-18</text>
 </svg>
