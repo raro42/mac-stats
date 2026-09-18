@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1160** | Battery-left instant — “how much battery is left?”, “battery left”, and “is the battery low” answer from the Bat chip (%, charging, no LLM); “why is the battery low” stays with the agent |
 | **v0.1.1159** | How-hot instant — “how hot is the CPU?”, “is the CPU hot”, and “how hot” answer from the Temp ring (°C, no LLM); “is the GPU hot” uses the GPU ring; “why is the CPU hot” stays with the agent |
 | **v0.1.1158** | Ollama URL instant — “what’s the ollama url?”, “ollama endpoint”, and “where is ollama” answer from the Ollama Ready chip (host + model, no LLM); “set the ollama url” stays a config change |
 | **v0.1.1157** | Which-model instant — “which model are you?” and `/model` answer from the Ollama Ready chip (model name, no LLM); plural “which models” still lists models |
@@ -16,7 +17,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “how hot is the CPU?” and you get the temperature at once. The chat model does not have to look that up.
+Ask “how much battery is left?” and you get the charge at once. The chat model does not have to look that up.
 
 ## Next
 
