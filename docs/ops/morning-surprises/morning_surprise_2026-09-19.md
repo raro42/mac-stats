@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1162** | Disk-used instant — “how much disk is used?”, “how much storage”, and “is the disk full” answer from the SSD chip (%, no LLM); “why is the disk full” stays with the agent; Disk Cleanup stays on `/disk` |
 | **v0.1.1161** | RAM-used instant — “how much RAM is used?”, “how much memory”, and “is the RAM high” answer from the RAM chip (%, no LLM); “why is the RAM high” stays with the agent |
 | **v0.1.1160** | Battery-left instant — “how much battery is left?”, “battery left”, and “is the battery low” answer from the Bat chip (%, charging, no LLM); “why is the battery low” stays with the agent |
 | **v0.1.1159** | How-hot instant — “how hot is the CPU?”, “is the CPU hot”, and “how hot” answer from the Temp ring (°C, no LLM); “is the GPU hot” uses the GPU ring; “why is the CPU hot” stays with the agent |
@@ -18,7 +19,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “how much RAM is used?” and you get the percent at once. The chat model does not have to look that up.
+Ask “how much disk is used?” and you get the percent at once. The chat model does not have to look that up.
 
 ## Next
 

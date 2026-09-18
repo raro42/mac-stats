@@ -2890,6 +2890,11 @@ pub fn looks_like_disk_cleanup_request(content: &str) -> bool {
         || n.contains("free space")
         || n.contains("free disk")
         || n.contains("how full")
+        || n.contains("how much disk")
+        || n.contains("how much storage")
+        || n.contains("disk used")
+        || n.contains("storage used")
+        || n.contains("disk full")
         || n.contains("percent")
         || n.contains(" for ")
         || n.contains(" about ")
@@ -33888,6 +33893,11 @@ pub fn looks_like_disk_cleanup_age_request(content: &str) -> bool {
         || n.contains("free space")
         || n.contains("free disk")
         || n.contains("how full")
+        || n.contains("how much disk")
+        || n.contains("how much storage")
+        || n.contains("disk used")
+        || n.contains("storage used")
+        || n.contains("disk full")
         || n.contains("percent")
         || n.contains(" for ")
         || n.contains(" about ")
@@ -34141,6 +34151,11 @@ pub fn looks_like_disk_cleanup_size_request(content: &str) -> bool {
         || n.contains("free space")
         || n.contains("free disk")
         || n.contains("how full")
+        || n.contains("how much disk")
+        || n.contains("how much storage")
+        || n.contains("disk used")
+        || n.contains("storage used")
+        || n.contains("disk full")
         || n.contains("percent")
         || n.contains(" for ")
         || n.contains(" about ")
@@ -50010,6 +50025,31 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "disk free"
             | "free disk"
             | "free space"
+            | "how much ssd"
+            | "how much ssd is used"
+            | "how much ssd used"
+            | "how much ssd do i have"
+            | "ssd used"
+            | "how much disk"
+            | "how much disk is used"
+            | "how much disk used"
+            | "how much disk do i have"
+            | "disk used"
+            | "how much storage"
+            | "how much storage is used"
+            | "how much storage used"
+            | "how much storage do i have"
+            | "storage used"
+            | "is the disk full"
+            | "is disk full"
+            | "is the ssd full"
+            | "is ssd full"
+            | "is the storage full"
+            | "is storage full"
+            | "is the disk high"
+            | "is disk high"
+            | "is the ssd high"
+            | "is ssd high"
     ) {
         return Some(StripChipAsk::Ssd);
     }
@@ -57150,7 +57190,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot` stays with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low` and `why is the ram high` stay with the agent)\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, and `why is the disk full` stay with the agent)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
@@ -59719,7 +59759,23 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is the ram high")
         || q.contains("is ram high")
         || q.contains("is the memory high")
-        || q.contains("is memory high"))
+        || q.contains("is memory high")
+        || q.contains("how much ssd")
+        || q.contains("how much disk")
+        || q.contains("how much storage")
+        || q.contains("ssd used")
+        || q == "disk used"
+        || q == "storage used"
+        || q.contains("is the disk full")
+        || q.contains("is disk full")
+        || q.contains("is the ssd full")
+        || q.contains("is ssd full")
+        || q.contains("is the storage full")
+        || q.contains("is storage full")
+        || q.contains("is the disk high")
+        || q.contains("is disk high")
+        || q.contains("is the ssd high")
+        || q.contains("is ssd high"))
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("strip")
@@ -76348,6 +76404,24 @@ mod tests {
             .expect("ram used instant");
         assert!(ram_used.to_lowercase().contains("ram"), "{ram_used}");
         assert!(try_operator_instant_reply("why is the ram high").is_none());
+        assert_eq!(
+            parse_strip_chip_ask("how much disk is used?"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("how much storage"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("is the disk full"),
+            Some(StripChipAsk::Ssd)
+        );
+        assert!(parse_strip_chip_ask("why is the disk full").is_none());
+        assert!(parse_strip_chip_ask("disk cleanup").is_none());
+        let disk_used = try_operator_instant_reply("how much disk is used?")
+            .expect("disk used instant");
+        assert!(disk_used.to_lowercase().contains("ssd"), "{disk_used}");
+        assert!(try_operator_instant_reply("why is the disk full").is_none());
         let open_ssd = try_operator_instant_reply("open ssd").expect("open ssd instant");
         assert!(open_ssd.to_lowercase().contains("ssd"), "{open_ssd}");
     }

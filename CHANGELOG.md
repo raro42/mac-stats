@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1162] - 2026-09-19
+
+### Changed
+- **Disk used instant** — “How much disk is used?”, “how much storage”, and “is the disk full” answer from the SSD chip (%, no LLM). “Why is the disk full” stays with the agent. Disk Cleanup stays on `/disk`.
+
 ## [0.1.1161] - 2026-09-18
 
 ### Changed
