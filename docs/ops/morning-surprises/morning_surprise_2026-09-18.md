@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-18
 
-Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan found AI Chat error bubbles still on louder 8%/28%.
+Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Digester open empty. Design review not due. Soft-parity scan found Perplexity empty-error still on louder 8%/35%.
 
 ## Shipped tonight
 
 | Version | What |
 | --- | --- |
+| **v0.1.1143** | Perplexity empty-error soft parity — empty-error pane soft alert at 7% / 30% border (Monitors Down / Perplexity has-error); louder 8%/35% tint removed |
 | **v0.1.1142** | AI Chat error-bubble soft parity — Assistant error message bubbles soft alert at 7% / 30% border (Errors glance / Monitors Down); louder 8%/28% tint removed |
 | **v0.1.1141** | Ops Runs Fail/Slow list-row soft parity — Fail and Slow run rows soft alert at 7% / 30% border (Runs has-fail / has-slow); louder 8%/22% tint removed |
 | **v0.1.1140** | Disk Cleanup Big list-row soft parity — Big reclaim rows soft alert at 7% / 30% border (Big attention / Monitors Slow); louder 8%/34% tint removed |
@@ -23,10 +24,10 @@ Overnight Track B (20:00–06:00 local, continuing from 2026-09-17 evening). Dig
 
 ## Why it matters
 
-Assistant error bubbles now match the Errors glance wash (7% fill, 30% border) — the bubble no longer shouts louder than the glance.
+Perplexity empty-error panes now match the has-error glance wash (7% fill, 30% border) — the empty pane no longer shouts louder than the glance.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (feature-agent-ops ~2d; Processes / Monitors; recapture AI Chat when Screen Recording TCC allows)
-- Soft-parity scan leftovers: Perplexity empty-error (8%/35%), changelog-error / monitors-empty error panes (8%/35%); sibling Hermes/OpenClaw ports with clear user fitness
+- Soft-parity scan leftovers: changelog-error / monitors-empty error panes (8%/35%); sibling Hermes/OpenClaw ports with clear user fitness
