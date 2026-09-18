@@ -1853,9 +1853,10 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
 }
 
+/* Hot ring — soft alert (Monitors Slow 7%/30%). Pulse stays; louder 12%/28% rest removed. */
 .metric-card.is-hot {
-  background-color: color-mix(in srgb, #ff9500 12%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 28%, transparent);
+  background-color: color-mix(in srgb, #ff9500 7%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
   border-radius: 12px;
   animation: ring-gauge-hot-glow 2.4s ease-in-out infinite;
 }
@@ -1906,14 +1907,14 @@ textarea.ops-agent-editor.is-dirty {
 @keyframes ring-gauge-hot-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 26%, transparent);
-    background-color: color-mix(in srgb, #ff9500 10%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
+    background-color: color-mix(in srgb, #ff9500 7%, transparent);
   }
   50% {
     box-shadow:
-      0 0 0 2px color-mix(in srgb, #ff9500 44%, transparent),
-      0 0 14px color-mix(in srgb, #ff9500 22%, transparent);
-    background-color: color-mix(in srgb, #ff9500 16%, transparent);
+      0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent),
+      0 0 8px color-mix(in srgb, #ff9500 14%, transparent);
+    background-color: color-mix(in srgb, #ff9500 10%, transparent);
   }
 }
 
@@ -1944,9 +1945,10 @@ textarea.ops-agent-editor.is-dirty {
   }
 }
 
+/* Matching sparkline — same soft alert as the hot ring (7%/30%). Fair stays quieter. */
 .history-chart-container.is-hot {
-  background-color: color-mix(in srgb, #ff9500 8%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 22%, transparent);
+  background-color: color-mix(in srgb, #ff9500 7%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
   border-radius: 10px;
 }
 

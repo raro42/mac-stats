@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1156] - 2026-09-18
+
+### Changed
+- **CPU ring and sparkline Hot soft parity** — Hot metric cards and matching history charts use the Slow alert wash (7%/30%). Fair stays quieter. Louder 12%/28% rest and 16%/44% pulse peak removed.
+
 ## [0.1.1155] - 2026-09-18
 
 ### Changed

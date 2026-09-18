@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1156
+
+- CPU ring and sparkline Hot soft parity: metric card and history chart hot wash at 7% / 30% border — Monitors Slow. Fair stays quieter. Louder 12%/28% rest and 16%/44% pulse peak removed.
+
 ## Overnight merge — v0.1.1155
 
 - Futuristic theme sidebar icon status soft parity: section icon good / warning / bad soft ok at 7% / 28% border and soft alert at 7% / 30% border — apple Ready calm / Monitors Slow·Down. Louder ~12%/28% tint removed.
