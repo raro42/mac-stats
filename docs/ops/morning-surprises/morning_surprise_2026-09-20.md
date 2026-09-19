@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1186** | Session count — “export this session”, “share this session”, and “archive this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1185** | Session count — “fork this session”, “duplicate this session”, and “clone this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1184** | Session count — “resume this session”, “open this session”, “switch this session”, and “continue this session” stay with the agent. They no longer answer with the session count. “Open sessions” still lists. “How many sessions” still counts. |
 | **v0.1.1183** | Session count — “summarize this session”, “rename this session”, “session summary”, and “title this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
@@ -20,10 +21,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “fork this session” or “clone this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts.
+Ask “export this session” or “archive this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “export this session” and “search this session” still match the session count. “Open sessions” stays the list. “Start over” and “fresh start” do not contain “session”, so they never hit that count.
+- Instant-lane leftovers: “search this session” and “save this session” still match the session count. “Open sessions” stays the list. “Start over” and “fresh start” do not contain “session”, so they never hit that count.

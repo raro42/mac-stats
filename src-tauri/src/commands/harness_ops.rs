@@ -1969,6 +1969,12 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session export or share is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("export") || n.contains("share") || n.contains("archive"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65082,6 +65088,16 @@ mod tests {
         assert!(try_operator_instant_reply("fork this session").is_none());
         assert!(try_operator_instant_reply("duplicate the session").is_none());
         assert!(try_operator_instant_reply("clone this session").is_none());
+        assert!(parse_operator_count_kind("export this session").is_none());
+        assert!(parse_operator_count_kind("export the session").is_none());
+        assert!(parse_operator_count_kind("export session").is_none());
+        assert!(parse_operator_count_kind("share this session").is_none());
+        assert!(parse_operator_count_kind("share the session").is_none());
+        assert!(parse_operator_count_kind("archive this session").is_none());
+        assert!(parse_operator_count_kind("archive the session").is_none());
+        assert!(try_operator_instant_reply("export this session").is_none());
+        assert!(try_operator_instant_reply("share the session").is_none());
+        assert!(try_operator_instant_reply("archive this session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");
