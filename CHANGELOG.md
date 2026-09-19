@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1173] - 2026-09-19
+
+### Changed
+- **Chip instant** — “What chip is this?”, “what processor”, and “cpu name” answer with the Apple chip name and core count (no LLM). “What’s the CPU” still uses the CPU ring. “Which model” still names the Ollama model. “Why” stays with the agent.
+
 ## [0.1.1172] - 2026-09-19
 
 ### Changed

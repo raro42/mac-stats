@@ -50461,6 +50461,83 @@ pub fn format_ram_capacity_gateway() -> String {
     format!("**RAM** · {total} installed · {used} used")
 }
 
+/// Apple chip name — not the CPU ring, not the Ollama model.
+/// "Why" stays with the agent. "What's the CPU" stays the usage ring.
+pub fn looks_like_chip_identity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("hot")
+        || n.contains("model")
+        || n.contains("ollama")
+        || n.contains("freq")
+        || n.contains("clock")
+        || n.contains("ghz")
+        || n.contains("fast")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains("high")
+        || n.contains("busy")
+        || n.contains("path")
+        || n.contains("size")
+        || n.contains("age")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("gpu")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "what chip"
+            | "what chip is this"
+            | "what chip do i have"
+            | "what chip does this mac have"
+            | "which chip"
+            | "which chip is this"
+            | "which chip do i have"
+            | "which chip does this mac have"
+            | "what's the chip"
+            | "whats the chip"
+            | "what is the chip"
+            | "what's my chip"
+            | "whats my chip"
+            | "what is my chip"
+            | "mac chip"
+            | "the mac chip"
+            | "chip name"
+            | "the chip name"
+            | "what processor"
+            | "what processor is this"
+            | "what processor do i have"
+            | "which processor"
+            | "which processor is this"
+            | "what's the processor"
+            | "whats the processor"
+            | "what is the processor"
+            | "processor name"
+            | "cpu name"
+            | "the cpu name"
+            | "what cpu do i have"
+            | "what cpu is this"
+            | "which cpu do i have"
+            | "apple chip"
+            | "the apple chip"
+    )
+}
+
+/// Zero-LLM chip name from cached `chip_info` (e.g. `Apple M3 · 16 cores`).
+pub fn format_chip_identity_gateway() -> String {
+    let d = crate::metrics::get_cpu_details();
+    let chip = d.chip_info.trim();
+    if chip.is_empty() {
+        return "**Chip** — _no chip name right now._".to_string();
+    }
+    format!("**Chip** · {chip}")
+}
+
 /// Details All · Hot filter for `/details` instant replies (collapsed glance parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailsListFilter {
@@ -57048,6 +57125,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_ram_capacity_request(content) {
         return Some(format_ram_capacity_gateway());
     }
+    // Chip name before ring chips ("what's the cpu" stays usage).
+    if looks_like_chip_identity_request(content) {
+        return Some(format_chip_identity_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -57538,6 +57619,7 @@ pub fn format_ops_help_gateway() -> String {
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` / `task age` for bytes / mtime)\n\
 • `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` installed RAM)\n\
 • `memory size` · `how big is memory` · `how many gb of ram` · `ram capacity` — installed RAM plus used (no LLM; `how much ram` stays the % chip; notes size / `memory.md` size stay on disk; `why` stays with the agent)\n\
+• `what chip is this` · `what processor` · `which chip` · `cpu name` — Apple chip name plus core count (no LLM; `what's the cpu` stays the CPU ring; `which model` stays Ollama; `why` and hot chips stay with the agent)\n\
 • `notes age` · `how old are notes` · `memory folder age` · `notes folder age` — notes folder last write age (newest file mtime; no list dump; does not steal `memory path` / `notes path` / `notes size` / `memory.md age` / bare `memory age`)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` / `notes age` for disk use / mtime)\n\
 • `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `memory.md age` / `notes size` / bare `memory size`)\n\
@@ -57663,6 +57745,10 @@ pub fn format_ops_help_gateway() -> String {
 /// Digester Slowest parity: exclude shipped instant noise from insights p50/slowest.
 fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], question: &str) -> bool {
     if lane == "instant" && wall_ms < 2_000 {
+        return true;
+    }
+    // Chip name instant (v0.1.1173) — not CPU-ring usage, not Ollama model.
+    if looks_like_chip_identity_request(question) {
         return true;
     }
     let q = question.to_lowercase();
@@ -77050,6 +77136,28 @@ mod tests {
             "{cap}"
         );
         assert!(try_operator_instant_reply("why is memory big").is_none());
+        assert!(looks_like_chip_identity_request("what chip is this?"));
+        assert!(looks_like_chip_identity_request("what processor do i have"));
+        assert!(looks_like_chip_identity_request("cpu name"));
+        assert!(!looks_like_chip_identity_request("what's the cpu"));
+        assert!(!looks_like_chip_identity_request("which model are you"));
+        assert!(!looks_like_chip_identity_request("which chips are hot"));
+        assert!(!looks_like_chip_identity_request("why is the chip hot"));
+        assert!(parse_ring_chip_ask("what chip is this").is_none());
+        assert!(parse_ring_chip_ask("what cpu do i have").is_none());
+        let chip = try_operator_instant_reply("what chip is this?")
+            .expect("chip identity instant");
+        assert!(
+            chip.starts_with("**Chip**"),
+            "{chip}"
+        );
+        let cpu_ring = try_operator_instant_reply("what's the cpu")
+            .expect("cpu ring stays usage");
+        assert!(
+            !cpu_ring.starts_with("**Chip**"),
+            "cpu usage must not become chip name: {cpu_ring}"
+        );
+        assert!(try_operator_instant_reply("why is the chip hot").is_none());
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)

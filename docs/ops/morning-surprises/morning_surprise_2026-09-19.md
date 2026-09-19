@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1173** | Chip instant — “what chip is this?”, “what processor”, and “cpu name” answer with the Apple chip name and core count (no LLM); “what’s the CPU” still uses the CPU ring; “which model” still names the Ollama model; “why” stays with the agent |
 | **v0.1.1172** | RAM size instant — “how big is memory?”, “memory size”, and “how many GB of RAM” answer with installed RAM plus used (no LLM); “how much RAM is used” still uses the percent chip; notes size and memory.md size stay on disk; “why” stays with the agent |
 | **v0.1.1171** | Charging instant — “is it charging?”, “is the battery charging”, and “is it plugged in” answer from the Bat chip (percent and charging, no LLM); “why is it charging” stays with the agent; “is the battery low” still uses the same chip |
 | **v0.1.1170** | Heat-high instant — “is the heat high?”, “is the thermal high”, and “is it throttling” answer from the Heat chip (thermal state, no LLM); “why is the heat high” stays with the agent; “is the CPU hot” still uses the Temp ring; “hot processes” still lists hot processes |
@@ -29,7 +30,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “how big is memory?” and you get installed RAM plus what is in use. The chat model does not have to look that up.
+Ask “what chip is this?” and you get the Apple chip name and core count. The chat model does not have to look that up.
 
 ## Next
 
