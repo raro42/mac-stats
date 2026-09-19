@@ -50287,6 +50287,55 @@ pub fn parse_details_list_filter(content: &str) -> DetailsListFilter {
     DetailsListFilter::All
 }
 
+/// Focused Load 1m asks — not full `/details` / `/load` (those stay the three-row panel).
+/// "Why is the load high" stays with the agent.
+pub fn looks_like_load_chip_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("download")
+        || n.contains("payload")
+        || n.contains("reload")
+        || n.contains("upload")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "is the load high"
+            | "is load high"
+            | "how's the load"
+            | "hows the load"
+            | "how high is the load"
+            | "how high is load"
+            | "how loaded"
+            | "how loaded is it"
+            | "how loaded is the mac"
+            | "how loaded is the system"
+            | "is the system loaded"
+            | "is the mac loaded"
+            | "load high"
+    )
+}
+
+/// Zero-LLM Load 1m reply (Details glance hot at Load≥4; not the full Details panel).
+pub fn format_load_chip_gateway() -> String {
+    let d = crate::metrics::get_cpu_details();
+    let hot_mark = if details_load_is_hot(d.load_1) {
+        " · hot"
+    } else {
+        ""
+    };
+    format!("**Load** · {:.2}{hot_mark}", d.load_1)
+}
+
 /// True for `/details` / `/load` / load average — not process details or strip/rings.
 /// View/see/show me/open/list-the NL (v0.1.1040). Exact `open details` / `open the details`
 /// only. After normalize strips `show me` / `show`, prefer `the details` / `the load` so
@@ -57003,6 +57052,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_strip_list_filter(content);
         return Some(format_strip_gateway(filter));
     }
+    if looks_like_load_chip_request(content) {
+        return Some(format_load_chip_gateway());
+    }
     if looks_like_details_request(content) {
         let filter = parse_details_list_filter(content);
         return Some(format_details_gateway(filter));
@@ -57278,7 +57330,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, and `why is the frequency high` stay with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, `why is the disk full`, and `why is the power high` stay with the agent)\n\
-• `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
+• `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` · `is the load high` · `how's the load` · `how high is the load` · `how loaded` — Details Load · RAM · Up, plus a Load 1m chip (Load≥4 hot; exact open only; `/load` stays the full panel; `why is the load high` stays with the agent)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
 • `digest open` · `view digest` · `see digest` · `show me the digest` · `open digest` · `list the digest` · `view open candidates` — cached open candidates (exact open only — no digester spawn; not path/size/age; bare `digest` / `show me digest` still refreshes)\n\
@@ -60507,7 +60559,17 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "whats the load"
         || q == "what is the load"
         || q == "what's hot on details"
-        || q == "whats hot on details")
+        || q == "whats hot on details"
+        || q.contains("is the load high")
+        || q.contains("is load high")
+        || q.contains("how's the load")
+        || q.contains("hows the load")
+        || q.contains("how high is the load")
+        || q.contains("how high is load")
+        || q.contains("how loaded")
+        || q.contains("is the system loaded")
+        || q.contains("is the mac loaded")
+        || q == "load high")
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("ring")
@@ -76668,6 +76730,18 @@ mod tests {
         assert!(!looks_like_details_request("process details"));
         assert!(!looks_like_details_request("more details about weather"));
         assert!(!looks_like_details_request("why is the load high"));
+        assert!(looks_like_load_chip_request("is the load high"));
+        assert!(looks_like_load_chip_request("how's the load?"));
+        assert!(looks_like_load_chip_request("how high is the load"));
+        assert!(looks_like_load_chip_request("how loaded is the mac"));
+        assert!(!looks_like_load_chip_request("why is the load high"));
+        assert!(!looks_like_load_chip_request("/load"));
+        assert!(!looks_like_load_chip_request("load average"));
+        let load_high = try_operator_instant_reply("is the load high?")
+            .expect("load high instant");
+        assert!(load_high.to_lowercase().contains("load"), "{load_high}");
+        assert!(!load_high.to_lowercase().contains("ram"), "{load_high}");
+        assert!(try_operator_instant_reply("why is the load high").is_none());
         assert!(!looks_like_details_request("details path"));
         assert_eq!(
             parse_details_list_filter("/details"),

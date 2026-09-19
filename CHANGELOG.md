@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1167] - 2026-09-19
+
+### Changed
+- **Load high instant** — “Is the load high?”, “how’s the load”, and “how high is the load” answer from the Load chip (1-minute load, no LLM). “Why is the load high” stays with the agent. `/load` still opens the full Details panel.
+
 ## [0.1.1166] - 2026-09-19
 
 ### Changed

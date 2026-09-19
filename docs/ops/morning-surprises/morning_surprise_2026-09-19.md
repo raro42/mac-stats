@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1167** | Load-high instant — “is the load high?”, “how's the load”, and “how high is the load” answer from the Load chip (1-minute load, no LLM); “why is the load high” stays with the agent; `/load` still opens the full Details panel |
 | **v0.1.1166** | Power-draw instant — “how much power is used?”, “power draw”, and “is the power high” answer from the Power chip (CPU+GPU watts, no LLM); “why is the power high” stays with the agent; `/power` still opens the full strip; Low Power Mode stays on `/lpm` |
 | **v0.1.1165** | Clock-speed instant — “how fast is the CPU?”, “clock speed”, and “is the frequency high” answer from the Freq ring (GHz, no LLM); “why is the frequency high” stays with the agent; “how much CPU” still uses the CPU ring |
 | **v0.1.1164** | GPU-used instant — “how much GPU is used?”, “is the GPU high”, and “is the GPU busy” answer from the GPU ring (%, no LLM); “why is the GPU high” stays with the agent; “is the GPU hot” still uses the GPU ring |
@@ -23,7 +24,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “how much power is used?” and you get CPU+GPU watts at once. The chat model does not have to look that up.
+Ask “is the load high?” and you get the 1-minute load at once. The chat model does not have to look that up.
 
 ## Next
 
