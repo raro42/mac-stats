@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1170] - 2026-09-19
+
+### Changed
+- **Heat-high instant** — “Is the heat high?”, “is the thermal high”, and “is it throttling” answer from the Heat chip (thermal state, no LLM). “Why is the heat high” stays with the agent. “Is the CPU hot” still uses the Temp ring. “Hot processes” still lists hot processes.
+
 ## [0.1.1169] - 2026-09-19
 
 ### Changed
