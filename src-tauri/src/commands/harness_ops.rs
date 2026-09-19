@@ -1930,6 +1930,17 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session delete or close is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("delete")
+            || n.contains("remove")
+            || n.contains("end this")
+            || n.contains("end the")
+            || n.contains("end session")
+            || n.contains("close"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65003,8 +65014,14 @@ mod tests {
         assert!(parse_operator_count_kind("clear this session").is_none());
         assert!(parse_operator_count_kind("new session").is_none());
         assert!(parse_operator_count_kind("wipe this session").is_none());
+        assert!(parse_operator_count_kind("delete this session").is_none());
+        assert!(parse_operator_count_kind("remove this session").is_none());
+        assert!(parse_operator_count_kind("end this session").is_none());
+        assert!(parse_operator_count_kind("close this session").is_none());
         assert!(try_operator_instant_reply("reset this session").is_none());
         assert!(try_operator_instant_reply("clear the session").is_none());
+        assert!(try_operator_instant_reply("delete this session").is_none());
+        assert!(try_operator_instant_reply("close the session").is_none());
         assert_eq!(
             parse_operator_count_kind("how many sessions"),
             Some(OperatorCountKind::Sessions)

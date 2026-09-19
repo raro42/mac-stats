@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1182] - 2026-09-19
+
+### Fixed
+- **Session count** — “Delete this session”, “remove this session”, “end this session”, and “close this session” no longer answer with the session count. Delete and close stay with the agent. “How many sessions” still counts.
+
 ## [0.1.1181] - 2026-09-19
 
 ### Fixed
