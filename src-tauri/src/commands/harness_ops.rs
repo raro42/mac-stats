@@ -50336,6 +50336,93 @@ pub fn format_load_chip_gateway() -> String {
     format!("**Load** · {:.2}{hot_mark}", d.load_1)
 }
 
+/// 5-minute or 15-minute load — not the 1-minute chip and not full `/load`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LoadWindowChip {
+    Five,
+    Fifteen,
+}
+
+/// Focused 5m / 15m load asks. "Why" stays with the agent. `/load` stays the full panel.
+pub fn parse_load_window_chip(content: &str) -> Option<LoadWindowChip> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return None;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("download")
+        || n.contains("payload")
+        || n.contains("reload")
+        || n.contains("upload")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return None;
+    }
+    if matches!(
+        n.as_str(),
+        "5 minute load"
+            | "5-minute load"
+            | "five minute load"
+            | "load 5"
+            | "load 5m"
+            | "5m load"
+            | "the 5 minute load"
+            | "what's the 5 minute load"
+            | "whats the 5 minute load"
+            | "what is the 5 minute load"
+            | "how's the 5 minute load"
+            | "hows the 5 minute load"
+            | "is the 5 minute load high"
+            | "is 5 minute load high"
+    ) {
+        return Some(LoadWindowChip::Five);
+    }
+    if matches!(
+        n.as_str(),
+        "15 minute load"
+            | "15-minute load"
+            | "fifteen minute load"
+            | "load 15"
+            | "load 15m"
+            | "15m load"
+            | "the 15 minute load"
+            | "what's the 15 minute load"
+            | "whats the 15 minute load"
+            | "what is the 15 minute load"
+            | "how's the 15 minute load"
+            | "hows the 15 minute load"
+            | "is the 15 minute load high"
+            | "is 15 minute load high"
+    ) {
+        return Some(LoadWindowChip::Fifteen);
+    }
+    None
+}
+
+/// True for a focused 5m or 15m load ask (not `/load`, not the 1-minute chip).
+pub fn looks_like_load_window_chip_request(content: &str) -> bool {
+    parse_load_window_chip(content).is_some()
+}
+
+/// Zero-LLM Load 5m / 15m reply (same Load≥4 hot mark as the 1-minute chip).
+pub fn format_load_window_chip_gateway(window: LoadWindowChip) -> String {
+    let d = crate::metrics::get_cpu_details();
+    let (label, value) = match window {
+        LoadWindowChip::Five => ("5m", d.load_5),
+        LoadWindowChip::Fifteen => ("15m", d.load_15),
+    };
+    let hot_mark = if details_load_is_hot(value) {
+        " · hot"
+    } else {
+        ""
+    };
+    format!("**Load {label}** · {value:.2}{hot_mark}")
+}
+
 /// True for `/details` / `/load` / load average — not process details or strip/rings.
 /// View/see/show me/open/list-the NL (v0.1.1040). Exact `open details` / `open the details`
 /// only. After normalize strips `show me` / `show`, prefer `the details` / `the load` so
@@ -57055,6 +57142,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_load_chip_request(content) {
         return Some(format_load_chip_gateway());
     }
+    if let Some(window) = parse_load_window_chip(content) {
+        return Some(format_load_window_chip_gateway(window));
+    }
     if looks_like_details_request(content) {
         let filter = parse_details_list_filter(content);
         return Some(format_details_gateway(filter));
@@ -57330,7 +57420,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, and `why is the frequency high` stay with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, `why is the disk full`, and `why is the power high` stay with the agent)\n\
-• `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` · `is the load high` · `how's the load` · `how high is the load` · `how loaded` — Details Load · RAM · Up, plus a Load 1m chip (Load≥4 hot; exact open only; `/load` stays the full panel; `why is the load high` stays with the agent)\n\
+• `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` · `is the load high` · `how's the load` · `how high is the load` · `how loaded` · `5 minute load` · `15 minute load` · `load 5` · `load 15` — Details Load · RAM · Up, plus Load 1m / 5m / 15m chips (Load≥4 hot; exact open only; `/load` stays the full panel; `why is the load high` and `why is the 5 minute load high` stay with the agent)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
 • `digest open` · `view digest` · `see digest` · `show me the digest` · `open digest` · `list the digest` · `view open candidates` — cached open candidates (exact open only — no digester spawn; not path/size/age; bare `digest` / `show me digest` still refreshes)\n\
@@ -60569,7 +60659,15 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("how loaded")
         || q.contains("is the system loaded")
         || q.contains("is the mac loaded")
-        || q == "load high")
+        || q == "load high"
+        || q.contains("5 minute load")
+        || q.contains("5-minute load")
+        || q.contains("15 minute load")
+        || q.contains("15-minute load")
+        || q == "load 5"
+        || q == "load 15"
+        || q == "load 5m"
+        || q == "load 15m")
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("ring")
@@ -76742,6 +76840,37 @@ mod tests {
         assert!(load_high.to_lowercase().contains("load"), "{load_high}");
         assert!(!load_high.to_lowercase().contains("ram"), "{load_high}");
         assert!(try_operator_instant_reply("why is the load high").is_none());
+        assert_eq!(
+            parse_load_window_chip("5 minute load"),
+            Some(LoadWindowChip::Five)
+        );
+        assert_eq!(
+            parse_load_window_chip("what's the 5 minute load?"),
+            Some(LoadWindowChip::Five)
+        );
+        assert_eq!(
+            parse_load_window_chip("15 minute load"),
+            Some(LoadWindowChip::Fifteen)
+        );
+        assert_eq!(
+            parse_load_window_chip("load 15"),
+            Some(LoadWindowChip::Fifteen)
+        );
+        assert!(parse_load_window_chip("why is the 5 minute load high").is_none());
+        assert!(parse_load_window_chip("/load").is_none());
+        assert!(parse_load_window_chip("is the load high").is_none());
+        let load_5 = try_operator_instant_reply("what's the 5 minute load?")
+            .expect("5 minute load instant");
+        assert!(load_5.to_lowercase().contains("5m"), "{load_5}");
+        assert!(!load_5.to_lowercase().contains("ram"), "{load_5}");
+        let load_15 = try_operator_instant_reply("15 minute load").expect("15 minute load instant");
+        assert!(load_15.to_lowercase().contains("15m"), "{load_15}");
+        assert!(try_operator_instant_reply("why is the 5 minute load high").is_none());
+        let full_load = try_operator_instant_reply("/load").expect("full load panel");
+        assert!(
+            !full_load.to_lowercase().contains("load 5m"),
+            "{full_load}"
+        );
         assert!(!looks_like_details_request("details path"));
         assert_eq!(
             parse_details_list_filter("/details"),

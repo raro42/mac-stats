@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1168] - 2026-09-19
+
+### Changed
+- **Load 5m / 15m instant** — “What’s the 5 minute load?”, “15 minute load”, and “is the 5 minute load high” answer from the Load 5m or 15m chip (no LLM). “Why is the 5 minute load high” stays with the agent. `/load` still opens the full Details panel. “Is the load high” still uses the 1-minute Load chip.
+
 ## [0.1.1167] - 2026-09-19
 
 ### Changed
