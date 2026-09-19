@@ -5739,7 +5739,7 @@ pub fn looks_like_memory_size_request(content: &str) -> bool {
     {
         return false;
     }
-    // Bare “memory size” / “how big is memory” stay off this lane (RAM ambiguity).
+    // Bare “memory size” / “how big is memory” stay off this lane (installed RAM).
     if n == "memory size"
         || n == "memory"
         || n == "how big is memory"
@@ -6412,7 +6412,7 @@ pub fn looks_like_memory_md_size_request(content: &str) -> bool {
     {
         return false;
     }
-    // Bare “memory size” / “how big is memory” stay off this lane (RAM ambiguity).
+    // Bare “memory size” / “how big is memory” stay off this lane (installed RAM).
     if n == "memory size"
         || n == "memory"
         || n == "how big is memory"
@@ -50381,6 +50381,86 @@ pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
     }
 }
 
+/// Installed RAM size — not the used-% chip, not notes / memory.md disk size.
+/// "Why" stays with the agent. "How much RAM is used" stays the RAM percent chip.
+pub fn looks_like_ram_capacity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("path")
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.contains("folder")
+        || n.contains("notes")
+        || n.contains("memory.md")
+        || n.contains("memory-md")
+        || n.contains("discord")
+        || n.contains("session")
+        || n.contains("curated")
+        || n.contains("process")
+        || n.contains("file")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("used")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "memory size"
+            | "the memory size"
+            | "how big is memory"
+            | "how big is the memory"
+            | "how large is memory"
+            | "how large is the memory"
+            | "memory bytes"
+            | "how big is ram"
+            | "how big is the ram"
+            | "how large is ram"
+            | "how large is the ram"
+            | "ram size"
+            | "the ram size"
+            | "total ram"
+            | "the total ram"
+            | "total memory"
+            | "the total memory"
+            | "ram capacity"
+            | "memory capacity"
+            | "how many gb of ram"
+            | "how many gb of memory"
+            | "how many gigabytes of ram"
+            | "how many gigabytes of memory"
+            | "how much ram does this mac have"
+            | "how much memory does this mac have"
+            | "what's the ram size"
+            | "whats the ram size"
+            | "what is the ram size"
+            | "what's the memory size"
+            | "whats the memory size"
+            | "what is the memory size"
+            | "installed ram"
+            | "installed memory"
+            | "how much ram installed"
+            | "how much memory installed"
+    )
+}
+
+/// Zero-LLM installed RAM (total bytes + used). Percent chip still owns "how much ram is used".
+pub fn format_ram_capacity_gateway() -> String {
+    let d = crate::metrics::get_cpu_details();
+    if d.ram_total_bytes == 0 {
+        return "**RAM** — _no memory size reading right now._".to_string();
+    }
+    let total = crate::commands::disk_cleanup::format_bytes(d.ram_total_bytes);
+    let used = crate::commands::disk_cleanup::format_bytes(d.ram_used_bytes);
+    format!("**RAM** · {total} installed · {used} used")
+}
+
 /// Details All · Hot filter for `/details` instant replies (collapsed glance parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailsListFilter {
@@ -56964,6 +57044,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_launchd_stdout_path_request(content) {
         return Some(format_launchd_stdout_path_gateway());
     }
+    // Installed RAM before notes-folder size (bare "memory size" is RAM, not notes).
+    if looks_like_ram_capacity_request(content) {
+        return Some(format_ram_capacity_gateway());
+    }
     // Notes/memory folder age before size/path (newest mtime; no list); size before path; path before scrub/save.
     if looks_like_memory_age_request(content) {
         return Some(format_memory_age_gateway());
@@ -57452,7 +57536,8 @@ pub fn format_ops_help_gateway() -> String {
 • `task age` · `how old are tasks` · `task folder age` · `when was tasks updated` — task folder last write age (newest file mtime; no list dump; does not steal `task path` / size / `/tasks`)\n\
 • `task size` · `how big are tasks` · `task folder size` — task folder size on disk (recursive file bytes; no list dump; does not steal `task path` / `task age` / `/tasks`)\n\
 • `task path` · `where is the task folder` · `task directory` — `~/.mac-stats/task/` path (config only; no list/create; `task size` / `task age` for bytes / mtime)\n\
-• `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` RAM)\n\
+• `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` installed RAM)\n\
+• `memory size` · `how big is memory` · `how many gb of ram` · `ram capacity` — installed RAM plus used (no LLM; `how much ram` stays the % chip; notes size / `memory.md` size stay on disk; `why` stays with the agent)\n\
 • `notes age` · `how old are notes` · `memory folder age` · `notes folder age` — notes folder last write age (newest file mtime; no list dump; does not steal `memory path` / `notes path` / `notes size` / `memory.md age` / bare `memory age`)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` / `notes age` for disk use / mtime)\n\
 • `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `memory.md age` / `notes size` / bare `memory size`)\n\
@@ -76943,7 +77028,28 @@ mod tests {
         let ram_used = try_operator_instant_reply("how much ram is used?")
             .expect("ram used instant");
         assert!(ram_used.to_lowercase().contains("ram"), "{ram_used}");
+        assert!(
+            !ram_used.contains("installed"),
+            "used-% chip must not claim capacity: {ram_used}"
+        );
         assert!(try_operator_instant_reply("why is the ram high").is_none());
+        assert!(looks_like_ram_capacity_request("how big is memory?"));
+        assert!(looks_like_ram_capacity_request("memory size"));
+        assert!(looks_like_ram_capacity_request("how many gb of ram?"));
+        assert!(looks_like_ram_capacity_request("how much ram does this mac have"));
+        assert!(!looks_like_ram_capacity_request("why is memory big"));
+        assert!(!looks_like_ram_capacity_request("memory folder size"));
+        assert!(!looks_like_ram_capacity_request("how much ram is used"));
+        assert!(!looks_like_ram_capacity_request("memory.md size"));
+        assert!(!looks_like_memory_size_request("how big is memory"));
+        assert!(!looks_like_memory_size_request("memory size"));
+        let cap = try_operator_instant_reply("how big is memory?")
+            .expect("ram capacity instant");
+        assert!(
+            cap.contains("installed") || cap.contains("no memory size"),
+            "{cap}"
+        );
+        assert!(try_operator_instant_reply("why is memory big").is_none());
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)

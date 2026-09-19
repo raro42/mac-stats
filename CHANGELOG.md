@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1172] - 2026-09-19
+
+### Changed
+- **RAM size instant** — “How big is memory?”, “memory size”, and “how many GB of RAM” answer with installed RAM plus used (no LLM). “How much RAM is used” still uses the percent chip. Notes size and `memory.md` size stay on disk. “Why” stays with the agent.
+
 ## [0.1.1171] - 2026-09-19
 
 ### Changed
