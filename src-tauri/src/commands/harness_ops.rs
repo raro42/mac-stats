@@ -1941,6 +1941,19 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session summarize or rename is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("summar")
+            || n.contains("rename")
+            || n.contains("recap")
+            || n.contains("title")
+            || n.contains("name this")
+            || n.contains("name the")
+            || n.contains("name a session")
+            || n.contains("session name"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65018,10 +65031,20 @@ mod tests {
         assert!(parse_operator_count_kind("remove this session").is_none());
         assert!(parse_operator_count_kind("end this session").is_none());
         assert!(parse_operator_count_kind("close this session").is_none());
+        assert!(parse_operator_count_kind("summarize this session").is_none());
+        assert!(parse_operator_count_kind("summary of this session").is_none());
+        assert!(parse_operator_count_kind("session summary").is_none());
+        assert!(parse_operator_count_kind("rename this session").is_none());
+        assert!(parse_operator_count_kind("title this session").is_none());
+        assert!(parse_operator_count_kind("name this session").is_none());
+        assert!(parse_operator_count_kind("recap this session").is_none());
         assert!(try_operator_instant_reply("reset this session").is_none());
         assert!(try_operator_instant_reply("clear the session").is_none());
         assert!(try_operator_instant_reply("delete this session").is_none());
         assert!(try_operator_instant_reply("close the session").is_none());
+        assert!(try_operator_instant_reply("summarize this session").is_none());
+        assert!(try_operator_instant_reply("rename this session").is_none());
+        assert!(try_operator_instant_reply("title the session").is_none());
         assert_eq!(
             parse_operator_count_kind("how many sessions"),
             Some(OperatorCountKind::Sessions)

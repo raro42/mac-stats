@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1183** | Session count — “summarize this session”, “rename this session”, “session summary”, and “title this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1182** | Session count — “delete this session”, “remove this session”, “end this session”, and “close this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1181** | Session count — “reset this session”, “clear this session”, and “new session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. Phrase-file path, size, and age stay on those lanes. |
 | **v0.1.1180** | Session count — “compact this session” stays with the agent. It no longer answers with the session count. “How many sessions” still counts. |
@@ -17,10 +18,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “delete this session” and the agent handles the delete. You no longer get a session count. “How many sessions” still counts.
+Ask “summarize this session” or “rename this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “summarize this session” and “rename this session” still match the session count. “Start over” and “fresh start” do not contain “session”, so they never hit that count.
+- Instant-lane leftovers: “resume this session”, “open this session”, and “switch this session” still match the session count. “Start over” and “fresh start” do not contain “session”, so they never hit that count.
