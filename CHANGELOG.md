@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1178] - 2026-09-19
+
+### Changed
+- **Top GPU instant** — “What’s using the most GPU?”, “which process is using the most GPU”, and “what’s eating the GPU” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” still uses the Hot filter. “How much GPU” and “is the GPU hot” still use the GPU ring. “Why” stays with the agent.
+
 ## [0.1.1177] - 2026-09-19
 
 ### Changed

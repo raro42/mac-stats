@@ -49105,6 +49105,87 @@ pub fn format_top_ram_process_gateway() -> String {
     }
 }
 
+/// One process using the most GPU — not the full Top Processes list.
+/// "Why" stays with the agent. `/processes` and `hot processes` stay the list.
+/// "How much gpu is used" and "is the gpu hot" stay the GPU ring.
+pub fn looks_like_top_gpu_process_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how much")
+        || n.contains("how hot")
+        || n.contains("how fast")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("kill")
+        || n.contains("hot")
+        || n.contains("cpu")
+        || n.contains("ram")
+        || n.contains("memory")
+        || n.contains("list")
+        || n.contains("processes")
+        || n.contains("pin")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "what's using the most gpu"
+            | "whats using the most gpu"
+            | "what is using the most gpu"
+            | "who's using the most gpu"
+            | "whos using the most gpu"
+            | "who is using the most gpu"
+            | "which process is using the most gpu"
+            | "which process uses the most gpu"
+            | "what's the top gpu process"
+            | "whats the top gpu process"
+            | "what is the top gpu process"
+            | "top gpu process"
+            | "what's eating the gpu"
+            | "whats eating the gpu"
+            | "what is eating the gpu"
+            | "what's hogging the gpu"
+            | "whats hogging the gpu"
+            | "which app is using the most gpu"
+            | "which app uses the most gpu"
+    )
+}
+
+/// Zero-LLM name of the process with the highest estimated GPU % (cached Top Processes).
+pub fn format_top_gpu_process_gateway() -> String {
+    let details = crate::metrics::get_cpu_details();
+    let best = details
+        .top_processes
+        .iter()
+        .filter(|p| p.gpu > 0.0 && !p.name.trim().is_empty())
+        .max_by(|a, b| {
+            a.gpu
+                .partial_cmp(&b.gpu)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+    match best {
+        Some(p) => {
+            let name = truncate_preview(&p.name, 40);
+            let ram = format_process_ram(p.memory);
+            let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
+            format!(
+                "**Top GPU** · `{name}` · pid {pid} · GPU {gpu:.0}% · CPU {cpu:.0}% · {ram}{hot_mark}",
+                pid = p.pid,
+                cpu = p.cpu,
+                gpu = p.gpu,
+            )
+        }
+        None if details.top_processes.is_empty() => {
+            "**Top GPU** — _nothing here yet — open the CPU window so Top Processes can fill in._"
+                .to_string()
+        }
+        None => "**Top GPU** — _no process is using the GPU right now._".to_string(),
+    }
+}
+
 /// CPU rings All · Hot filter for `/rings` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RingsListFilter {
@@ -57700,12 +57781,15 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_details_list_filter(content);
         return Some(format_details_gateway(filter));
     }
-    // One top-CPU / top-RAM process before the full Top Processes list.
+    // One top-CPU / top-RAM / top-GPU process before the full Top Processes list.
     if looks_like_top_cpu_process_request(content) {
         return Some(format_top_cpu_process_gateway());
     }
     if looks_like_top_ram_process_request(content) {
         return Some(format_top_ram_process_gateway());
+    }
+    if looks_like_top_gpu_process_request(content) {
+        return Some(format_top_gpu_process_gateway());
     }
     if looks_like_processes_request(content) {
         let filter = parse_processes_list_filter(content);
@@ -57979,6 +58063,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` · `view hot` · `see hot` · `show me the hot` · `open hot` · `list the hot` · `view pinned` · `see pinned` · `show me the pinned` · `open pinned` · `list the pinned` — Top Processes Hot/Pinned list (exact open only — not rings/strip/details Hot · not pinned path/size/age)\n\
 • `what's using the most cpu` · `which process is using the most cpu` · `what's eating the cpu` — one Top CPU process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much cpu` stays the CPU ring; `why` stays with the agent)\n\
 • `what's using the most ram` · `which process is using the most memory` · `what's eating the ram` — one Top RAM process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much ram` stays the % chip; `how big is memory` stays installed RAM; `why` stays with the agent)\n\
+• `what's using the most gpu` · `which process is using the most gpu` · `what's eating the gpu` — one Top GPU process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much gpu` and `is the gpu hot` stay the GPU ring; `why` stays with the agent)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` · `p core frequency` · `e core frequency` · `how fast are the p cores` · `how fast are the e cores` — CPU · GPU · Freq · Temp ring chips, plus P-core / E-core clocks (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, `why is the frequency high`, and `why is the p core high` stay with the agent; `how fast is the cpu` stays the Freq ring)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
@@ -58015,6 +58100,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Top RAM process instant (v0.1.1177) — not the RAM % chip, not installed size.
     if looks_like_top_ram_process_request(question) {
+        return true;
+    }
+    // Top GPU process instant (v0.1.1178) — not the GPU ring, not the process list.
+    if looks_like_top_gpu_process_request(question) {
         return true;
     }
     let q = question.to_lowercase();
@@ -77477,6 +77566,18 @@ mod tests {
         let top_ram = try_operator_instant_reply("what's using the most ram?")
             .expect("top ram process instant");
         assert!(top_ram.starts_with("**Top RAM**"), "{top_ram}");
+        assert!(looks_like_top_gpu_process_request(
+            "what's using the most gpu?"
+        ));
+        assert!(looks_like_top_gpu_process_request(
+            "which process is using the most gpu"
+        ));
+        assert!(!looks_like_top_gpu_process_request("how much gpu is used"));
+        assert!(!looks_like_top_gpu_process_request("is the gpu hot"));
+        assert!(!looks_like_processes_request("what's using the most gpu"));
+        let top_gpu = try_operator_instant_reply("what's using the most gpu?")
+            .expect("top gpu process instant");
+        assert!(top_gpu.starts_with("**Top GPU**"), "{top_gpu}");
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)
@@ -78967,6 +79068,40 @@ mod tests {
             "capacity must not name one process: {cap}"
         );
         assert!(try_operator_instant_reply("why is the ram high").is_none());
+        assert!(looks_like_top_gpu_process_request(
+            "what's using the most gpu?"
+        ));
+        assert!(looks_like_top_gpu_process_request(
+            "which process is using the most gpu"
+        ));
+        assert!(looks_like_top_gpu_process_request("what's eating the gpu"));
+        assert!(!looks_like_top_gpu_process_request("how much gpu is used"));
+        assert!(!looks_like_top_gpu_process_request("is the gpu hot"));
+        assert!(!looks_like_top_gpu_process_request("is the gpu high"));
+        assert!(!looks_like_top_gpu_process_request("top processes"));
+        assert!(!looks_like_top_gpu_process_request("hot processes"));
+        assert!(!looks_like_top_gpu_process_request("why is the gpu high"));
+        assert!(!looks_like_top_gpu_process_request(
+            "what's using the most cpu"
+        ));
+        assert!(!looks_like_processes_request("what's using the most gpu"));
+        assert!(!looks_like_ring_chip_request("what's using the most gpu"));
+        let top_gpu = try_operator_instant_reply("what's using the most gpu?")
+            .expect("top gpu process instant");
+        assert!(top_gpu.starts_with("**Top GPU**"), "{top_gpu}");
+        let gpu_used =
+            try_operator_instant_reply("how much gpu is used?").expect("gpu percent ring stays");
+        assert!(
+            !gpu_used.starts_with("**Top GPU**"),
+            "gpu ring must not name one process: {gpu_used}"
+        );
+        let gpu_hot =
+            try_operator_instant_reply("is the gpu hot?").expect("gpu hot stays the ring");
+        assert!(
+            !gpu_hot.starts_with("**Top GPU**"),
+            "gpu hot must not name one process: {gpu_hot}"
+        );
+        assert!(try_operator_instant_reply("why is the gpu high").is_none());
         assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
         assert_eq!(
             parse_operator_count_kind("how many agents"),
