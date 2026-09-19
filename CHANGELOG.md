@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1179] - 2026-09-19
+
+### Changed
+- **App uptime instant** — “How long have you been running?”, “app uptime”, and “process uptime” answer with how long mac-stats has been up (no LLM). “What’s the uptime” and “how long has the Mac been up” still use the Up chip. “Why” stays with the agent.
+
 ## [0.1.1178] - 2026-09-19
 
 ### Changed

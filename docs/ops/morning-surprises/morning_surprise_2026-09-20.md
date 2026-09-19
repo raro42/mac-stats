@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1179** | App uptime instant — “how long have you been running?”, “app uptime”, and “process uptime” answer with how long mac-stats has been up (no LLM). “What’s the uptime” and “how long has the Mac been up” still use the Up chip. “Why” stays with the agent. |
 | **v0.1.1178** | Top GPU instant — “what’s using the most GPU?”, “which process is using the most GPU”, and “what’s eating the GPU” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” stays Hot. “How much GPU” and “is the GPU hot” stay the GPU ring. “Why” stays with the agent. |
 | **v0.1.1177** | Top RAM instant — “what’s using the most RAM?”, “which process is using the most memory”, and “what’s eating the RAM” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” stays Hot. “How much RAM” stays the percent chip. “How big is memory” stays installed RAM. “Why” stays with the agent. |
 | **v0.1.1176** | Top CPU instant — “what’s using the most CPU?”, “which process is using the most CPU”, and “what’s eating the CPU” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” stays Hot. “How much CPU” stays the CPU ring. “Why” stays with the agent. `CURSOR_AGENT:` tool calls no longer answer with the agent count. |
@@ -13,7 +14,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “what’s using the most GPU?” and you get one process name. The chat model does not have to look that up.
+Ask “how long have you been running?” and you get the mac-stats clock. “What’s the uptime” still names how long the Mac has been up. The chat model does not have to look that up.
 
 ## Next
 

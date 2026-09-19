@@ -49860,6 +49860,49 @@ fn format_system_uptime(secs: u64) -> String {
     }
 }
 
+/// mac-stats process clock — not the Mac Up chip.
+/// "Why" stays with the agent. "What's the uptime" stays system uptime.
+pub fn looks_like_app_uptime_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("system")
+        || n.contains("machine")
+        || n.contains("the mac")
+        || n.contains("mac been")
+        || n.contains("session")
+        || n.contains("restart")
+        || n.contains("kill")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "how long have you been up"
+            | "how long are you up"
+            | "how long running"
+            | "how long have you been running"
+            | "how long has the app been up"
+            | "how long has the app been running"
+            | "how long has mac-stats been up"
+            | "how long has mac-stats been running"
+            | "process uptime"
+            | "app uptime"
+            | "mac-stats uptime"
+            | "bot uptime"
+            | "your uptime"
+    )
+}
+
+/// Zero-LLM mac-stats process uptime (not the Mac Up chip).
+pub fn format_app_uptime_gateway() -> String {
+    format!("**App up** · {}", crate::state::format_process_uptime())
+}
+
 fn strip_heat_is_attention(thermal: &str) -> bool {
     matches!(
         thermal.trim(),
@@ -57762,6 +57805,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     if looks_like_disk_free_request(content) {
         return Some(format_disk_free_gateway());
     }
+    // App clock before the Mac Up chip ("what's the uptime" stays system uptime).
+    if looks_like_app_uptime_request(content) {
+        return Some(format_app_uptime_gateway());
+    }
     if looks_like_strip_chip_request(content) {
         if let Some(ask) = parse_strip_chip_ask(content) {
             return Some(format_strip_chip_gateway(ask));
@@ -58064,6 +58111,7 @@ pub fn format_ops_help_gateway() -> String {
 • `what's using the most cpu` · `which process is using the most cpu` · `what's eating the cpu` — one Top CPU process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much cpu` stays the CPU ring; `why` stays with the agent)\n\
 • `what's using the most ram` · `which process is using the most memory` · `what's eating the ram` — one Top RAM process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much ram` stays the % chip; `how big is memory` stays installed RAM; `why` stays with the agent)\n\
 • `what's using the most gpu` · `which process is using the most gpu` · `what's eating the gpu` — one Top GPU process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much gpu` and `is the gpu hot` stay the GPU ring; `why` stays with the agent)\n\
+• `how long have you been running` · `app uptime` · `process uptime` — mac-stats process uptime (no LLM; `what's the uptime` and `how long has the mac been up` stay the Up chip; `why` stays with the agent)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` · `p core frequency` · `e core frequency` · `how fast are the p cores` · `how fast are the e cores` — CPU · GPU · Freq · Temp ring chips, plus P-core / E-core clocks (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, `why is the frequency high`, and `why is the p core high` stay with the agent; `how fast is the cpu` stays the Freq ring)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
@@ -58104,6 +58152,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Top GPU process instant (v0.1.1178) — not the GPU ring, not the process list.
     if looks_like_top_gpu_process_request(question) {
+        return true;
+    }
+    // App uptime instant (v0.1.1179) — not the Mac Up chip.
+    if looks_like_app_uptime_request(question) {
         return true;
     }
     let q = question.to_lowercase();
@@ -77578,6 +77630,23 @@ mod tests {
         let top_gpu = try_operator_instant_reply("what's using the most gpu?")
             .expect("top gpu process instant");
         assert!(top_gpu.starts_with("**Top GPU**"), "{top_gpu}");
+        assert!(looks_like_app_uptime_request(
+            "how long have you been running?"
+        ));
+        assert!(looks_like_app_uptime_request("app uptime"));
+        assert!(looks_like_app_uptime_request("process uptime"));
+        assert!(!looks_like_app_uptime_request("what's the uptime"));
+        assert!(!looks_like_app_uptime_request("how long has the mac been up"));
+        assert!(!looks_like_app_uptime_request("why have you been running"));
+        assert!(parse_strip_chip_ask("how long have you been running").is_none());
+        let app_up = try_operator_instant_reply("how long have you been running?")
+            .expect("app uptime instant");
+        assert!(app_up.starts_with("**App up**"), "{app_up}");
+        let mac_up = try_operator_instant_reply("what's the uptime?").expect("mac uptime stays");
+        assert!(
+            mac_up.starts_with("**Up**"),
+            "system uptime must stay the Up chip: {mac_up}"
+        );
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)
@@ -79102,6 +79171,37 @@ mod tests {
             "gpu hot must not name one process: {gpu_hot}"
         );
         assert!(try_operator_instant_reply("why is the gpu high").is_none());
+        assert!(looks_like_app_uptime_request(
+            "how long have you been running?"
+        ));
+        assert!(looks_like_app_uptime_request("how long have you been up"));
+        assert!(looks_like_app_uptime_request("app uptime"));
+        assert!(!looks_like_app_uptime_request("what's the uptime"));
+        assert!(!looks_like_app_uptime_request("how long has the mac been up"));
+        assert!(!looks_like_app_uptime_request("how long has it been up"));
+        assert!(!looks_like_app_uptime_request("system uptime"));
+        assert!(!looks_like_app_uptime_request("why have you been running"));
+        assert!(!looks_like_processes_request("process uptime"));
+        assert!(parse_strip_chip_ask("how long have you been running").is_none());
+        assert_eq!(
+            parse_strip_chip_ask("how long has the mac been up"),
+            Some(StripChipAsk::Uptime)
+        );
+        let app_up = try_operator_instant_reply("how long have you been running?")
+            .expect("app uptime instant");
+        assert!(app_up.starts_with("**App up**"), "{app_up}");
+        let mac_up = try_operator_instant_reply("what's the uptime?").expect("mac uptime stays");
+        assert!(
+            mac_up.starts_with("**Up**"),
+            "system uptime must stay the Up chip: {mac_up}"
+        );
+        assert!(try_operator_instant_reply("why have you been running").is_none());
+        assert!(is_insights_slowest_noise(
+            "direct",
+            12_000,
+            &[],
+            "how long have you been running?"
+        ));
         assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
         assert_eq!(
             parse_operator_count_kind("how many agents"),
