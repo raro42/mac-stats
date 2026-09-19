@@ -340,8 +340,8 @@
   async function fetchHistoryFromBackend(timeRangeSeconds, maxPoints) {
     try {
       const result = await tauriInvoke('get_metrics_history', {
-        time_range_seconds: timeRangeSeconds,
-        max_display_points: maxPoints
+        timeRangeSeconds: timeRangeSeconds,
+        maxDisplayPoints: maxPoints
       });
 
       return result;

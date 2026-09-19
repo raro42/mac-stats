@@ -2705,13 +2705,13 @@ function init() {
   ensurePowerStripKeyboard();
   
   // Try to get Tauri immediately - don't wait if it's already available
-  const immediateInvoke = getInvoke();
-  if (immediateInvoke) {
+    const immediateInvoke = getInvoke();
+    void seedThemeHistoryFromBackend();
+    if (immediateInvoke) {
     invoke = immediateInvoke;
     // Call refresh immediately - don't wait for interval
     refresh();
     startRefresh();
-    void seedThemeHistoryFromBackend();
   } else {
     // Tauri not ready yet - wait for it
     waitForTauri((invokeFn) => {
@@ -2719,7 +2719,6 @@ function init() {
       // Call refresh immediately when Tauri becomes available
       refresh();
       startRefresh();
-      void seedThemeHistoryFromBackend();
     });
   }
 }
@@ -2772,6 +2771,7 @@ function ensureGpuHistoryChart() {
 }
 
 function feedThemeHistoryCharts(data, _includeTemperature) {
+  if (!sparklineHistoryReady) return;
   ensureGpuHistoryChart();
   const usage =
     typeof data?.usage === 'number' && Number.isFinite(data.usage)
@@ -5444,13 +5444,12 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     // Window became visible - refresh immediately and force process update
     window._forceProcessUpdate = true; // Force immediate process list update
-    if (invoke) {
-      // Tauri is ready - refresh immediately and start interval
-      refresh(); // Immediate refresh
+      if (invoke) {
+      void seedThemeHistoryFromBackend();
+      refresh();
       if (!refreshInterval) {
         startRefresh();
       }
-      void seedThemeHistoryFromBackend();
     } else {
       // Tauri not ready - initialize (will keep trying until ready)
       init();
@@ -21726,23 +21725,48 @@ function initIconLine() {
 }
 
 
+/** True after the open-window history seed finishes (success or give-up). */
+let sparklineHistoryReady = false;
+
 /** Paint sparklines from backend history (menu-bar samples) so charts are not empty on open. */
 async function seedThemeHistoryFromBackend() {
   ensureGpuHistoryChart();
-  const inv = getInvoke() || invoke;
-  if (!inv || typeof window.themeHistory?.seedFromPoints !== 'function') return;
-  try {
-    const result = await inv('get_metrics_history', {
-      time_range_seconds: 300,
-      max_display_points: 60,
-    });
-    if (result?.points?.length) {
-      window.themeHistory.seedFromPoints(result.points);
+  const inv = getInvoke() || (typeof invoke !== 'undefined' ? invoke : null);
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const canSeed =
+      typeof window.themeHistory?.seedFromPoints === 'function' ||
+      typeof window.posterCharts?.seedFromPoints === 'function';
+    if (!inv || !canSeed) {
+      await sleep(200);
+      continue;
     }
-  } catch (_) {
-    // History not ready yet — live feed fills charts on the next refresh ticks.
+    try {
+      // Tauri 2 command args are camelCase. Snake_case never reached Rust, so
+      // the charts stayed empty and grew from the right on every open.
+      const result = await inv('get_metrics_history', {
+        timeRangeSeconds: 300,
+        maxDisplayPoints: 60,
+      });
+      if (result?.points?.length) {
+        if (typeof window.themeHistory?.seedFromPoints === 'function') {
+          window.themeHistory.seedFromPoints(result.points);
+        }
+        if (typeof window.posterCharts?.seedFromPoints === 'function') {
+          window.posterCharts.seedFromPoints(result.points);
+        }
+        sparklineHistoryReady = true;
+        return true;
+      }
+    } catch (err) {
+      console.debug('sparkline history seed', err);
+    }
+    await sleep(300);
   }
+  sparklineHistoryReady = true;
+  return false;
 }
+window.seedThemeHistoryFromBackend = seedThemeHistoryFromBackend;
 
 // Check if history data is available and show/hide dropdown accordingly
 async function checkHistoryAvailability() {
@@ -21750,9 +21774,9 @@ async function checkHistoryAvailability() {
     // Check if we have >24h of data available to show the dropdown
     const inv = getInvoke();
     if (!inv) return;
-    const result = await inv('get_metrics_history', {
-      time_range_seconds: 86400, // 24 hours
-      max_display_points: null
+      const result = await inv('get_metrics_history', {
+      timeRangeSeconds: 86400, // 24 hours
+      maxDisplayPoints: null
     });
 
     if (result && result.oldest_available_timestamp) {

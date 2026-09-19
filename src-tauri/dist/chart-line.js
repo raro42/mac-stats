@@ -214,6 +214,31 @@
     drawLineChart(metric);
   }
 
+  function seriesFromHistory(points, getter, metric) {
+    const slice = points.slice(-LINE_CHART_POINTS);
+    const values = [];
+    for (let i = 0; i < slice.length; i++) {
+      const v = getter(slice[i]);
+      if (typeof v !== "number" || !Number.isFinite(v)) continue;
+      // Temp/freq 0 means "no sample" in the backend cache path.
+      if ((metric === "temperature" || metric === "frequency") && v <= 0) continue;
+      values.push(v);
+    }
+    const line = new Array(LINE_CHART_POINTS).fill(EMPTY_POINT);
+    if (!values.length) return line;
+    if (values.length === 1) {
+      line[LINE_CHART_POINTS - 1] = values[0];
+      return line;
+    }
+    // Oldest on the left, newest on the right, across the full width.
+    // A short stub on the right looks like the chart "starts in ticks".
+    for (let i = 0; i < values.length; i++) {
+      const idx = Math.round((i / (values.length - 1)) * (LINE_CHART_POINTS - 1));
+      line[idx] = values[i];
+    }
+    return line;
+  }
+
   function seedFromPoints(points) {
     if (!Array.isArray(points) || !points.length) return false;
     const getters = {
@@ -222,20 +247,8 @@
       frequency: (p) => p && p.frequency,
       temperature: (p) => p && p.temperature,
     };
-    const slice = points.slice(-LINE_CHART_POINTS);
-    const start = LINE_CHART_POINTS - slice.length;
     for (const [metric, getter] of Object.entries(getters)) {
-      const line = new Array(LINE_CHART_POINTS).fill(EMPTY_POINT);
-      for (let i = 0; i < slice.length; i++) {
-        const v = getter(slice[i]);
-        if (typeof v !== "number" || !Number.isFinite(v)) continue;
-        // Temp/freq 0 means "no sample" in the backend cache path.
-        if ((metric === "temperature" || metric === "frequency") && v <= 0) {
-          continue;
-        }
-        line[start + i] = v;
-      }
-      dataBuffers[metric].line = line;
+      dataBuffers[metric].line = seriesFromHistory(points, getter, metric);
     }
     if (!canvases.usage) initializeCanvases();
     COLORS = getColors();
@@ -285,7 +298,12 @@
   function boot() {
     api.init();
     window.addEventListener("resize", () => api.refreshLayout());
-    requestAnimationFrame(() => api.refreshLayout());
+    requestAnimationFrame(() => {
+      api.refreshLayout();
+      if (typeof window.seedThemeHistoryFromBackend === "function") {
+        void window.seedThemeHistoryFromBackend();
+      }
+    });
   }
 
   if (document.readyState === "loading") {

@@ -2526,43 +2526,40 @@ pub fn get_metrics_history(
         max_display_points
     );
 
-    // Try to get history buffer with non-blocking lock
-    match METRICS_HISTORY.try_lock() {
-        Ok(history_opt) => {
-            if let Some(history) = history_opt.as_ref() {
-                let points = history.query(time_range_seconds, max_display_points);
-                let oldest = history.oldest_timestamp();
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map(|d| d.as_secs() as i64)
-                    .unwrap_or(0);
+    // Block briefly. try_lock dropped the open-window seed whenever the
+    // sampler held the mutex (including the history.json write).
+    let history_opt = match METRICS_HISTORY.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    if let Some(history) = history_opt.as_ref() {
+        let points = history.query(time_range_seconds, max_display_points);
+        let oldest = history.oldest_timestamp();
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs() as i64)
+            .unwrap_or(0);
 
-                debug3!(
-                    "get_metrics_history: returning {} points, oldest_ts={:?}, newest_ts={}",
-                    points.len(),
-                    oldest,
-                    now
-                );
+        debug3!(
+            "get_metrics_history: returning {} points, oldest_ts={:?}, newest_ts={}",
+            points.len(),
+            oldest,
+            now
+        );
 
-                Ok(history::HistoryQueryResult {
-                    points,
-                    time_range_seconds,
-                    oldest_available_timestamp: oldest,
-                    newest_available_timestamp: Some(now),
-                })
-            } else {
-                debug3!("get_metrics_history: history buffer not initialized yet");
-                Ok(history::HistoryQueryResult {
-                    points: Vec::new(),
-                    time_range_seconds,
-                    oldest_available_timestamp: None,
-                    newest_available_timestamp: None,
-                })
-            }
-        }
-        Err(e) => {
-            debug3!("get_metrics_history: lock contention - {}", e);
-            Err("History buffer temporarily unavailable".to_string())
-        }
+        Ok(history::HistoryQueryResult {
+            points,
+            time_range_seconds,
+            oldest_available_timestamp: oldest,
+            newest_available_timestamp: Some(now),
+        })
+    } else {
+        debug3!("get_metrics_history: history buffer not initialized yet");
+        Ok(history::HistoryQueryResult {
+            points: Vec::new(),
+            time_range_seconds,
+            oldest_available_timestamp: None,
+            newest_available_timestamp: None,
+        })
     }
 }

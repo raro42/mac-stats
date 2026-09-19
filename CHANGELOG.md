@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1174] - 2026-09-19
+
+### Fixed
+- **Sparkline history on open** — CPU, GPU, frequency, and temperature charts now draw the last five minutes from the saved history when you open the window. They no longer start empty and grow from the right.
+
 ## [0.1.1173] - 2026-09-19
 
 ### Changed
