@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1181] - 2026-09-19
+
+### Fixed
+- **Session count** — “Reset this session”, “clear this session”, and “new session” no longer answer with the session count. Reset stays with the agent. “How many sessions” still counts. Phrase-file path, size, and age stay on those lanes.
+
 ## [0.1.1180] - 2026-09-19
 
 ### Fixed

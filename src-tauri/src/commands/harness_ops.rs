@@ -1922,6 +1922,14 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     if n.contains("compact") {
         return None;
     }
+    // Session reset is an action. It must not answer with the session count.
+    if n.contains("reset")
+        || n.contains("new session")
+        || (n.contains("clear") && n.contains("session"))
+        || (n.contains("wipe") && n.contains("session"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -64991,6 +64999,20 @@ mod tests {
         assert!(parse_operator_count_kind("why are there so many tasks").is_none());
         assert!(parse_operator_count_kind("compact this session").is_none());
         assert!(try_operator_instant_reply("compact this session").is_none());
+        assert!(parse_operator_count_kind("reset this session").is_none());
+        assert!(parse_operator_count_kind("clear this session").is_none());
+        assert!(parse_operator_count_kind("new session").is_none());
+        assert!(parse_operator_count_kind("wipe this session").is_none());
+        assert!(try_operator_instant_reply("reset this session").is_none());
+        assert!(try_operator_instant_reply("clear the session").is_none());
+        assert_eq!(
+            parse_operator_count_kind("how many sessions"),
+            Some(OperatorCountKind::Sessions)
+        );
+        assert_eq!(
+            parse_operator_count_kind("session count"),
+            Some(OperatorCountKind::Sessions)
+        );
         let agents = try_operator_instant_reply("how many agents").expect("agent count instant");
         assert!(agents.contains("Agents") && agents.contains("on"));
         let digest = try_operator_instant_reply("digest open count")
