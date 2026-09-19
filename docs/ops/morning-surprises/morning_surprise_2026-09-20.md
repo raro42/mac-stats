@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1184** | Session count — “resume this session”, “open this session”, “switch this session”, and “continue this session” stay with the agent. They no longer answer with the session count. “Open sessions” still lists. “How many sessions” still counts. |
 | **v0.1.1183** | Session count — “summarize this session”, “rename this session”, “session summary”, and “title this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1182** | Session count — “delete this session”, “remove this session”, “end this session”, and “close this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
 | **v0.1.1181** | Session count — “reset this session”, “clear this session”, and “new session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. Phrase-file path, size, and age stay on those lanes. |
@@ -18,10 +19,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “summarize this session” or “rename this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts.
+Ask “resume this session” or “switch this session” and the agent handles it. You no longer get a session count. “Open sessions” still lists. “How many sessions” still counts.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “resume this session”, “open this session”, and “switch this session” still match the session count. “Start over” and “fresh start” do not contain “session”, so they never hit that count.
+- Instant-lane leftovers: “fork this session”, “export this session”, and “search this session” still match the session count. “Open sessions” stays the list. “Start over” and “fresh start” do not contain “session”, so they never hit that count.

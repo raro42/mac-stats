@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1184] - 2026-09-20
+
+### Fixed
+- **Session count** — “Resume this session”, “open this session”, “switch this session”, and “continue this session” no longer answer with the session count. Resume, open, and switch stay with the agent. “Open sessions” still lists. “How many sessions” still counts.
+
 ## [0.1.1183] - 2026-09-19
 
 ### Fixed

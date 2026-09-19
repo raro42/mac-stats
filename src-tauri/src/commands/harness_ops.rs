@@ -1954,6 +1954,15 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session resume, open, or switch is an action. It must not answer with the session count.
+    // Plural "open sessions" stays the list (checked before this count).
+    if n.contains("resume")
+        || (n.contains("continue") && n.contains("session"))
+        || (n.contains("switch") && n.contains("session"))
+        || (n.contains("open") && n.contains("session") && !n.contains("sessions"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65038,6 +65047,15 @@ mod tests {
         assert!(parse_operator_count_kind("title this session").is_none());
         assert!(parse_operator_count_kind("name this session").is_none());
         assert!(parse_operator_count_kind("recap this session").is_none());
+        assert!(parse_operator_count_kind("resume this session").is_none());
+        assert!(parse_operator_count_kind("resume the session").is_none());
+        assert!(parse_operator_count_kind("continue this session").is_none());
+        assert!(parse_operator_count_kind("open this session").is_none());
+        assert!(parse_operator_count_kind("open the session").is_none());
+        assert!(parse_operator_count_kind("open session").is_none());
+        assert!(parse_operator_count_kind("switch this session").is_none());
+        assert!(parse_operator_count_kind("switch the session").is_none());
+        assert!(parse_operator_count_kind("switch session").is_none());
         assert!(try_operator_instant_reply("reset this session").is_none());
         assert!(try_operator_instant_reply("clear the session").is_none());
         assert!(try_operator_instant_reply("delete this session").is_none());
@@ -65045,6 +65063,17 @@ mod tests {
         assert!(try_operator_instant_reply("summarize this session").is_none());
         assert!(try_operator_instant_reply("rename this session").is_none());
         assert!(try_operator_instant_reply("title the session").is_none());
+        assert!(try_operator_instant_reply("resume this session").is_none());
+        assert!(try_operator_instant_reply("continue the session").is_none());
+        assert!(try_operator_instant_reply("open this session").is_none());
+        assert!(try_operator_instant_reply("switch this session").is_none());
+        assert!(looks_like_sessions_request("open sessions"));
+        let open_sessions =
+            try_operator_instant_reply("open sessions").expect("open sessions list");
+        assert!(
+            open_sessions.contains("Sessions"),
+            "open sessions must stay the list: {open_sessions}"
+        );
         assert_eq!(
             parse_operator_count_kind("how many sessions"),
             Some(OperatorCountKind::Sessions)
