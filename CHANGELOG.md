@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1169] - 2026-09-19
+
+### Changed
+- **P-core / E-core clock instant** — “How fast are the P-cores?”, “p core frequency”, and “is the P-core high” answer from the P-core clock (GHz, no LLM). “E core frequency” and “how fast are the E-cores” use the E-core clock. “Why is the P-core high” stays with the agent. “How fast is the CPU” still uses the Freq ring.
+
 ## [0.1.1168] - 2026-09-19
 
 ### Changed

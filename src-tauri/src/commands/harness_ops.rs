@@ -49461,6 +49461,120 @@ pub fn format_ring_chip_gateway(ask: RingChipAsk) -> String {
     }
 }
 
+/// P-core or E-core clock — not the combined Freq ring.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CoreClusterChip {
+    Performance,
+    Efficiency,
+}
+
+/// Focused P-core / E-core clock asks. "Why" stays with the agent.
+/// "How fast is the CPU" stays the Freq ring. "How fast is the GPU" stays with the agent.
+pub fn parse_core_cluster_freq(content: &str) -> Option<CoreClusterChip> {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return None;
+    }
+    if n.contains("why")
+        || n.contains("process")
+        || n.contains("gpu")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return None;
+    }
+    if matches!(
+        n.as_str(),
+        "p core"
+            | "p-core"
+            | "p cores"
+            | "p-cores"
+            | "the p core"
+            | "the p cores"
+            | "p core frequency"
+            | "p-core frequency"
+            | "the p core frequency"
+            | "p core freq"
+            | "p-core freq"
+            | "p core clock"
+            | "p-core clock"
+            | "p core speed"
+            | "performance core"
+            | "performance cores"
+            | "the performance cores"
+            | "performance core frequency"
+            | "performance core clock"
+            | "how fast are the p cores"
+            | "how fast is the p core"
+            | "how fast are the performance cores"
+            | "what's the p core frequency"
+            | "whats the p core frequency"
+            | "what is the p core frequency"
+            | "is the p core high"
+            | "is p core high"
+            | "is the p core frequency high"
+    ) {
+        return Some(CoreClusterChip::Performance);
+    }
+    if matches!(
+        n.as_str(),
+        "e core"
+            | "e-core"
+            | "e cores"
+            | "e-cores"
+            | "the e core"
+            | "the e cores"
+            | "e core frequency"
+            | "e-core frequency"
+            | "the e core frequency"
+            | "e core freq"
+            | "e-core freq"
+            | "e core clock"
+            | "e-core clock"
+            | "e core speed"
+            | "efficiency core"
+            | "efficiency cores"
+            | "the efficiency cores"
+            | "efficiency core frequency"
+            | "efficiency core clock"
+            | "how fast are the e cores"
+            | "how fast is the e core"
+            | "how fast are the efficiency cores"
+            | "what's the e core frequency"
+            | "whats the e core frequency"
+            | "what is the e core frequency"
+            | "is the e core high"
+            | "is e core high"
+            | "is the e core frequency high"
+    ) {
+        return Some(CoreClusterChip::Efficiency);
+    }
+    None
+}
+
+/// True for a focused P-core or E-core clock ask (not the combined Freq ring).
+pub fn looks_like_core_cluster_freq_request(content: &str) -> bool {
+    parse_core_cluster_freq(content).is_some()
+}
+
+/// Zero-LLM P-core / E-core reply (same Freq≥3.5 GHz hot mark as the Freq ring).
+pub fn format_core_cluster_freq_gateway(cluster: CoreClusterChip) -> String {
+    let d = crate::metrics::get_cpu_details();
+    let (label, value) = match cluster {
+        CoreClusterChip::Performance => ("P-core", d.p_core_frequency),
+        CoreClusterChip::Efficiency => ("E-core", d.e_core_frequency),
+    };
+    if value <= 0.0 {
+        return format!(
+            "**{label}** — _no frequency reading right now (open the CPU window)._"
+        );
+    }
+    let hot_mark = if ring_freq_is_hot(value) { " · hot" } else { "" };
+    format!("**{label}** · {value:.2} GHz{hot_mark}")
+}
+
 /// Power strip All · Hot filter for `/strip` instant replies (menu-bar amber parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StripListFilter {
@@ -57125,6 +57239,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_rings_list_filter(content);
         return Some(format_rings_gateway(filter));
     }
+    if let Some(cluster) = parse_core_cluster_freq(content) {
+        return Some(format_core_cluster_freq_gateway(cluster));
+    }
     if looks_like_ring_chip_request(content) {
         if let Some(ask) = parse_ring_chip_ask(content) {
             return Some(format_ring_chip_gateway(ask));
@@ -57417,7 +57534,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` · `view hot` · `see hot` · `show me the hot` · `open hot` · `list the hot` · `view pinned` · `see pinned` · `show me the pinned` · `open pinned` · `list the pinned` — Top Processes Hot/Pinned list (exact open only — not rings/strip/details Hot · not pinned path/size/age)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
-• `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, and `why is the frequency high` stay with the agent)\n\
+• `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` · `p core frequency` · `e core frequency` · `how fast are the p cores` · `how fast are the e cores` — CPU · GPU · Freq · Temp ring chips, plus P-core / E-core clocks (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, `why is the frequency high`, and `why is the p core high` stay with the agent; `how fast is the cpu` stays the Freq ring)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
 • `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, `why is the disk full`, and `why is the power high` stay with the agent)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` · `is the load high` · `how's the load` · `how high is the load` · `how loaded` · `5 minute load` · `15 minute load` · `load 5` · `load 15` — Details Load · RAM · Up, plus Load 1m / 5m / 15m chips (Load≥4 hot; exact open only; `/load` stays the full panel; `why is the load high` and `why is the 5 minute load high` stay with the agent)\n\
@@ -59872,7 +59989,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is frequency high")
         || q.contains("is the freq high")
         || q.contains("is the clock high")
-        || q.contains("is clock high"))
+        || q.contains("is clock high")
+        || q.contains("p core")
+        || q.contains("p-core")
+        || q.contains("e core")
+        || q.contains("e-core")
+        || q.contains("performance core")
+        || q.contains("efficiency core"))
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("ring")
@@ -76894,6 +77017,45 @@ mod tests {
         assert!(!details_ram_is_hot(OPS_STRIP_RAM_HOT_PCT - 1.0));
         let view = try_operator_instant_reply("view details").expect("view details instant");
         assert!(view.to_lowercase().contains("detail") || view.to_lowercase().contains("load"), "{view}");
+    }
+
+    #[test]
+    fn core_cluster_freq_instant() {
+        assert_eq!(
+            parse_core_cluster_freq("p core frequency"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("how fast are the p cores?"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("is the p core frequency high"),
+            Some(CoreClusterChip::Performance)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("e core frequency"),
+            Some(CoreClusterChip::Efficiency)
+        );
+        assert_eq!(
+            parse_core_cluster_freq("how fast are the e cores"),
+            Some(CoreClusterChip::Efficiency)
+        );
+        assert!(parse_core_cluster_freq("why is the p core high").is_none());
+        assert!(parse_core_cluster_freq("how fast is the cpu").is_none());
+        assert!(parse_core_cluster_freq("how fast is the gpu").is_none());
+        assert!(looks_like_core_cluster_freq_request("performance cores"));
+        assert!(!looks_like_core_cluster_freq_request("/freq"));
+        let p_core = try_operator_instant_reply("what's the p core frequency?")
+            .expect("p core instant");
+        assert!(p_core.to_lowercase().contains("p-core"), "{p_core}");
+        assert!(!p_core.to_lowercase().contains("e-core"), "{p_core}");
+        let e_core = try_operator_instant_reply("e core frequency").expect("e core instant");
+        assert!(e_core.to_lowercase().contains("e-core"), "{e_core}");
+        assert!(try_operator_instant_reply("why is the p core high").is_none());
+        let freq = try_operator_instant_reply("how fast is the cpu?").expect("freq ring");
+        assert!(freq.to_lowercase().contains("freq"), "{freq}");
+        assert!(!freq.to_lowercase().contains("p-core"), "{freq}");
     }
 
     #[test]
