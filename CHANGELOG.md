@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1176] - 2026-09-19
+
+### Changed
+- **Top CPU instant** — “What’s using the most CPU?”, “which process is using the most CPU”, and “what’s eating the CPU” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” still uses the Hot filter. “How much CPU” still uses the CPU ring. “Why” stays with the agent.
+- **Agent count** — `CURSOR_AGENT:` tool calls no longer answer with the agent count. “How many agents” still does.
+
 ## [0.1.1175] - 2026-09-19
 
 ### Changed

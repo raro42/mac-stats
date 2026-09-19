@@ -1900,6 +1900,10 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
         || n.contains("next ")
         || n.contains("when ")
         || n.contains("last ")
+        || n.contains("cursor_agent")
+        || n.contains("cursor-agent")
+        || n.contains("fix ")
+        || n.contains(':')
         || n.chars().any(|c| c.is_ascii_digit())
     {
         return None;
@@ -48929,6 +48933,77 @@ pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
     out
 }
 
+/// One process using the most CPU — not the full Top Processes list.
+/// "Why" stays with the agent. `/processes` and `hot processes` stay the list.
+/// "How much cpu is used" stays the CPU ring.
+pub fn looks_like_top_cpu_process_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("how much")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("kill")
+        || n.contains("hot")
+        || n.contains("gpu")
+        || n.contains("ram")
+        || n.contains("memory")
+        || n.contains("list")
+        || n.contains("processes")
+        || n.contains("pin")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "what's using the most cpu"
+            | "whats using the most cpu"
+            | "what is using the most cpu"
+            | "who's using the most cpu"
+            | "whos using the most cpu"
+            | "who is using the most cpu"
+            | "which process is using the most cpu"
+            | "which process uses the most cpu"
+            | "what's the top cpu process"
+            | "whats the top cpu process"
+            | "what is the top cpu process"
+            | "top cpu process"
+            | "what's eating the cpu"
+            | "whats eating the cpu"
+            | "what is eating the cpu"
+            | "what's hogging the cpu"
+            | "whats hogging the cpu"
+            | "which app is using the most cpu"
+            | "which app uses the most cpu"
+    )
+}
+
+/// Zero-LLM name of the process with the highest CPU % (cached Top Processes).
+pub fn format_top_cpu_process_gateway() -> String {
+    let details = crate::metrics::get_cpu_details();
+    let best = details.top_processes.iter().max_by(|a, b| {
+        a.cpu
+            .partial_cmp(&b.cpu)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    match best {
+        Some(p) if !p.name.trim().is_empty() => {
+            let name = truncate_preview(&p.name, 40);
+            let ram = format_process_ram(p.memory);
+            let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
+            format!(
+                "**Top CPU** · `{name}` · pid {pid} · {cpu:.0}% · {ram}{hot_mark}",
+                pid = p.pid,
+                cpu = p.cpu,
+            )
+        }
+        _ => "**Top CPU** — _nothing here yet — open the CPU window so Top Processes can fill in._"
+            .to_string(),
+    }
+}
+
 /// CPU rings All · Hot filter for `/rings` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RingsListFilter {
@@ -57524,6 +57599,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_details_list_filter(content);
         return Some(format_details_gateway(filter));
     }
+    // One top-CPU process before the full Top Processes list.
+    if looks_like_top_cpu_process_request(content) {
+        return Some(format_top_cpu_process_gateway());
+    }
     if looks_like_processes_request(content) {
         let filter = parse_processes_list_filter(content);
         return Some(format_processes_gateway(filter));
@@ -57794,6 +57873,7 @@ pub fn format_ops_help_gateway() -> String {
 • `user info age` · `user-info.json age` · `how old is user info` · `when was user info updated` — user-info.json last write age (mtime; no dump; does not steal `user info path` / `user info size` / who-am-i)\n\
 • `user info path` · `where is user-info.json` · `user-info path` — Discord display-name map file (config only; no list/edit; `user info size` / `user info age` for bytes / mtime)\n\
 • `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` · `view processes` · `see processes` · `show me the processes` · `open processes` · `list the processes` · `view hot` · `see hot` · `show me the hot` · `open hot` · `list the hot` · `view pinned` · `see pinned` · `show me the pinned` · `open pinned` · `list the pinned` — Top Processes Hot/Pinned list (exact open only — not rings/strip/details Hot · not pinned path/size/age)\n\
+• `what's using the most cpu` · `which process is using the most cpu` · `what's eating the cpu` — one Top CPU process (no LLM; `/processes` stays the list; `hot processes` stays Hot; `how much cpu` stays the CPU ring; `why` stays with the agent)\n\
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` · `p core frequency` · `e core frequency` · `how fast are the p cores` · `how fast are the e cores` — CPU · GPU · Freq · Temp ring chips, plus P-core / E-core clocks (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, `why is the frequency high`, and `why is the p core high` stay with the agent; `how fast is the cpu` stays the Freq ring)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
@@ -77256,6 +77336,26 @@ mod tests {
             "used-% chip must not claim free bytes: {used}"
         );
         assert!(try_operator_instant_reply("why is the disk full").is_none());
+        assert!(looks_like_top_cpu_process_request(
+            "what's using the most cpu?"
+        ));
+        assert!(looks_like_top_cpu_process_request(
+            "which process is using the most cpu"
+        ));
+        assert!(looks_like_top_cpu_process_request("what's eating the cpu"));
+        assert!(!looks_like_top_cpu_process_request("how much cpu is used"));
+        assert!(!looks_like_top_cpu_process_request("top processes"));
+        assert!(!looks_like_top_cpu_process_request("hot processes"));
+        assert!(!looks_like_top_cpu_process_request("why is the cpu high"));
+        assert!(!looks_like_processes_request("what's using the most cpu"));
+        let top = try_operator_instant_reply("what's using the most cpu?")
+            .expect("top cpu process instant");
+        assert!(top.starts_with("**Top CPU**"), "{top}");
+        let list = try_operator_instant_reply("top processes").expect("process list stays");
+        assert!(
+            list.starts_with("**Top Processes**"),
+            "list must not become one process: {list}"
+        );
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)
@@ -78686,6 +78786,36 @@ mod tests {
         let c = c.unwrap();
         assert_eq!(c.kind, "promote_instant");
         assert!(c.reason.contains("Capabilities"));
+    }
+
+    #[test]
+    fn top_cpu_process_instant_names_one_process() {
+        assert!(looks_like_top_cpu_process_request(
+            "what's using the most cpu?"
+        ));
+        assert!(looks_like_top_cpu_process_request(
+            "which process is using the most cpu"
+        ));
+        assert!(looks_like_top_cpu_process_request("what's eating the cpu"));
+        assert!(!looks_like_top_cpu_process_request("how much cpu is used"));
+        assert!(!looks_like_top_cpu_process_request("top processes"));
+        assert!(!looks_like_top_cpu_process_request("hot processes"));
+        assert!(!looks_like_top_cpu_process_request("why is the cpu high"));
+        assert!(!looks_like_processes_request("what's using the most cpu"));
+        let top = try_operator_instant_reply("what's using the most cpu?")
+            .expect("top cpu process instant");
+        assert!(top.starts_with("**Top CPU**"), "{top}");
+        let list = try_operator_instant_reply("top processes").expect("process list stays");
+        assert!(
+            list.starts_with("**Top Processes**"),
+            "list must not become one process: {list}"
+        );
+        assert!(try_operator_instant_reply("why is the cpu high").is_none());
+        assert!(try_operator_instant_reply("CURSOR_AGENT: fix the bug").is_none());
+        assert_eq!(
+            parse_operator_count_kind("how many agents"),
+            Some(OperatorCountKind::Agents)
+        );
     }
 
     #[test]
