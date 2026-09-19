@@ -50538,6 +50538,74 @@ pub fn format_chip_identity_gateway() -> String {
     format!("**Chip** · {chip}")
 }
 
+/// Free disk bytes — not the used-% chip, not Disk Cleanup, not a config file size.
+/// "Why" stays with the agent. "How much disk is used" stays the SSD percent chip.
+/// Bare "free space" / "disk free" stay the percent chip.
+pub fn looks_like_disk_free_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 56 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("used")
+        || n.contains("usage")
+        || n.contains("percent")
+        || n.contains('%')
+        || n.contains("full")
+        || n.contains("hot")
+        || n.contains("cleanup")
+        || n.contains("reclaim")
+        || n.contains("path")
+        || n.contains(" age")
+        || n.ends_with(" age")
+        || n.contains(" size")
+        || n.ends_with(" size")
+        || n.contains("json")
+        || n.contains("notes")
+        || n.contains("memory")
+        || n.contains("process")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "how much free space"
+            | "how much space is left"
+            | "how much space left"
+            | "how much disk is free"
+            | "how much disk space is left"
+            | "how much disk space left"
+            | "how much storage is free"
+            | "how much storage is left"
+            | "how much storage left"
+            | "storage left"
+            | "disk space left"
+            | "free disk space"
+            | "how many gb free"
+            | "how many gb are free"
+            | "how many gigabytes free"
+            | "how many gb of free space"
+            | "how much ssd is free"
+            | "how much ssd free"
+            | "space left on disk"
+            | "space left on the disk"
+    )
+}
+
+/// Zero-LLM free disk bytes (same volume as the SSD % chip).
+pub fn format_disk_free_gateway() -> String {
+    match crate::metrics::get_system_disk_bytes() {
+        Some((total, available)) if total > 0 => {
+            let free = crate::commands::disk_cleanup::format_bytes(available);
+            let tot = crate::commands::disk_cleanup::format_bytes(total);
+            format!("**SSD** · {free} free · {tot} total")
+        }
+        _ => "**SSD** — _no free-space reading right now._".to_string(),
+    }
+}
+
 /// Details All · Hot filter for `/details` instant replies (collapsed glance parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DetailsListFilter {
@@ -57433,6 +57501,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
             return Some(format_ring_chip_gateway(ask));
         }
     }
+    // Free bytes before the SSD % chip ("how much disk is used" / bare "free space" stay %).
+    if looks_like_disk_free_request(content) {
+        return Some(format_disk_free_gateway());
+    }
     if looks_like_strip_chip_request(content) {
         if let Some(ask) = parse_strip_chip_ask(content) {
             return Some(format_strip_chip_gateway(ask));
@@ -57620,6 +57692,7 @@ pub fn format_ops_help_gateway() -> String {
 • `notes size` · `how big are notes` · `memory folder size` · `notes folder size` — notes folder size on disk (recursive file bytes; no list dump; does not steal `memory path` / `notes path` / `notes age` / scrub / bare `memory size` installed RAM)\n\
 • `memory size` · `how big is memory` · `how many gb of ram` · `ram capacity` — installed RAM plus used (no LLM; `how much ram` stays the % chip; notes size / `memory.md` size stay on disk; `why` stays with the agent)\n\
 • `what chip is this` · `what processor` · `which chip` · `cpu name` — Apple chip name plus core count (no LLM; `what's the cpu` stays the CPU ring; `which model` stays Ollama; `why` and hot chips stay with the agent)\n\
+• `how much free space` · `how much space is left` · `how many gb free` · `how much disk is free` — SSD free bytes (no LLM; `how much disk is used` and bare `free space` stay the % chip; Disk Cleanup stays on `/disk`; `why` stays with the agent)\n\
 • `notes age` · `how old are notes` · `memory folder age` · `notes folder age` — notes folder last write age (newest file mtime; no list dump; does not steal `memory path` / `notes path` / `notes size` / `memory.md age` / bare `memory age`)\n\
 • `memory path` · `notes path` · `where are notes` · `notes folder` — `~/.mac-stats/agents/notes/` + `memory.md` (config only; no list/save; `notes size` / `notes age` for disk use / mtime)\n\
 • `memory.md size` · `curated memory size` · `how big is memory.md` · `memory file size` — curated `agents/memory.md` size on disk (stat only; no dump; does not steal `memory.md path` / `memory.md age` / `notes size` / bare `memory size`)\n\
@@ -57749,6 +57822,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     }
     // Chip name instant (v0.1.1173) — not CPU-ring usage, not Ollama model.
     if looks_like_chip_identity_request(question) {
+        return true;
+    }
+    // Disk free-bytes instant (v0.1.1175) — not the SSD % chip, not Disk Cleanup.
+    if looks_like_disk_free_request(question) {
         return true;
     }
     let q = question.to_lowercase();
@@ -77158,6 +77235,27 @@ mod tests {
             "cpu usage must not become chip name: {cpu_ring}"
         );
         assert!(try_operator_instant_reply("why is the chip hot").is_none());
+        assert!(looks_like_disk_free_request("how much free space?"));
+        assert!(looks_like_disk_free_request("how much space is left"));
+        assert!(looks_like_disk_free_request("how many gb free"));
+        assert!(!looks_like_disk_free_request("how much disk is used"));
+        assert!(!looks_like_disk_free_request("free space"));
+        assert!(!looks_like_disk_free_request("why is the disk full"));
+        assert!(!looks_like_disk_free_request("disk cleanup"));
+        assert!(!looks_like_disk_cleanup_request("how much free space"));
+        let free = try_operator_instant_reply("how much free space?")
+            .expect("disk free instant");
+        assert!(
+            free.contains("free") || free.contains("no free-space"),
+            "{free}"
+        );
+        let used = try_operator_instant_reply("how much disk is used?")
+            .expect("disk used stays percent");
+        assert!(
+            !used.contains(" free"),
+            "used-% chip must not claim free bytes: {used}"
+        );
+        assert!(try_operator_instant_reply("why is the disk full").is_none());
         assert_eq!(
             parse_strip_chip_ask("how much disk is used?"),
             Some(StripChipAsk::Ssd)

@@ -977,65 +977,76 @@ fn pick_system_disk(disks: &Disks) -> Option<&sysinfo::Disk> {
         .or_else(|| list.iter().max_by_key(|d| d.total_space()))
 }
 
-/// System disk used / total as percent (0–100). Same basis as menu-bar SSD.
-fn get_disk_usage_percent(refresh_if_new: bool) -> f32 {
-    match DISKS.try_lock() {
-        Ok(mut disks) => {
-            let now = Instant::now();
-            let need_refresh = match LAST_DISK_REFRESH.lock() {
-                Ok(mut last) => {
-                    let stale = last
-                        .map(|t| now.duration_since(t) >= DISK_REFRESH_INTERVAL)
-                        .unwrap_or(true);
-                    if stale {
-                        *last = Some(now);
-                    }
-                    stale
-                }
-                Err(_) => true,
-            };
-
-            if disks.is_none() {
-                debug3!("Creating new Disks instance");
-                let mut new_disks = Disks::new();
-                if refresh_if_new || need_refresh {
-                    new_disks.refresh(true);
-                }
-                *disks = Some(new_disks);
-            } else if need_refresh {
-                // Re-read free space after cleanup / large deletes (was one-shot forever).
-                if let Some(d) = disks.as_mut() {
-                    d.refresh(true);
-                    debug3!("Disk list refreshed (periodic)");
-                }
-            }
-
-            let disks = disks.as_ref().unwrap();
-            if let Some(disk) = pick_system_disk(disks) {
-                let total = disk.total_space();
-                let available = disk.available_space();
-                if total > 0 {
-                    let disk_usage = ((total - available) as f32 / total as f32) * 100.0;
-                    debug3!(
-                        "Disk usage: {:.1}% mount={:?} (total: {}, available: {})",
-                        disk_usage,
-                        disk.mount_point(),
-                        total,
-                        available
-                    );
-                    disk_usage
-                } else {
-                    0.0
-                }
-            } else {
-                0.0
-            }
-        }
+/// Refresh the cached disk list, then return `(total, available)` bytes.
+/// `None` when the list is locked, empty, or the chosen disk has no size.
+fn read_system_disk_bytes(refresh_if_new: bool) -> Option<(u64, u64)> {
+    let mut disks = match DISKS.try_lock() {
+        Ok(guard) => guard,
         Err(_) => {
             debug3!("WARNING: DISKS mutex is locked, using 0% for disk");
-            0.0
+            return None;
+        }
+    };
+    let now = Instant::now();
+    let need_refresh = match LAST_DISK_REFRESH.lock() {
+        Ok(mut last) => {
+            let stale = last
+                .map(|t| now.duration_since(t) >= DISK_REFRESH_INTERVAL)
+                .unwrap_or(true);
+            if stale {
+                *last = Some(now);
+            }
+            stale
+        }
+        Err(_) => true,
+    };
+
+    if disks.is_none() {
+        debug3!("Creating new Disks instance");
+        let mut new_disks = Disks::new();
+        if refresh_if_new || need_refresh {
+            new_disks.refresh(true);
+        }
+        *disks = Some(new_disks);
+    } else if need_refresh {
+        // Re-read free space after cleanup / large deletes (was one-shot forever).
+        if let Some(d) = disks.as_mut() {
+            d.refresh(true);
+            debug3!("Disk list refreshed (periodic)");
         }
     }
+
+    let list = disks.as_ref()?;
+    let disk = pick_system_disk(list)?;
+    let total = disk.total_space();
+    if total == 0 {
+        return None;
+    }
+    let available = disk.available_space();
+    debug3!(
+        "Disk space: mount={:?} (total: {}, available: {})",
+        disk.mount_point(),
+        total,
+        available
+    );
+    Some((total, available))
+}
+
+/// System disk used / total as percent (0–100). Same basis as menu-bar SSD.
+fn get_disk_usage_percent(refresh_if_new: bool) -> f32 {
+    match read_system_disk_bytes(refresh_if_new) {
+        Some((total, available)) if total > 0 => {
+            let disk_usage = ((total.saturating_sub(available)) as f32 / total as f32) * 100.0;
+            debug3!("Disk usage: {:.1}%", disk_usage);
+            disk_usage
+        }
+        _ => 0.0,
+    }
+}
+
+/// System disk `(total, available)` bytes. Same volume as menu-bar SSD %.
+pub fn get_system_disk_bytes() -> Option<(u64, u64)> {
+    read_system_disk_bytes(false)
 }
 
 #[tauri::command]

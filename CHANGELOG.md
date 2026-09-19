@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1175] - 2026-09-19
+
+### Changed
+- **Disk free instant** — “How much free space?”, “how much space is left”, and “how many GB free” answer with free disk bytes (no LLM). “How much disk is used” and bare “free space” still use the percent chip. Disk Cleanup stays on `/disk`. “Why” stays with the agent.
+
 ## [0.1.1174] - 2026-09-19
 
 ### Fixed
