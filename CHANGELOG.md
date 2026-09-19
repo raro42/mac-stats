@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1177] - 2026-09-19
+
+### Changed
+- **Top RAM instant** — “What’s using the most RAM?”, “which process is using the most memory”, and “what’s eating the RAM” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” still uses the Hot filter. “How much RAM” still uses the percent chip. “How big is memory” still reports installed RAM. “Why” stays with the agent.
+
 ## [0.1.1176] - 2026-09-19
 
 ### Changed
