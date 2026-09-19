@@ -49473,6 +49473,8 @@ pub const OPS_STRIP_BAT_LOW_PCT: f32 = 20.0;
 pub const OPS_STRIP_UPTIME_LONG_SECS: u64 = 7 * 24 * 3600;
 pub const OPS_STRIP_RAM_HOT_PCT: f32 = 85.0;
 pub const OPS_STRIP_SSD_HOT_PCT: f32 = 85.0;
+/// Combined CPU+GPU watts — Power chip amber (same 20 W as the CPU window).
+pub const OPS_STRIP_POWER_HOT_W: f32 = 20.0;
 
 fn format_system_uptime(secs: u64) -> String {
     let days = secs / 86400;
@@ -49753,6 +49755,8 @@ pub enum StripChipAsk {
     Ram,
     Ssd,
     Uptime,
+    /// Combined CPU+GPU watts. Not `/power` (full strip) and not Low Power Mode.
+    Power,
 }
 
 /// Parse `/battery` · `/heat` · `/lpm` · `/ram` · `/ssd` · `/uptime` (and short NL). None when not a chip ask.
@@ -50126,6 +50130,33 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
     ) {
         return Some(StripChipAsk::Uptime);
     }
+    // Power watts — not `/power` (full strip) and not Low Power Mode.
+    if matches!(
+        n.as_str(),
+        "how much power"
+            | "how much power is used"
+            | "how much power used"
+            | "power draw"
+            | "the power draw"
+            | "power watts"
+            | "the power watts"
+            | "how many watts"
+            | "what's the power draw"
+            | "whats the power draw"
+            | "what is the power draw"
+            | "how's the power draw"
+            | "hows the power draw"
+            | "is the power high"
+            | "is power high"
+            | "is the power draw high"
+            | "is power draw high"
+            | "watts"
+            | "the watts"
+            | "cpu power"
+            | "gpu power"
+    ) {
+        return Some(StripChipAsk::Power);
+    }
     None
 }
 
@@ -50194,6 +50225,22 @@ pub fn format_strip_chip_gateway(ask: StripChipAsk) -> String {
             format!(
                 "**Up** · {}{hot_mark}",
                 format_system_uptime(d.uptime_secs)
+            )
+        }
+        StripChipAsk::Power => {
+            let total = d.cpu_power + d.gpu_power;
+            if total <= 0.0 {
+                return "**Power** — _no power reading right now (open the CPU window)._"
+                    .to_string();
+            }
+            let hot_mark = if total >= OPS_STRIP_POWER_HOT_W {
+                " · hot"
+            } else {
+                ""
+            };
+            format!(
+                "**Power** · {:.1} W{hot_mark} (CPU {:.1} · GPU {:.1})",
+                total, d.cpu_power, d.gpu_power
             )
         }
     }
@@ -57230,7 +57277,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` — CPU · GPU · Freq · Temp ring chips (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, and `why is the frequency high` stay with the agent)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips (exact open only; not strip / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, and `why is the disk full` stay with the agent)\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, `why is the disk full`, and `why is the power high` stay with the agent)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` — Details Load · RAM · Up (Load≥4 · RAM≥85% hot; exact open only)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
@@ -59841,7 +59888,17 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is the disk high")
         || q.contains("is disk high")
         || q.contains("is the ssd high")
-        || q.contains("is ssd high"))
+        || q.contains("is ssd high")
+        || q.contains("how much power")
+        || q.contains("power draw")
+        || q.contains("how many watts")
+        || q.contains("power watts")
+        || q.contains("is the power high")
+        || q.contains("is power high")
+        || q.contains("is the power draw high")
+        || q == "watts"
+        || q == "cpu power"
+        || q == "gpu power")
         && !q.contains("why")
         && !q.contains("process")
         && !q.contains("strip")
@@ -76545,6 +76602,28 @@ mod tests {
         );
         assert!(parse_strip_chip_ask("why is the disk full").is_none());
         assert!(parse_strip_chip_ask("disk cleanup").is_none());
+        assert_eq!(
+            parse_strip_chip_ask("how much power is used?"),
+            Some(StripChipAsk::Power)
+        );
+        assert_eq!(parse_strip_chip_ask("power draw"), Some(StripChipAsk::Power));
+        assert_eq!(
+            parse_strip_chip_ask("is the power high"),
+            Some(StripChipAsk::Power)
+        );
+        assert_eq!(parse_strip_chip_ask("how many watts"), Some(StripChipAsk::Power));
+        assert!(parse_strip_chip_ask("why is the power high").is_none());
+        assert!(parse_strip_chip_ask("/power").is_none());
+        assert_eq!(
+            parse_strip_chip_ask("low power mode"),
+            Some(StripChipAsk::Lpm)
+        );
+        let power_used = try_operator_instant_reply("how much power is used?")
+            .expect("power used instant");
+        assert!(power_used.to_lowercase().contains("power"), "{power_used}");
+        assert!(try_operator_instant_reply("why is the power high").is_none());
+        let strip = try_operator_instant_reply("/power").expect("power strip instant");
+        assert!(strip.to_lowercase().contains("power strip"), "{strip}");
         let disk_used = try_operator_instant_reply("how much disk is used?")
             .expect("disk used instant");
         assert!(disk_used.to_lowercase().contains("ssd"), "{disk_used}");

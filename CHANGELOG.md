@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1166] - 2026-09-19
+
+### Changed
+- **Power draw instant** — “How much power is used?”, “power draw”, and “is the power high” answer from the Power chip (CPU+GPU watts, no LLM). “Why is the power high” stays with the agent. `/power` still opens the full strip. Low Power Mode stays on `/lpm`.
+
 ## [0.1.1165] - 2026-09-19
 
 ### Changed
