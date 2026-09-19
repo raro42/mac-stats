@@ -1963,6 +1963,12 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session fork is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("fork") || n.contains("duplicate") || n.contains("clone"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65067,6 +65073,15 @@ mod tests {
         assert!(try_operator_instant_reply("continue the session").is_none());
         assert!(try_operator_instant_reply("open this session").is_none());
         assert!(try_operator_instant_reply("switch this session").is_none());
+        assert!(parse_operator_count_kind("fork this session").is_none());
+        assert!(parse_operator_count_kind("fork the session").is_none());
+        assert!(parse_operator_count_kind("fork session").is_none());
+        assert!(parse_operator_count_kind("duplicate this session").is_none());
+        assert!(parse_operator_count_kind("clone this session").is_none());
+        assert!(parse_operator_count_kind("clone the session").is_none());
+        assert!(try_operator_instant_reply("fork this session").is_none());
+        assert!(try_operator_instant_reply("duplicate the session").is_none());
+        assert!(try_operator_instant_reply("clone this session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");

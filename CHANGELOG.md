@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1185] - 2026-09-20
+
+### Fixed
+- **Session count** — “Fork this session”, “duplicate this session”, and “clone this session” no longer answer with the session count. Fork stays with the agent. “How many sessions” still counts.
+
 ## [0.1.1184] - 2026-09-20
 
 ### Fixed
