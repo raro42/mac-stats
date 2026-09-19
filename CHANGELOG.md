@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1187] - 2026-09-20
+
+### Fixed
+- **Session count** — “Search this session”, “find this session”, and “lookup this session” no longer answer with the session count. Search stays with the agent. “How many sessions” still counts.
+
 ## [0.1.1186] - 2026-09-20
 
 ### Fixed

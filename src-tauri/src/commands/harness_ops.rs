@@ -1975,6 +1975,15 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session search is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("search")
+            || n.contains("find")
+            || n.contains("lookup")
+            || n.contains("look up"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65098,6 +65107,16 @@ mod tests {
         assert!(try_operator_instant_reply("export this session").is_none());
         assert!(try_operator_instant_reply("share the session").is_none());
         assert!(try_operator_instant_reply("archive this session").is_none());
+        assert!(parse_operator_count_kind("search this session").is_none());
+        assert!(parse_operator_count_kind("search the session").is_none());
+        assert!(parse_operator_count_kind("search session").is_none());
+        assert!(parse_operator_count_kind("find this session").is_none());
+        assert!(parse_operator_count_kind("find the session").is_none());
+        assert!(parse_operator_count_kind("lookup this session").is_none());
+        assert!(parse_operator_count_kind("look up this session").is_none());
+        assert!(try_operator_instant_reply("search this session").is_none());
+        assert!(try_operator_instant_reply("find the session").is_none());
+        assert!(try_operator_instant_reply("lookup this session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");
