@@ -1918,6 +1918,10 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return Some(OperatorCountKind::DigestOpen);
     }
+    // Session compaction is an action. It must not answer with the session count.
+    if n.contains("compact") {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -64985,6 +64989,8 @@ mod tests {
         assert!(!looks_like_operator_count_request("how many jobs"));
         assert!(!looks_like_operator_count_request("list agents"));
         assert!(parse_operator_count_kind("why are there so many tasks").is_none());
+        assert!(parse_operator_count_kind("compact this session").is_none());
+        assert!(try_operator_instant_reply("compact this session").is_none());
         let agents = try_operator_instant_reply("how many agents").expect("agent count instant");
         assert!(agents.contains("Agents") && agents.contains("on"));
         let digest = try_operator_instant_reply("digest open count")

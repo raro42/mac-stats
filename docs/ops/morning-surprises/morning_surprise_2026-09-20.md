@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1180** | Session count — “compact this session” stays with the agent. It no longer answers with the session count. “How many sessions” still counts. |
 | **v0.1.1179** | App uptime instant — “how long have you been running?”, “app uptime”, and “process uptime” answer with how long mac-stats has been up (no LLM). “What’s the uptime” and “how long has the Mac been up” still use the Up chip. “Why” stays with the agent. |
 | **v0.1.1178** | Top GPU instant — “what’s using the most GPU?”, “which process is using the most GPU”, and “what’s eating the GPU” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” stays Hot. “How much GPU” and “is the GPU hot” stay the GPU ring. “Why” stays with the agent. |
 | **v0.1.1177** | Top RAM instant — “what’s using the most RAM?”, “which process is using the most memory”, and “what’s eating the RAM” name that one process (no LLM). `/processes` still lists Top Processes. “Hot processes” stays Hot. “How much RAM” stays the percent chip. “How big is memory” stays installed RAM. “Why” stays with the agent. |
@@ -14,10 +15,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “how long have you been running?” and you get the mac-stats clock. “What’s the uptime” still names how long the Mac has been up. The chat model does not have to look that up.
+Ask “compact this session” and the agent handles compaction. You no longer get a session count. “How many sessions” still counts.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “compact this session” still hits a count path; config changes (`set url`, `change model`) stay with the agent on purpose
+- Instant-lane leftovers: “reset this session” still hits the session count; config changes (`set url`, `change model`) stay with the agent on purpose
