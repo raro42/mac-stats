@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1171** | Charging instant — “is it charging?”, “is the battery charging”, and “is it plugged in” answer from the Bat chip (percent and charging, no LLM); “why is it charging” stays with the agent; “is the battery low” still uses the same chip |
 | **v0.1.1170** | Heat-high instant — “is the heat high?”, “is the thermal high”, and “is it throttling” answer from the Heat chip (thermal state, no LLM); “why is the heat high” stays with the agent; “is the CPU hot” still uses the Temp ring; “hot processes” still lists hot processes |
 | **v0.1.1169** | P-core / E-core clock instant — “how fast are the P-cores?”, “p core frequency”, and “is the P-core high” answer from the P-core clock (GHz, no LLM); “e core frequency” and “how fast are the E-cores” use the E-core clock; “why is the P-core high” stays with the agent; “how fast is the CPU” still uses the Freq ring |
 | **v0.1.1168** | Load 5m / 15m instant — “what’s the 5 minute load?”, “15 minute load”, and “is the 5 minute load high” answer from the Load 5m or 15m chip (no LLM); “why is the 5 minute load high” stays with the agent; `/load` still opens the full Details panel; “is the load high” still uses the 1-minute Load chip |
@@ -27,7 +28,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-18 20:00). Digeste
 
 ## Why it matters
 
-Ask “is the heat high?” and you get the thermal state at once. The chat model does not have to look that up.
+Ask “is it charging?” and you get the battery percent and charge state at once. The chat model does not have to look that up.
 
 ## Next
 

@@ -49974,6 +49974,14 @@ pub fn parse_strip_chip_ask(content: &str) -> Option<StripChipAsk> {
             | "is the battery low"
             | "is battery low"
             | "low battery"
+            | "is it charging"
+            | "is the battery charging"
+            | "is battery charging"
+            | "is the mac charging"
+            | "am i charging"
+            | "is it plugged in"
+            | "is the mac plugged in"
+            | "is it on charge"
     ) {
         return Some(StripChipAsk::Battery);
     }
@@ -57549,7 +57557,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/rings` · `/rings hot` · `view rings` · `see rings` · `show me the rings` · `open rings` · `list the rings` — CPU rings All/Hot list (menu-bar amber thresholds; exact open only)\n\
 • `/cpu` · `/gpu` · `/freq` · `/temp` · `view cpu` · `see cpu` · `show me the cpu` · `open cpu` · `list the cpu` · `view gpu` · `open freq` · `open temp` · `how hot` · `is the cpu hot` · `is the gpu hot` · `how much cpu` · `is the cpu high` · `is the cpu busy` · `how much gpu` · `is the gpu high` · `is the gpu busy` · `how fast` · `clock speed` · `is the frequency high` · `p core frequency` · `e core frequency` · `how fast are the p cores` · `how fast are the e cores` — CPU · GPU · Freq · Temp ring chips, plus P-core / E-core clocks (exact open only; not rings / details / cpu window; `why is the cpu hot`, `why is the cpu high`, `why is the gpu high`, `why is the frequency high`, and `why is the p core high` stay with the agent; `how fast is the cpu` stays the Freq ring)\n\
 • `/strip` · `/strip hot` · `/power` · `view strip` · `see strip` · `show me the strip` · `open strip` · `list the strip` · `view power` · `open power` — power strip All/Hot list (menu-bar amber / attention cues; exact open only)\n\
-• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `is the heat high` · `is the thermal high` · `is it throttling` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is the ram high`, `why is the disk full`, `why is the power high`, and `why is the heat high` stay with the agent; `is the cpu hot` stays the Temp ring)\n\
+• `/battery` · `/bat` · `/heat` · `/thermal` · `/lpm` · `/ram` · `/ssd` · `/uptime` · `view battery` · `see battery` · `show me the battery` · `open battery` · `list the battery` · `how much battery` · `battery left` · `is the battery low` · `is it charging` · `is the battery charging` · `is it plugged in` · `how much ram` · `how much memory` · `is the ram high` · `how much disk` · `how much ssd` · `how much storage` · `is the disk full` · `how much power` · `power draw` · `how many watts` · `is the power high` · `view heat` · `open thermal` · `is the heat high` · `is the thermal high` · `is it throttling` · `view lpm` · `open ram` · `view ssd` · `open uptime` — power-strip Bat · Heat · LPM · RAM · SSD · Up chips, plus Power watts (exact open only; not `/power` strip / low power mode / disk cleanup / details / path·size·age; `why is the battery low`, `why is it charging`, `why is the ram high`, `why is the disk full`, `why is the power high`, and `why is the heat high` stay with the agent; `is the cpu hot` stays the Temp ring)\n\
 • `/details` · `/details hot` · `/load` · `view details` · `see details` · `show me the details` · `open details` · `list the details` · `view load` · `open load` · `is the load high` · `how's the load` · `how high is the load` · `how loaded` · `5 minute load` · `15 minute load` · `load 5` · `load 15` — Details Load · RAM · Up, plus Load 1m / 5m / 15m chips (Load≥4 hot; exact open only; `/load` stays the full panel; `why is the load high` and `why is the 5 minute load high` stay with the agent)\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` · `view perplexity` · `see perplexity` · `show me the perplexity` · `open perplexity` · `list the perplexity` · `view last search` · `open top results` · `list the snippet results` — last Perplexity Top/Snippet list (exact open only — not key / live search / path·size·age)\n\
 • `/digest` · `refresh digest` · `run digester` · `rescan digest` — refresh digester (latest.md/json)\n\
@@ -60141,6 +60149,14 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("is the battery low")
         || q.contains("is battery low")
         || q == "low battery"
+        || q.contains("is it charging")
+        || q.contains("is the battery charging")
+        || q.contains("is battery charging")
+        || q.contains("is the mac charging")
+        || q.contains("am i charging")
+        || q.contains("is it plugged in")
+        || q.contains("is the mac plugged in")
+        || q == "is it on charge"
         || q.contains("how much ram")
         || q.contains("how much memory")
         || q.contains("ram used")
@@ -76872,6 +76888,19 @@ mod tests {
         );
         assert!(parse_strip_chip_ask("why is the battery low").is_none());
         assert_eq!(
+            parse_strip_chip_ask("is it charging?"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("is the battery charging"),
+            Some(StripChipAsk::Battery)
+        );
+        assert_eq!(
+            parse_strip_chip_ask("is it plugged in"),
+            Some(StripChipAsk::Battery)
+        );
+        assert!(parse_strip_chip_ask("why is it charging").is_none());
+        assert_eq!(
             parse_strip_chip_ask("how much ram is used?"),
             Some(StripChipAsk::Ram)
         );
@@ -76907,6 +76936,10 @@ mod tests {
             .expect("battery left instant");
         assert!(left.to_lowercase().contains("bat"), "{left}");
         assert!(try_operator_instant_reply("why is the battery low").is_none());
+        let charging = try_operator_instant_reply("is it charging?")
+            .expect("charging instant");
+        assert!(charging.to_lowercase().contains("bat"), "{charging}");
+        assert!(try_operator_instant_reply("why is it charging").is_none());
         let ram_used = try_operator_instant_reply("how much ram is used?")
             .expect("ram used instant");
         assert!(ram_used.to_lowercase().contains("ram"), "{ram_used}");

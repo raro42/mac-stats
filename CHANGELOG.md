@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1171] - 2026-09-19
+
+### Changed
+- **Charging instant** — “Is it charging?”, “is the battery charging”, and “is it plugged in” answer from the Bat chip (percent and charging, no LLM). “Why is it charging” stays with the agent. “Is the battery low” still uses the same chip.
+
 ## [0.1.1170] - 2026-09-19
 
 ### Changed
