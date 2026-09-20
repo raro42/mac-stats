@@ -4,6 +4,10 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Shipped
 
+### v0.1.1206 — Agent Ops Insights Slowest empty calm (~23:58)
+- When Runs Insights has turns but Slowest is empty, show warm “Nothing slow” + solid accent wash (Digest Queue clear parity).
+- Digester Slowest clear no longer hides the section.
+
 ### v0.1.1205 — Agent Ops Digest open empty calm (~23:35)
 - When Insights has runs but digest open is zero, Queue clear uses warm title + solid accent wash (true-empty / filter-miss parity).
 - Replaces the dashed muted one-line empty.
@@ -23,6 +27,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.1206** | Agent Ops Insights Slowest empty calm (warm Nothing slow when digester Slowest is clear). |
 | **v0.1.1205** | Agent Ops Digest open empty calm (warm title + solid wash when queue clear). |
 | **v0.1.1204** | Agent Ops true-empty calm (warm title + solid wash). Knowledge empty copy softens. |
 | **v0.1.1203** | Debug Log inventory counts answer only inventory asks (“count the errors”, …). “Delete these errors”, “clear the log”, “export warnings” stay with the agent. |
@@ -36,7 +41,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 ## Tried / context
 
 - Digester open stayed empty (no Slowest / open candidates).
-- Design review: shipped Digest open empty calm (**v0.1.1205**) after true-empty tabs (**v0.1.1204**); recapture `feature-agent-ops.png` still deferred (Screen Recording TCC).
+- Design review: shipped Insights Slowest empty calm (**v0.1.1206**) after Digest open empty calm (**v0.1.1205**) and true-empty tabs (**v0.1.1204**); recapture `feature-agent-ops.png` still deferred (Screen Recording TCC).
 - Debug.log: Having-fun idle Ollama timeout WARN — already soft-pathed; not product-owned ERROR fuel.
 
 ## Fitness
