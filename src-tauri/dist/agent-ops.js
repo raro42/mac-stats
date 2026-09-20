@@ -9773,6 +9773,51 @@ function renderOpsRuns(insights) {
         toolsEl.className = 'ops-row-meta';
         toolsEl.textContent = `Top tools: ${tools || '—'}`;
         card.appendChild(toolsEl);
+        {
+            // Latency section — calm when digester noise filters leave p50 n/a (Slowest / Digest parity).
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Latency';
+            card.appendChild(sub);
+            const p50Ms = Number(insights.p50_ms);
+            const latSample = Number(insights.latency_sample);
+            const meanMs = Number(insights.mean_ms);
+            const maxMs = Number(insights.max_ms);
+            const hasLatency =
+                Number.isFinite(p50Ms) &&
+                p50Ms > 0 &&
+                (Number.isNaN(latSample) || latSample > 0);
+            if (hasLatency) {
+                const line = document.createElement('div');
+                line.className = 'ops-insight-line';
+                const sampleBit =
+                    Number.isFinite(latSample) && latSample > 0
+                        ? ` · sample ${latSample}/${insights.turns}`
+                        : '';
+                const fmt = (ms) =>
+                    ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${Math.round(ms)} ms`;
+                line.textContent = `p50 ${fmt(p50Ms)} · mean ${fmt(meanMs)} · max ${fmt(maxMs)}${sampleBit}`;
+                line.title = 'Click to preview · Enter / double-click to load into AI Chat';
+                wireOpsInsightRunLine(
+                    line,
+                    `Latency\np50: ${Math.round(p50Ms)} ms\nmean: ${Math.round(meanMs)} ms\nmax: ${Math.round(maxMs)} ms${
+                        Number.isFinite(latSample) ? `\nsample: ${latSample}/${insights.turns}` : ''
+                    }`
+                );
+                card.appendChild(line);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title =
+                    'Latency n/a — remaining turns are fast instant or already filtered as shipped noise';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">Nothing to measure</div>` +
+                    `<div class="ops-empty-tab-hint">Latency n/a — turns are noise-filtered or too fast</div>`;
+                card.appendChild(empty);
+            }
+        }
         const slowRows = insights.slowest || [];
         {
             const sub = document.createElement('div');

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1209] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights Latency empty calm** — When Runs Insights has turns but latency sample is noise-filtered (p50 n/a), show warm “Nothing to measure” + solid accent wash (Slowest / Digest Queue clear parity). Real p50/mean/max still surface when the sample has turns.
+
 ## [0.1.1208] - 2026-09-21
 
 ### Changed
