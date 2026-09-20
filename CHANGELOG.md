@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1194] - 2026-09-20
+
+### Fixed
+- **Session count** — “Abort this session”, “cancel this session”, and “terminate this session” no longer answer with the session count. Abort stays with the agent. “How many sessions” still counts. “Stop this session” still stays with the agent. “Kill this session” stays for a later tick (the word “kill” sits inside “skill”).
+
 ## [0.1.1193] - 2026-09-20
 
 ### Fixed

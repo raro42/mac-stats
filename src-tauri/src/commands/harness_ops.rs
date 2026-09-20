@@ -2045,7 +2045,13 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     // Session stop is an action. It must not answer with the session count.
     // "start" does not contain "stop". "skill" contains "kill"; do not match kill here.
     if n.contains("session")
-        && (n.contains("stop") || n.contains("halt") || n.contains("pause") || n.contains("quit"))
+        && (n.contains("stop")
+            || n.contains("halt")
+            || n.contains("pause")
+            || n.contains("quit")
+            || n.contains("abort")
+            || n.contains("cancel")
+            || n.contains("terminate"))
     {
         return None;
     }
@@ -65264,8 +65270,18 @@ mod tests {
         assert!(try_operator_instant_reply("halt the session").is_none());
         assert!(try_operator_instant_reply("pause this session").is_none());
         assert!(try_operator_instant_reply("quit this session").is_none());
+        assert!(parse_operator_count_kind("abort this session").is_none());
+        assert!(parse_operator_count_kind("abort the session").is_none());
+        assert!(parse_operator_count_kind("abort session").is_none());
+        assert!(parse_operator_count_kind("cancel this session").is_none());
+        assert!(parse_operator_count_kind("cancel the session").is_none());
+        assert!(parse_operator_count_kind("terminate this session").is_none());
+        assert!(parse_operator_count_kind("terminate the session").is_none());
+        assert!(try_operator_instant_reply("abort this session").is_none());
+        assert!(try_operator_instant_reply("cancel the session").is_none());
+        assert!(try_operator_instant_reply("terminate this session").is_none());
         assert_eq!(
-            parse_operator_count_kind("abort this session"),
+            parse_operator_count_kind("kill this session"),
             Some(OperatorCountKind::Sessions)
         );
         assert!(looks_like_sessions_request("open sessions"));
