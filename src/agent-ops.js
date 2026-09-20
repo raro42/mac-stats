@@ -285,8 +285,9 @@
     );
   }
 
-  /** True-empty state on a list tab (already on the surface — title + short hint). */
+  /** True-empty state on a list tab — warm title + calm wash (filter-miss / overview parity). */
   function opsTabEmptyHtml(title, hint, cta) {
+    const tip = String(hint || title || '').trim() || 'Nothing here yet';
     const hintHtml = hint
       ? `<div class="ops-empty-tab-hint">${escapeHtml(hint)}</div>`
       : '';
@@ -296,10 +297,9 @@
       ctaHtml =
         `<button type="button" class="ops-clear-filter" data-ops-open-ai-chat="1">${escapeHtml(label)}</button>`;
     }
-    const extra = ctaHtml ? ' ops-empty-filter-miss' : '';
     return (
-      `<div class="ops-empty ops-empty-tab${extra}">` +
-      `<div class="ops-empty-filter-msg">${escapeHtml(title)}</div>` +
+      `<div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="${escapeHtml(tip)}">` +
+      `<div class="ops-empty-filter-title">${escapeHtml(title)}</div>` +
       hintHtml +
       ctaHtml +
       `</div>`
@@ -6562,7 +6562,7 @@ function setOverviewKnowledgeStatus(files) {
     const rows = Array.isArray(files) ? files : [];
     if (!rows.length) {
         card.classList.add('ops-health-warn');
-        card.title = 'No knowledge files yet under ~/.mac-stats';
+        card.title = 'No knowledge files yet — soul and memory land here';
         return;
     }
     const n = rows.length;
@@ -6584,7 +6584,7 @@ function renderOverviewKnowledge(files) {
     if (!files || !files.length) {
         paintOpsOverviewHeadCount('ops-overview-knowledge', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-          'No knowledge files yet under ~/.mac-stats',
+          'No knowledge files yet — open Knowledge when soul or memory land',
           'memory',
           'Open Knowledge'
         );
@@ -7021,7 +7021,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
         if (!schedAll.length) {
             list.innerHTML = opsTabEmptyHtml(
               'No schedules yet',
-              'Create one via Discord SCHEDULE tools or the scheduler API'
+              'Add one from Discord or the Schedules tools when you are ready'
             );
         } else if (!schedFiltered.length) {
             list.innerHTML = opsFilterMissHtml(
@@ -9078,7 +9078,7 @@ function renderOpsMemory(files) {
     if (!all.length) {
         el.innerHTML = opsTabEmptyHtml(
           'No knowledge files yet',
-          'soul.md and memory/*.md live under ~/.mac-stats'
+          'Soul and memory notes show up here once they land on disk'
         );
         paintOpsFilterMatch('ops-memory-filter', 0, 0, opsMemoryFilterQ);
         return;
@@ -9672,16 +9672,19 @@ function renderOpsRuns(insights) {
             digestMeta.textContent = `Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
             card.appendChild(digestMeta);
             const empty = document.createElement('div');
-            empty.className = 'ops-empty ops-empty-compact ops-empty-tab ops-empty-filter-miss';
+            empty.className =
+              'ops-empty ops-empty-compact ops-empty-tab ops-empty-filter-miss is-calm';
+            empty.setAttribute('role', 'status');
+            empty.title = 'Turns land after Discord or chat';
             empty.innerHTML =
-                `<div class="ops-empty-filter-msg">No runs yet</div>` +
+                `<div class="ops-empty-filter-title">No runs yet</div>` +
                 `<div class="ops-empty-tab-hint">Turns land after Discord or chat</div>` +
                 `<button type="button" class="ops-clear-filter" data-ops-open-ai-chat="1">Open AI Chat</button>`;
             card.appendChild(empty);
         } else {
             el.innerHTML = opsTabEmptyHtml(
               'No runs yet',
-              'Turns land in ~/.mac-stats/runs.jsonl after Discord or chat',
+              'Turns land after Discord or chat',
               { action: 'ai-chat', label: 'Open AI Chat' }
             );
         }

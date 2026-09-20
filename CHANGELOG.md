@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1204] - 2026-09-20
+
+### Changed
+- **Agent Ops true-empty calm** — Empty Agents, Sessions, Schedules, Knowledge, and Runs tabs use the same warm title + solid accent wash as filter-miss / overview Ready. Knowledge empty copy drops the raw home-path dump.
+
 ## [0.1.1203] - 2026-09-20
 
 ### Fixed

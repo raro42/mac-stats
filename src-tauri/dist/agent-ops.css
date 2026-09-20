@@ -1478,6 +1478,15 @@ textarea.ops-agent-editor.is-dirty {
   gap: 10px;
 }
 
+/* True-empty tab calm — same solid wash as filter-miss / overview Ready. */
+.ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  opacity: 1;
+  color: inherit;
+}
+
 .ops-empty-compact.ops-empty-tab .ops-clear-filter {
   font-size: 11px;
   padding: 5px 10px;
