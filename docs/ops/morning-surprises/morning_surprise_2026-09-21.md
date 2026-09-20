@@ -4,6 +4,10 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Shipped
 
+### v0.1.1208 — Agent Ops Insights Stale empty calm (~00:55)
+- When Runs Insights has turns but digester stale is empty, show warm “Nothing stale” + solid accent wash (Candidates / Slowest / Digest Queue clear parity).
+- Stale digester hints surface when present; `digest_stale_hints` threaded into Runs Insights.
+
 ### v0.1.1207 — Agent Ops Insights Candidates empty calm (~00:25)
 - When Runs Insights has turns but Candidates is empty, show warm “Nothing open” + solid accent wash (Slowest / Digest Queue clear parity).
 - Digester open empty no longer hides the Candidates section.
@@ -31,6 +35,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.1208** | Agent Ops Insights Stale empty calm (warm Nothing stale when digester stale is clear). |
 | **v0.1.1207** | Agent Ops Insights Candidates empty calm (warm Nothing open when digester open is clear). |
 | **v0.1.1206** | Agent Ops Insights Slowest empty calm (warm Nothing slow when digester Slowest is clear). |
 | **v0.1.1205** | Agent Ops Digest open empty calm (warm title + solid wash when queue clear). |
@@ -46,7 +51,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 ## Tried / context
 
 - Digester open stayed empty (no Slowest / open candidates).
-- Design review: shipped Insights Slowest empty calm (**v0.1.1206**) after Digest open empty calm (**v0.1.1205**) and true-empty tabs (**v0.1.1204**); recapture `feature-agent-ops.png` still deferred (Screen Recording TCC).
+- Design review: shipped Insights Stale empty calm (**v0.1.1208**) after Candidates (**v0.1.1207**) / Slowest (**v0.1.1206**) after Digest open empty calm (**v0.1.1205**) and true-empty tabs (**v0.1.1204**); recapture `feature-agent-ops.png` still deferred (Screen Recording TCC).
 - Debug.log: Having-fun idle Ollama timeout WARN — already soft-pathed; not product-owned ERROR fuel.
 
 ## Fitness
