@@ -1,18 +1,20 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B (20:00–06:00 local, window opened 2026-09-20 20:00). Digester open: empty. Debug log: Having-fun idle Ollama timeout (already soft-pathed).
+Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
-## Shipped tonight
+## Shipped
 
-| Version | What |
-| --- | --- |
-| **v0.1.1197** | Session count — only inventory asks count sessions (“how many sessions”, “session count”, “number of sessions”, “count sessions”). “Edit this session”, “hide this session”, “move this session”, “copy this session”, “refresh this session”, and “update this session” stay with the agent. “How many sessions” still counts. “Open sessions” still lists. The verb-exclusion list is gone. |
+| Version | What got better |
+|---------|-----------------|
+| **v0.1.1197** | Session count answers only inventory asks (“how many sessions”, …). Verb phrases like “edit this session” stay with the agent. |
+| **v0.1.1198** | Operator inventory counts (agents, monitors, tasks, skills, plugins, knowledge) answer only inventory asks. “Delete this agent”, “run this skill”, “check this monitor” stay with the agent. |
 
-## Why it matters
+## Tried / context
 
-Ask “edit this session” or “refresh this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts.
+- Digester open stayed empty (no Slowest / open candidates).
+- Design review: `feature-agent-ops` in grace (~5d); deferred for inventory-count correctness.
+- Debug.log: Having-fun idle Ollama timeout WARN — already soft-pathed; not product-owned ERROR fuel.
 
-## Next
+## Fitness
 
-- Digester open / product-owned `debug.log` errors when they appear
-- Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
+Users who say “delete this agent” or “run this skill” no longer get a bare inventory count. Count asks still stay instant.
