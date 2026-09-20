@@ -2165,6 +2165,8 @@ fn snapshot_runs_counts(days: Option<u32>) -> RunsCountSnapshot {
 }
 
 /// Parse count-only runs asks — Agent Ops Runs card parity; not list/report asks.
+/// Inventory only: “how many runs”, “run count”, “number of failed runs”.
+/// Verb phrases (“delete these runs”, “clear the runs”, “export runs”) stay with the agent.
 pub fn parse_runs_count_kind(content: &str) -> Option<RunsCountKind> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 52 {
@@ -2202,11 +2204,8 @@ pub fn parse_runs_count_kind(content: &str) -> Option<RunsCountKind> {
     {
         return None;
     }
-    let is_count = n.contains("how many")
-        || n.contains("count")
-        || n.contains("number of")
-        || n.ends_with(" runs")
-        || n == "runs";
+    // Inventory phrasing only — bare "runs" / "failed runs" / verb+runs stay off this lane.
+    let is_count = n.contains("how many") || n.contains("count") || n.contains("number of");
     if !is_count {
         return None;
     }
@@ -2225,7 +2224,7 @@ pub fn parse_runs_count_kind(content: &str) -> Option<RunsCountKind> {
     if n.contains("lite") {
         return Some(RunsCountKind::Lite);
     }
-    if n.contains("run") || n == "runs" {
+    if n.contains("run") {
         return Some(RunsCountKind::Total);
     }
     None
@@ -65340,6 +65339,19 @@ mod tests {
         assert!(!looks_like_runs_count_request("failed runs"));
         assert!(!looks_like_runs_count_request("/insights"));
         assert!(!looks_like_runs_count_request("why are there so many runs"));
+        // Inventory-only: verb phrases must not steal the count lane.
+        assert!(parse_runs_count_kind("delete these runs").is_none());
+        assert!(parse_runs_count_kind("clear the runs").is_none());
+        assert!(parse_runs_count_kind("prune runs").is_none());
+        assert!(parse_runs_count_kind("export runs").is_none());
+        assert!(parse_runs_count_kind("archive runs").is_none());
+        assert!(parse_runs_count_kind("runs").is_none());
+        assert!(try_operator_instant_reply("delete these runs").is_none());
+        assert!(try_operator_instant_reply("clear the runs").is_none());
+        assert_eq!(
+            parse_runs_count_kind("number of runs"),
+            Some(RunsCountKind::Total)
+        );
         let total = try_operator_instant_reply("how many runs").expect("runs count instant");
         assert!(total.contains("Runs"));
         let failed = try_operator_instant_reply("how many failed runs")

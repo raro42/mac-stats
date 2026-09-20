@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1199] - 2026-09-20
+
+### Fixed
+- **Runs inventory counts** — Run/fail/slow/instant/direct/lite counts answer only inventory asks (“how many runs”, “run count”, “number of failed runs”). “Delete these runs”, “clear the runs”, “export runs”, and other verb phrases stay with the agent. “How many runs” still counts.
+
 ## [0.1.1198] - 2026-09-20
 
 ### Fixed
