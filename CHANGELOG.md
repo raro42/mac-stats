@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1201] - 2026-09-20
+
+### Fixed
+- **Schedule / delivery inventory counts** — “How many schedules”, “job count”, “count the schedules”, and “number of deliveries” still answer with the count. “Delete these schedules”, “clear the jobs”, “export deliveries”, “pause this schedule”, and “run this job” stay with the agent.
+
 ## [0.1.1200] - 2026-09-20
 
 ### Fixed

@@ -1824,6 +1824,8 @@ pub fn looks_like_last_delivery_request(content: &str) -> bool {
 }
 
 /// True for short “how many schedules/jobs/deliveries” count asks — not full list or next fire.
+/// Inventory only: “how many schedules”, “job count”, “count the deliveries”.
+/// Verb phrases (“delete these schedules”, “clear the jobs”, “export deliveries”) stay with the agent.
 pub fn looks_like_schedule_count_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -1839,32 +1841,32 @@ pub fn looks_like_schedule_count_request(content: &str) -> bool {
         || n.contains("redmine")
         || n.contains("next ")
         || n.contains("when ")
+        || n.contains("delete")
+        || n.contains("clear")
+        || n.contains("remove")
+        || n.contains("export")
+        || n.contains("pause")
+        || n.contains("disable")
+        || n.contains("enable")
+        || n.contains("edit")
+        || n.contains("update")
+        || n.contains("cancel")
+        || n.contains("fire ")
+        || n.starts_with("run ")
+        || n.contains(" run ")
     {
         return false;
     }
     if looks_like_next_schedule_request(content) || looks_like_last_delivery_request(content) {
         return false;
     }
-    matches!(
-        n.as_str(),
-        "how many schedules"
-            | "how many jobs"
-            | "how many cron jobs"
-            | "how many cron"
-            | "how many scheduled jobs"
-            | "how many scheduled"
-            | "schedule count"
-            | "job count"
-            | "cron count"
-            | "schedules count"
-            | "jobs count"
-            | "number of schedules"
-            | "number of jobs"
-            | "how many deliveries"
-            | "delivery count"
-            | "deliveries count"
-            | "number of deliveries"
-    )
+    // Inventory only — bare "schedules" / verb+noun stay off this lane.
+    looks_like_noun_inventory_count(&n, "schedule")
+        || looks_like_noun_inventory_count(&n, "job")
+        || looks_like_noun_inventory_count(&n, "cron")
+        || looks_like_noun_inventory_count(&n, "delivery")
+        || ((n.contains("how many") || n.contains("number of"))
+            && (n.contains("scheduled") || n.contains("deliveries")))
 }
 
 /// Which operator inventory a short count ask targets (not full lists).
@@ -65012,14 +65014,28 @@ mod tests {
         assert!(looks_like_schedule_count_request("schedule count"));
         assert!(looks_like_schedule_count_request("how many deliveries"));
         assert!(looks_like_schedule_count_request("@Werner how many cron jobs"));
+        assert!(looks_like_schedule_count_request("count the schedules"));
+        assert!(looks_like_schedule_count_request("count jobs"));
+        assert!(looks_like_schedule_count_request("number of deliveries"));
+        assert!(looks_like_schedule_count_request("how many scheduled"));
         assert!(!looks_like_schedule_count_request("list schedules"));
         assert!(!looks_like_schedule_count_request("next schedule"));
         assert!(!looks_like_schedule_count_request("when is the next job"));
         assert!(!looks_like_schedule_count_request("why are there so many jobs"));
+        // Inventory only — verbs stay with the agent.
+        assert!(!looks_like_schedule_count_request("delete these schedules"));
+        assert!(!looks_like_schedule_count_request("clear the jobs"));
+        assert!(!looks_like_schedule_count_request("export deliveries"));
+        assert!(!looks_like_schedule_count_request("pause this schedule"));
+        assert!(!looks_like_schedule_count_request("run this job"));
+        assert!(try_operator_instant_reply("delete these schedules").is_none());
+        assert!(try_operator_instant_reply("clear the jobs").is_none());
         let jobs = try_operator_instant_reply("how many jobs").expect("job count instant");
         assert!(jobs.contains("Schedules") && jobs.contains("job"));
         let dels = try_operator_instant_reply("how many deliveries").expect("delivery count instant");
         assert!(dels.contains("Deliveries"));
+        let counted = try_operator_instant_reply("count the schedules").expect("count schedules");
+        assert!(counted.contains("Schedules") && counted.contains("job"));
     }
 
     #[test]
