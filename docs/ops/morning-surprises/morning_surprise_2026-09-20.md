@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1196** | Session count — “exit this session”, “leave this session”, and “abandon this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Kill this session” and “stop this session” still stay with the agent. |
 | **v0.1.1195** | Session count — “kill this session”, “destroy this session”, and “drop this session” stay with the agent. They no longer answer with the session count. Match uses the kill word, so “how many skills” still counts skills. “How many sessions” still counts. “Stop this session” and “abort this session” still stay with the agent. |
 | **v0.1.1194** | Session count — “abort this session”, “cancel this session”, and “terminate this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Stop this session” still stays with the agent. “Kill this session” stays for a later tick (the word “kill” sits inside “skill”). |
 | **v0.1.1193** | Session count — “stop this session”, “halt this session”, “pause this session”, and “quit this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Start this session” still stays with the agent. “Abort this session” stays for a later tick. |
@@ -30,7 +31,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “kill this session” or “destroy this session” and the agent handles it. You no longer get a session count. “How many skills” still counts skills. “How many sessions” still counts. “Stop this session” and “abort this session” still stay with the agent.
+Ask “exit this session” or “leave this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts. “Kill this session” and “stop this session” still stay with the agent.
 
 ## Next
 
