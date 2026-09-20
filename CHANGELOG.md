@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1200] - 2026-09-20
+
+### Fixed
+- **Digest open inventory counts** — “How many open candidates”, “digest count”, and “open count” still answer with the open-candidate count. “Open digest” / “digest open” stay the read-only snapshot (with hints). “Delete open candidates”, “clear digest open”, and other verb phrases stay with the agent.
+
 ## [0.1.1199] - 2026-09-20
 
 ### Fixed

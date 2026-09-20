@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1200
+
+- Digest open inventory counts answer only inventory asks (“how many open candidates”, “digest count”, “open count”). “Open digest” / “digest open” stay the read-only snapshot. “Delete open candidates” and other verbs stay with the agent.
+
 ## Overnight merge — v0.1.1199
 
 - Runs inventory counts answer only inventory asks (“how many runs”, “run count”, “number of failed runs”). “Delete these runs”, “clear the runs”, “export runs”, and other verb phrases stay with the agent. Bare “runs” stays off the count lane. “How many runs” still counts.

@@ -1906,6 +1906,23 @@ fn looks_like_knowledge_inventory_count(n: &str) -> bool {
         || looks_like_noun_inventory_count(n, "memory")
 }
 
+/// True when the phrase asks how many digest open candidates, not a verb or open snapshot.
+/// “Open digest” / “digest open” stay the read-only snapshot. “Delete open candidates” stays
+/// with the agent.
+fn looks_like_digest_open_inventory_count(n: &str) -> bool {
+    n.contains("how many")
+        || n.contains("number of")
+        || n.contains("open count")
+        || n.contains("digest count")
+        || n.contains("candidate count")
+        || n.contains("count open")
+        || n.contains("count the open")
+        || n.contains("count of open")
+        || n.contains("count candidate")
+        || n.contains("count the candidate")
+        || n.contains("count of candidate")
+}
+
 /// Parse count-only operator asks — Agent Ops card parity; not list/create asks.
 pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     let n = normalize_operator_command(content);
@@ -1934,6 +1951,7 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Digest open inventory only — "open digest" stays the snapshot; verbs stay with the agent.
     if n.contains("open candidate")
         || n.contains("digest open")
         || n.contains("open digest")
@@ -1941,8 +1959,13 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
         || n == "open count"
         || n == "digest count"
         || n == "candidate count"
+        || ((n.contains("digest") || n.contains("candidate"))
+            && (n.contains("how many") || n.contains("number of") || n.contains("count")))
     {
-        return Some(OperatorCountKind::DigestOpen);
+        if looks_like_digest_open_inventory_count(&n) {
+            return Some(OperatorCountKind::DigestOpen);
+        }
+        return None;
     }
     // Inventory only — "delete this agent" and other verbs stay with the agent.
     if n.contains("agent") {
@@ -65032,6 +65055,31 @@ mod tests {
         assert_eq!(
             parse_operator_count_kind("how many open candidates"),
             Some(OperatorCountKind::DigestOpen)
+        );
+        assert_eq!(
+            parse_operator_count_kind("digest count"),
+            Some(OperatorCountKind::DigestOpen)
+        );
+        assert_eq!(
+            parse_operator_count_kind("open count"),
+            Some(OperatorCountKind::DigestOpen)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many open"),
+            Some(OperatorCountKind::DigestOpen)
+        );
+        // Inventory only — open snapshot / verbs stay off the count lane.
+        assert!(parse_operator_count_kind("open digest").is_none());
+        assert!(parse_operator_count_kind("digest open").is_none());
+        assert!(parse_operator_count_kind("delete open candidates").is_none());
+        assert!(parse_operator_count_kind("clear digest open").is_none());
+        assert!(parse_operator_count_kind("export open candidates").is_none());
+        assert!(try_operator_instant_reply("delete open candidates").is_none());
+        // "open digest" stays the read-only snapshot (not the count card).
+        let open_snap = try_operator_instant_reply("open digest").expect("open digest snapshot");
+        assert!(
+            open_snap.contains("Digest") && !open_snap.contains("Agent Ops → Runs for hints"),
+            "reply: {open_snap}"
         );
         assert!(looks_like_operator_count_request("how many agents"));
         assert!(!looks_like_operator_count_request("how many jobs"));
