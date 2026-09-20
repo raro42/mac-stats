@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1193] - 2026-09-20
+
+### Fixed
+- **Session count** — “Stop this session”, “halt this session”, “pause this session”, and “quit this session” no longer answer with the session count. Stop stays with the agent. “How many sessions” still counts. “Start this session” still stays with the agent. “Abort this session” stays for a later tick.
+
 ## [0.1.1192] - 2026-09-20
 
 ### Fixed

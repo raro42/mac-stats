@@ -2042,6 +2042,13 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session stop is an action. It must not answer with the session count.
+    // "start" does not contain "stop". "skill" contains "kill"; do not match kill here.
+    if n.contains("session")
+        && (n.contains("stop") || n.contains("halt") || n.contains("pause") || n.contains("quit"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65244,8 +65251,21 @@ mod tests {
         assert!(try_operator_instant_reply("begin the session").is_none());
         assert!(try_operator_instant_reply("launch this session").is_none());
         assert!(try_operator_instant_reply("restart this session").is_none());
+        assert!(parse_operator_count_kind("stop this session").is_none());
+        assert!(parse_operator_count_kind("stop the session").is_none());
+        assert!(parse_operator_count_kind("stop session").is_none());
+        assert!(parse_operator_count_kind("halt this session").is_none());
+        assert!(parse_operator_count_kind("halt the session").is_none());
+        assert!(parse_operator_count_kind("pause this session").is_none());
+        assert!(parse_operator_count_kind("pause the session").is_none());
+        assert!(parse_operator_count_kind("quit this session").is_none());
+        assert!(parse_operator_count_kind("quit the session").is_none());
+        assert!(try_operator_instant_reply("stop this session").is_none());
+        assert!(try_operator_instant_reply("halt the session").is_none());
+        assert!(try_operator_instant_reply("pause this session").is_none());
+        assert!(try_operator_instant_reply("quit this session").is_none());
         assert_eq!(
-            parse_operator_count_kind("stop this session"),
+            parse_operator_count_kind("abort this session"),
             Some(OperatorCountKind::Sessions)
         );
         assert!(looks_like_sessions_request("open sessions"));

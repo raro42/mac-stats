@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1193** | Session count — “stop this session”, “halt this session”, “pause this session”, and “quit this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Start this session” still stays with the agent. “Abort this session” stays for a later tick. |
 | **v0.1.1192** | Session count — “start this session”, “begin this session”, “launch this session”, and “restart this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Star this session” still stays with the agent. “Stop this session” stays for a later tick. |
 | **v0.1.1191** | Session count — “pin this session”, “bookmark this session”, “star this session”, and “favorite this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Saved sessions” still lists. |
 | **v0.1.1190** | Session count — “import this session”, “load this session”, “merge this session”, and “attach this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Saved sessions” still lists. |
@@ -27,10 +28,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “start this session” or “begin this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts. “Star this session” still stays with the agent.
+Ask “stop this session” or “pause this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts. “Start this session” still stays with the agent.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “stop this session” still matches the session count. “How many sessions” still counts. “Star this session” still stays with the agent.
+- Instant-lane leftovers: “abort this session” still matches the session count. “How many sessions” still counts. “Start this session” still stays with the agent. “Skill” contains “kill”, so do not match bare “kill” on the session count.
