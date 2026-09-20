@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1191] - 2026-09-20
+
+### Fixed
+- **Session count** — “Pin this session”, “bookmark this session”, “star this session”, and “favorite this session” no longer answer with the session count. Pin stays with the agent. “How many sessions” still counts. “Saved sessions” still lists. “Start this session” stays for a later tick (“start” contains “star”).
+
 ## [0.1.1190] - 2026-09-20
 
 ### Fixed

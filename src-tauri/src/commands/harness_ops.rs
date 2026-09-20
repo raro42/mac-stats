@@ -2016,6 +2016,24 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session pin is an action. It must not answer with the session count.
+    // "start" contains "star"; start stays for a later tick.
+    // Bare "pin" matches "opinion"; match the pin word instead.
+    if n.contains("session")
+        && (n.contains("unpin")
+            || n.contains("pinned")
+            || n.contains(" pin")
+            || n.starts_with("pin ")
+            || n.contains("pin ")
+            || n.contains("bookmark")
+            || n.contains("favorite")
+            || n.contains("favourite")
+            || n.contains("unstar")
+            || n.contains(" star")
+            || n.starts_with("star "))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65188,6 +65206,23 @@ mod tests {
         assert!(try_operator_instant_reply("load the session").is_none());
         assert!(try_operator_instant_reply("merge this session").is_none());
         assert!(try_operator_instant_reply("attach this session").is_none());
+        assert!(parse_operator_count_kind("pin this session").is_none());
+        assert!(parse_operator_count_kind("pin the session").is_none());
+        assert!(parse_operator_count_kind("pin session").is_none());
+        assert!(parse_operator_count_kind("unpin this session").is_none());
+        assert!(parse_operator_count_kind("unpin the session").is_none());
+        assert!(parse_operator_count_kind("bookmark this session").is_none());
+        assert!(parse_operator_count_kind("bookmark the session").is_none());
+        assert!(parse_operator_count_kind("favorite this session").is_none());
+        assert!(parse_operator_count_kind("favourite this session").is_none());
+        assert!(parse_operator_count_kind("star this session").is_none());
+        assert!(parse_operator_count_kind("star the session").is_none());
+        assert!(parse_operator_count_kind("unstar this session").is_none());
+        assert!(try_operator_instant_reply("pin this session").is_none());
+        assert!(try_operator_instant_reply("unpin the session").is_none());
+        assert!(try_operator_instant_reply("bookmark this session").is_none());
+        assert!(try_operator_instant_reply("star this session").is_none());
+        assert!(try_operator_instant_reply("favorite the session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");
