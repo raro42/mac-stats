@@ -9686,6 +9686,8 @@ fn count_results_tsv_outcomes() -> Result<(u64, u64, u64, u64), String> {
 }
 
 /// True for short keep/discard count asks (`/keeps`, `keeps tonight`, `ratchet summary`…).
+/// Inventory only for count phrasing: “how many keeps”, “keep count”, “count the keeps”.
+/// Verb phrases (“delete these keeps”, “clear the discards”, “export keeps”) stay with the agent.
 /// Counts only — does not dump TSV rows or steal path/size/age / morning surprise / what-shipped.
 pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -9732,6 +9734,9 @@ pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
         || n.contains("explain")
         || n.contains("create")
         || n.contains("delete")
+        || n.contains("clear")
+        || n.contains("export")
+        || n.contains("reset")
         || n.contains("remove")
         || n.contains("prune")
         || n.contains("http://")
@@ -9754,6 +9759,13 @@ pub fn looks_like_results_tsv_count_request(content: &str) -> bool {
         || n.contains("between discards")
     {
         return false;
+    }
+    // Inventory: “count the keeps”, “number of discards”, “how many keeps”.
+    if looks_like_noun_inventory_count(&n, "keep")
+        || looks_like_noun_inventory_count(&n, "discard")
+        || looks_like_noun_inventory_count(&n, "ratchet")
+    {
+        return true;
     }
     matches!(
         n.as_str(),
@@ -57993,7 +58005,7 @@ pub fn format_ops_help_gateway() -> String {
 • `improvements size` · `how big is the improvements folder` · `improvements dir size` — improvements folder size on disk (recursive file bytes; no list dump; does not steal `improvements path` / `improvements age`)\n\
 • `improvements age` · `how old is the improvements folder` · `improvements dir age` · `when was improvements updated` — improvements folder last write age (newest file mtime; no list dump; does not steal `improvements path` / size / `results.tsv age` / overnight content)\n\
 • `results.tsv path` · `where is results.tsv` · `autoresearch results path` · `ratchet results path` — `~/.mac-stats/improvements/autoresearch/results.tsv` path only (no dump; does not steal `improvements path` / `loop backlog path`)\n\
-• `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `discard count` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; counts only — no row dump; not path/size/age / morning surprise)\n\
+• `/keeps` · `keeps tonight` · `keep count` · `how many keeps` · `count the keeps` · `number of keeps` · `discard count` · `count the discards` · `discards tonight` · `ratchet summary` · `view keeps` · `see keeps` · `show me the keeps` · `open keeps` · `list the keeps` — keep/discard counts from results.tsv (tonight since 20:00 + all-time; inventory count asks only — no row dump; `delete these keeps` / `clear the discards` / `export keeps` stay with the agent; not path/size/age / morning surprise)\n\
 • `/longest-streak` · `longest streak` · `best streak` · `record streak` · `view longest streak` / `open longest streak` — longest keep/discard streak from results.tsv (all-time + tonight since 20:00 only — no row dump; not current streak / counts / rate / last-row / recent list / path/size/age / morning surprise)\n\
 • `/keep-streak` · `keep streak` · `current streak` · `ratchet streak` · `view keep streak` / `open keep streak` — consecutive keep/discard streak from results.tsv (current + tonight since 20:00 only — no row dump; not counts / rate / last-row / recent list / path/size/age / morning surprise)\n\
 • `/keep-rate` · `keep rate` · `hit rate` · `ratchet hit rate` · `keep percentage` · `view keep rate` / `open keep rate` — keep/discard hit rate from results.tsv (tonight + all-time percentages only — no row dump; not counts / last-row / recent list / path/size/age / morning surprise)\n\
@@ -72194,12 +72206,19 @@ mod tests {
         assert!(looks_like_results_tsv_count_request("keeps tonight"));
         assert!(looks_like_results_tsv_count_request("keep count"));
         assert!(looks_like_results_tsv_count_request("how many keeps"));
+        assert!(looks_like_results_tsv_count_request("count the keeps"));
+        assert!(looks_like_results_tsv_count_request("count keeps"));
+        assert!(looks_like_results_tsv_count_request("number of keeps"));
         assert!(looks_like_results_tsv_count_request("discard count"));
+        assert!(looks_like_results_tsv_count_request("count the discards"));
+        assert!(looks_like_results_tsv_count_request("count discards"));
+        assert!(looks_like_results_tsv_count_request("number of discards"));
         assert!(looks_like_results_tsv_count_request("discards tonight"));
         assert!(looks_like_results_tsv_count_request("overnight keeps"));
         assert!(looks_like_results_tsv_count_request("keeps last night"));
         assert!(looks_like_results_tsv_count_request("ratchet summary"));
         assert!(looks_like_results_tsv_count_request("ratchet count"));
+        assert!(looks_like_results_tsv_count_request("count the ratchet"));
         assert!(looks_like_results_tsv_count_request("keep discard count"));
         assert!(looks_like_results_tsv_count_request("view keeps"));
         assert!(looks_like_results_tsv_count_request("see keeps"));
@@ -72208,6 +72227,14 @@ mod tests {
         assert!(looks_like_results_tsv_count_request("list the keeps"));
         assert!(looks_like_results_tsv_count_request("view discards"));
         assert!(looks_like_results_tsv_count_request("open the discards"));
+        // Inventory only — verbs stay with the agent.
+        assert!(!looks_like_results_tsv_count_request("delete these keeps"));
+        assert!(!looks_like_results_tsv_count_request("clear the discards"));
+        assert!(!looks_like_results_tsv_count_request("export keeps"));
+        assert!(!looks_like_results_tsv_count_request("reset the ratchet"));
+        assert!(try_operator_instant_reply("delete these keeps").is_none());
+        assert!(try_operator_instant_reply("clear the discards").is_none());
+        assert!(try_operator_instant_reply("export keeps").is_none());
         assert!(!looks_like_results_tsv_count_request("results.tsv path"));
         assert!(!looks_like_results_tsv_count_request("where is results.tsv"));
         assert!(!looks_like_results_tsv_count_request("results.tsv size"));
@@ -72250,6 +72277,16 @@ mod tests {
         );
         let slash = try_operator_instant_reply("/keeps").expect("/keeps instant");
         assert!(slash.contains("Ratchet") || slash.contains("tonight"), "{slash}");
+        let counted = try_operator_instant_reply("count the keeps").expect("count the keeps");
+        assert!(
+            counted.contains("Ratchet") || counted.contains("tonight"),
+            "expected ratchet count reply: {counted}"
+        );
+        let discards = try_operator_instant_reply("count the discards").expect("count discards");
+        assert!(
+            discards.contains("Ratchet") || discards.contains("tonight"),
+            "expected ratchet count reply: {discards}"
+        );
     }
 
     #[test]

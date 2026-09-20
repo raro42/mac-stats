@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1202] - 2026-09-20
+
+### Fixed
+- **Keep / discard inventory counts** — “How many keeps”, “keep count”, “count the keeps”, and “number of discards” still answer with the ratchet count. “Delete these keeps”, “clear the discards”, and “export keeps” stay with the agent.
+
 ## [0.1.1201] - 2026-09-20
 
 ### Fixed
