@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1190] - 2026-09-20
+
+### Fixed
+- **Session count** — “Import this session”, “load this session”, “merge this session”, and “attach this session” no longer answer with the session count. Import stays with the agent. “How many sessions” still counts. “Saved sessions” still lists.
+
 ## [0.1.1189] - 2026-09-20
 
 ### Fixed

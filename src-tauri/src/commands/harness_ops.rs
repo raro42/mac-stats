@@ -2006,6 +2006,16 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return None;
     }
+    // Session import is an action. It must not answer with the session count.
+    // "reload" contains "load"; the restore block above owns reload.
+    if n.contains("session")
+        && (n.contains("import")
+            || n.contains("load")
+            || n.contains("merge")
+            || n.contains("attach"))
+    {
+        return None;
+    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -65165,6 +65175,19 @@ mod tests {
         assert!(try_operator_instant_reply("restore this session").is_none());
         assert!(try_operator_instant_reply("recover the session").is_none());
         assert!(try_operator_instant_reply("reload this session").is_none());
+        assert!(parse_operator_count_kind("import this session").is_none());
+        assert!(parse_operator_count_kind("import the session").is_none());
+        assert!(parse_operator_count_kind("import session").is_none());
+        assert!(parse_operator_count_kind("load this session").is_none());
+        assert!(parse_operator_count_kind("load the session").is_none());
+        assert!(parse_operator_count_kind("merge this session").is_none());
+        assert!(parse_operator_count_kind("merge the session").is_none());
+        assert!(parse_operator_count_kind("attach this session").is_none());
+        assert!(parse_operator_count_kind("attach the session").is_none());
+        assert!(try_operator_instant_reply("import this session").is_none());
+        assert!(try_operator_instant_reply("load the session").is_none());
+        assert!(try_operator_instant_reply("merge this session").is_none());
+        assert!(try_operator_instant_reply("attach this session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");

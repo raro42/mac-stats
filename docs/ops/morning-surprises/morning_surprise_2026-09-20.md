@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 | Version | What |
 | --- | --- |
+| **v0.1.1190** | Session count — “import this session”, “load this session”, “merge this session”, and “attach this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Saved sessions” still lists. |
 | **v0.1.1189** | Session count — “restore this session”, “recover this session”, “reload this session”, and “revert this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Saved sessions” still lists. |
 | **v0.1.1188** | Session count — “save this session”, “store this session”, and “backup this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. “Saved sessions” still lists. |
 | **v0.1.1187** | Session count — “search this session”, “find this session”, and “lookup this session” stay with the agent. They no longer answer with the session count. “How many sessions” still counts. |
@@ -24,10 +25,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-09-19 20:00). Digeste
 
 ## Why it matters
 
-Ask “restore this session” or “reload this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts. “Saved sessions” still lists.
+Ask “import this session” or “load this session” and the agent handles it. You no longer get a session count. “How many sessions” still counts. “Saved sessions” still lists.
 
 ## Next
 
 - Digester open / product-owned `debug.log` errors when they appear
 - Design review when screens age past grace (Agent Ops is in grace; recapture when Screen Recording allows)
-- Instant-lane leftovers: “import this session” still matches the session count. “Saved sessions” stays the list. “Start over” and “fresh start” do not contain “session”, so they never hit that count.
+- Instant-lane leftovers: “pin this session” still matches the session count. “Saved sessions” stays the list. “Reload” stays with restore (the word “load” sits inside “reload”).
