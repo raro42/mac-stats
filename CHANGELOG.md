@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1189] - 2026-09-20
+
+### Fixed
+- **Session count** — “Restore this session”, “recover this session”, “reload this session”, and “revert this session” no longer answer with the session count. Restore stays with the agent. “How many sessions” still counts. “Saved sessions” still lists.
+
 ## [0.1.1188] - 2026-09-20
 
 ### Fixed

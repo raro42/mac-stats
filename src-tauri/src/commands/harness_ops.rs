@@ -1986,7 +1986,7 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     }
     // Session save is an action. It must not answer with the session count.
     // "saved sessions" stays the Files list (checked before this count).
-    // "restore" contains "store"; leave restore for its own action.
+    // "restore" contains "store"; the restore block below owns that action.
     if n.contains("session")
         && !n.contains("saved")
         && (n.contains("save")
@@ -1994,6 +1994,15 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
             || n.contains("persist")
             || n.contains("backup")
             || n.contains("back up"))
+    {
+        return None;
+    }
+    // Session restore is an action. It must not answer with the session count.
+    if n.contains("session")
+        && (n.contains("restore")
+            || n.contains("recover")
+            || n.contains("reload")
+            || n.contains("revert"))
     {
         return None;
     }
@@ -65146,6 +65155,16 @@ mod tests {
         assert!(try_operator_instant_reply("save this session").is_none());
         assert!(try_operator_instant_reply("store the session").is_none());
         assert!(try_operator_instant_reply("backup this session").is_none());
+        assert!(parse_operator_count_kind("restore this session").is_none());
+        assert!(parse_operator_count_kind("restore the session").is_none());
+        assert!(parse_operator_count_kind("restore session").is_none());
+        assert!(parse_operator_count_kind("recover this session").is_none());
+        assert!(parse_operator_count_kind("reload this session").is_none());
+        assert!(parse_operator_count_kind("reload the session").is_none());
+        assert!(parse_operator_count_kind("revert this session").is_none());
+        assert!(try_operator_instant_reply("restore this session").is_none());
+        assert!(try_operator_instant_reply("recover the session").is_none());
+        assert!(try_operator_instant_reply("reload this session").is_none());
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");
