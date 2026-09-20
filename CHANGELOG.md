@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1198] - 2026-09-20
+
+### Fixed
+- **Operator inventory counts** — Agents, monitors, tasks, skills, plugins, and knowledge answer only inventory asks (“how many …”, “… count”, “number of …”). “Delete this agent”, “run this skill”, “check this monitor”, and other verbs stay with the agent. “How many agents” still counts. Session inventory-only from v0.1.1197 stays.
+
 ## [0.1.1197] - 2026-09-20
 
 ### Fixed

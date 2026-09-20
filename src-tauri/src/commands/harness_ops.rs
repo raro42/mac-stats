@@ -1880,15 +1880,30 @@ pub enum OperatorCountKind {
     DigestOpen,
 }
 
-/// True when the phrase asks how many sessions, not a verb on one session.
-fn looks_like_session_inventory_count(n: &str) -> bool {
+/// True when the phrase asks how many of `stem` (e.g. "agent"), not a verb on one item.
+fn looks_like_noun_inventory_count(n: &str, stem: &str) -> bool {
+    if !n.contains(stem) {
+        return false;
+    }
     n.contains("how many")
         || n.contains("number of")
-        || n.contains("session count")
-        || n.contains("sessions count")
-        || n.contains("count session")
-        || n.contains("count the session")
-        || n.contains("count of session")
+        || n.contains(&format!("{stem} count"))
+        || n.contains(&format!("{stem}s count"))
+        || n.contains(&format!("count {stem}"))
+        || n.contains(&format!("count the {stem}"))
+        || n.contains(&format!("count of {stem}"))
+}
+
+/// True when the phrase asks how many sessions, not a verb on one session.
+fn looks_like_session_inventory_count(n: &str) -> bool {
+    looks_like_noun_inventory_count(n, "session")
+}
+
+/// True when the phrase asks how many knowledge/memory files, not a verb on one note.
+fn looks_like_knowledge_inventory_count(n: &str) -> bool {
+    looks_like_noun_inventory_count(n, "knowledge")
+        || looks_like_noun_inventory_count(n, "memories")
+        || looks_like_noun_inventory_count(n, "memory")
 }
 
 /// Parse count-only operator asks — Agent Ops card parity; not list/create asks.
@@ -1929,14 +1944,27 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return Some(OperatorCountKind::DigestOpen);
     }
+    // Inventory only — "delete this agent" and other verbs stay with the agent.
     if n.contains("agent") {
-        return Some(OperatorCountKind::Agents);
+        if looks_like_noun_inventory_count(&n, "agent") {
+            return Some(OperatorCountKind::Agents);
+        }
+        return None;
     }
     if n.contains("monitor") || (n.contains("site") && n.contains("how many")) {
-        return Some(OperatorCountKind::Monitors);
+        if n.contains("site") && n.contains("how many") {
+            return Some(OperatorCountKind::Monitors);
+        }
+        if looks_like_noun_inventory_count(&n, "monitor") {
+            return Some(OperatorCountKind::Monitors);
+        }
+        return None;
     }
     if n.contains("task") {
-        return Some(OperatorCountKind::Tasks);
+        if looks_like_noun_inventory_count(&n, "task") {
+            return Some(OperatorCountKind::Tasks);
+        }
+        return None;
     }
     // Session inventory only. "Edit this session" and other verbs stay with the agent.
     // "Open sessions" and "saved sessions" stay the list (checked before this count).
@@ -1947,13 +1975,22 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
         return None;
     }
     if n.contains("skill") {
-        return Some(OperatorCountKind::Skills);
+        if looks_like_noun_inventory_count(&n, "skill") {
+            return Some(OperatorCountKind::Skills);
+        }
+        return None;
     }
     if n.contains("plugin") {
-        return Some(OperatorCountKind::Plugins);
+        if looks_like_noun_inventory_count(&n, "plugin") {
+            return Some(OperatorCountKind::Plugins);
+        }
+        return None;
     }
     if n.contains("knowledge") || n.contains("memories") || n.contains("memory file") {
-        return Some(OperatorCountKind::Knowledge);
+        if looks_like_knowledge_inventory_count(&n) {
+            return Some(OperatorCountKind::Knowledge);
+        }
+        return None;
     }
     None
 }
@@ -65001,6 +65038,46 @@ mod tests {
         assert!(!looks_like_operator_count_request("how many jobs"));
         assert!(!looks_like_operator_count_request("list agents"));
         assert!(parse_operator_count_kind("why are there so many tasks").is_none());
+        // Inventory-only for agents/tasks/skills/plugins/monitors/knowledge
+        // (session inventory-only already covered below).
+        assert!(parse_operator_count_kind("delete this agent").is_none());
+        assert!(parse_operator_count_kind("enable this agent").is_none());
+        assert!(parse_operator_count_kind("disable this agent").is_none());
+        assert!(parse_operator_count_kind("edit this agent").is_none());
+        assert!(try_operator_instant_reply("delete this agent").is_none());
+        assert!(parse_operator_count_kind("delete this task").is_none());
+        assert!(parse_operator_count_kind("run this task").is_none());
+        assert!(parse_operator_count_kind("enable this skill").is_none());
+        assert!(parse_operator_count_kind("run this skill").is_none());
+        assert!(parse_operator_count_kind("disable this plugin").is_none());
+        assert!(parse_operator_count_kind("check this monitor").is_none());
+        assert!(parse_operator_count_kind("remove this monitor").is_none());
+        assert!(parse_operator_count_kind("open this knowledge").is_none());
+        assert!(parse_operator_count_kind("edit this memory file").is_none());
+        assert_eq!(
+            parse_operator_count_kind("agent count"),
+            Some(OperatorCountKind::Agents)
+        );
+        assert_eq!(
+            parse_operator_count_kind("number of tasks"),
+            Some(OperatorCountKind::Tasks)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many skills"),
+            Some(OperatorCountKind::Skills)
+        );
+        assert_eq!(
+            parse_operator_count_kind("plugin count"),
+            Some(OperatorCountKind::Plugins)
+        );
+        assert_eq!(
+            parse_operator_count_kind("monitor count"),
+            Some(OperatorCountKind::Monitors)
+        );
+        assert_eq!(
+            parse_operator_count_kind("how many memories"),
+            Some(OperatorCountKind::Knowledge)
+        );
         assert!(parse_operator_count_kind("compact this session").is_none());
         assert!(try_operator_instant_reply("compact this session").is_none());
         assert!(parse_operator_count_kind("reset this session").is_none());
