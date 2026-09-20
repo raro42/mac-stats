@@ -2043,7 +2043,8 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
         return None;
     }
     // Session stop is an action. It must not answer with the session count.
-    // "start" does not contain "stop". "skill" contains "kill"; do not match kill here.
+    // "start" does not contain "stop".
+    // "skill" contains "kill"; match the kill word (not the skill substring).
     if n.contains("session")
         && (n.contains("stop")
             || n.contains("halt")
@@ -2051,7 +2052,10 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
             || n.contains("quit")
             || n.contains("abort")
             || n.contains("cancel")
-            || n.contains("terminate"))
+            || n.contains("terminate")
+            || n.split_whitespace().any(|w| {
+                w == "kill" || w == "killed" || w == "killing" || w == "destroy" || w == "drop"
+            }))
     {
         return None;
     }
@@ -65280,9 +65284,20 @@ mod tests {
         assert!(try_operator_instant_reply("abort this session").is_none());
         assert!(try_operator_instant_reply("cancel the session").is_none());
         assert!(try_operator_instant_reply("terminate this session").is_none());
+        assert!(parse_operator_count_kind("kill this session").is_none());
+        assert!(parse_operator_count_kind("kill the session").is_none());
+        assert!(parse_operator_count_kind("kill session").is_none());
+        assert!(parse_operator_count_kind("destroy this session").is_none());
+        assert!(parse_operator_count_kind("destroy the session").is_none());
+        assert!(parse_operator_count_kind("drop this session").is_none());
+        assert!(parse_operator_count_kind("drop the session").is_none());
+        assert!(try_operator_instant_reply("kill this session").is_none());
+        assert!(try_operator_instant_reply("destroy the session").is_none());
+        assert!(try_operator_instant_reply("drop this session").is_none());
+        // "skill" contains "kill"; skill path/count must not look like a kill action.
         assert_eq!(
-            parse_operator_count_kind("kill this session"),
-            Some(OperatorCountKind::Sessions)
+            parse_operator_count_kind("how many skills"),
+            Some(OperatorCountKind::Skills)
         );
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =

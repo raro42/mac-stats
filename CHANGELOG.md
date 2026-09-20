@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1195] - 2026-09-20
+
+### Fixed
+- **Session count** — “Kill this session”, “destroy this session”, and “drop this session” no longer answer with the session count. Kill stays with the agent. The match uses the kill word, so “how many skills” still counts skills. “How many sessions” still counts. “Stop this session” and “abort this session” still stay with the agent.
+
 ## [0.1.1194] - 2026-09-20
 
 ### Fixed
