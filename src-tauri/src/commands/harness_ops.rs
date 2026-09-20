@@ -92,6 +92,8 @@ pub struct RunsInsights {
     pub digest_stale_count: usize,
     pub digest_generated_at: String,
     pub digest_open_hints: Vec<String>,
+    /// Digester stale / already-shipped hints (ignored by overnight fuel).
+    pub digest_stale_hints: Vec<String>,
     /// Digester provenance: `python`, `rust-native`, or empty if missing.
     pub digest_source: String,
     /// Seconds since this mac-stats process started (Agent Ops Version card).
@@ -420,6 +422,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         digest_stale_count: digest.stale_count,
         digest_generated_at: digest.generated_at.clone(),
         digest_open_hints: digest.open_hints.clone(),
+        digest_stale_hints: digest.stale_hints.clone(),
         digest_source: digest.source.clone(),
         process_uptime_secs: crate::state::process_uptime_secs(),
         window_days,
@@ -573,6 +576,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         digest_stale_count: digest.stale_count,
         digest_generated_at: digest.generated_at,
         digest_open_hints: digest.open_hints,
+        digest_stale_hints: digest.stale_hints,
         digest_source: digest.source,
         process_uptime_secs: crate::state::process_uptime_secs(),
         window_days,
@@ -64739,6 +64743,7 @@ mod tests {
             digest_stale_count: 3,
             digest_generated_at: "2026-07-21T05:00:00Z".into(),
             digest_open_hints: vec![],
+            digest_stale_hints: vec![],
             digest_source: "python".into(),
             process_uptime_secs: 0,
             window_days: Some(7),

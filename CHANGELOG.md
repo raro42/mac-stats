@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1208] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights Stale empty calm** — When Runs Insights has turns but digester stale is empty, show warm “Nothing stale” + solid accent wash (Candidates / Slowest / Digest Queue clear parity). Stale hints from the digester surface when present.
+
 ## [0.1.1207] - 2026-09-21
 
 ### Changed

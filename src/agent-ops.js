@@ -9562,6 +9562,22 @@ function formatOpsDigestHintAsSummary(hint) {
     };
 }
 
+/** Digest-stale hint → run preview shape (Load into AI Chat). */
+function formatOpsDigestStaleHintAsSummary(hint) {
+    const text = String(hint || '').trim();
+    return {
+        ts: '',
+        lane: 'digest',
+        wall_ms: 0,
+        tools: [],
+        question_preview: text,
+        ok: true,
+        request_id: '',
+        _candidateKind: 'digest-stale',
+        _candidateReason: 'Digester stale / already shipped',
+    };
+}
+
 /** Discord gateway status → run preview shape (Load into AI Chat). */
 function formatOpsDiscordGatewayAsSummary(gateway) {
     const text = String(gateway || '').trim();
@@ -9809,6 +9825,49 @@ function renderOpsRuns(insights) {
                 empty.innerHTML =
                   `<div class="ops-empty-filter-title">Nothing open</div>` +
                   `<div class="ops-empty-tab-hint">Digester open is clear — design review and standing backlog still count</div>`;
+                card.appendChild(empty);
+            }
+        }
+        const staleHints = insights.digest_stale_hints || [];
+        const staleN = Number(insights.digest_stale_count) || 0;
+        {
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Stale';
+            card.appendChild(sub);
+            if (staleHints.length) {
+                staleHints.slice(0, 4).forEach((h) => {
+                    const text = String(h || '').trim();
+                    if (!text) return;
+                    const line = document.createElement('div');
+                    line.className = 'ops-insight-line';
+                    line.textContent = text;
+                    line.dataset.digestStaleHint = text;
+                    wireOpsInsightRunLine(line, formatOpsDigestStaleHintAsSummary(text));
+                    card.appendChild(line);
+                });
+            } else if (staleN > 0) {
+                const line = document.createElement('div');
+                line.className = 'ops-insight-line';
+                line.textContent = `${staleN} stale ignored — already shipped or filtered`;
+                wireOpsInsightRunLine(
+                  line,
+                  formatOpsDigestStaleHintAsSummary(
+                    `${staleN} stale ignored — already shipped or filtered`
+                  )
+                );
+                card.appendChild(line);
+            } else {
+                // True-empty Stale calm (Candidates / Slowest / Digest Queue clear parity).
+                const empty = document.createElement('div');
+                empty.className =
+                  'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title =
+                  'No stale digester rows — nothing ignored as already shipped';
+                empty.innerHTML =
+                  `<div class="ops-empty-filter-title">Nothing stale</div>` +
+                  `<div class="ops-empty-tab-hint">No stale digester rows — nothing ignored as already shipped</div>`;
                 card.appendChild(empty);
             }
         }
