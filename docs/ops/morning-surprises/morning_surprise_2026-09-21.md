@@ -6,6 +6,7 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 
 | Version | What |
 |---------|------|
+| **v0.1.1210** | Insights **Top tools** empty calm — “No tools yet” wash when digester Top tools is clear |
 | **v0.1.1209** | Insights **Latency** empty calm — “Nothing to measure” wash when p50 is noise-filtered |
 | **v0.1.1208** | Insights **Stale** empty calm — “Nothing stale” |
 | **v0.1.1207** | Insights **Candidates** empty calm — “Nothing open” |
@@ -18,12 +19,12 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~01:20)
+## This tick (~01:45)
 
 - Digester open empty; design review grace on `feature-agent-ops`.
-- Fuel: Insights Latency was only in the health tooltip; digester showed Latency n/a after filters.
-- Keep: warm empty when there is nothing to measure; clickable p50/mean/max line when the sample has turns.
+- Fuel: Insights still showed muted `Top tools: —` after Latency/Slowest/Candidates/Stale/Digest calm.
+- Keep: warm empty when turns used no tools; tool counts when they did.
 
 ## Try it
 
-Open **Agent Ops → Runs**. With a quiet digester night you should see **Latency · Nothing to measure** under Top tools, beside Slowest / Candidates / Stale calm blocks.
+Open **Agent Ops → Runs**. On a quiet digester night you should see **Top tools · No tools yet** under Lanes, beside Latency / Slowest / Candidates / Stale calm blocks.
