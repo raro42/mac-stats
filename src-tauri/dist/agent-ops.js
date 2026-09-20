@@ -9758,18 +9758,31 @@ function renderOpsRuns(insights) {
         toolsEl.textContent = `Top tools: ${tools || '—'}`;
         card.appendChild(toolsEl);
         const slowRows = insights.slowest || [];
-        if (slowRows.length) {
+        {
             const sub = document.createElement('div');
             sub.className = 'ops-insight-sub';
             sub.textContent = 'Slowest';
             card.appendChild(sub);
-            slowRows.slice(0, 3).forEach((s) => {
-                const line = document.createElement('div');
-                line.className = 'ops-insight-line';
-                line.textContent = `${s.wall_ms} ms · ${s.lane || '—'} · ${s.question_preview || '(empty)'}`;
-                wireOpsInsightRunLine(line, s);
-                card.appendChild(line);
-            });
+            if (slowRows.length) {
+                slowRows.slice(0, 3).forEach((s) => {
+                    const line = document.createElement('div');
+                    line.className = 'ops-insight-line';
+                    line.textContent = `${s.wall_ms} ms · ${s.lane || '—'} · ${s.question_preview || '(empty)'}`;
+                    wireOpsInsightRunLine(line, s);
+                    card.appendChild(line);
+                });
+            } else {
+                // True-empty Slowest calm (Digest Queue clear parity) — digester filtered all turns as fast.
+                const empty = document.createElement('div');
+                empty.className =
+                  'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Recent turns are fast or already filtered as shipped noise';
+                empty.innerHTML =
+                  `<div class="ops-empty-filter-title">Nothing slow</div>` +
+                  `<div class="ops-empty-tab-hint">Recent turns are fast — digester Slowest is clear</div>`;
+                card.appendChild(empty);
+            }
         }
         const candRows = insights.candidates || [];
         if (candRows.length) {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1206] - 2026-09-20
+
+### Changed
+- **Agent Ops Insights Slowest empty calm** — When Runs Insights has turns but Slowest is empty, show warm “Nothing slow” + solid accent wash (Digest Queue clear parity) instead of hiding the section.
+
 ## [0.1.1205] - 2026-09-20
 
 ### Changed
