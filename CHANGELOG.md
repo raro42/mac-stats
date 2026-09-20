@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1203] - 2026-09-20
+
+### Fixed
+- **Debug Log inventory counts** — “How many log errors”, “error count”, “count the errors”, and “number of warnings” still answer with the tail count. “Delete these errors”, “clear the log”, and “export warnings” stay with the agent.
+
 ## [0.1.1202] - 2026-09-20
 
 ### Fixed

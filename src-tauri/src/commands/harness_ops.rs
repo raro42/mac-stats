@@ -3558,6 +3558,8 @@ pub enum DebugLogCountKind {
 }
 
 /// Parse count-only debug.log asks — Debug Log glance parity; not list/report asks.
+/// Inventory only: “how many log errors”, “error count”, “count the warnings”.
+/// Verb phrases (“delete these errors”, “clear the log”, “export warnings”) stay with the agent.
 pub fn parse_debug_log_count_kind(content: &str) -> Option<DebugLogCountKind> {
     let n = normalize_operator_command(content);
     if n.chars().count() > 56 {
@@ -3570,6 +3572,9 @@ pub fn parse_debug_log_count_kind(content: &str) -> Option<DebugLogCountKind> {
         || n.contains("fix")
         || n.contains("explain")
         || n.contains("clear")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("export")
         || n.contains("rotate")
         || n.contains("open in")
         || n.contains("editor")
@@ -3581,16 +3586,12 @@ pub fn parse_debug_log_count_kind(content: &str) -> Option<DebugLogCountKind> {
     if looks_like_debug_log_request(content) && !n.contains("how many") && !n.contains("count") {
         return None;
     }
-    let log_ctx = n.contains("log") || n.contains("debug");
-    let is_count = n.contains("how many")
-        || n.contains("count")
-        || n.contains("number of")
-        || n.ends_with(" errors")
-        || n.ends_with(" warnings")
-        || n.ends_with(" warns");
+    // Inventory phrasing only — bare "… errors" / verb+errors stay off this lane.
+    let is_count = n.contains("how many") || n.contains("count") || n.contains("number of");
     if !is_count {
         return None;
     }
+    let log_ctx = n.contains("log") || n.contains("debug");
     let wants_error = n.contains("error") || n.contains("panic");
     let wants_warn = n.contains("warn") || n.contains("warning");
     if wants_error && wants_warn {
@@ -3609,6 +3610,7 @@ pub fn parse_debug_log_count_kind(content: &str) -> Option<DebugLogCountKind> {
 }
 
 /// True for short “how many log errors / warn count…” asks.
+/// Inventory only — verb phrases stay with the agent.
 pub fn looks_like_debug_log_count_request(content: &str) -> bool {
     parse_debug_log_count_kind(content).is_some()
 }
@@ -57991,7 +57993,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` · `view monitors` · `see monitors` · `show me the monitors` · `open monitors` · `list the monitors` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` · `view disk` · `see disk` · `show me the disk cleanup` · `open disk` · `list the disk cleanup` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` · `review logs` · `check logs` · `view logs` · `see logs` · `show me the logs` · `open logs` — Debug Log Error/Warn list\n\
-• `how many log errors` · `log warn count` — Debug Log error/warn counts (tail; no line dump)\n\
+• `how many log errors` · `log warn count` · `count the errors` · `number of warnings` — Debug Log error/warn counts (tail; inventory count asks only — no line dump; `delete these errors` / `clear the log` / `export warnings` stay with the agent)\n\
 • `log file size` · `how big is the log` — Debug Log file size on disk (stat only)\n\
 • `where is the log` · `log file path` — Debug Log path on disk (config only)\n\
 • `log age` · `how old is the log` — Debug Log last write age (mtime; stat only)\n\
@@ -65630,6 +65632,14 @@ mod tests {
             Some(DebugLogCountKind::Error)
         );
         assert_eq!(
+            parse_debug_log_count_kind("count the errors"),
+            Some(DebugLogCountKind::Error)
+        );
+        assert_eq!(
+            parse_debug_log_count_kind("number of warnings"),
+            Some(DebugLogCountKind::Warn)
+        );
+        assert_eq!(
             parse_debug_log_count_kind("how many warnings in debug log"),
             Some(DebugLogCountKind::Warn)
         );
@@ -65642,11 +65652,17 @@ mod tests {
             Some(DebugLogCountKind::Both)
         );
         assert!(looks_like_debug_log_count_request("how many errors in the log"));
+        assert!(looks_like_debug_log_count_request("count the errors"));
         assert!(!looks_like_debug_log_count_request("/logs error"));
         assert!(!looks_like_debug_log_count_request("any errors"));
         assert!(!looks_like_debug_log_count_request("show warnings"));
         assert!(!looks_like_debug_log_count_request("why is there an error"));
         assert!(!looks_like_debug_log_count_request("how many failed runs"));
+        // Inventory only — verbs stay with the agent.
+        assert!(!looks_like_debug_log_count_request("delete these errors"));
+        assert!(!looks_like_debug_log_count_request("clear the log"));
+        assert!(!looks_like_debug_log_count_request("export warnings"));
+        assert!(!looks_like_debug_log_count_request("remove these errors"));
         let err = try_operator_instant_reply("how many errors in the log")
             .expect("log error count instant");
         assert!(err.contains("Log errors") || err.contains("error"));

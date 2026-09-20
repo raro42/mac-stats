@@ -4,6 +4,10 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Shipped
 
+### v0.1.1203 — Debug Log inventory counts (~22:35)
+- “How many log errors”, “error count”, “count the errors”, and “number of warnings” answer with the tail count (no LLM).
+- “Delete these errors”, “clear the log”, and “export warnings” stay with the agent.
+
 ### v0.1.1202 — Keep / discard inventory counts (~22:10)
 - “Count the keeps”, “how many keeps”, and “number of discards” answer with the ratchet count (no LLM).
 - “Delete these keeps”, “clear the discards”, and “export keeps” stay with the agent.
@@ -11,6 +15,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.1203** | Debug Log inventory counts answer only inventory asks (“count the errors”, …). “Delete these errors”, “clear the log”, “export warnings” stay with the agent. |
 | **v0.1.1202** | Keep / discard inventory counts answer only inventory asks (“count the keeps”, …). “Delete these keeps”, “clear the discards”, “export keeps” stay with the agent. |
 | **v0.1.1197** | Session count answers only inventory asks (“how many sessions”, …). Verb phrases like “edit this session” stay with the agent. |
 | **v0.1.1198** | Operator inventory counts (agents, monitors, tasks, skills, plugins, knowledge) answer only inventory asks. “Delete this agent”, “run this skill”, “check this monitor” stay with the agent. |
@@ -26,4 +31,4 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Fitness
 
-Keep / discard counts stay instant for inventory asks (“count the keeps”, “how many keeps”). Verb phrases on keeps/discards no longer steal the ratchet count lane. Schedule/delivery inventory-only from v0.1.1201 stays.
+Debug Log counts stay instant for inventory asks (“count the errors”, “how many log errors”). Verb phrases on log errors/warnings no longer steal the count lane. Keep/discard inventory-only from v0.1.1202 stays.
