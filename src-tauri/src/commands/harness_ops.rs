@@ -1880,6 +1880,17 @@ pub enum OperatorCountKind {
     DigestOpen,
 }
 
+/// True when the phrase asks how many sessions, not a verb on one session.
+fn looks_like_session_inventory_count(n: &str) -> bool {
+    n.contains("how many")
+        || n.contains("number of")
+        || n.contains("session count")
+        || n.contains("sessions count")
+        || n.contains("count session")
+        || n.contains("count the session")
+        || n.contains("count of session")
+}
+
 /// Parse count-only operator asks — Agent Ops card parity; not list/create asks.
 pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     let n = normalize_operator_command(content);
@@ -1918,151 +1929,6 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     {
         return Some(OperatorCountKind::DigestOpen);
     }
-    // Session compaction is an action. It must not answer with the session count.
-    if n.contains("compact") {
-        return None;
-    }
-    // Session reset is an action. It must not answer with the session count.
-    if n.contains("reset")
-        || n.contains("new session")
-        || (n.contains("clear") && n.contains("session"))
-        || (n.contains("wipe") && n.contains("session"))
-    {
-        return None;
-    }
-    // Session delete or close is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("delete")
-            || n.contains("remove")
-            || n.contains("end this")
-            || n.contains("end the")
-            || n.contains("end session")
-            || n.contains("close"))
-    {
-        return None;
-    }
-    // Session summarize or rename is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("summar")
-            || n.contains("rename")
-            || n.contains("recap")
-            || n.contains("title")
-            || n.contains("name this")
-            || n.contains("name the")
-            || n.contains("name a session")
-            || n.contains("session name"))
-    {
-        return None;
-    }
-    // Session resume, open, or switch is an action. It must not answer with the session count.
-    // Plural "open sessions" stays the list (checked before this count).
-    if n.contains("resume")
-        || (n.contains("continue") && n.contains("session"))
-        || (n.contains("switch") && n.contains("session"))
-        || (n.contains("open") && n.contains("session") && !n.contains("sessions"))
-    {
-        return None;
-    }
-    // Session fork is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("fork") || n.contains("duplicate") || n.contains("clone"))
-    {
-        return None;
-    }
-    // Session export or share is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("export") || n.contains("share") || n.contains("archive"))
-    {
-        return None;
-    }
-    // Session search is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("search")
-            || n.contains("find")
-            || n.contains("lookup")
-            || n.contains("look up"))
-    {
-        return None;
-    }
-    // Session save is an action. It must not answer with the session count.
-    // "saved sessions" stays the Files list (checked before this count).
-    // "restore" contains "store"; the restore block below owns that action.
-    if n.contains("session")
-        && !n.contains("saved")
-        && (n.contains("save")
-            || (n.contains("store") && !n.contains("restore"))
-            || n.contains("persist")
-            || n.contains("backup")
-            || n.contains("back up"))
-    {
-        return None;
-    }
-    // Session restore is an action. It must not answer with the session count.
-    if n.contains("session")
-        && (n.contains("restore")
-            || n.contains("recover")
-            || n.contains("reload")
-            || n.contains("revert"))
-    {
-        return None;
-    }
-    // Session import is an action. It must not answer with the session count.
-    // "reload" contains "load"; the restore block above owns reload.
-    if n.contains("session")
-        && (n.contains("import")
-            || n.contains("load")
-            || n.contains("merge")
-            || n.contains("attach"))
-    {
-        return None;
-    }
-    // Session pin is an action. It must not answer with the session count.
-    // "start" contains "star"; the start block below owns start.
-    // Bare "pin" matches "opinion"; match the pin word instead.
-    if n.contains("session")
-        && (n.contains("unpin")
-            || n.contains("pinned")
-            || n.contains(" pin")
-            || n.starts_with("pin ")
-            || n.contains("pin ")
-            || n.contains("bookmark")
-            || n.contains("favorite")
-            || n.contains("favourite")
-            || n.contains("unstar")
-            || n.contains(" star")
-            || n.starts_with("star "))
-    {
-        return None;
-    }
-    // Session start is an action. It must not answer with the session count.
-    // Match "start" (not "star") so pin/star stays on the block above.
-    // "restart" contains "start".
-    if n.contains("session")
-        && (n.contains("start") || n.contains("begin") || n.contains("launch"))
-    {
-        return None;
-    }
-    // Session stop is an action. It must not answer with the session count.
-    // "start" does not contain "stop".
-    // "skill" contains "kill"; match the kill word (not the skill substring).
-    // Exit / leave / abandon are leave-session actions (not a count ask).
-    if n.contains("session")
-        && (n.contains("stop")
-            || n.contains("halt")
-            || n.contains("pause")
-            || n.contains("quit")
-            || n.contains("abort")
-            || n.contains("cancel")
-            || n.contains("terminate")
-            || n.contains("exit")
-            || n.contains("leave")
-            || n.contains("abandon")
-            || n.split_whitespace().any(|w| {
-                w == "kill" || w == "killed" || w == "killing" || w == "destroy" || w == "drop"
-            }))
-    {
-        return None;
-    }
     if n.contains("agent") {
         return Some(OperatorCountKind::Agents);
     }
@@ -2072,8 +1938,13 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     if n.contains("task") {
         return Some(OperatorCountKind::Tasks);
     }
+    // Session inventory only. "Edit this session" and other verbs stay with the agent.
+    // "Open sessions" and "saved sessions" stay the list (checked before this count).
     if n.contains("session") {
-        return Some(OperatorCountKind::Sessions);
+        if looks_like_session_inventory_count(&n) {
+            return Some(OperatorCountKind::Sessions);
+        }
+        return None;
     }
     if n.contains("skill") {
         return Some(OperatorCountKind::Skills);
@@ -65308,6 +65179,24 @@ mod tests {
         assert!(try_operator_instant_reply("exit this session").is_none());
         assert!(try_operator_instant_reply("leave the session").is_none());
         assert!(try_operator_instant_reply("abandon this session").is_none());
+        // Leftover verbs stay with the agent. Inventory asks still count.
+        assert!(parse_operator_count_kind("edit this session").is_none());
+        assert!(parse_operator_count_kind("hide this session").is_none());
+        assert!(parse_operator_count_kind("move this session").is_none());
+        assert!(parse_operator_count_kind("copy this session").is_none());
+        assert!(parse_operator_count_kind("refresh this session").is_none());
+        assert!(parse_operator_count_kind("update this session").is_none());
+        assert!(try_operator_instant_reply("edit this session").is_none());
+        assert!(try_operator_instant_reply("hide this session").is_none());
+        assert!(try_operator_instant_reply("refresh this session").is_none());
+        assert_eq!(
+            parse_operator_count_kind("number of sessions"),
+            Some(OperatorCountKind::Sessions)
+        );
+        assert_eq!(
+            parse_operator_count_kind("count sessions"),
+            Some(OperatorCountKind::Sessions)
+        );
         // "skill" contains "kill"; skill path/count must not look like a kill action.
         assert_eq!(
             parse_operator_count_kind("how many skills"),

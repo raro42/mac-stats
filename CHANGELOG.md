@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1197] - 2026-09-20
+
+### Fixed
+- **Session count** — Only inventory asks count sessions (“how many sessions”, “session count”, “number of sessions”). “Edit this session”, “hide this session”, “move this session”, and other verbs stay with the agent. “How many sessions” still counts. “Open sessions” still lists.
+
 ## [0.1.1196] - 2026-09-20
 
 ### Fixed
