@@ -9785,18 +9785,32 @@ function renderOpsRuns(insights) {
             }
         }
         const candRows = insights.candidates || [];
-        if (candRows.length) {
+        {
             const sub = document.createElement('div');
             sub.className = 'ops-insight-sub';
             sub.textContent = 'Candidates';
             card.appendChild(sub);
-            candRows.slice(0, 4).forEach((c) => {
-                const line = document.createElement('div');
-                line.className = 'ops-insight-line';
-                line.innerHTML = `<span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em>`;
-                wireOpsInsightRunLine(line, formatOpsCandidateAsSummary(c));
-                card.appendChild(line);
-            });
+            if (candRows.length) {
+                candRows.slice(0, 4).forEach((c) => {
+                    const line = document.createElement('div');
+                    line.className = 'ops-insight-line';
+                    line.innerHTML = `<span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em>`;
+                    wireOpsInsightRunLine(line, formatOpsCandidateAsSummary(c));
+                    card.appendChild(line);
+                });
+            } else {
+                // True-empty Candidates calm (Slowest / Digest Queue clear parity) — digester open is empty.
+                const empty = document.createElement('div');
+                empty.className =
+                  'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title =
+                  'Digester open is empty — overnight still pulls design review or standing backlog';
+                empty.innerHTML =
+                  `<div class="ops-empty-filter-title">Nothing open</div>` +
+                  `<div class="ops-empty-tab-hint">Digester open is clear — design review and standing backlog still count</div>`;
+                card.appendChild(empty);
+            }
         }
     }
     ensureOpsRunsLaneChips();

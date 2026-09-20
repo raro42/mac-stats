@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1207] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights Candidates empty calm** — When Runs Insights has turns but Candidates is empty, show warm “Nothing open” + solid accent wash (Slowest / Digest Queue clear parity) instead of hiding the section.
+
 ## [0.1.1206] - 2026-09-20
 
 ### Changed
