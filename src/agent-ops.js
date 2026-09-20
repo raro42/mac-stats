@@ -9722,10 +9722,6 @@ function renderOpsRuns(insights) {
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
-    const tools = (insights.by_tool || [])
-        .slice(0, 6)
-        .map(([k, v]) => `${k}×${v}`)
-        .join(', ');
     if (card) {
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
@@ -9769,10 +9765,33 @@ function renderOpsRuns(insights) {
         lanesEl.className = 'ops-row-meta';
         lanesEl.textContent = `Lanes: ${lanes || '—'}`;
         card.appendChild(lanesEl);
-        const toolsEl = document.createElement('div');
-        toolsEl.className = 'ops-row-meta';
-        toolsEl.textContent = `Top tools: ${tools || '—'}`;
-        card.appendChild(toolsEl);
+        {
+            // Top tools empty calm (Latency / Slowest / Digest Queue clear parity).
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Top tools';
+            card.appendChild(sub);
+            const toolRows = insights.by_tool || [];
+            if (toolRows.length) {
+                const toolsEl = document.createElement('div');
+                toolsEl.className = 'ops-row-meta';
+                toolsEl.textContent = toolRows
+                    .slice(0, 6)
+                    .map(([k, v]) => `${k}×${v}`)
+                    .join(', ');
+                card.appendChild(toolsEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Recent turns used no tools or digester has none yet';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No tools yet</div>` +
+                    `<div class="ops-empty-tab-hint">Recent turns used no tools — digester Top tools is clear</div>`;
+                card.appendChild(empty);
+            }
+        }
         {
             // Latency section — calm when digester noise filters leave p50 n/a (Slowest / Digest parity).
             const sub = document.createElement('div');

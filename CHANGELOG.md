@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1210] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights Top tools empty calm** — When Runs Insights has turns but digester Top tools is empty, show warm “No tools yet” + solid accent wash (Latency / Slowest / Digest Queue clear parity). Tool counts still surface when turns used tools.
+
 ## [0.1.1209] - 2026-09-21
 
 ### Changed
