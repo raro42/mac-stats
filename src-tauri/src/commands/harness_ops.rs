@@ -2045,6 +2045,7 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
     // Session stop is an action. It must not answer with the session count.
     // "start" does not contain "stop".
     // "skill" contains "kill"; match the kill word (not the skill substring).
+    // Exit / leave / abandon are leave-session actions (not a count ask).
     if n.contains("session")
         && (n.contains("stop")
             || n.contains("halt")
@@ -2053,6 +2054,9 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
             || n.contains("abort")
             || n.contains("cancel")
             || n.contains("terminate")
+            || n.contains("exit")
+            || n.contains("leave")
+            || n.contains("abandon")
             || n.split_whitespace().any(|w| {
                 w == "kill" || w == "killed" || w == "killing" || w == "destroy" || w == "drop"
             }))
@@ -65294,6 +65298,16 @@ mod tests {
         assert!(try_operator_instant_reply("kill this session").is_none());
         assert!(try_operator_instant_reply("destroy the session").is_none());
         assert!(try_operator_instant_reply("drop this session").is_none());
+        assert!(parse_operator_count_kind("exit this session").is_none());
+        assert!(parse_operator_count_kind("exit the session").is_none());
+        assert!(parse_operator_count_kind("exit session").is_none());
+        assert!(parse_operator_count_kind("leave this session").is_none());
+        assert!(parse_operator_count_kind("leave the session").is_none());
+        assert!(parse_operator_count_kind("abandon this session").is_none());
+        assert!(parse_operator_count_kind("abandon the session").is_none());
+        assert!(try_operator_instant_reply("exit this session").is_none());
+        assert!(try_operator_instant_reply("leave the session").is_none());
+        assert!(try_operator_instant_reply("abandon this session").is_none());
         // "skill" contains "kill"; skill path/count must not look like a kill action.
         assert_eq!(
             parse_operator_count_kind("how many skills"),

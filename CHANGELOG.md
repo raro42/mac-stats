@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1196] - 2026-09-20
+
+### Fixed
+- **Session count** — “Exit this session”, “leave this session”, and “abandon this session” no longer answer with the session count. Exit stays with the agent. “How many sessions” still counts. “Kill this session” and “stop this session” still stay with the agent.
+
 ## [0.1.1195] - 2026-09-20
 
 ### Fixed
