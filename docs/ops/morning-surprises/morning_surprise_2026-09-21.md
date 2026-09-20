@@ -4,6 +4,10 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Shipped
 
+### v0.1.1205 — Agent Ops Digest open empty calm (~23:35)
+- When Insights has runs but digest open is zero, Queue clear uses warm title + solid accent wash (true-empty / filter-miss parity).
+- Replaces the dashed muted one-line empty.
+
 ### v0.1.1204 — Agent Ops true-empty calm (~23:05)
 - Empty Agents, Sessions, Schedules, Knowledge, and Runs tabs use warm title + solid accent wash (filter-miss / overview Ready parity).
 - Knowledge empty copy drops the raw home-path dump.
@@ -19,6 +23,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.1205** | Agent Ops Digest open empty calm (warm title + solid wash when queue clear). |
 | **v0.1.1204** | Agent Ops true-empty calm (warm title + solid wash). Knowledge empty copy softens. |
 | **v0.1.1203** | Debug Log inventory counts answer only inventory asks (“count the errors”, …). “Delete these errors”, “clear the log”, “export warnings” stay with the agent. |
 | **v0.1.1202** | Keep / discard inventory counts answer only inventory asks (“count the keeps”, …). “Delete these keeps”, “clear the discards”, “export keeps” stay with the agent. |
@@ -31,9 +36,9 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 ## Tried / context
 
 - Digester open stayed empty (no Slowest / open candidates).
-- Design review: shipped Agent Ops true-empty calm (**v0.1.1204**); recapture `feature-agent-ops.png`.
+- Design review: shipped Digest open empty calm (**v0.1.1205**) after true-empty tabs (**v0.1.1204**); recapture `feature-agent-ops.png` still deferred (Screen Recording TCC).
 - Debug.log: Having-fun idle Ollama timeout WARN — already soft-pathed; not product-owned ERROR fuel.
 
 ## Fitness
 
-Agent Ops empty tabs match filter-miss calm. Debug Log counts stay instant for inventory asks (“count the errors”, “how many log errors”). Verb phrases on log errors/warnings no longer steal the count lane. Keep/discard inventory-only from v0.1.1202 stays.
+Insights Queue clear matches Agent Ops true-empty calm. Digest open empty no longer looks dashed and muted when the overnight queue is clear.
