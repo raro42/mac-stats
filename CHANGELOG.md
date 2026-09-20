@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1192] - 2026-09-20
+
+### Fixed
+- **Session count** — “Start this session”, “begin this session”, “launch this session”, and “restart this session” no longer answer with the session count. Start stays with the agent. “How many sessions” still counts. “Star this session” still stays with the agent. “Stop this session” stays for a later tick.
+
 ## [0.1.1191] - 2026-09-20
 
 ### Fixed

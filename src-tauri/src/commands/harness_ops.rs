@@ -2017,7 +2017,7 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
         return None;
     }
     // Session pin is an action. It must not answer with the session count.
-    // "start" contains "star"; start stays for a later tick.
+    // "start" contains "star"; the start block below owns start.
     // Bare "pin" matches "opinion"; match the pin word instead.
     if n.contains("session")
         && (n.contains("unpin")
@@ -2031,6 +2031,14 @@ pub fn parse_operator_count_kind(content: &str) -> Option<OperatorCountKind> {
             || n.contains("unstar")
             || n.contains(" star")
             || n.starts_with("star "))
+    {
+        return None;
+    }
+    // Session start is an action. It must not answer with the session count.
+    // Match "start" (not "star") so pin/star stays on the block above.
+    // "restart" contains "start".
+    if n.contains("session")
+        && (n.contains("start") || n.contains("begin") || n.contains("launch"))
     {
         return None;
     }
@@ -65223,6 +65231,23 @@ mod tests {
         assert!(try_operator_instant_reply("bookmark this session").is_none());
         assert!(try_operator_instant_reply("star this session").is_none());
         assert!(try_operator_instant_reply("favorite the session").is_none());
+        assert!(parse_operator_count_kind("start this session").is_none());
+        assert!(parse_operator_count_kind("start the session").is_none());
+        assert!(parse_operator_count_kind("start session").is_none());
+        assert!(parse_operator_count_kind("begin this session").is_none());
+        assert!(parse_operator_count_kind("begin the session").is_none());
+        assert!(parse_operator_count_kind("launch this session").is_none());
+        assert!(parse_operator_count_kind("launch the session").is_none());
+        assert!(parse_operator_count_kind("restart this session").is_none());
+        assert!(parse_operator_count_kind("restart the session").is_none());
+        assert!(try_operator_instant_reply("start this session").is_none());
+        assert!(try_operator_instant_reply("begin the session").is_none());
+        assert!(try_operator_instant_reply("launch this session").is_none());
+        assert!(try_operator_instant_reply("restart this session").is_none());
+        assert_eq!(
+            parse_operator_count_kind("stop this session"),
+            Some(OperatorCountKind::Sessions)
+        );
         assert!(looks_like_sessions_request("open sessions"));
         let open_sessions =
             try_operator_instant_reply("open sessions").expect("open sessions list");
