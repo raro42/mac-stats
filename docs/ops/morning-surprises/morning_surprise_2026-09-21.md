@@ -4,6 +4,10 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 ## Shipped
 
+### v0.1.1207 — Agent Ops Insights Candidates empty calm (~00:25)
+- When Runs Insights has turns but Candidates is empty, show warm “Nothing open” + solid accent wash (Slowest / Digest Queue clear parity).
+- Digester open empty no longer hides the Candidates section.
+
 ### v0.1.1206 — Agent Ops Insights Slowest empty calm (~23:58)
 - When Runs Insights has turns but Slowest is empty, show warm “Nothing slow” + solid accent wash (Digest Queue clear parity).
 - Digester Slowest clear no longer hides the section.
@@ -27,6 +31,7 @@ Overnight Track B (20:00–06:00 window starting 2026-09-20).
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.1207** | Agent Ops Insights Candidates empty calm (warm Nothing open when digester open is clear). |
 | **v0.1.1206** | Agent Ops Insights Slowest empty calm (warm Nothing slow when digester Slowest is clear). |
 | **v0.1.1205** | Agent Ops Digest open empty calm (warm title + solid wash when queue clear). |
 | **v0.1.1204** | Agent Ops true-empty calm (warm title + solid wash). Knowledge empty copy softens. |
