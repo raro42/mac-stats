@@ -9739,9 +9739,14 @@ function renderOpsRuns(insights) {
             sub.textContent = 'Digest open';
             card.appendChild(sub);
             const empty = document.createElement('div');
-            empty.className = 'ops-empty ops-empty-compact';
-            empty.textContent =
-                'Queue clear — overnight must still ship design review / standing backlog (quiet is a fail)';
+            empty.className =
+              'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+            empty.setAttribute('role', 'status');
+            empty.title =
+              'Overnight still ships design review or standing backlog — quiet is a fail';
+            empty.innerHTML =
+              `<div class="ops-empty-filter-title">Queue clear</div>` +
+              `<div class="ops-empty-tab-hint">Overnight still ships design review or standing backlog — quiet is a fail</div>`;
             card.appendChild(empty);
         }
         const lanesEl = document.createElement('div');

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1205] - 2026-09-20
+
+### Changed
+- **Agent Ops Digest open empty calm** — When Insights has runs but digest open is zero, the queue-clear note uses warm title + solid accent wash (true-empty / filter-miss parity) instead of dashed muted text.
+
 ## [0.1.1204] - 2026-09-20
 
 ### Changed
