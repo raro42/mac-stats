@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1211] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights Lanes empty calm** — When Runs Insights has turns but lane mix is empty, show warm “No lanes yet” + solid accent wash (Top tools / Digest Queue clear parity). Lane counts still surface when turns have a lane mix.
+
 ## [0.1.1210] - 2026-09-21
 
 ### Changed

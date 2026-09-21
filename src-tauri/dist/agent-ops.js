@@ -9721,7 +9721,6 @@ function renderOpsRuns(insights) {
         applyOpsSlackAttentionGlanceState();
         return;
     }
-    const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
     if (card) {
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
@@ -9761,10 +9760,32 @@ function renderOpsRuns(insights) {
               `<div class="ops-empty-tab-hint">Overnight still ships design review or standing backlog — quiet is a fail</div>`;
             card.appendChild(empty);
         }
-        const lanesEl = document.createElement('div');
-        lanesEl.className = 'ops-row-meta';
-        lanesEl.textContent = `Lanes: ${lanes || '—'}`;
-        card.appendChild(lanesEl);
+        {
+            // Lanes empty calm (Top tools / Digest Queue clear parity).
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Lanes';
+            card.appendChild(sub);
+            const laneRows = insights.by_lane || [];
+            if (laneRows.length) {
+                const lanesEl = document.createElement('div');
+                lanesEl.className = 'ops-row-meta';
+                lanesEl.textContent = laneRows
+                    .map(([k, v]) => `${k}:${v}`)
+                    .join(' · ');
+                card.appendChild(lanesEl);
+            } else {
+                const empty = document.createElement('div');
+                empty.className =
+                    'ops-empty ops-empty-compact ops-empty-filter-miss is-calm';
+                empty.setAttribute('role', 'status');
+                empty.title = 'Lane mix appears after Discord or chat turns land';
+                empty.innerHTML =
+                    `<div class="ops-empty-filter-title">No lanes yet</div>` +
+                    `<div class="ops-empty-tab-hint">Lane mix appears after Discord or chat turns land</div>`;
+                card.appendChild(empty);
+            }
+        }
         {
             // Top tools empty calm (Latency / Slowest / Digest Queue clear parity).
             const sub = document.createElement('div');
