@@ -6257,11 +6257,12 @@ function renderOverviewRuns(insights) {
         btn.type = 'button';
         btn.className = 'ops-row';
         const q = String(r?.question_preview || '').trim() || '(empty)';
-        const toolsJoined = (r?.tools || []).slice(0, 3).join(', ') || '—';
-        const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : '—';
+        // Empty run meta: match schedule "None yet" / health "Unknown" (bare em dash reads like missing data).
+        const toolsJoined = (r?.tools || []).slice(0, 3).join(', ') || 'None yet';
+        const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
         btn.innerHTML =
             `<div><div class="ops-row-title">${escapeHtml(q.slice(0, 72))}</div>` +
-            `<div class="ops-row-meta">${escapeHtml(r?.lane || '—')} · ${escapeHtml(wall)} · ${escapeHtml(toolsJoined)}` +
+            `<div class="ops-row-meta">${escapeHtml(r?.lane || 'Unknown')} · ${escapeHtml(wall)} · ${escapeHtml(toolsJoined)}` +
             `${r?.ok === false ? ' · FAIL' : ''}</div></div>`;
         btn.addEventListener('click', () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -9269,7 +9270,7 @@ function setOpsRunsCopyChip(copyValue) {
     const el = ensureOpsRunsCopyChip();
     if (!el) return;
     const value = String(copyValue || '').trim();
-    if (!value || value === '—') {
+    if (!value || value === '—' || value === 'Unknown' || value === 'None yet') {
         el.hidden = true;
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
@@ -9586,7 +9587,8 @@ function wireOpsInsightRunLine(lineEl, summary) {
 function formatOpsCandidateAsSummary(c) {
     return {
         ts: '',
-        lane: c?.lane || '—',
+        // Empty lane: match run preview "Unknown" (bare em dash reads like missing data).
+        lane: c?.lane || 'Unknown',
         wall_ms: typeof c?.wall_ms === 'number' ? c.wall_ms : 0,
         tools: [],
         question_preview: c?.question_preview || '',
@@ -9695,12 +9697,13 @@ function showOpsRunPreview(text, requestId, question) {
 
 function formatOpsRunPreview(r) {
     const q = String(r?.question_preview || '').trim() || '(empty)';
-    const lane = r?.lane || '—';
-    const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : '—';
-    const tools = (r?.tools || []).length ? (r.tools || []).join(', ') : '—';
+    // Empty run meta: match Overview / schedule calm (bare em dash reads like missing data).
+    const lane = r?.lane || 'Unknown';
+    const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
+    const tools = (r?.tools || []).length ? (r.tools || []).join(', ') : 'None yet';
     const ok = r?.ok ? 'ok' : 'FAIL';
-    const ts = r?.ts || '—';
-    const rid = String(r?.request_id || '').trim() || '—';
+    const ts = r?.ts || 'Unknown';
+    const rid = String(r?.request_id || '').trim() || 'Unknown';
     const kind = String(r?._candidateKind || '').trim();
     const reason = String(r?._candidateReason || '').trim();
     const head = kind
@@ -9929,7 +9932,8 @@ function renderOpsRuns(insights) {
                 slowRows.slice(0, 3).forEach((s) => {
                     const line = document.createElement('div');
                     line.className = 'ops-insight-line';
-                    line.textContent = `${s.wall_ms} ms · ${s.lane || '—'} · ${s.question_preview || '(empty)'}`;
+                    // Empty lane: match run preview "Unknown".
+                    line.textContent = `${s.wall_ms} ms · ${s.lane || 'Unknown'} · ${s.question_preview || '(empty)'}`;
                     wireOpsInsightRunLine(line, s);
                     card.appendChild(line);
                 });
@@ -10023,7 +10027,8 @@ function renderOpsRuns(insights) {
     const kindPool = recentAll.filter((r) => runsRowMatchesLane(r));
     let shown = 0;
     kindPool.forEach((r) => {
-        const toolsJoined = (r.tools || []).join(', ') || '—';
+        // Empty tools: match Overview "None yet" (bare em dash reads like missing data).
+        const toolsJoined = (r.tools || []).join(', ') || 'None yet';
         if (
             !runsRowMatchesFilter(
                 `${r.question_preview || ''} ${r.lane || ''} ${toolsJoined} ${r.ok ? 'ok' : 'fail'}`
@@ -10042,7 +10047,10 @@ function renderOpsRuns(insights) {
         if (rid) btn.dataset.requestId = rid;
         btn.dataset.questionPreview = String(r?.question_preview || '');
         setOpsRowCopyValue(btn, rid);
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        const laneLabel = r.lane || 'Unknown';
+        const wallLabel =
+            typeof r.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(laneLabel)} · ${escapeHtml(wallLabel)} · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         btn.title = 'Click to preview · c copies id · Enter / double-click to load question into AI Chat';
         const openPreview = () => {
             document

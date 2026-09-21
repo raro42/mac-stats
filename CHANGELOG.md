@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1224] - 2026-09-21
+
+### Changed
+- **Agent Ops run empty meta** — When a run has no lane, wall time, timestamp, or request id, Overview, Runs list, Slowest, and preview say **Unknown**. Empty tools say **None yet** (not `—`). Real values still show when set.
+
 ## [0.1.1223] - 2026-09-21
 
 ### Changed
