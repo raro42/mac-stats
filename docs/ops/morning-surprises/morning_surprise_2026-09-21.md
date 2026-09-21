@@ -6,6 +6,7 @@ Overnight Track B kept shipping after digester open stayed empty.
 
 | Version | What |
 |---------|------|
+| **v0.1.1220** | Agent Ops Discord empty: health + collapsed glance say **Unknown** (not `—`). |
 | **v0.1.1219** | Agent Ops health: empty Next schedule / Last delivery say **None yet** (overview head parity). |
 | **v0.1.1218** | Agent Ops overview empty head pills: **None yet** (Agents/Runs/Schedules/Knowledge/Recent); Live **Quiet**. Digest still Queue clear. |
 | **v0.1.1217** | `/insights` names empty Lanes, Top tools, Slowest, Candidates |
@@ -16,7 +17,7 @@ Overnight Track B kept shipping after digester open stayed empty.
 
 ## Fuel note
 
-Digester open empty. Design review grace on feature-agent-ops. Standing backlog / empty-calm polish continued (health schedule/delivery after overview heads).
+Digester open empty. Design review grace on feature-agent-ops. Standing backlog / empty-calm polish continued (Discord Unknown after schedule/delivery None yet).
 
 ## Quiet ticks
 
