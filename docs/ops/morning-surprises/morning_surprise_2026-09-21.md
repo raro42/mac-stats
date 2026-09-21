@@ -6,6 +6,7 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 
 | Version | What |
 |---------|------|
+| **v0.1.1212** | Insights header **mean n/a · max n/a** when the latency sample is noise-filtered |
 | **v0.1.1211** | Insights **Lanes** empty calm — “No lanes yet” wash when by_lane is empty |
 | **v0.1.1210** | Insights **Top tools** empty calm — “No tools yet” wash when digester Top tools is clear |
 | **v0.1.1209** | Insights **Latency** empty calm — “Nothing to measure” wash when p50 is noise-filtered |
@@ -20,12 +21,12 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~02:15)
+## This tick (~02:40)
 
 - Digester open empty; design review grace on `feature-agent-ops`.
-- Fuel: Insights still showed muted `Lanes: —` after Top tools / Latency / Slowest / Candidates / Stale / Digest calm.
-- Keep: warm empty when lane mix is missing; lane counts when turns have a mix.
+- Fuel: Insights header still said mean 0 ms · max 0 ms after the Latency block already said nothing to measure.
+- Keep: header uses mean n/a · max n/a when the sample is empty. Real numbers stay when turns are in the sample.
 
 ## Try it
 
-Open **Agent Ops → Runs**. On a quiet digester night you should see **Lanes · No lanes yet** (when by_lane is empty) beside Top tools / Latency / Slowest / Candidates / Stale calm blocks. When turns have a lane mix, Lanes still shows `instant:N · direct:M`.
+Open **Agent Ops → Runs**. On a quiet digester night the Insights header should say **mean n/a · max n/a**, and the Latency block should still say **Nothing to measure**. When a real latency sample exists, mean and max show milliseconds again.
