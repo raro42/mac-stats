@@ -9722,9 +9722,19 @@ function renderOpsRuns(insights) {
         return;
     }
     if (card) {
+        // Header mean/max follow the Latency block: 0 ms is not a sample when noise filters clear p50.
+        const headerLatSample = Number(insights.latency_sample);
+        const headerP50 = Number(insights.p50_ms);
+        const headerHasLatency =
+            Number.isFinite(headerP50) &&
+            headerP50 > 0 &&
+            (Number.isNaN(headerLatSample) || headerLatSample > 0);
+        const headerLat = headerHasLatency
+            ? `mean ${insights.mean_ms} ms · max ${insights.max_ms} ms`
+            : 'mean n/a · max n/a';
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
-            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
+            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · ${headerLat}</div>
             <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
         `;
         appendOpsDiscordGatewayLine(card, gateway);

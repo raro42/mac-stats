@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1212] - 2026-09-21
+
+### Changed
+- **Agent Ops Insights header** — When Runs Insights has turns but the latency sample is noise-filtered, the header says mean n/a · max n/a (Latency “Nothing to measure” parity). Real mean and max still show when the sample has turns.
+
 ## [0.1.1211] - 2026-09-21
 
 ### Changed
