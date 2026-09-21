@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-22
 
-Overnight Track B kept shipping empty/unloaded calm (Agent Ops Agents identity).
+Overnight Track B kept shipping empty/unloaded calm (Agent Ops Knowledge / Sessions file titles).
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1230** | Knowledge / Sessions empty file title say **Unknown** (not blank) |
 | **v0.1.1229** | Agents empty name / slug say **Unknown** (not blank) |
 | **v0.1.1228** | Live empty source / session id say **Unknown** (not blank) |
 | **v0.1.1227** | Sessions / Knowledge empty meta say **Unknown** (not blank) |
@@ -21,7 +22,7 @@ Overnight Track B kept shipping empty/unloaded calm (Agent Ops Agents identity).
 
 ## Fuel
 
-Digester open stayed empty. Design review grace on `feature-agent-ops`. Standing backlog empty-state track (Agents identity after Live).
+Digester open stayed empty. Design review grace on `feature-agent-ops`. Standing backlog empty-state track (Knowledge / Sessions file titles after Agents).
 
 ## Note
 
