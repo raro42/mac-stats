@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1229] - 2026-09-22
+
+### Changed
+- **Agent Ops Agents empty identity** — When an agent has no name or slug/id, Overview Agents, Agents list, and agent detail say **Unknown** (not a blank). Real names and ids still show when set.
+
 ## [0.1.1228] - 2026-09-22
 
 ### Changed

@@ -6147,15 +6147,17 @@ function renderOverviewAgents(agents) {
         row.className = 'ops-row';
         row.setAttribute('role', 'button');
         row.tabIndex = 0;
-        const slug = a.slug || a.id || '';
+        // Empty name / slug: match Live "Unknown" (bare blank reads like missing data).
+        const slug = String(a.slug || a.id || '').trim() || 'Unknown';
+        const title = String(a.name || '').trim() || slug;
         const metaBits = [
             a.model || 'default model',
             a.orchestrator ? 'orchestrator' : '',
         ].filter(Boolean);
         const on = !!a.enabled;
         row.innerHTML =
-            `<div><div class="ops-row-title">${escapeHtml(a.name || slug)}` +
-            (slug ? ` <span class="ops-row-meta">· ${escapeHtml(slug)}</span>` : '') +
+            `<div><div class="ops-row-title">${escapeHtml(title)}` +
+            ` <span class="ops-row-meta">· ${escapeHtml(slug)}</span>` +
             `</div><div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}</div></div>` +
             `<button type="button" class="ops-badge ${on ? '' : 'off'}" data-ops-agent-toggle="${escapeHtml(a.id)}" aria-pressed="${on ? 'true' : 'false'}" title="${on ? 'Turn agent off' : 'Turn agent on'}">${on ? 'on' : 'off'}</button>`;
         const toggle = row.querySelector('[data-ops-agent-toggle]');
@@ -7554,13 +7556,15 @@ function renderOpsAgents(agents) {
         row.className = 'ops-row';
         row.setAttribute('role', 'button');
         row.tabIndex = 0;
-        const slug = a.slug || a.id;
+        // Empty name / slug: match Live "Unknown" (bare blank reads like missing data).
+        const slug = String(a.slug || a.id || '').trim() || 'Unknown';
+        const title = String(a.name || '').trim() || slug;
         const on = !!a.enabled;
         row.innerHTML =
-            `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div>` +
+            `<div><div class="ops-row-title">${escapeHtml(title)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div>` +
             `<div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div>` +
             `<button type="button" class="ops-badge ${on ? '' : 'off'}" data-ops-agent-toggle="${escapeHtml(a.id)}" aria-pressed="${on ? 'true' : 'false'}" title="${on ? 'Turn agent off' : 'Turn agent on'}">${on ? 'on' : 'off'}</button>`;
-        setOpsRowCopyValue(row, slug);
+        setOpsRowCopyValue(row, slug === 'Unknown' ? '' : slug);
         const toggle = row.querySelector('[data-ops-agent-toggle]');
         if (toggle) {
             toggle.addEventListener('click', (e) => {
@@ -7632,8 +7636,12 @@ async function toggleOpsAgentEnabled(agentId, currentlyEnabled) {
 function syncOpsAgentDetailEnabledUi() {
     const meta = document.getElementById('ops-agent-meta');
     if (!meta || !opsAgentCache) return;
+    // Empty name / slug: match Live "Unknown".
+    const slug =
+        String(opsAgentCache.slug || opsAgentCache.id || '').trim() || 'Unknown';
+    const name = String(opsAgentCache.name || '').trim() || slug;
     meta.textContent =
-        `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+        `${name} · ${slug} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
     ensureOpsAgentEnabledToggle();
 }
 
@@ -7680,10 +7688,14 @@ async function openOpsAgent(id) {
         document.getElementById('ops-agents-list').style.display = 'none';
         const detail = document.getElementById('ops-agent-detail');
         detail.hidden = false;
+        // Empty name / slug: match Live "Unknown".
+        const agentSlug =
+            String(opsAgentCache.slug || opsAgentCache.id || '').trim() || 'Unknown';
+        const agentName = String(opsAgentCache.name || '').trim() || agentSlug;
         document.getElementById('ops-agent-meta').textContent =
-            `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+            `${agentName} · ${agentSlug} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
         ensureOpsAgentEnabledToggle();
-        setOpsAgentCopyChip(opsAgentCache.slug || opsAgentCache.id || '');
+        setOpsAgentCopyChip(agentSlug === 'Unknown' ? '' : agentSlug);
         opsAgentFileTab = 'soul';
         opsAgentDirty = { soul: false, skill: false, mood: false };
         document.querySelectorAll('.ops-file-tab').forEach((b) => {
