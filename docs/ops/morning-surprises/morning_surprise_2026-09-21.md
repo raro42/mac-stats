@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping. This tick makes a zero fail count say no fails.
+Overnight Track B kept shipping. This tick makes empty Insights sections say they are clear.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1217** | `/insights` says **no lanes yet**, **no tools yet**, **nothing slow**, and **nothing open** when those sections are empty. Real rows still show. Zero turns stay “No turns”. |
 | **v0.1.1216** | Insights header, `/insights`, and “how many runs” say **no fails** when nothing failed. A real fail count still shows. |
 | **v0.1.1215** | `/status`, `/insights`, digest age, and `digest open` say **queue clear** and **nothing stale** when those counts are zero. “How many open” still returns a number. |
 | **v0.1.1214** | CPU rings say **Freq** and **Temp**, the same short names as the sparklines. Hover still says Frequency or Temperature. |
@@ -25,12 +26,12 @@ Overnight Track B kept shipping. This tick makes a zero fail count say no fails.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~05:25)
+## This tick (~05:50)
 
 - Digester open was empty. Design review was not due.
-- Fuel: Insights still said fail 0. Digest zeros already say queue clear.
-- Keep: **v0.1.1216** — the Insights header, `/insights`, and “how many runs” say no fails when nothing failed. A real fail count still shows.
+- Fuel: `/insights` still dropped empty Lanes, Top tools, Slowest, and Candidates. The CPU window already says those are clear.
+- Keep: **v0.1.1217** — those lines say no lanes yet, no tools yet, nothing slow, and nothing open. Real rows still show. Zero turns stay “No turns”.
 
 ## Try it
 
-Open Agent Ops → Runs. When every turn succeeded, the Insights header should say **no fails**, not fail 0. Ask `/insights` or “how many runs” in AI Chat. The same words should appear. A real fail still shows a count.
+Ask `/insights` in AI Chat or Discord. When turns exist but those lists are empty, the reply should name each empty section. A real lane, tool, slow turn, or candidate still shows its row.
