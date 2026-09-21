@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1226] - 2026-09-21
+
+### Changed
+- **Disk Cleanup empty meta** — When Next automatic run, Runs when, Enabled scopes, or a last-run timestamp is missing, those cards say **None yet** (not `—`). Real labels and times still show when set.
+
 ## [0.1.1225] - 2026-09-21
 
 ### Changed

@@ -17080,7 +17080,8 @@ function formatDiskBytes(n) {
 }
 
 function formatDiskWhen(iso) {
-  if (!iso) return '—';
+  // Empty when: match schedule / delivery "None yet" (bare em dash reads like missing data).
+  if (!iso) return 'None yet';
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
@@ -19014,7 +19015,8 @@ async function refreshDiskCleanupPanel(opts) {
       applyDiskCleanupReclaimCardState(reclaimBytes > 0);
     }
     if (nextEl) {
-      nextEl.textContent = status.nextRunLabel || '—';
+      // Empty next run: match schedule "None yet" (bare em dash reads like missing data).
+      nextEl.textContent = status.nextRunLabel || 'None yet';
       nextEl.title = status.nextRunUtc || '';
       const label = (status.nextRunLabel || '').trim();
       const due =
@@ -19028,12 +19030,16 @@ async function refreshDiskCleanupPanel(opts) {
       applyDiskCleanupNextRunCardState(due);
     }
     if (triggersEl) {
-      const triggersJoined = (status.triggers || []).join(' · ') || '—';
+      // Empty triggers: match schedule "None yet".
+      const triggersJoined =
+        (status.triggers || []).join(' · ') || 'None yet';
       triggersEl.textContent = triggersJoined;
       applyDiskCleanupRunsWhenCardState(triggersJoined);
     }
     if (scopeSummaryEl) {
-      scopeSummaryEl.textContent = status.enabledScopeSummary || status.rootHint || '—';
+      // Empty scope summary: match schedule "None yet".
+      scopeSummaryEl.textContent =
+        status.enabledScopeSummary || status.rootHint || 'None yet';
       const scopesForCard = window.__diskCleanupScopes || [];
       const enabledN = scopesForCard.filter((s) => s && s.enabled).length;
       applyDiskCleanupEnabledScopesCardState(enabledN, scopesForCard.length);
