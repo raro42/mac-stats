@@ -6565,13 +6565,16 @@ function renderOverviewLive(rows, insights) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty source / session id: match run meta "Unknown" (bare blank reads like missing data).
+        const source = String(r.source || '').trim() || 'Unknown';
+        const sessionId = String(r.session_id || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${r.message_count} msgs${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
             setOpsSessionKindFilter('live');
-            const matchTitle = `${r.source} · ${r.session_id}`;
+            const matchTitle = `${source} · ${sessionId}`;
             const liveList = document.getElementById('ops-live-sessions');
             const fileList = document.getElementById('ops-session-files');
             fileList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -6591,7 +6594,7 @@ function renderOverviewLive(rows, insights) {
                     sessionId: r.session_id,
                 });
                 if (matchedRow) markOpsSessionRowSelected(matchedRow);
-                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`, r.session_id);
+                showOpsSessionPreview(msgs, `Live ${source} · ${sessionId}`, r.session_id);
                 showOpsSessionStatus(
                     'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
                     true
@@ -9011,10 +9014,12 @@ function renderOpsLive(rows) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        // Empty last activity: match run meta "Unknown" (bare blank reads like missing data).
+        // Empty last activity / source / session id: match run meta "Unknown".
         const activity = String(r.last_activity || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
-        setOpsRowCopyValue(btn, r.session_id);
+        const source = String(r.source || '').trim() || 'Unknown';
+        const sessionId = String(r.session_id || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        setOpsRowCopyValue(btn, r.session_id || sessionId);
         const openLive = async () => {
             try {
                 const msgs = await invoke('read_live_session_messages', {
@@ -9022,7 +9027,7 @@ function renderOpsLive(rows) {
                     sessionId: r.session_id,
                 });
                 markOpsSessionRowSelected(btn);
-                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`, r.session_id);
+                showOpsSessionPreview(msgs, `Live ${source} · ${sessionId}`, r.session_id);
                 showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
             } catch (err) {
                 showOpsSessionPreview([], String(err), null);

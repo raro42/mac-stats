@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1228] - 2026-09-22
+
+### Changed
+- **Agent Ops Live empty identity** — When a live session has no source or session id, Overview Live and Sessions live rows say **Unknown** (not a blank). Real source and id still show when set.
+
 ## [0.1.1227] - 2026-09-22
 
 ### Changed
