@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1225] - 2026-09-21
+
+### Changed
+- **Agent Ops delivery empty when** — When a delivery has no timestamp, Overview Last delivery, Schedules deliveries list, and preview say **None yet** (not `—`). Real ages still show when set.
+
 ## [0.1.1224] - 2026-09-21
 
 ### Changed

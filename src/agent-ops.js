@@ -6470,7 +6470,8 @@ function appendOverviewLastDeliveryRow(body, d) {
     if (!body || !d) return;
     const t = d.utc ? Date.parse(d.utc) : NaN;
     const id = d.schedule_id || 'schedule';
-    const ageLabel = !Number.isNaN(t) ? fmtAge(t) : '';
+    // Empty when: match health Last delivery "None yet".
+    const ageLabel = !Number.isNaN(t) ? fmtAge(t) : d.utc || 'None yet';
     const summary = String(d.summary || '').trim();
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -7044,7 +7045,8 @@ function formatOpsSchedulePreview(s) {
 
 function formatOpsDeliveryPreview(d) {
     const id = d?.schedule_id || 'schedule';
-    const utc = d?.utc || '—';
+    // Empty when: match health Last delivery "None yet" (bare em dash reads like missing data).
+    const utc = d?.utc || 'None yet';
     const t = d?.utc ? Date.parse(d.utc) : NaN;
     const age = !Number.isNaN(t) ? fmtAge(t) : '';
     const whenLine = age ? `${utc} (${age})` : utc;
@@ -7127,7 +7129,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 btn.type = 'button';
                 btn.className = 'ops-row';
                 const t = d.utc ? Date.parse(d.utc) : NaN;
-                const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
+                // Empty when: match health Last delivery "None yet".
+                const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || 'None yet';
                 const summary = String(d.summary || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
                 setOpsRowCopyValue(btn, d.schedule_id);
