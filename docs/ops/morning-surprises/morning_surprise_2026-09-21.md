@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping Agent Ops digest calm copy.
+Overnight Track B kept shipping. This tick lines the CPU ring names up with the sparklines.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1214** | CPU rings say **Freq** and **Temp**, the same short names as the sparklines. Hover still says Frequency or Temperature. |
 | **v0.1.1213** | Digest zeros say **queue clear** / **nothing stale** (health, overview, Insights header). Overview empty says quiet is a fail. Health says **p50 n/a** when the sample is empty. |
 | **v0.1.1212** | Insights header **mean n/a · max n/a** when the latency sample is noise-filtered |
 | **v0.1.1211** | Insights **Lanes** empty calm — “No lanes yet” wash when by_lane is empty |
@@ -22,12 +23,12 @@ Overnight Track B kept shipping Agent Ops digest calm copy.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~03:05)
+## This tick (~03:35)
 
-- Digester open empty; design review grace on `feature-agent-ops`.
-- Fuel: the health Digest line, overview pill, and Insights header still said 0 open / 0 stale. The overview empty state said overnight is quiet for now.
-- Keep: those lines say queue clear and nothing stale. The overview empty state matches Insights. The health line says p50 n/a when the latency sample is empty. Counts above zero still show.
+- Design review due: `feature-cpu-metrics.png` was 14 days old.
+- Fuel: ring titles said Frequency and Temperature. CSS uppercases those words, so they no longer match Freq and Temp under the gauges.
+- Keep: **v0.1.1214** — the rings say Freq and Temp. Hover still says the long name.
 
 ## Try it
 
-Open **Agent Ops**. On a clear digester night the Digest health line should say **queue clear / nothing stale**, and **p50 n/a** when latency is noise-filtered. The overview Digest card should say **Queue clear**, not that overnight is quiet. When open or stale counts are above zero, the numbers come back.
+Open the CPU window. The third and fourth rings should read **FREQ** and **TEMP**, the same words as the sparklines under them. Hover a label to see Frequency or Temperature.
