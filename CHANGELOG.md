@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1230] - 2026-09-22
+
+### Changed
+- **Agent Ops Knowledge / Sessions empty file title** — When a knowledge or session file has no name or slug, Overview Knowledge, Overview Recent, Knowledge list, and Sessions files say **Unknown** (not a blank). Real names still show when set.
+
 ## [0.1.1229] - 2026-09-22
 
 ### Changed

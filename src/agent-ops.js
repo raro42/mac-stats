@@ -6653,16 +6653,17 @@ function renderOverviewKnowledge(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        // Empty kind / age: match run meta "Unknown".
+        // Empty kind / age / name: match run meta "Unknown".
         const kind = String(f.kind || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        const fileTitle = String(f.name || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             const kindFilter = String(f.kind || '').toLowerCase();
             setOpsMemoryKindFilter(kindFilter === 'discord' ? 'discord' : 'core');
             selectOpsTab('memory');
-            const matchTitle = f.name || '';
+            const matchTitle = fileTitle === 'Unknown' ? '' : fileTitle;
             const list = document.getElementById('ops-memory-list');
             list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             list?.querySelectorAll('.ops-row').forEach((row) => {
@@ -6673,8 +6674,8 @@ function renderOverviewKnowledge(files) {
                 }
             });
             const preview = document.getElementById('ops-memory-preview');
-            const copyPath = f.path || f.name || '';
-            const label = f.name || f.path || 'knowledge';
+            const copyPath = f.path || (fileTitle === 'Unknown' ? '' : fileTitle);
+            const label = fileTitle === 'Unknown' ? (f.path || 'knowledge') : fileTitle;
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
                 const bodyText = String(text || '').slice(0, 12000);
@@ -6773,15 +6774,16 @@ function renderOverviewRecent(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        // Empty source / age: match run meta "Unknown".
+        // Empty source / age / title: match run meta "Unknown".
         const sourceHint = String(f.source_hint || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        const fileTitle = String(f.slug || f.name || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
             setOpsSessionKindFilter('files');
-            const matchTitle = f.slug || f.name || '';
+            const matchTitle = fileTitle === 'Unknown' ? '' : fileTitle;
             const list = document.getElementById('ops-session-files');
             const liveList = document.getElementById('ops-live-sessions');
             liveList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -6797,10 +6799,10 @@ function renderOverviewRecent(files) {
             });
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
-                const copyId = f.slug || f.name || '';
+                const copyId = fileTitle === 'Unknown' ? '' : fileTitle;
                 if (msgs && msgs.length) {
                     if (matchedRow) markOpsSessionRowSelected(matchedRow);
-                    showOpsSessionPreview(msgs, f.name, copyId);
+                    showOpsSessionPreview(msgs, fileTitle === 'Unknown' ? '' : f.name, copyId);
                     showOpsSessionStatus(
                         'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
                         true
@@ -9099,17 +9101,18 @@ function renderOpsSessionFiles(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        // Empty source / age: match run meta "Unknown".
+        // Empty source / age / title: match run meta "Unknown".
         const sourceHint = String(f.source_hint || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
-        setOpsRowCopyValue(btn, f.slug || f.name);
+        const fileTitle = String(f.slug || f.name || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
+        setOpsRowCopyValue(btn, fileTitle === 'Unknown' ? '' : fileTitle);
         const openFile = async () => {
             try {
-                const copyId = f.slug || f.name || '';
+                const copyId = fileTitle === 'Unknown' ? '' : fileTitle;
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
                 if (msgs && msgs.length) {
                     markOpsSessionRowSelected(btn);
-                    showOpsSessionPreview(msgs, f.name, copyId);
+                    showOpsSessionPreview(msgs, fileTitle === 'Unknown' ? '' : f.name, copyId);
                     showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
                 } else {
                     markOpsSessionRowSelected(btn);
@@ -9176,17 +9179,18 @@ function renderOpsMemory(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        // Empty kind: match run meta "Unknown".
+        // Empty kind / name: match run meta "Unknown".
         const kind = String(f.kind || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
-        setOpsRowCopyValue(btn, f.path || f.name);
+        const fileTitle = String(f.name || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        setOpsRowCopyValue(btn, f.path || (fileTitle === 'Unknown' ? '' : fileTitle));
         const openFile = async () => {
             document
                 .querySelectorAll('#ops-memory-list .ops-row.is-selected')
                 .forEach((row) => row.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            const copyPath = f.path || f.name || '';
-            const label = f.name || f.path || 'knowledge';
+            const copyPath = f.path || (fileTitle === 'Unknown' ? '' : fileTitle);
+            const label = fileTitle === 'Unknown' ? (f.path || 'knowledge') : fileTitle;
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
                 const body = String(text || '').slice(0, 12000);
