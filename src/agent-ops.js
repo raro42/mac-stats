@@ -5567,7 +5567,8 @@ function openOpsSchedulePreviewNavigate(s) {
     if (agentOpsCollapsed) applyOpsCollapsed(false);
     selectOpsTab('schedules');
     setOpsSchedulesKindFilter('jobs');
-    const id = s.id || '(no id)';
+    // Empty id: match schedule list "Unknown" (bare (no id) reads like missing data).
+    const id = s.id || 'Unknown';
     const fullTask = String(s?.task || '').trim();
     showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', fullTask);
     const list = document.getElementById('ops-schedules-list');
@@ -6259,7 +6260,8 @@ function renderOverviewRuns(insights) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        const q = String(r?.question_preview || '').trim() || '(empty)';
+        // Empty question: match run list "None yet" (bare (empty) reads like missing data).
+        const q = String(r?.question_preview || '').trim() || 'None yet';
         // Empty run meta: match schedule "None yet" / health "Unknown" (bare em dash reads like missing data).
         const toolsJoined = (r?.tools || []).slice(0, 3).join(', ') || 'None yet';
         const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
@@ -6450,7 +6452,8 @@ function renderOverviewSchedules(schedules, deliveries) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        const id = s.id || '(no id)';
+        // Empty id: match schedule list "Unknown" (bare (no id) reads like missing data).
+        const id = s.id || 'Unknown';
         // Empty next run: match health Next schedule "None yet" (bare em dash reads like missing data).
         const next = s.next_run || s.nextRun || 'None yet';
         const task = String(s.task || '').slice(0, 40);
@@ -6848,7 +6851,8 @@ function showOpsSchedulePreview(text, copyValue, loadText) {
     preview.textContent = body.slice(0, 12000);
     setOpsScheduleCopyChip(copyValue);
     const q = String(loadText || '').trim();
-    opsScheduleLoadText = q && q !== '(empty task)' && q !== '(empty summary)' ? q : null;
+    // Empty task/summary placeholders are not loadable (match "None yet" calm).
+    opsScheduleLoadText = q && q !== 'None yet' ? q : null;
     setOpsScheduleLoadChatVisible(!!opsScheduleLoadText);
     if (opsScheduleLoadText) {
         showOpsScheduleLoadStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
@@ -7025,7 +7029,7 @@ function setOpsScheduleCopyChip(copyValue) {
     const el = ensureOpsScheduleCopyChip();
     if (!el) return;
     const value = String(copyValue || '').trim();
-    if (!value || value === '—') {
+    if (!value || value === '—' || value === 'Unknown' || value === '(no id)') {
         el.hidden = true;
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
@@ -7047,11 +7051,12 @@ function setOpsScheduleCopyChip(copyValue) {
 }
 
 function formatOpsSchedulePreview(s) {
-    const id = s?.id || '(no id)';
+    // Empty id / task: match list "Unknown" / "None yet" (bare (no id)/(empty task) reads like missing data).
+    const id = s?.id || 'Unknown';
     // Empty when / next: match health Next schedule "None yet".
     const when = s?.cron ? `cron ${s.cron}` : s?.at ? `at ${s.at}` : 'None yet';
     const next = s?.next_run || s?.nextRun || 'None yet';
-    const task = String(s?.task || '').trim() || '(empty task)';
+    const task = String(s?.task || '').trim() || 'None yet';
     return `Schedule: ${id}\nWhen: ${when}\nNext: ${next}\n\nTask:\n${task}`;
 }
 
@@ -7062,7 +7067,8 @@ function formatOpsDeliveryPreview(d) {
     const t = d?.utc ? Date.parse(d.utc) : NaN;
     const age = !Number.isNaN(t) ? fmtAge(t) : '';
     const whenLine = age ? `${utc} (${age})` : utc;
-    const summary = String(d?.summary || '').trim() || '(empty summary)';
+    // Empty summary: match schedule task "None yet".
+    const summary = String(d?.summary || '').trim() || 'None yet';
     return `Delivery: ${id}\nWhen: ${whenLine}\n\nSummary:\n${summary}`;
 }
 
@@ -7098,13 +7104,14 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'ops-row';
-                const id = s.id || '(no id)';
+                // Empty id: match Overview schedule "Unknown".
+                const id = s.id || 'Unknown';
                 // Empty when / next: match health Next schedule "None yet".
                 const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : 'None yet';
                 const next = s.next_run || s.nextRun || 'None yet';
                 const task = String(s.task || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
-                setOpsRowCopyValue(btn, s.id);
+                setOpsRowCopyValue(btn, id === 'Unknown' ? '' : s.id);
                 btn.title = 'Click to preview · c copies id · Enter / double-click to load task into AI Chat';
                 const openPreview = () => {
                     list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -8028,7 +8035,8 @@ function tryOpsClearSelectionEscape(e) {
 }
 
 function formatSessionMessagesPreview(rows) {
-    if (!rows || !rows.length) return '(empty session)';
+    // Empty session body: match run question "None yet".
+    if (!rows || !rows.length) return 'None yet';
     return rows
         .map((m) => `## ${m.role === 'user' ? 'User' : 'Assistant'}\n\n${m.content}`)
         .join('\n\n');
@@ -8317,7 +8325,8 @@ const OPS_COPY_CHIP_BY_TAB = {
 function setOpsRowCopyValue(btn, value) {
     if (!btn) return;
     const v = String(value || '').trim();
-    if (!v || v === '—' || v === '(no id)') {
+    // Empty / placeholder ids are not copyable (Unknown / (no id) / em dash).
+    if (!v || v === '—' || v === '(no id)' || v === 'Unknown') {
         delete btn.dataset.copyValue;
         return;
     }
@@ -9591,7 +9600,8 @@ function previewOpsRunFromInsight(summary, insightLine) {
         }
     }
 
-    const q = qPreview && qPreview !== '(empty)' ? qPreview : '';
+    // Empty question placeholder is not loadable (match "None yet" calm).
+    const q = qPreview && qPreview !== 'None yet' ? qPreview : '';
     showOpsRunPreview(formatOpsRunPreview(summary), summary?.request_id, q);
 }
 
@@ -9721,7 +9731,8 @@ function showOpsRunPreview(text, requestId, question) {
     preview.textContent = body.slice(0, 12000);
     setOpsRunsCopyChip(requestId);
     const q = String(question || '').trim();
-    opsRunLoadQuestion = q && q !== '(empty)' ? q : null;
+    // Empty question placeholder is not loadable (match "None yet" calm).
+    opsRunLoadQuestion = q && q !== 'None yet' ? q : null;
     setOpsRunsLoadChatVisible(!!opsRunLoadQuestion);
     if (opsRunLoadQuestion) {
         showOpsRunLoadStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
@@ -9731,7 +9742,8 @@ function showOpsRunPreview(text, requestId, question) {
 }
 
 function formatOpsRunPreview(r) {
-    const q = String(r?.question_preview || '').trim() || '(empty)';
+    // Empty question: match Overview / Runs list "None yet".
+    const q = String(r?.question_preview || '').trim() || 'None yet';
     // Empty run meta: match Overview / schedule calm (bare em dash reads like missing data).
     const lane = r?.lane || 'Unknown';
     const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
@@ -9968,7 +9980,7 @@ function renderOpsRuns(insights) {
                     const line = document.createElement('div');
                     line.className = 'ops-insight-line';
                     // Empty lane: match run preview "Unknown".
-                    line.textContent = `${s.wall_ms} ms · ${s.lane || 'Unknown'} · ${s.question_preview || '(empty)'}`;
+                    line.textContent = `${s.wall_ms} ms · ${s.lane || 'Unknown'} · ${s.question_preview || 'None yet'}`;
                     wireOpsInsightRunLine(line, s);
                     card.appendChild(line);
                 });
@@ -10085,7 +10097,7 @@ function renderOpsRuns(insights) {
         const laneLabel = r.lane || 'Unknown';
         const wallLabel =
             typeof r.wall_ms === 'number' ? `${r.wall_ms} ms` : 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(laneLabel)} · ${escapeHtml(wallLabel)} · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || 'None yet')}</div><div class="ops-row-meta">${escapeHtml(laneLabel)} · ${escapeHtml(wallLabel)} · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         btn.title = 'Click to preview · c copies id · Enter / double-click to load question into AI Chat';
         const openPreview = () => {
             document

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1231] - 2026-09-22
+
+### Changed
+- **Agent Ops empty question / schedule id** — When a run has no question preview, Overview Runs, Runs list, Slowest, and preview say **None yet** (not `(empty)`). When a schedule has no id, Overview / Schedules / preview say **Unknown** (not `(no id)`). Empty task, delivery summary, and session body say **None yet**. Real text still shows when set.
+
 ## [0.1.1230] - 2026-09-22
 
 ### Changed
