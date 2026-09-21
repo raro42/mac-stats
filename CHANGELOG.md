@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1218] - 2026-09-21
+
+### Changed
+- **Agent Ops overview empty head pills** — When Agents, Runs, Schedules, Knowledge, or Recent have no rows, the head pill says **None yet** (not `0`). Live empty says **Quiet**. Digest still says Queue clear. Real counts still show when rows exist.
+
 ## [0.1.1217] - 2026-09-21
 
 ### Changed

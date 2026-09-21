@@ -6098,7 +6098,8 @@ function renderOverviewAgents(agents) {
     const rows = Array.isArray(agents) ? agents.slice() : [];
     setOverviewAgentsStatus(rows);
     if (!rows.length) {
-        paintOpsOverviewHeadCount('ops-overview-agents', '0', { zero: true });
+        // Empty head pill: Digest uses "Queue clear"; raw "0" reads like an error.
+        paintOpsOverviewHeadCount('ops-overview-agents', 'None yet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
             'No agents yet — add folders under ~/.mac-stats/agents',
             'agents',
@@ -6215,7 +6216,7 @@ function renderOverviewRuns(insights) {
     const recent = Array.isArray(insights?.recent) ? insights.recent : [];
     setOverviewRunsStatus(insights);
     if (!recent.length) {
-        paintOpsOverviewHeadCount('ops-overview-runs', '0', { zero: true });
+        paintOpsOverviewHeadCount('ops-overview-runs', 'None yet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
             'No runs yet — turns land after Discord or chat',
             'runs',
@@ -6409,7 +6410,7 @@ function renderOverviewSchedules(schedules, deliveries) {
     body.innerHTML = '';
     setOverviewSchedulesStatus(schedules, deliveries);
     if (!schedules || !schedules.length) {
-        paintOpsOverviewHeadCount('ops-overview-schedules', '0', { zero: true });
+        paintOpsOverviewHeadCount('ops-overview-schedules', 'None yet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No schedules yet — add one on the Schedules tab',
           'schedules',
@@ -6522,7 +6523,8 @@ function renderOverviewLive(rows, insights) {
     body.innerHTML = '';
     setOverviewLiveStatus(rows, insights);
     if (!rows || !rows.length) {
-        paintOpsOverviewHeadCount('ops-overview-live', '0', { zero: true });
+        // Idle Live is calm (v0.1.919) — "Quiet" matches Ready wash, not a bare 0.
+        paintOpsOverviewHeadCount('ops-overview-live', 'Quiet', { zero: true });
         const dg = insights?.discord_gateway || '';
         const ready =
             /last Ready/i.test(dg) || /stage=connected/i.test(dg);
@@ -6609,7 +6611,7 @@ function renderOverviewKnowledge(files) {
     body.innerHTML = '';
     setOverviewKnowledgeStatus(files);
     if (!files || !files.length) {
-        paintOpsOverviewHeadCount('ops-overview-knowledge', '0', { zero: true });
+        paintOpsOverviewHeadCount('ops-overview-knowledge', 'None yet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No knowledge files yet — open Knowledge when soul or memory land',
           'memory',
@@ -6725,7 +6727,7 @@ function renderOverviewRecent(files) {
     body.innerHTML = '';
     setOverviewRecentStatus(files);
     if (!files || !files.length) {
-        paintOpsOverviewHeadCount('ops-overview-recent', '0', { zero: true });
+        paintOpsOverviewHeadCount('ops-overview-recent', 'None yet', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No recent chats — session memory shows up here',
           'sessions',
