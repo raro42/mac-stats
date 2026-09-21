@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1219] - 2026-09-21
+
+### Changed
+- **Agent Ops health empty schedule/delivery** — When no jobs are loaded, Next schedule says **None yet** (not `None`). When deliveries are empty, Last delivery says **None yet** (not `—`). Real ETA and ages still show when data exists.
+
 ## [0.1.1218] - 2026-09-21
 
 ### Changed

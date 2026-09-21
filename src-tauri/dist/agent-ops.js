@@ -5245,7 +5245,8 @@ function fmtProcessUptime(secs) {
 
 function fmtScheduleEta(sched) {
     if (!sched || sched.totalEntries == null) return '—';
-    if (sched.totalEntries === 0) return 'None';
+    // Empty Next schedule: match overview head "None yet" (raw "None" reads like an error).
+    if (sched.totalEntries === 0) return 'None yet';
     if (sched.secondsUntilNextFire == null) return `${sched.totalEntries} jobs`;
     const secs = Number(sched.secondsUntilNextFire);
     const when =
@@ -5422,13 +5423,16 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         }
     }
 
-    let deliveryText = '—';
+    // Empty Last delivery: match overview "None yet" (bare em dash reads like missing data).
+    let deliveryText = 'None yet';
     let deliveryAgeMs = NaN;
     if (Array.isArray(deliveries) && deliveries.length) {
         const newest = deliveries[0];
         const t = newest?.utc ? Date.parse(newest.utc) : NaN;
         deliveryAgeMs = !Number.isNaN(t) ? Date.now() - t : NaN;
-        deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || '—');
+        deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || 'None yet');
+    } else if (!Array.isArray(deliveries)) {
+        deliveryText = '—';
     }
     setText('ops-health-delivery', deliveryText);
     const deliveryEl = document.getElementById('ops-health-delivery');
