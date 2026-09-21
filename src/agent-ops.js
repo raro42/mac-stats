@@ -4924,7 +4924,8 @@ function parseOpsDiscordGateway(dgRaw) {
     const stage = (stageMatch ? stageMatch[1] : '').trim();
     const lastDisc = lastDiscMatch ? lastDiscMatch[1].trim() : '';
     const lastResume = lastResumeMatch ? lastResumeMatch[1].trim() : '';
-    let healthText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—';
+    // Empty Discord: match aria "status unknown" (bare em dash reads like missing data).
+    let healthText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : 'Unknown';
     if (discN > 0) {
         healthText = lastDisc
             ? `${healthText} · disc×${discN} (${lastDisc})`
@@ -4937,7 +4938,7 @@ function parseOpsDiscordGateway(dgRaw) {
     }
     const stageLower = stage.toLowerCase();
     let wash = 'empty';
-    if (!dg || healthText === '—') {
+    if (!dg || healthText === 'Unknown') {
         wash = 'empty';
     } else if (stageLower === 'disconnected') {
         wash = 'offline';
@@ -4946,7 +4947,7 @@ function parseOpsDiscordGateway(dgRaw) {
     } else if (stageLower === 'connected' || readyMatch) {
         wash = 'ready';
     }
-    let glanceLine = 'Discord · —';
+    let glanceLine = 'Discord · Unknown';
     if (wash === 'offline') {
         glanceLine = 'Discord · Offline';
     } else if (readyMatch) {

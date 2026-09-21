@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1220] - 2026-09-21
+
+### Changed
+- **Agent Ops Discord empty status** — When the Discord gateway string is empty, the health card and collapsed glance say **Unknown** (not `—`). Ready, Offline, and reconnect ages still show when data exists.
+
 ## [0.1.1219] - 2026-09-21
 
 ### Changed
