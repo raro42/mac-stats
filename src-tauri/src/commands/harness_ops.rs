@@ -63091,6 +63091,7 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             lines.push(format!("Last delivery: {} · {}", last.utc, preview));
         }
     }
+    // Empty sections match the CPU window calm copy. Zero turns stay “No turns…”.
     if !insights.by_lane.is_empty() {
         let lanes = insights
             .by_lane
@@ -63099,6 +63100,8 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             .collect::<Vec<_>>()
             .join(" · ");
         lines.push(format!("Lanes: {lanes}"));
+    } else if insights.turns > 0 {
+        lines.push("Lanes: **no lanes yet**".into());
     }
     if !insights.by_tool.is_empty() {
         let tools = insights
@@ -63109,6 +63112,8 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             .collect::<Vec<_>>()
             .join(", ");
         lines.push(format!("Top tools: {tools}"));
+    } else if insights.turns > 0 {
+        lines.push("Top tools: **no tools yet**".into());
     }
     if !insights.slowest.is_empty() {
         lines.push("**Slowest**".into());
@@ -63120,6 +63125,8 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             };
             lines.push(format!("• {} ms · {} · {}", s.wall_ms, s.lane, q));
         }
+    } else if insights.turns > 0 {
+        lines.push("Slowest: **nothing slow**".into());
     }
     if !insights.candidates.is_empty() {
         lines.push("**Candidates**".into());
@@ -63129,6 +63136,8 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
                 c.kind, c.wall_ms, c.reason, c.question_preview
             ));
         }
+    } else if insights.turns > 0 {
+        lines.push("Candidates: **nothing open**".into());
     }
     let mut out = lines.join("\n");
     if out.chars().count() > 1800 {
@@ -64792,6 +64801,8 @@ mod tests {
         assert!(report.contains("Schedules:"), "{report}");
         assert!(report.contains("Discord gateway:"), "{report}");
         assert!(report.contains("last **7** days"), "{report}");
+        assert!(!report.contains("no lanes yet"), "{report}");
+        assert!(!report.contains("nothing slow"), "{report}");
     }
 
     #[test]
@@ -64836,17 +64847,48 @@ mod tests {
         assert!(clear.contains("**queue clear**"), "{clear}");
         assert!(clear.contains("**nothing stale**"), "{clear}");
         assert!(clear.contains("**no fails**"), "{clear}");
+        assert!(clear.contains("Lanes: **no lanes yet**"), "{clear}");
+        assert!(clear.contains("Top tools: **no tools yet**"), "{clear}");
+        assert!(clear.contains("Slowest: **nothing slow**"), "{clear}");
+        assert!(clear.contains("Candidates: **nothing open**"), "{clear}");
         assert!(!clear.contains("fail 0"), "{clear}");
         assert!(!clear.contains("**0** open"), "{clear}");
         insights.digest_open_count = 2;
         insights.digest_stale_count = 1;
         insights.fail_count = 2;
+        insights.by_lane = vec![("instant".into(), 4)];
+        insights.by_tool = vec![("FETCH_URL".into(), 1)];
+        insights.slowest = vec![RunTurnSummary {
+            ts: String::new(),
+            lane: "direct".into(),
+            wall_ms: 9000,
+            tools: vec![],
+            question_preview: "slow ask".into(),
+            ok: true,
+            request_id: String::new(),
+        }];
+        insights.candidates = vec![RunInsightCandidate {
+            kind: "slow_zero_tool".into(),
+            reason: "Slow turn with no tools".into(),
+            wall_ms: 9000,
+            lane: "direct".into(),
+            question_preview: "slow ask".into(),
+            request_id: String::new(),
+        }];
         let busy = format_runs_insights_gateway(&insights);
         assert!(busy.contains("**2** open"), "{busy}");
         assert!(busy.contains("**1** stale"), "{busy}");
         assert!(busy.contains("**2** fails"), "{busy}");
+        assert!(busy.contains("Lanes: instant:4"), "{busy}");
+        assert!(busy.contains("Top tools: FETCH_URL×1"), "{busy}");
+        assert!(busy.contains("**Slowest**"), "{busy}");
+        assert!(busy.contains("**Candidates**"), "{busy}");
         assert!(!busy.contains("queue clear"), "{busy}");
         assert!(!busy.contains("no fails"), "{busy}");
+        assert!(!busy.contains("no lanes yet"), "{busy}");
+        assert!(!busy.contains("no tools yet"), "{busy}");
+        assert!(!busy.contains("nothing slow"), "{busy}");
+        assert!(!busy.contains("nothing open"), "{busy}");
     }
 
     #[test]

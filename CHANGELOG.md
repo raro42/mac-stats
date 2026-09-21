@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1217] - 2026-09-21
+
+### Changed
+- **Insights empty sections** — When turns exist but Lanes, Top tools, Slowest, or Candidates are empty, `/insights` says no lanes yet, no tools yet, nothing slow, and nothing open. Real rows still show. Zero turns stay “No turns”.
+
 ## [0.1.1216] - 2026-09-21
 
 ### Changed
