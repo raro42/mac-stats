@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1215
+
+- Digest status lines (`/status`, `/insights`, digest age, `digest open`) say queue clear and nothing stale when those counts are zero. “How many open” still returns a number.
+
 ## Overnight merge — v0.1.1214
 
 - CPU ring labels: Frequency and Temperature say Freq and Temp so they line up with the sparklines. Hover still shows the long name.

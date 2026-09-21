@@ -1159,11 +1159,37 @@ pub fn looks_like_digest_request(content: &str) -> bool {
     looks_like_digest_open_request(content) || looks_like_digest_refresh_request(content)
 }
 
+/// Digest open words for status lines. Zero is calm (CPU window parity), not a problem count.
+/// Inventory asks (“how many open”) still return a number.
+fn digest_open_status_bit(n: usize) -> String {
+    if n == 0 {
+        "**queue clear**".to_string()
+    } else if n == 1 {
+        "**1** open".to_string()
+    } else {
+        format!("**{n}** open")
+    }
+}
+
+/// Digest stale words for status lines. Zero is calm (CPU window parity).
+fn digest_stale_status_bit(n: usize) -> String {
+    if n == 0 {
+        "**nothing stale**".to_string()
+    } else if n == 1 {
+        "**1** stale".to_string()
+    } else {
+        format!("**{n}** stale")
+    }
+}
+
 /// Zero-LLM digest open snapshot from cached `latest.json` (no Python digester).
 pub fn format_digest_open_gateway() -> String {
     let summary = load_digest_summary();
     if summary.open_count == 0 {
-        return "**Digest:** **0** open candidates · `/digest` for a fresh scan.".to_string();
+        return format!(
+            "**Digest:** {} · `/digest` for a fresh scan.",
+            digest_open_status_bit(0)
+        );
     }
     let mut reply = format!(
         "**Digest:** **{}** open candidate(s)",
@@ -1255,8 +1281,9 @@ pub fn format_digest_age_gateway() -> String {
     }
     let age = age_from_rfc3339(&summary.generated_at);
     let mut reply = format!(
-        "**Digest:** cached **{age}** ago · **{}** open · **{}** stale",
-        summary.open_count, summary.stale_count,
+        "**Digest:** cached **{age}** ago · {} · {}",
+        digest_open_status_bit(summary.open_count),
+        digest_stale_status_bit(summary.stale_count),
     );
     if summary.turns > 0 {
         reply.push_str(&format!(" · **{}** turns (7d window)", summary.turns));
@@ -52914,9 +52941,9 @@ pub fn format_status_gateway() -> String {
         format!("**mac-stats v{version}**"),
         crate::discord::format_discord_gateway_insights_line(),
         format!(
-            "Digest: **{}** open · **{}** stale{}",
-            digest.open_count,
-            digest.stale_count,
+            "Digest: {} · {}{}",
+            digest_open_status_bit(digest.open_count),
+            digest_stale_status_bit(digest.stale_count),
             if digest.source.is_empty() {
                 String::new()
             } else {
@@ -63007,8 +63034,9 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     lines.push(crate::discord::format_discord_gateway_insights_line());
     {
         let mut digest = format!(
-            "Digest: **{}** open · **{}** stale",
-            insights.digest_open_count, insights.digest_stale_count
+            "Digest: {} · {}",
+            digest_open_status_bit(insights.digest_open_count),
+            digest_stale_status_bit(insights.digest_stale_count)
         );
         if !insights.digest_source.is_empty() {
             digest.push_str(&format!(" · {}", insights.digest_source));
@@ -64753,6 +64781,53 @@ mod tests {
         assert!(report.contains("Schedules:"), "{report}");
         assert!(report.contains("Discord gateway:"), "{report}");
         assert!(report.contains("last **7** days"), "{report}");
+    }
+
+    #[test]
+    fn digest_status_bits_use_calm_zeros() {
+        assert_eq!(digest_open_status_bit(0), "**queue clear**");
+        assert_eq!(digest_stale_status_bit(0), "**nothing stale**");
+        assert_eq!(digest_open_status_bit(1), "**1** open");
+        assert_eq!(digest_open_status_bit(2), "**2** open");
+        assert_eq!(digest_stale_status_bit(1), "**1** stale");
+        assert_eq!(digest_stale_status_bit(3), "**3** stale");
+    }
+
+    #[test]
+    fn insights_gateway_zero_digest_is_calm() {
+        let mut insights = RunsInsights {
+            turns: 4,
+            ok_count: 4,
+            fail_count: 0,
+            p50_ms: 0,
+            mean_ms: 0,
+            max_ms: 0,
+            latency_sample: 0,
+            by_lane: vec![],
+            by_tool: vec![],
+            candidates: vec![],
+            slowest: vec![],
+            recent: vec![],
+            discord_gateway: String::new(),
+            digest_open_count: 0,
+            digest_stale_count: 0,
+            digest_generated_at: String::new(),
+            digest_open_hints: vec![],
+            digest_stale_hints: vec![],
+            digest_source: "python".into(),
+            process_uptime_secs: 0,
+            window_days: None,
+        };
+        let clear = format_runs_insights_gateway(&insights);
+        assert!(clear.contains("**queue clear**"), "{clear}");
+        assert!(clear.contains("**nothing stale**"), "{clear}");
+        assert!(!clear.contains("**0** open"), "{clear}");
+        insights.digest_open_count = 2;
+        insights.digest_stale_count = 1;
+        let busy = format_runs_insights_gateway(&insights);
+        assert!(busy.contains("**2** open"), "{busy}");
+        assert!(busy.contains("**1** stale"), "{busy}");
+        assert!(!busy.contains("queue clear"), "{busy}");
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1215] - 2026-09-21
+
+### Changed
+- **Digest status words** — `/status`, `/insights`, digest age, and `digest open` say **queue clear** and **nothing stale** when those counts are zero. They no longer say 0 open or 0 stale. Counts above zero still show. “How many open” still returns a number.
+
 ## [0.1.1214] - 2026-09-21
 
 ### Changed
