@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping Agent Ops Insights empty-state calm.
+Overnight Track B kept shipping Agent Ops digest calm copy.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1213** | Digest zeros say **queue clear** / **nothing stale** (health, overview, Insights header). Overview empty says quiet is a fail. Health says **p50 n/a** when the sample is empty. |
 | **v0.1.1212** | Insights header **mean n/a · max n/a** when the latency sample is noise-filtered |
 | **v0.1.1211** | Insights **Lanes** empty calm — “No lanes yet” wash when by_lane is empty |
 | **v0.1.1210** | Insights **Top tools** empty calm — “No tools yet” wash when digester Top tools is clear |
@@ -21,12 +22,12 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~02:40)
+## This tick (~03:05)
 
 - Digester open empty; design review grace on `feature-agent-ops`.
-- Fuel: Insights header still said mean 0 ms · max 0 ms after the Latency block already said nothing to measure.
-- Keep: header uses mean n/a · max n/a when the sample is empty. Real numbers stay when turns are in the sample.
+- Fuel: the health Digest line, overview pill, and Insights header still said 0 open / 0 stale. The overview empty state said overnight is quiet for now.
+- Keep: those lines say queue clear and nothing stale. The overview empty state matches Insights. The health line says p50 n/a when the latency sample is empty. Counts above zero still show.
 
 ## Try it
 
-Open **Agent Ops → Runs**. On a quiet digester night the Insights header should say **mean n/a · max n/a**, and the Latency block should still say **Nothing to measure**. When a real latency sample exists, mean and max show milliseconds again.
+Open **Agent Ops**. On a clear digester night the Digest health line should say **queue clear / nothing stale**, and **p50 n/a** when latency is noise-filtered. The overview Digest card should say **Queue clear**, not that overnight is quiet. When open or stale counts are above zero, the numbers come back.
