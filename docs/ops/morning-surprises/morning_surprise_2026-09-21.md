@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping. This tick makes instant digest status match the CPU window.
+Overnight Track B kept shipping. This tick makes a zero fail count say no fails.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1216** | Insights header, `/insights`, and “how many runs” say **no fails** when nothing failed. A real fail count still shows. |
 | **v0.1.1215** | `/status`, `/insights`, digest age, and `digest open` say **queue clear** and **nothing stale** when those counts are zero. “How many open” still returns a number. |
 | **v0.1.1214** | CPU rings say **Freq** and **Temp**, the same short names as the sparklines. Hover still says Frequency or Temperature. |
 | **v0.1.1213** | Digest zeros say **queue clear** / **nothing stale** (health, overview, Insights header). Overview empty says quiet is a fail. Health says **p50 n/a** when the sample is empty. |
@@ -24,12 +25,12 @@ Overnight Track B kept shipping. This tick makes instant digest status match the
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~04:55)
+## This tick (~05:25)
 
 - Digester open was empty. Design review was not due.
-- Fuel: instant digest status still said 0 open and 0 stale. The CPU window already says queue clear.
-- Keep: **v0.1.1215** — `/status`, `/insights`, digest age, and `digest open` say queue clear and nothing stale. Counts above zero still show. “How many open” still returns a number.
+- Fuel: Insights still said fail 0. Digest zeros already say queue clear.
+- Keep: **v0.1.1216** — the Insights header, `/insights`, and “how many runs” say no fails when nothing failed. A real fail count still shows.
 
 ## Try it
 
-Ask `/status` or `digest open` in AI Chat. When the queue is empty, the line should say **queue clear** and **nothing stale**, not 0 open or 0 stale. “How many open” still returns a number.
+Open Agent Ops → Runs. When every turn succeeded, the Insights header should say **no fails**, not fail 0. Ask `/insights` or “how many runs” in AI Chat. The same words should appear. A real fail still shows a count.
