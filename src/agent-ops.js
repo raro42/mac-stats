@@ -272,13 +272,14 @@
   }
 
   /** Overview card empty state — filter-miss calm (warm title + solid wash) + Open-tab CTA. */
-  function opsOverviewEmptyHtml(message, tab, ctaLabel) {
+  function opsOverviewEmptyHtml(message, tab, ctaLabel, title) {
     const safeTab = String(tab || '').replace(/[^a-z]/gi, '');
     const label = ctaLabel || (safeTab ? `Open ${safeTab}` : 'Open tab');
+    const heading = String(title || '').trim() || 'Nothing here yet';
     const tip = String(message || '').trim() || 'Nothing here yet — open the linked tab';
     return (
       `<div class="ops-empty ops-empty-filter-miss ops-empty-overview-cta is-calm" role="status" title="${escapeHtml(tip)}">` +
-      `<div class="ops-empty-filter-title">Nothing here yet</div>` +
+      `<div class="ops-empty-filter-title">${escapeHtml(heading)}</div>` +
       `<div class="ops-empty-filter-msg">${escapeHtml(message)}</div>` +
       `<button type="button" class="ops-clear-filter" data-ops-goto-tab="${safeTab}">${escapeHtml(label)}</button>` +
       `</div>`
@@ -5472,11 +5473,13 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 p50Ms >= 1000
                     ? ` · p50 ${(p50Ms / 1000).toFixed(1)}s`
                     : ` · p50 ${Math.round(p50Ms)}ms`;
+        } else if (Number(insights.turns) > 0) {
+            p50 = ' · p50 n/a';
         }
         let fails = '';
         const failN = Number(insights.fail_count) || 0;
         if (failN > 0) fails = ` · ${failN} fail`;
-        digestText = `${open} open / ${stale} stale${p50}${fails}${age}`;
+        digestText = `${formatOpsDigestOpenBit(open)} / ${formatOpsDigestStaleBit(stale)}${p50}${fails}${age}`;
     }
     setText('ops-health-digest', digestText);
     const digestEl = document.getElementById('ops-health-digest');
@@ -6251,6 +6254,21 @@ function renderOverviewRuns(insights) {
     });
 }
 
+/** Digest count words. Zero is calm (Queue clear / Nothing stale), not a problem count. */
+function formatOpsDigestOpenBit(openN) {
+    const n = Number(openN);
+    const count = Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    if (count === 0) return 'queue clear';
+    return count === 1 ? '1 open' : `${count} open`;
+}
+
+function formatOpsDigestStaleBit(staleN) {
+    const n = Number(staleN);
+    const count = Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    if (count === 0) return 'nothing stale';
+    return count === 1 ? '1 stale' : `${count} stale`;
+}
+
 /** Overview Digest card: ok/warn/bad wash (health Digest fail/open parity). */
 function setOverviewDigestStatus(insights) {
     const card = document.getElementById('ops-overview-digest');
@@ -6293,11 +6311,12 @@ function renderOverviewDigest(insights) {
     const staleN = Number(insights?.digest_stale_count) || 0;
     const openLabel = Number.isFinite(openN) ? openN : hints.length;
     if (!hints.length && openLabel === 0) {
-        paintOpsOverviewHeadCount('ops-overview-digest', '0 open', { zero: true });
+        paintOpsOverviewHeadCount('ops-overview-digest', 'Queue clear', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
-            'No open digester candidates — overnight is quiet for now',
+            'Overnight still ships design review or standing backlog — quiet is a fail',
             'runs',
-            'Open Runs'
+            'Open Runs',
+            'Queue clear'
         );
         return;
     }
@@ -9685,7 +9704,7 @@ function renderOpsRuns(insights) {
             appendOpsDiscordGatewayLine(card, gateway);
             const digestMeta = document.createElement('div');
             digestMeta.className = 'ops-row-meta';
-            digestMeta.textContent = `Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
+            digestMeta.textContent = `Digest: ${formatOpsDigestOpenBit(insights.digest_open_count)} · ${formatOpsDigestStaleBit(insights.digest_stale_count)}${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
             card.appendChild(digestMeta);
             const empty = document.createElement('div');
             empty.className =
@@ -9735,7 +9754,7 @@ function renderOpsRuns(insights) {
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · ${headerLat}</div>
-            <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
+            <div class="ops-row-meta">Digest: ${formatOpsDigestOpenBit(insights.digest_open_count)} · ${formatOpsDigestStaleBit(insights.digest_stale_count)}${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
         `;
         appendOpsDiscordGatewayLine(card, gateway);
         const digestHints = insights.digest_open_hints || [];

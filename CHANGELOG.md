@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1213] - 2026-09-21
+
+### Changed
+- **Agent Ops digest zeros** — When the digester queue is clear, the health Digest line, the overview card, and the Insights header say queue clear and nothing stale. They no longer say 0 open or 0 stale. The overview empty state matches Insights: quiet is a fail. The health line says p50 n/a when turns exist but the latency sample is noise-filtered. Real open and stale counts still show when they are above zero.
+
 ## [0.1.1212] - 2026-09-21
 
 ### Changed
