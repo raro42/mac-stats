@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1223] - 2026-09-21
+
+### Changed
+- **Agent Ops schedule empty next** — When a schedule has no next run (or no cron/at), Overview, Schedules tab, and preview say **None yet** (not `—`). Real next times still show when set.
+
 ## [0.1.1222] - 2026-09-21
 
 ### Changed

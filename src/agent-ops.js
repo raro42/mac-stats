@@ -6447,7 +6447,8 @@ function renderOverviewSchedules(schedules, deliveries) {
         btn.type = 'button';
         btn.className = 'ops-row';
         const id = s.id || '(no id)';
-        const next = s.next_run || s.nextRun || '—';
+        // Empty next run: match health Next schedule "None yet" (bare em dash reads like missing data).
+        const next = s.next_run || s.nextRun || 'None yet';
         const task = String(s.task || '').slice(0, 40);
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}</div></div>`;
         btn.addEventListener('click', () => {
@@ -7033,8 +7034,9 @@ function setOpsScheduleCopyChip(copyValue) {
 
 function formatOpsSchedulePreview(s) {
     const id = s?.id || '(no id)';
-    const when = s?.cron ? `cron ${s.cron}` : s?.at ? `at ${s.at}` : '—';
-    const next = s?.next_run || s?.nextRun || '—';
+    // Empty when / next: match health Next schedule "None yet".
+    const when = s?.cron ? `cron ${s.cron}` : s?.at ? `at ${s.at}` : 'None yet';
+    const next = s?.next_run || s?.nextRun || 'None yet';
     const task = String(s?.task || '').trim() || '(empty task)';
     return `Schedule: ${id}\nWhen: ${when}\nNext: ${next}\n\nTask:\n${task}`;
 }
@@ -7082,8 +7084,9 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 btn.type = 'button';
                 btn.className = 'ops-row';
                 const id = s.id || '(no id)';
-                const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '—';
-                const next = s.next_run || s.nextRun || '—';
+                // Empty when / next: match health Next schedule "None yet".
+                const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : 'None yet';
+                const next = s.next_run || s.nextRun || 'None yet';
                 const task = String(s.task || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
                 setOpsRowCopyValue(btn, s.id);

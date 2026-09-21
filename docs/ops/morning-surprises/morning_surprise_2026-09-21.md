@@ -6,6 +6,7 @@ Overnight Track B kept shipping Agent Ops empty/unloaded calm.
 
 | Version | What |
 |---------|------|
+| **v0.1.1223** | Schedule empty next/when say **None yet** (not `—`) |
 | **v0.1.1222** | Redmine unloaded health says **Unknown** (not `—`) |
 | **v0.1.1221** | Health Version / Next schedule / Last delivery / Digest say **Unknown** when the payload is missing (not `—`) |
 | **v0.1.1220** | Discord empty health/glance say **Unknown** |
