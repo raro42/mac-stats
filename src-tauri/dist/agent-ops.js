@@ -5245,7 +5245,8 @@ function fmtProcessUptime(secs) {
 }
 
 function fmtScheduleEta(sched) {
-    if (!sched || sched.totalEntries == null) return '—';
+    // Unloaded schedule: match Discord "Unknown" (bare em dash reads like missing data).
+    if (!sched || sched.totalEntries == null) return 'Unknown';
     // Empty Next schedule: match overview head "None yet" (raw "None" reads like an error).
     if (sched.totalEntries === 0) return 'None yet';
     if (sched.secondsUntilNextFire == null) return `${sched.totalEntries} jobs`;
@@ -5270,7 +5271,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     const sessionN = (sessionFiles || []).length;
     setText(
         'ops-health-version',
-        version ? `v${version}${fmtProcessUptime(insights?.process_uptime_secs)}` : '—'
+        // Unloaded version: match Discord "Unknown" (bare em dash reads like missing data).
+        version ? `v${version}${fmtProcessUptime(insights?.process_uptime_secs)}` : 'Unknown'
     );
     const agentsHint = document.getElementById('ops-health-version');
     if (agentsHint) {
@@ -5433,7 +5435,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         deliveryAgeMs = !Number.isNaN(t) ? Date.now() - t : NaN;
         deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || 'None yet');
     } else if (!Array.isArray(deliveries)) {
-        deliveryText = '—';
+        // Unloaded deliveries: match Discord "Unknown".
+        deliveryText = 'Unknown';
     }
     setText('ops-health-delivery', deliveryText);
     const deliveryEl = document.getElementById('ops-health-delivery');
@@ -5456,7 +5459,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         }
     }
 
-    let digestText = '—';
+    // Unloaded digest: match Discord "Unknown" (bare em dash reads like missing data).
+    let digestText = 'Unknown';
     if (insights) {
         const open = insights.digest_open_count ?? 0;
         const stale = insights.digest_stale_count ?? 0;

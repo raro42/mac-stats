@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1221] - 2026-09-21
+
+### Changed
+- **Agent Ops health unloaded status** — When Version, Next schedule, Last delivery, or Digest have no payload yet, the health card says **Unknown** (not `—`). Empty jobs still say None yet; real values still show when data exists.
+
 ## [0.1.1220] - 2026-09-21
 
 ### Changed

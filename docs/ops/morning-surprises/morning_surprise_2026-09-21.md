@@ -1,24 +1,24 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping after digester open stayed empty.
+Overnight Track B kept shipping Agent Ops empty/unloaded calm.
 
-## Shipped tonight (highlights)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1220** | Agent Ops Discord empty: health + collapsed glance say **Unknown** (not `—`). |
-| **v0.1.1219** | Agent Ops health: empty Next schedule / Last delivery say **None yet** (overview head parity). |
-| **v0.1.1218** | Agent Ops overview empty head pills: **None yet** (Agents/Runs/Schedules/Knowledge/Recent); Live **Quiet**. Digest still Queue clear. |
-| **v0.1.1217** | `/insights` names empty Lanes, Top tools, Slowest, Candidates |
-| **v0.1.1216** | Insights fail zero → **no fails** |
-| **v0.1.1215** | `/status` / digest age / digest open → queue clear / nothing stale |
-| **v0.1.1214** | CPU rings say Freq and Temp |
-| **v0.1.1213** | Digest zeros say queue clear / nothing stale in health + overview |
+| **v0.1.1221** | Health Version / Next schedule / Last delivery / Digest say **Unknown** when the payload is missing (not `—`) |
+| **v0.1.1220** | Discord empty health/glance say **Unknown** |
+| **v0.1.1219** | Health Next schedule / Last delivery empty say **None yet** |
+| **v0.1.1218** | Overview empty head pills say **None yet** / Live **Quiet** |
+| **v0.1.1217** | `/insights` names empty Lanes / Top tools / Slowest / Candidates |
+| **v0.1.1216** | Insights fail zero says **no fails** |
+| **v0.1.1215** | Digest status lines say **queue clear** / **nothing stale** |
+| **v0.1.1214** | CPU rings say **Freq** and **Temp** |
 
-## Fuel note
+## Fuel
 
-Digester open empty. Design review grace on feature-agent-ops. Standing backlog / empty-calm polish continued (Discord Unknown after schedule/delivery None yet).
+Digester open stayed empty. Design review grace on `feature-agent-ops`. Standing backlog empty-state track.
 
-## Quiet ticks
+## Note
 
-None — this night kept moving the ratchet.
+Empty digester alone is not the surprise — the keep rows above are.
