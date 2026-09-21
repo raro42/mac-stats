@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping Agent Ops empty/unloaded calm.
+Overnight Track B kept shipping empty/unloaded calm (Agent Ops + Disk Cleanup).
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1226** | Disk Cleanup empty meta say **None yet** (not `—`) |
 | **v0.1.1225** | Delivery empty when say **None yet** (not `—`) |
 | **v0.1.1224** | Runs empty meta say **Unknown** / tools **None yet** (not `—`) |
 | **v0.1.1223** | Schedule empty next/when say **None yet** (not `—`) |
