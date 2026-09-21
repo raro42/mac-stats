@@ -5325,7 +5325,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         if (redmine) {
         const st = String(redmine.status || '').toLowerCase();
         const msg = String(redmine.message || '').trim();
-        let text = '—';
+        // Unloaded / empty Redmine: match Discord "Unknown" (bare em dash reads like missing data).
+        let text = 'Unknown';
         if (st === 'ok') text = msg || 'Ok';
         else if (st === 'notconfigured') text = 'Not configured';
         else if (st) text = msg ? `${st}: ${msg}`.slice(0, 36) : st;
@@ -5345,6 +5346,15 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         opsRedmineHealthCache = redmine;
     } else {
         opsRedmineHealthCache = null;
+        setText('ops-health-redmine', 'Unknown');
+        const el = document.getElementById('ops-health-redmine');
+        if (el) {
+            el.title = '';
+            const card = el.closest('.ops-health-card');
+            if (card) {
+                card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            }
+        }
     }
     applyOpsRedmineAttentionGlanceState();
     if (ollama) {

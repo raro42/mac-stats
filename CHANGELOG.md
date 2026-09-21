@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1222] - 2026-09-21
+
+### Changed
+- **Agent Ops Redmine unloaded status** — When Redmine health has no payload yet, the health card says **Unknown** (not `—`). Ok / Not configured / degraded states still show when data exists.
+
 ## [0.1.1221] - 2026-09-21
 
 ### Changed
