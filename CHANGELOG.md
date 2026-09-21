@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1227] - 2026-09-22
+
+### Changed
+- **Agent Ops Sessions / Knowledge empty meta** — When last activity, file age, kind, or source hint is missing, Sessions, Knowledge, and Overview rows say **Unknown** (not a blank). Real ages and labels still show when set.
+
 ## [0.1.1226] - 2026-09-21
 
 ### Changed

@@ -5219,7 +5219,8 @@ function fmtBytes(n) {
 }
 
 function fmtAge(ms) {
-    if (!ms) return '';
+    // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
+    if (!ms) return 'Unknown';
     const age = Date.now() - ms;
     if (age < 60_000) return 'just now';
     if (age < 3600_000) return `${Math.floor(age / 60_000)}m ago`;
@@ -6647,12 +6648,14 @@ function renderOverviewKnowledge(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        // Empty kind / age: match run meta "Unknown".
+        const kind = String(f.kind || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            const kind = String(f.kind || '').toLowerCase();
-            setOpsMemoryKindFilter(kind === 'discord' ? 'discord' : 'core');
+            const kindFilter = String(f.kind || '').toLowerCase();
+            setOpsMemoryKindFilter(kindFilter === 'discord' ? 'discord' : 'core');
             selectOpsTab('memory');
             const matchTitle = f.name || '';
             const list = document.getElementById('ops-memory-list');
@@ -6765,7 +6768,9 @@ function renderOverviewRecent(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        // Empty source / age: match run meta "Unknown".
+        const sourceHint = String(f.source_hint || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -9006,7 +9011,9 @@ function renderOpsLive(rows) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty last activity: match run meta "Unknown" (bare blank reads like missing data).
+        const activity = String(r.last_activity || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         setOpsRowCopyValue(btn, r.session_id);
         const openLive = async () => {
             try {
@@ -9075,7 +9082,9 @@ function renderOpsSessionFiles(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
+        // Empty source / age: match run meta "Unknown".
+        const sourceHint = String(f.source_hint || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
         setOpsRowCopyValue(btn, f.slug || f.name);
         const openFile = async () => {
             try {
@@ -9150,7 +9159,9 @@ function renderOpsMemory(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        // Empty kind: match run meta "Unknown".
+        const kind = String(f.kind || '').trim() || 'Unknown';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
         setOpsRowCopyValue(btn, f.path || f.name);
         const openFile = async () => {
             document
