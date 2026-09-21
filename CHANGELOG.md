@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1214] - 2026-09-21
+
+### Changed
+- **CPU ring labels** — Frequency and Temperature rings now say Freq and Temp, the same short names as the sparklines under them. Hover still says Frequency or Temperature.
+
 ## [0.1.1213] - 2026-09-21
 
 ### Changed

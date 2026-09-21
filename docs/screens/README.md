@@ -60,7 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
-- **2026-09-20 (~23:10):** Agent Ops true-empty calm (v0.1.1204). Recapture of `feature-agent-ops.png` deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior Sep 15 asset kept; polish grace marked.
+- **2026-09-21 (~03:35):** CPU ring labels Freq / Temp (v0.1.1214). Recapture of `feature-cpu-metrics.png` deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior asset kept; polish grace marked.
 - **2026-09-18 (~20:45):** Agent Ops active selection soft parity (v0.1.1154). Recapture of `feature-agent-ops.png` deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior asset kept; polish grace marked.
 - **2026-09-16 (~05:30):** AI Chat last-answer glance calm (v0.1.1103). Recapture of `feature-ai-chat.png` after install if Screen Recording TCC allows; otherwise prior asset kept; polish grace marked.
 - **2026-09-15 (~20:00):** Agent Ops Overview empty calm (v0.1.1082). Recaptured `feature-agent-ops.png` (window-only, Agent Ops expanded via `MAC_STATS_OPEN_SECTION=agent-ops`).

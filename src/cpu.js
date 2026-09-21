@@ -2699,6 +2699,7 @@ function init() {
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
+  alignRingGaugeLabels();
   removeRingsFilterChips();
   ensureRamStripStyles();
   pruneMetricStripChips();
@@ -2732,6 +2733,27 @@ function initRingGauges() {
       el.style.strokeDasharray = CIRCUMFERENCE;
       el.style.strokeDashoffset = CIRCUMFERENCE;
     }
+  });
+}
+
+/**
+ * Ring titles match sparkline captions: CPU · GPU · FREQ · TEMP.
+ * Themes ship "Frequency" / "Temperature"; CSS uppercases those to long words
+ * that no longer line up with Freq / Temp under the gauges.
+ */
+function alignRingGaugeLabels() {
+  const section = getRingGaugeSection();
+  if (!section) return;
+  const map = {
+    frequency: { text: 'Freq', title: 'Frequency' },
+    temperature: { text: 'Temp', title: 'Temperature' },
+  };
+  section.querySelectorAll('.metric-label').forEach((el) => {
+    const key = (el.textContent || '').trim().toLowerCase();
+    const next = map[key];
+    if (!next) return;
+    if (el.textContent !== next.text) el.textContent = next.text;
+    if (!el.getAttribute('title')) el.title = next.title;
   });
 }
 
