@@ -6,6 +6,7 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 
 | Version | What |
 |---------|------|
+| **v0.1.1211** | Insights **Lanes** empty calm — “No lanes yet” wash when by_lane is empty |
 | **v0.1.1210** | Insights **Top tools** empty calm — “No tools yet” wash when digester Top tools is clear |
 | **v0.1.1209** | Insights **Latency** empty calm — “Nothing to measure” wash when p50 is noise-filtered |
 | **v0.1.1208** | Insights **Stale** empty calm — “Nothing stale” |
@@ -19,12 +20,12 @@ Overnight Track B kept shipping Agent Ops Insights empty-state calm.
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~01:45)
+## This tick (~02:15)
 
 - Digester open empty; design review grace on `feature-agent-ops`.
-- Fuel: Insights still showed muted `Top tools: —` after Latency/Slowest/Candidates/Stale/Digest calm.
-- Keep: warm empty when turns used no tools; tool counts when they did.
+- Fuel: Insights still showed muted `Lanes: —` after Top tools / Latency / Slowest / Candidates / Stale / Digest calm.
+- Keep: warm empty when lane mix is missing; lane counts when turns have a mix.
 
 ## Try it
 
-Open **Agent Ops → Runs**. On a quiet digester night you should see **Top tools · No tools yet** under Lanes, beside Latency / Slowest / Candidates / Stale calm blocks.
+Open **Agent Ops → Runs**. On a quiet digester night you should see **Lanes · No lanes yet** (when by_lane is empty) beside Top tools / Latency / Slowest / Candidates / Stale calm blocks. When turns have a lane mix, Lanes still shows `instant:N · direct:M`.
