@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1216] - 2026-09-21
+
+### Changed
+- **Insights fail words** — When no turn failed, the Insights header, `/insights`, and “how many runs” say **no fails**. They no longer say fail 0. A real fail count still shows.
+
 ## [0.1.1215] - 2026-09-21
 
 ### Changed

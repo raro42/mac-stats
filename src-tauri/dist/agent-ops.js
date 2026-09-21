@@ -6254,6 +6254,14 @@ function renderOverviewRuns(insights) {
     });
 }
 
+/** Fail count words. Zero is calm (no fails), not a problem count. */
+function formatOpsFailBit(failN) {
+    const n = Number(failN);
+    const count = Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    if (count === 0) return 'no fails';
+    return count === 1 ? '1 fail' : `${count} fails`;
+}
+
 /** Digest count words. Zero is calm (Queue clear / Nothing stale), not a problem count. */
 function formatOpsDigestOpenBit(openN) {
     const n = Number(openN);
@@ -9753,7 +9761,7 @@ function renderOpsRuns(insights) {
             : 'mean n/a · max n/a';
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
-            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · ${headerLat}</div>
+            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · ${formatOpsFailBit(insights.fail_count)} · ${headerLat}</div>
             <div class="ops-row-meta">Digest: ${formatOpsDigestOpenBit(insights.digest_open_count)} · ${formatOpsDigestStaleBit(insights.digest_stale_count)}${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
         `;
         appendOpsDiscordGatewayLine(card, gateway);

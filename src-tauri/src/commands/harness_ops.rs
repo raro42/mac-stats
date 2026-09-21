@@ -1182,6 +1182,17 @@ fn digest_stale_status_bit(n: usize) -> String {
     }
 }
 
+/// Fail words for Insights and run counts. Zero is calm (overview “no fails”), not a problem count.
+fn fail_status_bit(n: usize) -> String {
+    if n == 0 {
+        "**no fails**".to_string()
+    } else if n == 1 {
+        "**1** fail".to_string()
+    } else {
+        format!("**{n}** fails")
+    }
+}
+
 /// Zero-LLM digest open snapshot from cached `latest.json` (no Python digester).
 pub fn format_digest_open_gateway() -> String {
     let summary = load_digest_summary();
@@ -2301,11 +2312,11 @@ pub fn format_runs_count_gateway(kind: RunsCountKind) -> String {
                     .to_string();
             }
             format!(
-                "**Runs:** **{total}** turns · ok **{ok}** · fail **{fail}** · instant **{instant}** · direct **{direct}** · slow **{slow}** (≥{} ms) · `/insights` or Agent Ops → Runs.",
+                "**Runs:** **{total}** turns · ok **{ok}** · {fail} · instant **{instant}** · direct **{direct}** · slow **{slow}** (≥{} ms) · `/insights` or Agent Ops → Runs.",
                 OPS_RUNS_SLOW_MS,
                 total = snap.total,
                 ok = snap.ok,
-                fail = snap.fail,
+                fail = fail_status_bit(snap.fail),
                 instant = snap.instant,
                 direct = snap.direct,
                 slow = snap.slow,
@@ -63002,10 +63013,10 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         };
         lines.push(title);
         lines.push(format!(
-            "Turns: **{}** · ok {} · fail {} · p50 **{}** · mean {} · max {}{}",
+            "Turns: **{}** · ok {} · {} · p50 **{}** · mean {} · max {}{}",
             insights.turns,
             insights.ok_count,
-            insights.fail_count,
+            fail_status_bit(insights.fail_count),
             if insights.latency_sample == 0 {
                 "n/a".into()
             } else {
@@ -64791,6 +64802,9 @@ mod tests {
         assert_eq!(digest_open_status_bit(2), "**2** open");
         assert_eq!(digest_stale_status_bit(1), "**1** stale");
         assert_eq!(digest_stale_status_bit(3), "**3** stale");
+        assert_eq!(fail_status_bit(0), "**no fails**");
+        assert_eq!(fail_status_bit(1), "**1** fail");
+        assert_eq!(fail_status_bit(2), "**2** fails");
     }
 
     #[test]
@@ -64821,13 +64835,18 @@ mod tests {
         let clear = format_runs_insights_gateway(&insights);
         assert!(clear.contains("**queue clear**"), "{clear}");
         assert!(clear.contains("**nothing stale**"), "{clear}");
+        assert!(clear.contains("**no fails**"), "{clear}");
+        assert!(!clear.contains("fail 0"), "{clear}");
         assert!(!clear.contains("**0** open"), "{clear}");
         insights.digest_open_count = 2;
         insights.digest_stale_count = 1;
+        insights.fail_count = 2;
         let busy = format_runs_insights_gateway(&insights);
         assert!(busy.contains("**2** open"), "{busy}");
         assert!(busy.contains("**1** stale"), "{busy}");
+        assert!(busy.contains("**2** fails"), "{busy}");
         assert!(!busy.contains("queue clear"), "{busy}");
+        assert!(!busy.contains("no fails"), "{busy}");
     }
 
     #[test]
