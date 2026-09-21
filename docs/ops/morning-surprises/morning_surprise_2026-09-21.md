@@ -1,11 +1,12 @@
 # Morning surprise — 2026-09-21
 
-Overnight Track B kept shipping. This tick lines the CPU ring names up with the sparklines.
+Overnight Track B kept shipping. This tick makes instant digest status match the CPU window.
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1215** | `/status`, `/insights`, digest age, and `digest open` say **queue clear** and **nothing stale** when those counts are zero. “How many open” still returns a number. |
 | **v0.1.1214** | CPU rings say **Freq** and **Temp**, the same short names as the sparklines. Hover still says Frequency or Temperature. |
 | **v0.1.1213** | Digest zeros say **queue clear** / **nothing stale** (health, overview, Insights header). Overview empty says quiet is a fail. Health says **p50 n/a** when the sample is empty. |
 | **v0.1.1212** | Insights header **mean n/a · max n/a** when the latency sample is noise-filtered |
@@ -23,12 +24,12 @@ Overnight Track B kept shipping. This tick lines the CPU ring names up with the 
 | **v0.1.1200** | Digest open inventory counts only |
 | **v0.1.1199** | Runs inventory counts only |
 
-## This tick (~03:35)
+## This tick (~04:55)
 
-- Design review due: `feature-cpu-metrics.png` was 14 days old.
-- Fuel: ring titles said Frequency and Temperature. CSS uppercases those words, so they no longer match Freq and Temp under the gauges.
-- Keep: **v0.1.1214** — the rings say Freq and Temp. Hover still says the long name.
+- Digester open was empty. Design review was not due.
+- Fuel: instant digest status still said 0 open and 0 stale. The CPU window already says queue clear.
+- Keep: **v0.1.1215** — `/status`, `/insights`, digest age, and `digest open` say queue clear and nothing stale. Counts above zero still show. “How many open” still returns a number.
 
 ## Try it
 
-Open the CPU window. The third and fourth rings should read **FREQ** and **TEMP**, the same words as the sparklines under them. Hover a label to see Frequency or Temperature.
+Ask `/status` or `digest open` in AI Chat. When the queue is empty, the line should say **queue clear** and **nothing stale**, not 0 open or 0 stale. “How many open” still returns a number.
