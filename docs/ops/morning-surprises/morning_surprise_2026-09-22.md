@@ -6,7 +6,8 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 | Version | What got better |
 |---------|-----------------|
-| **v0.1.1240** | Health **Digest** empty **age** say **None yet** (not a thinner open/stale line) |
+| **v0.1.1241** | Health **Version** empty **uptime** say **None yet** (not a thinner Version-only line) |
+| v0.1.1240 | Health **Digest** empty **age** say **None yet** (not a thinner open/stale line) |
 | v0.1.1239 | Health **Last delivery** empty **summary preview** say **None yet** (not a bare age) |
 | v0.1.1238 | Health **Next schedule** empty **task preview** say **None yet** (not a bare ETA) |
 | v0.1.1237 | Live / Sessions empty **preview** say **None yet** (not omitted thinner meta) |
@@ -15,15 +16,14 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 | v0.1.1234 | Delivery empty schedule id → **Unknown** (not placeholder `schedule`) |
 | v0.1.1233 | Insights Slowest empty wall/lane/question → **Unknown** / **None yet** |
 | v0.1.1232 | Insights Candidates empty kind/reason/question → **Unknown** / **None yet** |
-| v0.1.1231 | Runs/Schedules empty question/id → **None yet** / **Unknown** |
 
 ## Context
 
 - Digester open: empty all night (instant lane filters noise).
-- Design review: `feature-agent-ops.png` in grace (~6.4d); empty-calm list parity was better fuel than a quiet tick.
-- Debug.log: no ERROR/WARN/panic clusters in scan windows.
+- Design review: `feature-agent-ops.png` in grace (~7.0d); empty-calm list parity was better fuel than a quiet tick.
+- Debug.log: idle-thought Ollama timeout WARN (soft path already); no new ERROR/panic clusters.
 - Ratchet: keeps only (no discards this window).
 
 ## For Ralf
 
-Open Agent Ops → health **Digest**. When insights load but generated-at is missing, the line now ends with **· None yet** instead of omitting the age. Last delivery and Next schedule already matched this pattern at **v0.1.1238–1239**.
+Open Agent Ops → health **Version**. When the version is known but process uptime is missing, the line now ends with **· None yet** instead of omitting the uptime. Digest age already matched this pattern at **v0.1.1240**.
