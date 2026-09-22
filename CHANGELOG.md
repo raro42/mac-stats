@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1238] - 2026-09-22
+
+### Changed
+- **Agent Ops health Next schedule empty task preview** — When the next job has an ETA but no task preview, health says **5m · None yet** (not a bare ETA with the preview omitted). Real next-task previews still show when set.
+
 ## [0.1.1237] - 2026-09-22
 
 ### Changed

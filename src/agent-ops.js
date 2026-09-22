@@ -5272,10 +5272,11 @@ function fmtScheduleEta(sched) {
         secs < 3600
             ? `${Math.max(1, Math.round(secs / 60))}m`
             : `${Math.round(secs / 3600)}h`;
-    const preview = sched.nextTaskPreview
-        ? String(sched.nextTaskPreview).slice(0, 32)
-        : '';
-    return preview ? `${when} · ${preview}` : when;
+    // Empty next-task preview: match Live/Sessions "None yet" (omit left a thinner ETA).
+    const preview = fmtPreviewSnippet(
+        sched.nextTaskPreview ? String(sched.nextTaskPreview).slice(0, 32) : ''
+    );
+    return `${when} · ${preview}`;
 }
 
 function setText(id, text) {
