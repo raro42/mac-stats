@@ -6,7 +6,8 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 | Version | What got better |
 |---------|-----------------|
-| **v0.1.1236** | Knowledge / Sessions / Live empty **size**, **lines**, or **msgs** say **Unknown** (not `undefined` / `NaN MB`) |
+| **v0.1.1237** | Live / Sessions empty **preview** say **None yet** (not omitted thinner meta) |
+| v0.1.1236 | Knowledge / Sessions / Live empty **size**, **lines**, or **msgs** say **Unknown** (not `undefined` / `NaN MB`) |
 | v0.1.1235 | Schedule / delivery empty **task** or **summary** say **None yet** on Overview + Schedules lists |
 | v0.1.1234 | Delivery empty schedule id → **Unknown** (not placeholder `schedule`) |
 | v0.1.1233 | Insights Slowest empty wall/lane/question → **Unknown** / **None yet** |
@@ -20,10 +21,10 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 ## Context
 
 - Digester open: empty all night (instant lane filters noise).
-- Design review: `feature-agent-ops.png` in grace (~6.3d); empty-calm list parity was better fuel than a quiet tick.
+- Design review: `feature-agent-ops.png` in grace (~6.35d); empty-calm list parity was better fuel than a quiet tick.
 - Debug.log: no ERROR/WARN/panic clusters in scan windows.
 - Ratchet: keeps only (no discards this window).
 
 ## For Ralf
 
-Open Agent Ops → Knowledge or Sessions. Rows that miss line count, file size, or message count now say **Unknown** instead of `undefined` / `NaN`.
+Open Agent Ops → Overview Live or Sessions. Rows that miss a preview snippet now say **None yet** instead of dropping that bit from the meta line.
