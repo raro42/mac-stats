@@ -5461,7 +5461,12 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         const newest = deliveries[0];
         const t = newest?.utc ? Date.parse(newest.utc) : NaN;
         deliveryAgeMs = !Number.isNaN(t) ? Date.now() - t : NaN;
-        deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || 'None yet');
+        const age = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || 'None yet');
+        // Empty delivery summary preview: match Next schedule "None yet" (omit left a thinner age).
+        const preview = fmtPreviewSnippet(
+            newest.summary ? String(newest.summary).slice(0, 32) : ''
+        );
+        deliveryText = `${age} · ${preview}`;
     } else if (!Array.isArray(deliveries)) {
         // Unloaded deliveries: match Discord "Unknown".
         deliveryText = 'Unknown';

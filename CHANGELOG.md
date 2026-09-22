@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1239] - 2026-09-22
+
+### Changed
+- **Agent Ops health Last delivery empty summary preview** — When the newest delivery has an age but no summary, health says **2h · None yet** (not a bare age with the preview omitted). Real delivery summaries still show when set. Matches Next schedule preview parity.
+
 ## [0.1.1238] - 2026-09-22
 
 ### Changed
