@@ -9636,11 +9636,13 @@ function formatOpsCandidateAsSummary(c) {
         lane: c?.lane || 'Unknown',
         wall_ms: typeof c?.wall_ms === 'number' ? c.wall_ms : 0,
         tools: [],
-        question_preview: c?.question_preview || '',
+        // Empty question: match Slowest / Runs list "None yet".
+        question_preview: String(c?.question_preview || '').trim() || 'None yet',
         ok: true,
         request_id: c?.request_id || '',
-        _candidateKind: c?.kind || '',
-        _candidateReason: c?.reason || '',
+        // Empty kind / reason: match run meta "Unknown" / "None yet" (bare blank reads like missing data).
+        _candidateKind: String(c?.kind || '').trim() || 'Unknown',
+        _candidateReason: String(c?.reason || '').trim() || 'None yet',
     };
 }
 
@@ -9751,10 +9753,12 @@ function formatOpsRunPreview(r) {
     const ok = r?.ok ? 'ok' : 'FAIL';
     const ts = r?.ts || 'Unknown';
     const rid = String(r?.request_id || '').trim() || 'Unknown';
-    const kind = String(r?._candidateKind || '').trim();
-    const reason = String(r?._candidateReason || '').trim();
-    const head = kind
-        ? `Candidate (${kind})${reason ? `\nWhy: ${reason}` : ''}\n`
+    // Candidate rows always carry _candidateKind (even when Unknown).
+    const isCandidate = r && Object.prototype.hasOwnProperty.call(r, '_candidateKind');
+    const kind = String(r?._candidateKind || '').trim() || 'Unknown';
+    const reason = String(r?._candidateReason || '').trim() || 'None yet';
+    const head = isCandidate
+        ? `Candidate (${kind})\nWhy: ${reason}\n`
         : `Run (${ok})\n`;
     return `${head}Lane: ${lane}\nWall: ${wall}\nWhen: ${ts}\nRequest: ${rid}\nTools: ${tools}\n\nQuestion:\n${q}`;
 }
@@ -10007,7 +10011,13 @@ function renderOpsRuns(insights) {
                 candRows.slice(0, 4).forEach((c) => {
                     const line = document.createElement('div');
                     line.className = 'ops-insight-line';
-                    line.innerHTML = `<span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em>`;
+                    // Empty kind / reason / question: match Slowest / Runs calm (not blank).
+                    const kind = String(c.kind || '').trim() || 'Unknown';
+                    const reason = String(c.reason || '').trim() || 'None yet';
+                    const q = String(c.question_preview || '').trim() || 'None yet';
+                    const wall =
+                        typeof c.wall_ms === 'number' ? `${c.wall_ms} ms` : 'Unknown';
+                    line.innerHTML = `<span class="ops-badge">${escapeHtml(kind)}</span> ${escapeHtml(wall)} — ${escapeHtml(reason)} · <em>${escapeHtml(q)}</em>`;
                     wireOpsInsightRunLine(line, formatOpsCandidateAsSummary(c));
                     card.appendChild(line);
                 });

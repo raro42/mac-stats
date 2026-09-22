@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1232] - 2026-09-22
+
+### Changed
+- **Agent Ops Candidates empty kind / reason / question** — When Insights Candidates has a row with missing kind, reason, wall time, or question, the list and preview say **Unknown** / **None yet** (not a blank). Real kind, reason, and question still show when set.
+
 ## [0.1.1231] - 2026-09-22
 
 ### Changed
