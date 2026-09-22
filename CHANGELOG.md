@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1236] - 2026-09-22
+
+### Changed
+- **Agent Ops empty size / lines / msgs** — When Knowledge, Sessions files, or Live rows miss size, line count, or message count, the UI says **Unknown** (not `undefined lines` / `NaN MB` / `undefined msgs`). Real counts and sizes still show when set.
+
 ## [0.1.1235] - 2026-09-22
 
 ### Changed

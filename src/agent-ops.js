@@ -5213,9 +5213,19 @@ async function refreshOpsDigest() {
 }
 
 function fmtBytes(n) {
-    if (n < 1024) return `${n} B`;
-    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+    const v = Number(n);
+    // Empty size: match run meta "Unknown" (bare NaN / undefined reads like missing data).
+    if (!Number.isFinite(v) || v < 0) return 'Unknown';
+    if (v < 1024) return `${Math.round(v)} B`;
+    if (v < 1024 * 1024) return `${(v / 1024).toFixed(1)} KB`;
+    return `${(v / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Empty count label (msgs / lines): match size "Unknown". */
+function fmtCountLabel(n, unit) {
+    const v = Number(n);
+    if (!Number.isFinite(v) || v < 0) return `Unknown ${unit}`;
+    return `${Math.floor(v)} ${unit}`;
 }
 
 function fmtAge(ms) {
@@ -6579,7 +6589,9 @@ function renderOverviewLive(rows, insights) {
         // Empty source / session id: match run meta "Unknown" (bare blank reads like missing data).
         const source = String(r.source || '').trim() || 'Unknown';
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${r.message_count} msgs${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
+        const msgs = fmtCountLabel(r.message_count, 'msgs');
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -9052,7 +9064,9 @@ function renderOpsLive(rows) {
         const activity = String(r.last_activity || '').trim() || 'Unknown';
         const source = String(r.source || '').trim() || 'Unknown';
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
+        const msgs = fmtCountLabel(r.message_count, 'msgs');
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         setOpsRowCopyValue(btn, r.session_id || sessionId);
         const openLive = async () => {
             try {
@@ -9202,7 +9216,9 @@ function renderOpsMemory(files) {
         // Empty kind / name: match run meta "Unknown".
         const kind = String(f.kind || '').trim() || 'Unknown';
         const fileTitle = String(f.name || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        // Empty line count / size: match age "Unknown" (bare undefined lines / NaN MB reads like missing data).
+        const lines = fmtCountLabel(f.line_count, 'lines');
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(kind)} · ${escapeHtml(lines)} · ${escapeHtml(fmtBytes(f.size_bytes))}</div></div>`;
         setOpsRowCopyValue(btn, f.path || (fileTitle === 'Unknown' ? '' : fileTitle));
         const openFile = async () => {
             document
