@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1234] - 2026-09-22
+
+### Changed
+- **Agent Ops delivery empty schedule id** — When a delivery has no schedule id, Overview, Schedules deliveries list, and preview say **Unknown** (not the placeholder word `schedule`). Real ids still show when set.
+
 ## [0.1.1233] - 2026-09-22
 
 ### Changed
