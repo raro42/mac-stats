@@ -9634,7 +9634,8 @@ function formatOpsCandidateAsSummary(c) {
         ts: '',
         // Empty lane: match run preview "Unknown" (bare em dash reads like missing data).
         lane: c?.lane || 'Unknown',
-        wall_ms: typeof c?.wall_ms === 'number' ? c.wall_ms : 0,
+        // Omit wall when missing so preview says Unknown (not 0 ms).
+        ...(typeof c?.wall_ms === 'number' ? { wall_ms: c.wall_ms } : {}),
         tools: [],
         // Empty question: match Slowest / Runs list "None yet".
         question_preview: String(c?.question_preview || '').trim() || 'None yet',
@@ -9983,8 +9984,12 @@ function renderOpsRuns(insights) {
                 slowRows.slice(0, 3).forEach((s) => {
                     const line = document.createElement('div');
                     line.className = 'ops-insight-line';
-                    // Empty lane: match run preview "Unknown".
-                    line.textContent = `${s.wall_ms} ms · ${s.lane || 'Unknown'} · ${s.question_preview || 'None yet'}`;
+                    // Empty wall / lane / question: match Candidates / Runs calm (not blank / undefined ms).
+                    const wall =
+                        typeof s.wall_ms === 'number' ? `${s.wall_ms} ms` : 'Unknown';
+                    const lane = String(s.lane || '').trim() || 'Unknown';
+                    const q = String(s.question_preview || '').trim() || 'None yet';
+                    line.textContent = `${wall} · ${lane} · ${q}`;
                     wireOpsInsightRunLine(line, s);
                     card.appendChild(line);
                 });

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1233] - 2026-09-22
+
+### Changed
+- **Agent Ops Slowest empty wall / lane / question** — When Insights Slowest has a row with missing wall time, lane, or question, the list says **Unknown** / **None yet** (not `undefined ms` or a blank). Candidate preview no longer shows **0 ms** when wall is missing. Real values still show when set.
+
 ## [0.1.1232] - 2026-09-22
 
 ### Changed
