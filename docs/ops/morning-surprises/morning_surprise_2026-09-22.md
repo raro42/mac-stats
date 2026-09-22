@@ -6,7 +6,8 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 | Version | What got better |
 |---------|-----------------|
-| **v0.1.1235** | Schedule / delivery empty **task** or **summary** say **None yet** on Overview + Schedules lists (preview already matched) |
+| **v0.1.1236** | Knowledge / Sessions / Live empty **size**, **lines**, or **msgs** say **Unknown** (not `undefined` / `NaN MB`) |
+| v0.1.1235 | Schedule / delivery empty **task** or **summary** say **None yet** on Overview + Schedules lists |
 | v0.1.1234 | Delivery empty schedule id → **Unknown** (not placeholder `schedule`) |
 | v0.1.1233 | Insights Slowest empty wall/lane/question → **Unknown** / **None yet** |
 | v0.1.1232 | Insights Candidates empty kind/reason/question → **Unknown** / **None yet** |
@@ -25,4 +26,4 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 ## For Ralf
 
-Open Agent Ops → Schedules. Jobs without a task body and deliveries without a summary now say **None yet** in the list, same as the preview pane.
+Open Agent Ops → Knowledge or Sessions. Rows that miss line count, file size, or message count now say **Unknown** instead of `undefined` / `NaN`.
