@@ -6,7 +6,8 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 | Version | What got better |
 |---------|-----------------|
-| **v0.1.1239** | Health **Last delivery** empty **summary preview** say **None yet** (not a bare age) |
+| **v0.1.1240** | Health **Digest** empty **age** say **None yet** (not a thinner open/stale line) |
+| v0.1.1239 | Health **Last delivery** empty **summary preview** say **None yet** (not a bare age) |
 | v0.1.1238 | Health **Next schedule** empty **task preview** say **None yet** (not a bare ETA) |
 | v0.1.1237 | Live / Sessions empty **preview** say **None yet** (not omitted thinner meta) |
 | v0.1.1236 | Knowledge / Sessions / Live empty **size**, **lines**, or **msgs** say **Unknown** (not `undefined` / `NaN MB`) |
@@ -15,15 +16,14 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 | v0.1.1233 | Insights Slowest empty wall/lane/question → **Unknown** / **None yet** |
 | v0.1.1232 | Insights Candidates empty kind/reason/question → **Unknown** / **None yet** |
 | v0.1.1231 | Runs/Schedules empty question/id → **None yet** / **Unknown** |
-| v0.1.1230 | Knowledge/Sessions empty file title → **Unknown** |
 
 ## Context
 
 - Digester open: empty all night (instant lane filters noise).
-- Design review: `feature-agent-ops.png` in grace (~6.39d); empty-calm list parity was better fuel than a quiet tick.
+- Design review: `feature-agent-ops.png` in grace (~6.4d); empty-calm list parity was better fuel than a quiet tick.
 - Debug.log: no ERROR/WARN/panic clusters in scan windows.
 - Ratchet: keeps only (no discards this window).
 
 ## For Ralf
 
-Open Agent Ops → health **Last delivery**. When the newest delivery has an age but no summary, the line now says **2h · None yet** instead of a bare age. Next schedule already matched this pattern at **v0.1.1238**.
+Open Agent Ops → health **Digest**. When insights load but generated-at is missing, the line now ends with **· None yet** instead of omitting the age. Last delivery and Next schedule already matched this pattern at **v0.1.1238–1239**.
