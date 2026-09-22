@@ -5591,7 +5591,8 @@ function openOpsDeliveryPreviewNavigate(d) {
     if (agentOpsCollapsed) applyOpsCollapsed(false);
     selectOpsTab('schedules');
     setOpsSchedulesKindFilter('deliveries');
-    const id = d.schedule_id || 'schedule';
+    // Empty schedule id: match schedule list "Unknown" (bare "schedule" reads like missing data).
+    const id = String(d.schedule_id || '').trim() || 'Unknown';
     const summary = String(d.summary || '').trim();
     showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', summary);
     const list = document.getElementById('ops-schedules-list');
@@ -6456,8 +6457,10 @@ function renderOverviewSchedules(schedules, deliveries) {
         const id = s.id || 'Unknown';
         // Empty next run: match health Next schedule "None yet" (bare em dash reads like missing data).
         const next = s.next_run || s.nextRun || 'None yet';
-        const task = String(s.task || '').slice(0, 40);
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}</div></div>`;
+        // Empty task: match schedule preview "None yet" (bare blank after · reads like missing data).
+        const taskRaw = String(s.task || '').trim() || 'None yet';
+        const task = taskRaw.slice(0, 40);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}${taskRaw.length > 40 ? '…' : ''}</div></div>`;
         btn.addEventListener('click', () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -6475,17 +6478,20 @@ function renderOverviewSchedules(schedules, deliveries) {
 function appendOverviewLastDeliveryRow(body, d) {
     if (!body || !d) return;
     const t = d.utc ? Date.parse(d.utc) : NaN;
-    const id = d.schedule_id || 'schedule';
+    // Empty schedule id: match schedule list "Unknown" (bare "schedule" reads like missing data).
+    const id = String(d.schedule_id || '').trim() || 'Unknown';
     // Empty when: match health Last delivery "None yet".
     const ageLabel = !Number.isNaN(t) ? fmtAge(t) : d.utc || 'None yet';
-    const summary = String(d.summary || '').trim();
+    // Empty summary: match delivery preview "None yet" (omit left a gap vs preview).
+    const summaryRaw = String(d.summary || '').trim() || 'None yet';
+    const summary = summaryRaw.slice(0, 40);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ops-row';
-    const metaBits = [id, ageLabel, summary.slice(0, 40)].filter(Boolean);
+    const metaBits = [id, ageLabel, summary];
     btn.innerHTML =
         `<div><div class="ops-row-title">Last delivery</div>` +
-        `<div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}${summary.length > 40 ? '…' : ''}</div></div>`;
+        `<div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}${summaryRaw.length > 40 ? '…' : ''}</div></div>`;
     btn.addEventListener('click', () => {
         body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
         btn.classList.add('is-selected');
@@ -7061,7 +7067,8 @@ function formatOpsSchedulePreview(s) {
 }
 
 function formatOpsDeliveryPreview(d) {
-    const id = d?.schedule_id || 'schedule';
+    // Empty schedule id: match schedule list "Unknown" (bare "schedule" reads like missing data).
+    const id = String(d?.schedule_id || '').trim() || 'Unknown';
     // Empty when: match health Last delivery "None yet" (bare em dash reads like missing data).
     const utc = d?.utc || 'None yet';
     const t = d?.utc ? Date.parse(d.utc) : NaN;
@@ -7109,7 +7116,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 // Empty when / next: match health Next schedule "None yet".
                 const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : 'None yet';
                 const next = s.next_run || s.nextRun || 'None yet';
-                const task = String(s.task || '');
+                // Empty task: match schedule preview "None yet" (bare blank meta reads like missing data).
+                const task = String(s.task || '').trim() || 'None yet';
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
                 setOpsRowCopyValue(btn, id === 'Unknown' ? '' : s.id);
                 btn.title = 'Click to preview · c copies id · Enter / double-click to load task into AI Chat';
@@ -7150,9 +7158,12 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const t = d.utc ? Date.parse(d.utc) : NaN;
                 // Empty when: match health Last delivery "None yet".
                 const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || 'None yet';
-                const summary = String(d.summary || '');
-                btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
-                setOpsRowCopyValue(btn, d.schedule_id);
+                // Empty summary: match delivery preview "None yet" (bare blank after · reads like missing data).
+                const summary = String(d.summary || '').trim() || 'None yet';
+                // Empty schedule id: match schedule list "Unknown" (bare "schedule" reads like missing data).
+                const delId = String(d.schedule_id || '').trim() || 'Unknown';
+                btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(delId)}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
+                setOpsRowCopyValue(btn, delId === 'Unknown' ? '' : d.schedule_id);
                 btn.title = 'Click to preview · c copies id · Enter / double-click to load summary into AI Chat';
                 const openPreview = () => {
                     delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1235] - 2026-09-22
+
+### Changed
+- **Agent Ops empty schedule task / delivery summary** — When a schedule has no task or a delivery has no summary, Overview and Schedules list rows say **None yet** (not a blank after ·). Preview already matched; lists now match too. Real text still shows when set.
+
 ## [0.1.1234] - 2026-09-22
 
 ### Changed
