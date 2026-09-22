@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1240] - 2026-09-22
+
+### Changed
+- **Agent Ops health Digest empty age** — When Digest insights load but `digest_generated_at` is missing or unparseable, health says **queue clear / nothing stale · None yet** (not a thinner line with the age omitted). Real ages still show when set. Matches Last delivery / Next schedule preview parity.
+
 ## [0.1.1239] - 2026-09-22
 
 ### Changed

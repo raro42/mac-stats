@@ -5497,7 +5497,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     if (insights) {
         const open = insights.digest_open_count ?? 0;
         const stale = insights.digest_stale_count ?? 0;
-        let age = '';
+        // Empty digest age: match Last delivery "None yet" (omit left a thinner open/stale line).
+        let age = ' · None yet';
         if (insights.digest_generated_at) {
             const t = Date.parse(insights.digest_generated_at);
             if (!Number.isNaN(t)) age = ` · ${fmtAge(t)}`;
