@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1237] - 2026-09-22
+
+### Changed
+- **Agent Ops empty Live / Sessions preview** — When a Live or Sessions file row has no preview snippet, the UI says **None yet** (not a thinner meta with the preview omitted). Real previews still show when set.
+
 ## [0.1.1236] - 2026-09-22
 
 ### Changed

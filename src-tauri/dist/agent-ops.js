@@ -5228,6 +5228,12 @@ function fmtCountLabel(n, unit) {
     return `${Math.floor(v)} ${unit}`;
 }
 
+/** Empty row preview snippet: match schedule task "None yet" (omit left a thinner meta). */
+function fmtPreviewSnippet(preview) {
+    const t = String(preview || '').trim();
+    return t || 'None yet';
+}
+
 function fmtAge(ms) {
     // Empty age: match run meta "Unknown" (bare blank / em dash reads like missing data).
     if (!ms) return 'Unknown';
@@ -6591,7 +6597,9 @@ function renderOverviewLive(rows, insights) {
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
         // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
         const msgs = fmtCountLabel(r.message_count, 'msgs');
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty preview: match schedule task "None yet" (omit left thinner meta).
+        const previewBit = fmtPreviewSnippet(r.preview);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(previewBit)}</div></div>`;
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -9066,7 +9074,9 @@ function renderOpsLive(rows) {
         const sessionId = String(r.session_id || '').trim() || 'Unknown';
         // Empty message count: match size "Unknown" (bare undefined msgs reads like missing data).
         const msgs = fmtCountLabel(r.message_count, 'msgs');
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        // Empty preview: match schedule task "None yet" (omit left thinner meta).
+        const previewBit = fmtPreviewSnippet(r.preview);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(source)} · ${escapeHtml(sessionId)}</div><div class="ops-row-meta">${escapeHtml(msgs)} · ${escapeHtml(activity)} · ${escapeHtml(previewBit)}</div></div>`;
         setOpsRowCopyValue(btn, r.session_id || sessionId);
         const openLive = async () => {
             try {
@@ -9138,7 +9148,9 @@ function renderOpsSessionFiles(files) {
         // Empty source / age / title: match run meta "Unknown".
         const sourceHint = String(f.source_hint || '').trim() || 'Unknown';
         const fileTitle = String(f.slug || f.name || '').trim() || 'Unknown';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
+        // Empty preview: match schedule task "None yet" (omit left thinner meta).
+        const previewBit = fmtPreviewSnippet(f.preview);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(fileTitle)}</div><div class="ops-row-meta">${escapeHtml(sourceHint)} · ${escapeHtml(fmtBytes(f.size_bytes))} · ${escapeHtml(fmtAge(f.modified_ms))} · ${escapeHtml(previewBit)}</div></div>`;
         setOpsRowCopyValue(btn, fileTitle === 'Unknown' ? '' : fileTitle);
         const openFile = async () => {
             try {
