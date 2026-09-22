@@ -5257,7 +5257,8 @@ function fmtUptimeSecs(secs) {
 
 function fmtProcessUptime(secs) {
     const s = Number(secs) || 0;
-    if (s <= 0) return '';
+    // Empty uptime: match Digest empty age "None yet" (omit left a thinner Version line).
+    if (s <= 0) return ' · None yet';
     return ` · ${fmtUptimeSecs(s)}`;
 }
 

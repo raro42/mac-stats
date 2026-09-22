@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1241] - 2026-09-22
+
+### Changed
+- **Agent Ops health Version empty uptime** — When Version is known but process uptime is missing or zero, health says **v0.1.x · None yet** (not a thinner Version-only line). Real uptimes still show when set. Matches Digest empty age parity.
+
 ## [0.1.1240] - 2026-09-22
 
 ### Changed
