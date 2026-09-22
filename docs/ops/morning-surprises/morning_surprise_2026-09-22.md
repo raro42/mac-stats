@@ -6,7 +6,8 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 
 | Version | What got better |
 |---------|-----------------|
-| **v0.1.1237** | Live / Sessions empty **preview** say **None yet** (not omitted thinner meta) |
+| **v0.1.1238** | Health **Next schedule** empty **task preview** say **None yet** (not a bare ETA) |
+| v0.1.1237 | Live / Sessions empty **preview** say **None yet** (not omitted thinner meta) |
 | v0.1.1236 | Knowledge / Sessions / Live empty **size**, **lines**, or **msgs** say **Unknown** (not `undefined` / `NaN MB`) |
 | v0.1.1235 | Schedule / delivery empty **task** or **summary** say **None yet** on Overview + Schedules lists |
 | v0.1.1234 | Delivery empty schedule id → **Unknown** (not placeholder `schedule`) |
@@ -16,15 +17,14 @@ Overnight Track B (autoresearch) kept shipping Agent Ops empty-calm polish while
 | v0.1.1230 | Knowledge/Sessions empty file title → **Unknown** |
 | v0.1.1229 | Agents empty name/slug → **Unknown** |
 | v0.1.1228 | Live empty source/session id → **Unknown** |
-| v0.1.1227 | Sessions/Knowledge empty meta → **Unknown** |
 
 ## Context
 
 - Digester open: empty all night (instant lane filters noise).
-- Design review: `feature-agent-ops.png` in grace (~6.35d); empty-calm list parity was better fuel than a quiet tick.
+- Design review: `feature-agent-ops.png` in grace (~6.37d); empty-calm list parity was better fuel than a quiet tick.
 - Debug.log: no ERROR/WARN/panic clusters in scan windows.
 - Ratchet: keeps only (no discards this window).
 
 ## For Ralf
 
-Open Agent Ops → Overview Live or Sessions. Rows that miss a preview snippet now say **None yet** instead of dropping that bit from the meta line.
+Open Agent Ops → health **Next schedule**. When the next job has an ETA but no task preview, the line now says **5m · None yet** instead of a bare ETA.
