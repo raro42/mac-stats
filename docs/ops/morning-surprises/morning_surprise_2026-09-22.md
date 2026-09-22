@@ -1,11 +1,13 @@
 # Morning surprise — 2026-09-22
 
-Overnight Track B kept shipping empty/unloaded calm (Agent Ops Insights Candidates + identity/meta placeholders).
+Overnight Track B kept shipping empty/unloaded calm (Agent Ops delivery schedule id + Insights Slowest/Candidates placeholders).
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
+| **v0.1.1234** | Delivery empty schedule id say **Unknown** (not placeholder `schedule`) |
+| **v0.1.1233** | Insights Slowest empty wall / lane / question say **Unknown** / **None yet** (not `undefined ms` / blank) |
 | **v0.1.1232** | Insights Candidates empty kind / reason / question say **Unknown** / **None yet** (not blank) |
 | **v0.1.1231** | Runs / Schedules empty question / id say **None yet** / **Unknown** (not `(empty)` / `(no id)`) |
 | **v0.1.1230** | Knowledge / Sessions empty file title say **Unknown** (not blank) |
@@ -24,7 +26,7 @@ Overnight Track B kept shipping empty/unloaded calm (Agent Ops Insights Candidat
 
 ## Fuel
 
-Digester open stayed empty. Design review grace on `feature-agent-ops`. Standing backlog empty-state track (Candidates placeholders after Runs/Schedules).
+Digester open stayed empty. Design review grace on `feature-agent-ops`. Standing backlog empty-state track (delivery schedule id after Slowest/Candidates).
 
 ## Note
 
