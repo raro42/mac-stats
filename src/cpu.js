@@ -19080,6 +19080,10 @@ async function refreshDiskCleanupPanel(opts) {
           : null;
       scopesEl.innerHTML = scopes
         .map((s, idx) => {
+          // Empty label / kind: match Agents / Top Processes "Unknown".
+          const scopeLabel =
+            String(s.label || '').trim() || 'Unknown';
+          const scopeKind = String(s.kind || '').trim() || 'Unknown';
           const pathHint =
             s.path ||
             (s.kind === 'temp'
@@ -19088,7 +19092,7 @@ async function refreshDiskCleanupPanel(opts) {
                 ? 'docker image prune -f'
                 : s.kind === 'tmutil-thin'
                   ? 'tmutil thinlocalsnapshots'
-                  : s.kind);
+                  : scopeKind);
           const pathEsc = escapeDiskHtml(pathHint);
           const ageLocked =
             s.kind === 'mac-stats' ||
@@ -19105,9 +19109,9 @@ async function refreshDiskCleanupPanel(opts) {
             ? '↑↓ / j k · PgUp/PgDn select · click path / c copies · Space toggle enable · R toggle recurse · Esc clears'
             : '↑↓ / j k · PgUp/PgDn select · click path / c copies · Space toggle enable · R toggle recurse · Delete removes custom · Esc clears';
           return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" data-copy-path="${pathEsc}" role="option" title="${rowTitle}">
-            <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
+            <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${escapeDiskHtml(scopeLabel)}" />
             <div class="disk-cleanup-scope-main">
-              <div class="disk-cleanup-scope-title">${s.label} <span class="disk-cleanup-scope-kind">(${s.kind})</span></div>
+              <div class="disk-cleanup-scope-title">${escapeDiskHtml(scopeLabel)} <span class="disk-cleanup-scope-kind">(${escapeDiskHtml(scopeKind)})</span></div>
               <button type="button" class="disk-cleanup-scope-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>
             </div>
             <input type="number" min="1" max="3650" data-scope-days="${idx}" value="${ageVal}" ${ageDisabled} title="Max age (days)" placeholder="days" />
@@ -19151,6 +19155,11 @@ async function refreshDiskCleanupPanel(opts) {
           const samples = (c.sampleNames || []).slice(0, 3).join(', ');
           const pathHint = String(c.pathHint || '').trim();
           const pathEsc = escapeDiskHtml(pathHint);
+          // Empty title / policy: match Agents / schedule "Unknown" / "None yet".
+          const catTitle =
+            String(c.label || c.id || '').trim() || 'Unknown';
+          const catPolicy =
+            String(c.policy || '').trim() || 'None yet';
           const title = has
             ? '↑↓ / j k · PgUp/PgDn select · click path / c copies · Enter Clean now · Esc clears'
             : '↑↓ / j k · PgUp/PgDn select · click path / c copies · Enter focuses Clean now · Esc clears';
@@ -19160,18 +19169,18 @@ async function refreshDiskCleanupPanel(opts) {
           const catIdEsc = escapeDiskHtml(String(c.id || ''));
           return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}${isBig ? ' is-big' : ''}" role="option" data-item-idx="${idx}" data-cat-id="${catIdEsc}" data-reclaim-bytes="${bytes}" data-copy-path="${pathEsc}" title="${title}">
             <div class="disk-cleanup-item-head">
-              <span class="disk-cleanup-item-title">${c.label || c.id}</span>
+              <span class="disk-cleanup-item-title">${escapeDiskHtml(catTitle)}</span>
               <span class="disk-cleanup-item-stat">${
                 has
                   ? `${formatDiskBytes(c.bytes || 0)} · ${c.fileCount || 0}`
                   : 'OK'
               }</span>
             </div>
-            <div class="disk-cleanup-item-policy">${c.policy || ''}</div>
+            <div class="disk-cleanup-item-policy">${escapeDiskHtml(catPolicy)}</div>
             ${pathBtn}
             ${
               samples
-                ? `<div class="disk-cleanup-item-samples">${samples}</div>`
+                ? `<div class="disk-cleanup-item-samples">${escapeDiskHtml(samples)}</div>`
                 : ''
             }
           </li>`;
@@ -19199,16 +19208,19 @@ async function refreshDiskCleanupPanel(opts) {
         lastEl.innerHTML =
           '<strong>Last run</strong><br>Not yet this install — will run on launch.';
       } else {
+        // Empty trigger / category label: match Agents "Unknown" (bare ? reads like a bug).
+        const triggerLabel =
+          String(last.trigger || '').trim() || 'Unknown';
         const catBits = (last.categories || [])
           .filter((c) => (c.filesRemoved || 0) > 0 || (c.bytesFreed || 0) > 0)
-          .map(
-            (c) =>
-              `${c.label}: ${c.filesRemoved || 0} / ${formatDiskBytes(c.bytesFreed || 0)}`
-          )
+          .map((c) => {
+            const lab = String(c.label || '').trim() || 'Unknown';
+            return `${escapeDiskHtml(lab)}: ${c.filesRemoved || 0} / ${formatDiskBytes(c.bytesFreed || 0)}`;
+          })
           .join(' · ');
-        lastEl.innerHTML = `<strong>Last run</strong> · ${formatDiskWhen(last.atUtc)} · ${
-          last.trigger || '?'
-        }<br>${
+        lastEl.innerHTML = `<strong>Last run</strong> · ${formatDiskWhen(last.atUtc)} · ${escapeDiskHtml(
+          triggerLabel
+        )}<br>${
           last.note ||
           (last.filesRemoved
             ? `Removed ${last.filesRemoved} · freed ${formatDiskBytes(last.bytesFreed || 0)}${

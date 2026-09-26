@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1244] - 2026-09-26
+
+### Changed
+- **Disk Cleanup empty identity** — When a scope label or kind, category title, last-run trigger, or last-run category label is missing, the UI says **Unknown** (not a blank or `?`). Empty category policy says **None yet**. Real labels still show when set. Matches Top Processes / Agents empty-identity parity. Design review / `feature-disk-cleanup`.
+
 ## [0.1.1243] - 2026-09-26
 
 ### Changed
