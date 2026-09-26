@@ -925,7 +925,10 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   }
   window.__processesTopPid = String(topPid);
   glance.hidden = false;
-  const cpuStr = typeof topCpu === "number" ? `${topCpu.toFixed(1)}%` : "—";
+  const cpuStr =
+    typeof topCpu === "number" && Number.isFinite(topCpu)
+      ? `${topCpu.toFixed(1)}%`
+      : "None yet";
   if (text) text.textContent = `Top CPU · ${topName} ${cpuStr}`;
   const cpuHot =
     typeof topCpu === "number" && topCpu >= PROCESS_HOT_CPU_PCT;
@@ -1123,7 +1126,7 @@ function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
   window.__processesTopRamPid = String(topPid);
   glance.hidden = false;
   const memNum = Number(topMem) || 0;
-  const memStr = memNum > 0 ? formatBytes(memNum) : "—";
+  const memStr = memNum > 0 ? formatBytes(memNum) : "None yet";
   if (text) text.textContent = `Top RAM · ${topName} ${memStr}`;
   // Amber wash when resident ≥ 1 GiB (heavy process).
   const ramHot = memNum >= PROCESS_HOT_RAM_BYTES;
@@ -2391,6 +2394,8 @@ async function refresh() {
         processes.forEach((proc, i) => {
           const isPinned = pinnedNames.includes(proc.name);
           const isHot = isProcessHotMetrics(proc.cpu, proc.gpu, proc.memory);
+          // Empty name: match process details / Agents "Unknown" (bare blank reads like missing data).
+          const procNameDisplay = String(proc.name || "").trim() || "Unknown";
           const row = document.createElement("div");
           row.className =
             "process-row" +
@@ -2412,7 +2417,10 @@ async function refresh() {
           const pinBtn = document.createElement("button");
           pinBtn.type = "button";
           pinBtn.className = "process-pin" + (isPinned ? " is-pinned" : "");
-          pinBtn.setAttribute("aria-label", isPinned ? `Unpin ${proc.name}` : `Pin ${proc.name}`);
+          pinBtn.setAttribute(
+            "aria-label",
+            isPinned ? `Unpin ${procNameDisplay}` : `Pin ${procNameDisplay}`
+          );
           pinBtn.setAttribute("aria-pressed", isPinned ? "true" : "false");
           pinBtn.setAttribute("data-name", proc.name);
           pinBtn.title = isPinned ? "Unpin" : "Pin favorite";
@@ -2424,8 +2432,8 @@ async function refresh() {
           name.setAttribute("data-name", proc.name);
           name.setAttribute("tabindex", "-1");
           name.title = "Click to copy name";
-          name.setAttribute("aria-label", `Copy name ${proc.name}`);
-          name.textContent = proc.name;
+          name.setAttribute("aria-label", `Copy name ${procNameDisplay}`);
+          name.textContent = procNameDisplay;
           
           const usage = document.createElement("div");
           usage.className = "process-usage";
@@ -6135,7 +6143,9 @@ function populateProcessDetailsBody(body, details, pid) {
     const virtualMemoryFormatted = formatBytes(details.virtual_memory);
     const diskReadFormatted = formatBytes(details.disk_read);
     const diskWrittenFormatted = formatBytes(details.disk_written);
-    const name = escapeProcessHtml(details.name);
+    // Empty name / parent / user: match Agents / Live "Unknown" (bare em dash reads like missing data).
+    const nameRaw = String(details.name || "").trim() || "Unknown";
+    const name = escapeProcessHtml(nameRaw);
     const parentName = details.parent_name ? escapeProcessHtml(details.parent_name) : "";
     const userName = details.user_name ? escapeProcessHtml(details.user_name) : "";
     const effectiveUserName = details.effective_user_name
@@ -6186,15 +6196,15 @@ function populateProcessDetailsBody(body, details, pid) {
       <div class="process-detail-section">
         <div class="process-detail-row">
           <span class="process-detail-label">Parent Process</span>
-          <span class="process-detail-value">${parentName ? `${parentName} (PID: ${details.parent_pid})` : "—"}</span>
+          <span class="process-detail-value">${parentName ? `${parentName} (PID: ${details.parent_pid})` : "Unknown"}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">User</span>
-          <span class="process-detail-value">${userName ? `${userName} (${details.user_id})` : (details.user_id || "—")}</span>
+          <span class="process-detail-value">${userName ? `${userName} (${details.user_id})` : (details.user_id != null && details.user_id !== "" ? String(details.user_id) : "Unknown")}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">Effective User</span>
-          <span class="process-detail-value">${effectiveUserName ? `${effectiveUserName} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
+          <span class="process-detail-value">${effectiveUserName ? `${effectiveUserName} (${details.effective_user_id})` : (details.effective_user_id != null && details.effective_user_id !== "" ? String(details.effective_user_id) : "Unknown")}</span>
         </div>
       </div>
       <div class="process-detail-section">

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1243] - 2026-09-26
+
+### Changed
+- **Top Processes empty identity** — When a process name, parent, user, or effective user is missing, the list and details say **Unknown** (not a blank or `—`). Empty Top CPU / Top RAM glance metrics say **None yet**. Real names and metrics still show when set. Matches Agents / Live empty-identity parity. Design review / `feature-processes`.
+
 ## [0.1.1242] - 2026-09-26
 
 ### Changed
