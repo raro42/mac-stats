@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+
+## [0.1.1249] - 2026-09-26
+
+### Changed
+- **Power strip empty Heat · Up · RAM · SSD** — When thermal, uptime, RAM, or SSD is missing, the power-strip chips and Details rows say **None yet** (not **—**). Matches Details glance empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1248] - 2026-09-26
 
 ### Changed

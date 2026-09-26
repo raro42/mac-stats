@@ -1804,7 +1804,8 @@ async function refresh() {
       const thermalStripEl = document.getElementById("thermal-strip-value");
       const thermalStripCell = document.getElementById("thermal-strip");
       const thermalLevel = thermalLevelFromCpuDetails(data);
-      const thermalStripText = thermalLevel || "—";
+      // Empty Heat: match Details glance "None yet" (bare em dash reads like missing data).
+      const thermalStripText = thermalLevel || "None yet";
       if (thermalStripEl && thermalStripEl.textContent !== thermalStripText) {
         scheduleDOMUpdate(() => {
           thermalStripEl.textContent = thermalStripText;
@@ -1831,7 +1832,7 @@ async function refresh() {
         thermalStripCell.title = title;
         thermalStripCell.setAttribute(
           "aria-label",
-          `Thermal ${thermalStripText === "—" ? "unavailable" : thermalStripText}. ${title}`
+          `Thermal ${thermalStripText === "None yet" ? "unavailable" : thermalStripText}. ${title}`
         );
       }
     }
@@ -2032,7 +2033,8 @@ async function refresh() {
       typeof data.uptime_secs === "number" && Number.isFinite(data.uptime_secs)
         ? data.uptime_secs
         : 0;
-    const uptimeFormatted = uptimeSecs > 0 ? formatUptime(uptimeSecs) : "—";
+    // Empty Up: match Details glance "None yet" (bare em dash reads like missing data).
+    const uptimeFormatted = uptimeSecs > 0 ? formatUptime(uptimeSecs) : "None yet";
     if (uptimeEl && uptimeEl.textContent !== uptimeFormatted) {
       scheduleDOMUpdate(() => {
         uptimeEl.textContent = uptimeFormatted;
@@ -2050,7 +2052,7 @@ async function refresh() {
       uptimeStripCell.title = title;
       uptimeStripCell.setAttribute(
         "aria-label",
-        `Uptime ${uptimeFormatted === "—" ? "unavailable" : uptimeFormatted}. ${title}`
+        `Uptime ${uptimeFormatted === "None yet" ? "unavailable" : uptimeFormatted}. ${title}`
       );
     }
 
@@ -2068,9 +2070,10 @@ async function refresh() {
           : null;
       const used = Number(data.ram_used_bytes) || 0;
       const total = Number(data.ram_total_bytes) || 0;
-      const pctText = pct != null ? `${pct.toFixed(0)}%` : "—";
-      const usedText = used > 0 ? formatBytes(used) : "—";
-      const totalText = total > 0 ? formatBytes(total) : "—";
+      // Empty RAM: match Details glance "None yet" (bare em dash reads like missing data).
+      const pctText = pct != null ? `${pct.toFixed(0)}%` : "None yet";
+      const usedText = used > 0 ? formatBytes(used) : "None yet";
+      const totalText = total > 0 ? formatBytes(total) : "None yet";
       if (ramPctEl && ramPctEl.textContent !== pctText) {
         scheduleDOMUpdate(() => {
           ramPctEl.textContent = pctText;
@@ -2095,7 +2098,7 @@ async function refresh() {
         const hot = pct != null && pct >= 85;
         ramStripCell.classList.toggle("is-hot", hot);
         const extra =
-          usedText !== "—" && totalText !== "—"
+          usedText !== "None yet" && totalText !== "None yet"
             ? ` (${usedText} of ${totalText})`
             : "";
         const title = `Show RAM in Details${extra}`;
@@ -2113,7 +2116,8 @@ async function refresh() {
         typeof data.disk_percent === "number" && Number.isFinite(data.disk_percent)
           ? data.disk_percent
           : null;
-      const diskPctText = diskPct != null ? `${diskPct.toFixed(0)}%` : "—";
+      // Empty SSD: match Details glance "None yet" (bare em dash reads like missing data).
+      const diskPctText = diskPct != null ? `${diskPct.toFixed(0)}%` : "None yet";
       if (diskStripEl && diskStripEl.textContent !== diskPctText) {
         scheduleDOMUpdate(() => {
           diskStripEl.textContent = diskPctText;
