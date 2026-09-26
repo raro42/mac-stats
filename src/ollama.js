@@ -831,6 +831,12 @@ function truncateChatGlancePreview(text, maxLen = 48) {
   return `${raw.slice(0, maxLen - 1).trim()}…`;
 }
 
+/** Empty glance preview: match Agent Ops Live/Sessions "None yet" (omit hid the strip). */
+function chatGlancePreviewOrNone(preview) {
+  const t = String(preview || '').trim();
+  return t || 'None yet';
+}
+
 /** Connection snapshot for the model glance (updated by checkOllamaConnection). */
 let chatModelGlanceState = { status: 'unknown', model: '', circuitOpen: false };
 
@@ -967,8 +973,8 @@ function syncOllamaCollapsedGlance() {
     wash = 'is-active';
   } else if (errCount > 0) {
     const errLabel = errCount === 1 ? '1 failed' : `${errCount} failed`;
-    if (turns && preview) {
-      line = `${errLabel} · ${preview}`;
+    if (turns) {
+      line = `${errLabel} · ${chatGlancePreviewOrNone(preview)}`;
     } else {
       line = `Errors · ${errLabel}`;
     }
@@ -976,12 +982,12 @@ function syncOllamaCollapsedGlance() {
   } else if (status === 'connected' && modelName) {
     const answer = getLastAssistantAnswerText();
     const answerPreview = getChatAnswerGlancePreview();
-    if (answer && answerPreview && !isChatErrorText(answer)) {
-      line = `Last answer · ${answerPreview}`;
+    if (answer && !isChatErrorText(answer)) {
+      line = `Last answer · ${chatGlancePreviewOrNone(answerPreview)}`;
       wash = 'is-online';
-    } else if (turns && preview) {
+    } else if (turns) {
       const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
-      line = `${turnLabel} · ${preview}`;
+      line = `${turnLabel} · ${chatGlancePreviewOrNone(preview)}`;
       wash = 'is-online';
     } else if (modelName && !turns) {
       line = `Ready · try a starter · ${modelName}`;
@@ -990,9 +996,9 @@ function syncOllamaCollapsedGlance() {
       line = 'Ready · pick a model';
       wash = 'is-online';
     }
-  } else if (turns && preview) {
+  } else if (turns) {
     const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
-    line = `${turnLabel} · ${preview}`;
+    line = `${turnLabel} · ${chatGlancePreviewOrNone(preview)}`;
     wash = 'is-online';
   } else if (modelName) {
     line = `Ready · try a starter · ${modelName}`;
@@ -1330,8 +1336,9 @@ function applyChatTurnGlanceState() {
   if (!glance) return;
   const text = document.getElementById('chat-turn-glance-text');
   const turns = countChatTurns();
-  const preview = getChatTurnGlancePreview();
-  if (!turns || !preview) {
+  const rawPreview = getChatTurnGlancePreview();
+  const preview = chatGlancePreviewOrNone(rawPreview);
+  if (!turns) {
     glance.hidden = true;
     glance.classList.remove('is-active', 'is-ok');
     return;
@@ -1340,7 +1347,7 @@ function applyChatTurnGlanceState() {
   const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
   if (text) {
     text.textContent = chatSendInFlight
-      ? `Sending · ${preview}`
+      ? `Sending · ${rawPreview || 'wait'}`
       : `${turnLabel} · ${preview}`;
   }
   glance.classList.toggle('is-active', chatSendInFlight);
@@ -1786,8 +1793,8 @@ function applyChatAnswerGlanceState() {
   if (glance.classList.contains('is-just-copied') && glance._answerCopiedTimer) return;
   const text = document.getElementById('chat-answer-glance-text');
   const answer = getLastAssistantAnswerText();
-  const preview = getChatAnswerGlancePreview();
-  if (!answer || !preview || chatSendInFlight) {
+  const preview = chatGlancePreviewOrNone(getChatAnswerGlancePreview());
+  if (!answer || chatSendInFlight) {
     glance.hidden = true;
     glance.classList.remove('has-answer', 'has-errors');
     return;
@@ -2027,8 +2034,8 @@ function applyChatOfflineAttentionGlanceState() {
         return;
       }
       const answer = getLastAssistantAnswerText();
-      const answerPreview = getChatAnswerGlancePreview();
-      if (answer && answerPreview && !isChatErrorText(answer)) {
+      const answerPreview = chatGlancePreviewOrNone(getChatAnswerGlancePreview());
+      if (answer && !isChatErrorText(answer)) {
         glance.hidden = false;
         clearModeClasses();
         glance.classList.add('is-last-answer');

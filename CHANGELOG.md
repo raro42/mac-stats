@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1242] - 2026-09-26
+
+### Changed
+- **AI Chat empty glance preview** — When a turn or last answer exists but the glance preview is blank (for example screenshot-only text), the UI says **None yet** (not a hidden glance or a thinner Ready line). Real previews still show when set. Matches Agent Ops Live/Sessions empty-preview parity. Design review / `feature-ai-chat`.
+
 ## [0.1.1241] - 2026-09-22
 
 ### Changed
