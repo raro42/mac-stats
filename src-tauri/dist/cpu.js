@@ -2176,7 +2176,8 @@ async function refresh() {
       applyDetailsCollapsedGlanceState({
         load1: glanceLoad1,
         ramPct: glanceRam,
-        uptime: glanceUpSecs > 0 ? formatUptime(glanceUpSecs) : "—",
+        // Empty uptime: match Top Processes "None yet" (bare em dash reads like missing data).
+        uptime: glanceUpSecs > 0 ? formatUptime(glanceUpSecs) : "None yet",
         waiting: glanceLoad1 == null && glanceRam == null && glanceUpSecs <= 0,
       });
       applyDetailsHotAttentionGlanceState({
@@ -12132,13 +12133,18 @@ function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
     return;
   }
   glance.hidden = false;
+  // Empty Load / RAM / Up: match Top Processes "None yet" (bare em dash reads like missing data).
   const loadStr =
-    typeof load1 === "number" && Number.isFinite(load1) ? load1.toFixed(2) : "—";
+    typeof load1 === "number" && Number.isFinite(load1)
+      ? load1.toFixed(2)
+      : "None yet";
   const ramStr =
     typeof ramPct === "number" && Number.isFinite(ramPct)
       ? `${Math.round(ramPct)}%`
-      : "—";
-  const upStr = uptime && String(uptime).trim() ? String(uptime).trim() : "—";
+      : "None yet";
+  const upRaw = uptime && String(uptime).trim() ? String(uptime).trim() : "";
+  const upStr =
+    upRaw && upRaw !== "—" && upRaw !== "None yet" ? upRaw : "None yet";
   if (text) text.textContent = `Load · ${loadStr} · RAM · ${ramStr} · Up · ${upStr}`;
   const loadOk =
     typeof load1 === "number" && Number.isFinite(load1) && load1 < DETAILS_HOT_LOAD;
@@ -12178,15 +12184,18 @@ function refreshDetailsCollapsedGlanceFromDom() {
     ramRaw != null && ramRaw.endsWith("%")
       ? Number(ramRaw.replace("%", ""))
       : NaN;
+  const upEmpty =
+    !upRaw || upRaw === "—" || upRaw === "None yet" || upRaw === "0h";
+  const ramEmpty = !ramRaw || ramRaw === "—" || ramRaw === "None yet";
   const waiting =
-    (!Number.isFinite(load1) && (!upRaw || upRaw === "—" || upRaw === "0h")) ||
-    (loadRaw === "0.0" && (!ramRaw || ramRaw === "—") && (!upRaw || upRaw === "0h"));
+    (!Number.isFinite(load1) && upEmpty) ||
+    (loadRaw === "0.0" && ramEmpty && upEmpty);
   // Prefer live metrics when any row has real data.
   if (
     waiting &&
     !Number.isFinite(load1) &&
     !Number.isFinite(ramPct) &&
-    (!upRaw || upRaw === "—" || upRaw === "0h")
+    upEmpty
   ) {
     applyDetailsCollapsedGlanceState({
       load1: null,
@@ -12202,7 +12211,7 @@ function refreshDetailsCollapsedGlanceFromDom() {
   applyDetailsCollapsedGlanceState({
     load1: L,
     ramPct: R,
-    uptime: upRaw && upRaw !== "—" ? upRaw : null,
+    uptime: upRaw && !upEmpty ? upRaw : null,
     waiting: false,
   });
   applyDetailsHotAttentionGlanceState({ load1: L, ramPct: R });

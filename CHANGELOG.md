@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1248] - 2026-09-26
+
+### Changed
+- **Details collapsed glance empty metrics** — When Load, RAM, or uptime is missing, the Details keep-header glance says **None yet** (not **—**). Matches Top Processes empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1247] - 2026-09-26
 
 ### Changed
