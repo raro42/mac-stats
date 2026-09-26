@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1252] - 2026-09-27
+
+### Changed
+- **Chip · CPU/GPU subtext · Details RAM/Up first paint** — Before metrics arrive, the chip subtitle says **Unknown** (not **—**). CPU/GPU ring subtexts and Details RAM / uptime say **None yet** (not **—** / **0h**). Empty chip name stays **Unknown** after load. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1251] - 2026-09-26
 
 ### Changed

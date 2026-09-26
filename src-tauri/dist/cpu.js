@@ -386,12 +386,14 @@ function updateValue(element, newValue, previousValue, formatter) {
 // Update chip info from data
 function updateChipInfo(chipInfo, uptimeSecs) {
   const chipInfoEl = document.getElementById('chip-info');
-  if (chipInfoEl && chipInfo) {
-    let displayText = chipInfo;
-    if (uptimeSecs !== undefined && uptimeSecs > 0) {
-      const uptimeFormatted = formatUptime(uptimeSecs);
-      displayText = `${chipInfo} · ${uptimeFormatted}`;
-    }
+  if (!chipInfoEl) return;
+  // Empty chip name: match Agents "Unknown" (bare em dash reads like missing data).
+  const chip = String(chipInfo || '').trim() || 'Unknown';
+  let displayText = chip;
+  if (uptimeSecs !== undefined && uptimeSecs > 0) {
+    displayText = `${chip} · ${formatUptime(uptimeSecs)}`;
+  }
+  if (chipInfoEl.textContent !== displayText) {
     chipInfoEl.textContent = displayText;
   }
 }
