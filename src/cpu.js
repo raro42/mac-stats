@@ -1044,7 +1044,8 @@ function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
   window.__processesTopGpuPid = String(topPid);
   glance.hidden = false;
   const gpuNum = Number(topGpu) || 0;
-  const gpuStr = gpuNum >= 0.1 ? `${gpuNum.toFixed(1)}%` : "—";
+  // Empty GPU: match Top CPU / Top RAM "None yet" (bare em dash reads like missing data).
+  const gpuStr = gpuNum >= 0.1 ? `${gpuNum.toFixed(1)}%` : "None yet";
   if (text) text.textContent = `Top GPU · ${topName} ${gpuStr}`;
   const gpuHot = gpuNum >= PROCESS_HOT_GPU_PCT;
   glance.classList.toggle("is-hot", gpuHot);
@@ -2463,7 +2464,9 @@ async function refresh() {
           gpuFill.style.width = `${Math.min(100, gpuPct)}%`;
           const gpuPercent = document.createElement("div");
           gpuPercent.className = "process-percent";
-          gpuPercent.textContent = gpuPct >= 0.1 ? `${gpuPct.toFixed(1)}%` : "—";
+          // Empty GPU: match Top GPU glance "None yet" (bare em dash reads like missing data).
+          gpuPercent.textContent =
+            gpuPct >= 0.1 ? `${gpuPct.toFixed(1)}%` : "None yet";
           gpuBar.appendChild(gpuFill);
           gpuUsage.appendChild(gpuBar);
           gpuUsage.appendChild(gpuPercent);
@@ -6182,7 +6185,7 @@ function populateProcessDetailsBody(body, details, pid) {
           <span class="process-detail-label">Current CPU</span>
           <span class="process-detail-value">${details.cpu.toFixed(1)}%</span>
           <span class="process-detail-label">Current GPU</span>
-          <span class="process-detail-value">${(Number(details.gpu) || 0) >= 0.1 ? `${Number(details.gpu).toFixed(1)}%` : "—"}</span>
+          <span class="process-detail-value">${(Number(details.gpu) || 0) >= 0.1 ? `${Number(details.gpu).toFixed(1)}%` : "None yet"}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">Total CPU Time</span>

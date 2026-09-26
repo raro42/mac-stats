@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1247] - 2026-09-26
+
+### Changed
+- **Top Processes Top GPU empty metric** — When GPU is below 0.1%, Top GPU glance, the process list GPU column, and Current GPU in details say **None yet** (not **—**). Matches Top CPU / Top RAM empty-metric calm. Design review / `feature-processes`.
+
 ## [0.1.1246] - 2026-09-26
 
 ### Changed
