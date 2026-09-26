@@ -1,20 +1,18 @@
 # Morning surprise — 2026-09-26
 
-Overnight Track B opened with a **due** design review on AI Chat (screen ~43 days stale) and shipped empty-glance calm.
+Overnight Track B kept product work for Ralf.
 
-## Shipped tonight (highlights)
+## Shipped
 
-| Version | What got better |
-|---------|-----------------|
-| **v0.1.1242** | AI Chat empty **glance preview** say **None yet** (turn / last-answer / collapsed / attention) — not a hidden strip or a thinner Ready line |
+| Version | What |
+|---------|------|
+| **v0.1.1243** | Top Processes empty identity — missing name / parent / user say **Unknown**; empty Top CPU / Top RAM glance metrics say **None yet** (Agents / Live parity). Design review / `feature-processes`. |
+| **v0.1.1242** | AI Chat empty glance preview say **None yet** (Live / Sessions parity). Design review / `feature-ai-chat`. |
 
-## Context
+## Tried / notes
 
-- Digester open: design-review candidate only (runs quiet after instant filters).
-- Design review: `feature-ai-chat.png` STALE (43.3d) — polish shipped; PNG recapture deferred (Screen Recording TCC); grace marked.
-- Debug.log: idle-thought Ollama timeout WARN (soft path already); no new ERROR/panic clusters.
-- Ratchet: keep @ `7ca734e`.
+- Digester Slowest empty after filters; fuel was overnight design review (stale `feature-processes.png`).
+- Screenshot recapture deferred when Screen Recording TCC blocks `screencapture -l`; polish grace marked.
+- Debug.log: quiet in the scan window.
 
-## For Ralf
-
-Open AI Chat after a screenshot-only turn (or any turn whose glance text strips to blank). The turn / last-answer glances now say **· None yet** instead of vanishing. Same calm language as Agent Ops Live / Sessions empty previews.
+Generated: 2026-09-26T20:32:05
