@@ -1707,10 +1707,11 @@ async function refresh() {
       if (!data.can_read_temperature) {
         failedAttempts.temperature++;
         const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
-        if (currentDisplay !== "—") {
+        // Empty Temp ring: match Power / Heat "None yet" (bare em dash reads like missing data).
+        if (currentDisplay !== "None yet") {
           scheduleDOMUpdate(() => {
-            tempEl.innerHTML = "—";
-            if (tempSubtext) tempSubtext.textContent = "—";
+            tempEl.innerHTML = "None yet";
+            if (tempSubtext) tempSubtext.textContent = "None yet";
           });
         }
         // Only show hint after multiple failed attempts
@@ -1736,8 +1737,15 @@ async function refresh() {
             : "";
           if (currentText !== numberText) {
             scheduleDOMUpdate(() => {
-              if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
-                tempEl.firstChild.textContent = numberText;
+              // Only mutate in place when the first child is already a bare number
+              // (empty "None yet" / em dash are text nodes too — rebuild with unit).
+              const first = tempEl.firstChild;
+              if (
+                first &&
+                first.nodeType === 3 &&
+                /^\d+$/.test((first.textContent || "").trim())
+              ) {
+                first.textContent = numberText;
               } else {
                 tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
               }
@@ -1758,14 +1766,15 @@ async function refresh() {
         } else if (tempSubtext) {
           // Capability OK but no sample yet — stay quiet, no false "SMC: No data".
           const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
-          if (currentDisplay !== "—") {
+          // Empty Temp ring: match Power / Heat "None yet".
+          if (currentDisplay !== "None yet") {
             scheduleDOMUpdate(() => {
-              tempEl.innerHTML = "—";
+              tempEl.innerHTML = "None yet";
             });
           }
-          if (tempSubtext.textContent !== "—") {
+          if (tempSubtext.textContent !== "None yet") {
             scheduleDOMUpdate(() => {
-              tempSubtext.textContent = "—";
+              tempSubtext.textContent = "None yet";
             });
           }
         }
@@ -1777,7 +1786,8 @@ async function refresh() {
       ensureTempStrip();
       const tempStripEl = document.getElementById("temp-strip-value");
       const tempStripCell = document.getElementById("temp-strip");
-      let tempStripText = "—";
+      // Empty Temp: match Heat / Up "None yet" (bare em dash reads like missing data).
+      let tempStripText = "None yet";
       if (data.can_read_temperature && heldTemp > 0) {
         tempStripText = `${Math.round(heldTemp)}°C`;
       }
@@ -1796,7 +1806,7 @@ async function refresh() {
         tempStripCell.title = title;
         tempStripCell.setAttribute(
           "aria-label",
-          `Temperature ${tempStripText}. ${title}`
+          `Temperature ${tempStripText === "None yet" ? "unavailable" : tempStripText}. ${title}`
         );
       }
       // Thermal / heat band on the power strip (OS thermalState, else °C bands)
@@ -1938,10 +1948,11 @@ async function refresh() {
     
     if (!data.can_read_frequency) {
       failedAttempts.frequency++;
-      if (!freqEl.textContent.includes("—")) {
+      // Empty Freq ring: match Temp / Power "None yet" (bare em dash reads like missing data).
+      if (!freqEl.textContent.includes("None yet")) {
         scheduleDOMUpdate(() => {
-          freqEl.innerHTML = "—<span class=\"metric-unit\">GHz</span>";
-          freqSubtext.textContent = "—";
+          freqEl.innerHTML = "None yet";
+          freqSubtext.textContent = "None yet";
         });
       }
       // Only show hint after multiple failed attempts
@@ -1965,8 +1976,15 @@ async function refresh() {
       if (currentFreqText !== formatted) {
         scheduleDOMUpdate(() => {
           // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
-          if (freqEl.firstChild && freqEl.firstChild.nodeType === 3) {
-            freqEl.firstChild.textContent = formatted;
+          // Only mutate in place when the first child is already a bare number
+          // (empty "None yet" / em dash are text nodes too — rebuild with unit).
+          const first = freqEl.firstChild;
+          if (
+            first &&
+            first.nodeType === 3 &&
+            /^[\d.]+$/.test((first.textContent || "").trim())
+          ) {
+            first.textContent = formatted;
           } else {
             freqEl.innerHTML = `${formatted}<span class="metric-unit">GHz</span>`;
           }
@@ -1975,7 +1993,7 @@ async function refresh() {
       }
       // Display P-core and E-core frequencies if available (removed "GHz" to prevent flickering)
       // CRITICAL: Cache last known good values to prevent flickering when values temporarily become 0
-      let subtext = freqSubtext.textContent || "—"; // Keep current value if no new valid data
+      let subtext = freqSubtext.textContent || "None yet"; // Keep current value if no new valid data
       
       // Only update if we have valid P/E core frequencies (both > 0)
       if (data.p_core_frequency && data.p_core_frequency > 0 && data.e_core_frequency && data.e_core_frequency > 0) {
@@ -1987,7 +2005,7 @@ async function refresh() {
         // Only E-core available
         subtext = `E: ${data.e_core_frequency.toFixed(1)}`;
       }
-      // If neither is available, keep the last known value (don't switch to "—" immediately)
+      // If neither is available, keep the last known value (don't switch to "None yet" immediately)
       // Only update if subtext actually changed to prevent flickering
       if (freqSubtext.textContent !== subtext) {
         scheduleDOMUpdate(() => {
@@ -2001,7 +2019,8 @@ async function refresh() {
       ensureFreqStrip();
       const freqStripEl = document.getElementById("freq-strip-value");
       const freqStripCell = document.getElementById("freq-strip");
-      let freqStripText = "—";
+      // Empty Freq: match Heat / Temp "None yet" (bare em dash reads like missing data).
+      let freqStripText = "None yet";
       if (data.can_read_frequency && typeof data.frequency === "number" && data.frequency > 0) {
         freqStripText = data.frequency.toFixed(1);
       }
@@ -2020,7 +2039,7 @@ async function refresh() {
         freqStripCell.title = title;
         freqStripCell.setAttribute(
           "aria-label",
-          `CPU frequency ${freqStripText === "—" ? "unavailable" : freqStripText + " GHz"}. ${title}`
+          `CPU frequency ${freqStripText === "None yet" ? "unavailable" : freqStripText + " GHz"}. ${title}`
         );
       }
 
@@ -2944,7 +2963,7 @@ function metricValueCopyText(el) {
   if (!el) return '';
   let raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
   if (!raw || raw === '—' || raw.startsWith('—')) return '';
-  if (/^(N\/A|--|–)$/i.test(raw)) return '';
+  if (/^(N\/A|--|–|None yet)$/i.test(raw)) return '';
   if (/^--\s*W$/i.test(raw) || /^–\s*W$/i.test(raw)) return '';
   // Prefer a space before unit when the unit is a sibling span (GHz / % / °C).
   const unit = el.querySelector?.('.metric-unit');
@@ -6538,7 +6557,8 @@ function updateBatteryPower(cpuDetails) {
       if (totalPower > 0) {
         powerValue.textContent = `${totalPower.toFixed(1)} W`;
       } else {
-        powerValue.textContent = '-- W';
+        // Empty Power: match Heat / Temp "None yet" (bare -- W reads like missing data).
+        powerValue.textContent = 'None yet';
       }
     }
     applyPowerChipCalm(totalPower);
@@ -6580,7 +6600,8 @@ function updateBatteryPower(cpuDetails) {
       if (totalPower > 0) {
         powerValue.textContent = `${totalPower.toFixed(1)} W`;
       } else {
-        powerValue.textContent = '-- W';
+        // Empty Power: match Heat / Temp "None yet" (bare -- W reads like missing data).
+        powerValue.textContent = 'None yet';
       }
     }
     applyPowerChipCalm(totalPower);

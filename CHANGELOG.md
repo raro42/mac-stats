@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1250] - 2026-09-26
+
+### Changed
+- **Temp · Freq rings + Power empty** — When temperature or frequency is unavailable, the ring value and subtext say **None yet** (not **—**). When combined CPU+GPU power is missing, the power strip says **None yet** (not **-- W**). Matches Heat / Up / RAM empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1249] - 2026-09-26
 
 ### Changed
