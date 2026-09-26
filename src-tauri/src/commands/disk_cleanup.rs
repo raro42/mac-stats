@@ -406,12 +406,20 @@ fn default_scopes() -> Vec<DiskCleanupScope> {
             builtin: true,
         },
         // Weekly disk-full cause: incremental Rust debug trees (see docs/ops/disk-weekly-reclaim.md).
+        // Overnight loop also runs cargo clean once per night; these scopes are the daytime safety net.
         rebuild_scope(
             "rust-debug-mac-stats",
             "Rust debug (mac-stats)",
             "~/projects/mac-stats/src-tauri/target/debug",
             true,
             20 * GIB,
+        ),
+        rebuild_scope(
+            "rust-release-mac-stats",
+            "Rust release (mac-stats)",
+            "~/projects/mac-stats/src-tauri/target/release",
+            true,
+            10 * GIB,
         ),
         rebuild_scope(
             "cache-uv",

@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1254] - 2026-09-27
+
+### Added
+- **Overnight daily Rust `target/` clean** — First tick after 20:00 runs `scripts/overnight_rust_target_clean.py` (`cargo clean` + snapshot thin). Stops debug+release from growing past 100 GiB across nights. Disk Cleanup also wipes `target/release` at ≥10 GiB. See `docs/ops/disk-weekly-reclaim.md`.
+
+## [0.1.1253] - 2026-09-27
+
+### Changed
+- **Temp ring first paint** — Before a temperature sample arrives, the Temperature ring says **None yet** (not **0°C**). Matches Freq empty-metric calm. Design review / `feature-cpu-metrics`.
+
+
 
 ## [0.1.1252] - 2026-09-27
 

@@ -4,6 +4,10 @@
 Prints AGENT_LOOP_TICK_harness for observability, then **spawns** the Cursor
 `agent` CLI so work actually runs (print-only ticks were a quiet failure mode).
 
+Also runs a **once-per-night Rust `target/` clean** at the first overnight tick
+(`scripts/overnight_rust_target_clean.py`) so debug+release artifacts do not grow
+past 100 GiB across nights. Skips when cargo/rustc is busy or the tree is small.
+
 Also runs a **~23:00 pending git flush** (commit+push dirty safe files) once per night
 so finished work never sits uncommitted. See scripts/overnight_git_flush.py and
 .cursor/rules/no-uncommitted-leftovers.mdc.
@@ -26,6 +30,7 @@ from pathlib import Path
 SENTINEL = "AGENT_LOOP_TICK_harness"
 SLEEP_NOTE = "AGENT_LOOP_SLEEP_harness"
 FLUSH_NOTE = "AGENT_LOOP_FLUSH_git"
+CLEAN_NOTE = "AGENT_LOOP_RUST_CLEAN"
 RELEASE_NOTE = "AGENT_LOOP_RELEASE"
 AGENT_NOTE = "AGENT_LOOP_AGENT"
 START_H, END_H = 20, 6
@@ -36,6 +41,7 @@ AGENT_TIMEOUT_S = 1100
 ROOT = Path(__file__).resolve().parents[1]
 IMPROVEMENTS = Path.home() / ".mac-stats" / "improvements"
 FLUSH_STAMP = IMPROVEMENTS / "overnight_git_flush_date.txt"
+CLEAN_STAMP = IMPROVEMENTS / "overnight_rust_target_clean_date.txt"
 AGENT_LOCK = IMPROVEMENTS / "overnight_agent.pid"
 AGENT_LOG = IMPROVEMENTS / "overnight_agent.log"
 
@@ -90,6 +96,47 @@ def flush_due(now: datetime) -> bool:
     if FLUSH_STAMP.exists() and FLUSH_STAMP.read_text().strip() == today:
         return False
     return True
+
+
+def overnight_night_id(now: datetime) -> str:
+    """Date key for the 20:00–06:00 window (hour < 6 → previous calendar day)."""
+    d = now.date()
+    if now.hour < END_H:
+        d -= timedelta(days=1)
+    return d.isoformat()
+
+
+def rust_clean_due(now: datetime) -> bool:
+    """True once per overnight window (first tick after 20:00)."""
+    if not in_window(now):
+        return False
+    night = overnight_night_id(now)
+    if CLEAN_STAMP.exists() and CLEAN_STAMP.read_text().strip() == night:
+        return False
+    return True
+
+
+def run_rust_target_clean(now: datetime) -> None:
+    """Wipe src-tauri/target once per night before agent ticks pile onto old builds."""
+    script = ROOT / "scripts" / "overnight_rust_target_clean.py"
+    print(
+        f'{CLEAN_NOTE} {{"at":"{now.isoformat(timespec="seconds")}","script":"{script}"}}',
+        flush=True,
+    )
+    proc = subprocess.run(
+        ["python3", str(script)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if proc.stdout:
+        print(proc.stdout.rstrip(), flush=True)
+    if proc.stderr:
+        print(proc.stderr.rstrip(), flush=True)
+    print(
+        f'{CLEAN_NOTE} {{"exit":{proc.returncode}}}',
+        flush=True,
+    )
 
 
 def run_git_flush(now: datetime) -> None:
@@ -270,6 +317,10 @@ def main() -> None:
             wait = seconds_until_window(now)
             time.sleep(min(wait, 1800))
             continue
+
+        # Wipe yesterday's Rust build tree once per night before experiments rebuild.
+        if rust_clean_due(now):
+            run_rust_target_clean(now)
 
         if flush_due(now):
             run_git_flush(now)
