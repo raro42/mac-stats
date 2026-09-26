@@ -1,18 +1,17 @@
 # Morning surprise — 2026-09-26
 
-Overnight Track B kept product work for Ralf.
+Overnight Track B kept product polish (design review fuel; digester open empty).
 
 ## Shipped
 
-| Version | What |
-|---------|------|
-| **v0.1.1243** | Top Processes empty identity — missing name / parent / user say **Unknown**; empty Top CPU / Top RAM glance metrics say **None yet** (Agents / Live parity). Design review / `feature-processes`. |
-| **v0.1.1242** | AI Chat empty glance preview say **None yet** (Live / Sessions parity). Design review / `feature-ai-chat`. |
+- **v0.1.1244** — Disk Cleanup empty identity: missing scope label/kind, category title, last-run trigger/category label say **Unknown**; empty category policy says **None yet** (Top Processes / Agents parity). Design review / `feature-disk-cleanup`.
+- **v0.1.1243** — Top Processes empty identity Unknown / None yet (list + details + Top CPU/RAM glances). Design review / `feature-processes`.
+- **v0.1.1242** — AI Chat empty glance preview say None yet. Design review / `feature-ai-chat`.
 
-## Tried / notes
+## Deferred
 
-- Digester Slowest empty after filters; fuel was overnight design review (stale `feature-processes.png`).
-- Screenshot recapture deferred when Screen Recording TCC blocks `screencapture -l`; polish grace marked.
-- Debug.log: quiet in the scan window.
+- Window-only recapture of `feature-disk-cleanup.png` / `feature-processes.png` / `feature-ai-chat.png` (Screen Recording TCC / `screencapture -l`); polish grace marked when capture fails.
 
-Generated: 2026-09-26T20:32:05
+## Note
+
+Empty digester alone is not the surprise — standing design-review polish moved the ratchet.
