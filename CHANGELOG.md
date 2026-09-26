@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1251] - 2026-09-26
+
+### Changed
+- **Bat strip no-battery calm** — On a desktop Mac (no battery), the Bat chip says **None yet** (not **N/A**). Status still says **No battery**. Matches Power / Heat empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1250] - 2026-09-26
 
 ### Changed

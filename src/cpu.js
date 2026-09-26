@@ -6580,7 +6580,8 @@ function updateBatteryPower(cpuDetails) {
       batteryInfo.classList.remove('is-low');
       batteryInfo.classList.remove('is-ok');
     }
-    if (batteryLevel) batteryLevel.textContent = 'N/A';
+    // Empty Bat: match Power / Heat "None yet" (bare N/A reads like an error code).
+    if (batteryLevel) batteryLevel.textContent = 'None yet';
     if (batteryStatus) batteryStatus.textContent = 'No battery';
     if (batteryIcon && batteryIcon.tagName === 'svg') {
       batteryIcon.classList.add('no-battery');
