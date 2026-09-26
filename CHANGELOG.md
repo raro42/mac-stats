@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1255] - 2026-09-27
+
+### Changed
+- **Disk Cleanup · Monitors first paint** — Before status loads, Disk Cleanup summary and Reclaimable now say **None yet** (not **—**). Monitors summary says **Avg None yet** (not **Avg -- ms**). Matches empty-metric calm after load. Design review / `feature-disk-cleanup` · `feature-monitors`.
+
 ## [0.1.1254] - 2026-09-27
 
 ### Added
