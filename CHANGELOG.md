@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1256] - 2026-09-27
+
+### Changed
+- **Settings credentials first paint** — Before Keychain status loads, Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack status say **Unknown** (not **—**). Matches Agent Ops health empty calm. Failure paths use the same word.
+
 ## [0.1.1255] - 2026-09-27
 
 ### Changed

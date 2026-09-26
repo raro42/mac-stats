@@ -12601,14 +12601,14 @@ function updateBraveConfigStatus(statusText, elId) {
 async function refreshBraveStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateBraveConfigStatus('—');
+    updateBraveConfigStatus('Unknown');
     return;
   }
   try {
     const configured = await invoke('is_brave_configured');
     updateBraveConfigStatus(configured ? 'Key set' : 'No key');
   } catch (_) {
-    updateBraveConfigStatus('—');
+    updateBraveConfigStatus('Unknown');
   }
   if (typeof window.applySettingsBraveKeyAttentionGlanceState === 'function') {
     window.applySettingsBraveKeyAttentionGlanceState();
@@ -12728,7 +12728,7 @@ function updateRedmineConfigStatus(statusText, elId) {
 async function refreshRedmineStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateRedmineConfigStatus('—');
+    updateRedmineConfigStatus('Unknown');
     return;
   }
   try {
@@ -12740,7 +12740,7 @@ async function refreshRedmineStatus() {
     else if (key) updateRedmineConfigStatus('Key set · no URL');
     else updateRedmineConfigStatus('Not set');
   } catch (_) {
-    updateRedmineConfigStatus('—');
+    updateRedmineConfigStatus('Unknown');
   }
   if (typeof window.applySettingsRedmineAttentionGlanceState === 'function') {
     window.applySettingsRedmineAttentionGlanceState();
@@ -12887,7 +12887,7 @@ function updateMastodonConfigStatus(statusText, elId) {
 async function refreshMastodonStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateMastodonConfigStatus('—');
+    updateMastodonConfigStatus('Unknown');
     return;
   }
   try {
@@ -12899,7 +12899,7 @@ async function refreshMastodonStatus() {
     else if (token) updateMastodonConfigStatus('Token set · no URL');
     else updateMastodonConfigStatus('Not set');
   } catch (_) {
-    updateMastodonConfigStatus('—');
+    updateMastodonConfigStatus('Unknown');
   }
   if (typeof window.applySettingsMastodonAttentionGlanceState === 'function') {
     window.applySettingsMastodonAttentionGlanceState();
@@ -13046,7 +13046,7 @@ function updateMcpConfigStatus(statusText, elId) {
 async function refreshMcpStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateMcpConfigStatus('—');
+    updateMcpConfigStatus('Unknown');
     return;
   }
   try {
@@ -13058,7 +13058,7 @@ async function refreshMcpStatus() {
     else if (url) updateMcpConfigStatus('Ready · URL');
     else updateMcpConfigStatus('Not set');
   } catch (_) {
-    updateMcpConfigStatus('—');
+    updateMcpConfigStatus('Unknown');
   }
   if (typeof window.applySettingsMcpAttentionGlanceState === 'function') {
     window.applySettingsMcpAttentionGlanceState();
@@ -13205,7 +13205,7 @@ function updateBrowserConfigStatus(statusText, elId) {
 async function refreshBrowserStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateBrowserConfigStatus('—');
+    updateBrowserConfigStatus('Unknown');
     return;
   }
   try {
@@ -13242,7 +13242,7 @@ async function refreshBrowserStatus() {
       portInput.placeholder = String(port);
     }
   } catch (_) {
-    updateBrowserConfigStatus('—');
+    updateBrowserConfigStatus('Unknown');
   }
   if (typeof window.applySettingsBrowserAttentionGlanceState === 'function') {
     window.applySettingsBrowserAttentionGlanceState();
@@ -13376,7 +13376,7 @@ function updateCursorAgentConfigStatus(statusText, elId) {
 async function refreshCursorAgentStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateCursorAgentConfigStatus('—');
+    updateCursorAgentConfigStatus('Unknown');
     return;
   }
   try {
@@ -13413,7 +13413,7 @@ async function refreshCursorAgentStatus() {
     }
     void wsConfigured;
   } catch (_) {
-    updateCursorAgentConfigStatus('—');
+    updateCursorAgentConfigStatus('Unknown');
   }
   if (typeof window.applySettingsCursorAgentAttentionGlanceState === 'function') {
     window.applySettingsCursorAgentAttentionGlanceState();
@@ -13538,7 +13538,7 @@ function updateTelegramConfigStatus(statusText, elId) {
 async function refreshTelegramStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateTelegramConfigStatus('—');
+    updateTelegramConfigStatus('Unknown');
     return;
   }
   try {
@@ -13550,7 +13550,7 @@ async function refreshTelegramStatus() {
     else if (chat) updateTelegramConfigStatus('Chat id set · no token');
     else updateTelegramConfigStatus('Not set');
   } catch (_) {
-    updateTelegramConfigStatus('—');
+    updateTelegramConfigStatus('Unknown');
   }
   if (typeof window.applySettingsTelegramAttentionGlanceState === 'function') {
     window.applySettingsTelegramAttentionGlanceState();
@@ -13675,7 +13675,7 @@ function updateSlackConfigStatus(statusText, elId) {
 async function refreshSlackStatus() {
   const invoke = getInvoke();
   if (!invoke) {
-    updateSlackConfigStatus('—');
+    updateSlackConfigStatus('Unknown');
     return;
   }
   try {
@@ -13684,7 +13684,7 @@ async function refreshSlackStatus() {
     if (webhook) updateSlackConfigStatus('Ready');
     else updateSlackConfigStatus('Not set');
   } catch (_) {
-    updateSlackConfigStatus('—');
+    updateSlackConfigStatus('Unknown');
   }
   if (typeof window.applySettingsSlackAttentionGlanceState === 'function') {
     window.applySettingsSlackAttentionGlanceState();
@@ -15189,7 +15189,7 @@ async function refreshPerplexityStatus() {
       headerStatus.textContent = '';
       headerStatus.hidden = true;
     }
-    updatePerplexityConfigStatus('—', 'perplexity-settings-status');
+    updatePerplexityConfigStatus('Unknown', 'perplexity-settings-status');
   }
   updatePerplexitySetupVisibility();
   applyPerplexityLastGlanceState();

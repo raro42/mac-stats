@@ -1261,7 +1261,7 @@
     const statusEl = document.getElementById("redmine-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—" || text === "ready") return false;
+    if (!text || text === "—" || text === "unknown" || text === "ready") return false;
     return (
       text === "not set" ||
       text.includes("no key") ||
@@ -1377,7 +1377,7 @@
     const statusEl = document.getElementById("mastodon-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—" || text === "ready") return false;
+    if (!text || text === "—" || text === "unknown" || text === "ready") return false;
     return (
       text === "not set" ||
       text.includes("no token") ||
@@ -1493,7 +1493,7 @@
     const statusEl = document.getElementById("mcp-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—") return false;
+    if (!text || text === "—" || text === "unknown") return false;
     return text === "not set";
   }
 
@@ -1578,7 +1578,7 @@
     const statusEl = document.getElementById("browser-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—") return false;
+    if (!text || text === "—" || text === "unknown") return false;
     return text.startsWith("not set");
   }
 
@@ -1670,7 +1670,7 @@
     const statusEl = document.getElementById("cursor-agent-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—") return false;
+    if (!text || text === "—" || text === "unknown") return false;
     return text.startsWith("not set");
   }
 
@@ -1762,7 +1762,7 @@
     const statusEl = document.getElementById("telegram-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—") return false;
+    if (!text || text === "—" || text === "unknown") return false;
     if (text === "ready") return false;
     return (
       text === "not set" ||
@@ -1879,7 +1879,7 @@
     const statusEl = document.getElementById("slack-settings-status");
     if (!statusEl) return false;
     const text = (statusEl.textContent || "").trim().toLowerCase();
-    if (!text || text === "—") return false;
+    if (!text || text === "—" || text === "unknown") return false;
     if (text === "ready") return false;
     return text === "not set";
   }

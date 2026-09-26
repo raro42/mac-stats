@@ -643,7 +643,7 @@
             <h3 class="settings-section-title" id="settings-credentials-heading">Credentials</h3>
             <div class="setting-item" id="discord-setting">
               <div class="setting-label">Discord bot</div>
-              <div class="discord-status settings-status" id="discord-status">—</div>
+              <div class="discord-status settings-status" id="discord-status">Unknown</div>
               <input type="password" id="discord-token-input" class="settings-input discord-token-input" placeholder="Paste bot token here" autocomplete="off" />
               <div class="settings-actions discord-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="discord-save-token">Save token</button>
@@ -654,7 +654,7 @@
             </div>
             <div class="setting-item" id="perplexity-setting">
               <div class="setting-label">Perplexity API key</div>
-              <div class="perplexity-status settings-status" id="perplexity-settings-status">—</div>
+              <div class="perplexity-status settings-status" id="perplexity-settings-status">Unknown</div>
               <input type="password" id="perplexity-api-key-input" class="settings-input discord-token-input" placeholder="Paste API key (pplx-...)" autocomplete="off" />
               <div class="settings-actions perplexity-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="perplexity-save-key">Save key</button>
@@ -664,7 +664,7 @@
             </div>
             <div class="setting-item" id="brave-setting">
               <div class="setting-label">Brave Search API key</div>
-              <div class="brave-status settings-status" id="brave-settings-status">—</div>
+              <div class="brave-status settings-status" id="brave-settings-status">Unknown</div>
               <input type="password" id="brave-api-key-input" class="settings-input discord-token-input" placeholder="Paste Brave Search API key" autocomplete="off" />
               <div class="settings-actions brave-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="brave-save-key">Save key</button>
@@ -674,7 +674,7 @@
             </div>
             <div class="setting-item" id="redmine-setting">
               <div class="setting-label">Redmine</div>
-              <div class="redmine-status settings-status" id="redmine-settings-status">—</div>
+              <div class="redmine-status settings-status" id="redmine-settings-status">Unknown</div>
               <input type="url" id="redmine-url-input" class="settings-input discord-token-input" placeholder="https://redmine.example.com" autocomplete="off" />
               <input type="password" id="redmine-api-key-input" class="settings-input discord-token-input" placeholder="Paste Redmine API key" autocomplete="off" />
               <div class="settings-actions redmine-actions">
@@ -685,7 +685,7 @@
             </div>
             <div class="setting-item" id="mastodon-setting">
               <div class="setting-label">Mastodon</div>
-              <div class="mastodon-status settings-status" id="mastodon-settings-status">—</div>
+              <div class="mastodon-status settings-status" id="mastodon-settings-status">Unknown</div>
               <input type="url" id="mastodon-url-input" class="settings-input discord-token-input" placeholder="https://mastodon.social" autocomplete="off" />
               <input type="password" id="mastodon-token-input" class="settings-input discord-token-input" placeholder="Paste Mastodon access token" autocomplete="off" />
               <div class="settings-actions mastodon-actions">
@@ -696,7 +696,7 @@
             </div>
             <div class="setting-item" id="mcp-setting">
               <div class="setting-label">MCP server</div>
-              <div class="mcp-status settings-status" id="mcp-settings-status">—</div>
+              <div class="mcp-status settings-status" id="mcp-settings-status">Unknown</div>
               <input type="url" id="mcp-url-input" class="settings-input discord-token-input" placeholder="https://mcp.example.com/sse" autocomplete="off" />
               <input type="text" id="mcp-stdio-input" class="settings-input discord-token-input" placeholder="cmd|arg1|arg2 (stdio)" autocomplete="off" spellcheck="false" />
               <div class="settings-actions mcp-actions">
@@ -707,7 +707,7 @@
             </div>
             <div class="setting-item" id="browser-setting">
               <div class="setting-label">Browser / CDP</div>
-              <div class="browser-status settings-status" id="browser-settings-status">—</div>
+              <div class="browser-status settings-status" id="browser-settings-status">Unknown</div>
               <input type="text" id="browser-chromium-path-input" class="settings-input discord-token-input" placeholder="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" autocomplete="off" spellcheck="false" />
               <input type="number" id="browser-cdp-port-input" class="settings-input discord-token-input" placeholder="9222" min="1024" max="65535" inputmode="numeric" />
               <div class="settings-actions browser-actions">
@@ -718,7 +718,7 @@
             </div>
             <div class="setting-item" id="cursor-agent-setting">
               <div class="setting-label">Cursor agent</div>
-              <div class="cursor-agent-status settings-status" id="cursor-agent-settings-status">—</div>
+              <div class="cursor-agent-status settings-status" id="cursor-agent-settings-status">Unknown</div>
               <input type="text" id="cursor-agent-workspace-input" class="settings-input discord-token-input" placeholder="~/projects/mac-stats" autocomplete="off" spellcheck="false" />
               <input type="text" id="cursor-agent-executable-input" class="settings-input discord-token-input" placeholder="cursor-agent (PATH) or /full/path" autocomplete="off" spellcheck="false" />
               <div class="settings-actions cursor-agent-actions">
@@ -729,7 +729,7 @@
             </div>
             <div class="setting-item" id="telegram-setting">
               <div class="setting-label">Telegram alerts</div>
-              <div class="telegram-status settings-status" id="telegram-settings-status">—</div>
+              <div class="telegram-status settings-status" id="telegram-settings-status">Unknown</div>
               <input type="password" id="telegram-bot-token-input" class="settings-input discord-token-input" placeholder="Paste Telegram bot token" autocomplete="off" />
               <input type="text" id="telegram-chat-id-input" class="settings-input discord-token-input" placeholder="Chat id (e.g. 123456789)" autocomplete="off" spellcheck="false" />
               <div class="settings-actions telegram-actions">
@@ -740,7 +740,7 @@
             </div>
             <div class="setting-item" id="slack-setting">
               <div class="setting-label">Slack alerts</div>
-              <div class="slack-status settings-status" id="slack-settings-status">—</div>
+              <div class="slack-status settings-status" id="slack-settings-status">Unknown</div>
               <input type="password" id="slack-webhook-input" class="settings-input discord-token-input" placeholder="Paste Slack incoming webhook URL" autocomplete="off" />
               <div class="settings-actions slack-actions">
                 <button type="button" class="settings-btn settings-btn-primary discord-btn" id="slack-save">Save</button>
