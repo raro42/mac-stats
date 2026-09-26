@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1245] - 2026-09-26
+
+### Changed
+- **Monitors empty identity** — Missing URL or host says **Unknown** (not blank / `site` / `Monitor`). Empty latency or last-check age says **None yet** (not `--`). Empty DOWN failure reason says **Unknown** (not `error`). List, detail, and tooltips match Top Processes / Agents calm copy. Design review / `feature-monitors`.
+
 ## [0.1.1244] - 2026-09-26
 
 ### Changed

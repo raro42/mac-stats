@@ -8097,7 +8097,9 @@ function shortMonitorHostLabel(name, url) {
   } catch (_) {
     /* ignore */
   }
-  const fallback = (url || name || 'site').replace(/^https?:\/\//i, '');
+  // Empty identity: match Agents / Top Processes "Unknown" (bare "site" reads like a placeholder bug).
+  const fallback = (url || name || '').replace(/^https?:\/\//i, '').trim();
+  if (!fallback) return 'Unknown';
   return fallback.slice(0, 40);
 }
 
@@ -8200,7 +8202,8 @@ function formatMonitorDownSinceLabel(downInfo) {
 
 /** Hover title: failure + downtime + last check (keyboard stays in kb hint). */
 function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
-  const lines = [monitorUrl || 'Monitor'];
+  // Empty URL: match Agents "Unknown" (bare "Monitor" reads like a placeholder).
+  const lines = [String(monitorUrl || '').trim() || 'Unknown'];
   const pending =
     !status.is_up &&
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
@@ -8211,13 +8214,16 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
   }
   if (status.is_up) {
     const ago = formatMonitorCheckedAgo(status);
-    const ms = status.response_time_ms != null ? `${status.response_time_ms} ms` : null;
+    const ms =
+      status.response_time_ms != null
+        ? `${status.response_time_ms} ms`
+        : 'None yet';
     lines.push(['UP', ms, ago].filter(Boolean).join(' · '));
     if (status.checked_at) {
       lines.push(`Last check: ${new Date(status.checked_at).toLocaleString()}`);
     }
   } else {
-    const reason = shortMonitorFailReason(status.error) || 'error';
+    const reason = shortMonitorFailReason(status.error) || 'Unknown';
     lines.push(`DOWN · ${reason}`);
     const downInfo = resolveMonitorDownSince(monitorId, status);
     const downLabel = formatMonitorDownSinceLabel(downInfo);
@@ -9111,6 +9117,8 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   };
 
   {
+    // Empty URL: match Agents / Top Processes "Unknown".
+    const urlDisplay = String(monitorUrl || '').trim() || 'Unknown';
     const row = document.createElement('div');
     row.className = 'monitor-detail-row';
     const k = document.createElement('span');
@@ -9119,22 +9127,34 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
     const v = document.createElement('button');
     v.type = 'button';
     v.className = 'monitor-detail-v monitor-detail-url';
-    v.textContent = monitorUrl;
-    v.title = 'Click to copy URL';
-    v.setAttribute('aria-label', `Copy URL ${monitorUrl}`);
-    wireMonitorUrlCopy(v, monitorUrl, prevUrlFlash);
+    v.textContent = urlDisplay;
+    v.title = urlDisplay === 'Unknown' ? 'URL unavailable' : 'Click to copy URL';
+    v.setAttribute('aria-label', `Copy URL ${urlDisplay}`);
+    if (urlDisplay !== 'Unknown') {
+      wireMonitorUrlCopy(v, urlDisplay, prevUrlFlash);
+    }
     row.appendChild(k);
     row.appendChild(v);
     detail.appendChild(row);
   }
   if (pending) {
     addRow('Status', 'Pending first check');
+    addRow('Latency', 'None yet');
   } else if (status.is_up) {
     addRow('Status', 'UP');
-    if (status.response_time_ms != null) addRow('Latency', `${status.response_time_ms} ms`);
+    addRow(
+      'Latency',
+      status.response_time_ms != null
+        ? `${status.response_time_ms} ms`
+        : 'None yet'
+    );
   } else {
     addRow('Status', 'DOWN');
-    addRow('Failure', shortMonitorFailReason(status.error) || status.error || 'error');
+    addRow(
+      'Failure',
+      shortMonitorFailReason(status.error) ||
+        (status.error ? String(status.error) : 'Unknown')
+    );
     const downInfo = resolveMonitorDownSince(monitorId, status);
     if (downInfo) {
       addRow(
@@ -9150,6 +9170,8 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   }
   if (status.checked_at && !pending) {
     addRow('Last check', new Date(status.checked_at).toLocaleString());
+  } else if (!pending) {
+    addRow('Last check', 'None yet');
   }
   const backoff = formatMonitorBackoffHint(status);
   if (backoff) addRow('Auto-check', backoff);
@@ -9914,7 +9936,11 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
 }
 
 function fillMonitorInfo(info, monitorUrl, status, monitorId) {
-  const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
+  // Empty latency / URL: match Top Processes / Agents "None yet" / "Unknown" (bare -- reads like a bug).
+  const responseTimeText = status.response_time_ms
+    ? `${status.response_time_ms}ms`
+    : 'None yet';
+  const urlDisplay = String(monitorUrl || '').trim() || 'Unknown';
   const pending =
     !status.is_up &&
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
@@ -9927,10 +9953,12 @@ function fillMonitorInfo(info, monitorUrl, status, monitorId) {
   const urlEl = document.createElement('button');
   urlEl.type = 'button';
   urlEl.className = 'monitor-url';
-  urlEl.textContent = monitorUrl;
-  urlEl.title = 'Click to copy URL';
-  urlEl.setAttribute('aria-label', `Copy URL ${monitorUrl}`);
-  wireMonitorUrlCopy(urlEl, monitorUrl, prevUrlFlash);
+  urlEl.textContent = urlDisplay;
+  urlEl.title = urlDisplay === 'Unknown' ? 'URL unavailable' : 'Click to copy URL';
+  urlEl.setAttribute('aria-label', `Copy URL ${urlDisplay}`);
+  if (urlDisplay !== 'Unknown') {
+    wireMonitorUrlCopy(urlEl, urlDisplay, prevUrlFlash);
+  }
 
   const latencyEl = document.createElement('span');
   latencyEl.className = 'monitor-latency';
@@ -9940,28 +9968,26 @@ function fillMonitorInfo(info, monitorUrl, status, monitorId) {
   primary.appendChild(latencyEl);
 
   const ago = formatMonitorCheckedAgo(status);
-  if (ago && !pending) {
+  if (!pending) {
     const agoEl = document.createElement('span');
     agoEl.className = 'monitor-checked-ago';
-    agoEl.textContent = ago;
+    agoEl.textContent = ago || 'None yet';
     agoEl.title = status.checked_at
       ? `Last check: ${new Date(status.checked_at).toLocaleString()}`
-      : 'Last check';
+      : 'Last check · None yet';
     primary.appendChild(agoEl);
   }
 
   info.appendChild(primary);
 
   if (!status.is_up && !pending) {
-    const reason = shortMonitorFailReason(status.error);
+    const reason = shortMonitorFailReason(status.error) || 'Unknown';
     const downInfo = resolveMonitorDownSince(monitorId, status);
     const downLabel = formatMonitorDownSinceLabel(downInfo);
-    if (reason || downLabel) {
-      const meta = document.createElement('div');
-      meta.className = 'monitor-down-meta';
-      meta.textContent = [reason, downLabel].filter(Boolean).join(' · ');
-      info.appendChild(meta);
-    }
+    const meta = document.createElement('div');
+    meta.className = 'monitor-down-meta';
+    meta.textContent = [reason, downLabel].filter(Boolean).join(' · ');
+    info.appendChild(meta);
   }
 
   if (status.error && !pending) {
@@ -10004,7 +10030,8 @@ function createMonitorItem(monitorId, monitorUrl, status) {
   item.setAttribute('data-monitor-id', monitorId);
   item.tabIndex = -1;
   item.setAttribute('role', 'option');
-  item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
+  const urlDisplay = String(monitorUrl || '').trim() || 'Unknown';
+  item.setAttribute('aria-label', `Monitor ${urlDisplay}`);
   applyMonitorItemState(item, status);
   applyMonitorRowTooltip(item, monitorUrl, status);
   
@@ -10046,7 +10073,8 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
   applyMonitorItemState(item, status);
   if (!item.hasAttribute('tabindex')) item.tabIndex = -1;
   if (!item.getAttribute('role')) item.setAttribute('role', 'option');
-  item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
+  const urlDisplay = String(monitorUrl || '').trim() || 'Unknown';
+  item.setAttribute('aria-label', `Monitor ${urlDisplay}`);
   applyMonitorRowTooltip(item, monitorUrl, status);
 
   // Update status indicator
