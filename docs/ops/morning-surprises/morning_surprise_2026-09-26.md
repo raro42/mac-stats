@@ -4,6 +4,7 @@ Overnight Track B kept product polish (design review fuel; digester open empty).
 
 ## Shipped
 
+- **v0.1.1248** — Details collapsed glance empty Load / RAM / Up: **None yet** (not **—**). Matches Top Processes empty-metric calm. Design review / `feature-cpu-metrics`.
 - **v0.1.1247** — Top Processes Top GPU empty metric: **None yet** (not **—**) on glance, list column, and Current GPU details. Matches Top CPU / Top RAM. Design review / `feature-processes`.
 - **v0.1.1246** — Monitors summary empty avg: **Avg None yet** (not **Avg 0 ms**); settings empty URL/latency **Unknown** / **None yet**; DOWN summary failure **Unknown**. Design review / `feature-monitors`.
 - **v0.1.1245** — Monitors empty identity: missing URL/host say **Unknown**; empty latency / last-check age say **None yet** (not `--`); empty DOWN failure say **Unknown** (not `error`). List, detail, tooltips. Design review / `feature-monitors`.
@@ -13,7 +14,7 @@ Overnight Track B kept product polish (design review fuel; digester open empty).
 
 ## Deferred
 
-- Window-only recapture of `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-processes.png` / `feature-ai-chat.png` / `feature-agent-ops.png` (Screen Recording TCC / `screencapture -l`); polish grace marked when capture fails.
+- Window-only recapture of `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-processes.png` / `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-cpu-metrics.png` (Screen Recording TCC / `screencapture -l`); polish grace marked when capture fails.
 
 ## Note
 
