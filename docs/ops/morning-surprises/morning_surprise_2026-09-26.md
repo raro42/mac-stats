@@ -4,6 +4,7 @@ Overnight Track B kept product polish (design review fuel; digester open empty).
 
 ## Shipped
 
+- **v0.1.1249** — Power strip empty Heat / Up / RAM / SSD: **None yet** (not **—**) on strip chips and Details rows. Matches Details glance empty-metric calm. Design review / `feature-cpu-metrics`.
 - **v0.1.1248** — Details collapsed glance empty Load / RAM / Up: **None yet** (not **—**). Matches Top Processes empty-metric calm. Design review / `feature-cpu-metrics`.
 - **v0.1.1247** — Top Processes Top GPU empty metric: **None yet** (not **—**) on glance, list column, and Current GPU details. Matches Top CPU / Top RAM. Design review / `feature-processes`.
 - **v0.1.1246** — Monitors summary empty avg: **Avg None yet** (not **Avg 0 ms**); settings empty URL/latency **Unknown** / **None yet**; DOWN summary failure **Unknown**. Design review / `feature-monitors`.
