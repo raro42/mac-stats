@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.1246] - 2026-09-26
+
+### Changed
+- **Monitors summary empty avg / settings identity** — When no latency samples exist, the Monitors summary says **Avg None yet** (not **Avg 0 ms**). Settings rows with a missing URL say **Unknown**; cached status with no latency says **None yet**. DOWN summary chips always include a failure reason (**Unknown** when missing). Design review / `feature-monitors`.
+
 ## [0.1.1245] - 2026-09-26
 
 ### Changed

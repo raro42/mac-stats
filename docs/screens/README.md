@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-09-26 (~21:45):** Monitors summary Avg None yet + settings empty identity (v0.1.1246). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-09-26 (~21:20):** Monitors empty identity Unknown / None yet (v0.1.1245). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-09-26 (~20:56):** Disk Cleanup empty identity Unknown / None yet (v0.1.1244). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-09-26 (~20:30):** Top Processes empty identity Unknown / None yet (v0.1.1243). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 13 asset kept; polish grace marked.

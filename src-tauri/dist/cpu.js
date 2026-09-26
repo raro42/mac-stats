@@ -7288,12 +7288,17 @@ async function refreshMonitorsSettingsList() {
           console.warn(`Failed to get details for monitor ${monitorId}:`, e);
         }
         
+        // Empty URL: match list/detail "Unknown" (bare monitor id reads like a placeholder).
+        const urlDisplay = String(monitorUrl || '').trim() || 'Unknown';
         // Use cached status data instead of polling backend
         let statusInfo = '';
         const cachedStatus = monitorStatusCache.get(monitorId);
         if (cachedStatus) {
           const statusText = cachedStatus.is_up ? '✓ Up' : '✗ Down';
-          const timeText = cachedStatus.response_time_ms ? ` · ${cachedStatus.response_time_ms}ms` : '';
+          // Empty latency: match list "None yet" (omit left a thinner Up/Down-only line).
+          const timeText = cachedStatus.response_time_ms
+            ? ` · ${cachedStatus.response_time_ms}ms`
+            : ' · None yet';
           statusInfo = ` · ${statusText}${timeText}`;
         }
         
@@ -7303,8 +7308,8 @@ async function refreshMonitorsSettingsList() {
         const info = document.createElement('div');
         info.className = 'monitor-settings-item-info';
         info.innerHTML = `
-          <div class="monitor-settings-item-name">${monitorUrl}${statusInfo}</div>
-          <div class="monitor-settings-item-url">${monitorUrl}</div>
+          <div class="monitor-settings-item-name">${urlDisplay}${statusInfo}</div>
+          <div class="monitor-settings-item-url">${urlDisplay}</div>
         `;
         
         const actions = document.createElement('div');
@@ -7315,7 +7320,7 @@ async function refreshMonitorsSettingsList() {
         removeBtn.className = 'monitor-remove-btn';
         removeBtn.textContent = 'Remove';
         removeBtn.dataset.monitorId = monitorId;
-        removeBtn.setAttribute('aria-label', `Remove ${monitorUrl}`);
+        removeBtn.setAttribute('aria-label', `Remove ${urlDisplay}`);
         actions.appendChild(removeBtn);
         item.appendChild(info);
         item.appendChild(actions);
@@ -9334,14 +9339,16 @@ async function updateMonitorsSummary() {
               /* keep id */
             }
             const host = shortMonitorHostLabel(name, url);
-            const reason = shortMonitorFailReason(status.error);
+            // Empty failure: match list/detail "Unknown".
+            const reason = shortMonitorFailReason(status.error) || 'Unknown';
             const ago = formatMonitorCheckedAgo(status);
             const downInfo = resolveMonitorDownSince(monitorId, status);
             const downLabel = formatMonitorDownSinceLabel(downInfo);
-            const base = reason ? `${host} (${reason})` : host;
+            const base = `${host} (${reason})`;
             const parts = [base];
             if (downLabel) parts.push(downLabel);
             else if (ago) parts.push(ago);
+            else parts.push('None yet');
             downHints.push(parts.join(' · '));
           }
         }
@@ -9357,6 +9364,9 @@ async function updateMonitorsSummary() {
     const avgResponseTime = responseTimeCount > 0 
       ? Math.round(totalResponseTime / responseTimeCount)
       : 0;
+    // Empty avg latency: match list "None yet" (bare "Avg 0 ms" reads like a bug).
+    const avgLabel =
+      responseTimeCount > 0 ? `${avgResponseTime} ms` : 'None yet';
 
     upLatencyHints.sort((a, b) => b.ms - a.ms);
     const anyDown = downCount > 0;
@@ -9379,10 +9389,10 @@ async function updateMonitorsSummary() {
     } else {
       if (slowest && upLatencyHints.length >= 2) {
         summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms · slowest ${slowest.host} ${slowest.ms}ms`;
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
       } else {
         summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
       }
       if (upLatencyHints.length > 0) {
         summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
