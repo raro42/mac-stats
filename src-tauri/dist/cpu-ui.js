@@ -4306,7 +4306,8 @@
   // Make loadChangelog function accessible for version click handlers
   // This needs to be defined before injectAppVersion and initChangelogModal
   function loadChangelogForModal(changelogBody, changelogModal) {
-    changelogBody.innerHTML = '<div class="changelog-loading">Loading changelog...</div>';
+    // First paint / reload calm: match Overview "None yet" (not pulsing Loading…).
+    changelogBody.innerHTML = '<div class="changelog-loading">None yet</div>';
     wireChangelogBodyToolbarKeyboard(changelogBody);
     
     (async () => {

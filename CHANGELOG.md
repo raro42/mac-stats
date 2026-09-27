@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1262] - 2026-09-27
+
+### Changed
+- **Ollama model select · Changelog first paint** — Before models or changelog text arrive, the model dropdown and changelog body say **None yet** (not **Loading models…** / **Loading changelog…**). Matches Overview empty calm. Design review / `feature-ai-chat`.
+
 ## [0.1.1261] - 2026-09-27
 
 ### Changed
