@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1265] - 2026-09-27
+
+### Changed
+- **Agent Ops Insights card first paint** — Before runs insights load, the Insights card shows calm **None yet** (not a blank card). Matches Overview / Runs list empty calm. Design review / `feature-agent-ops`.
+
+
 ## [0.1.1264] - 2026-09-27
 
 ### Changed
