@@ -45,7 +45,7 @@ Discord, the scheduler, website monitors, background compaction, and Ollama-side
 - **User quit** — ⌘Q, or “Quit” from the menu bar app menu.
 - **Reboot, logout, or forced log out** — the process does not survive; it must be started again at login unless you configure that (see below).
 - **Deploy / agent workflow** — Instructions often use `pkill -f mac_stats` before a new build. If the **follow-up start** (`./run`, `cargo run --release`, or `open -a mac-stats`) **fails or is skipped**, the app stays down. This is a common source of “it was fine yesterday.”
-- **Crash or SIGKILL** — Panic, `kill -9`, or the OS terminating the app; no automatic restart unless `KeepAlive` (below) or a watchdog is configured.
+- **Crash or SIGKILL** — Panic, `kill -9`, or the OS terminating the app. The login agent does **not** restart a quit or a crash. It starts the app again at the next login.
 - **Sleep / disk unmount** — Unusual for menu-bar apps, but running from a **network or external volume** that unmounts will kill the binary path; prefer `/Applications` or a stable local path for always-on installs.
 
 ### Operator checklist (minimal downtime)
@@ -54,9 +54,9 @@ Discord, the scheduler, website monitors, background compaction, and Ollama-side
 2. **After reboot** — Either enable a **LaunchAgent** or add **mac-stats** to **System Settings → General → Login Items** (for an `/Applications/mac-stats.app` install).
 3. **Before assuming “Discord/scheduler is broken”** — Verify the process is running first; most “it stopped working” reports are an **absent process**, not a logic bug.
 
-### Recommended: LaunchAgent with `KeepAlive` (production)
+### Recommended: LaunchAgent at login (quit stays quit)
 
-Use a user LaunchAgent so macOS starts the app at login and **restarts it if it exits** (including crash). Adjust paths to match **your** install.
+Use a user LaunchAgent so macOS starts the app at login. Do **not** set `KeepAlive`. A quit (⌘Q or the menu) must stay quit until the next login. Adjust paths to match **your** install.
 
 **Installed app (DMG / `/Applications`):** confirm the executable name with  
 `ls "/Applications/mac-stats.app/Contents/MacOS/"`  
@@ -82,10 +82,6 @@ Create `~/Library/LaunchAgents/com.raro42.mac-stats.plist`:
   <string>/Users/YOU/projects/mac-stats</string>
   <key>RunAtLoad</key>
   <true/>
-  <key>KeepAlive</key>
-  <true/>
-  <key>ThrottleInterval</key>
-  <integer>10</integer>
 </dict>
 </plist>
 ```
@@ -98,7 +94,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.raro42.mac-stats.pli
 launchctl kickstart -k gui/$(id -u)/com.raro42.mac-stats
 ```
 
-To unload (stop auto-restart): `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.raro42.mac-stats.plist`
+Quit stays quit. To stop the app until the next login: `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.raro42.mac-stats.plist` (do not bootstrap again in the same session).
 
 **Dev tree (release binary):** point `ProgramArguments` at  
 `$HOME/projects/mac-stats/src-tauri/target/release/mac_stats`  

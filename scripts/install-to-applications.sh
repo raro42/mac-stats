@@ -113,6 +113,8 @@ if [[ -f "$PLIST" ]]; then
   else
     /usr/libexec/PlistBuddy -c "Add :WorkingDirectory string $LAUNCH_WD" "$PLIST" 2>/dev/null || true
   fi
+  # Quit stays quit. RunAtLoad still starts the app at login.
+  /usr/libexec/PlistBuddy -c 'Delete :KeepAlive' "$PLIST" 2>/dev/null || true
 fi
 
 # Deep-sign the full .app after replacing the Mach-O. Do not restart with a broken
