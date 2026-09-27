@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1264] - 2026-09-27
+
+### Changed
+- **Agent Ops Sessions · Schedules · Knowledge · Runs first paint** — Before list data loads, Live / Recent files / schedules / deliveries / knowledge / runs show calm empty titles (not blank lists). Matches Agents tab first-paint calm. Design review / `feature-agent-ops`.
+
 ## [0.1.1263] - 2026-09-27
 
 ### Changed

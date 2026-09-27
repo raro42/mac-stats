@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1264
+
+- Sessions / Schedules / Knowledge / Runs list first paint: calm empty titles (not blank lists). Design review / feature-agent-ops.
+
 ## Overnight merge — v0.1.1263
 
 - Agents tab first paint: No agents yet (not blank list). Design review / feature-agent-ops.
