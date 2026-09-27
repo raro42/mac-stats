@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1259
+
+- Details load averages + CPU/GPU Power first paint: None yet (not 0.0 / 0.0 W). Design review / feature-cpu-metrics.
+
 ## Overnight merge — v0.1.1258
 
 - CPU / GPU ring first paint: None yet (not 0%). Design review / feature-cpu-metrics.

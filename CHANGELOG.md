@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1259] - 2026-09-27
+
+### Changed
+- **Details load · power first paint** — Before samples arrive, Load 1m/5m/15m and CPU/GPU Power say **None yet** (not **0.0** / **0.0 W**). Power rows keep that calm until a real watt sample (or the root hint). Matches RAM / Up empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1258] - 2026-09-27
 
 ### Changed

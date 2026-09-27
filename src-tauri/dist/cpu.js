@@ -2220,7 +2220,12 @@ async function refresh() {
       failedAttempts.cpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      const displayText = shouldShowHint ? "--:--" : previousValues.cpuPower;
+      // Empty CPU Power: match RAM / Up "None yet" (bare 0 / 0.0 W reads like real watts).
+      const displayText = shouldShowHint
+        ? "--:--"
+        : previousValues.cpuPower > 0
+          ? `${previousValues.cpuPower.toFixed(1)} W`
+          : "None yet";
       if (cpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = displayText;
@@ -2256,7 +2261,9 @@ async function refresh() {
       
       // CRITICAL: Show 1 decimal place to prevent flickering when values are < 1W
       // Math.round() would show 0.3W as "0 W", causing flicker between 0 and actual values
-      const formatted = `${cpuPowerValue.toFixed(1)} W`;
+      // Empty: match Details RAM "None yet" until a real sample arrives.
+      const formatted =
+        cpuPowerValue > 0 ? `${cpuPowerValue.toFixed(1)} W` : "None yet";
       // Only update DOM if value actually changed
       if (cpuPowerEl.textContent !== formatted) {
         console.log("[CPU Power] Updating DOM to: ", formatted);
@@ -2271,7 +2278,12 @@ async function refresh() {
       failedAttempts.gpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.gpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      const displayText = shouldShowHint ? "--:--" : "0 W";
+      // Empty GPU Power: match CPU Power / RAM "None yet" (bare 0 W reads like real watts).
+      const displayText = shouldShowHint
+        ? "--:--"
+        : previousValues.gpuPower > 0
+          ? `${previousValues.gpuPower.toFixed(1)} W`
+          : "None yet";
       if (gpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
           gpuPowerEl.textContent = displayText;
@@ -2306,7 +2318,9 @@ async function refresh() {
       
       // CRITICAL: Show 1 decimal place to prevent flickering when values are < 1W
       // Math.round() would show 0.3W as "0 W", causing flicker between 0 and actual values
-      const formatted = `${gpuPowerValue.toFixed(1)} W`;
+      // Empty: match Details RAM "None yet" until a real sample arrives.
+      const formatted =
+        gpuPowerValue > 0 ? `${gpuPowerValue.toFixed(1)} W` : "None yet";
       // Only update DOM if value actually changed
       if (gpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
@@ -12207,7 +12221,13 @@ function refreshDetailsCollapsedGlanceFromDom() {
   const loadRaw = loadEl?.textContent?.trim();
   const ramRaw = ramEl?.textContent?.trim();
   const upRaw = upEl?.textContent?.trim();
-  const load1 = loadRaw != null && loadRaw !== "" ? Number(loadRaw) : NaN;
+  const loadEmpty =
+    !loadRaw ||
+    loadRaw === "—" ||
+    loadRaw === "None yet" ||
+    loadRaw === "0.0" ||
+    loadRaw === "0.00";
+  const load1 = !loadEmpty ? Number(loadRaw) : NaN;
   const ramPct =
     ramRaw != null && ramRaw.endsWith("%")
       ? Number(ramRaw.replace("%", ""))
@@ -12217,7 +12237,7 @@ function refreshDetailsCollapsedGlanceFromDom() {
   const ramEmpty = !ramRaw || ramRaw === "—" || ramRaw === "None yet";
   const waiting =
     (!Number.isFinite(load1) && upEmpty) ||
-    (loadRaw === "0.0" && ramEmpty && upEmpty);
+    (loadEmpty && ramEmpty && upEmpty);
   // Prefer live metrics when any row has real data.
   if (
     waiting &&
