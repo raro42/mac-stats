@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1257] - 2026-09-27
+
+### Changed
+- **Perplexity · Ollama model first paint** — Before status loads, Perplexity header config status and the (hidden) Ollama model label say **Unknown** (not **—**). Model glance ignores those placeholders so they are not treated as a model name. Matches Settings credentials empty calm.
+
 ## [0.1.1256] - 2026-09-27
 
 ### Changed

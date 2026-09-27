@@ -857,9 +857,13 @@ function shortChatModelName(modelName, maxLen = 28) {
 
 function getChatModelGlanceLabel() {
   const modelText = document.getElementById('ollama-model-text');
-  const fromUi = modelText && modelText.style.display !== 'none'
+  let fromUi = modelText && modelText.style.display !== 'none'
     ? String(modelText.textContent || '').trim()
     : '';
+  // First-paint / empty-identity placeholders are not a model name.
+  if (fromUi === '—' || fromUi === 'Unknown' || fromUi === 'None yet') {
+    fromUi = '';
+  }
   const fromStore = String(localStorage.getItem('ollama_model') || '').trim();
   return shortChatModelName(fromUi || fromStore || chatModelGlanceState.model || '');
 }
