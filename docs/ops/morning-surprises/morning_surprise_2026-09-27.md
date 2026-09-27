@@ -6,6 +6,7 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 | Version | What |
 |---------|------|
+| **v0.1.1263** | Agents tab (default) first paint → calm **No agents yet** (not a blank list). Matches Overview empty calm. Design review / `feature-agent-ops`. |
 | **v0.1.1262** | Ollama model select + Changelog first paint → **None yet** (not **Loading models…** / **Loading changelog…**). Matches Overview empty calm. Design review / `feature-ai-chat`. |
 | **v0.1.1261** | Agent Ops Overview first paint → **None yet** (not pulsing **Loading…**). Schedules / Live / Knowledge / Recent + injected Agents / Runs / Digest. Matches overview empty head pills. Design review / `feature-agent-ops`. |
 | **v0.1.1260** | Low Power Mode strip first paint → **None yet** (not **…**). Matches Power / Heat empty-metric calm. Design review / `feature-cpu-metrics`. |
@@ -21,8 +22,9 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d); polish grace marked for `feature-ai-chat` after **v0.1.1262**.
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d); polish grace remade for `feature-agent-ops` after **v0.1.1263** (also earlier `feature-ai-chat`).
 - Debug.log: no ERROR/WARN/panic clusters in the scan window.
+- ~05:15 tick: Agents tab first-paint keep (**v0.1.1263**).
 - ~04:50 tick: Ollama model select / Changelog first-paint keep (**v0.1.1262**).
 - ~04:25 tick: Agent Ops Overview first-paint keep (**v0.1.1261**).
 - ~03:50 tick: LPM strip first-paint keep (**v0.1.1260**).
@@ -35,6 +37,6 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 ## Next fuel
 
-- Scan for other first-paint **Loading…** leftovers (orphan dashboard only if still shipped; prefer CPU themes).
-- Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
+- Sessions / Schedules / Knowledge / Runs list panels still blank until JS (Agents tab seeded in **v0.1.1263**).
+- Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`); polish grace remade after **v0.1.1263**.
 - Sibling ports if digester stays empty.
