@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1258] - 2026-09-27
+
+### Changed
+- **CPU · GPU ring first paint** — Before usage samples arrive, the CPU and GPU rings say **None yet** (not **0%**). Matches Temp / Freq empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1257] - 2026-09-27
 
 ### Changed
