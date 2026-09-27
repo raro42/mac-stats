@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1260] - 2026-09-27
+
+### Changed
+- **Low Power Mode strip first paint** — Before On/Off arrives, the LPM chip says **None yet** (not **…**). Matches Power / Heat empty-metric calm. Design review / `feature-cpu-metrics`.
+
 ## [0.1.1259] - 2026-09-27
 
 ### Changed

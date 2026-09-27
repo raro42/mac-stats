@@ -3450,7 +3450,8 @@ function ensureLowPowerStrip() {
     cell.setAttribute('aria-label', `${LPM_GUI_LABEL}. ${cell.title}`);
     cell.innerHTML =
       `<span class="lpm-label">${LPM_GUI_LABEL}</span>` +
-      '<span class="lpm-value" id="lpm-strip-value">…</span>' +
+      // Empty LPM: match Power / Heat "None yet" (bare ellipsis reads like a hang).
+      '<span class="lpm-value" id="lpm-strip-value">None yet</span>' +
       '<span class="lpm-toggle" aria-hidden="true"></span>';
     const powerEl = document.getElementById('power-value');
     const timeEl = document.getElementById('time-remaining');
@@ -3465,6 +3466,17 @@ function ensureLowPowerStrip() {
   const labelEl = cell.querySelector('.lpm-label');
   if (labelEl && labelEl.textContent !== LPM_GUI_LABEL) {
     labelEl.textContent = LPM_GUI_LABEL;
+  }
+  // Normalize prior builds that flashed "…" before On/Off arrived.
+  const valueEl = cell.querySelector('#lpm-strip-value');
+  if (
+    valueEl &&
+    (valueEl.textContent === '…' ||
+      valueEl.textContent === '...' ||
+      valueEl.textContent === '—' ||
+      !valueEl.textContent.trim())
+  ) {
+    valueEl.textContent = 'None yet';
   }
   if (cell.dataset.lpmStripWired === '1') return cell;
   cell.dataset.lpmStripWired = '1';
