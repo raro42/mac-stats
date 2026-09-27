@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1263] - 2026-09-27
+
+### Changed
+- **Agent Ops Agents tab first paint** — Before the agent list loads, the Agents panel (default tab) shows calm **No agents yet** (not a blank list). Matches Overview empty calm. Design review / `feature-agent-ops`.
+
 ## [0.1.1262] - 2026-09-27
 
 ### Changed
