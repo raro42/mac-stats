@@ -1237,6 +1237,15 @@ function flashOpsKeyboardHint() {
     return true;
 }
 
+/** Overview card first paint — match empty head "None yet" (not pulsing Loading…). */
+function opsOverviewFirstPaintHtml() {
+    return (
+        `<div class="ops-empty ops-empty-compact ops-empty-filter-miss is-calm" role="status">` +
+        `<div class="ops-empty-filter-title">None yet</div>` +
+        `</div>`
+    );
+}
+
 /** Inject Agents overview card (first) so Agents tab gets active-card parity. */
 function ensureOpsOverviewAgentsCard() {
     const grid = document.getElementById('ops-overview-grid');
@@ -1250,7 +1259,7 @@ function ensureOpsOverviewAgentsCard() {
         `<button type="button" class="ops-overview-link" data-goto-tab="agents">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-agents-body">` +
-        `<div class="ops-loading" role="status">Loading…</div>` +
+        opsOverviewFirstPaintHtml() +
         `</div>`;
     grid.insertBefore(card, grid.firstChild);
 }
@@ -1268,7 +1277,7 @@ function ensureOpsOverviewRunsCard() {
         `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-runs-body">` +
-        `<div class="ops-loading" role="status">Loading…</div>` +
+        opsOverviewFirstPaintHtml() +
         `</div>`;
     grid.appendChild(card);
 }
@@ -1287,7 +1296,7 @@ function ensureOpsOverviewDigestCard() {
         `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-digest-body">` +
-        `<div class="ops-loading" role="status">Loading…</div>` +
+        opsOverviewFirstPaintHtml() +
         `</div>`;
     const runs = document.getElementById('ops-overview-runs');
     if (runs && runs.nextSibling) {

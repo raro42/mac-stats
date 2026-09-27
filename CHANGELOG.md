@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1261] - 2026-09-27
+
+### Changed
+- **Agent Ops Overview first paint** — Before overview data arrives, Schedules / Live / Knowledge / Recent (and injected Agents / Runs / Digest) say **None yet** with calm empty wash (not pulsing **Loading…**). Matches overview empty head pills. Design review / `feature-agent-ops`.
+
 ## [0.1.1260] - 2026-09-27
 
 ### Changed
