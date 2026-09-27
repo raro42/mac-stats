@@ -6,6 +6,7 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 | Version | What |
 |---------|------|
+| **v0.1.1257** | Perplexity header config + Ollama model label first paint → **Unknown** (not **—**). Model glance ignores Unknown/—/None yet placeholders. |
 | **v0.1.1256** | Settings credentials first paint → **Unknown** (not **—**). Discord / Perplexity / Brave / Redmine / Mastodon / MCP / Browser / Cursor / Telegram / Slack. Matches Agent Ops health empty calm. |
 | **v0.1.1255** | Disk Cleanup summary / reclaim first paint → **None yet** (not **—**). Monitors Avg → **None yet** (not **Avg -- ms**). Design review / `feature-disk-cleanup` · `feature-monitors`. |
 | **v0.1.1254** | Overnight daily Rust `target/` clean (first post-20:00 tick) + Disk Cleanup reclaim of `target/release` at ≥10 GiB. |
@@ -17,6 +18,7 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d).
 - Debug.log: no ERROR/WARN/panic clusters in the scan window.
+- ~02:10 tick: Perplexity / Ollama model first-paint keep (**v0.1.1257**).
 - ~01:45 tick: Settings credentials first-paint keep (**v0.1.1256**).
 - ~01:20 tick: Disk Cleanup / Monitors first-paint keep (**v0.1.1255**).
 - Earlier same night: Bat / Temp / Freq / Power / strip / Details glance / Top GPU / Monitors / Disk Cleanup / Top Processes / AI Chat empty calm through **v0.1.1242–1254**.
@@ -24,5 +26,4 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 ## Next fuel
 
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
-- Ollama model text first paint still **—** when hidden.
-- Perplexity header `#perplexity-config-status` still **—** before hide.
+- Scan for other first-paint calm leftovers; sibling ports if digester stays empty.
