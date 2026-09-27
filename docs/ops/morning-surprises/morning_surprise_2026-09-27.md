@@ -6,6 +6,7 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 | Version | What |
 |---------|------|
+| **v0.1.1265** | Agent Ops Insights card first paint → calm **None yet** (not a blank card). Matches Overview / Runs list empty calm. Design review / `feature-agent-ops`. |
 | **v0.1.1264** | Agent Ops Sessions · Schedules · Knowledge · Runs first paint → calm empty titles (Live / files / schedules / deliveries / knowledge / runs — not blank lists). Matches Agents tab. Design review / `feature-agent-ops`. |
 | **v0.1.1263** | Agents tab (default) first paint → calm **No agents yet** (not a blank list). Matches Overview empty calm. Design review / `feature-agent-ops`. |
 | **v0.1.1262** | Ollama model select + Changelog first paint → **None yet** (not **Loading models…** / **Loading changelog…**). Matches Overview empty calm. Design review / `feature-ai-chat`. |
@@ -23,8 +24,9 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d); polish grace remade after **v0.1.1264**.
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d); polish grace remade after **v0.1.1265**.
 - Debug.log: no ERROR/WARN/panic clusters in the scan window.
+- ~06:00 tick: Insights card first-paint keep (**v0.1.1265**); install/kickstart.
 - ~05:36 tick: Sessions / Schedules / Knowledge / Runs list first-paint keep (**v0.1.1264**).
 - ~05:15 tick: Agents tab first-paint keep (**v0.1.1263**).
 - ~04:50 tick: Ollama model select / Changelog first-paint keep (**v0.1.1262**).
@@ -39,6 +41,6 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 ## Next fuel
 
-- Insights card first-paint calm if it still flashes blank before digester data.
-- Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`); polish grace remade after **v0.1.1264**.
+- Remaining first-paint leftovers (if any) on Agent Ops / AI Chat.
+- Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`); polish grace remade after **v0.1.1265**.
 - Sibling ports if digester stays empty.
