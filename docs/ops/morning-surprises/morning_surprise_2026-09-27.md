@@ -6,6 +6,7 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 | Version | What |
 |---------|------|
+| **v0.1.1261** | Agent Ops Overview first paint → **None yet** (not pulsing **Loading…**). Schedules / Live / Knowledge / Recent + injected Agents / Runs / Digest. Matches overview empty head pills. Design review / `feature-agent-ops`. |
 | **v0.1.1260** | Low Power Mode strip first paint → **None yet** (not **…**). Matches Power / Heat empty-metric calm. Design review / `feature-cpu-metrics`. |
 | **v0.1.1259** | Details Load 1m/5m/15m + CPU/GPU Power first paint → **None yet** (not **0.0** / **0.0 W**). Power rows stay calm until a real watt sample. Design review / `feature-cpu-metrics`. |
 | **v0.1.1258** | CPU · GPU ring first paint → **None yet** (not **0%**). Matches Temp / Freq empty-metric calm. Design review / `feature-cpu-metrics`. |
@@ -19,8 +20,9 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~11d); polish grace marked after **v0.1.1261**.
 - Debug.log: no ERROR/WARN/panic clusters in the scan window.
+- ~04:25 tick: Agent Ops Overview first-paint keep (**v0.1.1261**).
 - ~03:50 tick: LPM strip first-paint keep (**v0.1.1260**).
 - ~03:20 tick: Details load / power first-paint keep (**v0.1.1259**).
 - ~02:40 tick: CPU/GPU ring first-paint keep (**v0.1.1258**).
@@ -31,6 +33,6 @@ Overnight Track B kept shipping empty-metric calm on the CPU window, plus overni
 
 ## Next fuel
 
-- Scan for remaining first-paint leftovers on the CPU window.
+- Ollama model select / changelog first-paint **Loading…** leftovers.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
