@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1266] - 2026-09-30
+
+### Changed
+- **Footer version first paint** — Before the real version loads, the footer says **None yet** (not a fake **v0.0.3**). After load, the theme name and the real version still show.
+
+
 ## [0.1.1265] - 2026-09-27
 
 ### Changed

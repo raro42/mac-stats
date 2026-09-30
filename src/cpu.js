@@ -5162,6 +5162,20 @@ function wireFilterChipToolbarKeyboard(wrap) {
 }
 window.wireFilterChipToolbarKeyboard = wireFilterChipToolbarKeyboard;
 
+/** Theme name on the footer version label. First paint may say "None yet". */
+function footerThemeLabel(el) {
+  if (!el) return "";
+  const fromData = (el.getAttribute("data-theme-label") || "").trim();
+  if (fromData) return fromData;
+  const text = (el.textContent || "").trim();
+  const parts = text.split(" v");
+  if (parts.length < 2) return "";
+  const name = parts[0].trim();
+  if (!name || /^none yet$/i.test(name) || /^unknown$/i.test(name)) return "";
+  return name;
+}
+window.footerThemeLabel = footerThemeLabel;
+
 // Try multiple initialization strategies
 if (document.readyState === "loading") {
   // Fetch app version once at startup (no polling for CPU efficiency)
@@ -5197,16 +5211,9 @@ if (document.readyState === "loading") {
       // Set version in all footer elements
       const versionElements = document.querySelectorAll('.app-version, .theme-version, .arch-version');
       versionElements.forEach(el => {
-        const text = el.textContent;
-        // Preserve theme name if present (e.g., "Apple v0.0.3" -> "Apple v0.0.4")
-        if (text.includes('v')) {
-          const parts = text.split('v');
-          const themeName = parts[0].trim();
-          if (themeName) {
-            el.textContent = `${themeName} v${appVersion}`;
-          } else {
-            el.textContent = `v${appVersion}`;
-          }
+        const themeName = footerThemeLabel(el);
+        if (themeName) {
+          el.textContent = `${themeName} v${appVersion}`;
         } else {
           el.textContent = `v${appVersion}`;
         }

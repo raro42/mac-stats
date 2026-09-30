@@ -4374,10 +4374,17 @@
       );
 
       versionElements.forEach((el) => {
-        const themeName = el.textContent.split(" v")[0].trim();
+        const themeName =
+          typeof footerThemeLabel === "function"
+            ? footerThemeLabel(el)
+            : (el.getAttribute("data-theme-label") || "").trim();
+        const isFooter =
+          el.classList.contains("app-version") ||
+          el.classList.contains("theme-version") ||
+          el.classList.contains("arch-version");
         if (themeName) {
           el.textContent = `${themeName} v${version}`;
-        } else {
+        } else if (isFooter || (el.textContent || "").includes(" v")) {
           el.textContent = `v${version}`;
         }
         
