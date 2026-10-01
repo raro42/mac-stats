@@ -1,6 +1,6 @@
 # Morning surprise — 2026-10-01
 
-Overnight Track B kept AI Chat calm before the transcript loads.
+Overnight Track B kept the CPU window calm before JavaScript paints.
 
 ## Shipped
 
@@ -15,6 +15,7 @@ Overnight Track B kept AI Chat calm before the transcript loads.
 | **v0.1.1273** | Debug Log viewer first paint → **Nothing here yet — loads when you open Debug Log** (not **Expand to load log…**). A real tail still replaces that line after a load. All themes. |
 | **v0.1.1274** | Perplexity results first paint → **Nothing here yet — search the web** (not a blank region). A real search still replaces that line. All themes. |
 | **v0.1.1275** | AI Chat message list first paint → **Nothing here yet — set an Ollama URL** and starter chips (not a blank list). A real transcript still replaces that empty state. All themes. |
+| **v0.1.1276** | GPU sparkline first paint → the history row shows **CPU · GPU · Freq · Temp** in the theme HTML. It no longer jumps from three charts to four after JavaScript loads. All themes. |
 
 ## Context
 
@@ -30,8 +31,10 @@ Overnight Track B kept AI Chat calm before the transcript loads.
 - ~22:43 tick: Debug Log viewer first-paint keep (**v0.1.1273**); install/kickstart.
 - ~23:12 tick: Perplexity results first-paint keep (**v0.1.1274**); install/kickstart.
 - ~23:35 tick: AI Chat message list first-paint keep (**v0.1.1275**); install/kickstart.
+- ~00:05 tick: GPU sparkline first-paint keep (**v0.1.1276**); install/kickstart.
 
 ## Next fuel
 
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
+- Ring labels still say Frequency / Temperature until JavaScript shortens them to Freq / Temp.
 - Sibling ports if digester stays empty.
