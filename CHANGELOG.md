@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1278] - 2026-10-01
+
+### Changed
+- **Low Power Mode first paint** — The power strip shows **Low Power Mode (LPM)** and **None yet** as soon as the window opens. The chip no longer pops in after JavaScript loads. On and Off still replace **None yet** after a sample.
+
+
 ## [0.1.1277] - 2026-10-01
 
 ### Changed

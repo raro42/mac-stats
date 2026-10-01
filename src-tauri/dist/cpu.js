@@ -3443,6 +3443,7 @@ function ensureLowPowerStrip() {
   const strip = document.getElementById('battery-power-strip');
   if (!strip) return null;
   let cell = document.getElementById('lpm-strip');
+  // Theme HTML ships the chip. Create it only when an older shell omitted it.
   if (!cell) {
     cell = document.createElement('div');
     cell.id = 'lpm-strip';

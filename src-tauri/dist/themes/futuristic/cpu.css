@@ -1032,10 +1032,45 @@ body {
   font-size: 13px;
 }
 
-.battery-info, .power-info, .time-remaining {
+.battery-info, .power-info, .lpm-info, .time-remaining {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.lpm-label {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.lpm-value {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.lpm-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted, #888) 35%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted, #888) 25%, transparent);
+}
+
+.lpm-toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
 .battery-icon {
