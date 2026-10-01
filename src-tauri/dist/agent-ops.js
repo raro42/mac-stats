@@ -1689,6 +1689,9 @@ function ensureOpsSessionKindChips() {
             '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count" data-ops-session-kind-count="live">0</span></button>' +
             '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+    }
+    if (wrap.dataset.opsSessionKindBound !== '1') {
+        wrap.dataset.opsSessionKindBound = '1';
         wrap.addEventListener('click', (e) => {
             const clearBtn =
                 e.target &&

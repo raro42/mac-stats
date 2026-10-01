@@ -405,6 +405,11 @@
             <div class="ops-filter-row">
               <input type="search" id="ops-session-filter" class="ops-filter-input" placeholder="Filter live + files…" autocomplete="off" spellcheck="false" />
             </div>
+            <div id="ops-session-kind-chips" class="ops-session-kind-chips" role="group" aria-label="Session kind filter">
+              <button type="button" class="ops-session-kind-chip is-active" data-ops-session-kind="all" aria-pressed="true" title="Show live sessions and saved files">All</button>
+              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count" data-ops-session-kind-count="live">0</span></button>
+              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>
+            </div>
             <h4 class="ops-subhead">Live</h4>
             <div class="ops-list" id="ops-live-sessions"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="A chat appears here while an agent runs"><div class="ops-empty-filter-title">No live sessions</div><div class="ops-empty-tab-hint">A chat appears here while an agent runs</div></div></div>
             <h4 class="ops-subhead">Recent files</h4>

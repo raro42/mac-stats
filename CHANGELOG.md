@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1284] - 2026-10-01
+
+### Changed
+- **Agent Ops Sessions filter first paint** — All · Live · Files chips are in the theme HTML. They no longer pop in after JavaScript loads. Counts still update after a load.
+
+
 ## [0.1.1283] - 2026-10-01
 
 ### Changed
