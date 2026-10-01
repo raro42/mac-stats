@@ -9451,14 +9451,17 @@ async function updateMonitorsSummary() {
       summaryText.textContent =
         `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
       summaryText.title = downHints.join('; ');
+    } else if (upCount === 0 && responseTimeCount === 0) {
+      // No sample yet: match first paint "None yet" (bare "0 / N sites up" reads like an outage).
+      summaryText.textContent = 'None yet';
+      summaryText.removeAttribute('title');
+    } else if (slowest && upLatencyHints.length >= 2) {
+      summaryText.textContent =
+        `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
+      summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
     } else {
-      if (slowest && upLatencyHints.length >= 2) {
-        summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
-      } else {
-        summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
-      }
+      summaryText.textContent =
+        `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
       if (upLatencyHints.length > 0) {
         summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
       } else {
