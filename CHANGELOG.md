@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1287] - 2026-10-01
+
+### Changed
+- **Agent Ops Updated stamp first paint** — the Refresh row shows **None yet** as soon as the window opens. It no longer pops in beside Refresh after the first refresh. A real age still replaces **None yet** (**Updated just now**).
+
+
 ## [0.1.1286] - 2026-10-01
 
 ### Changed

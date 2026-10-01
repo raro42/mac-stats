@@ -7375,7 +7375,11 @@ function ensureOpsRefreshRowPlacement() {
     return row;
 }
 
-/** Relative age stamp beside Refresh so operators see Command Center freshness. */
+/**
+ * Relative age stamp beside Refresh so operators see Command Center freshness.
+ * Theme HTML ships None yet. Create the stamp only when an older shell omitted it.
+ * Keep it visible so a later refresh does not grow the row.
+ */
 function ensureOpsUpdatedAgo() {
     ensureOpsRefreshRowPlacement();
     const row = document.querySelector('.ops-refresh-row');
@@ -7386,7 +7390,10 @@ function ensureOpsUpdatedAgo() {
     el.id = 'ops-updated-ago';
     el.className = 'ops-row-meta ops-updated-ago';
     el.setAttribute('aria-live', 'polite');
-    el.hidden = true;
+    el.setAttribute('role', 'button');
+    el.tabIndex = -1;
+    el.textContent = 'None yet';
+    el.title = 'No refresh yet · Enter refreshes';
     row.appendChild(el);
     return el;
 }
@@ -7394,12 +7401,12 @@ function ensureOpsUpdatedAgo() {
 function paintOpsUpdatedAgo() {
     const el = ensureOpsUpdatedAgo();
     if (!el) return;
+    if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+    if (el.tabIndex !== 0 && el.tabIndex !== -1) el.tabIndex = -1;
     if (!opsLastRefreshMs) {
-        el.hidden = true;
-        el.textContent = '';
-        el.removeAttribute('title');
-        el.removeAttribute('role');
-        el.tabIndex = -1;
+        el.hidden = false;
+        el.textContent = 'None yet';
+        el.title = 'No refresh yet · Enter refreshes';
         refreshOpsRefreshRowRovingTabindex();
         return;
     }
