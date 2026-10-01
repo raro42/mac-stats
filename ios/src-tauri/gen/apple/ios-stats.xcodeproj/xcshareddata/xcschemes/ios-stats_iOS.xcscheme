@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "94963C433099B78ED03BA14F"
-               BuildableName = "pulso_iOS.app"
-               BlueprintName = "pulso_iOS"
-               ReferencedContainer = "container:pulso.xcodeproj">
+               BlueprintIdentifier = "BD9B6D679F8E7556A23DE93E"
+               BuildableName = "ios-stats_iOS.app"
+               BlueprintName = "ios-stats_iOS"
+               ReferencedContainer = "container:ios-stats.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "94963C433099B78ED03BA14F"
-            BuildableName = "pulso_iOS.app"
-            BlueprintName = "pulso_iOS"
-            ReferencedContainer = "container:pulso.xcodeproj">
+            BlueprintIdentifier = "BD9B6D679F8E7556A23DE93E"
+            BuildableName = "ios-stats_iOS.app"
+            BlueprintName = "ios-stats_iOS"
+            ReferencedContainer = "container:ios-stats.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -69,10 +69,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "94963C433099B78ED03BA14F"
-            BuildableName = "pulso_iOS.app"
-            BlueprintName = "pulso_iOS"
-            ReferencedContainer = "container:pulso.xcodeproj">
+            BlueprintIdentifier = "BD9B6D679F8E7556A23DE93E"
+            BuildableName = "ios-stats_iOS.app"
+            BlueprintName = "ios-stats_iOS"
+            ReferencedContainer = "container:ios-stats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -100,10 +100,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "94963C433099B78ED03BA14F"
-            BuildableName = "pulso_iOS.app"
-            BlueprintName = "pulso_iOS"
-            ReferencedContainer = "container:pulso.xcodeproj">
+            BlueprintIdentifier = "BD9B6D679F8E7556A23DE93E"
+            BuildableName = "ios-stats_iOS.app"
+            BlueprintName = "ios-stats_iOS"
+            ReferencedContainer = "container:ios-stats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>

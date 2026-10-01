@@ -13,5 +13,5 @@ pub fn run() {
             metrics::device_info,
         ])
         .run(tauri::generate_context!())
-        .expect("error al iniciar Pulso");
+        .expect("error al iniciar iOS Stats");
 }

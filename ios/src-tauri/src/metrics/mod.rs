@@ -25,7 +25,7 @@ pub struct Snapshot {
     pub cpu: Option<f32>,
     pub ram_used: Option<u64>,
     pub ram_total: u64,
-    /// Memoria que iOS atribuye a Pulso.
+    /// Memoria que iOS atribuye a esta app.
     pub app_footprint: Option<u64>,
     /// Margen antes de que iOS cierre la app (solo en un iPhone real).
     pub app_available: Option<u64>,

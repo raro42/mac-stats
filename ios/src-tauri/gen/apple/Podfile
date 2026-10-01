@@ -1,13 +1,13 @@
 # Uncomment the next line to define a global platform for your project
 
-target 'pulso_iOS' do
+target 'ios-stats_iOS' do
 platform :ios, '17.0'
-  # Pods for pulso_iOS
+  # Pods for ios-stats_iOS
 end
 
-target 'pulso_macOS' do
+target 'ios-stats_macOS' do
 platform :osx, '11.0'
-  # Pods for pulso_macOS
+  # Pods for ios-stats_macOS
 end
 
 # Delete the deployment target for iOS and macOS, causing it to be inherited from the Podfile

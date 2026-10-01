@@ -1472,6 +1472,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "ios-stats"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "objc2",
+ "objc2-foundation",
+ "objc2-ui-kit",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tokio",
+]
+
+[[package]]
 name = "ipnet"
 version = "2.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2345,21 +2360,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "pulso"
-version = "0.1.0"
-dependencies = [
- "libc",
- "objc2",
- "objc2-foundation",
- "objc2-ui-kit",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tokio",
 ]
 
 [[package]]

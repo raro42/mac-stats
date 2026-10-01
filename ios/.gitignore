@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Pulso: binarios grandes que se descargan con scripts (no van al repo)
+# iOS Stats: binarios grandes que se descargan con scripts (no van al repo)
 vendor/llama.xcframework/
 vendor/*.zip
 models/*.gguf

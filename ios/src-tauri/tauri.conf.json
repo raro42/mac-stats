@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Pulso",
+  "productName": "iOS Stats",
   "version": "0.1.0",
-  "identifier": "com.gilberto.pulso",
+  "identifier": "com.gilberto.iosstats",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "withGlobalTauri": false,
     "windows": [
       {
-        "title": "Pulso"
+        "title": "iOS Stats"
       }
     ],
     "security": {

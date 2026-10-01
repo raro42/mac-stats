@@ -1,6 +1,6 @@
-name: pulso
+name: ios-stats
 options:
-  bundleIdPrefix: com.gilberto.pulso
+  bundleIdPrefix: com.gilberto.iosstats
   deploymentTarget:
     iOS: 17.0
 fileGroups: [../../src]
@@ -10,8 +10,8 @@ configs:
 settingGroups:
   app:
     base:
-      PRODUCT_NAME: Pulso
-      PRODUCT_BUNDLE_IDENTIFIER: com.gilberto.pulso
+      PRODUCT_NAME: iOS Stats
+      PRODUCT_BUNDLE_IDENTIFIER: com.gilberto.iosstats
       DEVELOPMENT_TEAM: 3GNSU9XDB4
 targetTemplates:
   app:
@@ -25,7 +25,7 @@ targetTemplates:
     settings:
       groups: [app]
 targets:
-  pulso_iOS:
+  ios-stats_iOS:
     type: application
     platform: iOS
     sources:
@@ -37,13 +37,13 @@ targets:
       # via LIBRARY_SEARCH_PATHS, never bundled as resources.
       - path: Externals
         excludes: ["**/*.a"]
-      - path: pulso_iOS
+      - path: ios-stats_iOS
       - path: assets
         buildPhase: resources
         type: folder
       - path: LaunchScreen.storyboard
     info:
-      path: pulso_iOS/Info.plist
+      path: ios-stats_iOS/Info.plist
       properties:
         LSRequiresIPhoneOS: true
         UILaunchStoryboardName: LaunchScreen
@@ -60,7 +60,7 @@ targets:
         CFBundleShortVersionString: 0.1.0
         CFBundleVersion: "0.1.0"
     entitlements:
-      path: pulso_iOS/pulso_iOS.entitlements
+      path: ios-stats_iOS/ios-stats_iOS.entitlements
     scheme:
       environmentVariables:
         RUST_BACKTRACE: full
