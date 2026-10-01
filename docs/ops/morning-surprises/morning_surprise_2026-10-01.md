@@ -27,6 +27,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1285** | Agent Ops tab counts first paint → Agents, Sessions, Schedules, Knowledge, and Runs show a **None yet** count pill in the theme HTML. The tabs no longer grow when JavaScript loads the counts. A real count still replaces **None yet**. All themes. |
 | **v0.1.1286** | Agent Ops overview head counts first paint → Agents, Schedules, Knowledge, Recent chats, and Runs show **None yet**. Live shows **Quiet**. Digest shows **Queue clear**. The card titles no longer grow when JavaScript loads the counts. A real count still replaces those words. All themes. |
 | **v0.1.1287** | Agent Ops Updated stamp first paint → the Refresh row shows **None yet** in the theme HTML. The stamp no longer pops in beside Refresh after the first refresh. A real age still replaces **None yet** (**Updated just now**). All themes. |
+| **v0.1.1288** | Agent Ops tab counts stay **None yet** when the count is zero. The pill no longer shrinks to **0** after a refresh. A positive count still replaces **None yet**. |
 
 ## Context
 
@@ -54,6 +55,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~04:05 tick: Agent Ops tab count first-paint keep (**v0.1.1285**); install/kickstart.
 - ~04:26 tick: Agent Ops overview head count first-paint keep (**v0.1.1286**); install/kickstart.
 - ~04:53 tick: Agent Ops Updated stamp first-paint keep (**v0.1.1287**); install/kickstart.
+- ~05:19 tick: Agent Ops tab counts stay None yet at zero (**v0.1.1288**); install/kickstart.
 
 ## Next fuel
 
