@@ -20,6 +20,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1278** | Low Power Mode first paint → the power strip shows **Low Power Mode (LPM)** and **None yet** in the theme HTML. The chip no longer pops in after JavaScript loads. On and Off still replace **None yet** after a sample. All themes. |
 | **v0.1.1279** | Apple CPU and Freq rings → the fill follows the same arc as the track (and as GPU and Temp). It no longer rides a shorter curve that misses the gauge. |
 | **v0.1.1280** | Agent Ops overview first paint → **Agents**, **Runs**, and **Digest** cards with **None yet** are in the theme HTML. The grid no longer jumps from four cards to seven after JavaScript loads. Live counts still replace **None yet**. All themes. |
+| **v0.1.1281** | Agent Ops tab strip first paint → **Overview** (press 0) and digit keys **1–5** are in the theme HTML. The strip no longer grows after JavaScript loads. Press 0 still jumps to the overview. All themes. |
 
 ## Context
 
@@ -40,8 +41,10 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~00:52 tick: Low Power Mode chip first-paint keep (**v0.1.1278**); install/kickstart.
 - ~01:19 tick: Apple CPU and Freq ring arcs match the track (**v0.1.1279**); install/kickstart.
 - ~01:46 tick: Agent Ops overview cards first-paint keep (**v0.1.1280**); install/kickstart.
+- ~02:13 tick: Agent Ops tab strip first-paint keep (**v0.1.1281**); install/kickstart.
 
 ## Next fuel
 
+- Agent Ops keyboard hint still appears after JavaScript (`#ops-keyboard-hint`).
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
