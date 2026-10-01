@@ -26,6 +26,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1284** | Agent Ops Sessions filter first paint → **All · Live · Files** chips are in the theme HTML. They no longer pop in after JavaScript loads. Counts still update after a load. All themes. |
 | **v0.1.1285** | Agent Ops tab counts first paint → Agents, Sessions, Schedules, Knowledge, and Runs show a **None yet** count pill in the theme HTML. The tabs no longer grow when JavaScript loads the counts. A real count still replaces **None yet**. All themes. |
 | **v0.1.1286** | Agent Ops overview head counts first paint → Agents, Schedules, Knowledge, Recent chats, and Runs show **None yet**. Live shows **Quiet**. Digest shows **Queue clear**. The card titles no longer grow when JavaScript loads the counts. A real count still replaces those words. All themes. |
+| **v0.1.1287** | Agent Ops Updated stamp first paint → the Refresh row shows **None yet** in the theme HTML. The stamp no longer pops in beside Refresh after the first refresh. A real age still replaces **None yet** (**Updated just now**). All themes. |
 
 ## Context
 
@@ -52,10 +53,11 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~03:35 tick: Agent Ops Sessions All · Live · Files first-paint keep (**v0.1.1284**); install/kickstart.
 - ~04:05 tick: Agent Ops tab count first-paint keep (**v0.1.1285**); install/kickstart.
 - ~04:26 tick: Agent Ops overview head count first-paint keep (**v0.1.1286**); install/kickstart.
+- ~04:53 tick: Agent Ops Updated stamp first-paint keep (**v0.1.1287**); install/kickstart.
 
 ## Next fuel
 
-- Agent Ops Updated stamp (`#ops-updated-ago`) still appears beside Refresh after a refresh.
+- Agent Ops filter match chips (`N/M`) and Clear stay hidden until a query, so they do not move first paint.
 - The keyboard hint (`#ops-keyboard-hint`) stays hidden in CSS, so it does not move the layout.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
