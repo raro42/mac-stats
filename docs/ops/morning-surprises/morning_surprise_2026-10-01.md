@@ -16,6 +16,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1274** | Perplexity results first paint → **Nothing here yet — search the web** (not a blank region). A real search still replaces that line. All themes. |
 | **v0.1.1275** | AI Chat message list first paint → **Nothing here yet — set an Ollama URL** and starter chips (not a blank list). A real transcript still replaces that empty state. All themes. |
 | **v0.1.1276** | GPU sparkline first paint → the history row shows **CPU · GPU · Freq · Temp** in the theme HTML. It no longer jumps from three charts to four after JavaScript loads. All themes. |
+| **v0.1.1277** | Ring labels first paint → **Freq** and **Temp** (same words as the sparklines). They no longer flash **Frequency** and **Temperature** until JavaScript loads. Hover still shows the full words. All themes. |
 
 ## Context
 
@@ -32,9 +33,9 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~23:12 tick: Perplexity results first-paint keep (**v0.1.1274**); install/kickstart.
 - ~23:35 tick: AI Chat message list first-paint keep (**v0.1.1275**); install/kickstart.
 - ~00:05 tick: GPU sparkline first-paint keep (**v0.1.1276**); install/kickstart.
+- ~00:27 tick: ring label first-paint keep (**v0.1.1277**); install/kickstart.
 
 ## Next fuel
 
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
-- Ring labels still say Frequency / Temperature until JavaScript shortens them to Freq / Temp.
 - Sibling ports if digester stays empty.

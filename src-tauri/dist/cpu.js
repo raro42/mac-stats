@@ -2790,15 +2790,17 @@ function initRingGauges() {
 
 /**
  * Ring titles match sparkline captions: CPU · GPU · FREQ · TEMP.
- * Themes ship "Frequency" / "Temperature"; CSS uppercases those to long words
- * that no longer line up with Freq / Temp under the gauges.
+ * Themes ship Freq / Temp. Older shells still say Frequency / Temperature;
+ * CSS uppercases those to long words that no longer line up under the gauges.
  */
 function alignRingGaugeLabels() {
   const section = getRingGaugeSection();
   if (!section) return;
   const map = {
     frequency: { text: 'Freq', title: 'Frequency' },
+    freq: { text: 'Freq', title: 'Frequency' },
     temperature: { text: 'Temp', title: 'Temperature' },
+    temp: { text: 'Temp', title: 'Temperature' },
   };
   section.querySelectorAll('.metric-label').forEach((el) => {
     const key = (el.textContent || '').trim().toLowerCase();

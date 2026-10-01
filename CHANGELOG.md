@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1277] - 2026-10-01
+
+### Changed
+- **Ring labels first paint** — CPU rings say **Freq** and **Temp** as soon as the window opens (same words as the sparklines under them). They no longer flash **Frequency** and **Temperature** until JavaScript loads. Hover still shows the full words.
+
+
 ## [0.1.1276] - 2026-10-01
 
 ### Changed
