@@ -28,6 +28,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1286** | Agent Ops overview head counts first paint → Agents, Schedules, Knowledge, Recent chats, and Runs show **None yet**. Live shows **Quiet**. Digest shows **Queue clear**. The card titles no longer grow when JavaScript loads the counts. A real count still replaces those words. All themes. |
 | **v0.1.1287** | Agent Ops Updated stamp first paint → the Refresh row shows **None yet** in the theme HTML. The stamp no longer pops in beside Refresh after the first refresh. A real age still replaces **None yet** (**Updated just now**). All themes. |
 | **v0.1.1288** | Agent Ops tab counts stay **None yet** when the count is zero. The pill no longer shrinks to **0** after a refresh. A positive count still replaces **None yet**. |
+| **v0.1.1289** | Agent Ops filter match chips (**N/M**) and **Clear** stay in the theme HTML, hidden until a query. They no longer pop in after JavaScript loads. A search still shows the count and Clear. All themes. |
 
 ## Context
 
@@ -56,10 +57,11 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~04:26 tick: Agent Ops overview head count first-paint keep (**v0.1.1286**); install/kickstart.
 - ~04:53 tick: Agent Ops Updated stamp first-paint keep (**v0.1.1287**); install/kickstart.
 - ~05:19 tick: Agent Ops tab counts stay None yet at zero (**v0.1.1288**); install/kickstart.
+- ~05:45 tick: Agent Ops filter match chips stay hidden until a query (**v0.1.1289**); install/kickstart.
 
 ## Next fuel
 
-- Agent Ops filter match chips (`N/M`) and Clear stay hidden until a query, so they do not move first paint.
+- Kind-filter counts (On/Off, Live/Files, Jobs/Deliveries, Discord/Core, Runs lanes) still say **0** until a load.
 - The keyboard hint (`#ops-keyboard-hint`) stays hidden in CSS, so it does not move the layout.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.

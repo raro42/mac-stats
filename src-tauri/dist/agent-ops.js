@@ -35,7 +35,11 @@
     'ops-schedules-filter': 'schedules',
   };
 
-  /** Live match chip beside the filter input (stays visible while scrolling the list). */
+  /**
+   * Live match chip beside the filter input (stays visible while scrolling the list).
+   * Theme HTML ships the chip hidden. Create it only when an older shell omitted it.
+   * It stays hidden until a query so the filter row does not grow on first paint.
+   */
   function ensureOpsFilterMatchChip(input) {
     if (!input || !input.parentElement) return null;
     let chip = input.parentElement.querySelector('.ops-filter-match');
@@ -44,11 +48,16 @@
     chip.className = 'ops-filter-match';
     chip.hidden = true;
     chip.setAttribute('aria-live', 'polite');
+    chip.setAttribute('role', 'status');
+    chip.title = 'Match count';
     input.parentElement.appendChild(chip);
     return chip;
   }
 
-  /** Compact Clear control when a filter query is active (Esc parity; works with matches too). */
+  /**
+   * Compact Clear control when a filter query is active (Esc parity; works with matches too).
+   * Theme HTML ships the button hidden. Create it only when an older shell omitted it.
+   */
   function ensureOpsFilterClearBtn(input) {
     if (!input || !input.parentElement) return null;
     let btn = input.parentElement.querySelector('.ops-filter-clear');

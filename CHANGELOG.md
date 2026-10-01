@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1289] - 2026-10-01
+
+### Changed
+- **Agent Ops filter match chips first paint** — the N/M match chip and Clear stay in the theme HTML, hidden until you type a filter. They no longer pop in after JavaScript loads. A search still shows the count and Clear.
+
+
 ## [0.1.1288] - 2026-10-01
 
 ### Changed

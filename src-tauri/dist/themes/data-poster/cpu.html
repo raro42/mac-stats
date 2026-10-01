@@ -411,6 +411,8 @@
           <div class="agent-ops-panel active" id="ops-panel-agents">
             <div class="ops-filter-row" role="toolbar">
               <input type="search" id="ops-agents-filter" class="ops-filter-input" placeholder="Filter agents by name, slug, model… (/ focus, Esc clears)" autocomplete="off" spellcheck="false" />
+              <span class="ops-filter-match" hidden aria-live="polite" role="status" title="Match count"></span>
+              <button type="button" class="ops-filter-clear" hidden data-ops-clear-filter="agents" aria-label="Clear filter" title="Clear filter (Esc)">Clear</button>
             </div>
             <div id="ops-agents-enabled-chips" class="ops-agents-enabled-chips" role="group" aria-label="Agent enabled filter">
               <button type="button" class="ops-agents-enabled-chip is-active" data-ops-agents-enabled="all" aria-pressed="true" title="Show every agent">All</button>
@@ -436,6 +438,8 @@
           <div class="agent-ops-panel" id="ops-panel-sessions">
             <div class="ops-filter-row">
               <input type="search" id="ops-session-filter" class="ops-filter-input" placeholder="Filter live + files…" autocomplete="off" spellcheck="false" />
+              <span class="ops-filter-match" hidden aria-live="polite" role="status" title="Match count"></span>
+              <button type="button" class="ops-filter-clear" hidden data-ops-clear-filter="sessions" aria-label="Clear filter" title="Clear filter (Esc)">Clear</button>
             </div>
             <div id="ops-session-kind-chips" class="ops-session-kind-chips" role="group" aria-label="Session kind filter">
               <button type="button" class="ops-session-kind-chip is-active" data-ops-session-kind="all" aria-pressed="true" title="Show live sessions and saved files">All</button>
@@ -452,6 +456,8 @@
           <div class="agent-ops-panel" id="ops-panel-schedules">
             <div class="ops-filter-row" role="toolbar">
               <input type="search" id="ops-schedules-filter" class="ops-filter-input" placeholder="Filter schedules + deliveries… (/ focus, Esc clears)" autocomplete="off" spellcheck="false" />
+              <span class="ops-filter-match" hidden aria-live="polite" role="status" title="Match count"></span>
+              <button type="button" class="ops-filter-clear" hidden data-ops-clear-filter="schedules" aria-label="Clear filter" title="Clear filter (Esc)">Clear</button>
             </div>
             <div id="ops-schedules-kind-chips" class="ops-schedules-kind-chips" role="group" aria-label="Schedule kind filter">
               <button type="button" class="ops-schedules-kind-chip is-active" data-ops-schedules-kind="all" aria-pressed="true" title="Show active schedules and recent deliveries">All</button>
@@ -468,6 +474,8 @@
           <div class="agent-ops-panel" id="ops-panel-memory">
             <div class="ops-filter-row" role="toolbar">
               <input type="search" id="ops-memory-filter" class="ops-filter-input" placeholder="Filter knowledge files… (/ focus, Esc clears)" autocomplete="off" spellcheck="false" />
+              <span class="ops-filter-match" hidden aria-live="polite" role="status" title="Match count"></span>
+              <button type="button" class="ops-filter-clear" hidden data-ops-clear-filter="memory" aria-label="Clear filter" title="Clear filter (Esc)">Clear</button>
             </div>
             <div id="ops-memory-kind-chips" class="ops-memory-kind-chips" role="group" aria-label="Knowledge kind filter">
               <button type="button" class="ops-memory-kind-chip is-active" data-ops-memory-kind="all" aria-pressed="true" title="Show every knowledge file">All</button>
@@ -481,6 +489,8 @@
             <div class="ops-insights-card" id="ops-runs-insights"><div class="ops-insight-title">Insights</div><div class="ops-empty ops-empty-compact ops-empty-filter-miss is-calm" role="status" title="Turns land after Discord or chat"><div class="ops-empty-filter-title">None yet</div><div class="ops-empty-tab-hint">Turns land after Discord or chat</div></div></div>
             <div class="ops-filter-row" role="toolbar">
               <input type="search" id="ops-runs-filter" class="ops-filter-input" placeholder="Filter runs by lane, tool, question… (/ focus, Esc clears)" autocomplete="off" spellcheck="false" />
+              <span class="ops-filter-match" hidden aria-live="polite" role="status" title="Match count"></span>
+              <button type="button" class="ops-filter-clear" hidden data-ops-clear-filter="runs" aria-label="Clear filter" title="Clear filter (Esc)">Clear</button>
             </div>
             <div id="ops-runs-lane-chips" class="ops-runs-lane-chips" role="group" aria-label="Run lane filter">
               <button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>
