@@ -1,11 +1,20 @@
-import { invoke } from "@tauri-apps/api/core";
+import { startMonitor } from "./monitor/monitor";
 
-window.addEventListener("DOMContentLoaded", async () => {
-  const estado = document.querySelector<HTMLParagraphElement>("#estado");
-  if (!estado) return;
-  try {
-    estado.textContent = await invoke<string>("ping");
-  } catch (e) {
-    estado.textContent = `Error: ${String(e)}`;
+function setupTabs(): void {
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>(".tab"));
+  const views = Array.from(document.querySelectorAll<HTMLElement>(".view"));
+  for (const tab of tabs) {
+    tab.addEventListener("click", () => {
+      for (const t of tabs) t.setAttribute("aria-selected", String(t === tab));
+      for (const v of views) v.hidden = v.id !== `view-${tab.dataset.view}`;
+    });
   }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  setupTabs();
+  startMonitor().catch((error: unknown) => {
+    const device = document.getElementById("device");
+    if (device) device.textContent = `No se pudo iniciar el monitor: ${String(error)}`;
+  });
 });

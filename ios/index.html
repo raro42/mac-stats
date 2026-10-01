@@ -9,9 +9,75 @@
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-    <main class="app">
-      <h1>Pulso</h1>
-      <p id="estado">Conectando con Rust…</p>
+    <main id="view-monitor" class="view">
+      <header class="top">
+        <div class="title-row">
+          <h1>Pulso</h1>
+          <div class="badges">
+            <span id="low-power" class="pill pill-lowpower" hidden>Bajo consumo</span>
+            <span id="thermal" class="pill pill-thermal" data-state="unknown">—</span>
+          </div>
+        </div>
+        <p id="device" class="device">Leyendo el dispositivo…</p>
+      </header>
+
+      <section id="rings" class="rings" aria-label="Indicadores"></section>
+
+      <section class="card">
+        <h2>Memoria de Pulso</h2>
+        <div class="bar" aria-hidden="true"><div id="appmem-fill" class="bar-fill"></div></div>
+        <p id="appmem-text" class="card-text">Midiendo…</p>
+      </section>
+
+      <section class="card net">
+        <h2>Red</h2>
+        <div class="net-row">
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↓</span><span id="net-down">—</span></span>
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↑</span><span id="net-up">—</span></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Historial</h2>
+          <div class="segmented" role="group" aria-label="Periodo">
+            <button type="button" data-range="5m" aria-pressed="true">5 min</button>
+            <button type="button" data-range="1h" aria-pressed="false">1 h</button>
+          </div>
+        </div>
+        <div class="chart">
+          <span class="chart-label">CPU</span>
+          <canvas id="chart-cpu" class="chart-canvas chart-cpu"></canvas>
+        </div>
+        <div class="chart">
+          <span class="chart-label">RAM</span>
+          <canvas id="chart-ram" class="chart-canvas chart-ram"></canvas>
+        </div>
+      </section>
+
+      <p class="footnote">iOS no deja leer temperaturas en °C, la GPU ni los procesos de otras apps.</p>
     </main>
+
+    <main id="view-chat" class="view" hidden>
+      <header class="top">
+        <div class="title-row"><h1>Chat</h1></div>
+        <p class="device">IA que corre dentro de tu iPhone, sin servidor.</p>
+      </header>
+      <section class="card empty">
+        <h2>Próximamente</h2>
+        <p class="card-text">El chat con un modelo local (llama.cpp) llega en la siguiente fase.</p>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Secciones">
+      <button type="button" class="tab" data-view="monitor" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" /></svg>
+        <span>Monitor</span>
+      </button>
+      <button type="button" class="tab" data-view="chat" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" /></svg>
+        <span>Chat</span>
+      </button>
+    </nav>
   </body>
 </html>
