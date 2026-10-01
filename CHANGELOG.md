@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1274] - 2026-09-30
+
+### Changed
+- **Perplexity results first paint** — Before a search, the results region says **Nothing here yet — search the web** (not a blank region). A real search still replaces that line.
+
+
 ## [0.1.1273] - 2026-09-30
 
 ### Changed

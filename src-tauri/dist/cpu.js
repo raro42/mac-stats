@@ -15723,6 +15723,38 @@ function wirePerplexityLastGlanceClick(glance) {
   });
 }
 
+const PERPLEXITY_RESULTS_FIRST_PAINT = 'Nothing here yet — search the web';
+
+/** Calm copy until a search fills the results region. Theme HTML uses the same line. */
+function paintPerplexityResultsFirstPaint(resultsEl) {
+  if (!resultsEl) return;
+  if (
+    resultsEl.querySelector(
+      '.perplexity-result-item, .perplexity-weather-card, .perplexity-empty-error, .perplexity-filter-miss'
+    )
+  ) {
+    return;
+  }
+  const existing = resultsEl.querySelector('.perplexity-empty');
+  const raw = (existing ? existing.textContent : resultsEl.textContent || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const stale =
+    raw === '' ||
+    raw === '—' ||
+    raw === '-' ||
+    raw === PERPLEXITY_RESULTS_FIRST_PAINT;
+  if (!stale) return;
+  if (existing && raw === PERPLEXITY_RESULTS_FIRST_PAINT) {
+    existing.classList.add('perplexity-results-first-paint');
+    return;
+  }
+  resultsEl.innerHTML =
+    '<div class="perplexity-empty perplexity-results-first-paint" role="status">' +
+    PERPLEXITY_RESULTS_FIRST_PAINT +
+    '</div>';
+}
+
 function initPerplexitySection() {
   const header = document.getElementById('perplexity-header');
   const content = document.getElementById('perplexity-content');
@@ -15731,6 +15763,7 @@ function initPerplexitySection() {
   const searchBtn = document.getElementById('perplexity-search-btn');
   const queryInput = document.getElementById('perplexity-query');
   const resultsEl = document.getElementById('perplexity-results');
+  paintPerplexityResultsFirstPaint(resultsEl);
 
   if (!header || !content) return;
 
