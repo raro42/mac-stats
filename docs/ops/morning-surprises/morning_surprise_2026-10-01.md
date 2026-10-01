@@ -1,6 +1,6 @@
 # Morning surprise — 2026-10-01
 
-Overnight Track B kept Disk Cleanup calm before scopes load.
+Overnight Track B kept Disk Cleanup calm before a status load.
 
 ## Shipped
 
@@ -11,6 +11,7 @@ Overnight Track B kept Disk Cleanup calm before scopes load.
 | **v0.1.1269** | Top Processes list first paint → **Waiting for process samples — opens with the CPU window** (not a blank list). Real rows still replace that line after a sample. All themes. |
 | **v0.1.1270** | Disk Cleanup category list first paint → **Nothing to reclaim yet** and **Review scopes** (not a blank list). Real category rows still replace that empty state after a load. All themes. |
 | **v0.1.1271** | Disk Cleanup scopes list first paint → **No scopes yet** and **Add a scope** (not a blank list). Real scope rows still replace that empty state after a load. All themes. |
+| **v0.1.1272** | Disk Cleanup last-run panel first paint → **Not yet this install — will run on launch** (not a blank panel). A real last run still replaces that line after a load. All themes. |
 
 ## Context
 
@@ -22,9 +23,10 @@ Overnight Track B kept Disk Cleanup calm before scopes load.
 - ~21:00 tick: Top Processes list first-paint keep (**v0.1.1269**); install/kickstart.
 - ~21:23 tick: Disk Cleanup category list first-paint keep (**v0.1.1270**); install/kickstart.
 - ~21:48 tick: Disk Cleanup scopes list first-paint keep (**v0.1.1271**); install/kickstart.
+- ~22:18 tick: Disk Cleanup last-run first-paint keep (**v0.1.1272**); install/kickstart.
 
 ## Next fuel
 
-- Scan remaining first-paint blanks (Debug Log viewer, last-run panel).
+- Debug Log viewer still says **Expand to load log…** until the section opens.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
