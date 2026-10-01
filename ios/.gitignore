@@ -25,5 +25,7 @@ dist-ssr
 
 # iOS Stats: binarios grandes que se descargan con scripts (no van al repo)
 vendor/llama.xcframework/
+vendor/llama.cpp/
 vendor/*.zip
 models/*.gguf
+models/*.part

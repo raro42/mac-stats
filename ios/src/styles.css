@@ -392,3 +392,63 @@ body {
 .tab[aria-selected="true"] {
   color: var(--accent);
 }
+
+/* Laboratorio (fase A) */
+.lab-select,
+.lab-prompt {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+}
+
+.lab-prompt {
+  margin-top: 10px;
+  resize: vertical;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.lab-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lab-btn {
+  flex: 1;
+  appearance: none;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--track);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lab-btn:disabled {
+  opacity: 0.5;
+}
+
+.lab-send {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.lab-output {
+  min-height: 3em;
+  margin-top: 12px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-user-select: text;
+  user-select: text;
+}

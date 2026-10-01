@@ -33,7 +33,10 @@
     ],
     "iOS": {
       "developmentTeam": "3GNSU9XDB4",
-      "minimumSystemVersion": "17.0"
+      "minimumSystemVersion": "17.0",
+      "frameworks": [
+        "../vendor/llama.xcframework"
+      ]
     }
   }
 }

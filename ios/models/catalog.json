@@ -1,0 +1,35 @@
+[
+  {
+    "id": "qwen3.5-2b",
+    "name": "Qwen3.5 2B",
+    "repo": "unsloth/Qwen3.5-2B-GGUF",
+    "commit": "f6d5376be1edb4d416d56da11e5397a961aca8ae",
+    "file": "Qwen3.5-2B-Q4_K_M.gguf",
+    "size": 1280835840,
+    "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+    "license": "Apache-2.0",
+    "thinkPrefill": true
+  },
+  {
+    "id": "lfm2.5-1.2b",
+    "name": "LFM2.5 1.2B",
+    "repo": "LiquidAI/LFM2.5-1.2B-Instruct-GGUF",
+    "commit": "8ed288026e23958ad9dfa92d53ed773a8eee7125",
+    "file": "LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+    "size": 730895168,
+    "sha256": "b1b3de114215d9507409a662a501a631095a479a419584e8a2ded6304b19b4f5",
+    "license": "LFM Open License v1.0",
+    "thinkPrefill": false
+  },
+  {
+    "id": "qwen2.5-1.5b",
+    "name": "Qwen2.5 1.5B",
+    "repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "commit": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+    "file": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "size": 1117320736,
+    "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "license": "Apache-2.0",
+    "thinkPrefill": false
+  }
+]

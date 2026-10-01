@@ -1,3 +1,4 @@
+import { startLab } from "./chat/lab";
 import { startMonitor } from "./monitor/monitor";
 
 function setupTabs(): void {
@@ -16,5 +17,9 @@ window.addEventListener("DOMContentLoaded", () => {
   startMonitor().catch((error: unknown) => {
     const device = document.getElementById("device");
     if (device) device.textContent = `No se pudo iniciar el monitor: ${String(error)}`;
+  });
+  startLab().catch((error: unknown) => {
+    const status = document.getElementById("lab-status");
+    if (status) status.textContent = `No se pudo iniciar el laboratorio: ${String(error)}`;
   });
 });

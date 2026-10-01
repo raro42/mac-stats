@@ -1,0 +1,3 @@
+[default]
+description = "El plugin no expone comandos a la web; solo lo usa el Rust de la app."
+permissions = []

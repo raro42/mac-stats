@@ -78,6 +78,7 @@ targets:
     dependencies:
       - framework: libapp.a
         embed: false
+      - framework: ../../../vendor/llama.xcframework
       - sdk: CoreGraphics.framework
       - sdk: Metal.framework
       - sdk: MetalKit.framework

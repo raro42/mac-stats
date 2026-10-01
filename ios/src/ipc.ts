@@ -53,3 +53,59 @@ export function metricsHistory(range: Range): Promise<HistoryPoint[]> {
 export function deviceInfo(): Promise<DeviceInfo> {
   return invoke<DeviceInfo>("device_info");
 }
+
+// --- Laboratorio de modelos (fase A, solo depuración) ---
+
+export interface LabModel {
+  id: string;
+  name: string;
+  file: string;
+  size: number;
+  license: string;
+  thinkPrefill: boolean;
+  installed: boolean;
+}
+
+export interface LoadInfo {
+  loadMs: number;
+  description: string;
+  nParams: number;
+  sizeBytes: number;
+  nCtx: number;
+  gpu: boolean;
+  availableMemory: number;
+}
+
+export interface BenchResult {
+  ppTps: number;
+  tgTps: number;
+  availableMemory: number;
+}
+
+export interface GenerateResult {
+  stopReason: string;
+  nPrompt: number;
+  nCached: number;
+  nGen: number;
+  ppTps: number;
+  tgTps: number;
+  availableMemory: number;
+}
+
+export const labModels = () => invoke<LabModel[]>("lab_models");
+export const labLoad = (id: string) => invoke<LoadInfo>("lab_load", { id });
+export const labUnload = () => invoke<void>("lab_unload");
+export const labBench = () => invoke<BenchResult>("lab_bench");
+export const labCancel = () => invoke<void>("lab_cancel");
+
+export function labGenerate(
+  prompt: string,
+  thinkPrefill: boolean,
+  onDelta: (text: string) => void,
+): Promise<GenerateResult> {
+  const channel = new Channel<{ type: string; text?: string }>();
+  channel.onmessage = (event) => {
+    if (event.type === "delta" && event.text) onDelta(event.text);
+  };
+  return invoke<GenerateResult>("lab_generate", { prompt, thinkPrefill, onEvent: channel });
+}

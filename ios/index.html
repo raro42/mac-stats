@@ -63,9 +63,18 @@
         <div class="title-row"><h1>Chat</h1></div>
         <p class="device">IA que corre dentro de tu iPhone, sin servidor.</p>
       </header>
-      <section class="card empty">
-        <h2>Próximamente</h2>
-        <p class="card-text">El chat con un modelo local (llama.cpp) llega en la siguiente fase.</p>
+      <section class="card lab">
+        <h2>Laboratorio</h2>
+        <select id="lab-model" class="lab-select" aria-label="Modelo"></select>
+        <div class="lab-buttons">
+          <button type="button" id="lab-load" class="lab-btn">Cargar</button>
+          <button type="button" id="lab-bench" class="lab-btn">Medir</button>
+          <button type="button" id="lab-unload" class="lab-btn">Descargar</button>
+        </div>
+        <p id="lab-status" class="card-text">Preparando…</p>
+        <textarea id="lab-prompt" class="lab-prompt" rows="3">¿Cómo van mi batería y mi memoria ahora mismo?</textarea>
+        <button type="button" id="lab-send" class="lab-btn lab-send">Generar</button>
+        <div id="lab-output" class="lab-output" aria-live="polite"></div>
       </section>
     </main>
 

@@ -63,6 +63,11 @@ impl MetricsState {
     fn lock(&self) -> MutexGuard<'_, Inner> {
         self.0.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
     }
+
+    /// Última lectura completa (la usa el chat para darle contexto al modelo).
+    pub fn latest(&self) -> Option<Snapshot> {
+        self.lock().latest.clone()
+    }
 }
 
 /// Registra el estado compartido y arranca el muestreo.
