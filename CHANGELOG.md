@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1283] - 2026-10-01
+
+### Changed
+- **Agent Ops filter first paint** — Agents (All · On · Off), Schedules (All · Jobs · Deliveries), Knowledge (All · Discord · Core), and Runs lanes are in the theme HTML. Those rows no longer pop in after JavaScript loads. Counts still update after a load.
+
+
 ## [0.1.1282] - 2026-10-01
 
 ### Changed

@@ -1879,6 +1879,8 @@ function ensureOpsMemoryKindChips() {
             '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count" data-ops-memory-kind-count="discord">0</span></button>' +
             '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count" data-ops-memory-kind-count="core">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+    }
+    if (wrap.dataset.opsMemoryKindClearBound !== '1') {
         wrap.dataset.opsMemoryKindClearBound = '1';
         wrap.addEventListener('click', (e) => {
             const clearBtn =
@@ -1898,22 +1900,6 @@ function ensureOpsMemoryKindChips() {
                 e.target && e.target.closest && e.target.closest('[data-ops-memory-kind]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsMemoryKindFilter(btn.getAttribute('data-ops-memory-kind') || 'all');
-        });
-    } else if (wrap.dataset.opsMemoryKindClearBound !== '1') {
-        wrap.dataset.opsMemoryKindClearBound = '1';
-        wrap.addEventListener('click', (e) => {
-            const clearBtn =
-                e.target &&
-                e.target.closest &&
-                e.target.closest(
-                    '#ops-memory-kind-filter-clear, .ops-memory-kind-filter-clear'
-                );
-            if (clearBtn && wrap.contains(clearBtn)) {
-                e.preventDefault();
-                e.stopPropagation();
-                setOpsMemoryKindFilter('all');
-                flashOpsMemoryKindFilterClearBtn(clearBtn);
-            }
         });
     }
     ensureOpsMemoryKindFilterClearBtn(wrap);
@@ -2094,6 +2080,8 @@ function ensureOpsRunsLaneChips() {
             `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>` +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+    }
+    if (wrap.dataset.opsRunsLaneClearBound !== '1') {
         wrap.dataset.opsRunsLaneClearBound = '1';
         wrap.addEventListener('click', (e) => {
             const clearBtn =
@@ -2114,59 +2102,41 @@ function ensureOpsRunsLaneChips() {
             if (!btn || !wrap.contains(btn)) return;
             setOpsRunsLaneFilter(btn.getAttribute('data-ops-runs-lane') || 'all');
         });
-    } else {
-        if (!wrap.querySelector('[data-ops-runs-lane="lite"]')) {
-            const liteBtn = document.createElement('button');
-            liteBtn.type = 'button';
-            liteBtn.className = 'ops-runs-lane-chip';
-            liteBtn.setAttribute('data-ops-runs-lane', 'lite');
-            liteBtn.setAttribute('aria-pressed', 'false');
-            liteBtn.title = 'Show lite-lane runs only';
-            liteBtn.innerHTML =
-                'Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span>';
-            const directBtn = wrap.querySelector('[data-ops-runs-lane="direct"]');
-            if (directBtn) wrap.insertBefore(liteBtn, directBtn);
-            else wrap.appendChild(liteBtn);
-        }
-        if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
-            const slowBtn = document.createElement('button');
-            slowBtn.type = 'button';
-            slowBtn.className = 'ops-runs-lane-chip';
-            slowBtn.setAttribute('data-ops-runs-lane', 'slow');
-            slowBtn.setAttribute('aria-pressed', 'false');
-            slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
-            slowBtn.innerHTML =
-                `Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span>`;
-            wrap.appendChild(slowBtn);
-        }
-        if (!wrap.querySelector('[data-ops-runs-lane="fail"]')) {
-            const failBtn = document.createElement('button');
-            failBtn.type = 'button';
-            failBtn.className = 'ops-runs-lane-chip';
-            failBtn.setAttribute('data-ops-runs-lane', 'fail');
-            failBtn.setAttribute('aria-pressed', 'false');
-            failBtn.title = 'Show failed runs only (ok=false)';
-            failBtn.innerHTML =
-                'Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span>';
-            wrap.appendChild(failBtn);
-        }
-        if (wrap.dataset.opsRunsLaneClearBound !== '1') {
-            wrap.dataset.opsRunsLaneClearBound = '1';
-            wrap.addEventListener('click', (e) => {
-                const clearBtn =
-                    e.target &&
-                    e.target.closest &&
-                    e.target.closest(
-                        '#ops-runs-lane-filter-clear, .ops-runs-lane-filter-clear'
-                    );
-                if (clearBtn && wrap.contains(clearBtn)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setOpsRunsLaneFilter('all');
-                    flashOpsRunsLaneFilterClearBtn(clearBtn);
-                }
-            });
-        }
+    }
+    if (!wrap.querySelector('[data-ops-runs-lane="lite"]')) {
+        const liteBtn = document.createElement('button');
+        liteBtn.type = 'button';
+        liteBtn.className = 'ops-runs-lane-chip';
+        liteBtn.setAttribute('data-ops-runs-lane', 'lite');
+        liteBtn.setAttribute('aria-pressed', 'false');
+        liteBtn.title = 'Show lite-lane runs only';
+        liteBtn.innerHTML =
+            'Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span>';
+        const directBtn = wrap.querySelector('[data-ops-runs-lane="direct"]');
+        if (directBtn) wrap.insertBefore(liteBtn, directBtn);
+        else wrap.appendChild(liteBtn);
+    }
+    if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
+        const slowBtn = document.createElement('button');
+        slowBtn.type = 'button';
+        slowBtn.className = 'ops-runs-lane-chip';
+        slowBtn.setAttribute('data-ops-runs-lane', 'slow');
+        slowBtn.setAttribute('aria-pressed', 'false');
+        slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
+        slowBtn.innerHTML =
+            `Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span>`;
+        wrap.appendChild(slowBtn);
+    }
+    if (!wrap.querySelector('[data-ops-runs-lane="fail"]')) {
+        const failBtn = document.createElement('button');
+        failBtn.type = 'button';
+        failBtn.className = 'ops-runs-lane-chip';
+        failBtn.setAttribute('data-ops-runs-lane', 'fail');
+        failBtn.setAttribute('aria-pressed', 'false');
+        failBtn.title = 'Show failed runs only (ok=false)';
+        failBtn.innerHTML =
+            'Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span>';
+        wrap.appendChild(failBtn);
     }
     ensureOpsRunsLaneFilterClearBtn(wrap);
     syncOpsRunsLaneFilterClearBtn();
@@ -4588,6 +4558,9 @@ function ensureOpsAgentsEnabledChips() {
             '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="on">0</span></button>' +
             '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="off">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+    }
+    if (wrap.dataset.opsAgentsEnabledBound !== '1') {
+        wrap.dataset.opsAgentsEnabledBound = '1';
         wrap.addEventListener('click', (e) => {
             const clearBtn =
                 e.target &&
@@ -4777,6 +4750,8 @@ function ensureOpsSchedulesKindChips() {
             '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="jobs">0</span></button>' +
             '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="deliveries">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
+    }
+    if (wrap.dataset.opsSchedulesKindClearBound !== '1') {
         wrap.dataset.opsSchedulesKindClearBound = '1';
         wrap.addEventListener('click', (e) => {
             const clearBtn =
@@ -4796,22 +4771,6 @@ function ensureOpsSchedulesKindChips() {
                 e.target && e.target.closest && e.target.closest('[data-ops-schedules-kind]');
             if (!btn || !wrap.contains(btn)) return;
             setOpsSchedulesKindFilter(btn.getAttribute('data-ops-schedules-kind') || 'all');
-        });
-    } else if (wrap.dataset.opsSchedulesKindClearBound !== '1') {
-        wrap.dataset.opsSchedulesKindClearBound = '1';
-        wrap.addEventListener('click', (e) => {
-            const clearBtn =
-                e.target &&
-                e.target.closest &&
-                e.target.closest(
-                    '#ops-schedules-kind-filter-clear, .ops-schedules-kind-filter-clear'
-                );
-            if (clearBtn && wrap.contains(clearBtn)) {
-                e.preventDefault();
-                e.stopPropagation();
-                setOpsSchedulesKindFilter('all');
-                flashOpsSchedulesKindFilterClearBtn(clearBtn);
-            }
         });
     }
     ensureOpsSchedulesKindFilterClearBtn(wrap);
