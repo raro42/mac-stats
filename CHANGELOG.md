@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1279] - 2026-10-01
+
+### Fixed
+- **Apple CPU and Freq rings** — The fill follows the same arc as the track (and as GPU and Temp). It no longer rides a shorter curve that misses the gauge.
+
+
 ## [0.1.1278] - 2026-10-01
 
 ### Changed
