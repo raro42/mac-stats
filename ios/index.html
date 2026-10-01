@@ -58,14 +58,31 @@
       <p class="footnote">iOS no deja leer temperaturas en °C, la GPU ni los procesos de otras apps.</p>
     </main>
 
-    <main id="view-chat" class="view" hidden>
+    <main id="view-chat" class="view chat-view" hidden>
       <header class="top">
-        <div class="title-row"><h1>Chat</h1></div>
-        <p class="device">IA que corre dentro de tu iPhone, sin servidor.</p>
+        <div class="title-row">
+          <h1>Chat</h1>
+          <button type="button" id="chat-new" class="pill-btn">Nueva</button>
+        </div>
+        <p class="device">IA que corre dentro de tu iPhone, sin servidor ni conexión.</p>
       </header>
-      <section class="card lab">
-        <h2>Laboratorio</h2>
-        <select id="lab-model" class="lab-select" aria-label="Modelo"></select>
+
+      <section id="model-card" class="card model-card" aria-label="Modelo"></section>
+      <div id="chat-banner" class="banner" role="status" hidden></div>
+
+      <p id="chat-empty" class="chat-empty">
+        Pregúntale por tu iPhone («¿cómo va mi batería?») o por cualquier otra cosa.
+      </p>
+      <section id="chat-history" class="chat-history" aria-live="polite"></section>
+
+      <details class="card conversations">
+        <summary>Conversaciones</summary>
+        <ul id="conv-list" class="conv-list"></ul>
+      </details>
+
+      <details id="lab-details" class="card lab" hidden>
+        <summary>Laboratorio (depuración)</summary>
+        <select id="lab-model" class="lab-select" aria-label="Modelo del laboratorio"></select>
         <div class="lab-buttons">
           <button type="button" id="lab-load" class="lab-btn">Cargar</button>
           <button type="button" id="lab-bench" class="lab-btn">Medir</button>
@@ -75,7 +92,12 @@
         <textarea id="lab-prompt" class="lab-prompt" rows="3">¿Cómo van mi batería y mi memoria ahora mismo?</textarea>
         <button type="button" id="lab-send" class="lab-btn lab-send">Generar</button>
         <div id="lab-output" class="lab-output" aria-live="polite"></div>
-      </section>
+      </details>
+
+      <form id="chat-form" class="composer">
+        <textarea id="chat-input" rows="1" placeholder="Pregunta algo…" aria-label="Mensaje"></textarea>
+        <button type="submit" id="chat-send" class="composer-send">Enviar</button>
+      </form>
     </main>
 
     <nav class="tabbar" aria-label="Secciones">

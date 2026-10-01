@@ -65,6 +65,18 @@ func availableMemory() -> UInt64 {
   UInt64(os_proc_available_memory())
 }
 
+/// Estado térmico; en depuración se puede forzar con `IOS_STATS_FAKE_THERMAL`.
+private func thermalState() -> ProcessInfo.ThermalState {
+  #if DEBUG
+    switch ProcessInfo.processInfo.environment["IOS_STATS_FAKE_THERMAL"] {
+    case "serious": return .serious
+    case "critical": return .critical
+    default: break
+    }
+  #endif
+  return ProcessInfo.processInfo.thermalState
+}
+
 private func millis(since start: UInt64) -> Double {
   Double(DispatchTime.now().uptimeNanoseconds - start) / 1_000_000
 }
@@ -314,13 +326,16 @@ final class LlamaEngine {
     if reused == 0 { llama_memory_clear(memory, true) }
     cached = Array(tokens[0..<reused])
 
+    // Bloques pequeños: la cancelación solo se puede atender entre llamadas a
+    // llama_decode, y con Metal el aborto de llama.cpp no funciona.
+    let promptChunk = min(Int(nBatch), 64)
     let promptStart = DispatchTime.now().uptimeNanoseconds
     var position = reused
     while position < tokens.count {
       if isCancelled() {
         return ["stopReason": "cancelled", "nPrompt": tokens.count, "nCached": reused, "nGen": 0]
       }
-      let count = min(Int(nBatch), tokens.count - position)
+      let count = min(promptChunk, tokens.count - position)
       try decode(&tokens, from: position, count: count)
       cached.append(contentsOf: tokens[position..<(position + count)])
       position += count
@@ -342,7 +357,7 @@ final class LlamaEngine {
         stopReason = "cancelled"
         break
       }
-      switch ProcessInfo.processInfo.thermalState {
+      switch thermalState() {
       case .critical:
         stopReason = "thermal"
         break generation

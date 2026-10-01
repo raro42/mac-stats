@@ -82,3 +82,16 @@ pub struct EngineStatus {
     pub busy: bool,
     pub available_memory: u64,
 }
+
+/// Descarga verificada de un modelo. Swift envía por `on_event`
+/// `{type: "progress", received, total}` y `{type: "verifying"}`.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DownloadRequest {
+    pub url: String,
+    pub sha256: String,
+    pub size: u64,
+    pub file: String,
+    pub allow_cellular: bool,
+    pub on_event: Channel<serde_json::Value>,
+}

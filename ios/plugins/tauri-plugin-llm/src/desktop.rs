@@ -41,6 +41,22 @@ impl<R: Runtime> Llm<R> {
         Ok(())
     }
 
+    pub async fn download(&self, _request: DownloadRequest) -> crate::Result<String> {
+        Err(Error::Unsupported)
+    }
+
+    pub async fn cancel_download(&self) -> crate::Result<()> {
+        Ok(())
+    }
+
+    pub async fn delete_model(&self, _file: &str) -> crate::Result<()> {
+        Err(Error::Unsupported)
+    }
+
+    pub async fn debug_simulate(&self, _event: &str) -> crate::Result<()> {
+        Err(Error::Unsupported)
+    }
+
     pub async fn keep_awake(&self, _enabled: bool) -> crate::Result<()> {
         Ok(())
     }

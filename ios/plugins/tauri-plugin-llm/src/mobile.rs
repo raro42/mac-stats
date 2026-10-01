@@ -51,6 +51,34 @@ impl<R: Runtime> Llm<R> {
         Ok(())
     }
 
+    /// Devuelve la ruta final del modelo ya verificado.
+    pub async fn download(&self, request: DownloadRequest) -> crate::Result<String> {
+        let reply: Value = self.0.run_mobile_plugin_async("download", request).await?;
+        Ok(reply.get("path").and_then(Value::as_str).unwrap_or_default().to_string())
+    }
+
+    pub async fn cancel_download(&self) -> crate::Result<()> {
+        let _: Value = self.0.run_mobile_plugin_async("cancelDownload", json!({})).await?;
+        Ok(())
+    }
+
+    pub async fn delete_model(&self, file: &str) -> crate::Result<()> {
+        let _: Value = self
+            .0
+            .run_mobile_plugin_async("deleteModel", json!({ "file": file }))
+            .await?;
+        Ok(())
+    }
+
+    /// Solo depuración: `memoryWarning` o `resignActive`.
+    pub async fn debug_simulate(&self, event: &str) -> crate::Result<()> {
+        let _: Value = self
+            .0
+            .run_mobile_plugin_async("debugSimulate", json!({ "event": event }))
+            .await?;
+        Ok(())
+    }
+
     pub async fn keep_awake(&self, enabled: bool) -> crate::Result<()> {
         let _: Value = self
             .0

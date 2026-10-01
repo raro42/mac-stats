@@ -109,3 +109,98 @@ export function labGenerate(
   };
   return invoke<GenerateResult>("lab_generate", { prompt, thinkPrefill, onEvent: channel });
 }
+
+// --- Chat (fase B) ---
+
+export interface ChatModel {
+  id: string;
+  name: string;
+  file: string;
+  size: number;
+  license: string;
+  installed: boolean;
+  selected: boolean;
+  recommended: boolean;
+}
+
+export interface ChatStatus {
+  loadedModel: string | null;
+  selectedModel: string;
+  engine: { loaded: boolean; busy: boolean; availableMemory: number };
+}
+
+export interface ReplyStats {
+  modelId: string;
+  nGen: number;
+  tgTps: number;
+  stopReason: string;
+}
+
+export interface StoredMessage {
+  role: "user" | "assistant";
+  content: string;
+  ts: number;
+  stats?: ReplyStats;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messages: StoredMessage[];
+}
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messageCount: number;
+}
+
+export interface SendResult {
+  conversationId: string;
+  stopReason: string;
+  nGen: number;
+  tgTps: number;
+}
+
+export type ChatEvent =
+  | { type: "status"; text: string }
+  | { type: "delta"; text: string }
+  | { type: "progress"; received: number; total: number }
+  | { type: "verifying" };
+
+function channelOf(onEvent: (event: ChatEvent) => void): Channel<ChatEvent> {
+  const channel = new Channel<ChatEvent>();
+  channel.onmessage = onEvent;
+  return channel;
+}
+
+export const chatModels = () => invoke<ChatModel[]>("chat_models");
+export const chatSelectModel = (id: string) => invoke<void>("chat_select_model", { id });
+export const chatStatus = () => invoke<ChatStatus>("chat_status");
+export const chatCancelDownload = () => invoke<void>("chat_cancel_download");
+export const chatDeleteModel = (id: string) => invoke<void>("chat_delete_model", { id });
+export const chatList = () => invoke<ConversationSummary[]>("chat_list");
+export const chatGet = (id: string) => invoke<Conversation | null>("chat_get", { id });
+export const chatDelete = (id: string) => invoke<void>("chat_delete", { id });
+export const chatCancel = () => invoke<void>("chat_cancel");
+export const debugBuild = () => invoke<boolean>("debug_build");
+export const debugDemoPrompt = () => invoke<string | null>("debug_demo_prompt");
+
+export function chatDownload(
+  id: string,
+  allowCellular: boolean,
+  onEvent: (event: ChatEvent) => void,
+): Promise<void> {
+  return invoke<void>("chat_download", { id, allowCellular, onEvent: channelOf(onEvent) });
+}
+
+export function chatSend(
+  conversationId: string | null,
+  text: string,
+  onEvent: (event: ChatEvent) => void,
+): Promise<SendResult> {
+  return invoke<SendResult>("chat_send", { conversationId, text, onEvent: channelOf(onEvent) });
+}

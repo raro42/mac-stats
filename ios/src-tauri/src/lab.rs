@@ -12,7 +12,7 @@ use std::sync::{
 };
 use std::time::{Duration, Instant};
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::{json, Value};
 use tauri::{
     ipc::{Channel, InvokeResponseBody},
@@ -23,111 +23,24 @@ use tauri_plugin_llm::{
     LoadRequest,
 };
 
-use crate::metrics::apple::{BatteryState, Thermal};
-use crate::metrics::{MetricsState, Snapshot};
+use crate::chat::catalog::{self, CatalogEntry};
+use crate::chat::prompt::{self, PERSONA};
+use crate::metrics::apple::Thermal;
+use crate::metrics::MetricsState;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CatalogEntry {
-    pub id: String,
-    pub name: String,
-    pub repo: String,
-    pub commit: String,
-    pub file: String,
-    pub size: u64,
-    pub sha256: String,
-    pub license: String,
-    pub think_prefill: bool,
-}
-
-pub fn catalog() -> Vec<CatalogEntry> {
-    serde_json::from_str(include_str!("../../models/catalog.json"))
-        .expect("models/catalog.json no es válido")
-}
-
-/// `Library/Application Support/models/` dentro del contenedor de la app.
-pub fn models_dir() -> PathBuf {
-    PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Library/Application Support/models")
-}
-
-pub const PERSONA: &str = "Eres el asistente de iOS Stats, una app que vigila el estado de este iPhone. \
-Respondes en español de México, de forma breve, clara y amable. \
-Antes de cada pregunta recibes un mensaje de sistema con los datos actuales del iPhone: \
-úsalos solo si la pregunta trata del teléfono, no inventes datos que no aparezcan ahí \
-y nunca copies esa lista en tu respuesta. \
-Estados térmicos de iOS: normal (sin problema), templado (algo caliente), \
-caliente o «serio» (iOS baja el rendimiento para enfriarse) y crítico (muy caliente, conviene dejar de usarlo).";
-
-fn gb(bytes: u64) -> String {
-    format!("{:.1} GB", bytes as f64 / 1_073_741_824.0)
-}
-
-fn thermal_es(t: Thermal) -> &'static str {
-    match t {
-        Thermal::Nominal => "normal",
-        Thermal::Fair => "templado",
-        Thermal::Serious => "caliente",
-        Thermal::Critical => "crítico",
-        Thermal::Unknown => "desconocido",
-    }
-}
-
-/// Línea con el estado del iPhone que se añade al mensaje del usuario.
-pub fn device_note(s: &Snapshot) -> String {
-    let mut parts = Vec::new();
-    if let Some(cpu) = s.cpu {
-        parts.push(format!("CPU {cpu:.0} %"));
-    }
-    if let Some(used) = s.ram_used {
-        parts.push(format!("RAM {} de {}", gb(used), gb(s.ram_total)));
-    }
-    if let Some(app) = s.app_footprint {
-        match s.app_available {
-            Some(margin) => parts.push(format!("memoria de la app {} (margen {})", gb(app), gb(margin))),
-            None => parts.push(format!("memoria de la app {}", gb(app))),
-        }
-    }
-    if let Some(b) = s.battery {
-        let state = match b.state {
-            BatteryState::Charging => ", cargando",
-            BatteryState::Full => ", llena",
-            BatteryState::Unplugged => ", sin cargador",
-            BatteryState::Unknown => "",
-        };
-        parts.push(format!("batería {:.0} %{state}", b.level * 100.0));
-    }
-    parts.push(format!("estado térmico {}", thermal_es(s.thermal)));
-    if s.low_power {
-        parts.push("modo de bajo consumo activado".into());
-    }
-    if let Some(st) = s.storage {
-        parts.push(format!("{} libres", gb(st.available)));
-    }
-    format!("Datos actuales de este iPhone: {}.", parts.join(", "))
-}
-
-/// Mensajes para el modelo: persona, historial, datos del iPhone (como mensaje de
-/// sistema aparte, para que el modelo no los copie) y la pregunta.
-pub fn build_messages(metrics: &MetricsState, history: &[ChatMessage], prompt: &str) -> Vec<ChatMessage> {
-    let mut messages = vec![ChatMessage { role: "system".into(), content: PERSONA.into() }];
-    messages.extend_from_slice(history);
-    if let Some(s) = metrics.latest() {
-        messages.push(ChatMessage { role: "system".into(), content: device_note(&s) });
-    }
-    messages.push(ChatMessage { role: "user".into(), content: prompt.into() });
-    messages
+/// Persona, datos del iPhone y pregunta: el mismo prompt que usa el chat.
+fn build_messages(metrics: &MetricsState, question: &str) -> Vec<ChatMessage> {
+    let device = metrics.latest().map(|s| prompt::device_note(&s));
+    prompt::build(&[], device.as_deref(), question, prompt::HISTORY_BUDGET_CHARS)
 }
 
 fn entry(id: &str) -> Result<CatalogEntry, String> {
-    catalog()
-        .into_iter()
-        .find(|m| m.id == id)
-        .ok_or_else(|| format!("No existe el modelo «{id}» en el catálogo"))
+    catalog::find(id).ok_or_else(|| format!("No existe el modelo «{id}» en el catálogo"))
 }
 
 fn load_request(entry: &CatalogEntry, threads: u32) -> LoadRequest {
     LoadRequest {
-        path: models_dir().join(&entry.file).to_string_lossy().into_owned(),
+        path: entry.path().to_string_lossy().into_owned(),
         n_ctx: 4096,
         n_batch: 512,
         n_threads: threads,
@@ -149,14 +62,9 @@ pub struct LabModel {
 
 #[tauri::command]
 pub fn lab_models() -> Vec<LabModel> {
-    catalog()
+    catalog::catalog()
         .into_iter()
-        .map(|entry| {
-            let installed = std::fs::metadata(models_dir().join(&entry.file))
-                .map(|m| m.len() == entry.size)
-                .unwrap_or(false);
-            LabModel { entry, installed }
-        })
+        .map(|entry| LabModel { installed: entry.installed(), entry })
         .collect()
 }
 
@@ -190,7 +98,7 @@ pub async fn lab_generate(
     think_prefill: bool,
     on_event: Channel<Value>,
 ) -> Result<GenerateResult, String> {
-    let messages = build_messages(&metrics, &[], &prompt);
+    let messages = build_messages(&metrics, &prompt);
     app.llm()
         .generate(GenerateRequest {
             messages,
@@ -364,7 +272,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
         // Calidad: respuestas deterministas (temperatura 0) a 10 preguntas en es-MX.
         let mut quality = Vec::new();
         for (i, prompt) in QUALITY_PROMPTS.iter().enumerate() {
-            let messages = build_messages(metrics, &[], prompt);
+            let messages = build_messages(metrics, prompt);
             let (text, ttft, r) = generate_collect(app, messages, 220, 0.0, 7, entry.think_prefill).await?;
             let item = json!({ "n": i + 1, "prompt": prompt, "answer": text, "ttftMs": ttft, "tgTps": r.tg_tps, "nGen": r.n_gen, "stop": r.stop_reason });
             bench_log(json!({ "event": "quality", "id": entry.id, "item": item }));
@@ -426,7 +334,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
 pub async fn auto_bench(app: AppHandle, spec: String) {
     let soak_secs = env_u64("IOS_STATS_SOAK_SECS", 600);
     let threads = env_u64("IOS_STATS_THREADS", 2) as u32;
-    let models: Vec<CatalogEntry> = catalog()
+    let models: Vec<CatalogEntry> = catalog::catalog()
         .into_iter()
         .filter(|m| spec == "all" || spec.split(',').any(|id| id.trim() == m.id))
         .collect();
@@ -442,54 +350,18 @@ pub async fn auto_bench(app: AppHandle, spec: String) {
     bench_log(json!({ "event": "start", "models": models.iter().map(|m| &m.id).collect::<Vec<_>>(), "soakSecs": soak_secs, "threads": threads }));
     let _ = app.llm().keep_awake(true).await;
 
+    // Se guarda después de cada modelo para no perder resultados si la prueba se corta.
+    let path = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents/llm-bench.json");
     let mut reports = Vec::new();
     for entry in &models {
         let report = bench_model(&app, &metrics, entry, soak_secs, threads).await;
         bench_log(json!({ "event": "model_done", "report": report }));
         reports.push(report);
+        let _ = std::fs::write(&path, serde_json::to_string_pretty(&reports).unwrap_or_default());
     }
 
     let _ = app.llm().keep_awake(false).await;
-    let path = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents/llm-bench.json");
-    let saved = std::fs::write(&path, serde_json::to_string_pretty(&reports).unwrap_or_default());
-    bench_log(json!({ "event": "done", "file": path, "saved": saved.is_ok() }));
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::metrics::apple::{Battery, Storage};
-
-    #[test]
-    fn catalog_parses_and_ids_are_unique() {
-        let c = catalog();
-        assert_eq!(c.len(), 3);
-        let mut ids: Vec<_> = c.iter().map(|m| m.id.clone()).collect();
-        ids.dedup();
-        assert_eq!(ids.len(), 3);
-        assert!(c.iter().all(|m| m.sha256.len() == 64 && m.size > 0));
-    }
-
-    #[test]
-    fn device_note_is_compact_and_in_spanish() {
-        let s = Snapshot {
-            ts: 0,
-            cpu: Some(23.4),
-            ram_used: Some(3 * 1_073_741_824),
-            ram_total: 6 * 1_073_741_824,
-            app_footprint: Some(1_610_612_736),
-            app_available: Some(1_073_741_824),
-            net_down: None,
-            net_up: None,
-            battery: Some(Battery { level: 0.78, state: BatteryState::Charging }),
-            storage: Some(Storage { total: 128 * 1_073_741_824, available: 41 * 1_073_741_824 }),
-            thermal: Thermal::Fair,
-            low_power: false,
-        };
-        assert_eq!(
-            device_note(&s),
-            "Datos actuales de este iPhone: CPU 23 %, RAM 3.0 GB de 6.0 GB, memoria de la app 1.5 GB \
-(margen 1.0 GB), batería 78 %, cargando, estado térmico templado, 41.0 GB libres."
-        );
-    }
+    let done = path.with_file_name("llm-bench.done");
+    let _ = std::fs::write(&done, "ok");
+    bench_log(json!({ "event": "done", "file": path }));
 }

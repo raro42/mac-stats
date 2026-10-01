@@ -41,9 +41,27 @@ class KeepAwakeArgs: Decodable {
   let enabled: Bool
 }
 
+class DownloadArgs: Decodable {
+  let url: String
+  let sha256: String
+  let size: Int64
+  let file: String
+  var allowCellular: Bool?
+  let onEvent: Channel
+}
+
+class DeleteArgs: Decodable {
+  let file: String
+}
+
+class SimulateArgs: Decodable {
+  let event: String
+}
+
 class LlmPlugin: Plugin {
   private let queue = DispatchQueue(label: "llm.engine", qos: .userInitiated)
   private let engine = LlamaEngine()
+  private let store = ModelStore()
 
   override init() {
     super.init()
@@ -134,6 +152,63 @@ class LlmPlugin: Plugin {
       UIApplication.shared.isIdleTimerDisabled = args.enabled
     }
     invoke.resolve(["ok": true])
+  }
+}
+
+extension LlmPlugin {
+  @objc public func download(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(DownloadArgs.self)
+    guard let url = URL(string: args.url), url.scheme == "https" else {
+      invoke.reject("La URL del modelo debe ser https.")
+      return
+    }
+    let request = DownloadRequest(
+      url: url, sha256: args.sha256, size: args.size, file: args.file,
+      allowCellular: args.allowCellular ?? false)
+    store.start(request, onEvent: args.onEvent) { result in
+      switch result {
+      case .success(let file): invoke.resolve(["path": file.path])
+      case .failure(let error): invoke.reject(error.localizedDescription)
+      }
+    }
+  }
+
+  @objc public func cancelDownload(_ invoke: Invoke) {
+    store.cancel()
+    invoke.resolve(["ok": true])
+  }
+
+  @objc public func deleteModel(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(DeleteArgs.self)
+    // No se puede borrar el archivo que llama.cpp tiene mapeado en memoria.
+    run(invoke) {
+      if (self.engine.snapshot()["path"] as? String)?.hasSuffix("/\(args.file)") == true {
+        self.engine.unload()
+      }
+      try ModelStore.delete(file: args.file)
+      return ["ok": true]
+    }
+  }
+}
+
+extension LlmPlugin {
+  /// Solo depuración: simula eventos del sistema para el autodiagnóstico.
+  @objc public func debugSimulate(_ invoke: Invoke) throws {
+    #if DEBUG
+      let args = try invoke.parseArgs(SimulateArgs.self)
+      let name: Notification.Name
+      switch args.event {
+      case "memoryWarning": name = UIApplication.didReceiveMemoryWarningNotification
+      case "resignActive": name = UIApplication.willResignActiveNotification
+      default:
+        invoke.reject("Evento desconocido: \(args.event)")
+        return
+      }
+      DispatchQueue.main.async { NotificationCenter.default.post(name: name, object: nil) }
+      invoke.resolve(["ok": true])
+    #else
+      invoke.reject("Solo disponible en builds de depuración.")
+    #endif
   }
 }
 

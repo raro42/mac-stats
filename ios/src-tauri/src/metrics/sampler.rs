@@ -52,6 +52,19 @@ async fn read_battery(_app: &AppHandle) -> Option<Battery> {
     None
 }
 
+/// En depuración, `IOS_STATS_FAKE_THERMAL=serious|critical` fuerza el estado térmico
+/// para probar los avisos del chat sin calentar el iPhone.
+fn thermal() -> apple::Thermal {
+    if cfg!(debug_assertions) {
+        match std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() {
+            Ok("serious") => return apple::Thermal::Serious,
+            Ok("critical") => return apple::Thermal::Critical,
+            _ => {}
+        }
+    }
+    apple::thermal_state()
+}
+
 fn read_storage() -> Option<Storage> {
     let home = std::env::var("HOME").ok()?;
     apple::storage(&home)
@@ -117,7 +130,7 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
             net_up,
             battery,
             storage,
-            thermal: apple::thermal_state(),
+            thermal: thermal(),
             low_power: apple::low_power_mode(),
         };
         let point = Point {

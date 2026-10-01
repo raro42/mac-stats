@@ -1,5 +1,26 @@
+use tauri::Manager;
+
+mod chat;
 mod lab;
 mod metrics;
+mod selftest;
+
+/// La web muestra el laboratorio de modelos solo en builds de depuración.
+#[tauri::command]
+fn debug_build() -> bool {
+    cfg!(debug_assertions)
+}
+
+/// Pruebas automáticas (solo depuración): con `IOS_STATS_DEMO_PROMPT` la web abre el
+/// chat y envía esa pregunta al arrancar.
+#[tauri::command]
+fn debug_demo_prompt() -> Option<String> {
+    if cfg!(debug_assertions) {
+        std::env::var("IOS_STATS_DEMO_PROMPT").ok()
+    } else {
+        None
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -8,16 +29,22 @@ pub fn run() {
         .setup(|app| {
             metrics::init(app.handle());
             // Destino de los modelos (se copian con devicectl o se descargan en la fase B).
-            let _ = std::fs::create_dir_all(lab::models_dir());
+            let _ = std::fs::create_dir_all(chat::catalog::models_dir());
+            app.manage(chat::ChatState::new(app.handle()));
             // Medición automática de modelos (fase A), solo en builds de depuración.
             if cfg!(debug_assertions) {
                 if let Ok(spec) = std::env::var("IOS_STATS_BENCH") {
                     tauri::async_runtime::spawn(lab::auto_bench(app.handle().clone(), spec));
                 }
+                if std::env::var("IOS_STATS_SELFTEST").is_ok() {
+                    tauri::async_runtime::spawn(selftest::run(app.handle().clone()));
+                }
             }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            debug_build,
+            debug_demo_prompt,
             metrics::metrics_subscribe,
             metrics::metrics_history,
             metrics::device_info,
@@ -27,6 +54,19 @@ pub fn run() {
             lab::lab_bench,
             lab::lab_generate,
             lab::lab_cancel,
+            chat::chat_models,
+            chat::chat_select_model,
+            chat::chat_status,
+            chat::chat_download,
+            chat::chat_cancel_download,
+            chat::chat_delete_model,
+            chat::chat_load,
+            chat::chat_unload,
+            chat::chat_list,
+            chat::chat_get,
+            chat::chat_delete,
+            chat::chat_cancel,
+            chat::chat_send,
         ])
         .run(tauri::generate_context!())
         .expect("error al iniciar iOS Stats");

@@ -59,6 +59,18 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Franja bajo la barra de estado: el contenido no se monta sobre la hora al desplazarse. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  height: env(safe-area-inset-top);
+  background: var(--bg);
+}
+
 .view {
   width: 100%;
   max-width: 640px;
@@ -451,4 +463,247 @@ body {
   line-height: 1.45;
   -webkit-user-select: text;
   user-select: text;
+}
+
+/* Chat (fase B) */
+.chat-view {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 150px);
+}
+
+.pill-btn {
+  appearance: none;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--track);
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.model-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+}
+
+.model-card .bar {
+  margin-top: 10px;
+}
+
+.model-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.model-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.model-cellular {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn);
+  color: #111;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chat-empty {
+  margin: 8px 12px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 16px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.bubble-user {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  white-space: pre-wrap;
+}
+
+.bubble-assistant {
+  align-self: flex-start;
+  border: 1px solid var(--card-border);
+  border-bottom-left-radius: 6px;
+  background: var(--card);
+}
+
+.bubble-pending {
+  color: var(--muted);
+}
+
+.bubble-error {
+  align-self: stretch;
+  max-width: none;
+  background: transparent;
+  color: var(--crit);
+  font-size: 14px;
+}
+
+.bubble-meta {
+  align-self: flex-start;
+  margin: -4px 0 4px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bubble-assistant p,
+.bubble-assistant ul,
+.bubble-assistant ol,
+.bubble-assistant pre,
+.bubble-assistant blockquote {
+  margin: 0 0 8px;
+}
+
+.bubble-assistant > :last-child {
+  margin-bottom: 0;
+}
+
+.bubble-assistant ul,
+.bubble-assistant ol {
+  padding-left: 20px;
+}
+
+.bubble-assistant code {
+  padding: 1px 4px;
+  border-radius: 5px;
+  background: var(--track);
+  font-size: 14px;
+}
+
+.bubble-assistant pre {
+  overflow-x: auto;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--track);
+}
+
+.bubble-assistant pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.conversations summary,
+.lab summary {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.conv-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conv-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--card-border);
+}
+
+.conv-open {
+  flex: 1;
+  overflow: hidden;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-delete {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--crit);
+  font: inherit;
+  font-size: 13px;
+}
+
+.composer {
+  position: fixed;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 58px);
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  background: var(--bg);
+}
+
+.composer textarea {
+  flex: 1;
+  max-height: 140px;
+  padding: 10px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+  font-size: 16px;
+  resize: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.composer-send {
+  appearance: none;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.composer-send:disabled {
+  opacity: 0.4;
 }

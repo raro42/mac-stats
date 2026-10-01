@@ -1,4 +1,6 @@
+import { startChat } from "./chat/chat";
 import { startLab } from "./chat/lab";
+import { debugBuild, debugDemoPrompt } from "./ipc";
 import { startMonitor } from "./monitor/monitor";
 
 function setupTabs(): void {
@@ -18,8 +20,28 @@ window.addEventListener("DOMContentLoaded", () => {
     const device = document.getElementById("device");
     if (device) device.textContent = `No se pudo iniciar el monitor: ${String(error)}`;
   });
-  startLab().catch((error: unknown) => {
-    const status = document.getElementById("lab-status");
-    if (status) status.textContent = `No se pudo iniciar el laboratorio: ${String(error)}`;
+  startChat()
+    .then(async (chat) => {
+      const demo = await debugDemoPrompt();
+      if (!demo) return;
+      document.querySelector<HTMLButtonElement>('.tab[data-view="chat"]')?.click();
+      await chat.ask(demo);
+    })
+    .catch((error: unknown) => {
+      const banner = document.getElementById("chat-banner");
+      if (banner) {
+        banner.textContent = `No se pudo iniciar el chat: ${String(error)}`;
+        banner.hidden = false;
+      }
+    });
+  // El laboratorio de modelos solo aparece en builds de depuración.
+  void debugBuild().then((debug) => {
+    if (!debug) return;
+    const lab = document.getElementById("lab-details");
+    if (lab) lab.hidden = false;
+    startLab().catch((error: unknown) => {
+      const status = document.getElementById("lab-status");
+      if (status) status.textContent = `No se pudo iniciar el laboratorio: ${String(error)}`;
+    });
   });
 });

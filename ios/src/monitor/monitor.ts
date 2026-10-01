@@ -2,12 +2,12 @@ import { bytes, percent, rate } from "../format";
 import {
   deviceInfo,
   metricsHistory,
-  subscribeMetrics,
   type BatteryState,
   type Range,
   type Snapshot,
   type Thermal,
 } from "../ipc";
+import { onMetrics } from "../metrics-bus";
 import { LineChart } from "./line-chart";
 import { RingGauge, type Level } from "./ring-gauge";
 
@@ -161,7 +161,7 @@ export async function startMonitor(): Promise<void> {
     `${bytes(info.ramTotal)} de RAM`,
   ].join(" · ");
 
-  const latest = await subscribeMetrics(render);
+  const latest = await onMetrics(render);
   await loadHistory();
   if (latest) render(latest);
 
