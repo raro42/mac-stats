@@ -19373,6 +19373,7 @@ async function refreshDiskCleanupPanel(opts) {
     if (lastEl) {
       const last = status.lastRun;
       if (!last) {
+        // First-paint HTML already includes this empty state. Keep the same copy.
         lastEl.innerHTML =
           '<strong>Last run</strong><br>Not yet this install — will run on launch.';
       } else {

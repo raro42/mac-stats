@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1272] - 2026-09-30
+
+### Changed
+- **Disk Cleanup last-run first paint** — Before a cleanup status loads, the last-run panel says **Not yet this install — will run on launch** (not a blank panel). A real last run still replaces that line after a load.
+
+
 ## [0.1.1271] - 2026-09-30
 
 ### Changed
