@@ -25,11 +25,12 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1283** | Agent Ops filter first paint → Agents (**All · On · Off**), Schedules (**All · Jobs · Deliveries**), Knowledge (**All · Discord · Core**), and Runs lanes are in the theme HTML. Those rows no longer pop in after JavaScript loads. Counts still update after a load. All themes. |
 | **v0.1.1284** | Agent Ops Sessions filter first paint → **All · Live · Files** chips are in the theme HTML. They no longer pop in after JavaScript loads. Counts still update after a load. All themes. |
 | **v0.1.1285** | Agent Ops tab counts first paint → Agents, Sessions, Schedules, Knowledge, and Runs show a **None yet** count pill in the theme HTML. The tabs no longer grow when JavaScript loads the counts. A real count still replaces **None yet**. All themes. |
+| **v0.1.1286** | Agent Ops overview head counts first paint → Agents, Schedules, Knowledge, Recent chats, and Runs show **None yet**. Live shows **Quiet**. Digest shows **Queue clear**. The card titles no longer grow when JavaScript loads the counts. A real count still replaces those words. All themes. |
 
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~15.6d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~15.7d).
 - Debug.log: no product ERROR/WARN/panic clusters in the scan window.
 - ~20:05 tick: monitors summary first-paint keep (**v0.1.1267**); install/kickstart.
 - ~20:35 tick: monitors list first-paint keep (**v0.1.1268**); install/kickstart.
@@ -50,10 +51,11 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~03:08 tick: Agent Ops filter-row first-paint keep (**v0.1.1283**); install/kickstart.
 - ~03:35 tick: Agent Ops Sessions All · Live · Files first-paint keep (**v0.1.1284**); install/kickstart.
 - ~04:05 tick: Agent Ops tab count first-paint keep (**v0.1.1285**); install/kickstart.
+- ~04:26 tick: Agent Ops overview head count first-paint keep (**v0.1.1286**); install/kickstart.
 
 ## Next fuel
 
-- Agent Ops overview head count pills still appear after JavaScript (the card title grows when the count shows).
+- Agent Ops Updated stamp (`#ops-updated-ago`) still appears beside Refresh after a refresh.
 - The keyboard hint (`#ops-keyboard-hint`) stays hidden in CSS, so it does not move the layout.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
