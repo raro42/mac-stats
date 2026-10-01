@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1285] - 2026-10-01
+
+### Changed
+- **Agent Ops tab counts first paint** — Agents, Sessions, Schedules, Knowledge, and Runs show a **None yet** count pill in the theme HTML. The tabs no longer grow when JavaScript loads the counts. A real count still replaces **None yet**.
+
+
 ## [0.1.1284] - 2026-10-01
 
 ### Changed

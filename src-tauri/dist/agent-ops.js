@@ -1157,14 +1157,16 @@ function ensureOpsTabBarToolbarKeyboard() {
     });
 }
 
-/** Inventory counts on tabs (agents / sessions / schedules / knowledge / runs). */
+/** Inventory counts on tabs (agents / sessions / schedules / knowledge / runs).
+ * Theme HTML ships the pill (None yet). Create it only when an older shell omitted it.
+ */
 function ensureOpsTabCountEl(btn) {
     let el = btn.querySelector('.ops-tab-count');
     if (el) return el;
     el = document.createElement('span');
-    el.className = 'ops-tab-count';
+    el.className = 'ops-tab-count is-zero';
     el.setAttribute('aria-hidden', 'true');
-    el.hidden = true;
+    el.textContent = 'None yet';
     btn.appendChild(el);
     return el;
 }
