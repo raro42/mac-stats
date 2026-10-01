@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1269] - 2026-09-30
+
+### Changed
+- **Top Processes list first paint** — Before process samples load, Top Processes shows **Waiting for process samples — opens with the CPU window** (not a blank list). Real rows still replace that line after a sample.
+
+
 ## [0.1.1268] - 2026-09-30
 
 ### Changed
