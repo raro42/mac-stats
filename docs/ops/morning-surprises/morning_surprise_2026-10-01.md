@@ -24,6 +24,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1282** | Agent Ops Refresh first paint → **Refresh** and **Refresh digest** sit under the health cards in the theme HTML. They no longer jump up from the bottom of Agent Ops after JavaScript loads. All themes. |
 | **v0.1.1283** | Agent Ops filter first paint → Agents (**All · On · Off**), Schedules (**All · Jobs · Deliveries**), Knowledge (**All · Discord · Core**), and Runs lanes are in the theme HTML. Those rows no longer pop in after JavaScript loads. Counts still update after a load. All themes. |
 | **v0.1.1284** | Agent Ops Sessions filter first paint → **All · Live · Files** chips are in the theme HTML. They no longer pop in after JavaScript loads. Counts still update after a load. All themes. |
+| **v0.1.1285** | Agent Ops tab counts first paint → Agents, Sessions, Schedules, Knowledge, and Runs show a **None yet** count pill in the theme HTML. The tabs no longer grow when JavaScript loads the counts. A real count still replaces **None yet**. All themes. |
 
 ## Context
 
@@ -48,10 +49,11 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~02:39 tick: Agent Ops Refresh row first-paint keep (**v0.1.1282**); install/kickstart.
 - ~03:08 tick: Agent Ops filter-row first-paint keep (**v0.1.1283**); install/kickstart.
 - ~03:35 tick: Agent Ops Sessions All · Live · Files first-paint keep (**v0.1.1284**); install/kickstart.
+- ~04:05 tick: Agent Ops tab count first-paint keep (**v0.1.1285**); install/kickstart.
 
 ## Next fuel
 
-- Agent Ops tab count pills still appear after JavaScript (the tab grows when the count shows).
+- Agent Ops overview head count pills still appear after JavaScript (the card title grows when the count shows).
 - The keyboard hint (`#ops-keyboard-hint`) stays hidden in CSS, so it does not move the layout.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
