@@ -1,6 +1,6 @@
 # Morning surprise — 2026-10-01
 
-Overnight Track B kept Perplexity calm before a search.
+Overnight Track B kept AI Chat calm before the transcript loads.
 
 ## Shipped
 
@@ -14,6 +14,7 @@ Overnight Track B kept Perplexity calm before a search.
 | **v0.1.1272** | Disk Cleanup last-run panel first paint → **Not yet this install — will run on launch** (not a blank panel). A real last run still replaces that line after a load. All themes. |
 | **v0.1.1273** | Debug Log viewer first paint → **Nothing here yet — loads when you open Debug Log** (not **Expand to load log…**). A real tail still replaces that line after a load. All themes. |
 | **v0.1.1274** | Perplexity results first paint → **Nothing here yet — search the web** (not a blank region). A real search still replaces that line. All themes. |
+| **v0.1.1275** | AI Chat message list first paint → **Nothing here yet — set an Ollama URL** and starter chips (not a blank list). A real transcript still replaces that empty state. All themes. |
 
 ## Context
 
@@ -28,9 +29,9 @@ Overnight Track B kept Perplexity calm before a search.
 - ~22:18 tick: Disk Cleanup last-run first-paint keep (**v0.1.1272**); install/kickstart.
 - ~22:43 tick: Debug Log viewer first-paint keep (**v0.1.1273**); install/kickstart.
 - ~23:12 tick: Perplexity results first-paint keep (**v0.1.1274**); install/kickstart.
+- ~23:35 tick: AI Chat message list first-paint keep (**v0.1.1275**); install/kickstart.
 
 ## Next fuel
 
-- AI Chat message list (`#chat-messages`) is still blank until JS paints it.
 - Agent Ops screenshot refresh when Screen Recording TCC allows (`feature-agent-ops.png`).
 - Sibling ports if digester stays empty.
