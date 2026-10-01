@@ -18301,6 +18301,37 @@ function wireDiskCleanupLastRunPanel() {
   });
 }
 
+/** Scope list empty: warm title + Add a scope CTA (category empty Review scopes parity). */
+function renderDiskCleanupScopesEmpty(scopesEl) {
+  if (!scopesEl) return;
+  // First-paint HTML already includes this empty state. Keep it; wire the CTA once.
+  let wrap = scopesEl.querySelector('.disk-cleanup-scopes-empty');
+  if (!wrap) {
+    scopesEl.innerHTML =
+      `<div class="disk-cleanup-empty disk-cleanup-scopes-empty" role="status">` +
+      `<div class="disk-cleanup-empty-msg">No scopes yet</div>` +
+      `<div class="disk-cleanup-empty-hint">Add a path below. Built-in scopes show here after a refresh.</div>` +
+      `<button type="button" class="disk-cleanup-empty-cta">Add a scope</button>` +
+      `</div>`;
+    wrap = scopesEl.querySelector('.disk-cleanup-scopes-empty');
+  }
+  const cta = wrap?.querySelector('.disk-cleanup-empty-cta');
+  if (cta && cta.dataset.addWired !== '1') {
+    cta.dataset.addWired = '1';
+    cta.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const addLabel = document.getElementById('disk-cleanup-add-label');
+      if (addLabel && typeof addLabel.focus === 'function') {
+        addLabel.focus();
+        if (typeof addLabel.scrollIntoView === 'function') {
+          addLabel.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    });
+  }
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -19213,6 +19244,11 @@ async function refreshDiskCleanupPanel(opts) {
         typeof window.__diskCleanupScopeFocusIdx === 'number'
           ? window.__diskCleanupScopeFocusIdx
           : null;
+      if (!scopes.length) {
+        renderDiskCleanupScopesEmpty(scopesEl);
+        document.getElementById('disk-cleanup-kb-hint')?.remove();
+        applyDiskCleanupScopeFilter();
+      } else {
       scopesEl.innerHTML = scopes
         .map((s, idx) => {
           // Empty label / kind: match Agents / Top Processes "Unknown".
@@ -19255,22 +19291,19 @@ async function refreshDiskCleanupPanel(opts) {
           </div>`;
         })
         .join('');
-      if (scopes.length > 0) {
-        let hint = document.getElementById('disk-cleanup-kb-hint');
-        if (!hint) {
-          hint = document.createElement('div');
-          hint.className = 'disk-cleanup-kb-hint';
-          hint.id = 'disk-cleanup-kb-hint';
-          scopesEl.parentNode?.insertBefore(hint, scopesEl);
-        }
-        hint.textContent =
-          'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
-      } else {
-        document.getElementById('disk-cleanup-kb-hint')?.remove();
+      let hint = document.getElementById('disk-cleanup-kb-hint');
+      if (!hint) {
+        hint = document.createElement('div');
+        hint.className = 'disk-cleanup-kb-hint';
+        hint.id = 'disk-cleanup-kb-hint';
+        scopesEl.parentNode?.insertBefore(hint, scopesEl);
       }
+      hint.textContent =
+        'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
       syncDiskCleanupScopeTabOrder(scopesEl, preferIdx);
       applyDiskCleanupPathCopyFlash(scopesEl);
       applyDiskCleanupScopeFilter();
+      }
     }
 
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
@@ -20312,6 +20345,10 @@ function initDiskCleanupSection() {
   const cleanupList = document.getElementById('disk-cleanup-list');
   if (cleanupList && !cleanupList.querySelector('.disk-cleanup-item')) {
     renderDiskCleanupListEmpty(cleanupList);
+  }
+  // First-paint HTML already includes the empty scope list. Wire Add a scope before status loads.
+  if (scopesEl && !scopesEl.querySelector('.disk-cleanup-scope-row')) {
+    renderDiskCleanupScopesEmpty(scopesEl);
   }
 
   if (icon && !icon.getAttribute('data-title-base')) {

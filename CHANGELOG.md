@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1271] - 2026-09-30
+
+### Changed
+- **Disk Cleanup scopes list first paint** — Before scopes load, Disk Cleanup shows **No scopes yet** and **Add a scope** (not a blank list). Real scope rows still replace that empty state after a load.
+
+
 ## [0.1.1270] - 2026-09-30
 
 ### Changed

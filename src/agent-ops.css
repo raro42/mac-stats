@@ -7635,7 +7635,8 @@ button.monitor-detail-url.is-just-saved {
   list-style: none;
 }
 
-.disk-cleanup-list-empty {
+.disk-cleanup-list-empty,
+.disk-cleanup-scopes-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
