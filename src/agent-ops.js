@@ -604,7 +604,20 @@ function showOpsOverview() {
     return !!target;
 }
 
-/** Visible 0 Overview control at the start of the tab strip. */
+function wireOpsOverviewJump(btn) {
+    if (!btn || btn.dataset.opsOverviewJumpWired === '1') return;
+    btn.dataset.opsOverviewJumpWired = '1';
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (agentOpsCollapsed) applyOpsCollapsed(false);
+        showOpsOverview();
+    });
+}
+
+/** Visible 0 Overview control at the start of the tab strip.
+ * Theme HTML ships it. Create it only when an older shell omitted it.
+ */
 function ensureOpsOverviewJump() {
     const tabs = document.querySelector('.agent-ops-tabs');
     if (!tabs) return null;
@@ -624,13 +637,8 @@ function ensureOpsOverviewJump() {
         btn.appendChild(digit);
         btn.appendChild(document.createTextNode('Overview'));
         tabs.insertBefore(btn, tabs.firstChild);
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (agentOpsCollapsed) applyOpsCollapsed(false);
-            showOpsOverview();
-        });
     }
+    wireOpsOverviewJump(btn);
     return btn;
 }
 
@@ -646,7 +654,25 @@ function ensureOpsTabDigits() {
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
         const tab = btn.dataset.opsTab || '';
         const d = digits[tab];
-        if (!d || btn.querySelector('.ops-tab-digit')) return;
+        if (!d) return;
+        if (btn.querySelector('.ops-tab-digit')) {
+            if (!btn.dataset.opsTabLabel) {
+                const raw = (btn.textContent || '')
+                    .replace(/^\s*\d+\s*/, '')
+                    .trim();
+                btn.dataset.opsTabLabel = raw || tab;
+            }
+            if (!btn.getAttribute('title')) {
+                btn.setAttribute(
+                    'title',
+                    `${btn.dataset.opsTabLabel} · press ${d}`
+                );
+            }
+            if (!btn.getAttribute('aria-keyshortcuts')) {
+                btn.setAttribute('aria-keyshortcuts', d);
+            }
+            return;
+        }
         const label = (btn.textContent || tab || '').trim() || tab;
         const span = document.createElement('span');
         span.className = 'ops-tab-digit';

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1281] - 2026-10-01
+
+### Changed
+- **Agent Ops tab strip first paint** — Overview (press 0) and the digit keys on Agents, Sessions, Schedules, Knowledge, and Runs are in the theme HTML. The strip no longer grows after JavaScript loads. Press 0 still jumps to the overview.
+
+
 ## [0.1.1280] - 2026-10-01
 
 ### Changed
