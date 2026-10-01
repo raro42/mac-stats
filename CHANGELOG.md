@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1273] - 2026-09-30
+
+### Changed
+- **Debug Log first paint** — Before the log tail loads, the viewer says **Nothing here yet — loads when you open Debug Log** (not **Expand to load log…**). A real tail still replaces that line after a load.
+
+
 ## [0.1.1272] - 2026-09-30
 
 ### Changed

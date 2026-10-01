@@ -17157,10 +17157,28 @@ function applyLogsFilter(scrollToEnd) {
   renderLogsViewerLines(viewer, prefix, filtered, scrollToEnd);
 }
 
+const LOGS_VIEWER_FIRST_PAINT =
+  'Nothing here yet — loads when you open Debug Log';
+
+/** Calm copy until the log tail arrives. Theme HTML uses the same line. */
+function paintLogsViewerFirstPaint(viewer) {
+  if (!viewer) return;
+  if (viewer.querySelector('.logs-line, .logs-viewer-empty, .logs-viewer-prefix')) return;
+  const raw = (viewer.textContent || '').replace(/\s+/g, ' ').trim();
+  const stale =
+    raw === '' ||
+    raw === 'Expand to load log…' ||
+    raw === LOGS_VIEWER_FIRST_PAINT;
+  if (!stale) return;
+  viewer.classList.add('is-empty');
+  viewer.textContent = LOGS_VIEWER_FIRST_PAINT;
+}
+
 async function refreshLogsViewer(scrollToEnd = true) {
   const viewer = document.getElementById('logs-viewer');
   const pathHint = document.getElementById('logs-path-hint');
   if (!viewer) return;
+  paintLogsViewerFirstPaint(viewer);
   if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
   ensureLogsFilterChips();
   const inv = getInvoke() || invoke;
@@ -20731,6 +20749,7 @@ function initLogsSection() {
   ensureLogsToolbarKeyboard();
   ensureLogsErrorGlance();
   ensureLogsAttentionGlance();
+  paintLogsViewerFirstPaint(document.getElementById('logs-viewer'));
   startLogsGlancePoll();
 
   const logsIcon = document.getElementById('icon-logs');
