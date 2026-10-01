@@ -19,11 +19,12 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1277** | Ring labels first paint → **Freq** and **Temp** (same words as the sparklines). They no longer flash **Frequency** and **Temperature** until JavaScript loads. Hover still shows the full words. All themes. |
 | **v0.1.1278** | Low Power Mode first paint → the power strip shows **Low Power Mode (LPM)** and **None yet** in the theme HTML. The chip no longer pops in after JavaScript loads. On and Off still replace **None yet** after a sample. All themes. |
 | **v0.1.1279** | Apple CPU and Freq rings → the fill follows the same arc as the track (and as GPU and Temp). It no longer rides a shorter curve that misses the gauge. |
+| **v0.1.1280** | Agent Ops overview first paint → **Agents**, **Runs**, and **Digest** cards with **None yet** are in the theme HTML. The grid no longer jumps from four cards to seven after JavaScript loads. Live counts still replace **None yet**. All themes. |
 
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~15.5d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~15.6d).
 - Debug.log: no product ERROR/WARN/panic clusters in the scan window.
 - ~20:05 tick: monitors summary first-paint keep (**v0.1.1267**); install/kickstart.
 - ~20:35 tick: monitors list first-paint keep (**v0.1.1268**); install/kickstart.
@@ -38,6 +39,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~00:27 tick: ring label first-paint keep (**v0.1.1277**); install/kickstart.
 - ~00:52 tick: Low Power Mode chip first-paint keep (**v0.1.1278**); install/kickstart.
 - ~01:19 tick: Apple CPU and Freq ring arcs match the track (**v0.1.1279**); install/kickstart.
+- ~01:46 tick: Agent Ops overview cards first-paint keep (**v0.1.1280**); install/kickstart.
 
 ## Next fuel
 
