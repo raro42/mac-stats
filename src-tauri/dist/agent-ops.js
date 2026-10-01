@@ -1246,7 +1246,7 @@ function opsOverviewFirstPaintHtml() {
     );
 }
 
-/** Inject Agents overview card (first) so Agents tab gets active-card parity. */
+/** Theme HTML ships the Agents card first. Create it only when an older shell omitted it. */
 function ensureOpsOverviewAgentsCard() {
     const grid = document.getElementById('ops-overview-grid');
     if (!grid || document.getElementById('ops-overview-agents')) return;
@@ -1264,7 +1264,7 @@ function ensureOpsOverviewAgentsCard() {
     grid.insertBefore(card, grid.firstChild);
 }
 
-/** Inject Runs overview card (end) so Runs tab gets active-card parity. */
+/** Theme HTML ships the Runs card. Create it only when an older shell omitted it. */
 function ensureOpsOverviewRunsCard() {
     const grid = document.getElementById('ops-overview-grid');
     if (!grid || document.getElementById('ops-overview-runs')) return;
@@ -1282,7 +1282,7 @@ function ensureOpsOverviewRunsCard() {
     grid.appendChild(card);
 }
 
-/** Inject Digest overview card (after Runs) — digester open hints on the command center. */
+/** Theme HTML ships the Digest card after Runs. Create it only when an older shell omitted it. */
 function ensureOpsOverviewDigestCard() {
     const grid = document.getElementById('ops-overview-grid');
     if (!grid || document.getElementById('ops-overview-digest')) return;

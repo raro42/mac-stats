@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1280] - 2026-10-01
+
+### Changed
+- **Agent Ops overview first paint** — Agents, Runs, and Digest cards are in the theme HTML with **None yet**. The overview no longer jumps from four cards to seven after JavaScript loads. Live counts still replace **None yet**.
+
+
 ## [0.1.1279] - 2026-10-01
 
 ### Fixed
