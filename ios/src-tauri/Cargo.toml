@@ -1,0 +1,27 @@
+[package]
+name = "pulso"
+version = "0.1.0"
+description = "Pulso: monitor del iPhone y chat con IA local (derivado de mac-stats)"
+authors = ["gilberto"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+# El sufijo `_lib` evita el choque de nombres con el binario de escritorio.
+name = "pulso_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
