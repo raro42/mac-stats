@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1282] - 2026-10-01
+
+### Changed
+- **Agent Ops Refresh first paint** — Refresh and Refresh digest sit under the health cards as soon as the window opens. They no longer jump up from the bottom of Agent Ops after JavaScript loads.
+
+
 ## [0.1.1281] - 2026-10-01
 
 ### Changed

@@ -7385,7 +7385,7 @@ function ensureOpsRefreshRowToolbarKeyboard() {
 
 /**
  * Keep Refresh / Updated under the health strip (not buried under tab panels).
- * Themes still ship the row at the bottom of agent-ops-content; we re-home it once.
+ * Theme HTML ships the row there. Move it only when an older shell left it at the bottom.
  */
 function ensureOpsRefreshRowPlacement() {
     const row = document.querySelector('.ops-refresh-row');
