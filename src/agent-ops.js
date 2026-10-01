@@ -1159,6 +1159,7 @@ function ensureOpsTabBarToolbarKeyboard() {
 
 /** Inventory counts on tabs (agents / sessions / schedules / knowledge / runs).
  * Theme HTML ships the pill (None yet). Create it only when an older shell omitted it.
+ * A zero count stays None yet. A positive count replaces that word.
  */
 function ensureOpsTabCountEl(btn) {
     let el = btn.querySelector('.ops-tab-count');
@@ -1186,7 +1187,9 @@ function paintOpsTabCounts(counts) {
         if (!(tab in c)) return;
         const n = Math.max(0, Number(c[tab]) || 0);
         const el = ensureOpsTabCountEl(btn);
-        el.textContent = String(n);
+        // Zero stays "None yet" so the first-paint pill does not shrink to 0.
+        const shown = n === 0 ? 'None yet' : String(n);
+        el.textContent = shown;
         el.hidden = false;
         el.classList.toggle('is-zero', n === 0);
         const label =
@@ -1195,7 +1198,7 @@ function paintOpsTabCounts(counts) {
         const d = digits[tab] || '';
         btn.setAttribute(
             'title',
-            d ? `${label} · ${n} · press ${d}` : `${label} · ${n}`
+            d ? `${label} · ${shown} · press ${d}` : `${label} · ${shown}`
         );
     });
 }

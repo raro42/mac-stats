@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1288] - 2026-10-01
+
+### Changed
+- **Agent Ops tab counts stay None yet at zero** — Agents, Sessions, Schedules, Knowledge, and Runs keep **None yet** when the count is zero. The pill no longer shrinks to **0** after a refresh. A positive count still replaces **None yet**.
+
+
 ## [0.1.1287] - 2026-10-01
 
 ### Changed
