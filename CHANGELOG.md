@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1275] - 2026-09-30
+
+### Changed
+- **AI Chat message list first paint** — Before chat loads, the message list says **Nothing here yet — set an Ollama URL** (not a blank list). Starter chips are already there. A real transcript still replaces that empty state.
+
+
 ## [0.1.1274] - 2026-09-30
 
 ### Changed

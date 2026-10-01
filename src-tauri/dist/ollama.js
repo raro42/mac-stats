@@ -2309,6 +2309,31 @@ function flashChatEmptyChip(btn) {
   }, 1600);
 }
 
+function wireChatEmptySuggestionChip(btn) {
+  if (!btn || btn.dataset.chatEmptyWired === '1') return;
+  btn.dataset.chatEmptyWired = '1';
+  if (!btn.dataset.idleLabel) {
+    btn.dataset.idleLabel = (btn.textContent || '').trim();
+  }
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    applyChatEmptySuggestion(btn.dataset.prompt || '', btn);
+  });
+}
+
+/** Theme HTML seeds the empty pane. Wire chips and click-to-focus once. */
+function wireChatEmptyPane(empty) {
+  if (!empty) return;
+  empty.querySelectorAll('.chat-empty-chip').forEach(wireChatEmptySuggestionChip);
+  if (empty.dataset.chatEmptyPaneWired === '1') return;
+  empty.dataset.chatEmptyPaneWired = '1';
+  empty.addEventListener('click', (e) => {
+    if (e.target.closest && e.target.closest('.chat-empty-chip')) return;
+    document.getElementById('chat-input')?.focus();
+  });
+}
+
 /**
  * Put a starter prompt in the composer (Load into AI Chat parity — user hits Enter).
  * @param {string} prompt
@@ -2553,6 +2578,7 @@ function ensureChatEmptyHint() {
   ensureChatFilterMissState(container, false);
   const existing = container.querySelector('.chat-empty:not(.chat-filter-miss)');
   if (existing) {
+    wireChatEmptyPane(existing);
     const row = existing.querySelector('.chat-empty-suggestions');
     if (row) ensureChatEmptySuggestionsToolbarKeyboard(row);
     syncChatEmptyCalmState(existing);
@@ -2585,21 +2611,11 @@ function ensureChatEmptyHint() {
     btn.dataset.prompt = item.prompt;
     btn.dataset.idleLabel = item.label;
     btn.title = 'Put this in the composer — then Send or Enter';
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      applyChatEmptySuggestion(item.prompt, btn);
-    });
     row.appendChild(btn);
   });
   empty.appendChild(row);
-
-  empty.addEventListener('click', (e) => {
-    if (e.target.closest('.chat-empty-chip')) return;
-    document.getElementById('chat-input')?.focus();
-  });
-
   container.appendChild(empty);
+  wireChatEmptyPane(empty);
   syncChatEmptyCalmState(empty);
   ensureChatEmptySuggestionsToolbarKeyboard(row);
   applyChatListFilter();
