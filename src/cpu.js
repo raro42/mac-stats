@@ -8127,7 +8127,12 @@ function ensureMonitorsListEmptyState(monitorsList, empty) {
       `<div class="monitors-empty-hint">Add a site to see uptime here.</div>` +
       `<button type="button" class="monitors-empty-cta">Add a monitor</button>`;
     monitorsList.appendChild(wrap);
-    wrap.querySelector('.monitors-empty-cta')?.addEventListener('click', (e) => {
+  }
+  // First-paint HTML already includes this empty state. Wire the CTA once.
+  const cta = wrap.querySelector('.monitors-empty-cta');
+  if (cta && cta.dataset.addWired !== '1') {
+    cta.dataset.addWired = '1';
+    cta.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       void openMonitorsAddFlow();

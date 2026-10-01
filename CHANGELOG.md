@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1268] - 2026-09-30
+
+### Changed
+- **Monitors list first paint** — Before sites load, External / Monitors shows **Nothing watching yet** and **Add a monitor** (not a blank list). Real site rows still replace that empty state after a load.
+
+
 ## [0.1.1267] - 2026-09-30
 
 ### Changed
