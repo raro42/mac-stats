@@ -18,6 +18,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 | **v0.1.1276** | GPU sparkline first paint → the history row shows **CPU · GPU · Freq · Temp** in the theme HTML. It no longer jumps from three charts to four after JavaScript loads. All themes. |
 | **v0.1.1277** | Ring labels first paint → **Freq** and **Temp** (same words as the sparklines). They no longer flash **Frequency** and **Temperature** until JavaScript loads. Hover still shows the full words. All themes. |
 | **v0.1.1278** | Low Power Mode first paint → the power strip shows **Low Power Mode (LPM)** and **None yet** in the theme HTML. The chip no longer pops in after JavaScript loads. On and Off still replace **None yet** after a sample. All themes. |
+| **v0.1.1279** | Apple CPU and Freq rings → the fill follows the same arc as the track (and as GPU and Temp). It no longer rides a shorter curve that misses the gauge. |
 
 ## Context
 
@@ -36,6 +37,7 @@ Overnight Track B kept the CPU window calm before JavaScript paints.
 - ~00:05 tick: GPU sparkline first-paint keep (**v0.1.1276**); install/kickstart.
 - ~00:27 tick: ring label first-paint keep (**v0.1.1277**); install/kickstart.
 - ~00:52 tick: Low Power Mode chip first-paint keep (**v0.1.1278**); install/kickstart.
+- ~01:19 tick: Apple CPU and Freq ring arcs match the track (**v0.1.1279**); install/kickstart.
 
 ## Next fuel
 
