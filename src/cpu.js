@@ -18304,17 +18304,26 @@ function wireDiskCleanupLastRunPanel() {
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
-  list.innerHTML =
-    `<li class="disk-cleanup-empty disk-cleanup-list-empty" role="status">` +
-    `<div class="disk-cleanup-empty-msg">Nothing to reclaim yet</div>` +
-    `<div class="disk-cleanup-empty-hint">Turn a scope on and Save, or add a custom path.</div>` +
-    `<button type="button" class="disk-cleanup-empty-cta">Review scopes</button>` +
-    `</li>`;
-  list.querySelector('.disk-cleanup-empty-cta')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    focusDiskCleanupScopesReview();
-  });
+  // First-paint HTML already includes this empty state. Keep it; wire the CTA once.
+  let wrap = list.querySelector('.disk-cleanup-list-empty');
+  if (!wrap) {
+    list.innerHTML =
+      `<li class="disk-cleanup-empty disk-cleanup-list-empty" role="status">` +
+      `<div class="disk-cleanup-empty-msg">Nothing to reclaim yet</div>` +
+      `<div class="disk-cleanup-empty-hint">Turn a scope on and Save, or add a custom path.</div>` +
+      `<button type="button" class="disk-cleanup-empty-cta">Review scopes</button>` +
+      `</li>`;
+    wrap = list.querySelector('.disk-cleanup-list-empty');
+  }
+  const cta = wrap?.querySelector('.disk-cleanup-empty-cta');
+  if (cta && cta.dataset.reviewWired !== '1') {
+    cta.dataset.reviewWired = '1';
+    cta.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      focusDiskCleanupScopesReview();
+    });
+  }
   applyDiskCleanupListFilter();
 }
 
@@ -20299,6 +20308,11 @@ function initDiskCleanupSection() {
   ensureDiskCleanupAddScopeToolbarKeyboard();
   wireDiskCleanupLastRunPanel();
   ensureDiskCleanupCollapsedGlance();
+  // First-paint HTML already includes the empty category list. Wire Review scopes before status loads.
+  const cleanupList = document.getElementById('disk-cleanup-list');
+  if (cleanupList && !cleanupList.querySelector('.disk-cleanup-item')) {
+    renderDiskCleanupListEmpty(cleanupList);
+  }
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');

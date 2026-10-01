@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1270] - 2026-09-30
+
+### Changed
+- **Disk Cleanup category list first paint** — Before categories load, Disk Cleanup shows **Nothing to reclaim yet** and **Review scopes** (not a blank list). Real category rows still replace that empty state after a load.
+
+
 ## [0.1.1269] - 2026-09-30
 
 ### Changed
