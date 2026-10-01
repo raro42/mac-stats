@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1276] - 2026-10-01
+
+### Changed
+- **GPU sparkline first paint** — The history row shows **CPU · GPU · Freq · Temp** as soon as the window opens. It no longer jumps from three charts to four after JavaScript loads. A real GPU sample still draws on that chart.
+
+
 ## [0.1.1275] - 2026-09-30
 
 ### Changed

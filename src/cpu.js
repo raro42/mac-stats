@@ -2809,7 +2809,7 @@ function alignRingGaugeLabels() {
   });
 }
 
-/** Inject GPU sparkline (CPU · GPU · Freq · Temp) when themes only ship three charts. */
+/** Inject GPU sparkline when a theme shell still ships only CPU · Freq · Temp. */
 function ensureGpuHistoryChart() {
   if (document.getElementById('gpu-history-chart')) return;
   const cpuCanvas = document.getElementById('usage-history-chart');

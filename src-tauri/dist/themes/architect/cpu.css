@@ -178,7 +178,7 @@ body {
 
 .history-section {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
   padding: 8px 0;
   flex-shrink: 0; /* Don't shrink history section */
@@ -2264,7 +2264,7 @@ body {
 /* History section and charts */
 .history-section {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   padding: 8px 0;
   flex-shrink: 0; /* Don't shrink history section */
