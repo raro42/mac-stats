@@ -1200,8 +1200,19 @@ function paintOpsTabCounts(counts) {
     });
 }
 
+/** Calm first-paint pill. Theme HTML ships the same span; older shells get it here. */
+function opsOverviewHeadCountHtml(label) {
+    const text = String(label || 'None yet');
+    return (
+        `<span class="ops-overview-head-count is-zero" aria-hidden="true" title="${text}">` +
+        `${text}</span>`
+    );
+}
+
 /**
  * Inventory/status pill in an overview card head (tab-count parity).
+ * Theme HTML ships the pill (None yet / Quiet / Queue clear).
+ * Create it only when an older shell omitted it.
  * Keeps the glance number next to the title while rows scroll in the body.
  * @param {string} cardId
  * @param {string|null|undefined} text — empty/null hides the pill
@@ -1284,6 +1295,7 @@ function ensureOpsOverviewAgentsCard() {
     card.innerHTML =
         `<div class="ops-overview-head">` +
         `<h3>Agents</h3>` +
+        opsOverviewHeadCountHtml('None yet') +
         `<button type="button" class="ops-overview-link" data-goto-tab="agents">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-agents-body">` +
@@ -1302,6 +1314,7 @@ function ensureOpsOverviewRunsCard() {
     card.innerHTML =
         `<div class="ops-overview-head">` +
         `<h3>Runs</h3>` +
+        opsOverviewHeadCountHtml('None yet') +
         `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-runs-body">` +
@@ -1321,6 +1334,7 @@ function ensureOpsOverviewDigestCard() {
     card.innerHTML =
         `<div class="ops-overview-head">` +
         `<h3>Digest</h3>` +
+        opsOverviewHeadCountHtml('Queue clear') +
         `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
         `</div>` +
         `<div class="ops-overview-body" id="ops-overview-digest-body">` +

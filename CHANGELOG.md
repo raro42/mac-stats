@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1286] - 2026-10-01
+
+### Changed
+- **Agent Ops overview head counts first paint** — Agents, Schedules, Knowledge, Recent chats, and Runs show **None yet**. Live shows **Quiet**. Digest shows **Queue clear**. The card titles no longer grow when JavaScript loads the counts. A real count still replaces those words.
+
+
 ## [0.1.1285] - 2026-10-01
 
 ### Changed
