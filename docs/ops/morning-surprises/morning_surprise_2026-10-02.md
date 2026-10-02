@@ -20,6 +20,7 @@ Overnight Track B kept filter counts calm before a load.
 - ~23:15 tick: Top Processes Pinned/Hot counts stay None yet at zero (**v0.1.1291**); install/kickstart.
 - ~23:40 tick: Monitors Up/Down/Slow counts stay None yet at zero (**v0.1.1292**); install/kickstart.
 - ~00:05 tick: Disk Cleanup Reclaim/Big/Clean counts stay None yet at zero (**v0.1.1293**); install/kickstart.
+- GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
