@@ -19006,9 +19006,9 @@ function ensureDiskCleanupFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="disk-cleanup-filter-chip is-active" data-disk-cleanup-filter="all" aria-pressed="true" title="Show every category">All</button>' +
-      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="reclaim" aria-pressed="false" title="Show categories with reclaimable space">Reclaim <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="reclaim">0</span></button>' +
-      `<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="big" aria-pressed="false" title="Show categories with big reclaimable space (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)})">Big <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="big">0</span></button>` +
-      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="clean">0</span></button>';
+      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="reclaim" aria-pressed="false" title="Show categories with reclaimable space">Reclaim <span class="disk-cleanup-filter-count is-zero" data-disk-cleanup-filter-count="reclaim">None yet</span></button>' +
+      `<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="big" aria-pressed="false" title="Show categories with big reclaimable space (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)})">Big <span class="disk-cleanup-filter-count is-zero" data-disk-cleanup-filter-count="big">None yet</span></button>` +
+      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count is-zero" data-disk-cleanup-filter-count="clean">None yet</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -19123,6 +19123,14 @@ function ensureDiskCleanupFilterMissState(listEl, show) {
   if (hint) hint.textContent = diskCleanupFilterMissHint();
 }
 
+/** Reclaim/Big/Clean counts: zero stays None yet (Monitors Up/Down/Slow parity). A positive count replaces that word. */
+function paintDiskCleanupFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyDiskCleanupListFilter() {
   ensureDiskCleanupFilterChips();
   const chips = document.getElementById('disk-cleanup-filter-chips');
@@ -19143,14 +19151,18 @@ function applyDiskCleanupListFilter() {
     else if (!el.classList.contains('has-reclaim')) cleanCount++;
   });
 
-  const reclaimEl = document.querySelector(
-    '[data-disk-cleanup-filter-count="reclaim"]'
+  paintDiskCleanupFilterCount(
+    document.querySelector('[data-disk-cleanup-filter-count="reclaim"]'),
+    reclaimCount
   );
-  const bigEl = document.querySelector('[data-disk-cleanup-filter-count="big"]');
-  const cleanEl = document.querySelector('[data-disk-cleanup-filter-count="clean"]');
-  if (reclaimEl) reclaimEl.textContent = String(reclaimCount);
-  if (bigEl) bigEl.textContent = String(bigCount);
-  if (cleanEl) cleanEl.textContent = String(cleanCount);
+  paintDiskCleanupFilterCount(
+    document.querySelector('[data-disk-cleanup-filter-count="big"]'),
+    bigCount
+  );
+  paintDiskCleanupFilterCount(
+    document.querySelector('[data-disk-cleanup-filter-count="clean"]'),
+    cleanCount
+  );
   const bigBtn = document.querySelector(
     '#disk-cleanup-filter-chips [data-disk-cleanup-filter="big"]'
   );

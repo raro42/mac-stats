@@ -5143,6 +5143,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.disk-cleanup-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 /* Agent Ops Sessions — All · Live · Files (Monitors / Processes parity) */
 .ops-session-kind-chips {
   display: flex;
