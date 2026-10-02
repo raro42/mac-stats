@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1298] - 2026-10-02
+
+### Changed
+- **Disk Cleanup scope filters on first paint** — All, On, and Off sit in the theme HTML above the scope list. They no longer pop in after JavaScript loads. A zero On or Off count still says **None yet**.
+
+
 ## [0.1.1297] - 2026-10-02
 
 ### Changed

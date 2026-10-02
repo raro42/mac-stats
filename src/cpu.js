@@ -18549,6 +18549,9 @@ function ensureDiskCleanupScopeFilterChips() {
       '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="on" aria-pressed="false" title="Show enabled scopes only">On <span class="disk-cleanup-scope-filter-count is-zero" data-disk-cleanup-scope-filter-count="on">None yet</span></button>' +
       '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="off" aria-pressed="false" title="Show disabled scopes only">Off <span class="disk-cleanup-scope-filter-count is-zero" data-disk-cleanup-scope-filter-count="off">None yet</span></button>';
     scopesEl.parentNode.insertBefore(wrap, scopesEl);
+  }
+  if (wrap.dataset.diskCleanupScopeFilterBound !== '1') {
+    wrap.dataset.diskCleanupScopeFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target &&
@@ -18681,7 +18684,8 @@ function applyDiskCleanupScopeFilter() {
   if (!scopesEl) return;
 
   const items = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
-  if (chips) chips.hidden = items.length === 0;
+  // Stay visible on first paint (theme HTML). A zero scope list still shows All · On · Off.
+  if (chips) chips.hidden = false;
   syncDiskCleanupScopeFilterClearBtn();
 
   let onCount = 0;
