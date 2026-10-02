@@ -604,13 +604,27 @@ function ensureChatFilterChips() {
     wrap.className = 'chat-filter-chips';
     wrap.setAttribute('role', 'group');
     wrap.setAttribute('aria-label', 'Chat message filter');
-    wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
       '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count is-zero" data-chat-filter-count="you">None yet</span></button>' +
       '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count is-zero" data-chat-filter-count="assistant">None yet</span></button>' +
       '<button type="button" class="chat-filter-chip" data-chat-filter="errors" aria-pressed="false" title="Show failed turns only (Error: …)">Errors <span class="chat-filter-count is-zero" data-chat-filter-count="errors">None yet</span></button>';
     messages.parentNode.insertBefore(wrap, messages);
+  } else if (!wrap.querySelector('[data-chat-filter="errors"]')) {
+    const errBtn = document.createElement('button');
+    errBtn.type = 'button';
+    errBtn.className = 'chat-filter-chip';
+    errBtn.setAttribute('data-chat-filter', 'errors');
+    errBtn.setAttribute('aria-pressed', 'false');
+    errBtn.title = 'Show failed turns only (Error: …)';
+    errBtn.innerHTML =
+      'Errors <span class="chat-filter-count is-zero" data-chat-filter-count="errors">None yet</span>';
+    const clearBtn = wrap.querySelector('#chat-filter-clear, .chat-filter-clear');
+    if (clearBtn) wrap.insertBefore(errBtn, clearBtn);
+    else wrap.appendChild(errBtn);
+  }
+  if (wrap.dataset.chatFilterBound !== '1') {
+    wrap.dataset.chatFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target && e.target.closest && e.target.closest('#chat-filter-clear, .chat-filter-clear');
@@ -627,16 +641,6 @@ function ensureChatFilterChips() {
       e.stopPropagation();
       setChatFilterMode(btn.getAttribute('data-chat-filter') || 'all');
     });
-  } else if (!wrap.querySelector('[data-chat-filter="errors"]')) {
-    const errBtn = document.createElement('button');
-    errBtn.type = 'button';
-    errBtn.className = 'chat-filter-chip';
-    errBtn.setAttribute('data-chat-filter', 'errors');
-    errBtn.setAttribute('aria-pressed', 'false');
-    errBtn.title = 'Show failed turns only (Error: …)';
-    errBtn.innerHTML =
-      'Errors <span class="chat-filter-count is-zero" data-chat-filter-count="errors">None yet</span>';
-    wrap.appendChild(errBtn);
   }
   ensureChatFilterClearBtn(wrap);
   syncChatFilterClearBtn();
@@ -755,7 +759,7 @@ function applyChatListFilter() {
 
   const items = Array.from(container.querySelectorAll('.chat-message'));
   const trueEmpty = !!container.querySelector('.chat-empty:not(.chat-filter-miss)');
-  if (chips) chips.hidden = trueEmpty || items.length === 0;
+  if (chips) chips.hidden = false;
 
   let youCount = 0;
   let assistantCount = 0;
