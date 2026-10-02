@@ -19046,6 +19046,9 @@ function ensureDiskCleanupFilterChips() {
       `<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="big" aria-pressed="false" title="Show categories with big reclaimable space (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)})">Big <span class="disk-cleanup-filter-count is-zero" data-disk-cleanup-filter-count="big">None yet</span></button>` +
       '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count is-zero" data-disk-cleanup-filter-count="clean">None yet</span></button>';
     list.parentNode.insertBefore(wrap, list);
+  }
+  if (wrap.dataset.diskCleanupFilterBound !== '1') {
+    wrap.dataset.diskCleanupFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target &&
@@ -19175,7 +19178,8 @@ function applyDiskCleanupListFilter() {
 
   const items = Array.from(listEl.querySelectorAll('.disk-cleanup-item'));
   const trueEmpty = !!listEl.querySelector('.disk-cleanup-list-empty');
-  if (chips) chips.hidden = trueEmpty || items.length === 0;
+  // Stay visible on first paint (theme HTML). An empty category list still shows All · Reclaim · Big · Clean.
+  if (chips) chips.hidden = false;
   syncDiskCleanupFilterClearBtn();
 
   let reclaimCount = 0;

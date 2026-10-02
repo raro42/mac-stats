@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1299] - 2026-10-02
+
+### Changed
+- **Disk Cleanup category filters on first paint** — All, Reclaim, Big, and Clean sit in the theme HTML above the category list. They no longer pop in after JavaScript loads. A zero Reclaim, Big, or Clean count still says **None yet**.
+
+
 ## [0.1.1298] - 2026-10-02
 
 ### Changed
