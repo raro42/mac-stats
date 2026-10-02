@@ -6616,6 +6616,15 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+.ops-session-kind-count.is-zero,
+.ops-agents-enabled-count.is-zero,
+.ops-schedules-kind-count.is-zero,
+.ops-memory-kind-count.is-zero,
+.ops-runs-lane-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .monitors-filter-chip {
   appearance: none;
   display: inline-flex;

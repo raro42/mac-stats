@@ -1714,8 +1714,8 @@ function ensureOpsSessionKindChips() {
         wrap.setAttribute('aria-label', 'Session kind filter');
         wrap.innerHTML =
             '<button type="button" class="ops-session-kind-chip is-active" data-ops-session-kind="all" aria-pressed="true" title="Show live sessions and saved files">All</button>' +
-            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count" data-ops-session-kind-count="live">0</span></button>' +
-            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>';
+            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count is-zero" data-ops-session-kind-count="live">None yet</span></button>' +
+            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count is-zero" data-ops-session-kind-count="files">None yet</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
     }
     if (wrap.dataset.opsSessionKindBound !== '1') {
@@ -1759,6 +1759,14 @@ function setOpsSessionKindFilter(mode) {
     renderOpsSessionFiles(opsSessionFilesCache);
 }
 
+/** Kind-filter counts: zero stays None yet (tab-count parity). A positive count replaces that word. */
+function paintOpsKindCount(el, n) {
+    if (!el) return;
+    const v = Math.max(0, Number(n) || 0);
+    el.textContent = v === 0 ? 'None yet' : String(v);
+    el.classList.toggle('is-zero', v === 0);
+}
+
 function paintOpsSessionKindChips() {
     const wrap = document.getElementById('ops-session-kind-chips');
     if (!wrap) return;
@@ -1767,8 +1775,8 @@ function paintOpsSessionKindChips() {
     const filesAll = opsSessionFilesCache || [];
     const liveEl = wrap.querySelector('[data-ops-session-kind-count="live"]');
     const filesEl = wrap.querySelector('[data-ops-session-kind-count="files"]');
-    if (liveEl) liveEl.textContent = String(liveAll.length);
-    if (filesEl) filesEl.textContent = String(filesAll.length);
+    paintOpsKindCount(liveEl, liveAll.length);
+    paintOpsKindCount(filesEl, filesAll.length);
     wrap.querySelectorAll('[data-ops-session-kind]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-session-kind');
         const on = key === opsSessionKindFilter;
@@ -1907,8 +1915,8 @@ function ensureOpsMemoryKindChips() {
         wrap.setAttribute('aria-label', 'Knowledge kind filter');
         wrap.innerHTML =
             '<button type="button" class="ops-memory-kind-chip is-active" data-ops-memory-kind="all" aria-pressed="true" title="Show every knowledge file">All</button>' +
-            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count" data-ops-memory-kind-count="discord">0</span></button>' +
-            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count" data-ops-memory-kind-count="core">0</span></button>';
+            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count is-zero" data-ops-memory-kind-count="discord">None yet</span></button>' +
+            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count is-zero" data-ops-memory-kind-count="core">None yet</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
     }
     if (wrap.dataset.opsMemoryKindClearBound !== '1') {
@@ -1958,8 +1966,8 @@ function paintOpsMemoryKindChips() {
     const coreN = all.filter((f) => memoryRowMatchesKind(f, 'core')).length;
     const discordEl = wrap.querySelector('[data-ops-memory-kind-count="discord"]');
     const coreEl = wrap.querySelector('[data-ops-memory-kind-count="core"]');
-    if (discordEl) discordEl.textContent = String(discordN);
-    if (coreEl) coreEl.textContent = String(coreN);
+    paintOpsKindCount(discordEl, discordN);
+    paintOpsKindCount(coreEl, coreN);
     wrap.querySelectorAll('[data-ops-memory-kind]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-memory-kind');
         const on = key === opsMemoryKindFilter;
@@ -2105,11 +2113,11 @@ function ensureOpsRunsLaneChips() {
         wrap.setAttribute('aria-label', 'Run lane filter');
         wrap.innerHTML =
             '<button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>' +
-            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count" data-ops-runs-lane-count="instant">0</span></button>' +
-            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="lite" aria-pressed="false" title="Show lite-lane runs only">Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span></button>' +
-            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count" data-ops-runs-lane-count="direct">0</span></button>' +
-            `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>` +
-            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>';
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="instant">None yet</span></button>' +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="lite" aria-pressed="false" title="Show lite-lane runs only">Lite <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="lite">None yet</span></button>' +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="direct">None yet</span></button>' +
+            `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="slow">None yet</span></button>` +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="fail">None yet</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
     }
     if (wrap.dataset.opsRunsLaneClearBound !== '1') {
@@ -2142,7 +2150,7 @@ function ensureOpsRunsLaneChips() {
         liteBtn.setAttribute('aria-pressed', 'false');
         liteBtn.title = 'Show lite-lane runs only';
         liteBtn.innerHTML =
-            'Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span>';
+            'Lite <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="lite">None yet</span>';
         const directBtn = wrap.querySelector('[data-ops-runs-lane="direct"]');
         if (directBtn) wrap.insertBefore(liteBtn, directBtn);
         else wrap.appendChild(liteBtn);
@@ -2155,7 +2163,7 @@ function ensureOpsRunsLaneChips() {
         slowBtn.setAttribute('aria-pressed', 'false');
         slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
         slowBtn.innerHTML =
-            `Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span>`;
+            `Slow <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="slow">None yet</span>`;
         wrap.appendChild(slowBtn);
     }
     if (!wrap.querySelector('[data-ops-runs-lane="fail"]')) {
@@ -2166,7 +2174,7 @@ function ensureOpsRunsLaneChips() {
         failBtn.setAttribute('aria-pressed', 'false');
         failBtn.title = 'Show failed runs only (ok=false)';
         failBtn.innerHTML =
-            'Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span>';
+            'Fail <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="fail">None yet</span>';
         wrap.appendChild(failBtn);
     }
     ensureOpsRunsLaneFilterClearBtn(wrap);
@@ -2218,11 +2226,11 @@ function paintOpsRunsLaneChips() {
     const directEl = wrap.querySelector('[data-ops-runs-lane-count="direct"]');
     const slowEl = wrap.querySelector('[data-ops-runs-lane-count="slow"]');
     const failEl = wrap.querySelector('[data-ops-runs-lane-count="fail"]');
-    if (instantEl) instantEl.textContent = String(instantN);
-    if (liteEl) liteEl.textContent = String(liteN);
-    if (directEl) directEl.textContent = String(directN);
-    if (slowEl) slowEl.textContent = String(slowN);
-    if (failEl) failEl.textContent = String(failN);
+    paintOpsKindCount(instantEl, instantN);
+    paintOpsKindCount(liteEl, liteN);
+    paintOpsKindCount(directEl, directN);
+    paintOpsKindCount(slowEl, slowN);
+    paintOpsKindCount(failEl, failN);
     wrap.querySelectorAll('[data-ops-runs-lane]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-runs-lane');
         const active = key === opsRunsLaneFilter;
@@ -4586,8 +4594,8 @@ function ensureOpsAgentsEnabledChips() {
         wrap.setAttribute('aria-label', 'Agent enabled filter');
         wrap.innerHTML =
             '<button type="button" class="ops-agents-enabled-chip is-active" data-ops-agents-enabled="all" aria-pressed="true" title="Show every agent">All</button>' +
-            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="on">0</span></button>' +
-            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="off">0</span></button>';
+            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count is-zero" data-ops-agents-enabled-count="on">None yet</span></button>' +
+            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count is-zero" data-ops-agents-enabled-count="off">None yet</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
     }
     if (wrap.dataset.opsAgentsEnabledBound !== '1') {
@@ -4636,8 +4644,8 @@ function paintOpsAgentsEnabledChips() {
     const offN = all.length - onN;
     const onEl = wrap.querySelector('[data-ops-agents-enabled-count="on"]');
     const offEl = wrap.querySelector('[data-ops-agents-enabled-count="off"]');
-    if (onEl) onEl.textContent = String(onN);
-    if (offEl) offEl.textContent = String(offN);
+    paintOpsKindCount(onEl, onN);
+    paintOpsKindCount(offEl, offN);
     wrap.querySelectorAll('[data-ops-agents-enabled]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-agents-enabled');
         const active = key === opsAgentsEnabledFilter;
@@ -4778,8 +4786,8 @@ function ensureOpsSchedulesKindChips() {
         wrap.setAttribute('aria-label', 'Schedule kind filter');
         wrap.innerHTML =
             '<button type="button" class="ops-schedules-kind-chip is-active" data-ops-schedules-kind="all" aria-pressed="true" title="Show active schedules and recent deliveries">All</button>' +
-            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="jobs">0</span></button>' +
-            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="deliveries">0</span></button>';
+            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count is-zero" data-ops-schedules-kind-count="jobs">None yet</span></button>' +
+            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count is-zero" data-ops-schedules-kind-count="deliveries">None yet</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
     }
     if (wrap.dataset.opsSchedulesKindClearBound !== '1') {
@@ -4830,8 +4838,8 @@ function paintOpsSchedulesKindChips() {
     const delAll = opsDeliveriesCache || [];
     const jobsEl = wrap.querySelector('[data-ops-schedules-kind-count="jobs"]');
     const delEl = wrap.querySelector('[data-ops-schedules-kind-count="deliveries"]');
-    if (jobsEl) jobsEl.textContent = String(jobsAll.length);
-    if (delEl) delEl.textContent = String(delAll.length);
+    paintOpsKindCount(jobsEl, jobsAll.length);
+    paintOpsKindCount(delEl, delAll.length);
     wrap.querySelectorAll('[data-ops-schedules-kind]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-schedules-kind');
         const on = key === opsSchedulesKindFilter;

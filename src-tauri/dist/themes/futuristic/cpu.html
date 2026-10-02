@@ -386,8 +386,8 @@
             </div>
             <div id="ops-agents-enabled-chips" class="ops-agents-enabled-chips" role="group" aria-label="Agent enabled filter">
               <button type="button" class="ops-agents-enabled-chip is-active" data-ops-agents-enabled="all" aria-pressed="true" title="Show every agent">All</button>
-              <button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="on">0</span></button>
-              <button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="off">0</span></button>
+              <button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count is-zero" data-ops-agents-enabled-count="on">None yet</span></button>
+              <button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count is-zero" data-ops-agents-enabled-count="off">None yet</span></button>
             </div>
             <div class="ops-list" id="ops-agents-list"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="Add agent folders under ~/.mac-stats/agents"><div class="ops-empty-filter-title">No agents yet</div><div class="ops-empty-tab-hint">Add agent folders under ~/.mac-stats/agents</div></div></div>
             <div class="ops-detail" id="ops-agent-detail" hidden>
@@ -413,8 +413,8 @@
             </div>
             <div id="ops-session-kind-chips" class="ops-session-kind-chips" role="group" aria-label="Session kind filter">
               <button type="button" class="ops-session-kind-chip is-active" data-ops-session-kind="all" aria-pressed="true" title="Show live sessions and saved files">All</button>
-              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count" data-ops-session-kind-count="live">0</span></button>
-              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>
+              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count is-zero" data-ops-session-kind-count="live">None yet</span></button>
+              <button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count is-zero" data-ops-session-kind-count="files">None yet</span></button>
             </div>
             <h4 class="ops-subhead">Live</h4>
             <div class="ops-list" id="ops-live-sessions"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="A chat appears here while an agent runs"><div class="ops-empty-filter-title">No live sessions</div><div class="ops-empty-tab-hint">A chat appears here while an agent runs</div></div></div>
@@ -431,8 +431,8 @@
             </div>
             <div id="ops-schedules-kind-chips" class="ops-schedules-kind-chips" role="group" aria-label="Schedule kind filter">
               <button type="button" class="ops-schedules-kind-chip is-active" data-ops-schedules-kind="all" aria-pressed="true" title="Show active schedules and recent deliveries">All</button>
-              <button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="jobs">0</span></button>
-              <button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="deliveries">0</span></button>
+              <button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count is-zero" data-ops-schedules-kind-count="jobs">None yet</span></button>
+              <button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count is-zero" data-ops-schedules-kind-count="deliveries">None yet</span></button>
             </div>
             <h4 class="ops-subhead">Active schedules</h4>
             <div class="ops-list" id="ops-schedules-list"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="Add one from Discord or the Schedules tools when you are ready"><div class="ops-empty-filter-title">No schedules yet</div><div class="ops-empty-tab-hint">Add one from Discord or the Schedules tools when you are ready</div></div></div>
@@ -449,8 +449,8 @@
             </div>
             <div id="ops-memory-kind-chips" class="ops-memory-kind-chips" role="group" aria-label="Knowledge kind filter">
               <button type="button" class="ops-memory-kind-chip is-active" data-ops-memory-kind="all" aria-pressed="true" title="Show every knowledge file">All</button>
-              <button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count" data-ops-memory-kind-count="discord">0</span></button>
-              <button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count" data-ops-memory-kind-count="core">0</span></button>
+              <button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count is-zero" data-ops-memory-kind-count="discord">None yet</span></button>
+              <button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count is-zero" data-ops-memory-kind-count="core">None yet</span></button>
             </div>
             <div class="ops-list" id="ops-memory-list"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="Soul and memory notes show up here once they land on disk"><div class="ops-empty-filter-title">No knowledge files yet</div><div class="ops-empty-tab-hint">Soul and memory notes show up here once they land on disk</div></div></div>
             <pre class="ops-preview" id="ops-memory-preview" hidden></pre>
@@ -464,11 +464,11 @@
             </div>
             <div id="ops-runs-lane-chips" class="ops-runs-lane-chips" role="group" aria-label="Run lane filter">
               <button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>
-              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count" data-ops-runs-lane-count="instant">0</span></button>
-              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="lite" aria-pressed="false" title="Show lite-lane runs only">Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span></button>
-              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count" data-ops-runs-lane-count="direct">0</span></button>
-              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥2000 ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>
-              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>
+              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="instant">None yet</span></button>
+              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="lite" aria-pressed="false" title="Show lite-lane runs only">Lite <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="lite">None yet</span></button>
+              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="direct">None yet</span></button>
+              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥2000 ms)">Slow <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="slow">None yet</span></button>
+              <button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="fail">None yet</span></button>
             </div>
             <div class="ops-list" id="ops-runs-list"><div class="ops-empty ops-empty-tab ops-empty-filter-miss is-calm" role="status" title="Turns land after Discord or chat"><div class="ops-empty-filter-title">No runs yet</div><div class="ops-empty-tab-hint">Turns land after Discord or chat</div></div></div>
             <pre class="ops-preview" id="ops-runs-preview" hidden></pre>
