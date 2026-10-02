@@ -16814,6 +16814,21 @@ function ensureLogsFilterChips() {
       '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count is-zero" data-logs-filter-count="error">None yet</span></button>' +
       '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count is-zero" data-logs-filter-count="warn">None yet</span></button>';
     toolbar.appendChild(wrap);
+  } else if (!wrap.querySelector('[data-logs-filter="warn"]')) {
+    const warnBtn = document.createElement('button');
+    warnBtn.type = 'button';
+    warnBtn.className = 'logs-filter-chip';
+    warnBtn.setAttribute('data-logs-filter', 'warn');
+    warnBtn.setAttribute('aria-pressed', 'false');
+    warnBtn.title = 'Show WARN lines';
+    warnBtn.innerHTML =
+      'Warn <span class="logs-filter-count is-zero" data-logs-filter-count="warn">None yet</span>';
+    const clearBtn = wrap.querySelector('#logs-filter-clear, .logs-filter-clear');
+    if (clearBtn) wrap.insertBefore(warnBtn, clearBtn);
+    else wrap.appendChild(warnBtn);
+  }
+  if (wrap.dataset.logsFilterBound !== '1') {
+    wrap.dataset.logsFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target &&

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1303] - 2026-10-02
+
+### Changed
+- **Debug Log filters on first paint** — All, Error, and Warn sit in the theme HTML on the log toolbar. They no longer pop in after JavaScript loads. A zero Error or Warn count still says **None yet**.
+
+
 ## [0.1.1302] - 2026-10-02
 
 ### Changed

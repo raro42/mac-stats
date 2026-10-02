@@ -297,6 +297,7 @@
             <button type="button" id="logs-refresh-btn" class="popover-btn-secondary">Refresh</button>
             <button type="button" id="logs-open-btn" class="popover-btn-secondary">Open in editor</button>
             <label class="logs-autorefresh"><input type="checkbox" id="logs-autorefresh" /> Auto-refresh</label>
+            <div id="logs-filter-chips" class="logs-filter-chips" role="group" aria-label="Log level filter"><button type="button" class="logs-filter-chip is-active" data-logs-filter="all" aria-pressed="true" title="Show the full log tail">All</button><button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count is-zero" data-logs-filter-count="error">None yet</span></button><button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count is-zero" data-logs-filter-count="warn">None yet</span></button><button type="button" id="logs-filter-clear" class="logs-filter-clear" hidden data-idle-label="Clear" aria-label="Clear filter" title="Clear filter — show the full log tail (All)">Clear</button></div>
           </div>
           <pre class="logs-viewer is-empty" id="logs-viewer">Nothing here yet — loads when you open Debug Log</pre>
         </div>
