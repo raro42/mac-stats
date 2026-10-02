@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1292] - 2026-10-01
+
+### Changed
+- **Monitors Up, Down, and Slow counts stay None yet at zero** — the Up, Down, and Slow chips keep **None yet** until the count is above zero. They no longer flash **0** before a load. A positive count still replaces **None yet**.
+
+
 ## [0.1.1291] - 2026-10-01
 
 ### Changed

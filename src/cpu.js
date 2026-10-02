@@ -7928,9 +7928,9 @@ function ensureMonitorsFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="monitors-filter-chip is-active" data-monitors-filter="all" aria-pressed="true" title="Show every monitor">All</button>' +
-      '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count" data-monitors-filter-count="up">0</span></button>' +
-      '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>' +
-      `<button type="button" class="monitors-filter-chip" data-monitors-filter="slow" aria-pressed="false" title="Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)">Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span></button>`;
+      '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count is-zero" data-monitors-filter-count="up">None yet</span></button>' +
+      '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count is-zero" data-monitors-filter-count="down">None yet</span></button>' +
+      `<button type="button" class="monitors-filter-chip" data-monitors-filter="slow" aria-pressed="false" title="Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)">Slow <span class="monitors-filter-count is-zero" data-monitors-filter-count="slow">None yet</span></button>`;
     summary.insertAdjacentElement('afterend', wrap);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -7958,7 +7958,7 @@ function ensureMonitorsFilterChips() {
     slowBtn.setAttribute('aria-pressed', 'false');
     slowBtn.title = `Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)`;
     slowBtn.innerHTML =
-      'Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span>';
+      'Slow <span class="monitors-filter-count is-zero" data-monitors-filter-count="slow">None yet</span>';
     wrap.appendChild(slowBtn);
   }
   ensureMonitorsFilterClearBtn(wrap);
@@ -8054,6 +8054,14 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
   if (hint) hint.textContent = monitorsFilterMissHint();
 }
 
+/** Up/Down/Slow counts: zero stays None yet (Top Processes Pinned/Hot parity). A positive count replaces that word. */
+function paintMonitorsFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyMonitorsListFilter() {
   ensureMonitorsFilterChips();
   const chips = document.getElementById('monitors-filter-chips');
@@ -8074,12 +8082,18 @@ function applyMonitorsListFilter() {
     if (el.classList.contains('is-slow')) slowCount++;
   });
 
-  const upEl = document.querySelector('[data-monitors-filter-count="up"]');
-  const downEl = document.querySelector('[data-monitors-filter-count="down"]');
-  const slowEl = document.querySelector('[data-monitors-filter-count="slow"]');
-  if (upEl) upEl.textContent = String(upCount);
-  if (downEl) downEl.textContent = String(downCount);
-  if (slowEl) slowEl.textContent = String(slowCount);
+  paintMonitorsFilterCount(
+    document.querySelector('[data-monitors-filter-count="up"]'),
+    upCount
+  );
+  paintMonitorsFilterCount(
+    document.querySelector('[data-monitors-filter-count="down"]'),
+    downCount
+  );
+  paintMonitorsFilterCount(
+    document.querySelector('[data-monitors-filter-count="slow"]'),
+    slowCount
+  );
   document.querySelectorAll('#monitors-filter-chips [data-monitors-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-monitors-filter');
     const hits =

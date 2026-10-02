@@ -6708,6 +6708,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.monitors-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .monitors-filter-miss {
   display: flex;
   flex-direction: column;
