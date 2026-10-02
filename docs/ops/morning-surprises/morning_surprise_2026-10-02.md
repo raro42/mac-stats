@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-02
 
-Overnight Track B kept AI Chat filters on first paint, and kept Debug Log filters on first paint.
+Overnight Track B kept the AI Chat model glance on first paint, and kept AI Chat filters on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1305** | AI Chat model glance is in the theme HTML under the header. It no longer pops in after JavaScript loads. Before a connection check it says **Not set · configure URL**. |
 | **v0.1.1304** | AI Chat chips All, You, Assistant, and Errors are in the theme HTML. They no longer pop in after JavaScript loads. A zero You, Assistant, or Errors count still says **None yet**. The row stays visible on first paint. |
 | **v0.1.1303** | Debug Log chips All, Error, and Warn are in the theme HTML. They no longer pop in after JavaScript loads. A zero Error or Warn count still says **None yet**. |
 | **v0.1.1302** | Perplexity chips All, Top, and Snippet are in the theme HTML. They no longer pop in after JavaScript loads. A zero Top or Snippet count still says **None yet**. |
@@ -25,7 +26,7 @@ Overnight Track B kept AI Chat filters on first paint, and kept Debug Log filter
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~16.75d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~16.77d).
 - Debug.log: no product ERROR/WARN/panic clusters in the scan window.
 - ~20:40 tick: kind-filter counts stay None yet at zero (**v0.1.1290**); install/kickstart.
 - ~23:15 tick: Top Processes Pinned/Hot counts stay None yet at zero (**v0.1.1291**); install/kickstart.
@@ -42,10 +43,11 @@ Overnight Track B kept AI Chat filters on first paint, and kept Debug Log filter
 - ~04:12 tick: Perplexity All · Top · Snippet chips first paint in theme HTML (**v0.1.1302**); install/kickstart.
 - ~04:40 tick: Debug Log All · Error · Warn chips first paint in theme HTML (**v0.1.1303**); install/kickstart.
 - ~05:05 tick: AI Chat All · You · Assistant · Errors chips first paint in theme HTML (**v0.1.1304**); install/kickstart.
+- ~05:30 tick: AI Chat model glance first paint in theme HTML (**v0.1.1305**); install/kickstart.
 - GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
-- AI Chat model glance still appears after JavaScript (not in the theme HTML).
+- AI Chat offline attention glance still appears after JavaScript (not in the theme HTML).
 - Screenshot refresh when Screen Recording TCC allows.
 - Sibling ports if digester stays empty.
