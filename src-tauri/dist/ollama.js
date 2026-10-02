@@ -1195,14 +1195,22 @@ function ensureChatModelGlance() {
   if (!glance) {
     glance = document.createElement('div');
     glance.id = 'chat-model-glance';
-    glance.className = 'chat-model-glance';
-    glance.hidden = true;
-    glance.innerHTML = '<span id="chat-model-glance-text"></span>';
+    glance.className = 'chat-model-glance is-offline';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Click to configure the Ollama URL';
+    glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
+    glance.innerHTML = '<span id="chat-model-glance-text">Not set · configure URL</span>';
     const collapsed = ensureOllamaCollapsedGlance();
     const anchor = collapsed || header;
     anchor.insertAdjacentElement('afterend', glance);
-    wireChatModelGlanceClick(glance);
+  } else if (!document.getElementById('chat-model-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'chat-model-glance-text';
+    span.textContent = 'Not set · configure URL';
+    glance.appendChild(span);
   }
+  wireChatModelGlanceClick(glance);
   return glance;
 }
 
