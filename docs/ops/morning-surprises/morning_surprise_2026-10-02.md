@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-02
 
-Overnight Track B kept Perplexity filters on first paint, and kept Monitors filters on first paint.
+Overnight Track B kept Debug Log filters on first paint, and kept Perplexity filters on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1303** | Debug Log chips All, Error, and Warn are in the theme HTML. They no longer pop in after JavaScript loads. A zero Error or Warn count still says **None yet**. |
 | **v0.1.1302** | Perplexity chips All, Top, and Snippet are in the theme HTML. They no longer pop in after JavaScript loads. A zero Top or Snippet count still says **None yet**. |
 | **v0.1.1301** | Monitors chips All, Up, Down, and Slow are in the theme HTML. They no longer pop in after JavaScript loads. A zero Up, Down, or Slow count still says **None yet**. |
 | **v0.1.1300** | Top Processes chips All, Pinned, and Hot are in the theme HTML. They no longer pop in after JavaScript loads. A zero Pinned or Hot count still says **None yet**. |
@@ -38,11 +39,11 @@ Overnight Track B kept Perplexity filters on first paint, and kept Monitors filt
 - ~03:08 tick: Top Processes All · Pinned · Hot chips first paint in theme HTML (**v0.1.1300**); install/kickstart.
 - ~03:40 tick: Monitors All · Up · Down · Slow chips first paint in theme HTML (**v0.1.1301**); install/kickstart.
 - ~04:12 tick: Perplexity All · Top · Snippet chips first paint in theme HTML (**v0.1.1302**); install/kickstart.
+- ~04:40 tick: Debug Log All · Error · Warn chips first paint in theme HTML (**v0.1.1303**); install/kickstart.
 - GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
-- Debug Log All · Error · Warn chips still appear after JavaScript (not in the theme HTML).
 - AI Chat All · You · Assistant · Errors chips still appear after JavaScript (not in the theme HTML).
 - Screenshot refresh when Screen Recording TCC allows.
 - Sibling ports if digester stays empty.
