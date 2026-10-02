@@ -8221,6 +8221,19 @@ button.monitor-detail-url.is-just-saved {
   border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
 }
 
+.perplexity-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 1.1em;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.perplexity-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .perplexity-filter-chip[data-perplexity-filter='top'].has-hits {
   background: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
   border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, transparent);

@@ -13950,8 +13950,8 @@ function ensurePerplexityFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="perplexity-filter-chip is-active" data-perplexity-filter="all" aria-pressed="true" title="Show every result">All</button>' +
-      `<button type="button" class="perplexity-filter-chip" data-perplexity-filter="top" aria-pressed="false" title="Show top ${PERPLEXITY_TOP_N} results only">Top <span class="perplexity-filter-count" data-perplexity-filter-count="top">0</span></button>` +
-      '<button type="button" class="perplexity-filter-chip" data-perplexity-filter="snippet" aria-pressed="false" title="Show results with preview text">Snippet <span class="perplexity-filter-count" data-perplexity-filter-count="snippet">0</span></button>';
+      `<button type="button" class="perplexity-filter-chip" data-perplexity-filter="top" aria-pressed="false" title="Show top ${PERPLEXITY_TOP_N} results only">Top <span class="perplexity-filter-count is-zero" data-perplexity-filter-count="top">None yet</span></button>` +
+      '<button type="button" class="perplexity-filter-chip" data-perplexity-filter="snippet" aria-pressed="false" title="Show results with preview text">Snippet <span class="perplexity-filter-count is-zero" data-perplexity-filter-count="snippet">None yet</span></button>';
     resultsEl.parentNode.insertBefore(wrap, resultsEl);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -14116,6 +14116,14 @@ function ensurePerplexityFilterMissState(resultsEl, show) {
   if (hint) hint.textContent = perplexityFilterMissHint();
 }
 
+/** Top/Snippet counts: zero stays None yet (Debug Log Error/Warn parity). A positive count replaces that word. */
+function paintPerplexityFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyPerplexityResultsFilter() {
   ensurePerplexityFilterChips();
   const chips = document.getElementById('perplexity-filter-chips');
@@ -14135,10 +14143,14 @@ function applyPerplexityResultsFilter() {
     if (el.classList.contains('has-snippet')) snippetCount++;
   });
 
-  const topEl = document.querySelector('[data-perplexity-filter-count="top"]');
-  const snippetEl = document.querySelector('[data-perplexity-filter-count="snippet"]');
-  if (topEl) topEl.textContent = String(topCount);
-  if (snippetEl) snippetEl.textContent = String(snippetCount);
+  paintPerplexityFilterCount(
+    document.querySelector('[data-perplexity-filter-count="top"]'),
+    topCount
+  );
+  paintPerplexityFilterCount(
+    document.querySelector('[data-perplexity-filter-count="snippet"]'),
+    snippetCount
+  );
   const topBtn = document.querySelector(
     '#perplexity-filter-chips [data-perplexity-filter="top"]'
   );
