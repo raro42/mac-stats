@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1302] - 2026-10-02
+
+### Changed
+- **Perplexity filters on first paint** — All, Top, and Snippet sit in the theme HTML above the result list. They no longer pop in after JavaScript loads. A zero Top or Snippet count still says **None yet**.
+
+
 ## [0.1.1301] - 2026-10-02
 
 ### Changed

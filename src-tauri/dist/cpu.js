@@ -13963,6 +13963,21 @@ function ensurePerplexityFilterChips() {
       `<button type="button" class="perplexity-filter-chip" data-perplexity-filter="top" aria-pressed="false" title="Show top ${PERPLEXITY_TOP_N} results only">Top <span class="perplexity-filter-count is-zero" data-perplexity-filter-count="top">None yet</span></button>` +
       '<button type="button" class="perplexity-filter-chip" data-perplexity-filter="snippet" aria-pressed="false" title="Show results with preview text">Snippet <span class="perplexity-filter-count is-zero" data-perplexity-filter-count="snippet">None yet</span></button>';
     resultsEl.parentNode.insertBefore(wrap, resultsEl);
+  } else if (!wrap.querySelector('[data-perplexity-filter="snippet"]')) {
+    const snippetBtn = document.createElement('button');
+    snippetBtn.type = 'button';
+    snippetBtn.className = 'perplexity-filter-chip';
+    snippetBtn.setAttribute('data-perplexity-filter', 'snippet');
+    snippetBtn.setAttribute('aria-pressed', 'false');
+    snippetBtn.title = 'Show results with preview text';
+    snippetBtn.innerHTML =
+      'Snippet <span class="perplexity-filter-count is-zero" data-perplexity-filter-count="snippet">None yet</span>';
+    const clearBtn = wrap.querySelector('#perplexity-filter-clear, .perplexity-filter-clear');
+    if (clearBtn) wrap.insertBefore(snippetBtn, clearBtn);
+    else wrap.appendChild(snippetBtn);
+  }
+  if (wrap.dataset.perplexityFilterBound !== '1') {
+    wrap.dataset.perplexityFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target &&
@@ -14144,7 +14159,8 @@ function applyPerplexityResultsFilter() {
   const trueEmpty = !!resultsEl.querySelector(
     '.perplexity-empty:not(.perplexity-filter-miss)'
   );
-  if (chips) chips.hidden = trueEmpty || items.length === 0;
+  // Stay visible on first paint (theme HTML). An empty list still shows All · Top · Snippet.
+  if (chips) chips.hidden = false;
 
   let topCount = 0;
   let snippetCount = 0;
