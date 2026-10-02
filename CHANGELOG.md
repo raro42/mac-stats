@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1306] - 2026-10-02
+
+### Changed
+- **AI Chat offline glance on first paint** — the attention line sits in the theme HTML above the message filters. It no longer pops in after JavaScript loads. Before a connection check it says **Chat · Not set · configure URL**.
+
+
 ## [0.1.1305] - 2026-10-02
 
 ### Changed

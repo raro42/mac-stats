@@ -1949,9 +1949,13 @@ function ensureChatOfflineAttentionGlance() {
   if (!glance) {
     glance = document.createElement('div');
     glance.id = 'chat-offline-attention-glance';
-    glance.className = 'chat-offline-attention-glance';
-    glance.hidden = true;
-    glance.innerHTML = '<span id="chat-offline-attention-glance-text"></span>';
+    glance.className = 'chat-offline-attention-glance is-not-set';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Click to configure the Ollama URL';
+    glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
+    glance.innerHTML =
+      '<span id="chat-offline-attention-glance-text">Chat · Not set · configure URL</span>';
     if (chips) {
       chips.insertAdjacentElement('beforebegin', glance);
     } else if (chat) {
@@ -1959,10 +1963,16 @@ function ensureChatOfflineAttentionGlance() {
     } else {
       return null;
     }
-    wireChatOfflineAttentionGlanceClick(glance);
-  } else if (chips && glance.nextElementSibling !== chips) {
+  } else if (!document.getElementById('chat-offline-attention-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'chat-offline-attention-glance-text';
+    span.textContent = 'Chat · Not set · configure URL';
+    glance.appendChild(span);
+  }
+  if (chips && glance.nextElementSibling !== chips) {
     chips.insertAdjacentElement('beforebegin', glance);
   }
+  wireChatOfflineAttentionGlanceClick(glance);
   return glance;
 }
 
