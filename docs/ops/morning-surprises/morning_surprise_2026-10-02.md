@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-02
 
-Overnight Track B kept Monitors filters on first paint, and kept Top Processes filters on first paint.
+Overnight Track B kept Perplexity filters on first paint, and kept Monitors filters on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1302** | Perplexity chips All, Top, and Snippet are in the theme HTML. They no longer pop in after JavaScript loads. A zero Top or Snippet count still says **None yet**. |
 | **v0.1.1301** | Monitors chips All, Up, Down, and Slow are in the theme HTML. They no longer pop in after JavaScript loads. A zero Up, Down, or Slow count still says **None yet**. |
 | **v0.1.1300** | Top Processes chips All, Pinned, and Hot are in the theme HTML. They no longer pop in after JavaScript loads. A zero Pinned or Hot count still says **None yet**. |
 | **v0.1.1299** | Disk Cleanup category chips All, Reclaim, Big, and Clean are in the theme HTML. They no longer pop in after JavaScript loads. A zero Reclaim, Big, or Clean count still says **None yet**. |
@@ -36,10 +37,12 @@ Overnight Track B kept Monitors filters on first paint, and kept Top Processes f
 - ~02:43 tick: Disk Cleanup category All · Reclaim · Big · Clean chips first paint in theme HTML (**v0.1.1299**); install/kickstart.
 - ~03:08 tick: Top Processes All · Pinned · Hot chips first paint in theme HTML (**v0.1.1300**); install/kickstart.
 - ~03:40 tick: Monitors All · Up · Down · Slow chips first paint in theme HTML (**v0.1.1301**); install/kickstart.
+- ~04:12 tick: Perplexity All · Top · Snippet chips first paint in theme HTML (**v0.1.1302**); install/kickstart.
 - GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
-- Perplexity All · Top · Snippet chips still appear after JavaScript (not in the theme HTML).
-- Monitors screenshot refresh when Screen Recording TCC allows (`feature-monitors.png`).
+- Debug Log All · Error · Warn chips still appear after JavaScript (not in the theme HTML).
+- AI Chat All · You · Assistant · Errors chips still appear after JavaScript (not in the theme HTML).
+- Screenshot refresh when Screen Recording TCC allows.
 - Sibling ports if digester stays empty.
