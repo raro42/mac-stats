@@ -18546,8 +18546,8 @@ function ensureDiskCleanupScopeFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="disk-cleanup-scope-filter-chip is-active" data-disk-cleanup-scope-filter="all" aria-pressed="true" title="Show every scope">All</button>' +
-      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="on" aria-pressed="false" title="Show enabled scopes only">On <span class="disk-cleanup-scope-filter-count" data-disk-cleanup-scope-filter-count="on">0</span></button>' +
-      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="off" aria-pressed="false" title="Show disabled scopes only">Off <span class="disk-cleanup-scope-filter-count" data-disk-cleanup-scope-filter-count="off">0</span></button>';
+      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="on" aria-pressed="false" title="Show enabled scopes only">On <span class="disk-cleanup-scope-filter-count is-zero" data-disk-cleanup-scope-filter-count="on">None yet</span></button>' +
+      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="off" aria-pressed="false" title="Show disabled scopes only">Off <span class="disk-cleanup-scope-filter-count is-zero" data-disk-cleanup-scope-filter-count="off">None yet</span></button>';
     scopesEl.parentNode.insertBefore(wrap, scopesEl);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -18666,6 +18666,14 @@ function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
   if (hint) hint.textContent = diskCleanupScopeFilterMissHint();
 }
 
+/** On/Off counts: zero stays None yet (Reclaim/Big/Clean parity). A positive count replaces that word. */
+function paintDiskCleanupScopeFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyDiskCleanupScopeFilter() {
   ensureDiskCleanupScopeFilterChips();
   const chips = document.getElementById('disk-cleanup-scope-filter-chips');
@@ -18683,14 +18691,14 @@ function applyDiskCleanupScopeFilter() {
     else onCount++;
   });
 
-  const onEl = document.querySelector(
-    '[data-disk-cleanup-scope-filter-count="on"]'
+  paintDiskCleanupScopeFilterCount(
+    document.querySelector('[data-disk-cleanup-scope-filter-count="on"]'),
+    onCount
   );
-  const offEl = document.querySelector(
-    '[data-disk-cleanup-scope-filter-count="off"]'
+  paintDiskCleanupScopeFilterCount(
+    document.querySelector('[data-disk-cleanup-scope-filter-count="off"]'),
+    offCount
   );
-  if (onEl) onEl.textContent = String(onCount);
-  if (offEl) offEl.textContent = String(offCount);
   document
     .querySelectorAll(
       '#disk-cleanup-scope-filter-chips [data-disk-cleanup-scope-filter]'

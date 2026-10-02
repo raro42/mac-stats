@@ -5046,6 +5046,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+.disk-cleanup-scope-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .disk-cleanup-scope-filter-miss {
   display: flex;
   flex-direction: column;
