@@ -3028,6 +3028,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.logs-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 /* Clear beside All·Error·Warn when a filter is active (Disk / Monitors / Processes / AI Chat Clear parity). */
 .logs-filter-clear {
   flex: 0 0 auto;

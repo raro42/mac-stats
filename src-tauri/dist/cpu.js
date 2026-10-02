@@ -16773,8 +16773,8 @@ function ensureLogsFilterChips() {
     wrap.setAttribute('aria-label', 'Log level filter');
     wrap.innerHTML =
       '<button type="button" class="logs-filter-chip is-active" data-logs-filter="all" aria-pressed="true" title="Show the full log tail">All</button>' +
-      '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count" data-logs-filter-count="error">0</span></button>' +
-      '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count" data-logs-filter-count="warn">0</span></button>';
+      '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count is-zero" data-logs-filter-count="error">None yet</span></button>' +
+      '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count is-zero" data-logs-filter-count="warn">None yet</span></button>';
     toolbar.appendChild(wrap);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -17126,6 +17126,14 @@ function syncLogsFilterMissCalmState(wrap) {
         : 'Nothing matches this filter — click Clear filter for All';
 }
 
+/** Error/Warn counts: zero stays None yet (Disk Cleanup Reclaim/Big/Clean parity). A positive count replaces that word. */
+function paintLogsFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyLogsFilter(scrollToEnd) {
   const viewer = document.getElementById('logs-viewer');
   if (!viewer) return;
@@ -17134,10 +17142,14 @@ function applyLogsFilter(scrollToEnd) {
   if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
   const { prefix, body, hasContent } = logsViewerRaw;
   const counts = countLogsByKind(hasContent ? body : '');
-  const errEl = document.querySelector('[data-logs-filter-count="error"]');
-  const warnEl = document.querySelector('[data-logs-filter-count="warn"]');
-  if (errEl) errEl.textContent = String(counts.error);
-  if (warnEl) warnEl.textContent = String(counts.warn);
+  paintLogsFilterCount(
+    document.querySelector('[data-logs-filter-count="error"]'),
+    counts.error
+  );
+  paintLogsFilterCount(
+    document.querySelector('[data-logs-filter-count="warn"]'),
+    counts.warn
+  );
   applyLogsGlanceState(counts);
   document.querySelectorAll('#logs-filter-chips [data-logs-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-logs-filter');
