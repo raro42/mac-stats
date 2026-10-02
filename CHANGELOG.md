@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1300] - 2026-10-02
+
+### Changed
+- **Top Processes filters on first paint** — All, Pinned, and Hot sit in the theme HTML above the process list. They no longer pop in after JavaScript loads. A zero Pinned or Hot count still says **None yet**.
+
+
 ## [0.1.1299] - 2026-10-02
 
 ### Changed

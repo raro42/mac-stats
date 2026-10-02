@@ -674,7 +674,7 @@
 
       <section class="cpu-processes" id="processes-section">
         <h2 class="section-title collapsible-header" id="processes-header">Top Processes</h2>
-        <div class="process-table" id="process-list"><div class="process-empty" role="status">Waiting for process samples — opens with the CPU window</div></div>
+        <div id="processes-filter-chips" class="processes-filter-chips" role="group" aria-label="Process list filter"><button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button><button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count is-zero" data-processes-filter-count="pinned">None yet</span></button><button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span></button><button type="button" id="processes-filter-clear" class="processes-filter-clear" hidden data-idle-label="Clear" aria-label="Clear filter" title="Clear filter — show every process (All)">Clear</button></div><div class="process-table" id="process-list"><div class="process-empty" role="status">Waiting for process samples — opens with the CPU window</div></div>
       </section>
 
       <footer class="theme-footer">

@@ -1445,6 +1445,20 @@ function ensureProcessesFilterChips() {
       '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count is-zero" data-processes-filter-count="pinned">None yet</span></button>' +
       '<button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span></button>';
     list.parentNode.insertBefore(wrap, list);
+  } else if (!wrap.querySelector('[data-processes-filter="hot"]')) {
+    const hotBtn = document.createElement("button");
+    hotBtn.type = "button";
+    hotBtn.className = "processes-filter-chip";
+    hotBtn.setAttribute("data-processes-filter", "hot");
+    hotBtn.setAttribute("aria-pressed", "false");
+    hotBtn.title =
+      "Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)";
+    hotBtn.innerHTML =
+      'Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span>';
+    wrap.appendChild(hotBtn);
+  }
+  if (wrap.dataset.processesFilterBound !== "1") {
+    wrap.dataset.processesFilterBound = "1";
     wrap.addEventListener("click", (e) => {
       const clearBtn =
         e.target &&
@@ -1463,17 +1477,6 @@ function ensureProcessesFilterChips() {
       e.stopPropagation();
       setProcessesFilterMode(btn.getAttribute("data-processes-filter") || "all");
     });
-  } else if (!wrap.querySelector('[data-processes-filter="hot"]')) {
-    const hotBtn = document.createElement("button");
-    hotBtn.type = "button";
-    hotBtn.className = "processes-filter-chip";
-    hotBtn.setAttribute("data-processes-filter", "hot");
-    hotBtn.setAttribute("aria-pressed", "false");
-    hotBtn.title =
-      "Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)";
-    hotBtn.innerHTML =
-      'Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span>';
-    wrap.appendChild(hotBtn);
   }
   ensureProcessesFilterClearBtn(wrap);
   syncProcessesFilterClearBtn();
@@ -1575,7 +1578,8 @@ function applyProcessesListFilter() {
 
   const rows = Array.from(processList.querySelectorAll(".process-row"));
   const waiting = !!processList.querySelector(".process-empty:not(.processes-filter-miss)");
-  if (chips) chips.hidden = waiting || rows.length === 0;
+  // Stay visible on first paint (theme HTML). A waiting list still shows All · Pinned · Hot.
+  if (chips) chips.hidden = false;
   syncProcessesFilterClearBtn();
 
   let pinnedCount = 0;
