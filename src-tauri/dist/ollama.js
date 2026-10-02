@@ -607,9 +607,9 @@ function ensureChatFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
-      '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count" data-chat-filter-count="you">0</span></button>' +
-      '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>' +
-      '<button type="button" class="chat-filter-chip" data-chat-filter="errors" aria-pressed="false" title="Show failed turns only (Error: …)">Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span></button>';
+      '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count is-zero" data-chat-filter-count="you">None yet</span></button>' +
+      '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count is-zero" data-chat-filter-count="assistant">None yet</span></button>' +
+      '<button type="button" class="chat-filter-chip" data-chat-filter="errors" aria-pressed="false" title="Show failed turns only (Error: …)">Errors <span class="chat-filter-count is-zero" data-chat-filter-count="errors">None yet</span></button>';
     messages.parentNode.insertBefore(wrap, messages);
     wrap.addEventListener('click', (e) => {
       const clearBtn =
@@ -635,7 +635,7 @@ function ensureChatFilterChips() {
     errBtn.setAttribute('aria-pressed', 'false');
     errBtn.title = 'Show failed turns only (Error: …)';
     errBtn.innerHTML =
-      'Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span>';
+      'Errors <span class="chat-filter-count is-zero" data-chat-filter-count="errors">None yet</span>';
     wrap.appendChild(errBtn);
   }
   ensureChatFilterClearBtn(wrap);
@@ -739,6 +739,14 @@ function ensureChatFilterMissState(container, show) {
   syncChatFilterMissCalmState(wrap);
 }
 
+/** You / Assistant / Errors counts: zero stays None yet (Perplexity Top/Snippet parity). A positive count replaces that word. */
+function paintChatFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? 'None yet' : String(v);
+  el.classList.toggle('is-zero', v === 0);
+}
+
 function applyChatListFilter() {
   ensureChatFilterChips();
   const chips = document.getElementById('chat-filter-chips');
@@ -760,12 +768,18 @@ function applyChatListFilter() {
     }
   });
 
-  const youEl = document.querySelector('[data-chat-filter-count="you"]');
-  const asstEl = document.querySelector('[data-chat-filter-count="assistant"]');
-  const errEl = document.querySelector('[data-chat-filter-count="errors"]');
-  if (youEl) youEl.textContent = String(youCount);
-  if (asstEl) asstEl.textContent = String(assistantCount);
-  if (errEl) errEl.textContent = String(errorsCount);
+  paintChatFilterCount(
+    document.querySelector('[data-chat-filter-count="you"]'),
+    youCount
+  );
+  paintChatFilterCount(
+    document.querySelector('[data-chat-filter-count="assistant"]'),
+    assistantCount
+  );
+  paintChatFilterCount(
+    document.querySelector('[data-chat-filter-count="errors"]'),
+    errorsCount
+  );
   document.querySelectorAll('#chat-filter-chips [data-chat-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-chat-filter');
     btn.classList.toggle(

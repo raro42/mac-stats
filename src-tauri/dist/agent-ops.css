@@ -4626,6 +4626,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.chat-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .chat-filter-miss {
   display: flex;
   flex-direction: column;

@@ -6,6 +6,7 @@ Overnight Track B kept filter counts calm before a load.
 
 | Version | What |
 |---------|------|
+| **v0.1.1296** | AI Chat You, Assistant, and Errors counts stay **None yet** when the count is zero. The chips no longer flash **0** before a load. A positive count still replaces **None yet**. |
 | **v0.1.1295** | Perplexity Top and Snippet counts stay **None yet** when the count is zero. The chips no longer flash **0** before a load. A positive count still replaces **None yet**. |
 | **v0.1.1294** | Debug Log Error and Warn counts stay **None yet** when the count is zero. The chips no longer flash **0** before a load. A positive count still replaces **None yet**. |
 | **v0.1.1293** | Disk Cleanup Reclaim, Big, and Clean counts stay **None yet** when the count is zero. The chips no longer flash **0** before a load. A positive count still replaces **None yet**. |
@@ -24,10 +25,11 @@ Overnight Track B kept filter counts calm before a load.
 - ~00:05 tick: Disk Cleanup Reclaim/Big/Clean counts stay None yet at zero (**v0.1.1293**); install/kickstart.
 - ~00:32 tick: Debug Log Error and Warn counts stay None yet at zero (**v0.1.1294**); install/kickstart.
 - ~01:02 tick: Perplexity Top and Snippet counts stay None yet at zero (**v0.1.1295**); install/kickstart.
+- ~01:24 tick: AI Chat You, Assistant, and Errors counts stay None yet at zero (**v0.1.1296**); install/kickstart.
 - GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
-- AI Chat You, Assistant, and Errors filter counts still say **0** until a load. Disk Cleanup scope On/Off counts do the same.
+- Disk Cleanup scope On and Off counts still say **0** until a load.
 - Disk Cleanup screenshot refresh when Screen Recording TCC allows (`feature-disk-cleanup.png`).
 - Sibling ports if digester stays empty.
