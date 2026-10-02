@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-02 (~03:40):** Monitors All · Up · Down · Slow chips first paint (v0.1.1301). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-02 (~03:08):** Top Processes All · Pinned · Hot chips first paint (v0.1.1300). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-02 (~00:32):** Debug Log Error and Warn counts stay None yet at zero (v0.1.1294). No dedicated feature screenshot; prior assets kept.
 - **2026-10-02 (~00:05):** Disk Cleanup Reclaim/Big/Clean counts stay None yet at zero (v0.1.1293). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1301] - 2026-10-02
+
+### Changed
+- **Monitors filters on first paint** — All, Up, Down, and Slow sit in the theme HTML above the monitor list. They no longer pop in after JavaScript loads. A zero Up, Down, or Slow count still says **None yet**.
+
+
 ## [0.1.1300] - 2026-10-02
 
 ### Changed

@@ -7936,6 +7936,21 @@ function ensureMonitorsFilterChips() {
       '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count is-zero" data-monitors-filter-count="down">None yet</span></button>' +
       `<button type="button" class="monitors-filter-chip" data-monitors-filter="slow" aria-pressed="false" title="Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)">Slow <span class="monitors-filter-count is-zero" data-monitors-filter-count="slow">None yet</span></button>`;
     summary.insertAdjacentElement('afterend', wrap);
+  } else if (!wrap.querySelector('[data-monitors-filter="slow"]')) {
+    const slowBtn = document.createElement('button');
+    slowBtn.type = 'button';
+    slowBtn.className = 'monitors-filter-chip';
+    slowBtn.setAttribute('data-monitors-filter', 'slow');
+    slowBtn.setAttribute('aria-pressed', 'false');
+    slowBtn.title = `Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)`;
+    slowBtn.innerHTML =
+      'Slow <span class="monitors-filter-count is-zero" data-monitors-filter-count="slow">None yet</span>';
+    const clearBtn = wrap.querySelector('#monitors-filter-clear, .monitors-filter-clear');
+    if (clearBtn) wrap.insertBefore(slowBtn, clearBtn);
+    else wrap.appendChild(slowBtn);
+  }
+  if (wrap.dataset.monitorsFilterBound !== '1') {
+    wrap.dataset.monitorsFilterBound = '1';
     wrap.addEventListener('click', (e) => {
       const clearBtn =
         e.target &&
@@ -7954,16 +7969,6 @@ function ensureMonitorsFilterChips() {
       e.stopPropagation();
       setMonitorsFilterMode(btn.getAttribute('data-monitors-filter') || 'all');
     });
-  } else if (!wrap.querySelector('[data-monitors-filter="slow"]')) {
-    const slowBtn = document.createElement('button');
-    slowBtn.type = 'button';
-    slowBtn.className = 'monitors-filter-chip';
-    slowBtn.setAttribute('data-monitors-filter', 'slow');
-    slowBtn.setAttribute('aria-pressed', 'false');
-    slowBtn.title = `Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)`;
-    slowBtn.innerHTML =
-      'Slow <span class="monitors-filter-count is-zero" data-monitors-filter-count="slow">None yet</span>';
-    wrap.appendChild(slowBtn);
   }
   ensureMonitorsFilterClearBtn(wrap);
   syncMonitorsFilterClearBtn();
@@ -8074,7 +8079,8 @@ function applyMonitorsListFilter() {
 
   const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
   const trueEmpty = !!monitorsList.querySelector('.monitors-list-empty');
-  if (chips) chips.hidden = trueEmpty || items.length === 0;
+  // Stay visible on first paint (theme HTML). An empty list still shows All · Up · Down · Slow.
+  if (chips) chips.hidden = false;
   syncMonitorsFilterClearBtn();
 
   let upCount = 0;

@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-02
 
-Overnight Track B kept Top Processes filters on first paint, and kept Disk Cleanup filters on first paint.
+Overnight Track B kept Monitors filters on first paint, and kept Top Processes filters on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1301** | Monitors chips All, Up, Down, and Slow are in the theme HTML. They no longer pop in after JavaScript loads. A zero Up, Down, or Slow count still says **None yet**. |
 | **v0.1.1300** | Top Processes chips All, Pinned, and Hot are in the theme HTML. They no longer pop in after JavaScript loads. A zero Pinned or Hot count still says **None yet**. |
 | **v0.1.1299** | Disk Cleanup category chips All, Reclaim, Big, and Clean are in the theme HTML. They no longer pop in after JavaScript loads. A zero Reclaim, Big, or Clean count still says **None yet**. |
 | **v0.1.1298** | Disk Cleanup scope chips All, On, and Off are in the theme HTML. They no longer pop in after JavaScript loads. A zero On or Off count still says **None yet**. |
@@ -21,7 +22,7 @@ Overnight Track B kept Top Processes filters on first paint, and kept Disk Clean
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~16.6d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~16.7d).
 - Debug.log: no product ERROR/WARN/panic clusters in the scan window.
 - ~20:40 tick: kind-filter counts stay None yet at zero (**v0.1.1290**); install/kickstart.
 - ~23:15 tick: Top Processes Pinned/Hot counts stay None yet at zero (**v0.1.1291**); install/kickstart.
@@ -34,10 +35,11 @@ Overnight Track B kept Top Processes filters on first paint, and kept Disk Clean
 - ~02:16 tick: Disk Cleanup scope All · On · Off chips first paint in theme HTML (**v0.1.1298**); install/kickstart.
 - ~02:43 tick: Disk Cleanup category All · Reclaim · Big · Clean chips first paint in theme HTML (**v0.1.1299**); install/kickstart.
 - ~03:08 tick: Top Processes All · Pinned · Hot chips first paint in theme HTML (**v0.1.1300**); install/kickstart.
+- ~03:40 tick: Monitors All · Up · Down · Slow chips first paint in theme HTML (**v0.1.1301**); install/kickstart.
 - GitHub Release **v0.1.1293** cut (20 patches since v0.1.1273). CI attaches the DMG.
 
 ## Next fuel
 
-- Monitors All · Up · Down · Slow chips still appear after JavaScript (not in the theme HTML).
-- Top Processes screenshot refresh when Screen Recording TCC allows (`feature-processes.png`).
+- Perplexity All · Top · Snippet chips still appear after JavaScript (not in the theme HTML).
+- Monitors screenshot refresh when Screen Recording TCC allows (`feature-monitors.png`).
 - Sibling ports if digester stays empty.
