@@ -1442,8 +1442,8 @@ function ensureProcessesFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button>' +
-      '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>' +
-      '<button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span></button>';
+      '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count is-zero" data-processes-filter-count="pinned">None yet</span></button>' +
+      '<button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener("click", (e) => {
       const clearBtn =
@@ -1472,7 +1472,7 @@ function ensureProcessesFilterChips() {
     hotBtn.title =
       "Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)";
     hotBtn.innerHTML =
-      'Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span>';
+      'Hot <span class="processes-filter-count is-zero" data-processes-filter-count="hot">None yet</span>';
     wrap.appendChild(hotBtn);
   }
   ensureProcessesFilterClearBtn(wrap);
@@ -1559,6 +1559,14 @@ function ensureProcessesFilterMissState(processList, show) {
   if (hint) hint.textContent = processesFilterMissHint();
 }
 
+/** Pinned/Hot counts: zero stays None yet (Agent Ops kind-filter parity). A positive count replaces that word. */
+function paintProcessesFilterCount(el, n) {
+  if (!el) return;
+  const v = Math.max(0, Number(n) || 0);
+  el.textContent = v === 0 ? "None yet" : String(v);
+  el.classList.toggle("is-zero", v === 0);
+}
+
 function applyProcessesListFilter() {
   ensureProcessesFilterChips();
   const chips = document.getElementById("processes-filter-chips");
@@ -1577,10 +1585,14 @@ function applyProcessesListFilter() {
     if (el.classList.contains("is-hot")) hotCount++;
   });
 
-  const pinnedEl = document.querySelector('[data-processes-filter-count="pinned"]');
-  if (pinnedEl) pinnedEl.textContent = String(pinnedCount);
-  const hotEl = document.querySelector('[data-processes-filter-count="hot"]');
-  if (hotEl) hotEl.textContent = String(hotCount);
+  paintProcessesFilterCount(
+    document.querySelector('[data-processes-filter-count="pinned"]'),
+    pinnedCount
+  );
+  paintProcessesFilterCount(
+    document.querySelector('[data-processes-filter-count="hot"]'),
+    hotCount
+  );
   document.querySelectorAll("#processes-filter-chips [data-processes-filter]").forEach((btn) => {
     const key = btn.getAttribute("data-processes-filter");
     const hits =

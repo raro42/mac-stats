@@ -2131,6 +2131,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.processes-filter-count.is-zero {
+  font-weight: 600;
+  opacity: 0.42;
+}
+
 .processes-filter-miss {
   display: flex;
   flex-direction: column;
