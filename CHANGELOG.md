@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1312] - 2026-10-02
+
+### Changed
+- **AI Chat starter-chip keyboard hint on first paint** — the hint sits in the theme HTML under the starter chips. It no longer pops in after JavaScript loads. Before a turn it says how to move across the chips and put a prompt in the composer.
+
+
 ## [0.1.1311] - 2026-10-02
 
 ### Changed
