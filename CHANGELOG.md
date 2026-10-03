@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1314] - 2026-10-02
+
+### Changed
+- **Top Processes filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Pinned · Hot. It no longer pops in after JavaScript loads. Before a sample it says how to move across the chips. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1313] - 2026-10-02
 
 ### Changed
