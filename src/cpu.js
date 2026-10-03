@@ -5072,7 +5072,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
         ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Details or Settings · at end → ring gauges · Enter / Space selects'
         : wrap.id === 'monitors-filter-chips'
           ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Monitors icon · at end → monitor list · Enter / Space selects'
-          : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+          : wrap.id === 'perplexity-filter-chips'
+            ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Perplexity icon · at end → result list · Enter / Space selects'
+            : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -5106,6 +5108,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
           } else if (
             wrap.id === 'monitors-filter-chips' &&
             tryChainMonitorsSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
+            wrap.id === 'perplexity-filter-chips' &&
+            tryChainPerplexityFilterToIconLine()
           ) {
             e.preventDefault();
             e.stopPropagation();
@@ -14225,6 +14233,16 @@ function focusPerplexityFilterChipFirst() {
   const chips = getFilterChipButtons(wrap);
   if (!chips.length) return false;
   return focusFilterChipButton(chips[0]);
+}
+
+/** Perplexity filter chip first ↑ → icon-line Perplexity icon. */
+function tryChainPerplexityFilterToIconLine() {
+  if (perplexityCollapsed) return false;
+  const icon = document.getElementById('icon-perplexity');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
 }
 
 /** Soft tip above results (Monitors / AI Chat kb-hint parity). */

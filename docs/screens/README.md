@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-02 (~23:55):** Perplexity filter-chip keyboard hint first paint (v0.1.1316). No dedicated feature screenshot; polish stays in the theme HTML.
 - **2026-10-02 (~23:27):** Monitors filter-chip keyboard hint first paint (v0.1.1315). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-02 (~03:40):** Monitors All · Up · Down · Slow chips first paint (v0.1.1301). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-02 (~03:08):** Top Processes All · Pinned · Hot chips first paint (v0.1.1300). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
