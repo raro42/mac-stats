@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1315] - 2026-10-02
+
+### Changed
+- **Monitors filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Up · Down · Slow. It no longer pops in after JavaScript loads. Before a check it says how to move across the chips. At the start, Up goes to the Monitors icon. At the end, the keys go to the monitor list. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1314] - 2026-10-02
 
 ### Changed

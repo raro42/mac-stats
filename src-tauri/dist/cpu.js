@@ -5070,7 +5070,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
       ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → temperature ring · at end → process list · Enter / Space selects'
       : wrap.id === 'rings-filter-chips'
         ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Details or Settings · at end → ring gauges · Enter / Space selects'
-        : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+        : wrap.id === 'monitors-filter-chips'
+          ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Monitors icon · at end → monitor list · Enter / Space selects'
+          : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(

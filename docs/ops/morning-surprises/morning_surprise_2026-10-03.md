@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-03
 
-Overnight Track B kept the Top Processes filter-chip keyboard hint on first paint.
+Overnight Track B kept the Monitors filter-chip keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1315** | Monitors filter-chip keyboard hint is in the theme HTML under All · Up · Down · Slow. It no longer pops in after JavaScript loads. Before a check it says how to move across the chips. At the start, Up goes to the Monitors icon. At the end, the keys go to the monitor list. Keyboard tips stay out of the layout. |
 | **v0.1.1314** | Top Processes filter-chip keyboard hint is in the theme HTML under All · Pinned · Hot. It no longer pops in after JavaScript loads. Before a sample it says how to move across the chips. Keyboard tips stay out of the layout. |
 | **v0.1.1313** | AI Chat filter-chip keyboard hint is in the theme HTML under All · You · Assistant · Errors. It no longer pops in after JavaScript loads. Before a turn it says how to move across the chips. Keyboard tips stay out of the layout. |
 | **v0.1.1312** | AI Chat starter-chip keyboard hint is in the theme HTML under the starter chips. It no longer pops in after JavaScript loads. Before a turn it says how to move across the chips and put a prompt in the composer. |
@@ -18,7 +19,8 @@ Overnight Track B kept the Top Processes filter-chip keyboard hint on first pain
 
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.5d).
-- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~23:03 tick.
+- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~23:30 tick.
+- ~23:30 tick: Monitors filter-chip keyboard hint first paint in theme HTML (**v0.1.1315**); install/kickstart.
 - ~23:03 tick: Top Processes filter-chip keyboard hint first paint in theme HTML (**v0.1.1314**); install/kickstart.
 - ~22:37 tick: AI Chat filter-chip keyboard hint first paint in theme HTML (**v0.1.1313**); install/kickstart.
 - ~22:11 tick: starter-chip keyboard hint first paint in theme HTML (**v0.1.1312**); install/kickstart.
