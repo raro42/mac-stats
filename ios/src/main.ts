@@ -1,3 +1,4 @@
+import { startBenchBanner } from "./bench-banner";
 import { startChat } from "./chat/chat";
 import { startLab } from "./chat/lab";
 import { debugBuild, debugDemoPrompt } from "./ipc";
@@ -39,6 +40,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!debug) return;
     const lab = document.getElementById("lab-details");
     if (lab) lab.hidden = false;
+    void startBenchBanner();
     startLab().catch((error: unknown) => {
       const status = document.getElementById("lab-status");
       if (status) status.textContent = `No se pudo iniciar el laboratorio: ${String(error)}`;

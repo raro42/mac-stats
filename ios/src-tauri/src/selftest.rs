@@ -3,14 +3,19 @@
 //! Con `IOS_STATS_SELFTEST=1` la app comprueba en el propio iPhone los criterios de la
 //! fase B y guarda el resultado en `Documents/selftest.json` (y `selftest.done` al
 //! terminar):
-//! - carga del modelo elegido y chat de varios turnos guardado en disco;
+//! - carga del modelo elegido y chat de varios turnos guardado en disco, en el que cada
+//!   turno reutiliza lo que el motor ya procesó en el anterior;
 //! - «Detener» corta la respuesta en menos de 300 ms;
 //! - salir a segundo plano cancela la generación;
 //! - tras un aviso de memoria el modelo se suelta y se vuelve a cargar al preguntar;
-//! - con `IOS_STATS_FAKE_THERMAL=critical`, el chat se niega a generar;
+//! - con `IOS_STATS_FAKE_THERMAL=critical`, el chat se niega a generar (en ese modo es la
+//!   única prueba, porque nada más puede generar);
 //! - deja una conversación con HTML malicioso para comprobar a ojo que no se ejecuta;
 //! - una descarga con SHA-256 incorrecto se rechaza y no deja el archivo;
 //! - con `IOS_STATS_SELFTEST_DOWNLOAD=<id>`, descarga ese modelo de verdad (con progreso).
+//!
+//! Mantiene la pantalla encendida mientras corre y al final borra las conversaciones de
+//! prueba, salvo la del HTML malicioso.
 
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
@@ -23,7 +28,7 @@ use crate::chat::{
     self,
     catalog,
     store::{Conversation, StoredMessage},
-    ChatState,
+    ChatState, SendResult,
 };
 use crate::metrics::MetricsState;
 
@@ -38,8 +43,8 @@ fn log(value: &Value) {
 }
 
 /// Lanza una respuesta larga en segundo plano y la interrumpe con `interrupt` a los 3 s.
-/// Devuelve el motivo de parada y cuánto tardó en cortar desde la interrupción.
-async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<String, String>, Duration) {
+/// Devuelve el resultado y cuánto tardó en cortar desde la interrupción.
+async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<SendResult, String>, Duration) {
     let handle = app.clone();
     let task = tauri::async_runtime::spawn(async move {
         let state = handle.state::<ChatState>();
@@ -53,10 +58,19 @@ async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<String, String
         event => app.llm().debug_simulate(event).await,
     };
     let result = match task.await {
-        Ok(r) => r.map(|r| r.stop_reason),
+        Ok(r) => r,
         Err(e) => Err(e.to_string()),
     };
     (result, start.elapsed())
+}
+
+async fn finish(app: &AppHandle, results: Vec<Value>) {
+    let _ = app.llm().keep_awake(false).await;
+    let passed = results.iter().filter(|r| r["ok"] == true).count();
+    log(&json!({ "event": "done", "passed": passed, "total": results.len() }));
+    let documents = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents");
+    let _ = std::fs::write(documents.join("selftest.json"), serde_json::to_string_pretty(&results).unwrap_or_default());
+    let _ = std::fs::write(documents.join("selftest.done"), "ok");
 }
 
 pub async fn run(app: AppHandle) {
@@ -69,12 +83,29 @@ pub async fn run(app: AppHandle) {
         tokio::time::sleep(Duration::from_millis(500)).await;
     }
 
+    let _ = app.llm().keep_awake(true).await;
+
     let mut results = Vec::new();
     let mut record = |name: &str, ok: bool, detail: Value| {
         let item = json!({ "test": name, "ok": ok, "detail": detail });
         log(&item);
         results.push(item);
     };
+
+    // Estado térmico crítico forzado: el chat debe negarse a generar.
+    if std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() == Ok("critical") {
+        let refused = chat::send(&app, &state, &metrics, None, "Hola", quiet()).await;
+        record(
+            "termico_critico",
+            refused.as_ref().is_err_and(|e| e.contains("caliente")),
+            json!({ "resultado": refused.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
+        );
+        finish(&app, results).await;
+        return;
+    }
+
+    // Conversaciones que se borran al terminar.
+    let mut created = Vec::new();
 
     // 1. Carga del modelo elegido.
     let entry = state.selected();
@@ -87,15 +118,25 @@ pub async fn run(app: AppHandle) {
     let mut conversation_id = None;
     let mut answers = Vec::new();
     let mut errors = Vec::new();
+    let mut reused = Vec::new();
     for q in questions {
         match chat::send(&app, &state, &metrics, conversation_id.clone(), q, quiet()).await {
             Ok(r) => {
+                reused.push(r.n_cached);
+                answers.push(json!({
+                    "pregunta": q,
+                    "tokensPrompt": r.n_prompt,
+                    "reutilizados": r.n_cached,
+                    "promptMs": r.prompt_ms.round(),
+                    "tgTps": r.tg_tps,
+                    "fin": r.stop_reason,
+                }));
                 conversation_id = Some(r.conversation_id);
-                answers.push(json!({ "pregunta": q, "tgTps": r.tg_tps, "fin": r.stop_reason }));
             }
             Err(e) => errors.push(e),
         }
     }
+    created.extend(conversation_id.clone());
     let stored = conversation_id.as_deref().and_then(|id| state.store.get(id));
     let messages = stored.as_ref().map_or(0, |c| c.messages.len());
     let replies: Vec<_> = stored
@@ -107,9 +148,17 @@ pub async fn run(app: AppHandle) {
         errors.is_empty() && messages == 6 && replies.iter().all(|r| !r.trim().is_empty()),
         json!({ "mensajesGuardados": messages, "respuestas": replies, "turnos": answers, "errores": errors }),
     );
+    // Los turnos 2 y 3 continúan el prompt anterior: el motor no debe procesarlo entero.
+    record(
+        "reutiliza_memoria",
+        reused.len() == 3 && reused[1..].iter().all(|&n| n > 0),
+        json!({ "reutilizadosPorTurno": reused }),
+    );
 
     // 3. «Detener».
-    let (stop, latency) = interrupted(&app, "cancel").await;
+    let (reply, latency) = interrupted(&app, "cancel").await;
+    created.extend(reply.as_ref().ok().map(|r| r.conversation_id.clone()));
+    let stop = reply.map(|r| r.stop_reason);
     record(
         "detener",
         stop.as_deref() == Ok("cancelled") && latency < Duration::from_millis(300),
@@ -117,7 +166,9 @@ pub async fn run(app: AppHandle) {
     );
 
     // 4. Salir a segundo plano.
-    let (stop, latency) = interrupted(&app, "resignActive").await;
+    let (reply, latency) = interrupted(&app, "resignActive").await;
+    created.extend(reply.as_ref().ok().map(|r| r.conversation_id.clone()));
+    let stop = reply.map(|r| r.stop_reason);
     record("segundo_plano", stop.as_deref() == Ok("cancelled"), json!({ "fin": stop, "ms": latency.as_millis() }));
 
     // 5. Aviso de memoria: se suelta el modelo y la siguiente pregunta lo recarga.
@@ -125,23 +176,14 @@ pub async fn run(app: AppHandle) {
     tokio::time::sleep(Duration::from_millis(1500)).await;
     let released = app.llm().status().await.map(|s| !s.loaded).unwrap_or(false);
     let again = chat::send(&app, &state, &metrics, None, "¿Sigues ahí?", quiet()).await;
+    created.extend(again.as_ref().ok().map(|r| r.conversation_id.clone()));
     record(
         "aviso_memoria",
         released && again.is_ok(),
         json!({ "modeloSoltado": released, "respondeDespues": again.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
     );
 
-    // 6. Estado térmico crítico (solo si se lanzó con IOS_STATS_FAKE_THERMAL=critical).
-    if std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() == Ok("critical") {
-        let refused = chat::send(&app, &state, &metrics, None, "Hola", quiet()).await;
-        record(
-            "termico_critico",
-            refused.as_ref().is_err_and(|e| e.contains("caliente")),
-            json!({ "resultado": refused.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
-        );
-    }
-
-    // 7. Descarga con SHA-256 incorrecto: se rechaza y no queda el archivo.
+    // 6. Descarga con SHA-256 incorrecto: se rechaza y no queda el archivo.
     let bad_file = "selftest-bad-sha.bin";
     let bad = app
         .llm()
@@ -161,7 +203,7 @@ pub async fn run(app: AppHandle) {
         json!({ "resultado": bad.as_ref().map_err(|e| e.to_string()), "archivoQueda": leftover }),
     );
 
-    // 8. Descarga real de un modelo del catálogo (opcional).
+    // 7. Descarga real de un modelo del catálogo (opcional).
     if let Ok(id) = std::env::var("IOS_STATS_SELFTEST_DOWNLOAD") {
         if let Some(entry) = catalog::find(&id) {
             let events = std::sync::Arc::new(std::sync::atomic::AtomicU32::new(0));
@@ -197,7 +239,7 @@ pub async fn run(app: AppHandle) {
         }
     }
 
-    // 9. Conversación con HTML malicioso, para revisar a ojo que se muestra como texto.
+    // 8. Conversación con HTML malicioso, para revisar a ojo que se muestra como texto.
     let now = chat::now_ms();
     let mut xss = Conversation::new(chat::new_id(), now);
     xss.title = "Prueba de HTML malicioso".into();
@@ -221,9 +263,8 @@ pub async fn run(app: AppHandle) {
     let saved = state.store.save(&xss);
     record("xss_guardada", saved.is_ok(), json!({ "id": xss.id }));
 
-    let passed = results.iter().filter(|r| r["ok"] == true).count();
-    log(&json!({ "event": "done", "passed": passed, "total": results.len() }));
-    let documents = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents");
-    let _ = std::fs::write(documents.join("selftest.json"), serde_json::to_string_pretty(&results).unwrap_or_default());
-    let _ = std::fs::write(documents.join("selftest.done"), "ok");
+    for id in &created {
+        let _ = state.store.delete(id);
+    }
+    finish(&app, results).await;
 }

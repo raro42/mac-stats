@@ -136,9 +136,23 @@ const QUALITY_PROMPTS: [&str; 10] = [
 
 const SOAK_PROMPT: &str = "Cuéntame una historia larga sobre un viaje en tren por la sierra de México, con muchos detalles.";
 
+/// Cada evento va a la consola, a `Documents/llm-bench-progress.jsonl` (para leerlo
+/// desde el Mac con devicectl aunque la consola no llegue) y a la web como aviso.
 fn bench_log(value: Value) {
     println!("BENCH {value}");
+    let path = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents/llm-bench-progress.jsonl");
+    if let Ok(mut file) = std::fs::OpenOptions::new().create(true).append(true).open(path) {
+        use std::io::Write;
+        let line = json!({ "ts": crate::chat::now_ms(), "event": value });
+        let _ = writeln!(file, "{line}");
+    }
+    if let Some(app) = BENCH_APP.get() {
+        use tauri::Emitter;
+        let _ = app.emit("bench-progress", &value);
+    }
 }
+
+static BENCH_APP: std::sync::OnceLock<AppHandle> = std::sync::OnceLock::new();
 
 fn env_u64(name: &str, default: u64) -> u64 {
     std::env::var(name).ok().and_then(|v| v.parse().ok()).unwrap_or(default)
@@ -332,6 +346,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
 }
 
 pub async fn auto_bench(app: AppHandle, spec: String) {
+    let _ = BENCH_APP.set(app.clone());
     let soak_secs = env_u64("IOS_STATS_SOAK_SECS", 600);
     let threads = env_u64("IOS_STATS_THREADS", 2) as u32;
     let models: Vec<CatalogEntry> = catalog::catalog()

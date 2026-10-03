@@ -92,8 +92,17 @@ class LlmPlugin: Plugin {
     }
   }
 
+  /// Metal solo puede usar la GPU con la app en primer plano. Si se lanza desde el Mac
+  /// con el iPhone en la pantalla de bloqueo, la app arranca en segundo plano.
+  private func isActive() -> Bool {
+    if Thread.isMainThread { return UIApplication.shared.applicationState == .active }
+    return DispatchQueue.main.sync { UIApplication.shared.applicationState == .active }
+  }
+
   @objc public func status(_ invoke: Invoke) {
-    invoke.resolve(engine.snapshot())
+    var status = engine.snapshot()
+    status["active"] = isActive()
+    invoke.resolve(status)
   }
 
   @objc public func load(_ invoke: Invoke) throws {
@@ -125,6 +134,10 @@ class LlmPlugin: Plugin {
 
   @objc public func generate(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(GenerateArgs.self)
+    guard isActive() else {
+      invoke.reject("La app tiene que estar en pantalla para responder.")
+      return
+    }
     let turns = args.messages.map { ChatTurn(role: $0.role, content: $0.content) }
     let options = GenerateOptions(
       maxTokens: args.maxTokens ?? 512,

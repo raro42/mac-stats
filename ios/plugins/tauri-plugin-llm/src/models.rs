@@ -81,6 +81,8 @@ pub struct EngineStatus {
     pub path: Option<String>,
     pub busy: bool,
     pub available_memory: u64,
+    /// La app está en primer plano (sin eso Metal no puede usar la GPU).
+    pub active: bool,
 }
 
 /// Descarga verificada de un modelo. Swift envía por `on_event`

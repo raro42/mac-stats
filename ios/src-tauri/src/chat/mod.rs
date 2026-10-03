@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::ipc::{Channel, InvokeResponseBody};
 use tauri::{AppHandle, Manager, State};
-use tauri_plugin_llm::{ChatMessage, DownloadRequest, EngineStatus, GenerateRequest, LlmExt, LoadInfo, LoadRequest};
+use tauri_plugin_llm::{DownloadRequest, EngineStatus, GenerateRequest, LlmExt, LoadInfo, LoadRequest};
 
 use crate::metrics::{apple::Thermal, MetricsState};
 use catalog::CatalogEntry;
@@ -235,6 +235,10 @@ pub struct SendResult {
     pub stop_reason: String,
     pub n_gen: u32,
     pub tg_tps: f64,
+    /// Tokens del prompt y cuántos se reutilizaron de la memoria del turno anterior.
+    pub n_prompt: u32,
+    pub n_cached: u32,
+    pub prompt_ms: f64,
 }
 
 /// Envía una pregunta. La web recibe `{type: "status", text}` mientras se carga el
@@ -284,11 +288,7 @@ pub(crate) async fn send(
     }
 
     let device = snapshot.as_ref().map(prompt::device_note);
-    let history: Vec<ChatMessage> = conversation
-        .messages
-        .iter()
-        .map(|m| ChatMessage { role: m.role.clone(), content: m.content.clone() })
-        .collect();
+    let history = prompt::history(&conversation.messages);
     let messages = prompt::build(&history, device.as_deref(), &question, prompt::HISTORY_BUDGET_CHARS);
 
     conversation.messages.push(StoredMessage {
@@ -328,12 +328,14 @@ pub(crate) async fn send(
         })
         .await;
 
-    let text = reply.lock().unwrap_or_else(|e| e.into_inner()).trim().to_string();
+    // Se guarda tal cual, sin recortar espacios: el siguiente turno la vuelve a enviar y
+    // tiene que coincidir con lo que el modelo generó para reutilizar la memoria.
+    let text = reply.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let (stop_reason, n_gen, tg_tps) = match &result {
         Ok(r) => (r.stop_reason.clone(), r.n_gen, r.tg_tps),
         Err(_) => ("error".to_string(), 0, 0.0),
     };
-    if !text.is_empty() {
+    if !text.trim().is_empty() {
         conversation.messages.push(StoredMessage {
             role: "assistant".into(),
             content: text,
@@ -345,6 +347,14 @@ pub(crate) async fn send(
         state.store.save(&conversation).map_err(|e| e.to_string())?;
     }
 
-    result.map_err(|e| e.to_string())?;
-    Ok(SendResult { conversation_id: conversation.id, stop_reason, n_gen, tg_tps })
+    let r = result.map_err(|e| e.to_string())?;
+    Ok(SendResult {
+        conversation_id: conversation.id,
+        stop_reason,
+        n_gen,
+        tg_tps,
+        n_prompt: r.n_prompt,
+        n_cached: r.n_cached,
+        prompt_ms: r.prompt_ms,
+    })
 }

@@ -309,8 +309,14 @@ final class LlamaEngine {
     begin()
     defer { end() }
 
-    var prompt = try applyTemplate(turns)
-    if options.thinkPrefill { prompt += "<think>\n\n</think>\n\n" }
+    // Las respuestas anteriores se generaron tras el bloque <think> vacío; se repite en el
+    // historial para que el prompt continúe exactamente lo que ya está en memoria.
+    let think = "<think>\n\n</think>\n\n"
+    let rendered = options.thinkPrefill
+      ? turns.map { $0.role == "assistant" ? ChatTurn(role: $0.role, content: think + $0.content) : $0 }
+      : turns
+    var prompt = try applyTemplate(rendered)
+    if options.thinkPrefill { prompt += think }
     var tokens = try tokenize(prompt)
     let limit = Int(nCtx) - options.maxTokens
     if tokens.count > limit { throw LlmError.promptTooLong(tokens: tokens.count, limit: limit) }

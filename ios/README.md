@@ -70,9 +70,9 @@ Solo existen en builds de depuración. Se pasan como variables de entorno al lan
 
 | Variable | Qué hace |
 |---|---|
-| `IOS_STATS_BENCH=all` o `<id>,<id>` | Mide los modelos (carga, velocidad, memoria, temperatura, 10 preguntas en es-MX) y guarda `Documents/llm-bench.json` |
+| `IOS_STATS_BENCH=all` o `<id>,<id>` | Mide los modelos (carga, velocidad, memoria, temperatura, 10 preguntas en es-MX) y guarda `Documents/llm-bench.json`; el avance sale en pantalla y en `Documents/llm-bench-progress.jsonl` |
 | `IOS_STATS_SOAK_SECS`, `IOS_STATS_THREADS` | Duración de la prueba sostenida (600 s) e hilos (2) para la medición |
-| `IOS_STATS_SELFTEST=1` | Autodiagnóstico del chat; guarda `Documents/selftest.json` |
+| `IOS_STATS_SELFTEST=1` | Autodiagnóstico del chat; guarda `Documents/selftest.json`. Con `IOS_STATS_SELFTEST_DOWNLOAD=<id>` también descarga ese modelo |
 | `IOS_STATS_FAKE_THERMAL=serious\|critical` | Simula el estado térmico en el monitor y en el motor |
 | `IOS_STATS_DEMO_PROMPT="…"` | Abre el chat y envía esa pregunta al arrancar |
 
@@ -89,4 +89,4 @@ pnpm build                     # tipos de TypeScript y empaquetado
 
 - No hay temperaturas en °C, uso de GPU, frecuencia ni lista de procesos: iOS solo expone el estado térmico (4 niveles).
 - La app se congela en segundo plano: el monitor deja un hueco en el historial y la generación se cancela.
-- El modelo debe caber en el margen de memoria de la app (~3 GB en un iPhone 12 Pro).
+- La app solo carga un modelo si su margen de memoria supera el tamaño del modelo más 512 MB. En un iPhone 12 Pro el margen es de ~3.8 GB con el entitlement `increased-memory-limit` y de ~3 GB sin él. Los pesos se leen con mmap y apenas cuentan en la memoria de la app.

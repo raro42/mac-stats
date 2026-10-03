@@ -4,9 +4,15 @@
 //! en la prueba de la fase A, cuando iban dentro del mensaje del usuario, los modelos
 //! pequeños los copiaban en la respuesta. La idea de darle al modelo las métricas en
 //! vivo viene de `src-tauri/src/prompts/mod.rs` de la app de Mac.
+//!
+//! El prompt de cada turno continúa exactamente el del anterior (los datos de cada
+//! pregunta se guardan con ella y el historial se recorta a saltos). Así el motor
+//! reutiliza lo ya procesado: Qwen3.5 y LFM2.5 son híbridos y solo pueden reutilizar
+//! un prefijo exacto; si cambia algo del principio, procesan todo otra vez.
 
 use tauri_plugin_llm::ChatMessage;
 
+use super::store::StoredMessage;
 use crate::metrics::apple::{BatteryState, Thermal};
 use crate::metrics::Snapshot;
 
@@ -71,19 +77,33 @@ pub fn device_note(s: &Snapshot) -> String {
     format!("Datos actuales de este iPhone: {}.", parts.join(", "))
 }
 
-/// Persona + los turnos más recientes que quepan en `budget_chars` + datos del iPhone +
-/// pregunta. El historial se recorta por el principio y nunca empieza con una respuesta.
-pub fn build(history: &[ChatMessage], device: Option<&str>, question: &str, budget_chars: usize) -> Vec<ChatMessage> {
-    let mut used = 0;
-    let mut start = history.len();
-    for (i, m) in history.iter().enumerate().rev() {
-        if used + m.content.len() > budget_chars {
-            break;
+/// Historial para el modelo: cada pregunta va precedida de los datos del iPhone que se
+/// le dieron en su momento, igual que cuando se generó la respuesta.
+pub fn history(messages: &[StoredMessage]) -> Vec<ChatMessage> {
+    let mut out = Vec::new();
+    for m in messages {
+        if let Some(note) = &m.device_note {
+            out.push(ChatMessage { role: "system".into(), content: note.clone() });
         }
-        used += m.content.len();
-        start = i;
+        out.push(ChatMessage { role: m.role.clone(), content: m.content.clone() });
     }
-    while start < history.len() && history[start].role != "user" {
+    out
+}
+
+/// Persona + historial + datos del iPhone + pregunta. Si el historial pasa de
+/// `budget_chars`, se recorta por el principio a saltos de medio presupuesto, para que
+/// el inicio no cambie en cada turno. Nunca empieza con una respuesta.
+pub fn build(history: &[ChatMessage], device: Option<&str>, question: &str, budget_chars: usize) -> Vec<ChatMessage> {
+    let total: usize = history.iter().map(|m| m.content.len()).sum();
+    let step = (budget_chars / 2).max(1);
+    let drop = total.saturating_sub(budget_chars).div_ceil(step) * step;
+    let mut start = 0;
+    let mut dropped = 0;
+    while start < history.len() && dropped < drop {
+        dropped += history[start].content.len();
+        start += 1;
+    }
+    while start < history.len() && history[start].role == "assistant" {
         start += 1;
     }
 
@@ -147,10 +167,50 @@ mod tests {
             msg("user", &"c".repeat(50)),
             msg("assistant", &"d".repeat(50)),
         ];
-        // Caben los 3 últimos (150), pero el primero sería una respuesta: se salta.
+        // Sobran 40 caracteres: se quita medio presupuesto (80), es decir «a» y «b».
         let out = build(&history, None, "?", 160);
         let contents: Vec<_> = out[1..out.len() - 1].iter().map(|m| &m.content[..1]).collect();
         assert_eq!(contents, ["c", "d"]);
+
+        // Si el corte cae en una respuesta, también se salta.
+        let history = vec![
+            msg("user", &"a".repeat(100)),
+            msg("assistant", &"b".repeat(10)),
+            msg("user", &"c".repeat(50)),
+            msg("assistant", &"d".repeat(50)),
+        ];
+        let out = build(&history, None, "?", 200);
+        let contents: Vec<_> = out[1..out.len() - 1].iter().map(|m| &m.content[..1]).collect();
+        assert_eq!(contents, ["c", "d"]);
+    }
+
+    #[test]
+    fn trimming_jumps_so_the_start_stays_the_same_for_several_turns() {
+        let turns: Vec<_> = (0..16)
+            .map(|i| msg(if i % 2 == 0 { "user" } else { "assistant" }, &format!("{i:03}").repeat(33)))
+            .collect();
+        let first = |n: usize| build(&turns[..n], None, "?", 1_000)[1].content.clone();
+        // 10 mensajes de 99 caracteres caben enteros.
+        assert_eq!(first(10), turns[0].content);
+        // Del 11 al 15 sobra menos de medio presupuesto: se quitan 6 y el inicio no cambia.
+        for n in 11..=15 {
+            assert_eq!(first(n), turns[6].content, "con {n} mensajes");
+        }
+        assert_eq!(first(16), turns[12].content);
+    }
+
+    #[test]
+    fn history_repeats_each_question_with_its_device_note() {
+        let stored = |role: &str, content: &str, note: Option<&str>| StoredMessage {
+            role: role.into(),
+            content: content.into(),
+            ts: 0,
+            device_note: note.map(Into::into),
+            stats: None,
+        };
+        let out = history(&[stored("user", "hola", Some("Datos 1")), stored("assistant", "¡hola!", None)]);
+        let pairs: Vec<_> = out.iter().map(|m| (m.role.as_str(), m.content.as_str())).collect();
+        assert_eq!(pairs, [("system", "Datos 1"), ("user", "hola"), ("assistant", "¡hola!")]);
     }
 
     #[test]
