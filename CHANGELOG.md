@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1319] - 2026-10-03
+
+### Changed
+- **Disk Cleanup category filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Reclaim · Big · Clean. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Disk Cleanup icon. At the end, the keys go to the category list. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1318] - 2026-10-03
 
 ### Changed
