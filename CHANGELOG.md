@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1317] - 2026-10-03
+
+### Changed
+- **Debug Log filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Error · Warn. It no longer pops in after JavaScript loads. Before a log load it says how to move across the chips. At the start, Up goes to the Debug Log icon. At the end, the keys go to the log viewer. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1316] - 2026-10-02
 
 ### Changed

@@ -5074,7 +5074,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
           ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Monitors icon · at end → monitor list · Enter / Space selects'
           : wrap.id === 'perplexity-filter-chips'
             ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Perplexity icon · at end → result list · Enter / Space selects'
-            : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+            : wrap.id === 'logs-filter-chips'
+              ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Debug Log icon · at end → log viewer · Enter / Space selects'
+              : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -5114,6 +5116,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
           } else if (
             wrap.id === 'perplexity-filter-chips' &&
             tryChainPerplexityFilterToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
+            wrap.id === 'logs-filter-chips' &&
+            tryChainLogsFilterToIconLine()
           ) {
             e.preventDefault();
             e.stopPropagation();
@@ -16572,6 +16580,16 @@ function tryChainIconLogsToToolbarFirst() {
   }
   if (!isLogsSectionOpen()) return false;
   return focusLogsToolbarFirst();
+}
+
+/** Debug Log filter chip first ↑ → icon-line Debug Log icon. */
+function tryChainLogsFilterToIconLine() {
+  if (logsSectionCollapsed || !isLogsSectionOpen()) return false;
+  const icon = document.getElementById('icon-logs');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
 }
 
 /** Debug Log Refresh toolbar first ↑ → icon-line logs icon (empty viewer path). */
