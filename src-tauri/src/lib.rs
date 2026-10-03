@@ -52,19 +52,24 @@ pub mod task;
 mod ui;
 mod user_info;
 
-use macsmc::Smc;
-use std::os::raw::c_void;
 use sysinfo::{Disks, System};
 
 // Re-export logging functions (macros are auto-exported via #[macro_export])
 pub use logging::{init_tracing, set_verbosity, sync_debug_log_best_effort};
-// IOReport types kept for future use (extern block still references them)
+
+// IOReport and SMC are macOS-only. Linux skips this block and still runs the agent UI.
+#[cfg(target_os = "macos")]
+use macsmc::Smc;
+#[cfg(target_os = "macos")]
+use std::os::raw::c_void;
+#[cfg(target_os = "macos")]
 use core_foundation::base::{CFTypeRef, TCFType};
+#[cfg(target_os = "macos")]
 use core_foundation::dictionary::{CFDictionaryRef, CFMutableDictionary, CFMutableDictionaryRef};
+#[cfg(target_os = "macos")]
 use core_foundation::string::{CFString, CFStringRef};
 
-// IOReport FFI bindings (similar to macmon)
-// Some functions are declared for future use
+#[cfg(target_os = "macos")]
 #[allow(dead_code)]
 #[link(name = "IOReport", kind = "dylib")]
 extern "C" {
@@ -104,7 +109,7 @@ extern "C" {
     fn IOReportStateGetResidency(item: CFDictionaryRef, index: i32) -> i64;
 }
 
-// CoreFoundation functions for memory management
+#[cfg(target_os = "macos")]
 #[link(name = "CoreFoundation", kind = "framework")]
 extern "C" {
     fn CFRelease(cf: CFTypeRef);
@@ -113,6 +118,7 @@ extern "C" {
 
 // IOReport helper functions removed - IOReport operations were too expensive for real-time monitoring
 // If needed in the future, these can be re-implemented with proper caching
+#[cfg(target_os = "macos")]
 use objc2::MainThreadMarker;
 use tauri::Manager;
 
@@ -137,9 +143,9 @@ pub use commands::suspicious_patterns::log_untrusted_suspicious_scan;
 pub use commands::untrusted_content::wrap_untrusted_content;
 
 // UI functions are now in ui module
-use ui::status_bar::{
-    build_status_text, create_cpu_window, make_attributed_title, setup_status_item,
-};
+use ui::status_bar::{build_status_text, create_cpu_window};
+#[cfg(target_os = "macos")]
+use ui::status_bar::{make_attributed_title, setup_status_item};
 
 /// Set frequency logging flag for detailed debugging
 pub fn set_frequency_logging(enabled: bool) {
@@ -530,7 +536,8 @@ fn run_internal(open_cpu_window: bool) {
             debug3!("No WebView at startup - app running in menu bar only");
 
             // If -cpu flag is set, create the window after a short delay (for testing only)
-            if open_cpu_window {
+            // Linux has no menu bar, so the CPU window opens at startup.
+            if open_cpu_window || cfg!(not(target_os = "macos")) {
                 std::thread::spawn(move || {
                     std::thread::sleep(std::time::Duration::from_millis(1000));
                     debug3!("Opening CPU window (from -cpu flag)");
@@ -546,6 +553,8 @@ fn run_internal(open_cpu_window: bool) {
                 });
             }
 
+            #[cfg(target_os = "macos")]
+            {
             setup_status_item();
 
             // Set placeholder text immediately (don't call get_metrics() here - it blocks)
@@ -566,8 +575,9 @@ fn run_internal(open_cpu_window: bool) {
                     }
                 }
             });
+            }
 
-            // Welcome message when menu bar is ready (always printed, regardless of verbosity)
+            // Welcome message when the app is ready (always printed, regardless of verbosity)
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             println!("✨ Welcome to mac-stats v{}! ✨", config::Config::version());
             println!("   Logs: tail -f ~/.mac-stats/debug.log");
@@ -744,7 +754,9 @@ fn run_internal(open_cpu_window: bool) {
 
                 // CRITICAL: Keep SMC connection alive in background thread (reuse for efficiency)
                 // SMC connection is not Sync, so we keep it thread-local
+                #[cfg(target_os = "macos")]
                 let mut smc_connection: Option<Smc> = None;
+                #[cfg(target_os = "macos")]
                 let mut smc_temperature_reader =
                     metrics::smc_temperature::SmcTemperatureReader::default();
 
@@ -832,8 +844,10 @@ fn run_internal(open_cpu_window: bool) {
                     let mut final_history_point = history_point;
 
                     // CRITICAL: Only read temperature when CPU window is visible (saves CPU)
+                    #[cfg(target_os = "macos")]
                     let should_read_temp = cpu_window_visible;
 
+                    #[cfg(target_os = "macos")]
                     if should_read_temp {
                         // CPU window is visible - read temperature and frequency
                         // Reuse SMC connection if available, otherwise create new one

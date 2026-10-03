@@ -13,9 +13,13 @@ pub mod attachment_roots;
 pub mod host_exec_env;
 
 use anyhow::{Context, Result};
+#[cfg(target_os = "macos")]
 use security_framework::passwords::delete_generic_password;
+#[cfg(target_os = "macos")]
 use security_framework::passwords::get_generic_password;
+#[cfg(target_os = "macos")]
 use security_framework::passwords::set_generic_password;
+#[cfg(target_os = "macos")]
 use security_framework_sys::base::errSecItemNotFound;
 use std::fs;
 use std::sync::Mutex;
@@ -34,6 +38,7 @@ static KEYCHAIN_LOCK: Mutex<()> = Mutex::new(());
 ///
 /// # Returns
 /// Ok(()) on success, Err on failure
+#[cfg(target_os = "macos")]
 pub fn store_credential(account: &str, password: &str) -> Result<()> {
     let _lock = KEYCHAIN_LOCK
         .lock()
@@ -73,6 +78,7 @@ pub fn store_credential(account: &str, password: &str) -> Result<()> {
 ///
 /// # Returns
 /// Ok(Some(String)) if found, Ok(None) if not found, Err on error
+#[cfg(target_os = "macos")]
 pub fn get_credential(account: &str) -> Result<Option<String>> {
     let _lock = KEYCHAIN_LOCK
         .lock()
@@ -107,6 +113,7 @@ pub fn get_credential(account: &str) -> Result<Option<String>> {
 ///
 /// # Returns
 /// Ok(()) on success (even if credential didn't exist), Err on error
+#[cfg(target_os = "macos")]
 pub fn delete_credential(account: &str) -> Result<()> {
     let _lock = KEYCHAIN_LOCK
         .lock()
@@ -127,6 +134,97 @@ pub fn delete_credential(account: &str) -> Result<()> {
                 Err(anyhow::anyhow!("Failed to delete credential: {:?}", e))
             }
         }
+    }
+}
+
+/// Linux secret file. Mode `0600`. Account names cannot contain a path separator.
+#[cfg(not(target_os = "macos"))]
+fn linux_secret_path(account: &str) -> Result<std::path::PathBuf> {
+    if account.is_empty()
+        || account.contains('/')
+        || account.contains('\\')
+        || account.contains("..")
+    {
+        return Err(anyhow::anyhow!("invalid credential account name"));
+    }
+    let path = credential_accounts_path();
+    let dir = path
+        .parent()
+        .ok_or_else(|| anyhow::anyhow!("credential directory missing"))?
+        .join("secrets");
+    Ok(dir.join(account))
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn store_credential(account: &str, password: &str) -> Result<()> {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("credential lock poisoned: {:?}", e))?;
+    let path = linux_secret_path(account)?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).context("Failed to create secrets directory")?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = fs::set_permissions(parent, fs::Permissions::from_mode(0o700));
+        }
+    }
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(&path)
+        .context("Failed to open secret file")?;
+    file.write_all(password.as_bytes())
+        .context("Failed to write secret file")?;
+    tracing::info!(
+        "Secrets: stored credential for account '{}' (file mode 0600)",
+        account
+    );
+    add_credential_account_to_list(account)?;
+    Ok(())
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn get_credential(account: &str) -> Result<Option<String>> {
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("credential lock poisoned: {:?}", e))?;
+    let path = linux_secret_path(account)?;
+    if !path.exists() {
+        return Ok(None);
+    }
+    let password = fs::read_to_string(&path).context("Failed to read secret file")?;
+    tracing::trace!(
+        target: "mac_stats::security",
+        "Secrets: retrieved credential for account '{}' (preview {})",
+        account,
+        mask_credential(&password)
+    );
+    Ok(Some(password))
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn delete_credential(account: &str) -> Result<()> {
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("credential lock poisoned: {:?}", e))?;
+    let path = linux_secret_path(account)?;
+    match fs::remove_file(&path) {
+        Ok(()) => {
+            tracing::debug!("Secret deleted for account: {}", account);
+            remove_credential_account_from_list(account)?;
+            Ok(())
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            let _ = remove_credential_account_from_list(account);
+            Ok(())
+        }
+        Err(e) => Err(anyhow::anyhow!("Failed to delete secret: {}", e)),
     }
 }
 

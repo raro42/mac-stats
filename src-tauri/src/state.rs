@@ -15,9 +15,13 @@
 //! and passing it through Tauri's state management.
 
 use crate::metrics::history::HistoryBuffer;
+#[cfg(target_os = "macos")]
 use objc2::rc::Retained;
+#[cfg(target_os = "macos")]
 use objc2::runtime::AnyObject;
+#[cfg(target_os = "macos")]
 use objc2_app_kit::NSStatusItem;
+#[cfg(target_os = "macos")]
 use std::cell::RefCell;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Mutex, OnceLock};
@@ -30,8 +34,9 @@ pub(crate) static SYSTEM: Mutex<Option<System>> = Mutex::new(None);
 pub(crate) static DISKS: Mutex<Option<Disks>> = Mutex::new(None);
 pub(crate) static LAST_SYSTEM_REFRESH: Mutex<Option<Instant>> = Mutex::new(None);
 
-// UI state
+// UI state (macOS menu bar). Linux has no status item; the CPU window is the UI.
 // Note: Thread-local is required for UI elements that must be accessed from main thread
+#[cfg(target_os = "macos")]
 thread_local! {
     pub(crate) static STATUS_ITEM: RefCell<Option<Retained<NSStatusItem>>> = const { RefCell::new(None) };
     pub(crate) static CLICK_HANDLER: RefCell<Option<Retained<AnyObject>>> = const { RefCell::new(None) };

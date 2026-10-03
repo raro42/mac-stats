@@ -12,5 +12,28 @@
 //! changing them, preserve those invariants and prefer migrating to the safe wrappers
 //! in `ffi/` (e.g. `ioreport`) where feasible.
 
+#[cfg(target_os = "macos")]
 pub mod ioreport;
+#[cfg(target_os = "macos")]
 pub mod objc;
+
+/// Linux stand-ins. The menu-bar app still reads CPU, RAM, and disk through `sysinfo`.
+#[cfg(not(target_os = "macos"))]
+pub mod objc {
+    pub fn ignore_macos_persistent_ui_state() {}
+
+    pub fn read_process_thermal_state() -> Option<&'static str> {
+        None
+    }
+
+    pub fn read_process_low_power_mode() -> bool {
+        false
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+pub mod ioreport {
+    pub fn probe_cpu_performance_channels_available() -> bool {
+        false
+    }
+}

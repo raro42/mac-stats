@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1331] - 2026-10-03
+
+### Added
+- **Linux window** — mac-stats opens the CPU window on Linux. CPU, RAM, and disk still update. The Mac menu bar, SMC temperature, CPU frequency, and Keychain stay on macOS. On Linux, secrets live in `~/.mac-stats/secrets/` with mode 0600.
+
+
 ## [0.1.1330] - 2026-10-03
 
 ### Changed

@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.1.1330"
+version = "0.1.1331"
 description = "Local AI agent for macOS (Rust + Tauri): Ollama chat, Discord bot, task runner, scheduler, MCP—all on your Mac. No cloud, no telemetry. Menu bar shows CPU/GPU/RAM/disk when you need it; website monitoring and alerts. Built for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
@@ -29,40 +29,15 @@ tauri = { version = "2", features = [ "custom-protocol", "devtools" ] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = "0.35"
-objc2 = "0.6.3"
-macsmc = "0.1"
-core-foundation = "0.10"
 libc = "0.2"
 ctrlc = "3"
 clap = { version = "4", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 thiserror = "1.0"
-objc2-foundation = { version = "0.3.2", features = ["NSString", "NSDictionary", "NSArray", "NSAttributedString", "NSRange", "NSObject", "NSProcessInfo", "NSRunLoop", "NSUserDefaults"] }
-objc2-app-kit = { version = "0.3.2", features = [
-  "NSApplication",
-  "NSColor",
-  "NSFont",
-  "NSFontDescriptor",
-  "NSStatusBar",
-  "NSStatusItem",
-  "NSStatusBarButton",
-  "NSMenu",
-  "NSMenuItem",
-  "NSAttributedString",
-  "NSParagraphStyle",
-  "NSText",
-  "NSButton",
-  "NSControl",
-  "NSResponder",
-  "NSView",
-  "objc2-core-foundation"
-] }
 battery = "0.7"
 reqwest = { version = "0.11", features = ["json", "blocking", "multipart"] }
 tokio = { version = "1", features = ["full"] }
-security-framework = "2.9"
-security-framework-sys = "2.9"
 chrono = { version = "0.4", features = ["serde"] }
 cron = "0.12"
 url = "2.5"
@@ -83,6 +58,34 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 imageproc = "0.25"
 ab_glyph = "0.2"
 tauri-plugin-shell = "2"
+
+# Menu bar, SMC, IOReport, and Keychain exist only on macOS.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6.3"
+macsmc = "0.1"
+core-foundation = "0.10"
+objc2-foundation = { version = "0.3.2", features = ["NSString", "NSDictionary", "NSArray", "NSAttributedString", "NSRange", "NSObject", "NSProcessInfo", "NSRunLoop", "NSUserDefaults"] }
+objc2-app-kit = { version = "0.3.2", features = [
+  "NSApplication",
+  "NSColor",
+  "NSFont",
+  "NSFontDescriptor",
+  "NSStatusBar",
+  "NSStatusItem",
+  "NSStatusBarButton",
+  "NSMenu",
+  "NSMenuItem",
+  "NSAttributedString",
+  "NSParagraphStyle",
+  "NSText",
+  "NSButton",
+  "NSControl",
+  "NSResponder",
+  "NSView",
+  "objc2-core-foundation"
+] }
+security-framework = "2.9"
+security-framework-sys = "2.9"
 
 # Patched vendored copy: adds `Tab::reset_fetch_auth_challenge_response_to_default` for CDP Fetch proxy vs server auth (see `vendor/headless_chrome`).
 [patch.crates-io]

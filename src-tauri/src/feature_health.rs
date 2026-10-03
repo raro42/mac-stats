@@ -590,6 +590,16 @@ async fn probe_redmine() -> FeatureHealth {
     }
 }
 
+#[cfg(not(target_os = "macos"))]
+async fn probe_smc_blocking() -> FeatureHealth {
+    entry(
+        "SMC (temperature)",
+        HealthStatus::Unavailable,
+        Some("temperature sensors are macOS-only".into()),
+    )
+}
+
+#[cfg(target_os = "macos")]
 async fn probe_smc_blocking() -> FeatureHealth {
     // Prefer a fresh background sample so Agent Ops health does not force another all_data().
     if let Ok(cache) = crate::state::TEMP_CACHE.lock() {
@@ -641,6 +651,16 @@ async fn probe_smc_blocking() -> FeatureHealth {
     }
 }
 
+#[cfg(not(target_os = "macos"))]
+async fn probe_ioreport_blocking() -> FeatureHealth {
+    entry(
+        "IOReport (CPU frequency)",
+        HealthStatus::Unavailable,
+        Some("CPU frequency via IOReport is macOS-only".into()),
+    )
+}
+
+#[cfg(target_os = "macos")]
 async fn probe_ioreport_blocking() -> FeatureHealth {
     let (tx, rx) = oneshot::channel::<bool>();
     std::thread::spawn(move || {

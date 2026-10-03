@@ -12,6 +12,7 @@
 
 pub mod history;
 pub(crate) mod gpu_processes;
+#[cfg(target_os = "macos")]
 pub(crate) mod smc_temperature;
 
 use battery::{Manager as BatteryManager, State};
