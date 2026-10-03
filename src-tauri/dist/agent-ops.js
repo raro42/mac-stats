@@ -4776,7 +4776,11 @@ function ensureOpsSchedulesKindFilterClearBtn(wrap) {
     btn.setAttribute('aria-label', 'Clear filter');
     btn.title = 'Clear filter — show jobs and deliveries (All)';
     btn.textContent = 'Clear';
-    wrap.appendChild(btn);
+    const hint = wrap.querySelector(
+        ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+    );
+    if (hint) wrap.insertBefore(btn, hint);
+    else wrap.appendChild(btn);
     return btn;
 }
 

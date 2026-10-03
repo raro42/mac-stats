@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1322] - 2026-10-03
+
+### Changed
+- **Agent Ops Schedules filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Jobs · Deliveries. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the schedule list. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1321] - 2026-10-03
 
 ### Changed
