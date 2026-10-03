@@ -723,6 +723,7 @@ function refreshOpsTabBarRovingTabindex(preferred) {
     }
 }
 
+/** Theme HTML ships the tab-bar hint under the tabs. Create it only on older shells. */
 function ensureOpsTabBarKbHint() {
     const tabs = document.querySelector('.agent-ops-tabs');
     if (!tabs) return;
@@ -732,6 +733,9 @@ function ensureOpsTabBarKbHint() {
         hint.id = 'ops-tab-bar-kb-hint';
         hint.className = 'ops-tab-bar-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        tabs.insertAdjacentElement('afterend', hint);
+    }
+    if (hint.previousElementSibling !== tabs) {
         tabs.insertAdjacentElement('afterend', hint);
     }
     hint.textContent =

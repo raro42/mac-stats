@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1330] - 2026-10-03
+
+### Changed
+- **Agent Ops tab-bar keyboard hint on first paint** — the hint sits in the theme HTML under the tabs. It no longer pops in after JavaScript loads. The line says how to move across Overview, Agents, Sessions, Schedules, Knowledge, and Runs. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1329] - 2026-10-03
 
 ### Changed
