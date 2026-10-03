@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1325] - 2026-10-03
+
+### Changed
+- **Agent Ops Runs preview keyboard hint on first paint** — the hint sits in the theme HTML under the run preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1324] - 2026-10-03
 
 ### Changed
