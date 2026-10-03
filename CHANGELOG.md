@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1327] - 2026-10-03
+
+### Changed
+- **Agent Ops Schedules preview keyboard hint on first paint** — the hint sits in the theme HTML under the schedule preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1326] - 2026-10-03
 
 ### Changed
