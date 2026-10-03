@@ -1367,12 +1367,25 @@ function ensureChatTurnGlance() {
     glance.id = 'chat-turn-glance';
     glance.className = 'chat-turn-glance';
     glance.hidden = true;
-    glance.innerHTML = '<span id="chat-turn-glance-text"></span>';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Scroll to latest message and focus composer';
+    glance.setAttribute('aria-label', 'No turns yet — scroll to latest');
+    glance.innerHTML = '<span id="chat-turn-glance-text">None yet</span>';
     const model = ensureChatModelGlance();
     const anchor = model || header;
     anchor.insertAdjacentElement('afterend', glance);
-    wireChatTurnGlanceClick(glance);
+  } else if (!document.getElementById('chat-turn-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'chat-turn-glance-text';
+    span.textContent = 'None yet';
+    glance.appendChild(span);
   }
+  const model = document.getElementById('chat-model-glance');
+  if (model && glance.previousElementSibling !== model) {
+    model.insertAdjacentElement('afterend', glance);
+  }
+  wireChatTurnGlanceClick(glance);
   return glance;
 }
 
