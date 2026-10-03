@@ -1940,10 +1940,22 @@ function ensureChatErrorsGlance() {
     glance.id = 'chat-errors-glance';
     glance.className = 'chat-errors-glance';
     glance.hidden = true;
-    glance.innerHTML = '<span id="chat-errors-glance-text"></span>';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Show failed turns only (Errors filter)';
+    glance.setAttribute('aria-label', 'No failed turns yet');
+    glance.innerHTML = '<span id="chat-errors-glance-text">None yet</span>';
     anchor.insertAdjacentElement('afterend', glance);
-    wireChatErrorsGlanceClick(glance);
+  } else if (!document.getElementById('chat-errors-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'chat-errors-glance-text';
+    span.textContent = 'None yet';
+    glance.appendChild(span);
   }
+  if (glance.previousElementSibling !== anchor) {
+    anchor.insertAdjacentElement('afterend', glance);
+  }
+  wireChatErrorsGlanceClick(glance);
   return glance;
 }
 
@@ -1961,6 +1973,7 @@ function applyChatErrorsGlanceState() {
   if (n <= 0) {
     glance.hidden = true;
     glance.classList.remove('has-errors');
+    if (text && !String(text.textContent || '').trim()) text.textContent = 'None yet';
     applyChatOfflineAttentionGlanceState();
     return;
   }

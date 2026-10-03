@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1310] - 2026-10-02
+
+### Changed
+- **AI Chat errors glance on first paint** — the errors line sits in the theme HTML under the last-answer glance. It no longer pops in after JavaScript loads. Before a failed turn it says **None yet** and stays hidden.
+
+
 ## [0.1.1309] - 2026-10-02
 
 ### Changed
