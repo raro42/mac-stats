@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1329] - 2026-10-03
+
+### Changed
+- **Agent Ops Insights keyboard hint on first paint** — the hint sits in the theme HTML under the Insights card. It no longer pops in after JavaScript loads. It stays hidden until two clickable insight lines are on screen. The line says how to move across those lines. A runs refresh keeps the same hint. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1328] - 2026-10-03
 
 ### Changed

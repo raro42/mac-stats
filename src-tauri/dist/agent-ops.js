@@ -9596,17 +9596,29 @@ function refreshOpsInsightsRovingTabindex(preferred) {
     }
 }
 
-function ensureOpsInsightsKbHint() {
+/** Lift the pre-seeded Insights hint before a card innerHTML wipe. */
+function parkOpsInsightsKbHint() {
+    const hint = document.getElementById('ops-insights-kb-hint');
+    if (!hint) return null;
+    hint.remove();
+    return hint;
+}
+
+function ensureOpsInsightsKbHint(parked) {
     const card = document.getElementById('ops-runs-insights');
     if (!card) return;
     let hint = document.getElementById('ops-insights-kb-hint');
+    if (!hint && parked && parked.id === 'ops-insights-kb-hint') hint = parked;
     if (!hint) {
         hint = document.createElement('div');
         hint.id = 'ops-insights-kb-hint';
         hint.className = 'ops-insights-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
-        card.appendChild(hint);
+        hint.hidden = true;
+        hint.textContent =
+            '← → / h l · Home/End move · Enter loads chat · click previews';
     }
+    if (hint.parentNode !== card) card.appendChild(hint);
     const items = getOpsInsightsToolbarItems();
     hint.hidden = items.length < 2;
     hint.textContent =
@@ -9618,10 +9630,10 @@ function ensureOpsInsightsKbHint() {
  * Candidates lines, then ←→ / h l / Home/End (filter-row / preview-row parity).
  * Enter/Space keeps line preview; Enter also loads into AI Chat.
  */
-function ensureOpsInsightsToolbarKeyboard() {
+function ensureOpsInsightsToolbarKeyboard(parked) {
     const card = document.getElementById('ops-runs-insights');
     if (!card) return;
-    ensureOpsInsightsKbHint();
+    ensureOpsInsightsKbHint(parked);
     refreshOpsInsightsRovingTabindex();
     if (card.dataset.opsInsightsKbWired === '1') return;
     card.dataset.opsInsightsKbWired = '1';
@@ -9886,6 +9898,7 @@ function formatOpsRunPreview(r) {
 function renderOpsRuns(insights) {
     const card = document.getElementById('ops-runs-insights');
     const el = document.getElementById('ops-runs-list');
+    const parkedHint = parkOpsInsightsKbHint();
     el.innerHTML = '';
     if (card) card.innerHTML = '';
     showOpsRunPreview('');
@@ -9931,6 +9944,7 @@ function renderOpsRuns(insights) {
         }
         paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
         ensureOpsRunsLaneChips();
+        ensureOpsInsightsToolbarKeyboard(parkedHint);
         applyOpsRunsAttentionGlanceState();
         applyOpsDigestAttentionGlanceState();
         applyOpsDiscordAttentionGlanceState();
@@ -10267,7 +10281,7 @@ function renderOpsRuns(insights) {
         );
         showOpsRunPreview('');
     }
-    ensureOpsInsightsToolbarKeyboard();
+    ensureOpsInsightsToolbarKeyboard(parkedHint);
     applyOpsRunsAttentionGlanceState();
     applyOpsDigestAttentionGlanceState();
     applyOpsDiscordAttentionGlanceState();
