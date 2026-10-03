@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1323] - 2026-10-03
+
+### Changed
+- **Agent Ops Knowledge filter-chip keyboard hint on first paint** — the hint sits in the theme HTML under All · Discord · Core. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the knowledge list. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1322] - 2026-10-03
 
 ### Changed

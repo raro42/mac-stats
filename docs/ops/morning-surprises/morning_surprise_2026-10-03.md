@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-03
 
-Overnight Track B kept the Agent Ops Schedules filter-chip keyboard hint on first paint.
+Overnight Track B kept the Agent Ops Knowledge filter-chip keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1323** | Agent Ops Knowledge filter-chip keyboard hint is in the theme HTML under All · Discord · Core. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the knowledge list. Keyboard tips stay out of the layout. |
 | **v0.1.1322** | Agent Ops Schedules filter-chip keyboard hint is in the theme HTML under All · Jobs · Deliveries. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the schedule list. Keyboard tips stay out of the layout. |
 | **v0.1.1321** | Agent Ops Sessions filter-chip keyboard hint is in the theme HTML under All · Live · Files. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the session list. Keyboard tips stay out of the layout. |
 | **v0.1.1320** | Agent Ops Agents filter-chip keyboard hint is in the theme HTML under All · On · Off. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Agent Ops icon. At the end, the keys go to the agent list. Keyboard tips stay out of the layout. |
@@ -25,8 +26,9 @@ Overnight Track B kept the Agent Ops Schedules filter-chip keyboard hint on firs
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.64d).
-- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~02:32 tick.
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.66d).
+- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~03:02 tick.
+- ~03:02 tick: Agent Ops Knowledge filter-chip keyboard hint first paint in theme HTML (**v0.1.1323**); install/kickstart.
 - ~02:32 tick: Agent Ops Schedules filter-chip keyboard hint first paint in theme HTML (**v0.1.1322**); install/kickstart.
 - ~02:10 tick: Agent Ops Sessions filter-chip keyboard hint first paint in theme HTML (**v0.1.1321**); install/kickstart.
 - ~01:40 tick: Agent Ops Agents filter-chip keyboard hint first paint in theme HTML (**v0.1.1320**); install/kickstart.
