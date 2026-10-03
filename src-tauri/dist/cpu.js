@@ -5080,7 +5080,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
                 ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → scope list · Enter / Space selects'
                 : wrap.id === 'disk-cleanup-filter-chips'
                   ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → category list · Enter / Space selects'
-                  : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+                  : wrap.id === 'ops-agents-enabled-chips'
+                    ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Agent Ops icon · at end → agent list · Enter / Space selects'
+                    : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -5139,6 +5141,13 @@ function wireFilterChipToolbarKeyboard(wrap) {
             (wrap.id === 'disk-cleanup-scope-filter-chips' ||
               wrap.id === 'disk-cleanup-filter-chips') &&
             tryChainDiskCleanupSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
+            wrap.id === 'ops-agents-enabled-chips' &&
+            typeof window.tryChainAgentOpsSectionToIconLine === 'function' &&
+            window.tryChainAgentOpsSectionToIconLine()
           ) {
             e.preventDefault();
             e.stopPropagation();
