@@ -5088,7 +5088,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
                         ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Agent Ops icon · at end → schedule list · Enter / Space selects'
                         : wrap.id === 'ops-memory-kind-chips'
                           ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Agent Ops icon · at end → knowledge list · Enter / Space selects'
-                          : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+                          : wrap.id === 'ops-runs-lane-chips'
+                            ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Agent Ops icon · at end → run list · Enter / Space selects'
+                            : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -5154,7 +5156,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
             (wrap.id === 'ops-agents-enabled-chips' ||
               wrap.id === 'ops-session-kind-chips' ||
               wrap.id === 'ops-schedules-kind-chips' ||
-              wrap.id === 'ops-memory-kind-chips') &&
+              wrap.id === 'ops-memory-kind-chips' ||
+              wrap.id === 'ops-runs-lane-chips') &&
             typeof window.tryChainAgentOpsSectionToIconLine === 'function' &&
             window.tryChainAgentOpsSectionToIconLine()
           ) {

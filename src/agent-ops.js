@@ -2103,7 +2103,11 @@ function ensureOpsRunsLaneFilterClearBtn(wrap) {
     btn.setAttribute('aria-label', 'Clear filter');
     btn.title = 'Clear filter — show every run lane (All)';
     btn.textContent = 'Clear';
-    wrap.appendChild(btn);
+    const hint = wrap.querySelector(
+        ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+    );
+    if (hint) wrap.insertBefore(btn, hint);
+    else wrap.appendChild(btn);
     return btn;
 }
 
@@ -2160,7 +2164,11 @@ function ensureOpsRunsLaneChips() {
         liteBtn.innerHTML =
             'Lite <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="lite">None yet</span>';
         const directBtn = wrap.querySelector('[data-ops-runs-lane="direct"]');
+        const liteHint = wrap.querySelector(
+            ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+        );
         if (directBtn) wrap.insertBefore(liteBtn, directBtn);
+        else if (liteHint) wrap.insertBefore(liteBtn, liteHint);
         else wrap.appendChild(liteBtn);
     }
     if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
@@ -2172,7 +2180,11 @@ function ensureOpsRunsLaneChips() {
         slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
         slowBtn.innerHTML =
             `Slow <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="slow">None yet</span>`;
-        wrap.appendChild(slowBtn);
+        const slowHint = wrap.querySelector(
+            ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+        );
+        if (slowHint) wrap.insertBefore(slowBtn, slowHint);
+        else wrap.appendChild(slowBtn);
     }
     if (!wrap.querySelector('[data-ops-runs-lane="fail"]')) {
         const failBtn = document.createElement('button');
@@ -2183,7 +2195,11 @@ function ensureOpsRunsLaneChips() {
         failBtn.title = 'Show failed runs only (ok=false)';
         failBtn.innerHTML =
             'Fail <span class="ops-runs-lane-count is-zero" data-ops-runs-lane-count="fail">None yet</span>';
-        wrap.appendChild(failBtn);
+        const failHint = wrap.querySelector(
+            ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+        );
+        if (failHint) wrap.insertBefore(failBtn, failHint);
+        else wrap.appendChild(failBtn);
     }
     ensureOpsRunsLaneFilterClearBtn(wrap);
     syncOpsRunsLaneFilterClearBtn();
