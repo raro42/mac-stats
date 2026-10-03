@@ -937,12 +937,31 @@ function ensureOllamaCollapsedGlance() {
   if (!glance) {
     glance = document.createElement('div');
     glance.id = 'ollama-collapsed-glance';
-    glance.className = 'ollama-collapsed-glance';
+    glance.className = 'ollama-collapsed-glance is-offline';
     glance.hidden = true;
-    glance.innerHTML = '<span id="ollama-collapsed-glance-text"></span>';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Open AI Chat — configure Ollama';
+    glance.setAttribute(
+      'aria-label',
+      'Not set · configure URL — click to configure'
+    );
+    glance.innerHTML =
+      '<span id="ollama-collapsed-glance-text">Not set · configure URL</span>';
     header.insertAdjacentElement('afterend', glance);
-    wireOllamaCollapsedGlanceClick(glance);
+  } else if (!document.getElementById('ollama-collapsed-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'ollama-collapsed-glance-text';
+    span.textContent = 'Not set · configure URL';
+    glance.appendChild(span);
   }
+  const model = document.getElementById('chat-model-glance');
+  if (model && glance.nextElementSibling !== model) {
+    model.insertAdjacentElement('beforebegin', glance);
+  } else if (!model && glance.previousElementSibling !== header) {
+    header.insertAdjacentElement('afterend', glance);
+  }
+  wireOllamaCollapsedGlanceClick(glance);
   return glance;
 }
 
