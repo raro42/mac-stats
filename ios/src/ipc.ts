@@ -1,0 +1,206 @@
+// Contrato con Rust (src-tauri/src/metrics/mod.rs). Los nombres llegan en camelCase.
+import { Channel, invoke } from "@tauri-apps/api/core";
+
+export type Thermal = "nominal" | "fair" | "serious" | "critical" | "unknown";
+export type BatteryState = "unknown" | "unplugged" | "charging" | "full";
+export type Range = "5m" | "1h";
+
+export interface Snapshot {
+  ts: number;
+  cpu: number | null;
+  ramUsed: number | null;
+  ramTotal: number;
+  appFootprint: number | null;
+  appAvailable: number | null;
+  netDown: number | null;
+  netUp: number | null;
+  battery: { level: number; state: BatteryState } | null;
+  storage: { total: number; available: number } | null;
+  thermal: Thermal;
+  lowPower: boolean;
+}
+
+export interface HistoryPoint {
+  ts: number;
+  cpu: number | null;
+  ram: number | null;
+  appMb: number | null;
+  gap: boolean;
+}
+
+export interface DeviceInfo {
+  model: string;
+  identifier: string;
+  osVersion: string;
+  cores: number;
+  ramTotal: number;
+  simulator: boolean;
+}
+
+/** Recibe una lectura por segundo; devuelve la última que ya tenga Rust. */
+export async function subscribeMetrics(
+  onSample: (snapshot: Snapshot) => void,
+): Promise<Snapshot | null> {
+  const channel = new Channel<Snapshot>();
+  channel.onmessage = onSample;
+  return invoke<Snapshot | null>("metrics_subscribe", { onSample: channel });
+}
+
+export function metricsHistory(range: Range): Promise<HistoryPoint[]> {
+  return invoke<HistoryPoint[]>("metrics_history", { range });
+}
+
+export function deviceInfo(): Promise<DeviceInfo> {
+  return invoke<DeviceInfo>("device_info");
+}
+
+// --- Laboratorio de modelos (fase A, solo depuración) ---
+
+export interface LabModel {
+  id: string;
+  name: string;
+  file: string;
+  size: number;
+  license: string;
+  thinkPrefill: boolean;
+  installed: boolean;
+}
+
+export interface LoadInfo {
+  loadMs: number;
+  description: string;
+  nParams: number;
+  sizeBytes: number;
+  nCtx: number;
+  gpu: boolean;
+  availableMemory: number;
+}
+
+export interface BenchResult {
+  ppTps: number;
+  tgTps: number;
+  availableMemory: number;
+}
+
+export interface GenerateResult {
+  stopReason: string;
+  nPrompt: number;
+  nCached: number;
+  nGen: number;
+  ppTps: number;
+  tgTps: number;
+  availableMemory: number;
+}
+
+export const labModels = () => invoke<LabModel[]>("lab_models");
+export const labLoad = (id: string) => invoke<LoadInfo>("lab_load", { id });
+export const labUnload = () => invoke<void>("lab_unload");
+export const labBench = () => invoke<BenchResult>("lab_bench");
+export const labCancel = () => invoke<void>("lab_cancel");
+
+export function labGenerate(
+  prompt: string,
+  thinkPrefill: boolean,
+  onDelta: (text: string) => void,
+): Promise<GenerateResult> {
+  const channel = new Channel<{ type: string; text?: string }>();
+  channel.onmessage = (event) => {
+    if (event.type === "delta" && event.text) onDelta(event.text);
+  };
+  return invoke<GenerateResult>("lab_generate", { prompt, thinkPrefill, onEvent: channel });
+}
+
+// --- Chat (fase B) ---
+
+export interface ChatModel {
+  id: string;
+  name: string;
+  file: string;
+  size: number;
+  license: string;
+  installed: boolean;
+  selected: boolean;
+  recommended: boolean;
+}
+
+export interface ChatStatus {
+  loadedModel: string | null;
+  selectedModel: string;
+  engine: { loaded: boolean; busy: boolean; availableMemory: number };
+}
+
+export interface ReplyStats {
+  modelId: string;
+  nGen: number;
+  tgTps: number;
+  stopReason: string;
+}
+
+export interface StoredMessage {
+  role: "user" | "assistant";
+  content: string;
+  ts: number;
+  stats?: ReplyStats;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  messages: StoredMessage[];
+}
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messageCount: number;
+}
+
+export interface SendResult {
+  conversationId: string;
+  stopReason: string;
+  nGen: number;
+  tgTps: number;
+}
+
+export type ChatEvent =
+  | { type: "status"; text: string }
+  | { type: "delta"; text: string }
+  | { type: "progress"; received: number; total: number }
+  | { type: "verifying" };
+
+function channelOf(onEvent: (event: ChatEvent) => void): Channel<ChatEvent> {
+  const channel = new Channel<ChatEvent>();
+  channel.onmessage = onEvent;
+  return channel;
+}
+
+export const chatModels = () => invoke<ChatModel[]>("chat_models");
+export const chatSelectModel = (id: string) => invoke<void>("chat_select_model", { id });
+export const chatStatus = () => invoke<ChatStatus>("chat_status");
+export const chatCancelDownload = () => invoke<void>("chat_cancel_download");
+export const chatDeleteModel = (id: string) => invoke<void>("chat_delete_model", { id });
+export const chatList = () => invoke<ConversationSummary[]>("chat_list");
+export const chatGet = (id: string) => invoke<Conversation | null>("chat_get", { id });
+export const chatDelete = (id: string) => invoke<void>("chat_delete", { id });
+export const chatCancel = () => invoke<void>("chat_cancel");
+export const debugBuild = () => invoke<boolean>("debug_build");
+export const debugDemoPrompt = () => invoke<string | null>("debug_demo_prompt");
+
+export function chatDownload(
+  id: string,
+  allowCellular: boolean,
+  onEvent: (event: ChatEvent) => void,
+): Promise<void> {
+  return invoke<void>("chat_download", { id, allowCellular, onEvent: channelOf(onEvent) });
+}
+
+export function chatSend(
+  conversationId: string | null,
+  text: string,
+  onEvent: (event: ChatEvent) => void,
+): Promise<SendResult> {
+  return invoke<SendResult>("chat_send", { conversationId, text, onEvent: channelOf(onEvent) });
+}

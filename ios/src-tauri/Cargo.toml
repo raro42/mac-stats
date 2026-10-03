@@ -1,0 +1,47 @@
+[package]
+name = "ios-stats"
+version = "0.1.0"
+description = "iOS Stats: monitor del iPhone y chat con IA local (derivado de mac-stats)"
+authors = ["gilberto"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+# El sufijo `_lib` evita el choque de nombres con el binario de escritorio.
+name = "ios_stats_lib"
+# Sin cdylib: en iOS solo se usa la staticlib, y la dylib exigiría resolver al enlazar
+# los símbolos de llama.framework (que solo enlaza Xcode).
+crate-type = ["staticlib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-llm = { path = "../plugins/tauri-plugin-llm" }
+tokio = { version = "1", features = ["time", "sync", "macros"] }
+libc = "0.2"
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSArray",
+  "NSDictionary",
+  "NSError",
+  "NSObject",
+  "NSProcessInfo",
+  "NSString",
+  "NSURL",
+  "NSValue",
+] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "UIDevice"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

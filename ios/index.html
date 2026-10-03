@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <title>iOS Stats</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <main id="view-monitor" class="view">
+      <header class="top">
+        <div class="title-row">
+          <h1>iOS Stats</h1>
+          <div class="badges">
+            <span id="low-power" class="pill pill-lowpower" hidden>Bajo consumo</span>
+            <span id="thermal" class="pill pill-thermal" data-state="unknown">—</span>
+          </div>
+        </div>
+        <p id="device" class="device">Leyendo el dispositivo…</p>
+      </header>
+
+      <section id="rings" class="rings" aria-label="Indicadores"></section>
+
+      <section class="card">
+        <h2>Memoria de la app</h2>
+        <div class="bar" aria-hidden="true"><div id="appmem-fill" class="bar-fill"></div></div>
+        <p id="appmem-text" class="card-text">Midiendo…</p>
+      </section>
+
+      <section class="card net">
+        <h2>Red</h2>
+        <div class="net-row">
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↓</span><span id="net-down">—</span></span>
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↑</span><span id="net-up">—</span></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Historial</h2>
+          <div class="segmented" role="group" aria-label="Periodo">
+            <button type="button" data-range="5m" aria-pressed="true">5 min</button>
+            <button type="button" data-range="1h" aria-pressed="false">1 h</button>
+          </div>
+        </div>
+        <div class="chart">
+          <span class="chart-label">CPU</span>
+          <canvas id="chart-cpu" class="chart-canvas chart-cpu"></canvas>
+        </div>
+        <div class="chart">
+          <span class="chart-label">RAM</span>
+          <canvas id="chart-ram" class="chart-canvas chart-ram"></canvas>
+        </div>
+      </section>
+
+      <p class="footnote">iOS no deja leer temperaturas en °C, la GPU ni los procesos de otras apps.</p>
+    </main>
+
+    <main id="view-chat" class="view chat-view" hidden>
+      <header class="top">
+        <div class="title-row">
+          <h1>Chat</h1>
+          <button type="button" id="chat-new" class="pill-btn">Nueva</button>
+        </div>
+        <p class="device">IA que corre dentro de tu iPhone, sin servidor ni conexión.</p>
+      </header>
+
+      <section id="model-card" class="card model-card" aria-label="Modelo"></section>
+      <div id="chat-banner" class="banner" role="status" hidden></div>
+
+      <p id="chat-empty" class="chat-empty">
+        Pregúntale por tu iPhone («¿cómo va mi batería?») o por cualquier otra cosa.
+      </p>
+      <section id="chat-history" class="chat-history" aria-live="polite"></section>
+
+      <details class="card conversations">
+        <summary>Conversaciones</summary>
+        <ul id="conv-list" class="conv-list"></ul>
+      </details>
+
+      <details id="lab-details" class="card lab" hidden>
+        <summary>Laboratorio (depuración)</summary>
+        <select id="lab-model" class="lab-select" aria-label="Modelo del laboratorio"></select>
+        <div class="lab-buttons">
+          <button type="button" id="lab-load" class="lab-btn">Cargar</button>
+          <button type="button" id="lab-bench" class="lab-btn">Medir</button>
+          <button type="button" id="lab-unload" class="lab-btn">Descargar</button>
+        </div>
+        <p id="lab-status" class="card-text">Preparando…</p>
+        <textarea id="lab-prompt" class="lab-prompt" rows="3">¿Cómo van mi batería y mi memoria ahora mismo?</textarea>
+        <button type="button" id="lab-send" class="lab-btn lab-send">Generar</button>
+        <div id="lab-output" class="lab-output" aria-live="polite"></div>
+      </details>
+
+      <form id="chat-form" class="composer">
+        <textarea id="chat-input" rows="1" placeholder="Pregunta algo…" aria-label="Mensaje"></textarea>
+        <button type="submit" id="chat-send" class="composer-send">Enviar</button>
+      </form>
+    </main>
+
+    <nav class="tabbar" aria-label="Secciones">
+      <button type="button" class="tab" data-view="monitor" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" /></svg>
+        <span>Monitor</span>
+      </button>
+      <button type="button" class="tab" data-view="chat" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" /></svg>
+        <span>Chat</span>
+      </button>
+    </nav>
+  </body>
+</html>
