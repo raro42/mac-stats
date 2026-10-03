@@ -1838,10 +1838,22 @@ function ensureChatAnswerGlance() {
     glance.id = 'chat-answer-glance';
     glance.className = 'chat-answer-glance';
     glance.hidden = true;
-    glance.innerHTML = '<span id="chat-answer-glance-text"></span>';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Copy last answer';
+    glance.setAttribute('aria-label', 'No answer yet');
+    glance.innerHTML = '<span id="chat-answer-glance-text">None yet</span>';
     anchor.insertAdjacentElement('afterend', glance);
-    wireChatAnswerGlanceClick(glance);
+  } else if (!document.getElementById('chat-answer-glance-text')) {
+    const span = document.createElement('span');
+    span.id = 'chat-answer-glance-text';
+    span.textContent = 'None yet';
+    glance.appendChild(span);
   }
+  if (glance.previousElementSibling !== anchor) {
+    anchor.insertAdjacentElement('afterend', glance);
+  }
+  wireChatAnswerGlanceClick(glance);
   return glance;
 }
 
