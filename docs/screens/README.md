@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-03 (~00:46):** Disk Cleanup scope filter-chip keyboard hint first paint (v0.1.1318). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-03 (~00:20):** Debug Log filter-chip keyboard hint first paint (v0.1.1317). No dedicated feature screenshot; polish stays in the theme HTML.
 - **2026-10-02 (~23:55):** Perplexity filter-chip keyboard hint first paint (v0.1.1316). No dedicated feature screenshot; polish stays in the theme HTML.
 - **2026-10-02 (~23:27):** Monitors filter-chip keyboard hint first paint (v0.1.1315). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.

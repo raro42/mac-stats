@@ -5076,7 +5076,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
             ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Perplexity icon · at end → result list · Enter / Space selects'
             : wrap.id === 'logs-filter-chips'
               ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Debug Log icon · at end → log viewer · Enter / Space selects'
-              : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+              : wrap.id === 'disk-cleanup-scope-filter-chips'
+                ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → Disk Cleanup icon · at end → scope list · Enter / Space selects'
+                : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(

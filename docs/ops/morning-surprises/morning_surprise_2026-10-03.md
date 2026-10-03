@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-03
 
-Overnight Track B kept the Debug Log filter-chip keyboard hint on first paint.
+Overnight Track B kept the Disk Cleanup scope filter-chip keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1318** | Disk Cleanup scope filter-chip keyboard hint is in the theme HTML under All · On · Off. It no longer pops in after JavaScript loads. Before a load it says how to move across the chips. At the start, Up goes to the Disk Cleanup icon. At the end, the keys go to the scope list. Keyboard tips stay out of the layout. |
 | **v0.1.1317** | Debug Log filter-chip keyboard hint is in the theme HTML under All · Error · Warn. It no longer pops in after JavaScript loads. Before a log load it says how to move across the chips. At the start, Up goes to the Debug Log icon. At the end, the keys go to the log viewer. Keyboard tips stay out of the layout. |
 | **v0.1.1316** | Perplexity filter-chip keyboard hint is in the theme HTML under All · Top · Snippet. It no longer pops in after JavaScript loads. Before a search it says how to move across the chips. At the start, Up goes to the Perplexity icon. At the end, the keys go to the result list. Keyboard tips stay out of the layout. |
 | **v0.1.1315** | Monitors filter-chip keyboard hint is in the theme HTML under All · Up · Down · Slow. It no longer pops in after JavaScript loads. Before a check it says how to move across the chips. At the start, Up goes to the Monitors icon. At the end, the keys go to the monitor list. Keyboard tips stay out of the layout. |
@@ -20,8 +21,9 @@ Overnight Track B kept the Debug Log filter-chip keyboard hint on first paint.
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.55d).
-- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~00:20 tick.
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.57d).
+- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~00:46 tick.
+- ~00:46 tick: Disk Cleanup scope filter-chip keyboard hint first paint in theme HTML (**v0.1.1318**); install/kickstart.
 - ~00:20 tick: Debug Log filter-chip keyboard hint first paint in theme HTML (**v0.1.1317**); install/kickstart.
 - ~23:55 tick: Perplexity filter-chip keyboard hint first paint in theme HTML (**v0.1.1316**); install/kickstart.
 - ~23:30 tick: Monitors filter-chip keyboard hint first paint in theme HTML (**v0.1.1315**); install/kickstart.
