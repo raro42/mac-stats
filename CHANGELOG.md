@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1311] - 2026-10-02
+
+### Changed
+- **AI Chat composer keyboard hint on first paint** — the hint sits in the theme HTML under Send. It no longer pops in after JavaScript loads. Before a turn it matches the starter-chip line. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1310] - 2026-10-02
 
 ### Changed
