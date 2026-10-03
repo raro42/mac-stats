@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-03
 
-Overnight Track B kept the Agent Ops Schedules preview keyboard hint on first paint.
+Overnight Track B kept the Agent Ops Knowledge preview keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1328** | Agent Ops Knowledge preview keyboard hint is in the theme HTML under the knowledge preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout. |
 | **v0.1.1327** | Agent Ops Schedules preview keyboard hint is in the theme HTML under the schedule preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout. |
 | **v0.1.1326** | Agent Ops Sessions preview keyboard hint is in the theme HTML under the session preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout. |
 | **v0.1.1325** | Agent Ops Runs preview keyboard hint is in the theme HTML under the run preview. It no longer pops in after JavaScript loads. It stays hidden until Copy and Load into AI Chat are both on screen. The line says how to move across those actions. Keyboard tips stay out of the layout. |
@@ -31,7 +32,8 @@ Overnight Track B kept the Agent Ops Schedules preview keyboard hint on first pa
 
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~17.7d).
-- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~04:43 tick.
+- Debug.log: no ERROR/WARN/panic in the 180 minute window at the ~05:08 tick.
+- ~05:08 tick: Agent Ops Knowledge preview keyboard hint first paint in theme HTML (**v0.1.1328**); install/kickstart.
 - ~04:43 tick: Agent Ops Schedules preview keyboard hint first paint in theme HTML (**v0.1.1327**); install/kickstart.
 - ~04:17 tick: Agent Ops Sessions preview keyboard hint first paint in theme HTML (**v0.1.1326**); install/kickstart.
 - ~03:50 tick: Agent Ops Runs preview keyboard hint first paint in theme HTML (**v0.1.1325**); install/kickstart.
