@@ -14287,22 +14287,32 @@ function tryChainPerplexityFilterToIconLine() {
   return true;
 }
 
-/** Soft tip above results (Monitors / AI Chat kb-hint parity). */
+/** How to move across results when a search has lines. */
+const PERPLEXITY_RESULTS_KB_HINT =
+  'Focus results then ↑↓ / j k / Home / End · last ↓ → search · PgUp/PgDn · Enter opens · c copies URL · Esc clears';
+
+/** Theme HTML ships the hint above results. It stays hidden until results exist. Create it only on older shells. */
 function ensurePerplexityResultsKbHint(resultsEl, show) {
   if (!resultsEl || !resultsEl.parentNode) return;
   let hint = document.getElementById('perplexity-kb-hint');
-  if (!show) {
-    hint?.remove();
-    return;
+  if (!hint) {
+    hint = resultsEl.parentNode.querySelector(':scope > .perplexity-kb-hint');
   }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'perplexity-kb-hint';
     hint.id = 'perplexity-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = PERPLEXITY_RESULTS_KB_HINT;
     resultsEl.parentNode.insertBefore(hint, resultsEl);
   }
-  hint.textContent =
-    'Focus results then ↑↓ / j k / Home / End · last ↓ → search · PgUp/PgDn · Enter opens · c copies URL · Esc clears';
+  if (!hint.id) hint.id = 'perplexity-kb-hint';
+  if (hint.nextElementSibling !== resultsEl) {
+    resultsEl.parentNode.insertBefore(hint, resultsEl);
+  }
+  hint.hidden = !show;
+  if (show) hint.textContent = PERPLEXITY_RESULTS_KB_HINT;
 }
 
 function syncPerplexityResultsTabOrder(resultsEl, preferEl) {

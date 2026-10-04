@@ -2872,6 +2872,10 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+.perplexity-kb-hint[hidden] {
+  display: none !important;
+}
+
 .perplexity-section.collapsed .perplexity-kb-hint,
 #perplexity-content.collapsed .perplexity-kb-hint {
   display: none;

@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-04
 
-Overnight Track B kept the Perplexity search-box keyboard hint on first paint.
+Overnight Track B kept the Perplexity results keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1349** | Perplexity results keyboard hint is in the theme HTML above the result list. It no longer pops in after JavaScript loads. It stays hidden until a search has results. The line says how to move across those results. Keyboard tips stay out of the layout. |
 | **v0.1.1348** | Perplexity search-box keyboard hint is in the theme HTML under the query and Search. It no longer pops in after JavaScript loads. Before a search, the line says how to move across those controls. After results exist, the line points the query back to the last result. Keyboard tips stay out of the layout. |
 | **v0.1.1347** | Debug Log toolbar keyboard hint is in the theme HTML under Refresh, Open in editor, and Auto-refresh. It no longer pops in after JavaScript loads. Before a log load, the line says how to move across those controls. After lines exist, the line points Refresh back to the last line. Keyboard tips stay out of the layout. |
 | **v0.1.1346** | Disk Cleanup add-scope keyboard hint is in the theme HTML under the label, path, days, Recursive, and Add scope fields. It no longer pops in after JavaScript loads. The line says how to move across those fields. Keyboard tips stay out of the layout. |
@@ -22,6 +23,7 @@ Overnight Track B kept the Perplexity search-box keyboard hint on first paint.
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.68d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~03:50 tick: Perplexity results keyboard hint first paint in theme HTML (**v0.1.1349**); install/kickstart.
 - ~03:28 tick: Perplexity search-box keyboard hint first paint in theme HTML (**v0.1.1348**); install/kickstart.
 - ~03:05 tick: Debug Log toolbar keyboard hint first paint in theme HTML (**v0.1.1347**); install/kickstart.
 - ~02:35 tick: Disk Cleanup add-scope keyboard hint first paint in theme HTML (**v0.1.1346**); install/kickstart.
