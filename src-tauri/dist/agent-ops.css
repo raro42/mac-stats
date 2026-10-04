@@ -3220,6 +3220,10 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+.logs-kb-hint[hidden] {
+  display: none !important;
+}
+
 .logs-section.collapsed .logs-kb-hint,
 #logs-content.collapsed .logs-kb-hint {
   display: none;

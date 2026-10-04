@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1350] - 2026-10-04
+
+### Changed
+- **Debug Log viewer keyboard hint on first paint** — the hint sits in the theme HTML above the log viewer. It no longer pops in after JavaScript loads. It stays hidden until the log has lines. The line says how to move across those lines. The last line points back to Refresh. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1349] - 2026-10-04
 
 ### Changed

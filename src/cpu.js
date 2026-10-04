@@ -16975,19 +16975,24 @@ function setLogsFilterMode(mode) {
   applyLogsFilter(true);
 }
 
-/** Soft tip above Debug Log viewer (Monitors / Perplexity kb-hint parity). */
+/** How to move across log lines when the viewer has a toolbar. */
+const LOGS_VIEWER_KB_HINT_TOOLBAR =
+  '↑↓ / j k · last line ↓ → Refresh toolbar · Enter / c copies line · Esc clears';
+
+/** How to move across log lines when the viewer has no toolbar. */
+const LOGS_VIEWER_KB_HINT_PLAIN =
+  '↑↓ / j k · PgUp/PgDn · Home/End select · Enter / c copies line · Esc clears';
+
+/** Theme HTML ships the hint above the log viewer. It stays hidden until lines exist. Create it only on older shells. */
 function ensureLogsKbHint(viewer, show) {
   if (!viewer || !viewer.parentNode) return;
   let hint = document.getElementById('logs-kb-hint');
-  if (!show) {
-    hint?.remove();
-    return;
-  }
   if (!hint) {
-    hint = document.createElement('div');
-    hint.className = 'logs-kb-hint';
-    hint.id = 'logs-kb-hint';
-    viewer.parentNode.insertBefore(hint, viewer);
+    hint = viewer.parentNode.querySelector(':scope > .logs-kb-hint');
+  }
+  if (!show) {
+    if (hint) hint.hidden = true;
+    return;
   }
   const hasToolbar =
     getLogsToolbarActionItems(
@@ -16997,9 +17002,22 @@ function ensureLogsKbHint(viewer, show) {
             document.querySelector('.logs-toolbar')
         )
     ).length > 0;
-  hint.textContent = hasToolbar
-    ? '↑↓ / j k · last line ↓ → Refresh toolbar · Enter / c copies line · Esc clears'
-    : '↑↓ / j k · PgUp/PgDn · Home/End select · Enter / c copies line · Esc clears';
+  const text = hasToolbar ? LOGS_VIEWER_KB_HINT_TOOLBAR : LOGS_VIEWER_KB_HINT_PLAIN;
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'logs-kb-hint';
+    hint.id = 'logs-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = text;
+    viewer.parentNode.insertBefore(hint, viewer);
+  }
+  if (!hint.id) hint.id = 'logs-kb-hint';
+  if (hint.nextElementSibling !== viewer) {
+    viewer.parentNode.insertBefore(hint, viewer);
+  }
+  hint.hidden = false;
+  hint.textContent = text;
 }
 
 function visibleLogsLines(viewer) {
