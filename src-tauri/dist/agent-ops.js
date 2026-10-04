@@ -7363,6 +7363,7 @@ function refreshOpsRefreshRowRovingTabindex(preferred) {
     }
 }
 
+/** Theme HTML ships the hint under Refresh · Refresh digest · Updated. Create it only on older shells. */
 function ensureOpsRefreshRowKbHint() {
     const row = document.querySelector('.ops-refresh-row');
     if (!row) return;
@@ -7372,6 +7373,9 @@ function ensureOpsRefreshRowKbHint() {
         hint.id = 'ops-refresh-row-kb-hint';
         hint.className = 'ops-refresh-row-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        row.appendChild(hint);
+    }
+    if (hint.parentElement !== row) {
         row.appendChild(hint);
     }
     hint.textContent =

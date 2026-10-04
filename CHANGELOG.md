@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1337] - 2026-10-03
+
+### Changed
+- **Agent Ops refresh-row keyboard hint on first paint** — the hint sits in the theme HTML under Refresh, Refresh digest, and Updated. It no longer pops in after JavaScript loads. The line says how to move across those controls. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1336] - 2026-10-03
 
 ### Changed
