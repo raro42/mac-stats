@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1342] - 2026-10-04
+
+### Changed
+- **Footer toolbar keyboard hint on first paint** — the hint sits in the theme HTML under the version chip and the GitHub link. It no longer pops in after JavaScript loads. Before a panel opens, the line says the version chip opens the changelog. An open panel still replaces that line. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1341] - 2026-10-04
 
 ### Changed

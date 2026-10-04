@@ -21637,15 +21637,29 @@ function ensureFooterToolbarKbStyles() {
   document.head.appendChild(style);
 }
 
+/** Closed window: version opens the changelog. Open panels replace this line. */
+const FOOTER_TOOLBAR_KB_HINT_CLOSED =
+  '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+
+/** Theme HTML ships the hint under the version chip and GitHub link. Create it only on older shells. */
 function ensureFooterToolbarKbHint() {
   ensureFooterToolbarKbStyles();
   const footer = getCpuFooterElement();
   if (!footer) return;
-  let hint = footer.querySelector('.footer-toolbar-kb-hint');
+  let hint = document.getElementById('footer-toolbar-kb-hint');
+  if (!hint) {
+    hint = footer.querySelector('.footer-toolbar-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'footer-toolbar-kb-hint';
     hint.className = 'footer-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = FOOTER_TOOLBAR_KB_HINT_CLOSED;
+    footer.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'footer-toolbar-kb-hint';
+  if (hint.parentElement !== footer) {
     footer.appendChild(hint);
   }
   const items = getFooterToolbarItems();
@@ -21666,7 +21680,7 @@ function ensureFooterToolbarKbHint() {
         ? '← → / h l · Home/End move · version ← crosses to Perplexity Clear (or Discord View logs) · at end crosses to section icons'
         : processDetailsOpen
           ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
-          : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+          : FOOTER_TOOLBAR_KB_HINT_CLOSED;
 }
 
 function tryChainFooterToIconLineFirst() {
