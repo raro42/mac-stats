@@ -8,8 +8,8 @@
 - [x] cargo check in src-tauri/
 - [x] CHANGELOG + version bump
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit and push origin/main (do not close the GitHub issue)
+- [x] Commit and push origin/main (do not close the GitHub issue)
 
 ## Review
 
-WKWebView `tauri://localhost` / Graphics and Media stayed hot while the CPU window was open. Opaque window still ran live `backdrop-filter`. Hot rings (GPU ≥ 15%) ran infinite `filter` animations. Ring tween kept `requestAnimationFrame` at display refresh. `cargo check` pass (v0.1.1356).
+WKWebView `tauri://localhost` / Graphics and Media stayed hot while the CPU window was open. Opaque window still ran live `backdrop-filter`. Hot rings (GPU ≥ 15%) ran infinite `filter` animations. Ring tween kept `requestAnimationFrame` at display refresh. `cargo check` pass (v0.1.1356). Pushed `7b0d0443`. Issue #14 left open.
