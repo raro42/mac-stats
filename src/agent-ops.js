@@ -769,6 +769,7 @@ function refreshOpsFileTabRovingTabindex(preferred) {
     }
 }
 
+/** Theme HTML ships the file-tab hint under Soul · Skill · Mood. Create it only on older shells. */
 function ensureOpsFileTabKbHint() {
     const tabs = document.querySelector('.ops-file-tabs');
     if (!tabs) return;
@@ -778,6 +779,9 @@ function ensureOpsFileTabKbHint() {
         hint.id = 'ops-file-tab-kb-hint';
         hint.className = 'ops-file-tab-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        tabs.insertAdjacentElement('afterend', hint);
+    }
+    if (hint.previousElementSibling !== tabs) {
         tabs.insertAdjacentElement('afterend', hint);
     }
     hint.textContent =
