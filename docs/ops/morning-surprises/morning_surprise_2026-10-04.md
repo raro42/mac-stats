@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-04
 
-Overnight Track B kept the Disk Cleanup category list keyboard hint on first paint.
+Overnight Track B kept the Disk Cleanup scope list keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1354** | Disk Cleanup scope list keyboard hint is in the theme HTML above the scope list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout. |
 | **v0.1.1353** | Disk Cleanup category list keyboard hint is in the theme HTML above the category list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout. |
 | **v0.1.1352** | Monitors list keyboard hint is in the theme HTML above the monitor list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout. |
 | **v0.1.1351** | Top Processes list keyboard hint is in the theme HTML above the process list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout. |
@@ -25,8 +26,9 @@ Overnight Track B kept the Disk Cleanup category list keyboard hint on first pai
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.77d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.79d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~06:00 tick: Disk Cleanup scope list keyboard hint first paint in theme HTML (**v0.1.1354**); install/kickstart.
 - ~05:40 tick: Disk Cleanup category list keyboard hint first paint in theme HTML (**v0.1.1353**); install/kickstart.
 - ~05:06 tick: Monitors list keyboard hint first paint in theme HTML (**v0.1.1352**); install/kickstart.
 - ~04:41 tick: Top Processes list keyboard hint first paint in theme HTML (**v0.1.1351**); install/kickstart.

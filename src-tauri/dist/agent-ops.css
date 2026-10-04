@@ -7889,6 +7889,10 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.disk-cleanup-kb-hint[hidden] {
+  display: none !important;
+}
+
 .monitors-kb-hint {
   margin: 8px 0 6px;
   font-size: 11px;

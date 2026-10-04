@@ -18670,6 +18670,38 @@ function renderDiskCleanupScopesEmpty(scopesEl) {
   }
 }
 
+/** How to move across Disk Cleanup scope rows when the list has rows. */
+const DISK_CLEANUP_SCOPE_KB_HINT =
+  'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+
+/** Theme HTML ships the hint above the scope list. It stays hidden until rows exist. Create it only on older shells. */
+function ensureDiskCleanupScopeKbHint(scopesEl, show) {
+  if (!scopesEl || !scopesEl.parentNode) return;
+  let hint = document.getElementById('disk-cleanup-kb-hint');
+  if (!hint) {
+    hint = scopesEl.parentNode.querySelector(':scope > .disk-cleanup-kb-hint');
+  }
+  if (!show) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'disk-cleanup-kb-hint';
+    hint.id = 'disk-cleanup-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = DISK_CLEANUP_SCOPE_KB_HINT;
+    scopesEl.parentNode.insertBefore(hint, scopesEl);
+  }
+  if (!hint.id) hint.id = 'disk-cleanup-kb-hint';
+  if (hint.nextElementSibling !== scopesEl) {
+    scopesEl.parentNode.insertBefore(hint, scopesEl);
+  }
+  hint.hidden = false;
+  hint.textContent = DISK_CLEANUP_SCOPE_KB_HINT;
+}
+
 /** How to move across Disk Cleanup category rows when the list has rows. */
 const DISK_CLEANUP_LIST_KB_HINT =
   `Categories: All · Reclaim · Big (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}) · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable`;
@@ -19644,7 +19676,7 @@ async function refreshDiskCleanupPanel(opts) {
           : null;
       if (!scopes.length) {
         renderDiskCleanupScopesEmpty(scopesEl);
-        document.getElementById('disk-cleanup-kb-hint')?.remove();
+        ensureDiskCleanupScopeKbHint(scopesEl, false);
         applyDiskCleanupScopeFilter();
       } else {
       scopesEl.innerHTML = scopes
@@ -19689,15 +19721,7 @@ async function refreshDiskCleanupPanel(opts) {
           </div>`;
         })
         .join('');
-      let hint = document.getElementById('disk-cleanup-kb-hint');
-      if (!hint) {
-        hint = document.createElement('div');
-        hint.className = 'disk-cleanup-kb-hint';
-        hint.id = 'disk-cleanup-kb-hint';
-        scopesEl.parentNode?.insertBefore(hint, scopesEl);
-      }
-      hint.textContent =
-        'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+      ensureDiskCleanupScopeKbHint(scopesEl, true);
       syncDiskCleanupScopeTabOrder(scopesEl, preferIdx);
       applyDiskCleanupPathCopyFlash(scopesEl);
       applyDiskCleanupScopeFilter();
