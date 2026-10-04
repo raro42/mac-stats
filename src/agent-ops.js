@@ -6046,6 +6046,7 @@ function refreshOpsHealthRovingTabindex(preferred) {
     }
 }
 
+/** Theme HTML ships the hint under the health cards. Create it only on older shells. */
 function ensureOpsHealthKbHint() {
     const row = document.getElementById('ops-health-row');
     if (!row) return;
@@ -6055,6 +6056,9 @@ function ensureOpsHealthKbHint() {
         hint.id = 'ops-health-kb-hint';
         hint.className = 'ops-health-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        row.appendChild(hint);
+    }
+    if (hint.parentElement !== row) {
         row.appendChild(hint);
     }
     hint.textContent =
