@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1348] - 2026-10-04
+
+### Changed
+- **Perplexity search-box keyboard hint on first paint** — the hint sits in the theme HTML under the query and Search. It no longer pops in after JavaScript loads. Before a search, the line says how to move across those controls. After results exist, the line points the query back to the last result. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1347] - 2026-10-04
 
 ### Changed

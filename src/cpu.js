@@ -14763,14 +14763,32 @@ function refreshPerplexitySearchRovingTabindex(container, preferred) {
   }
 }
 
+/** How to move across query · Search before a search. */
+const PERPLEXITY_SEARCH_KB_HINT_EMPTY =
+  '← → / h l · Home/End move · Enter searches from input · Search on button';
+
+/** How to move across query · Search after results exist. */
+const PERPLEXITY_SEARCH_KB_HINT_RESULTS =
+  '← → / h l · Home/End move · at start ← last result · Search → footer · Enter searches from input';
+
+/** Theme HTML ships the hint under the query and Search. Create it only on older shells. */
 function ensurePerplexitySearchKbHint(container) {
   const row = container || document.querySelector('.perplexity-search-box');
   if (!row) return;
-  let hint = row.querySelector('.perplexity-search-kb-hint');
+  let hint = document.getElementById('perplexity-search-kb-hint');
+  if (!hint) {
+    hint = row.querySelector('.perplexity-search-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'perplexity-search-kb-hint';
     hint.className = 'perplexity-search-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = PERPLEXITY_SEARCH_KB_HINT_EMPTY;
+    row.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'perplexity-search-kb-hint';
+  if (hint.parentElement !== row) {
     row.appendChild(hint);
   }
   const items = getPerplexitySearchToolbarItems(row);
@@ -14778,13 +14796,9 @@ function ensurePerplexitySearchKbHint(container) {
   const hasResults = visiblePerplexityResultItems(
     document.getElementById('perplexity-results')
   ).length > 0;
-  if (hasResults) {
-    hint.textContent =
-      '← → / h l · Home/End move · at start ← last result · Search → footer · Enter searches from input';
-  } else {
-    hint.textContent =
-      '← → / h l · Home/End move · Enter searches from input · Search on button';
-  }
+  hint.textContent = hasResults
+    ? PERPLEXITY_SEARCH_KB_HINT_RESULTS
+    : PERPLEXITY_SEARCH_KB_HINT_EMPTY;
 }
 
 /**
