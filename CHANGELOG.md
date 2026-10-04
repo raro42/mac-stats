@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1334] - 2026-10-03
+
+### Changed
+- **Agent Ops filter-row keyboard hint on first paint** — the hint sits in the theme HTML under the search box, the match count, and Clear. It no longer pops in after JavaScript loads. It stays hidden until a search shows the match count and Clear. The line says how to move across those controls. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1333] - 2026-10-03
 
 ### Changed

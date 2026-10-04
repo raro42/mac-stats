@@ -158,6 +158,7 @@
     }
   }
 
+  /** Theme HTML ships the hint under search · match · Clear. Create it only on older shells. It stays hidden until match and Clear are on screen. */
   function ensureOpsFilterRowKbHint(row) {
     if (!row) return;
     let hint = row.querySelector('.ops-filter-row-kb-hint');
@@ -165,6 +166,7 @@
       hint = document.createElement('div');
       hint.className = 'ops-filter-row-kb-hint';
       hint.setAttribute('aria-hidden', 'true');
+      hint.hidden = true;
       row.appendChild(hint);
     }
     const items = getOpsFilterRowItems(row);
