@@ -403,20 +403,20 @@ body {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Poster credit strip â€” sticky so it stays visible; was unstyled (browser-blue GitHub). */
+/* Poster credit strip — last in the panel scroll, not sticky over gauges or lists. */
 .theme-footer {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 8;
+  position: static;
+  z-index: auto;
   margin-top: auto;
   margin-left: -20px;
   margin-right: -20px;
-  margin-bottom: -8px;
+  margin-bottom: -20px;
   padding: 12px 24px 14px;
   border-top: 1px solid var(--hairline);
   background:

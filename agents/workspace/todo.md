@@ -1,7 +1,12 @@
-# Session todo — 2026-08-18 ~23:56 overnight tick
+# Session todo — GitHub #13 data-poster footer overlay
 
-- [x] Digest, sibling watch, design review, log scan
-- [ ] Fuel: digester empty; design-review due=false (grace); recommended AI chat
-- [ ] Experiment: AI Chat copy message chip (Copied flash)
-- [ ] Ratchet verify → keep → bump 0.1.526 → changelog → sync/install → push
-- [ ] loop_backlog + morning surprise + archive
+- [x] Pick lowest GitHub task (WIP-13 / issue 13)
+- [x] Keep data-poster footer in document flow (no sticky overlay)
+- [x] cargo check in src-tauri/
+- [x] CHANGELOG user-facing note (v0.1.1355)
+- [x] Rename WIP-13 → UNTESTED-13
+- [ ] Commit and push origin/main (do not close the GitHub issue)
+
+## Review
+
+Sticky `z-index` footer on Data Poster covered metrics/lists. Footer is `position: static` in the panel scroll. Playwright: no overlap; scroll-to-bottom shows the strip.
