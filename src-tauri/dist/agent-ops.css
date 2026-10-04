@@ -1733,6 +1733,14 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+.power-strip-kb-hint {
+  margin: 2px 0 0;
+  font-size: 11px;
+  opacity: 0.72;
+  width: 100%;
+  flex-basis: 100%;
+}
+
 /*
  * Soft keyboard tips stay hidden. Showing them on focus-within shifted the
  * layout (footer / filters jumped). Shortcuts still work; no on-screen essays.

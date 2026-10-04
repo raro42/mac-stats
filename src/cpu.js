@@ -3616,7 +3616,7 @@ function refreshPowerStripRovingTabindex(preferred) {
   }
 }
 
-/** Soft tip under the battery/power strip (Details kb-hint parity). */
+/** Theme HTML ships the hint under Bat · LPM · Power. Create it only on older shells. */
 function ensurePowerStripKbHint() {
   ensureRamStripStyles();
   const strip = document.getElementById('battery-power-strip');
@@ -3627,6 +3627,9 @@ function ensurePowerStripKbHint() {
     hint.id = 'power-strip-kb-hint';
     hint.className = 'power-strip-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    strip.appendChild(hint);
+  }
+  if (hint.parentElement !== strip) {
     strip.appendChild(hint);
   }
   hint.textContent =
