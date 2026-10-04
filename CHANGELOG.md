@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1340] - 2026-10-03
+
+### Changed
+- **History sparkline keyboard hint on first paint** — the hint sits in the theme HTML under CPU, GPU, Freq, and Temp. It no longer pops in after JavaScript loads. The line says how to move across those charts. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1339] - 2026-10-03
 
 ### Changed

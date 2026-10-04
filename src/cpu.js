@@ -4206,7 +4206,7 @@ function ensureHistorySparklineKbStyles() {
   document.head.appendChild(style);
 }
 
-/** Soft tip under history sparklines (ring-gauge / power-strip kb-hint parity). */
+/** Theme HTML ships the hint under CPU · GPU · Freq · Temp charts. Create it only on older shells. */
 function ensureHistorySparklineKbHint() {
   ensureHistorySparklineKbStyles();
   const section = getHistorySparklineSection();
@@ -4217,6 +4217,9 @@ function ensureHistorySparklineKbHint() {
     hint.id = 'history-sparkline-kb-hint';
     hint.className = 'history-sparkline-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    section.appendChild(hint);
+  }
+  if (hint.parentElement !== section) {
     section.appendChild(hint);
   }
   hint.textContent =
