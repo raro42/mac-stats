@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1347] - 2026-10-04
+
+### Changed
+- **Debug Log toolbar keyboard hint on first paint** — the hint sits in the theme HTML under Refresh, Open in editor, and Auto-refresh. It no longer pops in after JavaScript loads. Before a log load, the line says how to move across those controls. After lines exist, the line points Refresh back to the last line. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1346] - 2026-10-04
 
 ### Changed

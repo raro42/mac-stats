@@ -16694,6 +16694,15 @@ function refreshLogsToolbarRovingTabindex(row, preferred) {
   }
 }
 
+/** How to move across Refresh · Open in editor · Auto-refresh before a log load. */
+const LOGS_TOOLBAR_KB_HINT_EMPTY =
+  '← → / h l · Home/End move · Refresh ← logs icon · Space toggles auto-refresh · Enter / Space on buttons';
+
+/** How to move across Refresh · Open in editor · Auto-refresh after lines exist. */
+const LOGS_TOOLBAR_KB_HINT_LINES =
+  '← → / h l · Home/End move · Refresh ← last line · Auto-refresh → footer · Space toggles auto-refresh';
+
+/** Theme HTML ships the hint under the toolbar buttons. Create it only on older shells. */
 function ensureLogsToolbarKbHint(row) {
   const wrap =
     row ||
@@ -16703,23 +16712,26 @@ function ensureLogsToolbarKbHint(row) {
         document.querySelector('.logs-toolbar')
     );
   if (!wrap) return;
-  let hint = wrap.querySelector('.logs-toolbar-kb-hint');
+  let hint = document.getElementById('logs-toolbar-kb-hint');
+  if (!hint) {
+    hint = wrap.querySelector('.logs-toolbar-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'logs-toolbar-kb-hint';
     hint.className = 'logs-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = LOGS_TOOLBAR_KB_HINT_EMPTY;
+    wrap.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'logs-toolbar-kb-hint';
+  if (hint.parentElement !== wrap) {
     wrap.appendChild(hint);
   }
   const items = getLogsToolbarActionItems(wrap);
   hint.hidden = items.length < 2;
   const hasLines = visibleLogsLines(document.getElementById('logs-viewer')).length > 0;
-  if (hasLines) {
-    hint.textContent =
-      '← → / h l · Home/End move · Refresh ← last line · Auto-refresh → footer · Space toggles auto-refresh';
-  } else {
-    hint.textContent =
-      '← → / h l · Home/End move · Refresh ← logs icon · Space toggles auto-refresh · Enter / Space on buttons';
-  }
+  hint.textContent = hasLines ? LOGS_TOOLBAR_KB_HINT_LINES : LOGS_TOOLBAR_KB_HINT_EMPTY;
 }
 
 /**
