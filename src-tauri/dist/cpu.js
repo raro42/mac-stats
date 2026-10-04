@@ -21963,7 +21963,7 @@ function ensureIconLineKbStyles() {
   document.head.appendChild(style);
 }
 
-/** Soft tip under the section icon line (power-strip kb-hint parity). */
+/** Theme HTML ships the hint under the section icons. Create it only on older shells. */
 function ensureIconLineKbHint() {
   ensureIconLineKbStyles();
   const line = document.getElementById('icon-line');
@@ -21974,6 +21974,9 @@ function ensureIconLineKbHint() {
     hint.id = 'icon-line-kb-hint';
     hint.className = 'icon-line-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    line.appendChild(hint);
+  }
+  if (hint.parentElement !== line) {
     line.appendChild(hint);
   }
   hint.textContent =

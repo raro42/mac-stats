@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1341] - 2026-10-04
+
+### Changed
+- **Section icon-line keyboard hint on first paint** — the hint sits in the theme HTML under Monitors, AI Chat, Perplexity, Debug Log, Discord, Disk Cleanup, and Agent Ops. It no longer pops in after JavaScript loads. The line says how to move across those icons. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1340] - 2026-10-03
 
 ### Changed
