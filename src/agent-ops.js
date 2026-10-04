@@ -878,8 +878,19 @@ function refreshOpsAgentEditActionsRovingTabindex(preferred) {
     }
 }
 
+/** Theme shells ship the class without the id. Stamp it so keyboard wiring can find the row. */
+function ensureOpsAgentEditActionsRow() {
+    let row = document.getElementById('ops-agent-edit-actions');
+    if (!row) {
+        row = document.querySelector('.ops-agent-edit-actions');
+        if (row) row.id = 'ops-agent-edit-actions';
+    }
+    return row;
+}
+
+/** Theme HTML ships the edit-actions hint under Save · Load into AI Chat · Back. Create it only on older shells. */
 function ensureOpsAgentEditActionsKbHint() {
-    const row = document.getElementById('ops-agent-edit-actions');
+    const row = ensureOpsAgentEditActionsRow();
     if (!row) return;
     let hint = document.getElementById('ops-agent-edit-actions-kb-hint');
     if (!hint) {
@@ -887,6 +898,9 @@ function ensureOpsAgentEditActionsKbHint() {
         hint.id = 'ops-agent-edit-actions-kb-hint';
         hint.className = 'ops-agent-edit-actions-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        row.insertAdjacentElement('afterend', hint);
+    }
+    if (hint.previousElementSibling !== row) {
         row.insertAdjacentElement('afterend', hint);
     }
     hint.textContent =
@@ -899,7 +913,7 @@ function ensureOpsAgentEditActionsKbHint() {
  * existing button activate.
  */
 function ensureOpsAgentEditActionsToolbarKeyboard() {
-    const row = document.getElementById('ops-agent-edit-actions');
+    const row = ensureOpsAgentEditActionsRow();
     if (!row) return;
     ensureOpsAgentEditActionsKbHint();
     refreshOpsAgentEditActionsRovingTabindex();
@@ -7922,6 +7936,7 @@ function ensureOpsAgentEditor() {
         editor.after(row);
         save.addEventListener('click', () => saveOpsAgentFile());
     }
+    ensureOpsAgentEditActionsRow();
     ensureOpsAgentLoadChatBtn();
     ensureOpsAgentEditActionsToolbarKeyboard();
     if (editor && editor.dataset.opsEditBound !== '1') {
@@ -8693,9 +8708,11 @@ function showOpsAgentLoadStatus(msg, ok) {
         el.id = 'ops-agent-load-status';
         el.className = 'ops-row-meta';
         el.style.margin = '6px 4px 0';
+        const hint = document.getElementById('ops-agent-edit-actions-kb-hint');
         const actions = document.getElementById('ops-agent-edit-actions');
-        if (actions?.parentNode) {
-            actions.parentNode.insertBefore(el, actions.nextSibling);
+        const anchor = hint || actions;
+        if (anchor?.parentNode) {
+            anchor.parentNode.insertBefore(el, anchor.nextSibling);
         } else if (loadBtn?.parentNode) {
             loadBtn.parentNode.insertBefore(el, loadBtn.nextSibling);
         }
