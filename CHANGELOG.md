@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1345] - 2026-10-04
+
+### Changed
+- **Disk Cleanup action toolbar keyboard hint on first paint** — the hint sits in the theme HTML under Clean now, Refresh, and Save scopes. It no longer pops in after JavaScript loads. The line says how to move across those buttons. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1344] - 2026-10-04
 
 ### Changed

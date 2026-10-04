@@ -18190,20 +18190,33 @@ function refreshDiskCleanupToolbarRovingTabindex(row, preferred) {
   }
 }
 
+/** How to move across Clean now · Refresh · Save scopes. */
+const DISK_CLEANUP_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · Enter / Space on buttons';
+
+/** Theme HTML ships the hint under the action buttons. Create it only on older shells. */
 function ensureDiskCleanupToolbarKbHint(row) {
   const wrap = row || document.querySelector('.disk-cleanup-toolbar');
   if (!wrap) return;
-  let hint = wrap.querySelector('.disk-cleanup-toolbar-kb-hint');
+  let hint = document.getElementById('disk-cleanup-toolbar-kb-hint');
+  if (!hint) {
+    hint = wrap.querySelector('.disk-cleanup-toolbar-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'disk-cleanup-toolbar-kb-hint';
     hint.className = 'disk-cleanup-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = DISK_CLEANUP_TOOLBAR_KB_HINT;
+    wrap.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'disk-cleanup-toolbar-kb-hint';
+  if (hint.parentElement !== wrap) {
     wrap.appendChild(hint);
   }
   const items = getDiskCleanupToolbarActionItems(wrap);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Enter / Space on buttons';
+  hint.textContent = DISK_CLEANUP_TOOLBAR_KB_HINT;
 }
 
 /**

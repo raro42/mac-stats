@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-04 (~02:00):** Disk Cleanup action toolbar keyboard hint first paint (v0.1.1345). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-04 (~01:30):** Disk Cleanup meta keyboard hint first paint (v0.1.1344). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-03 (~03:25):** Agent Ops Runs filter-chip keyboard hint first paint (v0.1.1324). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 - **2026-10-03 (~02:59):** Agent Ops Knowledge filter-chip keyboard hint first paint (v0.1.1323). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
