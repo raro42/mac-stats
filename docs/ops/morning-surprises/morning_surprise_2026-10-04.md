@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-04
 
-Overnight Track B kept the footer toolbar keyboard hint on first paint.
+Overnight Track B kept the header toolbar keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1343** | Header toolbar keyboard hint is in the theme HTML under Refresh and Settings. It no longer pops in after JavaScript loads. The line says how to move across those buttons. At the end, the keys go to the CPU ring (or Credentials when Settings is open). At the start, the keys go to the Top Processes filters or the footer. Keyboard tips stay out of the layout. |
 | **v0.1.1342** | Footer toolbar keyboard hint is in the theme HTML under the version chip and the GitHub link. It no longer pops in after JavaScript loads. Before a panel opens, the line says the version chip opens the changelog. An open panel still replaces that line. Keyboard tips stay out of the layout. |
 | **v0.1.1341** | Section icon-line keyboard hint is in the theme HTML under Monitors, AI Chat, Perplexity, Debug Log, Discord, Disk Cleanup, and Agent Ops. It no longer pops in after JavaScript loads. The line says how to move across those icons. Keyboard tips stay out of the layout. |
 | **v0.1.1340** | History sparkline keyboard hint is in the theme HTML under CPU, GPU, Freq, and Temp. It no longer pops in after JavaScript loads. The line says how to move across those charts. Keyboard tips stay out of the layout. |
@@ -16,6 +17,7 @@ Overnight Track B kept the footer toolbar keyboard hint on first paint.
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.57d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~01:08 tick: header toolbar keyboard hint first paint in theme HTML (**v0.1.1343**); install/kickstart.
 - ~00:45 tick: footer toolbar keyboard hint first paint in theme HTML (**v0.1.1342**); install/kickstart.
 - ~00:07 tick: section icon-line keyboard hint first paint in theme HTML (**v0.1.1341**); install/kickstart.
 - ~23:41 tick: history sparkline keyboard hint first paint in theme HTML (**v0.1.1340**); install/kickstart.

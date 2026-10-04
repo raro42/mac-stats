@@ -21266,21 +21266,34 @@ function ensureCpuHeaderToolbarKbStyles() {
   document.head.appendChild(style);
 }
 
+/** How to move across Refresh and Settings. Settings-open still says Credentials. */
+const HEADER_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · at end crosses to CPU ring (or Credentials when settings open) · at start crosses to Top Processes filters or footer';
+
+/** Theme HTML ships the hint under Refresh and Settings. Create it only on older shells. */
 function ensureCpuHeaderToolbarKbHint() {
   ensureCpuHeaderToolbarKbStyles();
   const actions = getCpuHeaderActionsElement();
   if (!actions) return;
-  let hint = actions.querySelector('.header-toolbar-kb-hint');
+  let hint = document.getElementById('header-toolbar-kb-hint');
+  if (!hint) {
+    hint = actions.querySelector('.header-toolbar-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'header-toolbar-kb-hint';
     hint.className = 'header-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = HEADER_TOOLBAR_KB_HINT;
+    actions.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'header-toolbar-kb-hint';
+  if (hint.parentElement !== actions) {
     actions.appendChild(hint);
   }
   const items = getCpuHeaderToolbarItems();
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · at end crosses to CPU ring (or Credentials when settings open) · at start crosses to Top Processes filters or footer';
+  hint.textContent = HEADER_TOOLBAR_KB_HINT;
 }
 
 function tryChainHeaderToRingGaugeFirst() {

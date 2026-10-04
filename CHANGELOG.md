@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1343] - 2026-10-04
+
+### Changed
+- **Header toolbar keyboard hint on first paint** — the hint sits in the theme HTML under Refresh and Settings. It no longer pops in after JavaScript loads. The line says how to move across those buttons. At the end, the keys go to the CPU ring (or Credentials when Settings is open). At the start, the keys go to the Top Processes filters or the footer. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1342] - 2026-10-04
 
 ### Changed
