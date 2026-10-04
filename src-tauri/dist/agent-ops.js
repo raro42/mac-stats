@@ -5876,6 +5876,7 @@ function refreshOpsOverviewRovingTabindex(preferred) {
     }
 }
 
+/** Theme HTML ships the hint under the overview cards. Create it only on older shells. */
 function ensureOpsOverviewKbHint() {
     const grid = document.getElementById('ops-overview-grid');
     if (!grid) return;
@@ -5885,6 +5886,9 @@ function ensureOpsOverviewKbHint() {
         hint.id = 'ops-overview-kb-hint';
         hint.className = 'ops-overview-kb-hint';
         hint.setAttribute('aria-hidden', 'true');
+        grid.appendChild(hint);
+    }
+    if (hint.parentElement !== grid) {
         grid.appendChild(hint);
     }
     hint.textContent =

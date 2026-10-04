@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1335] - 2026-10-03
+
+### Changed
+- **Agent Ops overview keyboard hint on first paint** — the hint sits in the theme HTML under the overview cards. It no longer pops in after JavaScript loads. The line says how to move across Agents, Schedules, Live, Knowledge, Recent chats, Runs, and Digest. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1334] - 2026-10-03
 
 ### Changed
