@@ -18670,6 +18670,38 @@ function renderDiskCleanupScopesEmpty(scopesEl) {
   }
 }
 
+/** How to move across Disk Cleanup category rows when the list has rows. */
+const DISK_CLEANUP_LIST_KB_HINT =
+  `Categories: All · Reclaim · Big (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}) · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable`;
+
+/** Theme HTML ships the hint above the category list. It stays hidden until rows exist. Create it only on older shells. */
+function ensureDiskCleanupListKbHint(list, show) {
+  if (!list || !list.parentNode) return;
+  let hint = document.getElementById('disk-cleanup-list-kb-hint');
+  if (!hint) {
+    hint = list.parentNode.querySelector(':scope > .disk-cleanup-list-kb-hint');
+  }
+  if (!show) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'disk-cleanup-list-kb-hint';
+    hint.id = 'disk-cleanup-list-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = DISK_CLEANUP_LIST_KB_HINT;
+    list.parentNode.insertBefore(hint, list);
+  }
+  if (!hint.id) hint.id = 'disk-cleanup-list-kb-hint';
+  if (hint.nextElementSibling !== list) {
+    list.parentNode.insertBefore(hint, list);
+  }
+  hint.hidden = false;
+  hint.textContent = DISK_CLEANUP_LIST_KB_HINT;
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -19675,7 +19707,7 @@ async function refreshDiskCleanupPanel(opts) {
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
     if (!cats.length) {
       renderDiskCleanupListEmpty(list);
-      document.getElementById('disk-cleanup-list-kb-hint')?.remove();
+      ensureDiskCleanupListKbHint(list, false);
     } else {
       const preferItemIdx =
         typeof window.__diskCleanupItemFocusIdx === 'number'
@@ -19720,17 +19752,7 @@ async function refreshDiskCleanupPanel(opts) {
           </li>`;
         })
         .join('');
-      let listHint = document.getElementById('disk-cleanup-list-kb-hint');
-      if (!listHint && list.parentNode) {
-        listHint = document.createElement('div');
-        listHint.className = 'disk-cleanup-list-kb-hint';
-        listHint.id = 'disk-cleanup-list-kb-hint';
-        list.parentNode.insertBefore(listHint, list);
-      }
-      if (listHint) {
-        listHint.textContent =
-          `Categories: All · Reclaim · Big (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}) · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable`;
-      }
+      ensureDiskCleanupListKbHint(list, true);
       window.__diskCleanupItemFocusIdx = preferItemIdx;
       applyDiskCleanupListFilter();
       applyDiskCleanupPathCopyFlash(list);

@@ -7611,6 +7611,10 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.disk-cleanup-list-kb-hint[hidden] {
+  display: none !important;
+}
+
 .disk-cleanup-item-head {
   display: flex;
   justify-content: space-between;

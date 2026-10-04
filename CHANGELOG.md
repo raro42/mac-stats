@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1353] - 2026-10-04
+
+### Changed
+- **Disk Cleanup category list keyboard hint on first paint** — the hint sits in the theme HTML above the category list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1352] - 2026-10-04
 
 ### Changed
