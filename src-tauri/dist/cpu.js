@@ -4045,7 +4045,7 @@ function ensureRingGaugeKbStyles() {
   document.head.appendChild(style);
 }
 
-/** Soft tip under the ring gauges (power-strip kb-hint parity). */
+/** Theme HTML ships the hint under CPU · GPU · Freq · Temp. Create it only on older shells. */
 function ensureRingGaugeKbHint() {
   ensureRingGaugeKbStyles();
   const section = getRingGaugeSection();
@@ -4056,6 +4056,9 @@ function ensureRingGaugeKbHint() {
     hint.id = 'ring-gauge-kb-hint';
     hint.className = 'ring-gauge-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    section.appendChild(hint);
+  }
+  if (hint.parentElement !== section) {
     section.appendChild(hint);
   }
   hint.textContent =

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1339] - 2026-10-03
+
+### Changed
+- **Ring gauge keyboard hint on first paint** — the hint sits in the theme HTML under CPU, GPU, Freq, and Temp. It no longer pops in after JavaScript loads. The line says how to move across those rings. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1338] - 2026-10-03
 
 ### Changed
