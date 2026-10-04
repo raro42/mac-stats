@@ -8171,6 +8171,7 @@ function applyMonitorsListFilter() {
 
   if (trueEmpty || items.length === 0) {
     ensureMonitorsFilterMissState(monitorsList, false);
+    ensureMonitorsListKbHint(monitorsList, false);
     applyMonitorsFilterAttentionGlanceState(true);
     applyMonitorsAttentionGlanceState(0, 0, true);
     updateMonitorsHeight();
@@ -9883,22 +9884,36 @@ function ensureProcessesListKbHint(processList, show) {
   hint.textContent = PROCESSES_LIST_KB_HINT;
 }
 
-/** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
+/** How to move across monitor rows when the list has rows. */
+const MONITORS_LIST_KB_HINT =
+  'All · Up · Down · Slow filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+
+/** Theme HTML ships the hint above the monitor list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureMonitorsListKbHint(monitorsList, show) {
-  if (!monitorsList) return;
+  if (!monitorsList || !monitorsList.parentNode) return;
   let hint = document.getElementById('monitors-kb-hint');
+  if (!hint) {
+    hint = monitorsList.parentNode.querySelector(':scope > .monitors-kb-hint');
+  }
   if (!show) {
-    hint?.remove();
+    if (hint) hint.hidden = true;
     return;
   }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'monitors-kb-hint';
     hint.id = 'monitors-kb-hint';
-    monitorsList.parentNode?.insertBefore(hint, monitorsList);
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = MONITORS_LIST_KB_HINT;
+    monitorsList.parentNode.insertBefore(hint, monitorsList);
   }
-  hint.textContent =
-    'All · Up · Down · Slow filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+  if (!hint.id) hint.id = 'monitors-kb-hint';
+  if (hint.nextElementSibling !== monitorsList) {
+    monitorsList.parentNode.insertBefore(hint, monitorsList);
+  }
+  hint.hidden = false;
+  hint.textContent = MONITORS_LIST_KB_HINT;
 }
 
 function wireMonitorsListKeyboard() {

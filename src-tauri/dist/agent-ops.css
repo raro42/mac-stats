@@ -7891,6 +7891,10 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.monitors-kb-hint[hidden] {
+  display: none !important;
+}
+
 .processes-kb-hint {
   margin: 8px 0 6px;
   font-size: 11px;
