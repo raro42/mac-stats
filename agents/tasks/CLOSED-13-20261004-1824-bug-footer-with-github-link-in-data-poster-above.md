@@ -37,3 +37,14 @@
 ### Notes
 - Fix is in `src-tauri/dist/themes/data-poster/cpu.css` (sticky/z-index 8 removed). Changelog `v0.1.1355`.
 - Did not close GitHub issue 13.
+
+## Closing review (004)
+
+- Date: 2026-10-04
+- `cargo check` pass. `cargo build --release` **v0.1.1355** pass.
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints, not this CSS fix).
+- `cargo test --offline`: 1346 passed, 7 failed (`harness_ops` matchers/digest/timing; not this CSS fix).
+- `CHANGELOG.md` **[0.1.1355]** Fixed names GitHub #13. Issue-loop note moved from Unreleased to Added on the same version.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. Existing `mac_stats` left running.
+
+Handoff: complete
