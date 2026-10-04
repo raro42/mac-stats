@@ -282,95 +282,26 @@ function updateRingGauge(ringId, percent, key) {
   const clamped = Math.max(0, Math.min(100, percent));
   const progressEl = document.getElementById(ringId);
   if (!progressEl) return;
-  
+
   const targetOffset = CIRCUMFERENCE - (clamped / 100) * CIRCUMFERENCE;
-  
-  // Check if this is the first time we're updating this gauge
-  const isFirstUpdate = !ringAnimations.has(key);
-  
-  if (isFirstUpdate) {
-    // First update: initialize and paint immediately (no animation, no batching)
-    ringAnimations.set(key, { current: targetOffset, target: targetOffset, lastFrameTime: null, frameId: null });
-    // Paint immediately on first load - don't batch this, it needs to show right away
+  const prev = ringAnimations.get(key);
+
+  if (!prev) {
+    ringAnimations.set(key, { current: targetOffset });
     progressEl.style.strokeDashoffset = targetOffset;
     return;
   }
-  
-  const anim = ringAnimations.get(key);
-  const diff = Math.abs(anim.current - targetOffset);
-  
-  // STEP 7: If change is very small (<5% of gauge), skip update entirely
-  // OPTIMIZATION Phase 1: Increased from 2% to 5% (human perception threshold)
-  // This prevents unnecessary WebKit rendering for imperceptible changes
-  // BUT: Always allow updates if current value is at default (CIRCUMFERENCE) - means gauge wasn't painted yet
-  if (diff < (CIRCUMFERENCE * 0.05) && anim.current !== CIRCUMFERENCE) {
-    // Change is too small to be visible - skip update
+
+  const diff = Math.abs(prev.current - targetOffset);
+  // Skip paints under ~5% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.05 && prev.current !== CIRCUMFERENCE) {
     return;
   }
-  
-  // STEP 7: If change is small but visible, update directly without animation
-  // OPTIMIZATION Phase 1: Increased threshold from 15% to 20% to reduce animation frequency
-  if (diff < (CIRCUMFERENCE * 0.20)) {
-    anim.current = targetOffset;
-    // Batch this DOM update
-    scheduleDOMUpdate(() => {
-      progressEl.style.strokeDashoffset = anim.current;
-    });
-    ringAnimations.delete(key);
-    return;
-  }
-  
-  anim.target = targetOffset;
-  
-  if (anim.frameId) {
-    cancelAnimationFrame(anim.frameId);
-  }
-  
-  function animate() {
-    const diff = anim.target - anim.current;
-    if (Math.abs(diff) < 0.5) {
-      anim.current = anim.target;
-      progressEl.style.strokeDashoffset = anim.current;
-      ringAnimations.delete(key);
-      return;
-    }
-    
-    // STEP 6: Throttle to 20fps (update every ~50ms) to reduce Graphics/Media CPU usage
-    // CRITICAL: Only call requestAnimationFrame if we're actually updating
-    // This prevents WebKit from processing unnecessary display link callbacks
-    const now = performance.now();
-    if (!anim.lastFrameTime) {
-      anim.lastFrameTime = now;
-    }
-    const elapsed = now - anim.lastFrameTime;
-    
-    if (elapsed >= 50) { // 20fps = 50ms per frame (reduced from 30fps to save CPU)
-      // Faster animation (0.35 instead of 0.3) to complete sooner with fewer frames
-      anim.current += diff * 0.35;
-      // Batch DOM update
-      scheduleDOMUpdate(() => {
-        progressEl.style.strokeDashoffset = anim.current;
-      });
-      anim.lastFrameTime = now;
-      
-      // Only schedule next frame if we're not done
-      if (Math.abs(anim.target - anim.current) >= 0.5) {
-        anim.frameId = requestAnimationFrame(animate);
-      } else {
-        anim.current = anim.target;
-        scheduleDOMUpdate(() => {
-          progressEl.style.strokeDashoffset = anim.current;
-        });
-        ringAnimations.delete(key);
-      }
-    } else {
-      // Not time to update yet - schedule next check but don't update DOM
-      // This reduces WebKit rendering work
-      anim.frameId = requestAnimationFrame(animate);
-    }
-  }
-  
-  animate();
+
+  prev.current = targetOffset;
+  scheduleDOMUpdate(() => {
+    progressEl.style.strokeDashoffset = targetOffset;
+  });
 }
 
 // Simple value update (no tweening to save CPU)
@@ -399,6 +330,8 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 }
 
 let refreshInterval = null;
+/** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
+const CPU_WINDOW_REFRESH_MS = 3000;
 let invoke = null;
 let lastProcessUpdate = 0;
 let lastProcessListKey = "";
@@ -1685,10 +1618,8 @@ async function refresh() {
       if (refreshInterval) {
         clearInterval(refreshInterval);
       }
-      // 2s matches backend get_cpu_details rate limit (1s polls were mostly cache hits
-      // but still woke WebKit + IPC every second while the window was open).
-      refreshInterval = setInterval(refresh, 2000);
-      console.log("Got real data, switched to 2-second interval");
+      refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
+      console.log("Got real data, switched to 3-second interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -2742,20 +2673,21 @@ function waitForTauri(callback, maxAttempts = 200) {
 }
 
 // Start refreshing when Tauri is ready
-// CRITICAL: Poll every 1 second (matches menu bar update frequency)
-// This ensures CPU usage gauge updates at same rate as menu bar
 function startRefresh() {
   // Don't call refresh() here - it's already called in init() or visibilitychange
-  // This prevents double-calling on startup
   if (refreshInterval) {
     clearInterval(refreshInterval);
   }
-  
-  // Check if we got real data on first call
-  // If not, poll every 1 second until we do (SYSTEM might not be initialized yet)
-  // Once we get real data (usage > 0), continue with 1-second interval (matches menu bar)
+
   isWaitingForData = true;
-  refreshInterval = setInterval(refresh, 2000); // 2s: matches backend rate limit / lower WebKit wakeups
+  refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
+}
+
+function stopRefresh() {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
 }
 
 // Initialize when DOM and Tauri are ready
@@ -5605,19 +5537,19 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    // Window became visible - refresh immediately and force process update
-    window._forceProcessUpdate = true; // Force immediate process list update
-      if (invoke) {
-      void seedThemeHistoryFromBackend();
-      refresh();
-      if (!refreshInterval) {
-        startRefresh();
-      }
-    } else {
-      // Tauri not ready - initialize (will keep trying until ready)
-      init();
+  if (document.hidden) {
+    stopRefresh();
+    return;
+  }
+  window._forceProcessUpdate = true;
+  if (invoke) {
+    void seedThemeHistoryFromBackend();
+    refresh();
+    if (!refreshInterval) {
+      startRefresh();
     }
+  } else {
+    init();
   }
 });
 

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1356] - 2026-10-04
+
+### Fixed
+- **CPU window WebView CPU** — dropped live backdrop-filter, infinite hot-ring glow, and ring-gauge animation frames so `tauri://localhost` stays quieter while the window is open. Metrics refresh every 3s and pause when the window is hidden. GitHub #14.
+
+
 ## [0.1.1355] - 2026-10-04
 
 ### Added

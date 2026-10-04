@@ -1,6 +1,18 @@
 /* Agent Ops Command Center — shared across dashboard + theme CPU windows */
 
 /*
+ * Opaque Tauri webview: live backdrop-filter re-blurs every compositor tick
+ * (WKWebView "Graphics and Media" / tauri://localhost). Themes already paint
+ * frosted rgba panels; skip the live blur.
+ */
+*,
+*::before,
+*::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/*
  * Theme CPU windows pin body/shell to 100vh with overflow:hidden and often
  * max-width:560px — so widening the OS window does nothing and Agent Ops
  * gets clipped. These rules make the shell fill the window and scroll.
@@ -1924,16 +1936,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
 }
 
-/* Hot ring — soft alert (Monitors Slow 7%/30%). Pulse stays; louder 12%/28% rest removed. */
+/* Hot ring — static wash only (KISS). Infinite filter/box-shadow pulses kept WKWebView hot. */
 .metric-card.is-hot {
   background-color: color-mix(in srgb, #ff9500 7%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
   border-radius: 12px;
-  animation: ring-gauge-hot-glow 2.4s ease-in-out infinite;
-}
-
-.metric-card.is-hot .ring-progress {
-  animation: ring-gauge-hot-stroke 2.4s ease-in-out infinite;
 }
 
 /* CPU · GPU · FREQ · Temp rings — calm below hot (Temp Nominal / Details is-ok parity). */
@@ -1941,10 +1948,6 @@ textarea.ops-agent-editor.is-dirty {
   background-color: color-mix(in srgb, #34c759 7%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
   border-radius: 12px;
-}
-
-.metric-card.is-ok:not(.is-hot):not(.is-fair) .ring-progress {
-  filter: drop-shadow(0 0 2px color-mix(in srgb, #34c759 22%, transparent));
 }
 
 .metric-card.is-ok:not(.is-hot):not(.is-fair) .metric-subtext,
@@ -1960,61 +1963,12 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 12px;
 }
 
-.metric-card.is-fair:not(.is-hot) .ring-progress {
-  filter: drop-shadow(0 0 2px color-mix(in srgb, #ff9500 28%, transparent));
-}
-
 .metric-card.is-fair:not(.is-hot) .metric-subtext,
 .metric-card.is-fair:not(.is-hot) [id$="-subtext"] {
   color: color-mix(in srgb, #ff9500 72%, var(--text, currentColor));
   font-weight: 650;
 }
 
-/* GPU ring — slightly stronger pulse when hot (no extra DOM / layout shift). */
-.metric-card.is-hot:has(#gpu-usage-value) .ring-progress {
-  animation: ring-gauge-hot-stroke-gpu 2s ease-in-out infinite;
-}
-
-@keyframes ring-gauge-hot-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
-    background-color: color-mix(in srgb, #ff9500 7%, transparent);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent),
-      0 0 8px color-mix(in srgb, #ff9500 14%, transparent);
-    background-color: color-mix(in srgb, #ff9500 10%, transparent);
-  }
-}
-
-@keyframes ring-gauge-hot-stroke {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 1px color-mix(in srgb, #ff9500 30%, transparent));
-  }
-  50% {
-    filter: drop-shadow(0 0 6px color-mix(in srgb, #ff9500 55%, transparent));
-  }
-}
-
-@keyframes ring-gauge-hot-stroke-gpu {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 2px color-mix(in srgb, #ff9500 40%, transparent));
-  }
-  50% {
-    filter: drop-shadow(0 0 10px color-mix(in srgb, #ff9500 70%, transparent));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .metric-card.is-hot,
-  .metric-card.is-hot .ring-progress {
-    animation: none;
-  }
-}
 
 /* Matching sparkline — same soft alert as the hot ring (7%/30%). Fair stays quieter. */
 .history-chart-container.is-hot {

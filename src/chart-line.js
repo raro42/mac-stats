@@ -56,9 +56,17 @@
 
   let canvases = {};
   let contexts = {};
+  const canvasLayoutCache = {};
+  const lastSample = {
+    temperature: NaN,
+    usage: NaN,
+    gpu: NaN,
+    frequency: NaN,
+  };
 
   function canvasLayoutSize(canvas) {
-    const dpr = window.devicePixelRatio || 1;
+    // Cap DPR: 2x/3x backing stores keep the compositor busy for 40px sparklines.
+    const dpr = Math.min(1, window.devicePixelRatio || 1);
     const rect = canvas.getBoundingClientRect();
     const width = rect.width > 0 ? rect.width : canvas.offsetWidth || 200;
     const height = rect.height > 0 ? rect.height : canvas.offsetHeight || 40;
@@ -70,9 +78,18 @@
     if (!canvas) return false;
     const { dpr, width, height } = canvasLayoutSize(canvas);
     if (width <= 0 || height <= 0) return false;
+    const prev = canvasLayoutCache[metric];
+    const same =
+      prev &&
+      prev.dpr === dpr &&
+      prev.width === width &&
+      prev.height === height &&
+      contexts[metric];
+    if (same) return true;
+    canvasLayoutCache[metric] = { dpr, width, height };
     canvas.width = width * dpr;
     canvas.height = height * dpr;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return false;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -92,6 +109,7 @@
     };
     contexts = {};
     Object.keys(canvases).forEach((metric) => {
+      delete canvasLayoutCache[metric];
       if (canvases[metric]) setupCanvas(metric);
     });
   }
@@ -199,10 +217,19 @@
     ctx.stroke();
   }
 
+  function sampleEpsilon(metric) {
+    if (metric === "frequency") return 0.03;
+    return 0.5;
+  }
+
   function updateCharts(metric, value) {
-    // Always buffer samples even if the canvas is not ready yet (zero-size layout,
-    // late GPU chart inject). Otherwise temperature can stay empty while the gauge
-    // already shows a live reading.
+    if (value === null || value === undefined || !Number.isFinite(value)) return;
+    const prev = lastSample[metric];
+    if (Number.isFinite(prev) && Math.abs(prev - value) < sampleEpsilon(metric)) {
+      return;
+    }
+    lastSample[metric] = value;
+    // Buffer even if the canvas is not ready yet (zero-size layout, late GPU inject).
     addValue(metric, value);
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
@@ -249,6 +276,15 @@
     };
     for (const [metric, getter] of Object.entries(getters)) {
       dataBuffers[metric].line = seriesFromHistory(points, getter, metric);
+      const line = dataBuffers[metric].line;
+      let last = NaN;
+      for (let i = line.length - 1; i >= 0; i--) {
+        if (Number.isFinite(line[i])) {
+          last = line[i];
+          break;
+        }
+      }
+      lastSample[metric] = last;
     }
     if (!canvases.usage) initializeCanvases();
     COLORS = getColors();
@@ -297,13 +333,14 @@
 
   function boot() {
     api.init();
-    window.addEventListener("resize", () => api.refreshLayout());
-    requestAnimationFrame(() => {
-      api.refreshLayout();
-      if (typeof window.seedThemeHistoryFromBackend === "function") {
-        void window.seedThemeHistoryFromBackend();
-      }
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => api.refreshLayout(), 200);
     });
+    if (typeof window.seedThemeHistoryFromBackend === "function") {
+      void window.seedThemeHistoryFromBackend();
+    }
   }
 
   if (document.readyState === "loading") {
