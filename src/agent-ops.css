@@ -7897,6 +7897,10 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.processes-kb-hint[hidden] {
+  display: none !important;
+}
+
 .disk-cleanup-scope-main {
   min-width: 0;
 }

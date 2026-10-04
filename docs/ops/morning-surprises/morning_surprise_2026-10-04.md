@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-04
 
-Overnight Track B kept the Debug Log viewer keyboard hint on first paint.
+Overnight Track B kept the Top Processes list keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1351** | Top Processes list keyboard hint is in the theme HTML above the process list. It no longer pops in after JavaScript loads. It stays hidden until the list has rows. The line says how to move across those rows. Keyboard tips stay out of the layout. |
 | **v0.1.1350** | Debug Log viewer keyboard hint is in the theme HTML above the log viewer. It no longer pops in after JavaScript loads. It stays hidden until the log has lines. The line says how to move across those lines. The last line points back to Refresh. Keyboard tips stay out of the layout. |
 | **v0.1.1349** | Perplexity results keyboard hint is in the theme HTML above the result list. It no longer pops in after JavaScript loads. It stays hidden until a search has results. The line says how to move across those results. Keyboard tips stay out of the layout. |
 | **v0.1.1348** | Perplexity search-box keyboard hint is in the theme HTML under the query and Search. It no longer pops in after JavaScript loads. Before a search, the line says how to move across those controls. After results exist, the line points the query back to the last result. Keyboard tips stay out of the layout. |
@@ -22,8 +23,9 @@ Overnight Track B kept the Debug Log viewer keyboard hint on first paint.
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.72d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.73d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~04:41 tick: Top Processes list keyboard hint first paint in theme HTML (**v0.1.1351**); install/kickstart.
 - ~04:20 tick: Debug Log viewer keyboard hint first paint in theme HTML (**v0.1.1350**); install/kickstart.
 - ~03:50 tick: Perplexity results keyboard hint first paint in theme HTML (**v0.1.1349**); install/kickstart.
 - ~03:28 tick: Perplexity search-box keyboard hint first paint in theme HTML (**v0.1.1348**); install/kickstart.

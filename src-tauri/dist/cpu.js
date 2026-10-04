@@ -9851,22 +9851,36 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
   ensureMonitorsListKbHint(monitorsList, items.length > 0);
 }
 
-/** Hint above Top Processes list (Monitors / Disk Cleanup kb-hint parity). */
+/** How to move across process rows when the list has rows. */
+const PROCESSES_LIST_KB_HINT =
+  'All · Pinned filters · click row for details · first row ↑ → Details last value · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+
+/** Theme HTML ships the hint above the process list. It stays hidden until rows exist. Create it only on older shells. */
 function ensureProcessesListKbHint(processList, show) {
-  if (!processList) return;
+  if (!processList || !processList.parentNode) return;
   let hint = document.getElementById('processes-kb-hint');
+  if (!hint) {
+    hint = processList.parentNode.querySelector(':scope > .processes-kb-hint');
+  }
   if (!show) {
-    hint?.remove();
+    if (hint) hint.hidden = true;
     return;
   }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'processes-kb-hint';
     hint.id = 'processes-kb-hint';
-    processList.parentNode?.insertBefore(hint, processList);
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = PROCESSES_LIST_KB_HINT;
+    processList.parentNode.insertBefore(hint, processList);
   }
-  hint.textContent =
-    'All · Pinned filters · click row for details · first row ↑ → Details last value · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+  if (!hint.id) hint.id = 'processes-kb-hint';
+  if (hint.nextElementSibling !== processList) {
+    processList.parentNode.insertBefore(hint, processList);
+  }
+  hint.hidden = false;
+  hint.textContent = PROCESSES_LIST_KB_HINT;
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
