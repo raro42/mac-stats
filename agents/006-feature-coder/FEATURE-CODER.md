@@ -2,6 +2,8 @@
 
 Agent-facing backlog for mac-stats. Pick an open row, implement, run `cargo check` / `cargo test` / `cargo clippy`, then mark done and note in `CHANGELOG.md` under the current version section (or `[Unreleased]` if not yet released) when behaviour changes.
 
+**GitHub issue loop:** If `agents/tasks/FEAT-<n>-*.md` or `WIP-<n>-*.md` exists (n = GitHub issue number, file links `raro42/mac-stats/issues/<n>`), implement **that** first. Do not pick a `FEAT-D*` table row while a GitHub task is open. Pickup: `agents/001-issue-reviewer.md`. Loop: `./agents/mac-stats-cursor-loop.sh`.
+
 ## Recently closed
 
 | ID | Item | Notes |

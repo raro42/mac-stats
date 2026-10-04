@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **GitHub issue agent loop** — `agents/mac-stats-cursor-loop.sh` polls open issues, writes `FEAT-<n>` tasks, and runs coder / tester / close using the existing `agents/` prompts. Linux: `python3 scripts/install_mac_stats_agent_units.py` (systemd + watchdog). Skips issue #3. Overnight autoresearch stays a separate harness.
+
 
 ## [0.1.1354] - 2026-10-04
 
