@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1344] - 2026-10-04
+
+### Changed
+- **Disk Cleanup meta keyboard hint on first paint** — the hint sits in the theme HTML under Reclaimable now, Next automatic run, Runs when, and Enabled scopes. It no longer pops in after JavaScript loads. The line says how to move across those cards. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1343] - 2026-10-04
 
 ### Changed

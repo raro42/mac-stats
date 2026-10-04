@@ -18070,20 +18070,32 @@ function ensureDiskCleanupMetaKbStyles() {
   document.head.appendChild(style);
 }
 
+/** How to move across Reclaim · Next · Runs when · Enabled scopes. */
+const DISK_CLEANUP_META_KB_HINT =
+  '← → / h l · Home/End move · Enter / Space opens reclaim / next / runs / scopes';
+
+/** Theme HTML ships the hint under the meta cards. Create it only on older shells. */
 function ensureDiskCleanupMetaKbHint() {
   ensureDiskCleanupMetaKbStyles();
   const wrap = document.querySelector('.disk-cleanup-meta');
   if (!wrap) return;
   let hint = document.getElementById('disk-cleanup-meta-kb-hint');
   if (!hint) {
+    hint = wrap.querySelector('.disk-cleanup-meta-kb-hint');
+  }
+  if (!hint) {
     hint = document.createElement('div');
     hint.id = 'disk-cleanup-meta-kb-hint';
     hint.className = 'disk-cleanup-meta-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = DISK_CLEANUP_META_KB_HINT;
     wrap.appendChild(hint);
   }
-  hint.textContent =
-    '← → / h l · Home/End move · Enter / Space opens reclaim / next / runs / scopes';
+  if (!hint.id) hint.id = 'disk-cleanup-meta-kb-hint';
+  if (hint.parentElement !== wrap) {
+    wrap.appendChild(hint);
+  }
+  hint.textContent = DISK_CLEANUP_META_KB_HINT;
 }
 
 /**
