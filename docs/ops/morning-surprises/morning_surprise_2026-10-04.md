@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-04
 
-Overnight Track B kept the Disk Cleanup action toolbar keyboard hint on first paint.
+Overnight Track B kept the Disk Cleanup add-scope keyboard hint on first paint.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1346** | Disk Cleanup add-scope keyboard hint is in the theme HTML under the label, path, days, Recursive, and Add scope fields. It no longer pops in after JavaScript loads. The line says how to move across those fields. Keyboard tips stay out of the layout. |
 | **v0.1.1345** | Disk Cleanup action toolbar keyboard hint is in the theme HTML under Clean now, Refresh, and Save scopes. It no longer pops in after JavaScript loads. The line says how to move across those buttons. Keyboard tips stay out of the layout. |
 | **v0.1.1344** | Disk Cleanup meta keyboard hint is in the theme HTML under Reclaimable now, Next automatic run, Runs when, and Enabled scopes. It no longer pops in after JavaScript loads. The line says how to move across those cards. Keyboard tips stay out of the layout. |
 | **v0.1.1343** | Header toolbar keyboard hint is in the theme HTML under Refresh and Settings. It no longer pops in after JavaScript loads. The line says how to move across those buttons. At the end, the keys go to the CPU ring (or Credentials when Settings is open). At the start, the keys go to the Top Processes filters or the footer. Keyboard tips stay out of the layout. |
@@ -17,8 +18,9 @@ Overnight Track B kept the Disk Cleanup action toolbar keyboard hint on first pa
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.62d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~18.65d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~02:35 tick: Disk Cleanup add-scope keyboard hint first paint in theme HTML (**v0.1.1346**); install/kickstart.
 - ~02:00 tick: Disk Cleanup action toolbar keyboard hint first paint in theme HTML (**v0.1.1345**); install/kickstart.
 - ~01:30 tick: Disk Cleanup meta keyboard hint first paint in theme HTML (**v0.1.1344**); install/kickstart.
 - ~01:08 tick: header toolbar keyboard hint first paint in theme HTML (**v0.1.1343**); install/kickstart.

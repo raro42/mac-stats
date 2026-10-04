@@ -18259,20 +18259,33 @@ function refreshDiskCleanupAddScopeToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/** How to move across label · path · days · Recursive · Add scope. */
+const DISK_CLEANUP_ADD_SCOPE_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · ↑ scopes last · ↓ categories first · Enter adds from fields';
+
+/** Theme HTML ships the hint under the add-scope fields. Create it only on older shells. */
 function ensureDiskCleanupAddScopeToolbarKbHint(wrap) {
   const form = wrap || document.querySelector('.disk-cleanup-add-scope');
   if (!form) return;
-  let hint = form.querySelector('.disk-cleanup-add-scope-toolbar-kb-hint');
+  let hint = document.getElementById('disk-cleanup-add-scope-toolbar-kb-hint');
+  if (!hint) {
+    hint = form.querySelector('.disk-cleanup-add-scope-toolbar-kb-hint');
+  }
   if (!hint) {
     hint = document.createElement('div');
+    hint.id = 'disk-cleanup-add-scope-toolbar-kb-hint';
     hint.className = 'disk-cleanup-add-scope-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.textContent = DISK_CLEANUP_ADD_SCOPE_TOOLBAR_KB_HINT;
+    form.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'disk-cleanup-add-scope-toolbar-kb-hint';
+  if (hint.parentElement !== form) {
     form.appendChild(hint);
   }
   const items = getDiskCleanupAddScopeToolbarItems(form);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · ↑ scopes last · ↓ categories first · Enter adds from fields';
+  hint.textContent = DISK_CLEANUP_ADD_SCOPE_TOOLBAR_KB_HINT;
 }
 
 /**
