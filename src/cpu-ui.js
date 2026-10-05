@@ -164,7 +164,9 @@
       return false;
     }
     if (title.hidden || closeBtn.hidden || closeBtn.disabled) return false;
-    const shell = header.closest("#process-details-modal, #changelog-modal");
+    const shell = header.closest(
+      "#process-details-modal, #changelog-modal, #settings-modal"
+    );
     if (shell) {
       if (
         shell.hidden ||
@@ -185,11 +187,12 @@
   function seededModalHeaderKbClass(titleId) {
     if (titleId === "process-details-title") return "process-details-header-kb-hint";
     if (titleId === "changelog-modal-title") return "changelog-header-kb-hint";
+    if (titleId === "settings-title") return "settings-header-kb-hint";
     return "";
   }
 
   /**
-   * Theme HTML ships Process Details and Changelog hints between the title and Close.
+   * Theme HTML ships Process Details, Changelog, and Settings hints between the title and Close.
    * They stay hidden until both controls are on screen. Create them only on older shells.
    */
   function ensureModalHeaderKbHint(header, titleId, closeId, closeSelector, hintText) {
