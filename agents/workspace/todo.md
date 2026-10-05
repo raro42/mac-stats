@@ -5,7 +5,7 @@
 - [x] Fix harness_ops `contains("age")` false positives (tester gate)
 - [x] `cargo check` in src-tauri/
 - [x] Version bump + CHANGELOG + task → UNTESTED-
-- [ ] Commit and push origin/main (do not close GitHub #14)
+- [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 v0.1.1390: further cut open-window work (15s polls, 5s backend loop when visible, CSS contain, fewer sparkline points) and fix age-token matcher false positives so `cargo test` harness_ops passes on Linux. macOS Activity Monitor remains the <1% acceptance gate.
