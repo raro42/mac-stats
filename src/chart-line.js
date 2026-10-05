@@ -7,7 +7,7 @@
   "use strict";
 
   // Fewer points = less canvas work per sample (#14).
-  const LINE_CHART_POINTS = 12;
+  const LINE_CHART_POINTS = 8;
   const EMPTY_POINT = NaN;
   let cachedSparklineBackdrop = null;
 

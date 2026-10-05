@@ -331,9 +331,11 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 45000;
+const CPU_WINDOW_REFRESH_MS = 60000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
-const DISCORD_ICON_STATUS_MS = 30000;
+const DISCORD_ICON_STATUS_MS = 60000;
+/** Top Processes list / glance cadence (match PROCESS_CACHE_TTL_SECS in metrics). */
+const PROCESS_LIST_REFRESH_MS = 60000;
 let discordIconStatusInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
@@ -2284,7 +2286,7 @@ async function refresh() {
     const now = Date.now();
     const forceUpdate = window._forceProcessUpdate === true;
     const isInitialLoad = lastProcessUpdate === 0;
-    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 45000) {
+    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= PROCESS_LIST_REFRESH_MS) {
       lastProcessUpdate = now;
       window._forceProcessUpdate = false; // Reset flag after use
       
@@ -5602,7 +5604,7 @@ function resumeIdleWindowPolls() {
           updateMonitorsHeight();
         });
       }
-    }, 30000);
+    }, 60000);
   }
 }
 
@@ -6649,7 +6651,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Live metrics every 30s. Faster polls forced full work + DOM rebuild (#14).
+    // Live metrics every 60s. Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -6663,7 +6665,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 30000);
+    }, 60000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);
@@ -7034,7 +7036,7 @@ function initMonitorsSection() {
       }
       monitorsUpdateInterval = setInterval(() => {
         updateMonitorsSummary();
-      }, 30000);
+      }, 60000);
     } else {
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -7046,7 +7048,7 @@ function initMonitorsSection() {
         loadMonitors().then(() => {
           updateMonitorsHeight();
         });
-      }, 30000);
+      }, 60000);
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
@@ -19433,8 +19435,8 @@ function stopLogsAutoRefresh() {
 
 function startLogsAutoRefresh() {
   stopLogsAutoRefresh();
-  // 10s is enough for live tails; 2s kept WebKit + IPC hot while Debug Log was open (#14).
-  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 10000);
+  // 30s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
+  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 30000);
 }
 
 function formatDiskBytes(n) {

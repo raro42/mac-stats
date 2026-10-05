@@ -22,17 +22,18 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1393** (follow-up after v0.1.1392 tester FAIL).
+Version **v0.1.1394** (follow-up after v0.1.1393 tester FAIL).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
 
 Changes:
 
-- `src/cpu.js` — metrics poll 45s; process list cadence 45s; collapsed Top Processes → glance chips only; Debug Log auto-refresh 10s.
-- `src/history.js` — data-poster history poll 45s.
-- `src/chart-line.js` — sparkline buffer 12 points; cache opaque backdrop color.
-- `src-tauri/src/lib.rs` — backend metric loop 15s.
-- `src-tauri/dist/themes/{apple,light,dark}/cpu.css` — opaque action / power-strip chrome (no always-visible translucent blend).
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 60` (was 5s rate-limited path / 10s full path). Stops `refresh_processes(All)` on almost every `get_cpu_details` while the CPU window is open.
+- `src/cpu.js` — metrics poll 60s; process list 60s; Discord / monitors 60s; Process Details 60s; Debug Log auto-refresh 30s.
+- `src/history.js` — data-poster history poll 60s.
+- `src/chart-line.js` — sparkline buffer 8 points.
+- `src/agent-ops.js` — Agent Ops refresh 60s.
+- `src-tauri/src/lib.rs` — backend metric loop 20s.
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
 

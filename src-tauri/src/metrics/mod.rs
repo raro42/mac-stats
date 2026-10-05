@@ -1661,11 +1661,16 @@ pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// How long a Top Processes snapshot stays fresh while the CPU window is open.
+/// Must stay ≥ the CPU-window process-list poll (60s). A 5–10s TTL forced
+/// `refresh_processes(All)` on almost every `get_cpu_details` while the window
+/// was visible and kept Graphics and Media / host CPU hot (#14).
+const PROCESS_CACHE_TTL_SECS: u64 = 60;
+
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
     // STEP 5: Rate limiting - prevent get_cpu_details from being called too frequently
-    // BUT: Always allow process cache age check - processes need to refresh every 5s
-    // Rate limit other expensive operations, but check process cache on every call
+    // Process list still refreshes when PROCESS_CACHE is older than PROCESS_CACHE_TTL_SECS.
     let should_allow_full_call = match crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
         Ok(mut last_call) => {
             let now = std::time::Instant::now();
@@ -1686,14 +1691,13 @@ pub fn get_cpu_details() -> CpuDetails {
         }
     };
 
-    // CRITICAL: Always check process cache age, even if rate-limited
-    // This ensures processes refresh every 5 seconds as requested
+    // Still honour process-cache TTL on the rate-limited path (without a full metrics rebuild).
     let should_check_process_cache = true;
 
     if !should_allow_full_call {
         debug3!("get_cpu_details() rate limited - returning cached values for most metrics");
         // Return cached values immediately without doing expensive work
-        // BUT: Still check and refresh process cache if stale (>5s)
+        // BUT: Still check and refresh process cache if stale (>PROCESS_CACHE_TTL_SECS)
         let (usage, load, uptime_secs, ram_percent, ram_used_bytes, ram_total_bytes) =
             match crate::state::SYSTEM.try_lock() {
             Ok(sys) => {
@@ -1766,8 +1770,8 @@ pub fn get_cpu_details() -> CpuDetails {
                 .unwrap_or(0.0),
         );
 
-        // CRITICAL: Check process cache age even when rate-limited
-        // If stale (>5s), refresh it now (process refresh is the priority)
+        // Check process cache age even when rate-limited.
+        // If stale (>PROCESS_CACHE_TTL_SECS), refresh it now.
         let processes = if should_check_process_cache {
             let should_collect_processes = crate::state::APP_HANDLE
                 .get()
@@ -1783,7 +1787,7 @@ pub fn get_cpu_details() -> CpuDetails {
                     Ok(cache) => {
                         if let Some((procs, timestamp)) = cache.as_ref() {
                             let age_secs = timestamp.elapsed().as_secs();
-                            if age_secs >= 5 {
+                            if age_secs >= PROCESS_CACHE_TTL_SECS {
                                 // Cache is stale - refresh now even if rate-limited
                                 debug3!("Process cache is stale ({}s) - refreshing now (even though rate-limited)", age_secs);
                                 // Need SYSTEM lock to refresh processes
@@ -1973,9 +1977,8 @@ pub fn get_cpu_details() -> CpuDetails {
 
                 // Only collect processes if window is visible (saves CPU when window is closed)
                 let processes = if should_collect_processes {
-                    // STEP 4: Cache process list for 5 seconds when window is open (refresh every 5s)
-                    // CRITICAL: Always check cache first and return immediately if available
-                    // This prevents blocking on expensive refresh_processes() when window first opens
+                    // Cache process list for PROCESS_CACHE_TTL_SECS while the window is open (#14).
+                    // Always check cache first and return immediately if available.
                     let cached_processes = match PROCESS_CACHE.try_lock() {
                         Ok(cache) => cache.as_ref().map(|(procs, timestamp)| {
                             let age_secs = timestamp.elapsed().as_secs();
@@ -1984,23 +1987,20 @@ pub fn get_cpu_details() -> CpuDetails {
                         Err(_) => None, // Lock held, skip cache check
                     };
 
-                    // If we have cached data, check if it's still fresh (<10 seconds)
-                    // OPTIMIZATION Phase 1: Increased from 5s to 10s to reduce process enumeration overhead
-                    // BUT: If cache is empty (None), always refresh immediately for instant display
+                    // Fresh cache: return immediately. Empty cache: refresh for first paint.
                     if let Some((cached_procs, age_secs)) = cached_processes {
-                        if age_secs < 10 {
-                            // Cache is less than 10 seconds old - return immediately
-                            // This prevents blocking and reduces CPU usage
+                        if age_secs < PROCESS_CACHE_TTL_SECS {
                             debug3!(
-                                "Returning cached process list (age: {}s) - refresh every 10s",
-                                age_secs
+                                "Returning cached process list (age: {}s) - refresh every {}s",
+                                age_secs,
+                                PROCESS_CACHE_TTL_SECS
                             );
                             cached_procs
                         } else {
-                            // Cache is stale (>5s) - refresh now
                             debug3!(
-                                "Process cache is stale ({}s), refreshing now (5s interval)",
-                                age_secs
+                                "Process cache is stale ({}s), refreshing now ({}s interval)",
+                                age_secs,
+                                PROCESS_CACHE_TTL_SECS
                             );
                             use sysinfo::ProcessesToUpdate;
                             sys.refresh_processes(ProcessesToUpdate::All, true);
