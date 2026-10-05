@@ -1115,12 +1115,14 @@ padding: 18px 18px 16px;
   height: 14px;
   display: block;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(1) opacity(0.45);
-  opacity: 1;
+  /* Opacity only — multi-step CSS filters keep Graphics and Media busy (#14). */
+  filter: none;
+  opacity: 0.45;
 }
 
 .icon-line-item:hover img {
-  filter: brightness(0) saturate(100%) invert(1) opacity(0.75);
+  filter: none;
+  opacity: 0.75;
 }
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
@@ -1146,7 +1148,7 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-good img {
-  filter: brightness(0) saturate(100%) invert(68%) sepia(40%) saturate(500%) hue-rotate(85deg) brightness(100%) contrast(90%);
+  filter: none;
   opacity: 0.9;
 }
 
@@ -1169,7 +1171,7 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-warning img {
-  filter: brightness(0) saturate(100%) invert(75%) sepia(45%) saturate(700%) hue-rotate(5deg) brightness(105%) contrast(90%);
+  filter: none;
   opacity: 0.85;
 }
 
@@ -1198,7 +1200,7 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-bad img {
-  filter: brightness(0) saturate(100%) invert(45%) sepia(70%) saturate(2000%) hue-rotate(340deg) brightness(105%) contrast(95%);
+  filter: none;
   opacity: 0.9;
 }
 

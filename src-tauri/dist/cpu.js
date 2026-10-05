@@ -331,7 +331,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 20000;
+const CPU_WINDOW_REFRESH_MS = 30000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
 const DISCORD_ICON_STATUS_MS = 30000;
 let discordIconStatusInterval = null;
@@ -2164,9 +2164,6 @@ async function refresh() {
     // Update power consumption (with caching to prevent flickering)
     const cpuPowerEl = document.getElementById("cpu-power");
     if (!data.can_read_cpu_power) {
-      console.log("[CPU Power] Cannot read CPU power");
-      console.log("[CPU Power] Failed attempts: ", failedAttempts.cpuPower);
-      console.log("[CPU Power] Should show hint: ", cpuPowerEl);
       failedAttempts.cpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
@@ -2205,7 +2202,6 @@ async function refresh() {
       if (data.cpu_power && data.cpu_power > 0) {
         cpuPowerValue = data.cpu_power;
         previousValues.cpuPower = data.cpu_power;
-        console.log("[CPU Power] Updated to: ", data.cpu_power, "from: ", previousValues.cpuPower);
       }
       // If backend value is 0 or undefined, keep using previousValues (don't reset to 0)
       
@@ -2216,7 +2212,6 @@ async function refresh() {
         cpuPowerValue > 0 ? `${cpuPowerValue.toFixed(1)} W` : "None yet";
       // Only update DOM if value actually changed
       if (cpuPowerEl.textContent !== formatted) {
-        console.log("[CPU Power] Updating DOM to: ", formatted);
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = formatted;
         });
@@ -3834,7 +3829,11 @@ function tryChainSparklineToRingLastDirect() {
 
 /** Apply menu-bar amber hot washes on ring cards + matching history charts. */
 function updateRingHotStates(data) {
-  removeRingsFilterChips();
+  // Strip legacy Hot chrome once (not every metrics tick).
+  if (!window.__macStatsRingsHotChromeCleared) {
+    removeRingsFilterChips();
+    window.__macStatsRingsHotChromeCleared = true;
+  }
   const usage =
     typeof data?.usage === 'number' && Number.isFinite(data.usage)
       ? data.usage
@@ -6623,7 +6622,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Live metrics every 15s (was 5s). Faster polls forced full work + DOM rebuild (#14).
+    // Live metrics every 30s. Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -6637,7 +6636,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 15000);
+    }, 30000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);

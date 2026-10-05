@@ -1,11 +1,12 @@
-# Session todo — GitHub #14 tauri://localhost CPU (follow-up #6)
+# Session todo — GitHub #14 tauri://localhost CPU (follow-up #7)
 
-- [x] Pick WIP-14 (lowest GitHub FEAT/WIP)
-- [x] Flatten Light shell gradients; slower polls; fewer sparkline points; process-details 15s
-- [x] Isolate rust-native digest test from shared latest.json race
+- [x] Cut hot-path IPC: tauri-logger warn/error only; drop CPU Power console.log spam
+- [x] Slower open-window work: metrics/history 30s, 16 sparkline points, process details 30s, backend 12s
+- [x] Apple/Light/Dark CSS: drop expensive icon `img` filter chains
+- [x] Fix Linux unused `cpu_window_visible` in metric loop
 - [x] `cargo check` in src-tauri/
 - [x] Version bump + CHANGELOG + task → UNTESTED-
 - [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
-v0.1.1391: further cut open-window work (20s polls, 8s backend loop, 24 sparkline points, Light/Dark compositor flatten, process-details 15s) and isolate native digest test from shared latest.json races. macOS Activity Monitor remains the <1% acceptance gate.
+v0.1.1392: cut open-window IPC and compositor work (30s polls, 12s backend loop, 16 sparkline points, warn/error-only tauri-logger, opacity-only icon imgs). macOS Activity Monitor remains the <1% acceptance gate.

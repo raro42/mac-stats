@@ -1338,13 +1338,14 @@ body {
   height: 14px;
   display: block;
   object-fit: contain;
-  /* Soft neutral glyph for raster/SVG logos (Ollama) */
-  filter: brightness(0) saturate(100%) invert(45%) opacity(0.55);
-  opacity: 1;
+  /* Opacity only — multi-step CSS filters keep Graphics and Media busy (#14). */
+  filter: none;
+  opacity: 0.55;
 }
 
 .icon-line-item:hover img {
-  filter: brightness(0) saturate(100%) invert(35%) opacity(0.7);
+  filter: none;
+  opacity: 0.75;
 }
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
@@ -1370,12 +1371,12 @@ body {
 }
 
 .icon-line-item.status-good img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(550%) hue-rotate(95deg) brightness(95%) contrast(88%);
+  filter: none;
   opacity: 0.85;
 }
 
 .icon-line-item.status-good:hover img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(550%) hue-rotate(95deg) brightness(100%) contrast(90%);
+  filter: none;
   opacity: 0.95;
 }
 
@@ -1394,7 +1395,7 @@ body {
 }
 
 .icon-line-item.status-warning img {
-  filter: brightness(0) saturate(100%) invert(62%) sepia(55%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%);
+  filter: none;
   opacity: 0.8;
 }
 
@@ -1423,7 +1424,7 @@ body {
 }
 
 .icon-line-item.status-bad img {
-  filter: brightness(0) saturate(100%) invert(28%) sepia(70%) saturate(1800%) hue-rotate(340deg) brightness(95%) contrast(95%);
+  filter: none;
   opacity: 0.85;
 }
 

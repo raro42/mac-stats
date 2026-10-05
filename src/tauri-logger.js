@@ -90,14 +90,14 @@
     return 'js';
   }
   
+  // Forward warn/error only. Idle metrics refresh used to spam console.log →
+  // log_from_js IPC every tick and keep tauri://localhost busy (#14).
   console.log = function(...args) {
     originalLog.apply(console, args);
-    forwardToTauri('log', args, getSource());
   };
   
   console.info = function(...args) {
     originalInfo.apply(console, args);
-    forwardToTauri('info', args, getSource());
   };
   
   console.warn = function(...args) {
@@ -112,6 +112,5 @@
   
   console.debug = function(...args) {
     originalDebug.apply(console, args);
-    forwardToTauri('debug', args, getSource());
   };
 })();

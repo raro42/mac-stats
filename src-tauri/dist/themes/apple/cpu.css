@@ -563,18 +563,7 @@ border-radius: 24px;
   box-shadow: var(--panel-shadow, 0 32px 100px rgba(0, 0, 0, 0.20));
 padding: 18px 18px 16px;
   overflow: hidden;
-  animation: settings-card-in 0.22s ease-out;
-}
-
-@keyframes settings-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  animation: none; /* was settings-card-in; WebView CPU (#14) */
 }
 
 .settings-header {
@@ -1526,13 +1515,14 @@ padding: 18px 18px 16px;
   height: 14px;
   display: block;
   object-fit: contain;
-  /* Soft neutral glyph for raster/SVG logos (Ollama) */
-  filter: brightness(0) saturate(100%) invert(45%) opacity(0.55);
-  opacity: 1;
+  /* Opacity only — multi-step CSS filters keep Graphics and Media busy (#14). */
+  filter: none;
+  opacity: 0.55;
 }
 
 .icon-line-item:hover img {
-  filter: brightness(0) saturate(100%) invert(35%) opacity(0.7);
+  filter: none;
+  opacity: 0.75;
 }
 
 /* Soft ok (Ready calm / Monitors all-up 7%/28% parity). */
@@ -1558,12 +1548,12 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-good img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(550%) hue-rotate(95deg) brightness(95%) contrast(88%);
+  filter: none;
   opacity: 0.85;
 }
 
 .icon-line-item.status-good:hover img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(550%) hue-rotate(95deg) brightness(100%) contrast(90%);
+  filter: none;
   opacity: 0.95;
 }
 
@@ -1582,7 +1572,7 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-warning img {
-  filter: brightness(0) saturate(100%) invert(62%) sepia(55%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%);
+  filter: none;
   opacity: 0.8;
 }
 
@@ -1611,7 +1601,7 @@ padding: 18px 18px 16px;
 }
 
 .icon-line-item.status-bad img {
-  filter: brightness(0) saturate(100%) invert(28%) sepia(70%) saturate(1800%) hue-rotate(340deg) brightness(95%) contrast(95%);
+  filter: none;
   opacity: 0.85;
 }
 
@@ -2767,18 +2757,7 @@ padding: 0;
   line-height: 1.6;
   word-wrap: break-word;
   white-space: pre-wrap;
-  animation: chat-message-in 0.22s ease-out;
-}
-
-@keyframes chat-message-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  animation: none; /* was chat-message-in; WebView CPU (#14) */
 }
 
 .chat-message .markdown {

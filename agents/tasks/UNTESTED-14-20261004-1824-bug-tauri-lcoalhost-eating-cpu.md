@@ -22,23 +22,23 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1391** (follow-up after v0.1.1390 tester FAIL).
+Version **v0.1.1392** (follow-up after v0.1.1391 tester FAIL).
 
-Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and timer work.
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
 
 Changes:
 
-- `src/cpu.js` — metrics poll 20s (was 15s); Process Details live refresh 15s (was 5s).
-- `src/history.js` — data-poster history poll 20s.
-- `src/chart-line.js` — sparkline buffer 24 points (was 36).
-- `src-tauri/src/lib.rs` — backend metric loop 8s open or idle (was 5s).
-- `src-tauri/dist/themes/light/cpu.css` — flat opaque body/shell (drop stacked radial + soft shadow).
-- `src-tauri/dist/themes/dark/cpu.css` — drop glass-panel glow shadow.
-- `src-tauri/src/commands/harness_ops.rs` — `write_digest_native` returns summary from the write; `MAC_STATS_DIGEST_JSON` isolates the unit test from shared `latest.json` races.
+- `src/tauri-logger.js` — forward warn/error only (drop console.log / info / debug → `log_from_js` IPC).
+- `src/cpu.js` — metrics poll 30s; Process Details live refresh 30s; remove hot-path CPU Power `console.log`; clear legacy Hot chrome once per session.
+- `src/history.js` — data-poster history poll 30s.
+- `src/chart-line.js` — sparkline buffer 16 points.
+- `src-tauri/src/lib.rs` — backend metric loop 12s; `cpu_window_visible` gated to macOS (fixes Linux unused warning).
+- `src-tauri/dist/themes/{apple,light,dark}/cpu.css` — drop multi-step icon `img` CSS filters (opacity only); Apple entrance animations already off.
+- `src-tauri/src/ui/status_bar_linux.rs` — clippy unused-parens on `WEBKIT_DISABLE_COMPOSITING_MODE` guard.
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
 
-## Prior test report (v0.1.1390)
+## Prior test report (v0.1.1391)
 
 **Result: FAIL** → moved back to WIP
 
@@ -46,6 +46,6 @@ Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphi
 
 **Why not CLOSED**
 1. Issue acceptance is **&lt;1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
-2. Full `cargo test` had a flaky shared-path digest assertion (`rust_native_digest_writes_json`) — addressed in v0.1.1391.
+2. Linux WebKit floor (blank `cpu.html` near a full core) still blocks proving the product cut meets the issue bar here.
 
 Do **not** close GitHub #14.
