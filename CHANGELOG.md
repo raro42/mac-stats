@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1404] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Sparkline canvases park (1×1 backing store) on window blur / `document.hidden`, then redraw on focus. Paint / ring / DOM rAF / metrics refresh skip when the window lacks focus (macOS often stays `visibilityState=visible` when occluded). History chart containers use `content-visibility: auto` + `contain: paint`. Data-poster history path caps DPR at 1 and uses opaque canvases. Ring gauges skip paints under ~30%. Aim: quieter `tauri://localhost` / Graphics and Media while another app is frontmost.
+
+
 ## [0.1.1403] - 2026-10-06
 
 ### Changed

@@ -59,12 +59,54 @@
   let canvases = {};
   let contexts = {};
   const canvasLayoutCache = {};
+  let canvasesParked = false;
   const lastSample = {
     temperature: NaN,
     usage: NaN,
     gpu: NaN,
     frequency: NaN,
   };
+
+  /** macOS often keeps visibilityState=visible when another app is frontmost (#14). */
+  function windowOccluded() {
+    if (typeof document === "undefined") return false;
+    if (document.hidden) return true;
+    try {
+      if (typeof document.hasFocus === "function" && !document.hasFocus()) {
+        return true;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+    return false;
+  }
+
+  /** Drop GPU backing stores while occluded — keeps last buffer for unpark redraw (#14). */
+  function parkCanvases() {
+    canvasesParked = true;
+    Object.keys(canvases).forEach((metric) => {
+      const canvas = canvases[metric];
+      if (!canvas) return;
+      try {
+        canvas.width = 1;
+        canvas.height = 1;
+      } catch (_) {
+        /* ignore */
+      }
+      delete contexts[metric];
+      delete canvasLayoutCache[metric];
+    });
+  }
+
+  function unparkCanvases() {
+    if (!canvasesParked && Object.keys(contexts).length) return;
+    canvasesParked = false;
+    initializeCanvases();
+    COLORS = getColors();
+    Object.keys(dataBuffers).forEach((metric) => {
+      if (contexts[metric] && canvasIsPaintable(metric)) drawLineChart(metric);
+    });
+  }
 
   function canvasLayoutSize(canvas) {
     // Cap DPR: 2x/3x backing stores keep the compositor busy for 40px sparklines.
@@ -255,8 +297,8 @@
     lastSample[metric] = value;
     // Buffer even if the canvas is not ready yet (zero-size layout, late GPU inject).
     addValue(metric, value);
-    // Hidden window: keep the buffer, skip WebKit canvas invalidation (#14).
-    if (typeof document !== "undefined" && document.hidden) return;
+    // Occluded / parked: keep the buffer, skip WebKit canvas invalidation (#14).
+    if (canvasesParked || windowOccluded()) return;
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
     }
@@ -312,7 +354,7 @@
       }
       lastSample[metric] = last;
     }
-    if (typeof document !== "undefined" && document.hidden) return true;
+    if (canvasesParked || windowOccluded()) return true;
     if (!canvases.usage) initializeCanvases();
     COLORS = getColors();
     Object.keys(dataBuffers).forEach((metric) => {
@@ -328,7 +370,14 @@
     updateGpu: (value) => updateCharts("gpu", value),
     updateFrequency: (value) => updateCharts("frequency", value),
     seedFromPoints,
+    park: parkCanvases,
+    unpark: unparkCanvases,
     init: () => {
+      if (windowOccluded()) {
+        canvasesParked = true;
+        return;
+      }
+      canvasesParked = false;
       initializeCanvases();
       COLORS = getColors();
       Object.keys(canvases).forEach((metric) => {
@@ -336,6 +385,11 @@
       });
     },
     refreshLayout: () => {
+      if (windowOccluded()) {
+        parkCanvases();
+        return;
+      }
+      canvasesParked = false;
       initializeCanvases();
       COLORS = getColors();
       Object.keys(canvases).forEach((metric) => {
@@ -368,6 +422,13 @@
         if (resizeTimer) clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => api.refreshLayout(), 200);
       });
+      // Release sparkline GPU buffers when occluded; redraw on focus (#14).
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) parkCanvases();
+        else unparkCanvases();
+      });
+      window.addEventListener("blur", parkCanvases);
+      window.addEventListener("focus", unparkCanvases);
       if (typeof window.seedThemeHistoryFromBackend === "function") {
         void window.seedThemeHistoryFromBackend();
       }

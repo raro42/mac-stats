@@ -246,9 +246,23 @@ function thermalLevelFromCpuDetails(data) {
 let pendingDOMUpdates = [];
 let domUpdateScheduled = false;
 
+/** macOS often keeps visibilityState=visible when another app is frontmost (#14). */
+function windowOccluded() {
+  if (typeof document === "undefined") return false;
+  if (document.hidden) return true;
+  try {
+    if (typeof document.hasFocus === "function" && !document.hasFocus()) {
+      return true;
+    }
+  } catch (_) {
+    /* ignore */
+  }
+  return false;
+}
+
 function scheduleDOMUpdate(updateFn) {
-  // Hidden window: do not wake WebKit with rAF batches (#14).
-  if (typeof document !== "undefined" && document.hidden) return;
+  // Occluded window: do not wake WebKit with rAF batches (#14).
+  if (windowOccluded()) return;
   pendingDOMUpdates.push(updateFn);
   if (!domUpdateScheduled) {
     domUpdateScheduled = true;
@@ -281,8 +295,8 @@ const ringAnimations = new Map();
 const CIRCUMFERENCE = 2 * Math.PI * 42; // radius = 42
 
 function updateRingGauge(ringId, percent, key) {
-  // Hidden window: skip SVG invalidation (#14).
-  if (typeof document !== "undefined" && document.hidden) return;
+  // Occluded window: skip SVG invalidation (#14).
+  if (windowOccluded()) return;
   const clamped = Math.max(0, Math.min(100, percent));
   const progressEl = document.getElementById(ringId);
   if (!progressEl) return;
@@ -297,8 +311,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~25% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.25 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~30% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.30 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -1602,7 +1616,7 @@ let lastMetricsRefreshMs = 0;
 
 async function refresh() {
   // Blur/visibility pause clears the interval; still guard stray invokes (#14).
-  if (typeof document !== "undefined" && document.hidden) return;
+  if (windowOccluded()) return;
   if (!invoke) {
     invoke = getInvoke();
     if (!invoke) {
@@ -5591,10 +5605,19 @@ function pauseIdleWindowPolls() {
   if (typeof window.__macStatsPauseAgentOpsPolls === "function") {
     window.__macStatsPauseAgentOpsPolls();
   }
+  // Drop sparkline GPU backing stores while occluded (#14).
+  const hist = window.themeHistory;
+  if (hist && typeof hist.park === "function") {
+    hist.park();
+  }
 }
 
 function resumeIdleWindowPolls() {
   if (document.hidden) return;
+  const hist = window.themeHistory;
+  if (hist && typeof hist.unpark === "function") {
+    hist.unpark();
+  }
   startDiscordIconStatus();
   startLogsGlancePoll();
   startHistoryAvailabilityPoll();

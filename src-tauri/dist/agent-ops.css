@@ -52,6 +52,25 @@
 }
 
 /*
+ * History sparklines stay mounted while the window is open. Contain paint so
+ * WebKit does not keep large canvas layers hot when charts are off-screen (#14).
+ */
+.history-chart-container,
+.history-charts,
+#history-section .history-chart-container {
+  content-visibility: auto;
+  contain: paint;
+}
+
+.history-chart-container canvas,
+#temperature-history-chart,
+#usage-history-chart,
+#gpu-history-chart,
+#frequency-history-chart {
+  contain: strict;
+}
+
+/*
  * Theme CPU windows pin body/shell to 100vh with overflow:hidden and often
  * max-width:560px — so widening the OS window does nothing and Agent Ops
  * gets clipped. These rules make the shell fill the window and scroll.

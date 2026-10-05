@@ -22,6 +22,23 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1404** (follow-up after v0.1.1403).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (compositor / occlusion; prior 3600s poll floor kept):
+
+- `src/chart-line.js` — park sparkline canvases to 1×1 on blur / `document.hidden`; unpark + redraw on focus; skip paints when `!document.hasFocus()` (macOS occlusion); expose `themeHistory.park` / `unpark`.
+- `src/cpu.js` — `windowOccluded()` (`document.hidden` or `!hasFocus`); skip `refresh` / ring / DOM rAF while occluded; `pauseIdleWindowPolls` / `resumeIdleWindowPolls` call park/unpark; ring paints skip under ~30%.
+- `src/history.js` — data-poster: park canvases on blur/focus; DPR capped at 1; opaque `getContext('2d', { alpha: false })`.
+- `src/agent-ops.css` — history chart containers `content-visibility: auto` + `contain: paint`; canvases `contain: strict`.
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and hot washes still update when focused. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1403)
+
 Version **v0.1.1403** (follow-up after v0.1.1402).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

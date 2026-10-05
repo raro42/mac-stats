@@ -126,45 +126,72 @@
 
   // Canvas contexts - initialize immediately (like poster-charts.js)
   const contexts = {};
-  
-  // Initialize canvas contexts immediately (synchronously, like poster-charts.js)
-  Object.keys(canvases).forEach(metric => {
-    if (canvases[metric]) {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvases[metric].getBoundingClientRect();
-      // Use rect size or fallback to offsetWidth/Height or defaults
-      let width = rect.width > 0 ? rect.width : canvases[metric].offsetWidth || 200;
-      let height = rect.height > 0 ? rect.height : canvases[metric].offsetHeight || 40;
-      
-      // If still no size, try parent container
-      if (width <= 0 || height <= 0) {
-        const container = canvases[metric].parentElement;
-        if (container) {
-          const containerRect = container.getBoundingClientRect();
-          width = containerRect.width > 0 ? containerRect.width : 200;
-          height = containerRect.height > 0 ? containerRect.height : 40;
-        } else {
-          width = 200;
-          height = 40;
-        }
-      }
-      
-      // Set physical pixel size (for high DPI) - this clears canvas and invalidates any existing context
-      canvases[metric].width = width * dpr;
-      canvases[metric].height = height * dpr;
-      
-      // Get context AFTER setting width/height (like poster-charts.js line 82)
-      const ctx = canvases[metric].getContext('2d');
-      if (ctx) {
-        ctx.scale(dpr, dpr);
-        contexts[metric] = ctx;
-        // Set display size (CSS pixels)
-        canvases[metric].style.width = width + 'px';
-        canvases[metric].style.height = height + 'px';
-        console.log(`[history] ${metric} canvas initialized synchronously: ${width}x${height} (${canvases[metric].width}x${canvases[metric].height} @ ${dpr}x)`);
+  let canvasesParked = false;
+
+  function windowOccluded() {
+    if (typeof document === 'undefined') return false;
+    if (document.hidden) return true;
+    try {
+      if (typeof document.hasFocus === 'function' && !document.hasFocus()) return true;
+    } catch (_) { /* ignore */ }
+    return false;
+  }
+
+  function setupHistoryCanvas(metric) {
+    const canvas = canvases[metric];
+    if (!canvas) return;
+    // Cap DPR: 2x/3x backing stores keep the compositor busy for sparklines (#14).
+    const dpr = Math.min(1, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    let width = rect.width > 0 ? rect.width : canvas.offsetWidth || 200;
+    let height = rect.height > 0 ? rect.height : canvas.offsetHeight || 40;
+
+    if (width <= 0 || height <= 0) {
+      const container = canvas.parentElement;
+      if (container) {
+        const containerRect = container.getBoundingClientRect();
+        width = containerRect.width > 0 ? containerRect.width : 200;
+        height = containerRect.height > 0 ? containerRect.height : 40;
+      } else {
+        width = 200;
+        height = 40;
       }
     }
-  });
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (ctx) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      contexts[metric] = ctx;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+    }
+  }
+
+  function parkHistoryCanvases() {
+    canvasesParked = true;
+    Object.keys(canvases).forEach((metric) => {
+      const canvas = canvases[metric];
+      if (!canvas) return;
+      try {
+        canvas.width = 1;
+        canvas.height = 1;
+      } catch (_) { /* ignore */ }
+      delete contexts[metric];
+    });
+  }
+
+  function unparkHistoryCanvases() {
+    canvasesParked = false;
+    Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
+    Object.keys(canvases).forEach((metric) => {
+      if (canvases[metric] && contexts[metric]) drawLineChart(metric);
+    });
+  }
+
+  // Initialize canvas contexts immediately (synchronously, like poster-charts.js)
+  Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
 
   // Create tooltip element
   function createTooltip() {
@@ -353,7 +380,7 @@
 
   // Update charts from backend data
   async function updateChartsFromBackend() {
-    if (document.hidden) return;
+    if (canvasesParked || windowOccluded()) return;
     const timeRangeSeconds = TIME_RANGES[currentTimeRange] || 300;
     
     const result = await fetchHistoryFromBackend(timeRangeSeconds, HISTORY_POINTS);
@@ -420,40 +447,11 @@
 
   // Re-initialize canvas sizes (for window resize)
   function reinitializeCanvasSizes() {
-    console.log('[history] reinitializeCanvasSizes() called');
-    Object.keys(canvases).forEach(metric => {
-      if (canvases[metric]) {
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvases[metric].getBoundingClientRect();
-        let width = rect.width > 0 ? rect.width : canvases[metric].offsetWidth || 200;
-        let height = rect.height > 0 ? rect.height : canvases[metric].offsetHeight || 40;
-        
-        if (width <= 0 || height <= 0) {
-          const container = canvases[metric].parentElement;
-          if (container) {
-            const containerRect = container.getBoundingClientRect();
-            width = containerRect.width > 0 ? containerRect.width : 200;
-            height = containerRect.height > 0 ? containerRect.height : 40;
-          } else {
-            width = 200;
-            height = 40;
-          }
-        }
-        
-        // Set physical pixel size (this invalidates the context, so we need to get a new one)
-        canvases[metric].width = width * dpr;
-        canvases[metric].height = height * dpr;
-        
-        // Get new context after setting size (like poster-charts.js)
-        const ctx = canvases[metric].getContext('2d');
-        if (ctx) {
-          ctx.scale(dpr, dpr);
-          contexts[metric] = ctx;
-          canvases[metric].style.width = width + 'px';
-          canvases[metric].style.height = height + 'px';
-        }
-      }
-    });
+    if (canvasesParked || windowOccluded()) {
+      parkHistoryCanvases();
+      return;
+    }
+    Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
   }
 
   // Public API
@@ -511,13 +509,15 @@
           clearInterval(historyPollInterval);
           historyPollInterval = null;
         }
+        parkHistoryCanvases();
       }
 
       function resumeHistoryPoll() {
         if (document.hidden || historyPollInterval) return;
+        unparkHistoryCanvases();
         updateChartsFromBackend();
         historyPollInterval = setInterval(() => {
-          if (document.hidden) return;
+          if (document.hidden || canvasesParked) return;
           updateChartsFromBackend();
         }, HISTORY_POLL_MS);
       }
