@@ -1,13 +1,18 @@
-# Session todo — overnight 2026-10-05 ~22:50
+# Session todo — GitHub #14 tauri://localhost CPU (follow-up #3)
 
-- [x] Digester / sibling / design review / debug scan
-- [x] Fuel: P2 debug.log log-012 + standing #14 idle cuts (merged tree)
-- [x] Ollama model_list_cache: 30s fail cooldown + WARN ≤1/5min
-- [x] #14 follow-up already in tree: opaque window, 8s polls, pause when hidden, opaque sparklines
-- [x] `python3 scripts/autoresearch_ratchet.py verify --test-filter model_list_cache`
-- [x] Bump v0.1.1388 + CHANGELOG (both bullets)
-- [ ] Commit + keep + push + morning surprise + loop_backlog
+- [x] Pick lowest GitHub task (WIP-14 / issue 14)
+- [x] macOS: `.transparent(false)` on CPU window (Linux already has it)
+- [x] Pause monitors / disk-cleanup glance / agent-ops timers on `document.hidden`
+- [x] Opaque sparklines (no canvas alpha)
+- [x] Kill dark-theme hover infinite `glow-rotate`
+- [x] Metrics poll 5s → 8s; history.js 2s → 8s
+- [x] Disconnect changelog MutationObserver after wire-up
+- [x] Sync dist, bump version, CHANGELOG
+- [x] `cargo check` in src-tauri/
+- [x] Rough CPU sample with `--cpu` on this host (WebKit still ~99% on Linux blank-floor host)
+- [x] Rename WIP-14 → UNTESTED-14
+- [ ] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 
-Shipped **v0.1.1388**: quieter Ollama-down model-list WARNs + more WebView idle cuts for #14. #14 stays open until macOS webview under ~1%.
+v0.1.1388 cuts remaining idle timers and compositor blends for the macOS `tauri://localhost` / Graphics and Media path. Linux webkit2gtk still shows ~99% WebKitWebProcess after warm (same host floor as prior blank-page A/B); macOS Activity Monitor remains the acceptance gate.
