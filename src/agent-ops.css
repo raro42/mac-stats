@@ -2442,6 +2442,30 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+.changelog-body-toolbar-kb-hint {
+  margin: 0 0 8px;
+  font-size: 11px;
+  opacity: 0.72;
+  text-align: center;
+}
+
+.changelog-body-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
+.changelog-h2[tabindex]:focus {
+  outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.changelog-loading[tabindex]:focus,
+.changelog-error[tabindex]:focus {
+  outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .settings-header-kb-hint {
   margin: 0;
   font-size: 11px;

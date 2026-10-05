@@ -4829,6 +4829,11 @@
     }
   }
 
+  /** How to move across changelog version headings when two or more are on screen. */
+  const CHANGELOG_BODY_TOOLBAR_KB_HINT =
+    "← → / h l · Home/End move between versions · at start crosses to footer version (or header Close) · at end crosses to header Close";
+
+  /** Focus styles for older shells that lack agent-ops.css rules. */
   function ensureChangelogBodyKbStyles() {
     if (document.getElementById("mac-stats-changelog-body-kb-styles")) return;
     const style = document.createElement("style");
@@ -4841,7 +4846,7 @@
         text-align: center;
       }
       .changelog-body-toolbar-kb-hint[hidden] {
-        display: none;
+        display: none !important;
       }
       .changelog-h2[tabindex]:focus {
         outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
@@ -4858,20 +4863,28 @@
     document.head.appendChild(style);
   }
 
+  /** Theme HTML ships the hint at the top of the changelog body. It stays hidden until two versions exist. Create it only on older shells. */
   function ensureChangelogBodyKbHint(body) {
     const wrap = body || document.getElementById("changelog-body");
     if (!wrap) return;
-    let hint = wrap.querySelector(".changelog-body-toolbar-kb-hint");
+    let hint = wrap.querySelector(":scope > .changelog-body-toolbar-kb-hint");
+    if (!hint) {
+      hint = wrap.querySelector(".changelog-body-toolbar-kb-hint");
+    }
     if (!hint) {
       hint = document.createElement("div");
       hint.className = "changelog-body-toolbar-kb-hint";
       hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
+      hint.textContent = CHANGELOG_BODY_TOOLBAR_KB_HINT;
+      wrap.insertBefore(hint, wrap.firstChild);
+    }
+    if (hint.parentNode !== wrap || hint !== wrap.firstElementChild) {
       wrap.insertBefore(hint, wrap.firstChild);
     }
     const items = getChangelogBodyToolbarItems(wrap);
     hint.hidden = items.length < 2;
-    hint.textContent =
-      "← → / h l · Home/End move between versions · at start crosses to footer version (or header Close) · at end crosses to header Close";
+    hint.textContent = CHANGELOG_BODY_TOOLBAR_KB_HINT;
   }
 
   function focusChangelogBodyItem(body, el) {

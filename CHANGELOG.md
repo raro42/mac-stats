@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1385] - 2026-10-05
+
+### Changed
+- **Changelog body keyboard hint on first paint** — the hint sits in the theme HTML at the top of the changelog body. It no longer pops in after JavaScript loads. It stays hidden until two versions are on screen. The line says how to move across those version headings. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1384] - 2026-10-05
 
 ### Changed
