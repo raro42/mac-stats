@@ -21,7 +21,7 @@ Steered by the prompts in this directory. Pickup → coder → tester → close.
 python3 scripts/install_mac_stats_agent_units.py   # Linux systemd + watchdog
 ```
 
-**Single instance:** `agents/state/loop.pid` (gitignored). `start-unattended.command` refuses a second start unless `AGENT_LOOP_FORCE_RESTART=1`. Skip issue **#3** (`MAC_STATS_SKIP_ISSUES`). Overnight autoresearch stays a separate LaunchAgent (`scripts/run_overnight_harness_loop.py`).
+**Single instance:** `agents/state/loop.pid` (gitignored). `start-unattended.command` refuses a second start unless `AGENT_LOOP_FORCE_RESTART=1`. Skip issue **#3** (`MAC_STATS_SKIP_ISSUES`). Overnight autoresearch is a separate unit: `python3 scripts/install_mac_stats_overnight_units.py` (`mac-stats-overnight-harness.service`; quiet daytime).
 
 ## Standing rules (always)
 

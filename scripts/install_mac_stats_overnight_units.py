@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Install reboot-safe systemd user units for the mac-stats GitHub issue loop.
+"""Install reboot-safe systemd user units for the mac-stats overnight harness.
 
+Linux counterpart of scripts/install-overnight-harness-launchagent.sh (macOS).
 Writes units under the user systemd directory (not the repo).
-Does not copy tokens into the repo. Relies on `gh` already authenticated.
+Quiet during daytime; spawns Cursor agent CLI only 20:00–06:00 local.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 UNIT_DIR = Path.home() / ".config" / "systemd" / "user"
+IMPROVEMENTS = Path.home() / ".mac-stats" / "improvements"
 HOME = Path.home()
 PYTHON = sys.executable
 
@@ -25,8 +27,11 @@ PATH_VALUE = (
     f"/usr/local/bin:/usr/bin"
 )
 
-AGENT_SERVICE = f"""[Unit]
-Description=mac-stats GitHub issue agent loop
+STDOUT_LOG = IMPROVEMENTS / "overnight_harness_loop.stdout.log"
+STDERR_LOG = IMPROVEMENTS / "overnight_harness_loop.stderr.log"
+
+HARNESS_SERVICE = f"""[Unit]
+Description=mac-stats overnight autoresearch harness (20:00–06:00)
 After=network-online.target
 Wants=network-online.target
 
@@ -35,22 +40,19 @@ Type=simple
 WorkingDirectory={ROOT}
 Environment=HOME={HOME}
 Environment=PATH={PATH_VALUE}
-Environment=AGENT_USE_CURSOR=1
-Environment=AGENT_LOOP_SLEEP_MINUTES=5
-Environment=AGENT_LOOP_BUSY_SLEEP_SECONDS=15
-Environment=AGENT_GIT_SYNC=1
-Environment=MAC_STATS_GH_REPO=raro42/mac-stats
-Environment=MAC_STATS_SKIP_ISSUES=3
-ExecStart=/usr/bin/bash {ROOT}/agents/mac-stats-cursor-loop.sh loop
+ExecStart={PYTHON} -u {ROOT}/scripts/run_overnight_harness_loop.py
 Restart=always
-RestartSec=20
+RestartSec=30
 KillMode=mixed
-TimeoutStopSec=60
+TimeoutStopSec=90
+StandardOutput=append:{STDOUT_LOG}
+StandardError=append:{STDERR_LOG}
 
 [Install]
 WantedBy=default.target
 """
 
+# Shared watchdog (issue loop + overnight) — reinstall so both units are covered.
 WATCHDOG_SERVICE = f"""[Unit]
 Description=mac-stats agent loops watchdog
 After=network-online.target
@@ -85,10 +87,20 @@ def run(cmd: list[str]) -> None:
 
 def main() -> int:
     UNIT_DIR.mkdir(parents=True, exist_ok=True)
-    (UNIT_DIR / "mac-stats-agent-loop.service").write_text(AGENT_SERVICE, encoding="utf-8")
-    (UNIT_DIR / "mac-stats-watchdog.service").write_text(WATCHDOG_SERVICE, encoding="utf-8")
+    IMPROVEMENTS.mkdir(parents=True, exist_ok=True)
+    STDOUT_LOG.touch(exist_ok=True)
+    STDERR_LOG.touch(exist_ok=True)
+
+    (UNIT_DIR / "mac-stats-overnight-harness.service").write_text(
+        HARNESS_SERVICE, encoding="utf-8"
+    )
+    (UNIT_DIR / "mac-stats-watchdog.service").write_text(
+        WATCHDOG_SERVICE, encoding="utf-8"
+    )
     (UNIT_DIR / "mac-stats-watchdog.timer").write_text(WATCHDOG_TIMER, encoding="utf-8")
     print(f"wrote units in {UNIT_DIR}")
+    print(f"logs: {STDOUT_LOG}")
+    print(f"      {STDERR_LOG}")
 
     user = os.environ.get("USER") or getpass.getuser()
     linger = subprocess.run(
@@ -101,14 +113,27 @@ def main() -> int:
         print("NOTE: user linger is off. Loop may stop at logout.")
         print("Enable with: loginctl enable-linger")
 
+    # Prefer systemd ownership over an ad-hoc nohup copy.
+    subprocess.run(
+        ["pkill", "-f", "run_overnight_harness_loop.py"],
+        check=False,
+        capture_output=True,
+    )
+
     run(["systemctl", "--user", "daemon-reload"])
-    run(["systemctl", "--user", "enable", "--now", "mac-stats-agent-loop.service"])
+    run(["systemctl", "--user", "enable", "--now", "mac-stats-overnight-harness.service"])
     run(["systemctl", "--user", "enable", "--now", "mac-stats-watchdog.timer"])
     run(["systemctl", "--user", "start", "mac-stats-watchdog.service"])
 
     print("--- status ---")
     subprocess.run(
-        ["systemctl", "--user", "status", "mac-stats-agent-loop.service", "--no-pager"],
+        [
+            "systemctl",
+            "--user",
+            "status",
+            "mac-stats-overnight-harness.service",
+            "--no-pager",
+        ],
         check=False,
     )
     subprocess.run(

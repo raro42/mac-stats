@@ -98,7 +98,9 @@ def rm_target() -> None:
 
 
 def thin_snapshots() -> None:
-    # Best-effort; ignore failures (needs privileges / TM present).
+    # Best-effort; macOS only. Ignore failures (needs privileges / TM present).
+    if sys.platform != "darwin" or shutil.which("tmutil") is None:
+        return
     subprocess.run(
         ["tmutil", "thinlocalsnapshots", "/", "1000000000000", "4"],
         capture_output=True,

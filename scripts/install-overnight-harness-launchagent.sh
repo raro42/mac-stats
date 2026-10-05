@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install LaunchAgent so the overnight harness survives IDE/session exit.
+# Install LaunchAgent so the overnight harness survives IDE/session exit (macOS).
+# Linux: python3 scripts/install_mac_stats_overnight_units.py
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LABEL=com.raro42.mac-stats-overnight-harness
