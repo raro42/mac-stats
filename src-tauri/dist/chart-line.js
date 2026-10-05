@@ -357,14 +357,23 @@
   });
 
   function boot() {
-    api.init();
-    let resizeTimer = null;
-    window.addEventListener("resize", () => {
-      if (resizeTimer) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => api.refreshLayout(), 200);
-    });
-    if (typeof window.seedThemeHistoryFromBackend === "function") {
-      void window.seedThemeHistoryFromBackend();
+    // Defer canvas setup past first paint so open does not stack with
+    // get_cpu_details IPC / ring DOM (#14).
+    const start = () => {
+      api.init();
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => api.refreshLayout(), 200);
+      });
+      if (typeof window.seedThemeHistoryFromBackend === "function") {
+        void window.seedThemeHistoryFromBackend();
+      }
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(start, { timeout: 1500 });
+    } else {
+      setTimeout(start, 0);
     }
   }
 

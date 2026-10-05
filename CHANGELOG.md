@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1400] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Metrics / history / process list / Discord / monitors / Agent Ops / Debug Log poll every 600s. Process cache TTL is 600s. `get_cpu_details` rate floor and backend metric / temp read intervals are 120s (temp cache max age 180s). History charts keep 2 points. Ring gauges skip paints under ~10%. Sparkline canvas boot defers past first paint (`requestIdleCallback`). Collapsed Top Processes list uses `content-visibility: hidden`. GPU sampler warm is deferred 20s after open. Aim: quieter `tauri://localhost` / Graphics and Media.
+
+
 ## [0.1.1399] - 2026-10-06
 
 ### Changed

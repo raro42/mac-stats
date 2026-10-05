@@ -39,6 +39,13 @@
 .perplexity-section.collapsed .section-content-collapsible,
 .details-section.collapsed .section-content-collapsible,
 #details-section.collapsed .apple-details-body,
+.processes-section.collapsed .section-content-collapsible,
+.apple-processes.collapsed #process-list,
+.cpu-processes.collapsed #process-list,
+.poster-processes.collapsed #process-list,
+.mat-processes.collapsed #process-list,
+.arch-processes.collapsed #process-list,
+.swiss-processes.collapsed #process-list,
 .section-content-collapsible.collapsed {
   content-visibility: hidden;
   contain: strict;

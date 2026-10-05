@@ -554,7 +554,8 @@ border-radius: 24px;
 }
 
 /* Keep-header collapse: hide body from the compositor while glances stay (#14). */
-.section-content-collapsible.collapsed {
+.section-content-collapsible.collapsed,
+.apple-processes.collapsed #process-list {
   content-visibility: hidden;
   contain: strict;
 }

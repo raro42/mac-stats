@@ -93,8 +93,8 @@ pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_GPU_POWER: OnceLock<bool> = OnceLock::new();
 
-pub(crate) const TEMP_READ_INTERVAL: Duration = Duration::from_secs(90);
-pub(crate) const TEMP_CACHE_MAX_AGE: Duration = Duration::from_secs(120);
+pub(crate) const TEMP_READ_INTERVAL: Duration = Duration::from_secs(120);
+pub(crate) const TEMP_CACHE_MAX_AGE: Duration = Duration::from_secs(180);
 
 /// Sticky: set true after any successful CPU temperature sample (survives cache age gaps).
 pub(crate) static TEMPERATURE_READ_OK: AtomicBool = AtomicBool::new(false);
