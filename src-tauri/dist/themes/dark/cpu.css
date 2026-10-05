@@ -405,6 +405,12 @@ body {
   z-index: 10000;
 }
 
+/* Closed settings / process / changelog shells stay out of the compositor (#14). */
+.settings-modal[aria-hidden="true"] {
+  content-visibility: hidden;
+  contain: strict;
+}
+
 .settings-card {
   width: min(440px, 96vw);
   max-height: min(85vh, 720px);

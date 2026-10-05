@@ -449,8 +449,8 @@
     return true;
   }
 
-  const OPS_REFRESH_INTERVAL = 120000;
-  const OPS_GLANCE_POLL_INTERVAL = 120000;
+  const OPS_REFRESH_INTERVAL = 180000;
+  const OPS_GLANCE_POLL_INTERVAL = 180000;
   let agentOpsInterval = null;
   let agentOpsGlanceInterval = null;
   let agentOpsCollapsed = true;
@@ -5033,10 +5033,10 @@ window.__macStatsPauseAgentOpsPolls = function () {
 
 window.__macStatsResumeAgentOpsPolls = function () {
     if (document.hidden) return;
+    // Collapsed Agent Ops is display:none (icon pane). Glance IPC only woke
+    // Tauri while nothing was on screen (#14). Poll only when the pane is open.
     if (!agentOpsCollapsed) {
         startAgentOpsAutoRefresh();
-    } else {
-        startOpsGlancePoll();
     }
     if (opsLastRefreshMs) {
         paintOpsUpdatedAgo();
@@ -5044,7 +5044,7 @@ window.__macStatsResumeAgentOpsPolls = function () {
             opsUpdatedAgoTimer = setInterval(() => {
                 if (document.hidden || !opsLastRefreshMs) return;
                 paintOpsUpdatedAgo();
-            }, 120_000);
+            }, 180_000);
         }
     }
 };

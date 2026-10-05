@@ -22,6 +22,28 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1398** (follow-up after v0.1.1397).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes:
+
+- `src/agent-ops.js` — do **not** start collapsed-glance IPC while Agent Ops is icon-hidden (`display:none`); refresh / updated-ago **180s**.
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 180`; `get_cpu_details` rate floor **60s**.
+- `src-tauri/src/lib.rs` — backend metric loop **60s**.
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 60s; `TEMP_CACHE_MAX_AGE` 90s.
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **8s** after window open.
+- `src/cpu.js` — metrics / process list / Discord / monitors / Process Details / logs glance **180s**; Debug Log auto-refresh **180s**; history seed skips on focus if last seed &lt;180s; sparkline seed `maxDisplayPoints` 4.
+- `src/history.js` — data-poster history poll **180s**; `HISTORY_POINTS` 8.
+- `src/chart-line.js` — sparkline buffer **2** points; skip canvas paints / seed draws when `document.hidden`.
+- Themes apple/light/dark `cpu.css` — closed `.settings-modal[aria-hidden="true"]` uses `content-visibility: hidden` + `contain: strict`.
+
+Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1397)
+
 Version **v0.1.1397** (follow-up after v0.1.1396).
 
 Also in this ship (overnight log-012): circuit-open WARN ≤1/5min; model-list fail cooldown 5m; shared `/api/tags` waiters log once.

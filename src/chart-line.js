@@ -7,7 +7,7 @@
   "use strict";
 
   // Fewer points = less canvas work per sample (#14).
-  const LINE_CHART_POINTS = 4;
+  const LINE_CHART_POINTS = 2;
   const EMPTY_POINT = NaN;
   let cachedSparklineBackdrop = null;
 
@@ -245,6 +245,8 @@
     lastSample[metric] = value;
     // Buffer even if the canvas is not ready yet (zero-size layout, late GPU inject).
     addValue(metric, value);
+    // Hidden window: keep the buffer, skip WebKit canvas invalidation (#14).
+    if (typeof document !== "undefined" && document.hidden) return;
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
     }
@@ -300,6 +302,7 @@
       }
       lastSample[metric] = last;
     }
+    if (typeof document !== "undefined" && document.hidden) return true;
     if (!canvases.usage) initializeCanvases();
     COLORS = getColors();
     Object.keys(dataBuffers).forEach((metric) => {

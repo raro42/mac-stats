@@ -271,7 +271,7 @@ const failedAttempts = {
 const FAILED_ATTEMPTS_THRESHOLD = 3;
 
 // Match main metrics poll — legacy 3s gate was leftover from 1s refresh (#14).
-const TEMPERATURE_UPDATE_INTERVAL_MS = 120000;
+const TEMPERATURE_UPDATE_INTERVAL_MS = 180000;
 let lastTemperatureUpdateMs = 0;
 
 // SVG Ring Gauge Animation
@@ -331,11 +331,11 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 120000;
+const CPU_WINDOW_REFRESH_MS = 180000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
-const DISCORD_ICON_STATUS_MS = 120000;
+const DISCORD_ICON_STATUS_MS = 180000;
 /** Top Processes list / glance cadence (match PROCESS_CACHE_TTL_SECS in metrics). */
-const PROCESS_LIST_REFRESH_MS = 120000;
+const PROCESS_LIST_REFRESH_MS = 180000;
 let discordIconStatusInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
@@ -5615,7 +5615,7 @@ function resumeIdleWindowPolls() {
           updateMonitorsHeight();
         });
       }
-    }, 120000);
+    }, 180000);
   }
 }
 
@@ -5627,7 +5627,7 @@ function resumeVisibleWindowWork() {
     if (
       !sparklineHistoryReady ||
       !lastSparklineSeedMs ||
-      Date.now() - lastSparklineSeedMs >= 120000
+      Date.now() - lastSparklineSeedMs >= 180000
     ) {
       void seedThemeHistoryFromBackend();
     }
@@ -6683,7 +6683,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 120000);
+    }, 180000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);
@@ -7054,7 +7054,7 @@ function initMonitorsSection() {
       }
       monitorsUpdateInterval = setInterval(() => {
         updateMonitorsSummary();
-      }, 120000);
+      }, 180000);
     } else {
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -7066,7 +7066,7 @@ function initMonitorsSection() {
         loadMonitors().then(() => {
           updateMonitorsHeight();
         });
-      }, 120000);
+      }, 180000);
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
@@ -7751,7 +7751,7 @@ function ensureMonitorsSectionExpanded() {
       loadMonitors().then(() => {
         updateMonitorsHeight();
       });
-    }, 120000);
+    }, 180000);
   }
 }
 
@@ -18517,7 +18517,7 @@ function startLogsGlancePoll() {
   stopLogsGlancePoll();
   ensureLogsErrorGlance();
   pollLogsGlanceCounts();
-  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 120000);
+  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 180000);
 }
 
 function stopLogsGlancePoll() {
@@ -19453,11 +19453,11 @@ function stopLogsAutoRefresh() {
 
 function startLogsAutoRefresh() {
   stopLogsAutoRefresh();
-  // 120s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
+  // 180s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
   logsAutoRefreshTimer = setInterval(() => {
     if (document.hidden) return;
     refreshLogsViewer(true);
-  }, 120000);
+  }, 180000);
 }
 
 function formatDiskBytes(n) {
@@ -19707,7 +19707,7 @@ function startDiskCleanupGlancePoll() {
     void refreshDiskCleanupPanel({ deep: false }).then(() => {
       syncDiskCleanupCollapsedGlance();
     });
-  }, 120000);
+  }, 180000);
 }
 
 /** Focus first disabled scope (or Add form) after empty-list CTA. */
@@ -24372,7 +24372,7 @@ async function seedThemeHistoryFromBackend() {
       // the charts stayed empty and grew from the right on every open.
       const result = await inv('get_metrics_history', {
         timeRangeSeconds: 300,
-        maxDisplayPoints: 8,
+        maxDisplayPoints: 4,
       });
       if (result?.points?.length) {
         if (typeof window.themeHistory?.seedFromPoints === 'function') {
