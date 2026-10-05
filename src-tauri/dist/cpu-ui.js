@@ -419,6 +419,13 @@
     }
     if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
     if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+    const discordSetting = document.getElementById("discord-setting");
+    if (
+      discordSetting &&
+      typeof window.ensureDiscordToolbarKeyboard === "function"
+    ) {
+      window.ensureDiscordToolbarKeyboard(discordSetting);
+    }
     const perplexitySetting = document.getElementById("perplexity-setting");
     if (
       perplexitySetting &&
@@ -492,6 +499,13 @@
     applySettingsSignalAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
+    const discordSetting = document.getElementById("discord-setting");
+    if (
+      discordSetting &&
+      typeof window.ensureDiscordToolbarKeyboard === "function"
+    ) {
+      window.ensureDiscordToolbarKeyboard(discordSetting);
+    }
     const perplexitySetting = document.getElementById("perplexity-setting");
     if (
       perplexitySetting &&

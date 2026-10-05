@@ -270,23 +270,38 @@
     );
   }
 
+  /** How to move across the Discord token, Save, Clear, and View logs when Settings is open. */
+  const DISCORD_TOOLBAR_KB_HINT =
+    "← → / h l · Home/End move · arrows at token start/end · token first ↑ → Discord icon · at end crosses to footer version";
+
+  /**
+   * Theme HTML ships the hint under the token field, Save, Clear, and View logs.
+   * It stays hidden until Settings is open. Create it only on older shells.
+   */
   function ensureDiscordToolbarKbHint(wrap) {
     const container = wrap || document.getElementById("discord-setting");
     if (!container) return;
     const actions = container.querySelector(".discord-actions");
     if (!actions) return;
     let hint = actions.querySelector(".discord-toolbar-kb-hint");
+    if (!isSettingsModalOpen()) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    const items = getDiscordToolbarItems(container);
+    if (items.length < 2) {
+      if (hint) hint.hidden = true;
+      return;
+    }
     if (!hint) {
       hint = document.createElement("div");
       hint.className = "discord-toolbar-kb-hint";
       hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
       actions.appendChild(hint);
     }
-    const items = getDiscordToolbarItems(container);
-    hint.hidden = items.length < 2;
-    hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token start/end · token first ↑ → Discord icon · at end crosses to footer version"
-      : "← → / h l · Home/End move · Enter saves from token · buttons keep activate";
+    hint.hidden = false;
+    hint.textContent = DISCORD_TOOLBAR_KB_HINT;
   }
 
   function isDiscordSettingVisible() {
@@ -503,6 +518,7 @@
       });
     }
     wireDiscordToolbarKeyboard();
+    window.ensureDiscordToolbarKeyboard = wireDiscordToolbarKeyboard;
   }
 
   window.Discord = { refreshStatus: refreshStatus };
