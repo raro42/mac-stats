@@ -112,3 +112,35 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1394)
+
+**Date:** 2026-10-05 21:53 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1394)
+- `cd src-tauri && cargo test` — **pass** (1354 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1394**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 60`
+- `src/cpu.js` — `CPU_WINDOW_REFRESH_MS = 60000`; `PROCESS_LIST_REFRESH_MS = 60000`; Discord / monitors / Process Details / logs glance **60s**; Debug Log auto-refresh **30s**
+- `src/history.js` — `HISTORY_POLL_MS = 60000`
+- `src/chart-line.js` — `LINE_CHART_POINTS = 8`
+- `src/agent-ops.js` — `OPS_REFRESH_INTERVAL` / `OPS_GLANCE_POLL_INTERVAL` = 60000
+- `src-tauri/src/lib.rs` — metric loop sleep **20s**
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 timer/IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
