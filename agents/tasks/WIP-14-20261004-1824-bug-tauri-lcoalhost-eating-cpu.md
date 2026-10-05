@@ -51,3 +51,39 @@ Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphi
 2. `cargo test` red (7 harness_ops). Unrelated to #14 cuts, but verification preference failed.
 
 Do **not** close GitHub #14.
+
+## Test report (v0.1.1389)
+
+**Date:** 2026-10-05 23:10 CEST (local); 2026-10-05T21:10Z UTC
+
+**Result: FAIL** → move to `WIP-` (not CLOSED)
+
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands**
+
+- `cd src-tauri && cargo check` — **pass** (v0.1.1389; warnings only)
+- `cd src-tauri && cargo test` — **fail** (1348 passed; **6 failed**; all `commands::harness_ops::tests::*`)
+  - `details_request_and_filter`
+  - `digest_open_is_read_only`
+  - `disk_cleanup_age_request_detected`
+  - `insights_request_detected`
+  - `launchagent_path_request_detected`
+  - `launchagent_size_request_detected`
+  - Unrelated to #14 UI/CSS/timer cuts; preferred verification still red.
+
+**Static verification (PASS)** — coder-listed cuts present at **v0.1.1389**:
+
+- Apple theme: no shell `::before` gradient mask comment + opaque/flat panel intent; themes use `content-visibility: hidden` + `contain: strict` on collapsed panes; neon/futuristic/light ring `filter: none`
+- `CPU_WINDOW_REFRESH_MS = 12000`; process list gate `30000`; `window` `blur` pauses polls; banner `backdrop-filter: none`
+- `chart-line.js` stroke-only (#14); `history.js` `HISTORY_POLL_MS = 12000`
+- `ollama.js` lazy marked/highlight; Apple `cpu.html` notes on-demand load (no CDN on every open)
+
+**debug.log:** recent lines are Ollama localhost connection refused / circuit-open only; nothing tying to #14 compositor/timer cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. `cargo test` red (6 harness_ops). Unrelated to #14 cuts, but verification preference failed.
+
+Do **not** close GitHub #14.
