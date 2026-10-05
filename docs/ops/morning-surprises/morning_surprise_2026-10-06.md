@@ -1,29 +1,20 @@
 # Morning surprise — 2026-10-06
 
-Overnight Track B cut WebView idle work for GitHub #14 and quieted Ollama-down model-list WARN spam in debug.log.
+Overnight Track B kept cutting CPU-window WebView idle work for GitHub #14, and fixed operator “age” matching so Linux `cargo test` harness_ops goes green again.
 
 ## Shipped
 
 | Version | What |
-| --- | --- |
-| **v0.1.1388** | Ollama model-list: 30s fail cooldown + at most one WARN / 5 minutes when Ollama is off (log-012). CPU window: macOS opaque (`transparent(false)`), metrics every 8s, pause more polls when hidden, opaque sparklines, slower history poll, dark theme no infinite hover glow. |
-| **v0.1.1387** | Apple opaque shell, instant ring paints, 5s metrics / 30s Discord icon, WKWebView background Suspend (#14). |
-| **v0.1.1386** | Static Agent Ops loading / Force Quit confirm; theme cpu.css drop live backdrop-filter; thinking dots static. |
-| **v0.1.1385** | Changelog body keyboard hint first paint in theme HTML. |
-| **v0.1.1384** | Agent Ops row-selection Tips keyboard hint first paint in theme HTML. |
-| **v0.1.1383** | AI Chat message-list keyboard hint first paint in theme HTML. |
+|---------|------|
+| **v0.1.1390** | Metrics / history poll **15s**. Backend metric loop stays **5s** while the CPU window is open (was 2s). Sparklines keep **36** points. Apple / Light use flat opaque panels + CSS `contain`. Whole-token `age` (not `average` / `usage` / `agent`). Empty digest-open still says **0 open candidates**. |
+| **v0.1.1389** | Stroke-only sparklines, 12s polls, blur pauses idle polls, lazy marked/hljs, Apple opaque chrome. |
+| **v0.1.1388** | Opaque macOS window, 8s polls, pause more when hidden, Ollama model-list WARN cooldown. |
 
-## Tried / context
+## Still open
 
-- Digester open stayed empty; design review still in grace.
-- Fuel: P2 debug.log log-012 (41 model_cache WARNs) plus standing #14 idle cuts.
-- Linux WebKit still hot on blank pages; #14 needs macOS Activity Monitor before close.
+- GitHub **#14** — macOS Activity Monitor `tauri://localhost` / Graphics and Media under ~1% (Linux webkit2gtk blank-page floor is not that gate). Tester has TESTING-14.
+- Design-review screenshot for `feature-agent-ops` when Screen Recording TCC allows.
 
-## For Ralf
+## Digester
 
-Open the CPU window on this build. With Ollama off, `debug.log` should stay calm (one WARN every few minutes, not a burst). Activity Monitor (Graphics and Media / `tauri://localhost`) should be quieter when the window is hidden. #14 stays open until the webview sits under ~1% on macOS.
-
-## Tick notes
-
-- ~22:55 tick: Ollama model-list WARN cooldown + #14 idle cuts (**v0.1.1388**); sync-dist + ratchet keep.
-- ~22:20–22:40: prior #14 compositor / idle work (**v0.1.1386–1387**); tester FAIL on Linux under-1% AC.
+Open candidates: none this window. Night still moved the ratchet via standing backlog (#14).
