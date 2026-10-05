@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
+### Changed
+- **CI is manual** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally (`cd src-tauri && cargo check`), then run macOS CI when you want it: `gh workflow run ci.yml --ref main`.
+
 
 ## [0.1.1395] - 2026-10-05
 

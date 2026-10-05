@@ -5,7 +5,7 @@
 Apple Silicon only. Optional local AI agent when you want company (off by default, stays on your machine).
 
 [![GitHub release](https://img.shields.io/github/v/release/raro42/mac-stats?include_prereleases&style=flat-square)](https://github.com/raro42/mac-stats/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/ci.yml?event=workflow_dispatch&label=CI&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/release.yml?event=release&label=release&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 

@@ -55,7 +55,7 @@ Release DMGs are not notarized yet. Help with an Apple Developer ID + CI secrets
 2. Keep the PR focused (one concern when possible).
 3. Update [CHANGELOG.md](CHANGELOG.md) under `## [Unreleased]` for user-visible changes (Keep a Changelog style).
 4. Do **not** add `Co-authored-by`, `Signed-off-by`, or IDE/agent attribution to commit messages.
-5. Run `cargo check` (and relevant tests) before you push.
+5. Run `cargo check` (and relevant tests) before you push. GitHub Actions CI is **manual** (no run on every push). After a batch of real changes, trigger macOS CI with `gh workflow run ci.yml --ref main` (or Actions → CI → Run workflow).
 6. Describe **why** in the PR body; link issues when they exist.
 
 ## Code style
