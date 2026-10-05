@@ -15496,6 +15496,226 @@ function initSlackSettings() {
 
   refreshSlackStatus();
   window.SlackSettings = { refreshStatus: refreshSlackStatus };
+  wireSlackSettingsToolbarKeyboard();
+  window.ensureSlackSettingsToolbarKeyboard = wireSlackSettingsToolbarKeyboard;
+}
+
+function slackSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  if (start == null || end == null) return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return start === len && end === len;
+  }
+  return start === 0 && end === 0;
+}
+
+function isSlackSettingsInput(el) {
+  return el?.id === 'slack-webhook-input';
+}
+
+/** Focusable Settings Slack toolbar items (webhook · Save · Clear). */
+function getSlackSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('slack-setting');
+  if (!container) return [];
+  const ids = ['slack-webhook-input', 'slack-save', 'slack-clear'];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshSlackSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('slack-setting');
+  const items = getSlackSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Slack webhook, Save, and Clear when Settings is open. */
+const SLACK_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at webhook start/end · webhook first crosses to Telegram · Clear last crosses to header';
+
+/**
+ * Theme HTML ships the hint under the webhook field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureSlackSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('slack-setting');
+  if (!container) return;
+  const actions = container.querySelector('.slack-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.slack-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getSlackSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'slack-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = SLACK_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Slack webhook first ← Telegram Clear, else footer version, when Settings is open. */
+function tryChainSlackSettingsToolbarWebhookBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('telegram-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Slack Clear last → Settings header Close, else footer version, when Settings is open. */
+function tryChainSlackSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (
+    typeof window.tryChainSettingsCredentialsToHeader === 'function' &&
+    window.tryChainSettingsCredentialsToHeader()
+  ) {
+    return true;
+  }
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Slack toolbar keyboard — focus webhook · Save · Clear,
+ * then ←→ / h l / Home/End (Telegram settings toolbar parity).
+ */
+function wireSlackSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('slack-setting');
+  if (!container) return;
+  ensureSlackSettingsToolbarKbHint(container);
+  refreshSlackSettingsToolbarRovingTabindex(container);
+  if (container.dataset.slackSettingsToolbarKbWired === '1') return;
+  container.dataset.slackSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Slack incoming webhook');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getSlackSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshSlackSettingsToolbarRovingTabindex(container, e.target);
+      ensureSlackSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getSlackSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isSlackSettingsInput(active) ||
+        active?.id === 'slack-save' ||
+        active?.id === 'slack-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        isSlackSettingsInput(active) &&
+        !slackSettingsInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainSlackSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (
+        isSlackSettingsInput(active) &&
+        !slackSettingsInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainSlackSettingsToolbarWebhookBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshSlackSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (
+      isSlackSettingsInput(items[next]) &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
 }
 
 /** Settings: Signal alerts honest placeholder (REST API not wired; Slack/Telegram parity glance). */

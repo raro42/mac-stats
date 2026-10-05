@@ -482,6 +482,13 @@
     ) {
       window.ensureTelegramSettingsToolbarKeyboard(telegramSetting);
     }
+    const slackSetting = document.getElementById("slack-setting");
+    if (
+      slackSetting &&
+      typeof window.ensureSlackSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureSlackSettingsToolbarKeyboard(slackSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -610,6 +617,13 @@
       typeof window.ensureTelegramSettingsToolbarKeyboard === "function"
     ) {
       window.ensureTelegramSettingsToolbarKeyboard(telegramSetting);
+    }
+    const slackSetting = document.getElementById("slack-setting");
+    if (
+      slackSetting &&
+      typeof window.ensureSlackSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureSlackSettingsToolbarKeyboard(slackSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;
@@ -5028,6 +5042,7 @@
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;
   window.getModalHeaderToolbarItems = getModalHeaderToolbarItems;
   window.refreshModalHeaderRovingTabindex = refreshModalHeaderRovingTabindex;
+  window.tryChainSettingsCredentialsToHeader = tryChainSettingsCredentialsToHeader;
   window.isSettingsModalOpen = isSettingsModalOpen;
   window.isChangelogModalOpen = isChangelogModalOpen;
   window.tryChainCpuHeaderToSettingsModalAppearance =
