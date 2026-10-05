@@ -331,7 +331,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 30000;
+const CPU_WINDOW_REFRESH_MS = 45000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
 const DISCORD_ICON_STATUS_MS = 30000;
 let discordIconStatusInterval = null;
@@ -2278,25 +2278,52 @@ async function refresh() {
     updateRingHotStates(data);
     updatePowerStripHotAttention(data);
 
-    // STEP 7: Update process list only every 15 seconds to reduce CPU usage
+    // STEP 7: Update process list on a slow cadence to reduce CPU usage
     // Use document fragment to batch DOM updates and reduce WebKit reflows
     // But allow forced immediate updates when needed (e.g., after force quit, or on initial load)
     const now = Date.now();
     const forceUpdate = window._forceProcessUpdate === true;
     const isInitialLoad = lastProcessUpdate === 0;
-    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 30000) {
+    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 45000) {
       lastProcessUpdate = now;
       window._forceProcessUpdate = false; // Reset flag after use
       
       const list = document.getElementById("process-list");
       if (!list) return;
-      
-      // Skip DOM update when process list unchanged (avoids reflows and listener churn)
-      const pinnedNames = getPinnedProcessNames();
+
+      // Collapsed keep-header: glance chips only — skip full list DOM + pinned lookup (#14).
+      const processesCollapsed = isProcessesSectionCollapsed();
       let processes =
         data.top_processes && data.top_processes.length > 0
           ? data.top_processes.slice(0, 10)
           : [];
+      if (processesCollapsed) {
+        const topProc = processes.length > 0 ? processes[0] : null;
+        applyProcessesTopGlanceState({
+          topPid: topProc?.pid ?? null,
+          topName: topProc?.name ?? null,
+          topCpu: topProc?.cpu ?? null,
+          waiting: processes.length === 0,
+        });
+        const topGpuProc = pickTopGpuProcess(processes);
+        applyProcessesTopGpuGlanceState({
+          topPid: topGpuProc?.pid ?? null,
+          topName: topGpuProc?.name ?? null,
+          topGpu: topGpuProc?.gpu ?? null,
+          waiting: processes.length === 0,
+        });
+        const topRamProc = pickTopRamProcess(processes);
+        applyProcessesTopRamGlanceState({
+          topPid: topRamProc?.pid ?? null,
+          topName: topRamProc?.name ?? null,
+          topMem: topRamProc?.memory ?? null,
+          waiting: processes.length === 0,
+        });
+        return;
+      }
+      
+      // Skip DOM update when process list unchanged (avoids reflows and listener churn)
+      const pinnedNames = getPinnedProcessNames();
       if (pinnedNames.length > 0) {
         let pinnedLookup = [];
         try {
@@ -12712,6 +12739,11 @@ function initCollapsibleSections() {
       processesDivider.style.display = '';
     }
     syncProcessesCollapseA11y();
+    // Collapsed path skips list DOM (#14); force one rebuild on expand.
+    window._forceProcessUpdate = true;
+    if (refreshInterval && typeof refresh === 'function') {
+      void refresh();
+    }
     applyProcessesListFilter();
     const topGlance = document.getElementById('processes-top-glance');
     if (topGlance && !window.__processesTopPid) {
@@ -19401,7 +19433,8 @@ function stopLogsAutoRefresh() {
 
 function startLogsAutoRefresh() {
   stopLogsAutoRefresh();
-  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 2000);
+  // 10s is enough for live tails; 2s kept WebKit + IPC hot while Debug Log was open (#14).
+  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 10000);
 }
 
 function formatDiskBytes(n) {

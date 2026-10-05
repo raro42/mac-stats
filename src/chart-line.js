@@ -7,8 +7,9 @@
   "use strict";
 
   // Fewer points = less canvas work per sample (#14).
-  const LINE_CHART_POINTS = 16;
+  const LINE_CHART_POINTS = 12;
   const EMPTY_POINT = NaN;
+  let cachedSparklineBackdrop = null;
 
   function metricColor(metric, computedStyle) {
     const keys = {
@@ -75,14 +76,19 @@
   }
 
   function sparklineBackdrop() {
+    if (cachedSparklineBackdrop) return cachedSparklineBackdrop;
     try {
       const bg = window.getComputedStyle(document.body || document.documentElement)
         .backgroundColor;
-      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+        cachedSparklineBackdrop = bg;
+        return bg;
+      }
     } catch (_) {
       /* ignore */
     }
-    return "#f7f7fa";
+    cachedSparklineBackdrop = "#f7f7fa";
+    return cachedSparklineBackdrop;
   }
 
   function setupCanvas(metric) {

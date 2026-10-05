@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1393] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Metrics and data-poster history poll every 45s. Backend metric loop is 15s. Sparklines keep 12 points and cache the opaque backdrop. Collapsed Top Processes updates glance chips only (no list DOM). Debug Log auto-refresh is 10s. Apple / Light / Dark flatten always-visible action and power-strip chrome to opaque fills. Aim: quieter `tauri://localhost` / Graphics and Media.
+
+
 ## [0.1.1392] - 2026-10-05
 
 ### Changed

@@ -1,12 +1,12 @@
-# Session todo — GitHub #14 tauri://localhost CPU (follow-up #7)
+# Session todo — GitHub #14 tauri://localhost CPU (follow-up #8)
 
-- [x] Cut hot-path IPC: tauri-logger warn/error only; drop CPU Power console.log spam
-- [x] Slower open-window work: metrics/history 30s, 16 sparkline points, process details 30s, backend 12s
-- [x] Apple/Light/Dark CSS: drop expensive icon `img` filter chains
-- [x] Fix Linux unused `cpu_window_visible` in metric loop
+- [x] Slower open-window work: metrics/history 45s, backend 15s, 12 sparkline points
+- [x] Skip Top Processes DOM when Processes keep-header collapsed
+- [x] Cache sparkline backdrop; logs auto-refresh 10s
+- [x] Apple / Light / Dark: flatten always-visible translucent chrome (actions, power strip)
 - [x] `cargo check` in src-tauri/
 - [x] Version bump + CHANGELOG + task → UNTESTED-
 - [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
-v0.1.1392: cut open-window IPC and compositor work (30s polls, 12s backend loop, 16 sparkline points, warn/error-only tauri-logger, opacity-only icon imgs). macOS Activity Monitor remains the <1% acceptance gate.
+v0.1.1393: slower polls, collapsed process glance-only path, opaque action/power-strip chrome. macOS Activity Monitor remains the <1% acceptance gate.

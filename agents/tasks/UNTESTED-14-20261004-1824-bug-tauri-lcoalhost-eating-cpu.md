@@ -22,21 +22,20 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1392** (follow-up after v0.1.1391 tester FAIL).
+Version **v0.1.1393** (follow-up after v0.1.1392 tester FAIL).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
 
 Changes:
 
-- `src/tauri-logger.js` — forward warn/error only (drop console.log / info / debug → `log_from_js` IPC).
-- `src/cpu.js` — metrics poll 30s; Process Details live refresh 30s; remove hot-path CPU Power `console.log`; clear legacy Hot chrome once per session.
-- `src/history.js` — data-poster history poll 30s.
-- `src/chart-line.js` — sparkline buffer 16 points.
-- `src-tauri/src/lib.rs` — backend metric loop 12s; `cpu_window_visible` gated to macOS (fixes Linux unused warning).
-- `src-tauri/dist/themes/{apple,light,dark}/cpu.css` — drop multi-step icon `img` CSS filters (opacity only); Apple entrance animations already off.
-- `src-tauri/src/ui/status_bar_linux.rs` — clippy unused-parens on `WEBKIT_DISABLE_COMPOSITING_MODE` guard.
+- `src/cpu.js` — metrics poll 45s; process list cadence 45s; collapsed Top Processes → glance chips only; Debug Log auto-refresh 10s.
+- `src/history.js` — data-poster history poll 45s.
+- `src/chart-line.js` — sparkline buffer 12 points; cache opaque backdrop color.
+- `src-tauri/src/lib.rs` — backend metric loop 15s.
+- `src-tauri/dist/themes/{apple,light,dark}/cpu.css` — opaque action / power-strip chrome (no always-visible translucent blend).
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
+
 
 ## Prior test report (v0.1.1391)
 

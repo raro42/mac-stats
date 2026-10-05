@@ -969,10 +969,14 @@ padding: 18px 18px 16px;
   align-items: center;
   padding: 12px 10px;
   margin: 0;
-  background: transparent;
+  /* Opaque panel fill — transparent strip still composites over the shell (#14). */
+  background: #0a0a0a;
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
+  box-shadow: none;
+  transition: none;
+  contain: layout paint style;
 }
 
 .battery-info, .power-info, .lpm-info, .time-remaining {

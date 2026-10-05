@@ -500,7 +500,7 @@
       updateChartsFromBackend();
 
       // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
-      const HISTORY_POLL_MS = 30000;
+      const HISTORY_POLL_MS = 45000;
       let historyPollInterval = setInterval(() => {
         if (document.hidden) return;
         updateChartsFromBackend();
