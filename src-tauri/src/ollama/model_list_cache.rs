@@ -2,7 +2,7 @@
 //! poisoned-cache prevention: failed or empty responses do not replace a prior non-empty list.
 
 use crate::ollama::ListResponse;
-use crate::{mac_stats_info, mac_stats_warn};
+use crate::{mac_stats_debug, mac_stats_info, mac_stats_warn};
 use futures_util::future::FutureExt;
 use std::collections::HashMap;
 use std::future::Future;
@@ -15,6 +15,22 @@ const MODEL_LIST_TTL: Duration = Duration::from_secs(5 * 60);
 /// Avoid flooding debug.log when many callers hit a stale list during one bg refresh
 /// (info-level SWR messages share this interval after the kickoff log).
 const STALE_IN_PROGRESS_LOG_INTERVAL: Duration = Duration::from_secs(60);
+/// When Ollama is down / circuit-open, skip re-hitting `/api/tags` for a short window
+/// so UI + idle callers do not stampede Connection refused / circuit-open WARNs.
+const FETCH_FAIL_COOLDOWN: Duration = Duration::from_secs(30);
+/// Emit at most one fetch-fail WARN per endpoint in this interval; further fails stay DEBUG
+/// (idle-thought timeout / single-instance busy parity).
+const FETCH_FAIL_WARN_INTERVAL: Duration = Duration::from_secs(5 * 60);
+
+fn should_warn_fetch_fail(
+    last_warn: Option<Instant>,
+    now: Instant,
+    interval: Duration,
+) -> bool {
+    last_warn
+        .map(|t| now.duration_since(t) >= interval)
+        .unwrap_or(true)
+}
 
 /// Visible in `~/.mac-stats/debug.log` message text: the file log layer omits tracing `target`, so
 /// operators should `rg '\[ollama/model_cache\]'` (or the human-readable phrases) to audit stale serves.
@@ -27,6 +43,10 @@ type SharedFetch = futures_util::future::Shared<BoxFetch>;
 #[derive(Default)]
 struct EndpointEntry {
     last_success: Option<(Instant, ListResponse)>,
+    /// Last hard fetch failure (cooldown + rate-limited WARN). Cleared on success.
+    last_fail: Option<(Instant, String)>,
+    /// Last time we emitted a fetch-fail WARN for this endpoint.
+    last_fetch_fail_warn: Option<Instant>,
     bg_refreshing: bool,
     /// Last time we logged "stale; refresh already in progress" for this endpoint.
     last_stale_in_progress_log: Option<Instant>,
@@ -115,14 +135,25 @@ async fn fetch_tags_http(endpoint: &str, api_key: Option<&str>) -> FetchResult {
     Ok(list)
 }
 
+fn log_fetch_fail_warn(ent: &mut EndpointEntry, now: Instant, message: String) {
+    if should_warn_fetch_fail(ent.last_fetch_fail_warn, now, FETCH_FAIL_WARN_INTERVAL) {
+        ent.last_fetch_fail_warn = Some(now);
+        mac_stats_warn!("ollama/model_cache", "{}", message);
+    } else {
+        mac_stats_debug!("ollama/model_cache", "{} (rate-limited)", message);
+    }
+}
+
 async fn run_bg_refresh(endpoint: String, api_key: Option<String>) {
     let res = fetch_tags_http(&endpoint, api_key.as_deref()).await;
     let mut g = cache().lock().await;
     let ent = g.endpoints.entry(endpoint.clone()).or_default();
     ent.bg_refreshing = false;
+    let now = Instant::now();
     match res {
         Ok(list) if !list.models.is_empty() => {
-            ent.last_success = Some((Instant::now(), list.clone()));
+            ent.last_success = Some((now, list.clone()));
+            ent.last_fail = None;
             mac_stats_info!(
                 "ollama/model_cache",
                 "{} Background model list refresh succeeded ({} models) for {}",
@@ -140,12 +171,14 @@ async fn run_bg_refresh(endpoint: String, api_key: Option<String>) {
             );
         }
         Err(e) => {
-            mac_stats_warn!(
-                "ollama/model_cache",
-                "{} Background model list refresh failed for {}: {}",
-                MCACHE_LOG_TAG,
-                endpoint,
-                e
+            ent.last_fail = Some((now, e.clone()));
+            log_fetch_fail_warn(
+                ent,
+                now,
+                format!(
+                    "{} Background model list refresh failed for {}: {}",
+                    MCACHE_LOG_TAG, endpoint, e
+                ),
             );
         }
     }
@@ -177,7 +210,12 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
             if let Some((t, list)) = ent.last_success.clone() {
                 if now.duration_since(t) >= MODEL_LIST_TTL {
                     let age = now.duration_since(t);
-                    if !ent.bg_refreshing {
+                    let fail_cooling = ent
+                        .last_fail
+                        .as_ref()
+                        .map(|(ft, _)| now.duration_since(*ft) < FETCH_FAIL_COOLDOWN)
+                        .unwrap_or(false);
+                    if !ent.bg_refreshing && !fail_cooling {
                         ent.bg_refreshing = true;
                         // Share the same rate-limit clock so a concurrent caller does not
                         // immediately emit a second WARN for the same SWR cycle.
@@ -196,6 +234,10 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                         );
                         return Ok(list);
                     }
+                    if fail_cooling && !ent.bg_refreshing {
+                        // Recent hard fail — keep serving stale quietly until cooldown ends.
+                        return Ok(list);
+                    }
                     let should_log = ent
                         .last_stale_in_progress_log
                         .map(|t| now.duration_since(t) >= STALE_IN_PROGRESS_LOG_INTERVAL)
@@ -211,6 +253,18 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                         );
                     }
                     return Ok(list);
+                }
+            }
+            // No fresh success: honor fail cooldown so down Ollama does not stampede /api/tags.
+            // Stay silent here — the hard-fail path already rate-limits WARN.
+            if let Some((t, err)) = ent.last_fail.clone() {
+                if now.duration_since(t) < FETCH_FAIL_COOLDOWN {
+                    let prior_list = ent
+                        .last_success
+                        .as_ref()
+                        .map(|(_, l)| l.clone())
+                        .filter(|l| !l.models.is_empty());
+                    return merge_tags_fetch_result(Err(err), prior_list);
                 }
             }
         }
@@ -240,6 +294,7 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
             Ok(list) if !list.models.is_empty() => {
                 let ent = g.endpoints.entry(ep.clone()).or_default();
                 ent.last_success = Some((Instant::now(), list.clone()));
+                ent.last_fail = None;
                 Ok(list)
             }
             Ok(list) => {
@@ -267,19 +322,27 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                 merged
             }
             Err(e) => {
+                let now_err = Instant::now();
                 let prior_snapshot = g.endpoints.get(&ep).and_then(|e| e.last_success.clone());
                 let prior_list = prior_snapshot.as_ref().map(|(_, l)| l.clone());
-                mac_stats_warn!(
-                    "ollama/model_cache",
-                    "{} Model list fetch failed: {}; not updating cache",
-                    MCACHE_LOG_TAG,
-                    e
-                );
+                {
+                    let ent = g.endpoints.entry(ep.clone()).or_default();
+                    ent.last_fail = Some((now_err, e.clone()));
+                    log_fetch_fail_warn(
+                        ent,
+                        now_err,
+                        format!(
+                            "{} Model list fetch failed: {}; not updating cache",
+                            MCACHE_LOG_TAG, e
+                        ),
+                    );
+                }
                 let merged = merge_tags_fetch_result(Err(e), prior_list);
                 if let Some((age_start, stale)) = prior_snapshot.as_ref() {
                     if !stale.models.is_empty() {
                         let age = Instant::now().duration_since(*age_start);
-                        mac_stats_warn!(
+                        // Expected while Ollama is down — info, not a second WARN beside fetch-fail.
+                        mac_stats_info!(
                             "ollama/model_cache",
                             "{} Serving stale model list (last success {}s ago, {} models) after fetch error",
                             MCACHE_LOG_TAG,
@@ -297,8 +360,9 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
 
 #[cfg(test)]
 mod merge_tests {
-    use super::merge_tags_fetch_result;
+    use super::{merge_tags_fetch_result, should_warn_fetch_fail};
     use crate::ollama::{ListResponse, ModelSummary};
+    use std::time::{Duration, Instant};
 
     fn model(name: &str) -> ModelSummary {
         ModelSummary {
@@ -359,5 +423,21 @@ mod merge_tests {
         let empty = ListResponse { models: vec![] };
         let out = merge_tags_fetch_result(Ok(empty.clone()), Some(prior)).unwrap();
         assert!(out.models.is_empty());
+    }
+
+    #[test]
+    fn fetch_fail_warn_first_and_after_interval() {
+        let now = Instant::now();
+        assert!(should_warn_fetch_fail(None, now, Duration::from_secs(60)));
+        assert!(!should_warn_fetch_fail(
+            Some(now),
+            now + Duration::from_secs(30),
+            Duration::from_secs(60)
+        ));
+        assert!(should_warn_fetch_fail(
+            Some(now),
+            now + Duration::from_secs(60),
+            Duration::from_secs(60)
+        ));
     }
 }

@@ -5006,7 +5006,7 @@ function paintOpsSessionFilterFromCaches() {
 function startAgentOpsAutoRefresh() {
     if (agentOpsInterval) return;
     agentOpsInterval = setInterval(() => {
-        if (agentOpsCollapsed || opsRefreshInFlight) return;
+        if (document.hidden || agentOpsCollapsed || opsRefreshInFlight) return;
         refreshAgentOps();
     }, OPS_REFRESH_INTERVAL);
 }
@@ -5017,6 +5017,37 @@ function stopAgentOpsAutoRefresh() {
         agentOpsInterval = null;
     }
 }
+
+function stopOpsUpdatedAgoTimer() {
+    if (opsUpdatedAgoTimer) {
+        clearInterval(opsUpdatedAgoTimer);
+        opsUpdatedAgoTimer = null;
+    }
+}
+
+window.__macStatsPauseAgentOpsPolls = function () {
+    stopAgentOpsAutoRefresh();
+    stopOpsGlancePoll();
+    stopOpsUpdatedAgoTimer();
+};
+
+window.__macStatsResumeAgentOpsPolls = function () {
+    if (document.hidden) return;
+    if (!agentOpsCollapsed) {
+        startAgentOpsAutoRefresh();
+    } else {
+        startOpsGlancePoll();
+    }
+    if (opsLastRefreshMs) {
+        paintOpsUpdatedAgo();
+        if (!opsUpdatedAgoTimer) {
+            opsUpdatedAgoTimer = setInterval(() => {
+                if (document.hidden || !opsLastRefreshMs) return;
+                paintOpsUpdatedAgo();
+            }, 15_000);
+        }
+    }
+};
 
 /** Parse Discord gateway insight string (health card + collapsed glance). */
 function parseOpsDiscordGateway(dgRaw) {
@@ -5249,6 +5280,7 @@ function startOpsGlancePoll() {
     ensureOpsCollapsedGlance();
     void pollOpsCollapsedGlance();
     agentOpsGlanceInterval = setInterval(() => {
+        if (document.hidden) return;
         if (!agentOpsCollapsed) {
             stopOpsGlancePoll();
             return;
@@ -7530,7 +7562,7 @@ function markOpsRefreshedAt(ms) {
     paintOpsUpdatedAgo();
     if (opsUpdatedAgoTimer) return;
     opsUpdatedAgoTimer = setInterval(() => {
-        if (!opsLastRefreshMs) return;
+        if (document.hidden || !opsLastRefreshMs) return;
         paintOpsUpdatedAgo();
     }, 15_000);
 }

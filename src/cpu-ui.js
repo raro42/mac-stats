@@ -5099,11 +5099,11 @@
       });
     });
     
-    // Also set up click handler on version elements that might be added later
-    // This ensures version elements added by injectAppVersion() are also clickable
-    const observer = new MutationObserver((mutations) => {
+    // Wire version elements once; avoid a permanent body MutationObserver
+    // (wildcard [class*='version'] rescans on every DOM tick and wakes WebKit, #14).
+    const wireVersionClicks = () => {
       const newVersionElements = document.querySelectorAll(
-        ".app-version, .theme-version, .arch-version, [class*='version']"
+        ".app-version, .theme-version, .arch-version"
       );
       newVersionElements.forEach((el) => {
         if (!el.dataset.changelogHandler) {
@@ -5114,18 +5114,28 @@
             e.preventDefault();
             e.stopPropagation();
             if (el.classList.contains("is-just-saved")) return;
-            console.log("Version clicked (from observer), opening changelog modal");
             openChangelogModal(changelogModal, changelogBody, el);
           });
         }
       });
+    };
+    wireVersionClicks();
+    // One deferred pass for late injectAppVersion(); then stop watching.
+    const observer = new MutationObserver(() => {
+      wireVersionClicks();
     });
-    
-    // Observe the document body for new version elements
     observer.observe(document.body, {
       childList: true,
       subtree: true
     });
+    window.setTimeout(() => {
+      try {
+        observer.disconnect();
+      } catch (_) {
+        /* ignore */
+      }
+      wireVersionClicks();
+    }, 4000);
 
     // Close modal handlers
     if (closeChangelog) {

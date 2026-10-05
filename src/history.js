@@ -353,29 +353,19 @@
 
   // Update charts from backend data
   async function updateChartsFromBackend() {
+    if (document.hidden) return;
     const timeRangeSeconds = TIME_RANGES[currentTimeRange] || 300;
-    console.log(`[history] updateChartsFromBackend() called, timeRange=${currentTimeRange} (${timeRangeSeconds}s)`);
     
     const result = await fetchHistoryFromBackend(timeRangeSeconds, HISTORY_POINTS);
 
     if (!result || !result.points) {
       // History data not available yet (normal on startup) - silent return
-      console.log(`[history] No history data available yet (result=${!!result}, points=${!!result?.points})`);
       return;
     }
     
     if (result.points.length === 0) {
-      // No data points yet
-      console.log(`[history] History data empty (0 points)`);
       return;
     }
-    
-    console.log(`[history] Received ${result.points.length} history points`, {
-      oldest: result.oldest_available_timestamp,
-      newest: result.newest_available_timestamp,
-      firstPoint: result.points[0],
-      lastPoint: result.points[result.points.length - 1]
-    });
 
     // Extract data by metric
     const temperatureData = result.points.map(p => ({ value: p.temperature, timestamp: p.timestamp }));
@@ -509,8 +499,29 @@
       console.log('[history] Fetching initial history data');
       updateChartsFromBackend();
 
-      // Refresh every 2 seconds
-      setInterval(updateChartsFromBackend, 2000);
+      // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
+      const HISTORY_POLL_MS = 8000;
+      let historyPollInterval = setInterval(() => {
+        if (document.hidden) return;
+        updateChartsFromBackend();
+      }, HISTORY_POLL_MS);
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (historyPollInterval) {
+            clearInterval(historyPollInterval);
+            historyPollInterval = null;
+          }
+          return;
+        }
+        if (!historyPollInterval) {
+          updateChartsFromBackend();
+          historyPollInterval = setInterval(() => {
+            if (document.hidden) return;
+            updateChartsFromBackend();
+          }, HISTORY_POLL_MS);
+        }
+      });
       
       // Handle window resize
       let resizeTimeout;

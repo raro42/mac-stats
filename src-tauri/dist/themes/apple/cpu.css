@@ -1753,6 +1753,8 @@ transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 .disk-cleanup-section.collapsed,
 .agent-ops-section.collapsed {
   display: none !important;
+  content-visibility: hidden;
+  contain: strict;
 }
 .perplexity-config-status {
   font-size: 12px;

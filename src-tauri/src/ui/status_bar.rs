@@ -844,6 +844,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
+            .transparent(false)
             .background_color(Color(242, 242, 246, 255))
             .background_throttling(BackgroundThrottlingPolicy::Suspend)
             .build();

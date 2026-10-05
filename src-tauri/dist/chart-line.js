@@ -73,6 +73,17 @@
     return { dpr, width, height };
   }
 
+  function sparklineBackdrop() {
+    try {
+      const bg = window.getComputedStyle(document.body || document.documentElement)
+        .backgroundColor;
+      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+    } catch (_) {
+      /* ignore */
+    }
+    return "#f7f7fa";
+  }
+
   function setupCanvas(metric) {
     const canvas = canvases[metric];
     if (!canvas) return false;
@@ -89,14 +100,17 @@
     canvasLayoutCache[metric] = { dpr, width, height };
     canvas.width = width * dpr;
     canvas.height = height * dpr;
-    const ctx = canvas.getContext("2d", { alpha: true });
+    // Opaque canvas: avoid per-frame alpha blending with the shell (#14).
+    const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return false;
+    const backdrop = sparklineBackdrop();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = backdrop;
+    ctx.fillRect(0, 0, width, height);
     contexts[metric] = ctx;
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
-    canvas.style.backgroundColor = "transparent";
+    canvas.style.backgroundColor = backdrop;
     return true;
   }
 
@@ -149,7 +163,9 @@
     const colors = COLORS[metric] || COLORS.usage;
     const { width, height } = canvasLayoutSize(canvas);
     const finiteValues = buffer.line.filter((val) => Number.isFinite(val));
-    ctx.clearRect(0, 0, width, height);
+    const backdrop = sparklineBackdrop();
+    ctx.fillStyle = backdrop;
+    ctx.fillRect(0, 0, width, height);
     if (!finiteValues.length) return;
 
     const { minValue, maxValue, range } = valueRange(finiteValues, metric);

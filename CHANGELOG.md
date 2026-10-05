@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1388] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — macOS CPU window forces `transparent(false)` like Linux. Metrics poll every 8s. Hidden window pauses monitors, disk-cleanup glance, logs glance, Discord icon, and Agent Ops timers. Opaque sparklines (no canvas alpha). Data-poster history poll 8s (was 2s) and quiet when hidden. Dark theme drops infinite hover glow. Changelog MutationObserver disconnects after wire-up. Aim: quieter `tauri://localhost` / Graphics and Media.
+- **Ollama model-list fetch quieter when down** — after a hard `/api/tags` failure, wait 30s before retrying the same endpoint, and emit at most one WARN every 5 minutes (further fails stay DEBUG). Stale-while-revalidate also skips background refresh during that cooldown. Cuts Connection refused / circuit-open spam in `debug.log` when Ollama is off.
+
+
 ## [0.1.1387] - 2026-10-05
 
 ### Changed

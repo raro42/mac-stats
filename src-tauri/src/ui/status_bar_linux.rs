@@ -105,6 +105,15 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         .map(|g| (g.width, g.height))
         .unwrap_or((default_w, default_h));
 
+    // Prefer software compositing when the compositor path pegs a WebKit core (#14).
+    // Safe no-op if already set by the operator; WKWebView on macOS ignores this.
+    if (std::env::var_os("WEBKIT_DISABLE_COMPOSITING_MODE").is_none()) {
+        // SAFETY: set before the first WebView is created in this process path.
+        unsafe {
+            std::env::set_var("WEBKIT_DISABLE_COMPOSITING_MODE", "1");
+        }
+    }
+
     // Opaque fill; Suspend is macOS 14+ (no-op on Linux). Keeps parity with macOS (#14).
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))

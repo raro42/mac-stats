@@ -331,7 +331,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 5000;
+const CPU_WINDOW_REFRESH_MS = 8000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
 const DISCORD_ICON_STATUS_MS = 30000;
 let discordIconStatusInterval = null;
@@ -1622,7 +1622,7 @@ async function refresh() {
         clearInterval(refreshInterval);
       }
       refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
-      console.log("Got real data, switched to 5-second interval");
+      console.log("Got real data, switched to 8-second interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -5539,10 +5539,46 @@ window.addEventListener("load", () => {
   }
 });
 
+function pauseIdleWindowPolls() {
+  stopRefresh();
+  stopDiscordIconStatus();
+  stopLogsGlancePoll();
+  stopDiskCleanupGlancePoll();
+  if (monitorsUpdateInterval) {
+    clearInterval(monitorsUpdateInterval);
+    monitorsUpdateInterval = null;
+  }
+  if (typeof window.__macStatsPauseAgentOpsPolls === "function") {
+    window.__macStatsPauseAgentOpsPolls();
+  }
+}
+
+function resumeIdleWindowPolls() {
+  startDiscordIconStatus();
+  startLogsGlancePoll();
+  if (typeof diskCleanupCollapsed !== "undefined" && diskCleanupCollapsed) {
+    startDiskCleanupGlancePoll();
+  }
+  if (typeof window.__macStatsResumeAgentOpsPolls === "function") {
+    window.__macStatsResumeAgentOpsPolls();
+  }
+  // Monitors: restart light summary poll (full list only when expanded).
+  if (!monitorsUpdateInterval) {
+    monitorsUpdateInterval = setInterval(() => {
+      if (document.hidden) return;
+      updateMonitorsSummary();
+      if (!monitorsCollapsed) {
+        loadMonitors().then(() => {
+          updateMonitorsHeight();
+        });
+      }
+    }, 30000);
+  }
+}
+
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    stopRefresh();
-    stopDiscordIconStatus();
+    pauseIdleWindowPolls();
     return;
   }
   window._forceProcessUpdate = true;
@@ -5552,7 +5588,7 @@ document.addEventListener("visibilitychange", () => {
     if (!refreshInterval) {
       startRefresh();
     }
-    startDiscordIconStatus();
+    resumeIdleWindowPolls();
   } else {
     init();
   }

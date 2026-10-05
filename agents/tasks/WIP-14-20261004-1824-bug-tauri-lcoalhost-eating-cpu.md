@@ -22,21 +22,23 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1387** (follow-up after v0.1.1356 / v0.1.1386 tester FAIL).
+Version **v0.1.1388** (follow-up after v0.1.1387 tester FAIL).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and timer work.
 
 Changes:
 
-- `src/agent-ops.css` — force `transition: none` on ring progress; `content-visibility: hidden` + `contain: strict` on collapsed section bodies.
-- `src-tauri/dist/themes/apple/cpu.css` — flat opaque body/shell/metric cards (no stacked radial glass); ring stroke-dashoffset instant; smaller shadows.
-- `src-tauri/dist/themes/architect/cpu.css` — ring transition removed.
-- `src/cpu.js` — metrics poll 5s; Discord icon status 30s; both pause when `document.hidden`.
-- `src-tauri/src/ui/status_bar.rs` (+ Linux twin) — opaque `background_color`, `BackgroundThrottlingPolicy::Suspend` (macOS 14+); Linux also `transparent(false)`.
-- Apple theme CDN markdown scripts use `defer`.
+- `src-tauri/src/ui/status_bar.rs` — `.transparent(false)` on macOS CPU window (parity with Linux).
+- `src/cpu.js` — metrics poll 8s; `visibilitychange` pauses monitors / disk-cleanup / logs / Discord / Agent Ops polls.
+- `src/agent-ops.js` — pause/resume hooks for hidden window; glance and updated-ago skip when hidden.
+- `src/chart-line.js` — opaque canvas (`alpha: false`) to avoid sparkline blending.
+- `src/history.js` — data-poster history poll 8s (was 2s); pause when hidden; drop per-tick console spam.
+- `src/cpu-ui.js` — changelog MutationObserver disconnects after late wire-up (no permanent body watch).
+- `src-tauri/dist/themes/dark/cpu.css` — remove infinite hover `glow-rotate`.
+- Apple collapsed icon-line panes keep `content-visibility` + `contain`.
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
 
-## Prior test report (v0.1.1356)
+## Prior test report (v0.1.1387)
 
-**Result: FAIL** on Linux webkit2gtk (~95–107% WebKit). Static cuts landed; under-1% target not met. See git history for full report.
+**Result: FAIL** on Linux webkit2gtk (~85% WebKit). Static cuts landed; under-1% target not met. See git history for full report.

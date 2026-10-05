@@ -109,16 +109,8 @@ body {
 
 .glass-panel:hover::before {
   opacity: 1;
-  animation: glow-rotate 2s linear infinite;
-}
-
-@keyframes glow-rotate {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+  /* Static hover wash only — infinite glow-rotate kept the WebView compositor busy (#14). */
+  animation: none;
 }
 
 .panel-header {
