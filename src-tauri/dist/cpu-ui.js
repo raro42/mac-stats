@@ -433,6 +433,13 @@
     ) {
       window.ensurePerplexitySettingsToolbarKeyboard(perplexitySetting);
     }
+    const braveSetting = document.getElementById("brave-setting");
+    if (
+      braveSetting &&
+      typeof window.ensureBraveSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureBraveSettingsToolbarKeyboard(braveSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -512,6 +519,13 @@
       typeof window.ensurePerplexitySettingsToolbarKeyboard === "function"
     ) {
       window.ensurePerplexitySettingsToolbarKeyboard(perplexitySetting);
+    }
+    const braveSetting = document.getElementById("brave-setting");
+    if (
+      braveSetting &&
+      typeof window.ensureBraveSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureBraveSettingsToolbarKeyboard(braveSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;

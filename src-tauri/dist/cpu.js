@@ -12814,6 +12814,227 @@ async function refreshBraveStatus() {
   }
 }
 
+function braveSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+/** Focusable Settings Brave key toolbar items (key input · Save · Clear). */
+function getBraveSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('brave-setting');
+  if (!container) return [];
+  const ids = ['brave-api-key-input', 'brave-save-key', 'brave-clear-key'];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshBraveSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('brave-setting');
+  const items = getBraveSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Brave key, Save, and Clear when Settings is open. */
+const BRAVE_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at key start/end · key first crosses to Perplexity · Clear last crosses to Redmine';
+
+/**
+ * Theme HTML ships the hint under the key field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureBraveSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('brave-setting');
+  if (!container) return;
+  const actions = container.querySelector('.brave-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.brave-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getBraveSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'brave-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = BRAVE_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+function focusCredentialControl(id) {
+  const el = document.getElementById(id);
+  if (!el || el.hidden || el.disabled) return false;
+  try {
+    el.focus();
+  } catch (_) {
+    return false;
+  }
+  if (el.tagName === 'INPUT' && typeof el.setSelectionRange === 'function') {
+    const len = (el.value || '').length;
+    el.setSelectionRange(len, len);
+  }
+  return true;
+}
+
+/** Brave key first ← Perplexity Clear, else footer version, when Settings is open. */
+function tryChainBraveSettingsToolbarKeyBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('perplexity-clear-key')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Brave Clear last → Redmine URL, else footer version, when Settings is open. */
+function tryChainBraveSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('redmine-url-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Brave key toolbar keyboard — focus key input · Save · Clear,
+ * then ←→ / h l / Home/End (Perplexity settings toolbar parity).
+ */
+function wireBraveSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('brave-setting');
+  if (!container) return;
+  ensureBraveSettingsToolbarKbHint(container);
+  refreshBraveSettingsToolbarRovingTabindex(container);
+  if (container.dataset.braveSettingsToolbarKbWired === '1') return;
+  container.dataset.braveSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Brave Search API key');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getBraveSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshBraveSettingsToolbarRovingTabindex(container, e.target);
+      ensureBraveSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getBraveSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        active?.id === 'brave-api-key-input' ||
+        active?.id === 'brave-save-key' ||
+        active?.id === 'brave-clear-key'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        active?.id === 'brave-api-key-input' &&
+        !braveSettingsInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainBraveSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (
+        active?.id === 'brave-api-key-input' &&
+        !braveSettingsInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainBraveSettingsToolbarKeyBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshBraveSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (
+      items[next]?.id === 'brave-api-key-input' &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 /** Settings: Save / Clear Brave Search API key (Perplexity key parity). */
 function initBraveSettings() {
   const saveBtn = document.getElementById('brave-save-key');
@@ -12915,8 +13136,11 @@ function initBraveSettings() {
     });
   }
 
+  wireBraveSettingsToolbarKeyboard();
+
   refreshBraveStatus();
   window.BraveSettings = { refreshStatus: refreshBraveStatus };
+  window.ensureBraveSettingsToolbarKeyboard = wireBraveSettingsToolbarKeyboard;
 }
 
 function updateRedmineConfigStatus(statusText, elId) {
