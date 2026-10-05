@@ -140,14 +140,16 @@
       .modal-header-kb-hint,
       .process-details-header-kb-hint,
       .changelog-header-kb-hint,
-      .settings-header-kb-hint {
+      .settings-header-kb-hint,
+      .ollama-settings-header-kb-hint {
         margin: 0;
         font-size: 11px;
         opacity: 0.72;
         flex: 1 1 auto;
         text-align: center;
       }
-      .settings-header h2[tabindex]:focus {
+      .settings-header h2[tabindex]:focus,
+      .ollama-settings-popover .popover-header h3[tabindex]:focus {
         outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
         outline-offset: 2px;
         border-radius: 4px;
@@ -165,7 +167,7 @@
     }
     if (title.hidden || closeBtn.hidden || closeBtn.disabled) return false;
     const shell = header.closest(
-      "#process-details-modal, #changelog-modal, #settings-modal"
+      "#process-details-modal, #changelog-modal, #settings-modal, #ollama-settings-popover"
     );
     if (shell) {
       if (
@@ -188,18 +190,20 @@
     if (titleId === "process-details-title") return "process-details-header-kb-hint";
     if (titleId === "changelog-modal-title") return "changelog-header-kb-hint";
     if (titleId === "settings-title") return "settings-header-kb-hint";
+    if (titleId === "ollama-settings-title") return "ollama-settings-header-kb-hint";
     return "";
   }
 
   /**
-   * Theme HTML ships Process Details, Changelog, and Settings hints between the title and Close.
-   * They stay hidden until both controls are on screen. Create them only on older shells.
+   * Theme HTML ships Process Details, Changelog, Settings, and Ollama settings hints
+   * between the title and Close. They stay hidden until both controls are on screen.
+   * Create them only on older shells.
    */
   function ensureModalHeaderKbHint(header, titleId, closeId, closeSelector, hintText) {
     if (!header) return;
     const seededClass = seededModalHeaderKbClass(titleId);
     let hint = header.querySelector(
-      ".process-details-header-kb-hint, .changelog-header-kb-hint, .modal-header-kb-hint, .settings-header-kb-hint"
+      ".process-details-header-kb-hint, .changelog-header-kb-hint, .modal-header-kb-hint, .settings-header-kb-hint, .ollama-settings-header-kb-hint"
     );
     if (seededClass && !modalHeaderPairOnScreen(header, titleId, closeId)) {
       if (hint) hint.hidden = true;
