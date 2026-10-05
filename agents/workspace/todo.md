@@ -11,8 +11,8 @@
 - [x] `cargo check` in src-tauri/
 - [x] Rough CPU sample with `--cpu` on this host (WebKit still ~99% on Linux blank-floor host)
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit and push origin/main (do not close GitHub #14)
+- [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 
-v0.1.1388 cuts remaining idle timers and compositor blends for the macOS `tauri://localhost` / Graphics and Media path. Linux webkit2gtk still shows ~99% WebKitWebProcess after warm (same host floor as prior blank-page A/B); macOS Activity Monitor remains the acceptance gate.
+v0.1.1388 cuts remaining idle timers and compositor blends for the macOS `tauri://localhost` / Graphics and Media path. Linux webkit2gtk still shows ~99% WebKitWebProcess after warm (same host floor as prior blank-page A/B); macOS Activity Monitor remains the acceptance gate. Task file is `UNTESTED-14-…`; issue #14 left open.
