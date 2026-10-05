@@ -11218,6 +11218,14 @@ function refreshOllamaSettingsToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/** How to move across the system prompt, Reset, and Save. */
+const OLLAMA_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at prompt start/end · prompt first ↑ → AI Chat icon · at start crosses to footer version · at end crosses to footer version';
+
+/**
+ * Theme HTML ships the hint under the system prompt, Reset, and Save.
+ * It stays hidden until the popover is open. Create it only on older shells.
+ */
 function ensureOllamaSettingsToolbarKbHint(wrap) {
   const content =
     wrap || document.querySelector('#ollama-settings-popover .popover-content');
@@ -11225,17 +11233,24 @@ function ensureOllamaSettingsToolbarKbHint(wrap) {
   const actions = content.querySelector('.popover-actions');
   if (!actions) return;
   let hint = actions.querySelector('.ollama-settings-toolbar-kb-hint');
+  if (!isOllamaSettingsPopoverOpen()) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getOllamaSettingsToolbarItems(content);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'ollama-settings-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
     actions.appendChild(hint);
   }
-  const items = getOllamaSettingsToolbarItems(content);
-  hint.hidden = items.length < 2;
-  hint.textContent = isOllamaSettingsPopoverOpen()
-    ? '← → / h l · Home/End move · arrows at prompt start/end · prompt first ↑ → AI Chat icon · at start crosses to footer version · at end crosses to footer version'
-    : '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to header Close · at end crosses to header Close';
+  hint.hidden = false;
+  hint.textContent = OLLAMA_SETTINGS_TOOLBAR_KB_HINT;
 }
 
 function isOllamaSettingsPopoverOpen() {
@@ -11490,6 +11505,8 @@ function closeOllamaSettingsPopover() {
   if (popover) {
     popover.style.display = 'none';
     popover.setAttribute('aria-hidden', 'true');
+    const settingsContent = popover.querySelector('.popover-content');
+    if (settingsContent) ensureOllamaSettingsToolbarKbHint(settingsContent);
   }
   const returnEl = ollamaSettingsFocusReturn;
   ollamaSettingsFocusReturn = null;
