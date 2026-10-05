@@ -245,7 +245,7 @@ body {
   white-space: nowrap;
 }
 
-/* Click-to-copy injects styles globally — keep poster values absolutely centered. */
+/* Click-to-copy injects styles globally ï¿½ keep poster values absolutely centered. */
 .poster-tile .metric-value[data-metric-copy="1"] {
   position: absolute;
   top: 50%;
@@ -403,7 +403,7 @@ body {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Poster credit strip — last in the panel scroll, not sticky over gauges or lists. */
+/* Poster credit strip ï¿½ last in the panel scroll, not sticky over gauges or lists. */
 .theme-footer {
   display: flex;
   justify-content: center;
@@ -2389,4 +2389,13 @@ body {
 
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
+}
+
+/* Collapsed panes: skip layout/paint when off (#14). */
+.perplexity-section.collapsed,
+.logs-section.collapsed,
+.disk-cleanup-section.collapsed,
+.agent-ops-section.collapsed {
+  content-visibility: hidden;
+  contain: strict;
 }

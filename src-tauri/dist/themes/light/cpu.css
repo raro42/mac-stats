@@ -363,7 +363,8 @@ body {
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.10));
+  /* No drop-shadow — SVG filters keep the WebView compositor busy (#14). */
+  filter: none;
 }
 
 .section-title {
@@ -2475,4 +2476,13 @@ body {
 
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
+}
+
+/* Collapsed panes: skip layout/paint when off (#14). */
+.perplexity-section.collapsed,
+.logs-section.collapsed,
+.disk-cleanup-section.collapsed,
+.agent-ops-section.collapsed {
+  content-visibility: hidden;
+  contain: strict;
 }

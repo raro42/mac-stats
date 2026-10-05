@@ -56,12 +56,10 @@ body {
 
 border-radius: 24px;
 
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.08);
+  /* Flat border only — multi-layer shadows keep Graphics and Media busy (#14). */
+  box-shadow: none;
 
   padding: 40px 38px 30px;
 
@@ -83,39 +81,32 @@ border-radius: 24px;
 .apple-details {
   padding: 10px 12px 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.22);
+  /* Solid fills — rgba panels force continuous alpha blend (#14). */
+  background: #ffffff;
   border: 1px solid var(--hairline);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow: none;
+  transition: none;
 }
 
 .apple-details:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, var(--hairline));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 4px 12px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  border-color: var(--hairline);
+  box-shadow: none;
 }
 
 .apple-processes {
   padding: 10px 12px 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.22);
+  background: #ffffff;
   border: 1px solid var(--hairline);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow: none;
+  transition: none;
 }
 
 .apple-processes:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, var(--hairline));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 4px 12px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  border-color: var(--hairline);
+  box-shadow: none;
 }
 
 /* Collapsible header styling */
@@ -185,27 +176,7 @@ border-radius: 24px;
   background: rgba(0, 0, 0, 0.25);
 }
 
-.apple-shell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.72),
-    rgba(255, 255, 255, 0.30)
-  );
-
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-
-  pointer-events: none;
-}
+/* No ::before gradient mask — masked edge layers keep WebKit compositing (#14). */
 
 .apple-header {
   display: flex;
@@ -333,13 +304,10 @@ border-radius: 24px;
 .metric-card {
   position: relative;
   border-radius: 20px;
-  /* Opaque-ish cards — translucent glass + large shadows cost compositor (#14). */
+  /* Opaque cards — no soft shadows (Graphics and Media idle cost, #14). */
   background: #ffffff;
-  border: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.70),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: none;
   padding: 16px 12px;
   min-height: 160px;
   overflow: hidden;
@@ -353,10 +321,7 @@ border-radius: 24px;
 .metric-card:hover {
   transform: none;
   background: #ffffff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .metric-card:focus-within {
@@ -996,13 +961,10 @@ padding: 18px 18px 16px;
   height: 44px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.30);
-  border: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.58),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
-    0 3px 10px rgba(0, 0, 0, 0.08);
-transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: none;
+  transition: none;
 }
 
 .history-chart-caption {
@@ -1020,12 +982,10 @@ transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .history-chart-container:hover {
-  background: rgba(255, 255, 255, 0.38);
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
-    0 5px 14px rgba(0, 0, 0, 0.10);
+  background: #ffffff;
+  transform: none;
+  box-shadow: none;
+}
 }
 
 .history-chart {

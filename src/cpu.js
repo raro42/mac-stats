@@ -331,7 +331,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 8000;
+const CPU_WINDOW_REFRESH_MS = 12000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
 const DISCORD_ICON_STATUS_MS = 30000;
 let discordIconStatusInterval = null;
@@ -1622,7 +1622,7 @@ async function refresh() {
         clearInterval(refreshInterval);
       }
       refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
-      console.log("Got real data, switched to 8-second interval");
+      console.log("Got real data, switched to 12-second interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -2289,7 +2289,7 @@ async function refresh() {
     const now = Date.now();
     const forceUpdate = window._forceProcessUpdate === true;
     const isInitialLoad = lastProcessUpdate === 0;
-    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 15000) {
+    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 30000) {
       lastProcessUpdate = now;
       window._forceProcessUpdate = false; // Reset flag after use
       
@@ -5285,12 +5285,13 @@ function ensureAppBannerStyles() {
       border-radius: 14px;
       font: 12px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
       color: var(--text, rgba(12, 12, 16, 0.88));
-      background: var(--panel, rgba(255, 255, 255, 0.72));
-      border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.7));
-      box-shadow: var(--panel-shadow, 0 16px 48px rgba(0, 0, 0, 0.12));
-      backdrop-filter: blur(28px) saturate(160%);
-      -webkit-backdrop-filter: blur(28px) saturate(160%);
-      animation: mac-stats-banner-in 0.32s ease-out;
+      background: var(--panel, #f7f7fa);
+      border: 1px solid var(--panel-border, rgba(0, 0, 0, 0.08));
+      box-shadow: none;
+      /* No live backdrop-filter — keeps WebView compositor busy (#14). */
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      animation: none;
     }
     @keyframes mac-stats-banner-in {
       from { opacity: 0; transform: translateY(-6px); }
@@ -5544,6 +5545,7 @@ function pauseIdleWindowPolls() {
   stopDiscordIconStatus();
   stopLogsGlancePoll();
   stopDiskCleanupGlancePoll();
+  stopHistoryAvailabilityPoll();
   if (monitorsUpdateInterval) {
     clearInterval(monitorsUpdateInterval);
     monitorsUpdateInterval = null;
@@ -5554,8 +5556,10 @@ function pauseIdleWindowPolls() {
 }
 
 function resumeIdleWindowPolls() {
+  if (document.hidden) return;
   startDiscordIconStatus();
   startLogsGlancePoll();
+  startHistoryAvailabilityPoll();
   if (typeof diskCleanupCollapsed !== "undefined" && diskCleanupCollapsed) {
     startDiskCleanupGlancePoll();
   }
@@ -5576,11 +5580,8 @@ function resumeIdleWindowPolls() {
   }
 }
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    pauseIdleWindowPolls();
-    return;
-  }
+function resumeVisibleWindowWork() {
+  if (document.hidden) return;
   window._forceProcessUpdate = true;
   if (invoke) {
     void seedThemeHistoryFromBackend();
@@ -5592,6 +5593,23 @@ document.addEventListener("visibilitychange", () => {
   } else {
     init();
   }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    pauseIdleWindowPolls();
+    return;
+  }
+  resumeVisibleWindowWork();
+});
+
+// macOS often keeps visibilityState=visible when another app is frontmost;
+// pause timers on blur so tauri://localhost does not keep polling (#14).
+window.addEventListener("blur", () => {
+  pauseIdleWindowPolls();
+});
+window.addEventListener("focus", () => {
+  resumeVisibleWindowWork();
 });
 
 // Process details popover
@@ -24346,6 +24364,25 @@ async function checkHistoryAvailability() {
   }
 }
 
+let historyAvailabilityInterval = null;
+
+function stopHistoryAvailabilityPoll() {
+  if (historyAvailabilityInterval) {
+    clearInterval(historyAvailabilityInterval);
+    historyAvailabilityInterval = null;
+  }
+}
+
+function startHistoryAvailabilityPoll() {
+  stopHistoryAvailabilityPoll();
+  if (document.hidden) return;
+  checkHistoryAvailability();
+  historyAvailabilityInterval = setInterval(() => {
+    if (document.hidden) return;
+    checkHistoryAvailability();
+  }, 60000);
+}
+
 // Initialize history controls
 function initHistoryControls() {
   const timeRangeSelect = document.getElementById('time-range-select');
@@ -24356,9 +24393,7 @@ function initHistoryControls() {
     });
   }
 
-  // Check history availability periodically
-  checkHistoryAvailability();
-  setInterval(checkHistoryAvailability, 60000); // Check every minute
+  startHistoryAvailabilityPoll();
 }
 
 // Initialize monitoring features when DOM is ready

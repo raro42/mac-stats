@@ -894,6 +894,7 @@ function isOllamaSectionCollapsed() {
 
 /** Expand AI Chat if collapsed (model glance / Offline CTA / collapsed glance). */
 function ensureOllamaSectionExpanded() {
+  void ensureMarkdownLibs();
   const content = document.getElementById('ollama-content');
   const section = document.querySelector('.ollama-section');
   const header = document.getElementById('ollama-header');
@@ -2831,6 +2832,8 @@ async function sendChatMessage() {
     return;
   }
 
+  await ensureMarkdownLibs();
+
   console.log('[Ollama] ========== sendChatMessage() CALLED ==========');
   console.log('[Ollama] Message:', message);
   console.log('[Ollama] Conversation history length:', conversationHistory.length);
@@ -3371,6 +3374,57 @@ async function executeJavaScriptCode(code) {
 // ============================================================================
 
 /**
+ * Lazy-load marked + highlight.js once (not on every window open — #14).
+ * Falls back silently if CDN is unreachable; chat still shows escaped text.
+ */
+let markdownLibsPromise = null;
+
+function ensureMarkdownLibs() {
+  if (typeof marked !== 'undefined') {
+    return Promise.resolve(true);
+  }
+  if (markdownLibsPromise) return markdownLibsPromise;
+  markdownLibsPromise = new Promise((resolve) => {
+    const head = document.head || document.documentElement;
+    if (!document.getElementById('mac-stats-hljs-css')) {
+      const link = document.createElement('link');
+      link.id = 'mac-stats-hljs-css';
+      link.rel = 'stylesheet';
+      link.href =
+        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+      head.appendChild(link);
+    }
+    let pending = 2;
+    const done = () => {
+      pending -= 1;
+      if (pending <= 0) resolve(typeof marked !== 'undefined');
+    };
+    const loadScript = (id, src) => {
+      if (document.getElementById(id)) {
+        done();
+        return;
+      }
+      const s = document.createElement('script');
+      s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = done;
+      s.onerror = done;
+      head.appendChild(s);
+    };
+    loadScript(
+      'mac-stats-marked',
+      'https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js'
+    );
+    loadScript(
+      'mac-stats-hljs',
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
+    );
+  });
+  return markdownLibsPromise;
+}
+
+/**
  * Render assistant markdown to HTML (escaped fallback).
  */
 function renderMarkdownHtml(text) {
@@ -3887,6 +3941,7 @@ window.Ollama = {
   
   // UI
   addMessage: addChatMessage,
+  ensureMarkdownLibs: ensureMarkdownLibs,
   setAssistantMessageContent: setAssistantMessageContent,
   initListeners: initOllamaChatListeners,
   syncCollapsedGlance: syncOllamaCollapsedGlance,

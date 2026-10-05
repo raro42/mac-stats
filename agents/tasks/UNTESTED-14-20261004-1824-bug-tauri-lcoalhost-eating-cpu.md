@@ -22,23 +22,32 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1388** (follow-up after v0.1.1387 tester FAIL).
+Version **v0.1.1389** (follow-up after v0.1.1388 tester FAIL).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and timer work.
 
 Changes:
 
-- `src-tauri/src/ui/status_bar.rs` — `.transparent(false)` on macOS CPU window (parity with Linux).
-- `src/cpu.js` — metrics poll 8s; `visibilitychange` pauses monitors / disk-cleanup / logs / Discord / Agent Ops polls.
-- `src/agent-ops.js` — pause/resume hooks for hidden window; glance and updated-ago skip when hidden.
-- `src/chart-line.js` — opaque canvas (`alpha: false`) to avoid sparkline blending.
-- `src/history.js` — data-poster history poll 8s (was 2s); pause when hidden; drop per-tick console spam.
-- `src/cpu-ui.js` — changelog MutationObserver disconnects after late wire-up (no permanent body watch).
-- `src-tauri/dist/themes/dark/cpu.css` — remove infinite hover `glow-rotate`.
-- Apple collapsed icon-line panes keep `content-visibility` + `contain`.
+- `src-tauri/dist/themes/apple/cpu.css` — remove shell `::before` gradient mask; flat opaque panels (no soft shadows / rgba washes); opaque history chart chrome.
+- `src-tauri/dist/themes/{neon,futuristic,light}/cpu.css` — ring `filter: drop-shadow` → `none`.
+- Themes — collapsed panes get `content-visibility: hidden` + `contain: strict`.
+- `src/cpu.js` — metrics poll 12s; process list 30s; pause idle polls on window `blur` (macOS stays visible when occluded); history-availability poll pause/resume; banner styles drop live `backdrop-filter`.
+- `src/chart-line.js` — stroke-only sparklines (no area fill).
+- `src/history.js` — data-poster history poll 12s.
+- `src/ollama.js` + Apple `cpu.html` — marked/highlight.js load on demand when AI Chat needs markdown (no CDN on every open).
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
 
-## Prior test report (v0.1.1387)
+## Prior test report (v0.1.1388)
 
-**Result: FAIL** on Linux webkit2gtk (~85% WebKit). Static cuts landed; under-1% target not met. See git history for full report.
+**Result: FAIL** (blocked for product acceptance; build static cuts look landed)
+
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Static verification (PASS)** — all coder-listed cuts present at **v0.1.1388**.
+
+**Why not CLOSED**
+1. Issue acceptance is **&lt;1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. `cargo test` red (7 harness_ops). Unrelated to #14 cuts, but verification preference failed.
+
+Do **not** close GitHub #14.

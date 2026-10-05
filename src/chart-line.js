@@ -204,16 +204,7 @@
       }
     }
 
-    ctx.beginPath();
-    ctx.moveTo(points[firstIdx].x, height);
-    for (let i = firstIdx; i <= lastIdx; i++) {
-      if (!points[i].empty) ctx.lineTo(points[i].x, points[i].y);
-    }
-    ctx.lineTo(points[lastIdx].x, height);
-    ctx.closePath();
-    ctx.fillStyle = colors.fill;
-    ctx.fill();
-
+    // Stroke only — area fills force extra canvas blend work every sample (#14).
     ctx.beginPath();
     let started = false;
     for (let i = firstIdx; i <= lastIdx; i++) {

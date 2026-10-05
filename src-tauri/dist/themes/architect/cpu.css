@@ -2396,3 +2396,12 @@ padding: 0;
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
 }
+
+/* Collapsed panes: skip layout/paint when off (#14). */
+.perplexity-section.collapsed,
+.logs-section.collapsed,
+.disk-cleanup-section.collapsed,
+.agent-ops-section.collapsed {
+  content-visibility: hidden;
+  contain: strict;
+}

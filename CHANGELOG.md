@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1389] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Apple shell drops the gradient mask and soft shadows for flat opaque panels. Sparklines paint stroke-only. Metrics / history poll every 12s; process list every 30s. Window blur pauses idle polls (macOS stays `visible` when occluded). marked/highlight.js load only when AI Chat needs markdown. Neon / Futuristic / Light rings drop SVG `drop-shadow`. Aim: quieter `tauri://localhost` / Graphics and Media.
+
+
 ## [0.1.1388] - 2026-10-05
 
 ### Changed

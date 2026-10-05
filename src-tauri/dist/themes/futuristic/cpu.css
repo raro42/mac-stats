@@ -278,7 +278,8 @@ body {
   stroke-dashoffset: 264;
   transform: rotate(-120deg);
   transform-origin: 50% 50%;
-  filter: drop-shadow(0 0 8px rgba(59, 214, 255, 0.35));
+  /* No drop-shadow — SVG filters keep the WebView compositor busy (#14). */
+  filter: none;
 }
 
 .details-section {
@@ -2385,4 +2386,13 @@ body {
 
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
+}
+
+/* Collapsed panes: skip layout/paint when off (#14). */
+.perplexity-section.collapsed,
+.logs-section.collapsed,
+.disk-cleanup-section.collapsed,
+.agent-ops-section.collapsed {
+  content-visibility: hidden;
+  contain: strict;
 }

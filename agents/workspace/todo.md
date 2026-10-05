@@ -1,18 +1,16 @@
-# Session todo — GitHub #14 tauri://localhost CPU (follow-up #3)
+# Session todo — GitHub #14 tauri://localhost CPU (follow-up #4)
 
 - [x] Pick lowest GitHub task (WIP-14 / issue 14)
-- [x] macOS: `.transparent(false)` on CPU window (Linux already has it)
-- [x] Pause monitors / disk-cleanup glance / agent-ops timers on `document.hidden`
-- [x] Opaque sparklines (no canvas alpha)
-- [x] Kill dark-theme hover infinite `glow-rotate`
-- [x] Metrics poll 5s → 8s; history.js 2s → 8s
-- [x] Disconnect changelog MutationObserver after wire-up
+- [x] Pause idle polls on window `blur` (macOS stays `visible` when occluded)
+- [x] Opaque Apple primary surfaces (no rgba panel blend); drop ring `drop-shadow` filters
+- [x] Stroke-only sparklines (no area fill); metrics poll 12s; process list 30s
+- [x] Lazy-load marked/hljs (remove always-on CDN from Apple theme head)
+- [x] content-visibility collapsed sections on remaining themes
 - [x] Sync dist, bump version, CHANGELOG
 - [x] `cargo check` in src-tauri/
-- [x] Rough CPU sample with `--cpu` on this host (WebKit still ~99% on Linux blank-floor host)
 - [x] Rename WIP-14 → UNTESTED-14
 - [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 
-v0.1.1388 cuts remaining idle timers and compositor blends for the macOS `tauri://localhost` / Graphics and Media path. Linux webkit2gtk still shows ~99% WebKitWebProcess after warm (same host floor as prior blank-page A/B); macOS Activity Monitor remains the acceptance gate. Task file is `UNTESTED-14-…`; issue #14 left open.
+v0.1.1389 cuts remaining Apple compositor chrome (gradient mask, soft shadows, rgba panels), pauses polls on blur, slows metrics to 12s, stroke-only sparklines, and lazy-loads markdown libs. Linux webkit2gtk blank-page floor remains; macOS Activity Monitor is the acceptance gate.
