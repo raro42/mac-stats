@@ -7265,6 +7265,16 @@ button.monitor-detail-url.is-just-saved {
   display: none !important;
 }
 
+.appearance-setting-kb-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.appearance-setting-kb-hint[hidden] {
+  display: none !important;
+}
+
 .credentials-section-kb-hint {
   margin: 8px 0 0;
   font-size: 11px;

@@ -497,6 +497,12 @@
     if (credentialsSection) {
       wireCredentialsSectionToolbarKeyboard(credentialsSection);
     }
+    const appearanceSection = settingsModal.querySelector(
+      'section[aria-labelledby="settings-appearance-heading"]'
+    );
+    if (appearanceSection) {
+      wireAppearanceSettingToolbarKeyboard(appearanceSection);
+    }
     requestAnimationFrame(() => {
       const closeBtn = document.getElementById("close-settings");
       if (closeBtn) {
@@ -630,6 +636,12 @@
     );
     if (credentialsSection) {
       wireCredentialsSectionToolbarKeyboard(credentialsSection);
+    }
+    const appearanceSection = settingsModal.querySelector(
+      'section[aria-labelledby="settings-appearance-heading"]'
+    );
+    if (appearanceSection) {
+      wireAppearanceSettingToolbarKeyboard(appearanceSection);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;
@@ -802,6 +814,37 @@
     document.head.appendChild(style);
   }
 
+  /** How to move across Appearance controls when Settings is open. */
+  const APPEARANCE_SETTING_KB_HINT =
+    "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at start crosses to header Settings (or modal header) · at end crosses to Product";
+
+  /**
+   * Theme HTML ships the hint at the end of the Appearance section.
+   * It stays hidden until Settings is open. Create it only on older shells.
+   */
+  function ensureAppearanceSettingKbHint(section) {
+    if (!section) return;
+    let hint = section.querySelector(":scope > .appearance-setting-kb-hint");
+    if (!isSettingsModalOpen()) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    const controls = getAppearanceSettingControls(section);
+    if (controls.length < 2) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "appearance-setting-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
+      section.appendChild(hint);
+    }
+    hint.hidden = false;
+    hint.textContent = APPEARANCE_SETTING_KB_HINT;
+  }
+
   /**
    * Settings Appearance toolbar keyboard — theme list + window frame toggle;
    * ←→ / h l / Home/End (theme-list / header toolbar parity).
@@ -809,17 +852,7 @@
   function wireAppearanceSettingToolbarKeyboard(section) {
     if (!section) return;
     ensureAppearanceSettingKbStyles();
-    let hint = section.querySelector(":scope > .appearance-setting-kb-hint");
-    if (!hint) {
-      hint = document.createElement("div");
-      hint.className = "appearance-setting-kb-hint";
-      hint.setAttribute("aria-hidden", "true");
-      section.appendChild(hint);
-    }
-    const controls = getAppearanceSettingControls(section);
-    hint.hidden = controls.length < 2;
-    hint.textContent =
-      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at start crosses to header Settings (or modal header) · at end crosses to Product";
+    ensureAppearanceSettingKbHint(section);
     refreshAppearanceSettingRovingTabindex(section);
     if (section.dataset.appearanceSettingKbWired === "1") return;
     section.dataset.appearanceSettingKbWired = "1";
@@ -831,7 +864,7 @@
       const items = getAppearanceSettingControls(section);
       if (items.includes(e.target)) {
         refreshAppearanceSettingRovingTabindex(section, e.target);
-        hint.hidden = items.length < 2;
+        ensureAppearanceSettingKbHint(section);
       }
     });
     section.addEventListener("keydown", (e) => {
