@@ -146,3 +146,37 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1396)
+
+**Date:** 2026-10-05 22:02 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1396)
+- `cd src-tauri && cargo test` — **pass** (1354 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1396**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 90`; `get_cpu_details` rate floor **30s**
+- `src-tauri/src/lib.rs` — backend metric loop sleep **30s**
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 30s; `TEMP_CACHE_MAX_AGE` 45s
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **3s** after window open
+- `src/cpu.js` — `CPU_WINDOW_REFRESH_MS` / `PROCESS_LIST_REFRESH_MS` / Discord / monitors / Process Details / logs glance **90s**; Debug Log auto-refresh **60s**; sparkline seed `maxDisplayPoints` 12
+- `src/history.js` — `HISTORY_POLL_MS = 90000`; pause on window blur; `HISTORY_POINTS = 24`
+- `src/chart-line.js` — `LINE_CHART_POINTS = 6`
+- `src/agent-ops.js` — `OPS_REFRESH_INTERVAL` / `OPS_GLANCE_POLL_INTERVAL` = 90000; “updated ago” timer **60s**
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 timer/IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
