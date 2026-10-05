@@ -6141,13 +6141,22 @@ function forceQuitToolbarKbHintText() {
     : FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED;
 }
 
+/** Advanced summary and Force Quit are both on screen only while Advanced is open. */
+function forceQuitToolbarBothOnScreen(wrap) {
+  const details = wrap.querySelector(".force-quit-advanced");
+  const summary = details?.querySelector("summary");
+  const quit = wrap.querySelector("#force-quit-process-btn");
+  if (!details || !summary || !quit) return false;
+  if (summary.hidden || quit.hidden) return false;
+  return !!details.open;
+}
+
 /** Theme HTML and the detail body ship the hint inside the force-quit section. It stays hidden until Advanced and Force Quit are both on screen. Create it only on older shells. */
 function ensureForceQuitToolbarKbHint(section) {
   const wrap = section || document.querySelector(".force-quit-section");
   if (!wrap) return;
   let hint = wrap.querySelector(".force-quit-toolbar-kb-hint");
-  const items = getForceQuitToolbarItems(wrap);
-  if (items.length < 2) {
+  if (!forceQuitToolbarBothOnScreen(wrap)) {
     if (hint) hint.hidden = true;
     return;
   }
