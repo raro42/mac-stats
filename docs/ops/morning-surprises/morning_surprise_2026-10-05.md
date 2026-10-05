@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the Brave settings toolbar keyboard hint in the theme HTML.
+Overnight Track B put the Redmine settings toolbar keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1370** | Redmine settings toolbar keyboard hint is in the theme HTML under the URL field, the key field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. URL first crosses to Brave. Clear last crosses to Mastodon. Keyboard tips stay out of the layout. |
 | **v0.1.1369** | Brave settings toolbar keyboard hint is in the theme HTML under the key field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Key first crosses to Perplexity. Clear last crosses to Redmine. Keyboard tips stay out of the layout. |
 | **v0.1.1368** | Discord settings toolbar keyboard hint is in the theme HTML under the token field, Save, Clear, and View logs. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Keyboard tips stay out of the layout. |
 | **v0.1.1367** | Perplexity settings toolbar keyboard hint is in the theme HTML under the key field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Keyboard tips stay out of the layout. |
@@ -25,6 +26,7 @@ Overnight Track B put the Brave settings toolbar keyboard hint in the theme HTML
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.6d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~01:30 tick: Redmine settings toolbar keyboard hint first paint in theme HTML (**v0.1.1370**); install/kickstart.
 - ~01:06 tick: Brave settings toolbar keyboard hint first paint in theme HTML (**v0.1.1369**); install/kickstart.
 - ~00:36 tick: Discord settings toolbar keyboard hint first paint in theme HTML (**v0.1.1368**); install/kickstart.
 - ~00:10 tick: Perplexity settings toolbar keyboard hint first paint in theme HTML (**v0.1.1367**); install/kickstart.

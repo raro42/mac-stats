@@ -13170,6 +13170,212 @@ async function refreshRedmineStatus() {
   }
 }
 
+function redmineSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+function isRedmineSettingsInput(el) {
+  return el?.id === 'redmine-url-input' || el?.id === 'redmine-api-key-input';
+}
+
+/** Focusable Settings Redmine toolbar items (URL · key · Save · Clear). */
+function getRedmineSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('redmine-setting');
+  if (!container) return [];
+  const ids = [
+    'redmine-url-input',
+    'redmine-api-key-input',
+    'redmine-save',
+    'redmine-clear',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshRedmineSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('redmine-setting');
+  const items = getRedmineSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Redmine URL, key, Save, and Clear when Settings is open. */
+const REDMINE_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at URL/key start/end · URL first crosses to Brave · Clear last crosses to Mastodon';
+
+/**
+ * Theme HTML ships the hint under the URL field, key field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureRedmineSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('redmine-setting');
+  if (!container) return;
+  const actions = container.querySelector('.redmine-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.redmine-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getRedmineSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'redmine-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = REDMINE_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Redmine URL first ← Brave Clear, else footer version, when Settings is open. */
+function tryChainRedmineSettingsToolbarUrlBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('brave-clear-key')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Redmine Clear last → Mastodon URL, else footer version, when Settings is open. */
+function tryChainRedmineSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('mastodon-url-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Redmine toolbar keyboard — focus URL · key · Save · Clear,
+ * then ←→ / h l / Home/End (Brave settings toolbar parity).
+ */
+function wireRedmineSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('redmine-setting');
+  if (!container) return;
+  ensureRedmineSettingsToolbarKbHint(container);
+  refreshRedmineSettingsToolbarRovingTabindex(container);
+  if (container.dataset.redmineSettingsToolbarKbWired === '1') return;
+  container.dataset.redmineSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Redmine URL and API key');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getRedmineSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshRedmineSettingsToolbarRovingTabindex(container, e.target);
+      ensureRedmineSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getRedmineSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isRedmineSettingsInput(active) ||
+        active?.id === 'redmine-save' ||
+        active?.id === 'redmine-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (isRedmineSettingsInput(active) && !redmineSettingsInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainRedmineSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (isRedmineSettingsInput(active) && !redmineSettingsInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainRedmineSettingsToolbarUrlBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshRedmineSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (isRedmineSettingsInput(items[next]) && typeof items[next].setSelectionRange === 'function') {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 /** Settings: Save / Clear Redmine URL + API key (Brave key parity). */
 function initRedmineSettings() {
   const saveBtn = document.getElementById('redmine-save');
@@ -13300,6 +13506,8 @@ function initRedmineSettings() {
 
   refreshRedmineStatus();
   window.RedmineSettings = { refreshStatus: refreshRedmineStatus };
+  wireRedmineSettingsToolbarKeyboard();
+  window.ensureRedmineSettingsToolbarKeyboard = wireRedmineSettingsToolbarKeyboard;
 }
 
 function updateMastodonConfigStatus(statusText, elId) {
