@@ -6,10 +6,12 @@ Overnight autoresearch kept shipping against GitHub **#14** (tauri://localhost C
 
 | Version | What |
 |--------|------|
-| **v0.1.1397** | Circuit opened WARN **≤1/5min**; model-list fail cooldown **5m**; shared `/api/tags` waiters log once. UI polls/TTL **120s**; backend/`get_cpu_details` **45s**; sparklines **4** points; Debug Log **120s** + blur pause |
-| **v0.1.1396** | Metrics/history **90s**; process cache **90s**; `get_cpu_details` floor **30s**; backend **30s**; sparklines **6** points; Debug Log **60s** |
-| **v0.1.1394** | Process cache **60s**; polls **60s**; backend **20s**; sparklines **8** |
-| **v0.1.1393** | Metrics/history **45s**; backend loop **15s**; sparklines **12** + cached opaque backdrop; collapsed Top Processes glance-only |
+| **v0.1.1400** | UI polls/TTL **600s**; backend/`get_cpu_details`/temp **120s**; process cache **600s**; HISTORY_POINTS **2**; ring skip ~**10%**; chart-line boot via `requestIdleCallback`; collapsed Top Processes `content-visibility`; GPU warm **20s** |
+| **v0.1.1399** | UI polls/TTL **300s**; backend/`get_cpu_details` **90s**; sparklines **2** points; skip ring/DOM rAF when hidden; collapsed keep-header `content-visibility`; GPU warm **12s** |
+| **v0.1.1398** | UI polls **180s**; no Agent Ops glance IPC while icon-hidden; backend **60s**; sparklines **2** points |
+| **v0.1.1397** | Circuit opened WARN **≤1/5min**; model-list fail cooldown **5m**; shared `/api/tags` waiters log once. UI polls/TTL **120s**; backend/`get_cpu_details` **45s**; sparklines **4** points |
+| **v0.1.1396** | Metrics/history **90s**; process cache **90s**; `get_cpu_details` floor **30s**; backend **30s**; sparklines **6** points |
+| **v0.1.1394–1393** | Process cache / poll / backend / sparkline cuts; collapsed Top Processes glance-only |
 | **v0.1.1390–1392** | Earlier idle/IPC cuts (polls, sparkline points, opaque chrome) |
 | **v0.1.1388** | Ollama model-list fail cooldown + WARN ≤1/5min (first log-012 pass) |
 
