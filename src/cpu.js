@@ -8643,22 +8643,31 @@ function refreshMonitorAddFormToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/** How to move across URL, Cancel, and Add Monitor. */
+const MONITOR_ADD_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · add-btn ↓ → list · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
+
+/** Theme HTML ships the hint inside the add form. It stays hidden until the form is open. Create it only on older shells. */
 function ensureMonitorAddFormToolbarKbHint(wrap) {
   const form = wrap || document.getElementById('add-monitor-form');
   if (!form) return;
   const actions = form.querySelector('.popover-actions');
   if (!actions) return;
   let hint = actions.querySelector('.monitor-add-toolbar-kb-hint');
+  const items = getMonitorAddFormToolbarItems(form);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'monitor-add-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
     actions.appendChild(hint);
   }
-  const items = getMonitorAddFormToolbarItems(form);
-  hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · add-btn ↓ → list · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
+  hint.hidden = false;
+  hint.textContent = MONITOR_ADD_TOOLBAR_KB_HINT;
 }
 
 function isMonitorsSettingsPopoverOpen() {
