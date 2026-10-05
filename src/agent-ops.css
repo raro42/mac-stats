@@ -13,6 +13,38 @@
 }
 
 /*
+ * #14 follow-up: ring gauges must not CSS-tween stroke-dashoffset.
+ * An 0.8s cubic transition re-composites the SVG every display tick after
+ * each metrics poll (WKWebView Graphics and Media / tauri://localhost).
+ * JS already paints rings instantly with a 5% skip threshold.
+ */
+.ring-progress,
+.ring .ring-progress,
+[id$="-ring-progress"] {
+  transition: none !important;
+  animation: none !important;
+}
+
+/*
+ * Collapsed section bodies stay in the DOM for glance headers. Skip layout
+ * and paint for their heavy trees while collapsed.
+ */
+.agent-ops-section.collapsed .agent-ops-panel,
+.agent-ops-section.collapsed #agent-ops-content,
+.ollama-section.collapsed .section-content-collapsible,
+.monitors-section.collapsed .section-content-collapsible,
+.logs-section.collapsed .logs-viewer,
+.logs-section.collapsed .section-content-collapsible,
+.disk-cleanup-section.collapsed .section-content-collapsible,
+.perplexity-section.collapsed .section-content-collapsible,
+.details-section.collapsed .section-content-collapsible,
+#details-section.collapsed .apple-details-body,
+.section-content-collapsible.collapsed {
+  content-visibility: hidden;
+  contain: strict;
+}
+
+/*
  * Theme CPU windows pin body/shell to 100vh with overflow:hidden and often
  * max-width:560px — so widening the OS window does nothing and Agent Ops
  * gets clipped. These rules make the shell fill the window and scroll.

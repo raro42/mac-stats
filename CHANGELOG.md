@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1387] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Apple theme drops multi-layer glass gradients for opaque fills; ring gauges no longer CSS-tween `stroke-dashoffset`; collapsed sections use `content-visibility: hidden`. Metrics poll every 5s; Discord icon status every 30s and pauses when the window is hidden. Window uses an opaque background and macOS background-throttling Suspend. Aim: quieter `tauri://localhost` / Graphics and Media while open.
+
+
 ## [0.1.1386] - 2026-10-05
 
 ### Changed

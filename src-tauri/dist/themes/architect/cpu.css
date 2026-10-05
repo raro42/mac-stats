@@ -333,7 +333,8 @@ body {
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Instant paint — CSS tween kept Graphics and Media hot (#14). */
+  transition: none;
 }
 
 .section-title {

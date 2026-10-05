@@ -2,6 +2,7 @@
 //!
 //! There is no macOS status item here. The CPU window is the app surface.
 
+use tauri::utils::config::{BackgroundThrottlingPolicy, Color};
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 use crate::config::Config;
@@ -104,6 +105,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         .map(|g| (g.width, g.height))
         .unwrap_or((default_w, default_h));
 
+    // Opaque fill; Suspend is macOS 14+ (no-op on Linux). Keeps parity with macOS (#14).
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
             .title("mac-stats · glad you're here")
@@ -112,6 +114,9 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
+            .transparent(false)
+            .background_color(Color(242, 242, 246, 255))
+            .background_throttling(BackgroundThrottlingPolicy::Suspend)
             .build();
 
     match cpu_window {

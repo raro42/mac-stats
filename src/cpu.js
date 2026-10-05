@@ -331,7 +331,10 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 3000;
+const CPU_WINDOW_REFRESH_MS = 5000;
+/** Discord menu-bar icon status — slow; pause while the window is hidden. */
+const DISCORD_ICON_STATUS_MS = 30000;
+let discordIconStatusInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
 let lastProcessListKey = "";
@@ -1619,7 +1622,7 @@ async function refresh() {
         clearInterval(refreshInterval);
       }
       refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
-      console.log("Got real data, switched to 3-second interval");
+      console.log("Got real data, switched to 5-second interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -5539,6 +5542,7 @@ window.addEventListener("load", () => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     stopRefresh();
+    stopDiscordIconStatus();
     return;
   }
   window._forceProcessUpdate = true;
@@ -5548,6 +5552,7 @@ document.addEventListener("visibilitychange", () => {
     if (!refreshInterval) {
       startRefresh();
     }
+    startDiscordIconStatus();
   } else {
     init();
   }
@@ -10571,6 +10576,23 @@ async function toggleDiscordGatewayFromIcon() {
   }
 }
 
+function stopDiscordIconStatus() {
+  if (discordIconStatusInterval) {
+    clearInterval(discordIconStatusInterval);
+    discordIconStatusInterval = null;
+  }
+}
+
+function startDiscordIconStatus() {
+  stopDiscordIconStatus();
+  if (document.hidden) return;
+  refreshDiscordIconStatus();
+  discordIconStatusInterval = setInterval(() => {
+    if (document.hidden) return;
+    refreshDiscordIconStatus();
+  }, DISCORD_ICON_STATUS_MS);
+}
+
 function initDiscordIconStatus() {
   const discordIcon = document.getElementById('icon-discord');
   if (discordIcon) {
@@ -10579,8 +10601,7 @@ function initDiscordIconStatus() {
       toggleDiscordGatewayFromIcon();
     });
   }
-  refreshDiscordIconStatus();
-  setInterval(refreshDiscordIconStatus, 5000);
+  startDiscordIconStatus();
 }
 
 function showAddMonitorDialog() {
