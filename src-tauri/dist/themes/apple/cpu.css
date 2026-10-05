@@ -59,10 +59,7 @@ body {
     radial-gradient(1100px 900px at 18% 12%, rgba(165, 190, 255, 0.22), rgba(255, 255, 255, 0) 60%),
     radial-gradient(1100px 900px at 85% 10%, rgba(255, 190, 245, 0.18), rgba(255, 255, 255, 0) 62%);
 
-  backdrop-filter: blur(34px) saturate(1.35);
-  -webkit-backdrop-filter: blur(34px) saturate(1.35);
-
-  border-radius: 24px;
+border-radius: 24px;
 
   border: none;
 
@@ -603,9 +600,7 @@ body {
   background: var(--panel, rgba(255, 255, 255, 0.86));
   border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.65));
   box-shadow: var(--panel-shadow, 0 32px 100px rgba(0, 0, 0, 0.20));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 18px 18px 16px;
+padding: 18px 18px 16px;
   overflow: hidden;
   animation: settings-card-in 0.22s ease-out;
 }
@@ -985,13 +980,9 @@ body {
   border-color: rgba(255, 59, 48, 0.55);
   color: #ff3b30;
   box-shadow: 0 0 0 3px color-mix(in srgb, #ff3b30 18%, transparent);
-  animation: force-quit-pulse 1.1s ease-in-out infinite;
+  animation: none;
 }
 
-@keyframes force-quit-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, #ff3b30 14%, transparent); }
-  50% { box-shadow: 0 0 0 5px color-mix(in srgb, #ff3b30 26%, transparent); }
-}
 
 
 /* History section and charts */
@@ -1014,9 +1005,7 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.58),
     inset 0 -1px 0 rgba(0, 0, 0, 0.03),
     0 3px 10px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .history-chart-caption {
@@ -2029,8 +2018,6 @@ body {
   box-shadow: var(--panel-shadow);
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .monitors-menu-item {
@@ -2074,9 +2061,7 @@ body {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow: 0 32px 100px rgba(0, 0, 0, 0.20);
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 0;
+padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2266,8 +2251,6 @@ body {
   transition: all 0.2s;
   position: relative;
   z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .add-btn-small:hover {
@@ -2494,8 +2477,6 @@ body {
   box-shadow: var(--panel-shadow);
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .ollama-menu-item {
@@ -2538,9 +2519,7 @@ body {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow: 0 32px 100px rgba(0, 0, 0, 0.20);
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 0;
+padding: 0;
   overflow: hidden;
 }
 
@@ -3087,7 +3066,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--muted);
-  animation: thinking-pulse 1.4s ease-in-out infinite;
+  animation: none; /* was thinking-pulse; WebView CPU */
 }
 
 .thinking-dots span:nth-child(1) {

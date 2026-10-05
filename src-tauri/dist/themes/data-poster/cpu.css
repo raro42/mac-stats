@@ -421,8 +421,6 @@ body {
   border-top: 1px solid var(--hairline);
   background:
     linear-gradient(180deg, rgba(8, 8, 12, 0.55), rgba(8, 8, 12, 0.92) 35%, rgba(8, 8, 12, 0.96));
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.08em;
@@ -505,8 +503,6 @@ body {
   background: var(--panel);
   border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(28px) saturate(140%);
-  -webkit-backdrop-filter: blur(28px) saturate(140%);
   padding: 18px 18px 16px;
   overflow: hidden;
   color: var(--text);
@@ -1375,8 +1371,6 @@ body {
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .monitors-menu-item {
@@ -1414,8 +1408,6 @@ body {
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
   border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -1600,8 +1592,6 @@ body {
   transition: all 0.2s;
   position: relative;
   z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .add-btn-small:hover {
@@ -1775,8 +1765,6 @@ body {
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .ollama-menu-item {
@@ -1813,8 +1801,6 @@ body {
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
   border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
   padding: 0;
   overflow: hidden;
 }
@@ -2204,7 +2190,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
-  animation: thinking-pulse 1.4s ease-in-out infinite;
+  animation: none; /* was thinking-pulse; WebView CPU */
 }
 
 .thinking-dots span:nth-child(1) {

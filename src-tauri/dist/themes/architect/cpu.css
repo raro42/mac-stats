@@ -195,8 +195,6 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.50),
     inset 0 -1px 0 rgba(0, 0, 0, 0.02),
     0 2px 8px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .history-chart {
@@ -458,9 +456,7 @@ body {
   background: var(--panel, rgba(255, 255, 255, 0.86));
   border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.65));
   box-shadow: var(--panel-shadow, 0 32px 100px rgba(0, 0, 0, 0.20));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 18px 18px 16px;
+padding: 18px 18px 16px;
   overflow: hidden;
 }
 
@@ -1377,8 +1373,6 @@ body {
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .monitors-menu-item {
@@ -1416,9 +1410,7 @@ body {
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
   border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 0;
+padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1602,8 +1594,6 @@ body {
   transition: all 0.2s;
   position: relative;
   z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .add-btn-small:hover {
@@ -1777,8 +1767,6 @@ body {
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
   z-index: 1000;
   min-width: 140px;
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
 }
 
 .ollama-menu-item {
@@ -1815,9 +1803,7 @@ body {
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
   border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
   box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
-  backdrop-filter: blur(36px) saturate(160%);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  padding: 0;
+padding: 0;
   overflow: hidden;
 }
 
@@ -2206,7 +2192,7 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
-  animation: thinking-pulse 1.4s ease-in-out infinite;
+  animation: none; /* was thinking-pulse; WebView CPU */
 }
 
 .thinking-dots span:nth-child(1) {
@@ -2316,8 +2302,6 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.10),
     inset 0 -1px 0 rgba(0, 0, 0, 0.20),
     0 2px 8px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .history-chart {
