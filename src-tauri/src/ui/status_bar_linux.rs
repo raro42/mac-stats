@@ -148,13 +148,26 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             let _ = window.set_focus();
             let _ = window.unminimize();
 
-            let window_for_close = window.clone();
+            let window_for_events = window.clone();
             window.on_window_event(move |event| {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    api.prevent_close();
-                    save_cpu_window_geometry(&window_for_close);
-                    let _ = window_for_close.destroy();
-                    debug1!("CPU window close requested — destroyed");
+                match event {
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        api.prevent_close();
+                        save_cpu_window_geometry(&window_for_events);
+                        let _ = window_for_events.destroy();
+                        debug1!("CPU window close requested — destroyed");
+                    }
+                    tauri::WindowEvent::Focused(false) => {
+                        let _ = window_for_events.eval(
+                            "try{if(typeof window.__macStatsPauseIdleWindowPolls==='function')window.__macStatsPauseIdleWindowPolls();}catch(e){}",
+                        );
+                    }
+                    tauri::WindowEvent::Focused(true) => {
+                        let _ = window_for_events.eval(
+                            "try{if(typeof window.__macStatsResumeVisibleWindowWork==='function')window.__macStatsResumeVisibleWindowWork();}catch(e){}",
+                        );
+                    }
+                    _ => {}
                 }
             });
         }

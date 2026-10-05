@@ -1,10 +1,10 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1407)
+# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1408)
 
-- [x] Stronger occlusion park: `display: none` on parked trees + freeze will-change/transform
-- [x] Ring gauges skip paints under ~60%; chart-line boot idle 120s; wider sample deadband
-- [x] GPU warm defer 960s; park canvases with `display: none`
-- [x] `cargo check` in src-tauri/; sync-dist; bump v0.1.1407 + CHANGELOG
+- [x] Tauri `WindowEvent::Focused` → park/resume idle polls (macOS + Linux)
+- [x] Skip sparkline history IPC seed on chart-line boot; boot idle 180s
+- [x] Ring gauges skip paints under ~70%; GPU warm defer 1800s
+- [x] `cargo check` / ratchet verify; sync-dist; bump v0.1.1408 + CHANGELOG
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-v0.1.1407 stronger compositor/occlusion park for #14 (`display: none` body park, ring 60%, boot 120s, GPU warm 960s). Linux cannot prove macOS Graphics and Media <1%; leave open for tester / 004.
+v0.1.1408 structural occlusion park for #14 (Focused event + no boot history seed). Linux cannot prove macOS Graphics and Media <1%; leave open for tester / 004.

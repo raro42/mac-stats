@@ -876,7 +876,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             // Defer AGX GPU-time warm so window open does not stack ioreg with
             // the first get_cpu_details / WebView paint (#14).
             std::thread::spawn(|| {
-                std::thread::sleep(std::time::Duration::from_secs(960));
+                std::thread::sleep(std::time::Duration::from_secs(1800));
                 let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
             });
 
@@ -896,13 +896,27 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
 
             // Title-bar close destroys the WebView so WebKit GPU ("Graphics and Media")
             // does not keep burning CPU while the menu bar is idle.
-            let window_for_close = window.clone();
+            // Focused(false) parks JS timers/paint when window.blur is flaky (#14).
+            let window_for_events = window.clone();
             window.on_window_event(move |event| {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    api.prevent_close();
-                    save_cpu_window_geometry(&window_for_close);
-                    let _ = window_for_close.destroy();
-                    debug1!("CPU window close requested — destroyed for idle CPU");
+                match event {
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        api.prevent_close();
+                        save_cpu_window_geometry(&window_for_events);
+                        let _ = window_for_events.destroy();
+                        debug1!("CPU window close requested — destroyed for idle CPU");
+                    }
+                    tauri::WindowEvent::Focused(false) => {
+                        let _ = window_for_events.eval(
+                            "try{if(typeof window.__macStatsPauseIdleWindowPolls==='function')window.__macStatsPauseIdleWindowPolls();}catch(e){}",
+                        );
+                    }
+                    tauri::WindowEvent::Focused(true) => {
+                        let _ = window_for_events.eval(
+                            "try{if(typeof window.__macStatsResumeVisibleWindowWork==='function')window.__macStatsResumeVisibleWindowWork();}catch(e){}",
+                        );
+                    }
+                    _ => {}
                 }
             });
 

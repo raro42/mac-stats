@@ -344,8 +344,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~60% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.60 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~70% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.70 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -5731,6 +5731,10 @@ window.addEventListener("blur", () => {
 window.addEventListener("focus", () => {
   resumeVisibleWindowWork();
 });
+
+// Tauri WindowEvent::Focused calls these when JS blur/focus is flaky on macOS (#14).
+window.__macStatsPauseIdleWindowPolls = pauseIdleWindowPolls;
+window.__macStatsResumeVisibleWindowWork = resumeVisibleWindowWork;
 
 // Process details popover
 let processDetailsModal = null;

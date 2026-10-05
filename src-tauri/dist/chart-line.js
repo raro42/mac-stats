@@ -451,12 +451,11 @@
       });
       window.addEventListener("blur", parkCanvases);
       window.addEventListener("focus", unparkCanvases);
-      if (typeof window.seedThemeHistoryFromBackend === "function") {
-        void window.seedThemeHistoryFromBackend();
-      }
+      // Do not seed history IPC here — open already stacks get_cpu_details +
+      // ring DOM. Live feed + focus resume seed when needed (#14).
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 120000 });
+      window.requestIdleCallback(start, { timeout: 180000 });
     } else {
       setTimeout(start, 0);
     }
