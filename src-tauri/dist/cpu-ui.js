@@ -138,6 +138,7 @@
     style.id = "mac-stats-modal-header-kb-styles";
     style.textContent = `
       .modal-header-kb-hint,
+      .process-details-header-kb-hint,
       .settings-header-kb-hint {
         margin: 0;
         font-size: 11px;
@@ -154,13 +155,52 @@
     document.head.appendChild(style);
   }
 
+  /** Title and Close are both on screen only while that header's shell is open. */
+  function modalHeaderPairOnScreen(header, titleId, closeId) {
+    const title = document.getElementById(titleId);
+    const closeBtn = document.getElementById(closeId);
+    if (!title || !closeBtn || !header.contains(title) || !header.contains(closeBtn)) {
+      return false;
+    }
+    if (title.hidden || closeBtn.hidden || closeBtn.disabled) return false;
+    const shell = header.closest("#process-details-modal");
+    if (shell) {
+      if (
+        shell.hidden ||
+        shell.style.display === "none" ||
+        shell.getAttribute("aria-hidden") === "true"
+      ) {
+        return false;
+      }
+    }
+    try {
+      return title.getClientRects().length > 0 && closeBtn.getClientRects().length > 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /**
+   * Theme HTML ships the Process Details hint between the title and Close.
+   * It stays hidden until both controls are on screen. Create it only on older shells.
+   */
   function ensureModalHeaderKbHint(header, titleId, closeId, closeSelector, hintText) {
     if (!header) return;
-    let hint = header.querySelector(".modal-header-kb-hint, .settings-header-kb-hint");
+    const processDetails = titleId === "process-details-title";
+    let hint = header.querySelector(
+      ".process-details-header-kb-hint, .modal-header-kb-hint, .settings-header-kb-hint"
+    );
+    if (processDetails && !modalHeaderPairOnScreen(header, titleId, closeId)) {
+      if (hint) hint.hidden = true;
+      return;
+    }
     if (!hint) {
       hint = document.createElement("div");
-      hint.className = "modal-header-kb-hint";
+      hint.className = processDetails
+        ? "process-details-header-kb-hint"
+        : "modal-header-kb-hint";
       hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
       const closeBtn =
         (closeSelector && header.querySelector(closeSelector)) ||
         document.getElementById(closeId);
