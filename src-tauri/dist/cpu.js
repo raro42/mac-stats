@@ -11868,22 +11868,36 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 // Initialize collapsible sections (Details and Top Processes)
 // Universal implementation that works across all themes using IDs
 
-/** Soft tip above Details grid (Debug Log / Top Processes kb-hint parity). */
+/** How to move across Details values when the grid has values. */
+const DETAILS_KB_HINT =
+  '↑↓ / j k · Home/End select · first value ↑ → temperature ring · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
+
+/** Theme HTML ships the hint above the Details grid. Hide it when the grid has no values. Create it only on older shells. */
 function ensureDetailsKbHint(grid, show) {
   if (!grid || !grid.parentNode) return;
   let hint = document.getElementById('details-kb-hint');
+  if (!hint) {
+    hint = grid.parentNode.querySelector(':scope > .details-kb-hint');
+  }
   if (!show) {
-    hint?.remove();
+    if (hint) hint.hidden = true;
     return;
   }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'details-kb-hint';
     hint.id = 'details-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = DETAILS_KB_HINT;
     grid.parentNode.insertBefore(hint, grid);
   }
-  hint.textContent =
-    '↑↓ / j k · Home/End select · first value ↑ → temperature ring · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
+  if (!hint.id) hint.id = 'details-kb-hint';
+  if (hint.nextElementSibling !== grid) {
+    grid.parentNode.insertBefore(hint, grid);
+  }
+  hint.hidden = false;
+  hint.textContent = DETAILS_KB_HINT;
 }
 
 function getDetailsGridElement() {
