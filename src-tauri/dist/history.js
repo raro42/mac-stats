@@ -178,20 +178,36 @@
         canvas.width = 1;
         canvas.height = 1;
       } catch (_) { /* ignore */ }
+      try {
+        canvas.style.visibility = 'hidden';
+        canvas.style.contentVisibility = 'hidden';
+      } catch (_) { /* ignore */ }
       delete contexts[metric];
     });
   }
 
   function unparkHistoryCanvases() {
     canvasesParked = false;
-    Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
+    Object.keys(canvases).forEach((metric) => {
+      const canvas = canvases[metric];
+      if (!canvas) return;
+      try {
+        canvas.style.visibility = '';
+        canvas.style.contentVisibility = '';
+      } catch (_) { /* ignore */ }
+      setupHistoryCanvas(metric);
+    });
     Object.keys(canvases).forEach((metric) => {
       if (canvases[metric] && contexts[metric]) drawLineChart(metric);
     });
   }
 
-  // Initialize canvas contexts immediately (synchronously, like poster-charts.js)
-  Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
+  // Skip canvas GPU layers when the data-poster window opens occluded (#14).
+  if (windowOccluded()) {
+    parkHistoryCanvases();
+  } else {
+    Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
+  }
 
   // Create tooltip element
   function createTooltip() {

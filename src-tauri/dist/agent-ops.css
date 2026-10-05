@@ -71,6 +71,51 @@
 }
 
 /*
+ * Ring cards / SVG rings: contain paint so WebKit does not keep four gauge
+ * layers compositing when only text values change (#14).
+ */
+.metric-card,
+.apple-metrics .metric-card,
+svg.ring,
+.ring {
+  contain: layout paint style;
+}
+
+/*
+ * Another app frontmost: macOS often keeps visibilityState=visible. JS toggles
+ * html.is-occluded so heavy trees skip layout/paint (Graphics and Media / #14).
+ */
+html.is-occluded .apple-metrics,
+html.is-occluded .metric-card,
+html.is-occluded svg.ring,
+html.is-occluded .ring,
+html.is-occluded .history-charts,
+html.is-occluded .history-chart-container,
+html.is-occluded .battery-power-strip,
+html.is-occluded #battery-power-strip,
+html.is-occluded #process-list,
+html.is-occluded .agent-ops-panel,
+html.is-occluded #agent-ops-content,
+html.is-occluded .section-content-collapsible,
+html.is-occluded .logs-viewer,
+html.is-occluded .apple-details-body {
+  content-visibility: hidden !important;
+  contain: strict !important;
+}
+
+html.is-occluded,
+html.is-occluded body {
+  scroll-behavior: auto !important;
+}
+
+html.is-occluded *,
+html.is-occluded *::before,
+html.is-occluded *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/*
  * Theme CPU windows pin body/shell to 100vh with overflow:hidden and often
  * max-width:560px — so widening the OS window does nothing and Agent Ops
  * gets clipped. These rules make the shell fill the window and scroll.

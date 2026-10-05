@@ -260,6 +260,12 @@ function windowOccluded() {
   return false;
 }
 
+/** Drive CSS paint parking for heavy layers while occluded (#14). */
+function setDocumentOccluded(occluded) {
+  if (typeof document === "undefined" || !document.documentElement) return;
+  document.documentElement.classList.toggle("is-occluded", !!occluded);
+}
+
 function scheduleDOMUpdate(updateFn) {
   // Occluded window: do not wake WebKit with rAF batches (#14).
   if (windowOccluded()) return;
@@ -311,8 +317,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~30% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.30 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~40% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.40 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -5592,6 +5598,7 @@ window.addEventListener("load", () => {
 });
 
 function pauseIdleWindowPolls() {
+  setDocumentOccluded(true);
   stopRefresh();
   stopDiscordIconStatus();
   stopLogsGlancePoll();
@@ -5614,6 +5621,7 @@ function pauseIdleWindowPolls() {
 
 function resumeIdleWindowPolls() {
   if (document.hidden) return;
+  setDocumentOccluded(false);
   const hist = window.themeHistory;
   if (hist && typeof hist.unpark === "function") {
     hist.unpark();
@@ -5653,6 +5661,7 @@ function resumeIdleWindowPolls() {
 
 function resumeVisibleWindowWork() {
   if (document.hidden) return;
+  setDocumentOccluded(false);
   window._forceProcessUpdate = true;
   if (invoke) {
     // Skip history reseed on rapid focus churn (alt-tab) — gauges refresh below (#14).

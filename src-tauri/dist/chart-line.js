@@ -93,6 +93,12 @@
       } catch (_) {
         /* ignore */
       }
+      try {
+        canvas.style.visibility = "hidden";
+        canvas.style.contentVisibility = "hidden";
+      } catch (_) {
+        /* ignore */
+      }
       delete contexts[metric];
       delete canvasLayoutCache[metric];
     });
@@ -101,6 +107,16 @@
   function unparkCanvases() {
     if (!canvasesParked && Object.keys(contexts).length) return;
     canvasesParked = false;
+    Object.keys(canvases).forEach((metric) => {
+      const canvas = canvases[metric];
+      if (!canvas) return;
+      try {
+        canvas.style.visibility = "";
+        canvas.style.contentVisibility = "";
+      } catch (_) {
+        /* ignore */
+      }
+    });
     initializeCanvases();
     COLORS = getColors();
     Object.keys(dataBuffers).forEach((metric) => {
@@ -434,7 +450,7 @@
       }
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 16000 });
+      window.requestIdleCallback(start, { timeout: 30000 });
     } else {
       setTimeout(start, 0);
     }
