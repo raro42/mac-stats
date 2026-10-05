@@ -205,3 +205,39 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1397)
+
+**Date:** 2026-10-05 22:13 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1397)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1397**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 120`; `get_cpu_details` rate floor **45s**
+- `src-tauri/src/lib.rs` — backend metric loop sleep **45s**
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 45s; `TEMP_CACHE_MAX_AGE` 60s
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **5s** after window open
+- `src/cpu.js` — metrics / process list / Discord / monitors / Process Details / logs glance **120s**; Debug Log auto-refresh **120s**; history seed skips on focus if last seed <120s; sparkline seed `maxDisplayPoints` 8; blur pauses idle polls (incl. Debug Log)
+- `src/history.js` — `HISTORY_POLL_MS = 120000`; `HISTORY_POINTS = 16`
+- `src/chart-line.js` — `LINE_CHART_POINTS = 4`
+- `src/agent-ops.js` — `OPS_REFRESH_INTERVAL` / `OPS_GLANCE_POLL_INTERVAL` = 120000; “updated ago” timer **120s**
+- `src-tauri/src/circuit_breaker.rs` — `OPEN_WARN_INTERVAL` = 5min
+- `src-tauri/src/ollama/model_list_cache.rs` — `FETCH_FAIL_COOLDOWN` / fail WARN interval 5m; primary waiter logs only
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 timer/IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
