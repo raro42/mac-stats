@@ -2777,8 +2777,8 @@ function stopRefresh() {
 function init() {
   // Keep warm PROCESS_CACHE on open — do not force a full process refresh (#14).
   // Defer DOM wiring past first paint so open does not stack layout with WebKit (#14).
+  // Always wire (cheap); do not skip when occluded or keyboard/copy never bind.
   const wireDom = () => {
-    if (windowOccluded()) return;
     wireMetricValueCopy();
     ensureCpuHeaderToolbarKeyboard();
     ensureRingGaugeKeyboard();
@@ -2799,11 +2799,11 @@ function init() {
   // Defer first get_cpu_details well past first paint so open does not stack
   // IPC with WebView compositor work (#14). Do not seed history IPC on open —
   // live feed + focus resume seed when needed (chart-line boot already skips).
+  // Always arm invoke + interval; refresh() no-ops while occluded (#14).
   const startMetrics = () => {
-    if (windowOccluded()) return;
     const afterFirst = () => {
       // Ensure the slow interval exists even when first usage sample is 0 (#14).
-      if (!refreshInterval && !windowOccluded()) startRefresh();
+      if (!refreshInterval) startRefresh();
     };
     const immediateInvoke = getInvoke();
     if (immediateInvoke) {
@@ -2812,7 +2812,6 @@ function init() {
       Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
     } else {
       waitForTauri((invokeFn) => {
-        if (windowOccluded()) return;
         invoke = invokeFn;
         Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
       });

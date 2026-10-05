@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1412** (follow-up after v0.1.1411).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (deferred-init correctness on open while occluded):
+
+- `src/cpu.js` — deferred `wireDom` always binds keyboard/copy/strip (no `windowOccluded()` early return). Deferred `startMetrics` always arms `invoke` + refresh interval; `refresh()` still no-ops while occluded. Prevents a stuck UI when idle callbacks fire before the window has focus.
+
+Tester: open CPU window on macOS without focus (or alt-tab before 60s), then focus later — rings/keyboard/copy still work. Warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1411)
+
 Version **v0.1.1411** (follow-up after v0.1.1410).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -941,6 +955,39 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 **debug.log**
 
 - Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 open-path / park / no-AGX-warm cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1411 / tree advanced to v0.1.1412)
+
+**Date:** 2026-10-05 23:56 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Preflight:** Started from `agents/testing/active/TESTING-14-…` (GitHub #14). During this run the coder advanced the same basename to `UNTESTED-…` with **v0.1.1412** notes; Rust suite below was executed while `Cargo.toml` was still **0.1.1411**. Re-`cargo check` after 1412 bump also **pass**.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1411 at run time; re-check **pass** on v0.1.1412)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src-tauri/Cargo.toml` — now **0.1.1412**
+- `src/cpu.js` (v0.1.1411) — DOM wiring idle timeout **60s**; first `get_cpu_details` / version IPC idle timeout **120s**; ring paints skip under ~99%; `updateRingHotStates` signature skip; `ensureGpuHistoryChart` does not call `themeHistory.init()`
+- `src/cpu.js` (v0.1.1412) — deferred `wireDom` / `startMetrics` always arm (no `windowOccluded()` early return); `refresh()` still no-ops while occluded
+- `src/chart-line.js` — stay parked through open; late idle unpark **120s** or focus; wider sample deadband
+- `src/agent-ops.css` — global freeze covers `mix-blend-mode`; metric/ring/history/power/process trees freeze `transform`
+- Prior 3600s poll floor kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 open-path / park / idle-defer cuts.
 
 **Why not CLOSED**
 

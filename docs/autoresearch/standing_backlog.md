@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1412
+
+- CPU window deferred open wiring: always bind DOM + arm metrics interval even when occluded; refresh() still no-ops while occluded. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1408
 
 - CPU window WebView idle cut (#14 follow-up): Tauri `WindowEvent::Focused` parks/resumes idle polls; sparkline boot skips history IPC seed; ring skip ~70%; chart-line boot idle 180s; GPU warm 1800s. P2 reliability / GitHub #14.
