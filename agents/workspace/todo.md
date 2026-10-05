@@ -5,7 +5,7 @@
 - [x] Agent Ops refresh 60s; sparkline points 8; backend metric loop 20s
 - [x] `cargo check` in src-tauri/
 - [x] Version bump + CHANGELOG + task → UNTESTED-
-- [ ] Commit and push origin/main (do not close GitHub #14)
+- [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 v0.1.1394: process-cache TTL 60s was the main miss (full process enum every 5–10s while window open). Timers aligned to 60s / backend 20s / 8 sparkline points. macOS Activity Monitor remains the <1% acceptance gate.
