@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1390] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Metrics and data-poster history poll every 15s. Backend metric loop stays at 5s even when the CPU window is open (was 2s). Sparklines keep 36 points (was 60). Apple / Light drop hover lifts, soft shadows, and frosted history chrome for flat opaque panels with CSS `contain`. Aim: quieter `tauri://localhost` / Graphics and Media.
+- **Operator age token matching** — Instant “age” routes match a whole `age` word only, not substrings inside `average` / `usage` / `agent`. Fixes harness_ops false positives on Linux `cargo test`.
+
+
 ## [0.1.1389] - 2026-10-05
 
 ### Changed

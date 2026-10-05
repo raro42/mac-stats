@@ -194,11 +194,13 @@ body {
 }
 
 .metric-card {
+  contain: layout paint style;
   position: relative;
   border-radius: var(--radius-card);
-  background: rgba(255, 255, 255, 0.34);
+  /* Opaque flat card — soft shadow + radial wash kept Graphics and Media busy (#14). */
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.12);
+  box-shadow: none;
 
   padding: 14px 6px 12px;
   min-height: 200px;
@@ -208,12 +210,7 @@ body {
 }
 
 .metric-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(140px 140px at 50% 20%, rgba(255, 255, 255, 0.60), rgba(255, 255, 255, 0) 60%);
-  opacity: 0.65;
-  pointer-events: none;
+  content: none;
 }
 
 /* Usage card clickable */

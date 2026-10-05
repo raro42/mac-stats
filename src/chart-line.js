@@ -6,7 +6,8 @@
 (function () {
   "use strict";
 
-  const LINE_CHART_POINTS = 60;
+  // Fewer points = less canvas work per sample (#14).
+  const LINE_CHART_POINTS = 36;
   const EMPTY_POINT = NaN;
 
   function metricColor(metric, computedStyle) {

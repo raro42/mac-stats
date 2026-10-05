@@ -133,25 +133,23 @@ border-radius: 24px;
 /* Usage card clickable */
 #cpu-usage-card {
   cursor: pointer;
-  transition: opacity 0.2s ease, box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  /* No hover lift / soft shadow — compositing cost while the window is open (#14). */
+  transition: none;
 }
 
 #cpu-usage-card:hover {
   opacity: 1;
-  transform: translateY(-2px);
+  transform: none;
 }
 
 #cpu-usage-card:focus-visible {
-  outline: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 22%, transparent),
-    0 18px 40px rgba(0, 0, 0, 0.12);
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 #cpu-usage-card:active {
-  transform: translateY(0);
+  transform: none;
 }
 
 /* Smooth scrolling */
@@ -316,6 +314,7 @@ border-radius: 24px;
   align-items: center;
   justify-content: space-between;
   transition: none;
+  contain: layout paint style;
 }
 
 .metric-card:hover {
@@ -965,6 +964,7 @@ padding: 18px 18px 16px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: none;
   transition: none;
+  contain: layout paint style;
 }
 
 .history-chart-caption {
@@ -986,7 +986,6 @@ padding: 18px 18px 16px;
   transform: none;
   box-shadow: none;
 }
-}
 
 .history-chart {
   width: 100%;
@@ -1004,9 +1003,10 @@ padding: 18px 18px 16px;
   margin-bottom: 8px;
   font-size: 12px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.22);
+  /* Opaque — frosted rgba + inset highlight re-blends every tick (#14). */
+  background: #ffffff;
   border: 1px solid var(--hairline);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: none;
 }
 
 .history-controls label {

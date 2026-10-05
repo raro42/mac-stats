@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1390
+
+- CPU window WebView idle cut (#14 follow-up): 15s metrics/history polls, 5s backend loop while open, 36 sparkline points, Apple/Light opaque flat chrome + CSS contain. Operator age routes use whole-token `age` (harness_ops false-positive fix). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1388
 
 - CPU window WebView idle cut (#14 follow-up): macOS `transparent(false)`, 8s metrics poll, pause more timers when hidden, opaque sparklines, slower history poll. Ollama model-list fetch: 30s fail cooldown + WARN ≤1/5min when Ollama is down (debug.log spam cut). P2 reliability / GitHub #14 + log-012.
