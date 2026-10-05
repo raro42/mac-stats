@@ -9168,20 +9168,29 @@ function refreshMonitorDetailActionsRovingTabindex(row, preferred) {
   }
 }
 
+/** How to move across Check now · Remove. */
+const MONITOR_DETAIL_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · Check now ← monitor row · Remove → footer · Enter / Space on buttons';
+
+/** Detail HTML ships the hint under Check now and Remove. Create it only on older shells. */
 function ensureMonitorDetailActionsKbHint(row) {
   const wrap = row || document.querySelector('.monitor-detail-actions');
   if (!wrap) return;
   let hint = wrap.querySelector('.monitor-detail-toolbar-kb-hint');
+  const items = getMonitorDetailActionItems(wrap);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'monitor-detail-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
     wrap.appendChild(hint);
   }
-  const items = getMonitorDetailActionItems(wrap);
-  hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Check now ← monitor row · Remove → footer · Enter / Space on buttons';
+  hint.hidden = false;
+  hint.textContent = MONITOR_DETAIL_TOOLBAR_KB_HINT;
 }
 
 /**
@@ -9403,6 +9412,12 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
     void removeMonitorFromListRow(detail.closest('.monitor-item'));
   });
   actions.appendChild(removeBtn);
+  const hint = document.createElement('div');
+  hint.className = 'monitor-detail-toolbar-kb-hint';
+  hint.setAttribute('aria-hidden', 'true');
+  hint.hidden = true;
+  hint.textContent = MONITOR_DETAIL_TOOLBAR_KB_HINT;
+  actions.appendChild(hint);
   ensureMonitorDetailActionsKeyboard(actions);
   detail.appendChild(actions);
 }

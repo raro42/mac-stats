@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1381] - 2026-10-05
+
+### Changed
+- **Monitors detail keyboard hint with the toolbar** — Check now and Remove ship with the hint in the same paint. The line no longer pops in after the buttons. It stays hidden until both buttons are on screen. The line says how to move across those controls. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1380] - 2026-10-05
 
 ### Changed

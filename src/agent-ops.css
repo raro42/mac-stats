@@ -7155,6 +7155,10 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.monitor-detail-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
 .discord-toolbar-kb-hint {
   flex: 1 1 100%;
   margin: 0;
