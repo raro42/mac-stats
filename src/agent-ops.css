@@ -2430,6 +2430,18 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+.changelog-header-kb-hint {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.changelog-header-kb-hint[hidden] {
+  display: none !important;
+}
+
 .process-detail-name {
   display: block;
   width: 100%;

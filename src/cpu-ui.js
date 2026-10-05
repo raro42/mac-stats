@@ -139,6 +139,7 @@
     style.textContent = `
       .modal-header-kb-hint,
       .process-details-header-kb-hint,
+      .changelog-header-kb-hint,
       .settings-header-kb-hint {
         margin: 0;
         font-size: 11px;
@@ -163,7 +164,7 @@
       return false;
     }
     if (title.hidden || closeBtn.hidden || closeBtn.disabled) return false;
-    const shell = header.closest("#process-details-modal");
+    const shell = header.closest("#process-details-modal, #changelog-modal");
     if (shell) {
       if (
         shell.hidden ||
@@ -180,25 +181,30 @@
     }
   }
 
+  /** Theme HTML class for a header hint that must exist before JavaScript runs. */
+  function seededModalHeaderKbClass(titleId) {
+    if (titleId === "process-details-title") return "process-details-header-kb-hint";
+    if (titleId === "changelog-modal-title") return "changelog-header-kb-hint";
+    return "";
+  }
+
   /**
-   * Theme HTML ships the Process Details hint between the title and Close.
-   * It stays hidden until both controls are on screen. Create it only on older shells.
+   * Theme HTML ships Process Details and Changelog hints between the title and Close.
+   * They stay hidden until both controls are on screen. Create them only on older shells.
    */
   function ensureModalHeaderKbHint(header, titleId, closeId, closeSelector, hintText) {
     if (!header) return;
-    const processDetails = titleId === "process-details-title";
+    const seededClass = seededModalHeaderKbClass(titleId);
     let hint = header.querySelector(
-      ".process-details-header-kb-hint, .modal-header-kb-hint, .settings-header-kb-hint"
+      ".process-details-header-kb-hint, .changelog-header-kb-hint, .modal-header-kb-hint, .settings-header-kb-hint"
     );
-    if (processDetails && !modalHeaderPairOnScreen(header, titleId, closeId)) {
+    if (seededClass && !modalHeaderPairOnScreen(header, titleId, closeId)) {
       if (hint) hint.hidden = true;
       return;
     }
     if (!hint) {
       hint = document.createElement("div");
-      hint.className = processDetails
-        ? "process-details-header-kb-hint"
-        : "modal-header-kb-hint";
+      hint.className = seededClass || "modal-header-kb-hint";
       hint.setAttribute("aria-hidden", "true");
       hint.hidden = true;
       const closeBtn =
@@ -206,6 +212,8 @@
         document.getElementById(closeId);
       if (closeBtn) header.insertBefore(hint, closeBtn);
       else header.appendChild(hint);
+    } else if (seededClass && hint.className !== seededClass) {
+      hint.className = seededClass;
     }
     const items = getModalHeaderToolbarItems(header, titleId, closeId);
     hint.hidden = items.length < 2;
