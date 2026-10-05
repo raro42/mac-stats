@@ -49,3 +49,36 @@ Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphi
 2. `cargo test` red (6 harness_ops) on that build — addressed in v0.1.1390 via whole-token age matcher.
 
 Do **not** close GitHub #14.
+
+## Test report — 2026-10-05 (agents/testing/TESTER.md; local CEST; UTC 21:20)
+
+**Result: FAIL** → move to `WIP-…`
+
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Version under test:** `0.1.1390` (`src-tauri/Cargo.toml`)
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; includes unused `cpu_window_visible` in `lib.rs` after 5s-always loop)
+- `cd src-tauri && cargo test` — **pass** (1354 passed in `mac_stats` library; 0 failed; 1 doc-test ignored)
+
+**Static spot-check of claimed #14 cuts (present on tree)**
+
+- `src/cpu.js`: `CPU_WINDOW_REFRESH_MS = 15000`
+- `src/history.js`: `HISTORY_POLL_MS = 15000`
+- `src/chart-line.js`: `LINE_CHART_POINTS = 36`
+- `src-tauri/src/lib.rs`: metric loop `sleep(5s)` open or idle
+- `harness_ops.rs`: `contains_age_token` whole-word split (fixes prior false-positive age routes)
+- Theme CSS: apple hover lift disabled + `contain`; light metric cards `contain` / flat shadow
+
+**debug.log**
+
+- Recent noise is Ollama endpoint refused / circuit open only. No panic or WebView crash lines tied to this change.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **&lt;1%** `tauri://localhost` / Graphics and Media on **macOS** after warm ≥30s with CPU window open. This host cannot measure that gate.
+2. Prior FAIL item (red `cargo test` / harness age false-positives) is **resolved** on v0.1.1390.
+
+Do **not** close GitHub #14.
