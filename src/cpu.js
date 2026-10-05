@@ -344,8 +344,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~70% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.70 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~85% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.85 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -2787,23 +2787,30 @@ function init() {
   ensureRamStripStyles();
   pruneMetricStripChips();
   ensurePowerStripKeyboard();
-  
-  // Try to get Tauri immediately - don't wait if it's already available
+
+  // Defer first get_cpu_details past first paint so open does not stack IPC
+  // with WebView compositor work (#14). Do not seed history IPC on open —
+  // live feed + focus resume seed when needed (chart-line boot already skips).
+  const startMetrics = () => {
+    if (windowOccluded()) return;
     const immediateInvoke = getInvoke();
-    void seedThemeHistoryFromBackend();
     if (immediateInvoke) {
-    invoke = immediateInvoke;
-    // Call refresh immediately - don't wait for interval
-    refresh();
-    startRefresh();
-  } else {
-    // Tauri not ready yet - wait for it
-    waitForTauri((invokeFn) => {
-      invoke = invokeFn;
-      // Call refresh immediately when Tauri becomes available
+      invoke = immediateInvoke;
       refresh();
       startRefresh();
-    });
+    } else {
+      waitForTauri((invokeFn) => {
+        if (windowOccluded()) return;
+        invoke = invokeFn;
+        refresh();
+        startRefresh();
+      });
+    }
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(startMetrics, { timeout: 8000 });
+  } else {
+    setTimeout(startMetrics, 0);
   }
 }
 

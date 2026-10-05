@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1409** (follow-up after v0.1.1408).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (open-path IPC / compositor cut; prior 3600s poll floor kept):
+
+- `src/cpu.js` — defer first `get_cpu_details` via `requestIdleCallback` (timeout **8s**); do **not** seed history IPC on init (live feed + focus resume seed); ring paints skip under ~85%.
+- `src/agent-ops.css` — global freeze of CSS `transition` / `animation` while the window is open (plus prior backdrop-filter kill).
+- `src/chart-line.js` — wider sample deadband; boot idle timeout **360s**.
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **3600s** after window open.
+- `src-tauri/src/ui/status_bar_linux.rs` — keep warm process cache on open (macOS parity; no forced full refresh).
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and hot washes still update when focused. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1408)
+
 Version **v0.1.1408** (follow-up after v0.1.1407).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -796,6 +814,38 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 **debug.log**
 
 - Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 park/occlusion/compositor cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1408)
+
+**Date:** 2026-10-05 23:31 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1408)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 structural occlusion park cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1408**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 3600`; prior 3600s poll floor kept
+- `src-tauri/src/ui/status_bar.rs` — `WindowEvent::Focused(false/true)` calls `__macStatsPauseIdleWindowPolls` / `__macStatsResumeVisibleWindowWork`; AGX GPU sampler warm deferred **1800s** after window open
+- `src-tauri/src/ui/status_bar_linux.rs` — same `Focused` → pause/resume hooks
+- `src/cpu.js` — exposes `__macStatsPauseIdleWindowPolls` / `__macStatsResumeVisibleWindowWork`; `windowOccluded()` / `html.is-occluded`; ring paints skip under ~70%; metrics / process list / glances **3600s**
+- `src/chart-line.js` — boot does **not** seed history IPC; boot idle timeout **180s**; park/unpark on blur/focus / hidden
+- `src/agent-ops.css` — `html.is-occluded` parks shell / body / metric trees (prior compositor park kept)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 Focused-event / park / no-boot-seed cuts.
 
 **Why not CLOSED**
 

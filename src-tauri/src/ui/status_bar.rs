@@ -876,7 +876,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             // Defer AGX GPU-time warm so window open does not stack ioreg with
             // the first get_cpu_details / WebView paint (#14).
             std::thread::spawn(|| {
-                std::thread::sleep(std::time::Duration::from_secs(1800));
+                std::thread::sleep(std::time::Duration::from_secs(3600));
                 let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
             });
 

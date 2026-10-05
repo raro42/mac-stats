@@ -1,10 +1,10 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1408)
+# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1409)
 
-- [x] Tauri `WindowEvent::Focused` → park/resume idle polls (macOS + Linux)
-- [x] Skip sparkline history IPC seed on chart-line boot; boot idle 180s
-- [x] Ring gauges skip paints under ~70%; GPU warm defer 1800s
-- [x] `cargo check` / ratchet verify; sync-dist; bump v0.1.1408 + CHANGELOG
-- [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
+- [x] Defer first `get_cpu_details` past first paint; drop init history seed
+- [x] Ring skip ~85%; chart-line boot idle 360s; AGX warm 3600s
+- [x] Global CSS transition/animation freeze while window open
+- [x] Bump version, CHANGELOG, sync-dist, cargo check
+- [x] Rename WIP → UNTESTED; commit + push origin/main
 
 ## Review
-v0.1.1408 structural occlusion park for #14 (Focused event + no boot history seed). Linux cannot prove macOS Graphics and Media <1%; leave open for tester / 004.
+v0.1.1409 open-path cut: idle-deferred first metrics IPC, no init history seed, global CSS transition freeze, ring 85%, sparkline deadband wider, boot idle 360s, AGX warm 3600s, Linux warm cache parity. `cargo check` pass. Hand to tester; do not close #14.

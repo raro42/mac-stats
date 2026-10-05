@@ -136,14 +136,8 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 use tauri::{LogicalPosition, Position};
                 let _ = window.set_position(Position::Logical(LogicalPosition::new(g.x, g.y)));
             }
-            use crate::state::PROCESS_CACHE;
-            if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
-                *cache = None;
-            }
-            use crate::state::LAST_CPU_DETAILS_CALL;
-            if let Ok(mut last_call) = LAST_CPU_DETAILS_CALL.try_lock() {
-                *last_call = None;
-            }
+            // Keep PROCESS_CACHE + LAST_CPU_DETAILS_CALL warm on open (#14).
+            // Clearing them stacked a full process refresh with first WebView paint.
             let _ = window.show();
             let _ = window.set_focus();
             let _ = window.unminimize();

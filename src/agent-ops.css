@@ -3,20 +3,23 @@
 /*
  * Opaque Tauri webview: live backdrop-filter re-blurs every compositor tick
  * (WKWebView "Graphics and Media" / tauri://localhost). Themes already paint
- * frosted rgba panels; skip the live blur.
+ * frosted rgba panels; skip the live blur. Also freeze CSS transitions /
+ * animations while the window is open — JS updates values in place (#14).
  */
 *,
 *::before,
 *::after {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  transition: none !important;
+  animation: none !important;
 }
 
 /*
  * #14 follow-up: ring gauges must not CSS-tween stroke-dashoffset.
  * An 0.8s cubic transition re-composites the SVG every display tick after
  * each metrics poll (WKWebView Graphics and Media / tauri://localhost).
- * JS already paints rings instantly with a 5% skip threshold.
+ * JS already paints rings instantly with an ~85% skip threshold.
  */
 .ring-progress,
 .ring .ring-progress,

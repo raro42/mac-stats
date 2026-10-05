@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1409] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — First `get_cpu_details` waits for idle (8s timeout) so open does not stack IPC with first paint. Init no longer seeds history IPC (live feed + focus resume do). Global CSS freezes transitions/animations while the window is open. Ring gauges skip paints under ~85%. Sparkline sample deadband is wider; chart-line boot idle timeout is 360s. GPU sampler warm deferred 3600s after open. Linux open keeps warm process cache (macOS parity). Aim: quieter `tauri://localhost` / Graphics and Media on open and while another app is frontmost.
+
+
 ## [0.1.1408] - 2026-10-06
 
 ### Changed
