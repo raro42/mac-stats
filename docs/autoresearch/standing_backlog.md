@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1404
+
+- CPU window WebView idle cut (#14 follow-up): park sparkline canvases to 1×1 on blur / `document.hidden`; skip paints when `!document.hasFocus()`; history chart `content-visibility: auto` + `contain: paint`; data-poster DPR 1 + opaque canvas; ring skip ~30%. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1400
 
 - CPU window WebView idle cut (#14 follow-up): 600s UI polls/TTL, 120s backend/`get_cpu_details`/temp read, process cache 600s, HISTORY_POINTS 2, ring skip ~10%, chart-line boot via `requestIdleCallback`, collapsed Top Processes `content-visibility`, GPU warm deferred 20s. P2 reliability / GitHub #14.
