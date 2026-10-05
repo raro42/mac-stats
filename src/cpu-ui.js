@@ -461,6 +461,13 @@
     ) {
       window.ensureMcpSettingsToolbarKeyboard(mcpSetting);
     }
+    const browserSetting = document.getElementById("browser-setting");
+    if (
+      browserSetting &&
+      typeof window.ensureBrowserSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureBrowserSettingsToolbarKeyboard(browserSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -568,6 +575,13 @@
       typeof window.ensureMcpSettingsToolbarKeyboard === "function"
     ) {
       window.ensureMcpSettingsToolbarKeyboard(mcpSetting);
+    }
+    const browserSetting = document.getElementById("browser-setting");
+    if (
+      browserSetting &&
+      typeof window.ensureBrowserSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureBrowserSettingsToolbarKeyboard(browserSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;

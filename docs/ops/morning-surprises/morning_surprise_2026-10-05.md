@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the MCP settings toolbar keyboard hint in the theme HTML.
+Overnight Track B put the Browser settings toolbar keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1373** | Browser settings toolbar keyboard hint is in the theme HTML under the path field, the port field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Path first crosses to MCP. Clear last crosses to Cursor. Keyboard tips stay out of the layout. |
 | **v0.1.1372** | MCP settings toolbar keyboard hint is in the theme HTML under the URL field, the stdio field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. URL first crosses to Mastodon. Clear last crosses to Browser. Keyboard tips stay out of the layout. |
 | **v0.1.1371** | Mastodon settings toolbar keyboard hint is in the theme HTML under the URL field, the token field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. URL first crosses to Redmine. Clear last crosses to MCP. Keyboard tips stay out of the layout. |
 | **v0.1.1370** | Redmine settings toolbar keyboard hint is in the theme HTML under the URL field, the key field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. URL first crosses to Brave. Clear last crosses to Mastodon. Keyboard tips stay out of the layout. |
@@ -28,6 +29,7 @@ Overnight Track B put the MCP settings toolbar keyboard hint in the theme HTML.
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.6d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~02:48 tick: Browser settings toolbar keyboard hint first paint in theme HTML (**v0.1.1373**); install/kickstart.
 - ~02:26 tick: MCP settings toolbar keyboard hint first paint in theme HTML (**v0.1.1372**); install/kickstart.
 - ~02:00 tick: Mastodon settings toolbar keyboard hint first paint in theme HTML (**v0.1.1371**); install/kickstart.
 - ~01:30 tick: Redmine settings toolbar keyboard hint first paint in theme HTML (**v0.1.1370**); install/kickstart.

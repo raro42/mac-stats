@@ -14239,6 +14239,219 @@ function initMcpSettings() {
   window.ensureMcpSettingsToolbarKeyboard = wireMcpSettingsToolbarKeyboard;
 }
 
+function browserSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  if (start == null || end == null) return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return start === len && end === len;
+  }
+  return start === 0 && end === 0;
+}
+
+function isBrowserSettingsInput(el) {
+  return el?.id === 'browser-chromium-path-input' || el?.id === 'browser-cdp-port-input';
+}
+
+/** Focusable Settings Browser toolbar items (path · port · Save · Clear). */
+function getBrowserSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('browser-setting');
+  if (!container) return [];
+  const ids = [
+    'browser-chromium-path-input',
+    'browser-cdp-port-input',
+    'browser-save',
+    'browser-clear',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshBrowserSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('browser-setting');
+  const items = getBrowserSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Browser path, port, Save, and Clear when Settings is open. */
+const BROWSER_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at path/port start/end · path first crosses to MCP · Clear last crosses to Cursor';
+
+/**
+ * Theme HTML ships the hint under the path field, port field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureBrowserSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('browser-setting');
+  if (!container) return;
+  const actions = container.querySelector('.browser-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.browser-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getBrowserSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'browser-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = BROWSER_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Browser path first ← MCP Clear, else footer version, when Settings is open. */
+function tryChainBrowserSettingsToolbarPathBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('mcp-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Browser Clear last → Cursor workspace, else footer version, when Settings is open. */
+function tryChainBrowserSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('cursor-agent-workspace-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Browser toolbar keyboard — focus path · port · Save · Clear,
+ * then ←→ / h l / Home/End (MCP settings toolbar parity).
+ */
+function wireBrowserSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('browser-setting');
+  if (!container) return;
+  ensureBrowserSettingsToolbarKbHint(container);
+  refreshBrowserSettingsToolbarRovingTabindex(container);
+  if (container.dataset.browserSettingsToolbarKbWired === '1') return;
+  container.dataset.browserSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Browser path and CDP port');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getBrowserSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshBrowserSettingsToolbarRovingTabindex(container, e.target);
+      ensureBrowserSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getBrowserSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isBrowserSettingsInput(active) ||
+        active?.id === 'browser-save' ||
+        active?.id === 'browser-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (isBrowserSettingsInput(active) && !browserSettingsInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainBrowserSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (isBrowserSettingsInput(active) && !browserSettingsInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainBrowserSettingsToolbarPathBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshBrowserSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (isBrowserSettingsInput(items[next]) && typeof items[next].setSelectionRange === 'function') {
+      try {
+        const len = (items[next].value || '').length;
+        items[next].setSelectionRange(len, len);
+      } catch (_) {
+        /* number inputs have no caret */
+      }
+    }
+  });
+}
+
 function updateBrowserConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'browser-settings-status');
   if (el) el.textContent = statusText;
@@ -14408,6 +14621,8 @@ function initBrowserSettings() {
 
   refreshBrowserStatus();
   window.BrowserSettings = { refreshStatus: refreshBrowserStatus };
+  wireBrowserSettingsToolbarKeyboard();
+  window.ensureBrowserSettingsToolbarKeyboard = wireBrowserSettingsToolbarKeyboard;
 }
 
 function updateCursorAgentConfigStatus(statusText, elId) {
