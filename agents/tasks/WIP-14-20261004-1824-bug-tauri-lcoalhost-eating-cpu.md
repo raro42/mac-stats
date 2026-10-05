@@ -49,3 +49,34 @@ Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphi
 2. Linux WebKit floor (blank `cpu.html` near a full core) still blocks proving the product cut meets the issue bar here.
 
 Do **not** close GitHub #14.
+
+## Test report (v0.1.1392)
+
+**Date:** 2026-10-05 21:36 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1392)
+- `cd src-tauri && cargo test` — **pass** (1354 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src/tauri-logger.js` — warn/error only to `log_from_js` (log/info/debug local only)
+- `src/cpu.js` — `CPU_WINDOW_REFRESH_MS = 30000`; process list refresh ≥30s
+- `src/history.js` — `HISTORY_POLL_MS = 30000`
+- `src/chart-line.js` — `LINE_CHART_POINTS = 16`
+- `src-tauri/src/lib.rs` — metric loop sleep 12s; `cpu_window_visible` gated `#[cfg(target_os = "macos")]`
+- Theme `cpu.css` — icon `filter: none` + opacity (no multi-step CSS filters)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 timer/IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **&lt;1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
