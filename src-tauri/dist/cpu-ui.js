@@ -447,6 +447,13 @@
     ) {
       window.ensureRedmineSettingsToolbarKeyboard(redmineSetting);
     }
+    const mastodonSetting = document.getElementById("mastodon-setting");
+    if (
+      mastodonSetting &&
+      typeof window.ensureMastodonSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureMastodonSettingsToolbarKeyboard(mastodonSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -540,6 +547,13 @@
       typeof window.ensureRedmineSettingsToolbarKeyboard === "function"
     ) {
       window.ensureRedmineSettingsToolbarKeyboard(redmineSetting);
+    }
+    const mastodonSetting = document.getElementById("mastodon-setting");
+    if (
+      mastodonSetting &&
+      typeof window.ensureMastodonSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureMastodonSettingsToolbarKeyboard(mastodonSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;

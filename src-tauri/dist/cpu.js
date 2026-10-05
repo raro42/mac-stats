@@ -13510,6 +13510,212 @@ function initRedmineSettings() {
   window.ensureRedmineSettingsToolbarKeyboard = wireRedmineSettingsToolbarKeyboard;
 }
 
+function mastodonSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+function isMastodonSettingsInput(el) {
+  return el?.id === 'mastodon-url-input' || el?.id === 'mastodon-token-input';
+}
+
+/** Focusable Settings Mastodon toolbar items (URL · token · Save · Clear). */
+function getMastodonSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('mastodon-setting');
+  if (!container) return [];
+  const ids = [
+    'mastodon-url-input',
+    'mastodon-token-input',
+    'mastodon-save',
+    'mastodon-clear',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshMastodonSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('mastodon-setting');
+  const items = getMastodonSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Mastodon URL, token, Save, and Clear when Settings is open. */
+const MASTODON_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at URL/token start/end · URL first crosses to Redmine · Clear last crosses to MCP';
+
+/**
+ * Theme HTML ships the hint under the URL field, token field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureMastodonSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('mastodon-setting');
+  if (!container) return;
+  const actions = container.querySelector('.mastodon-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.mastodon-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getMastodonSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'mastodon-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = MASTODON_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Mastodon URL first ← Redmine Clear, else footer version, when Settings is open. */
+function tryChainMastodonSettingsToolbarUrlBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('redmine-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Mastodon Clear last → MCP URL, else footer version, when Settings is open. */
+function tryChainMastodonSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('mcp-url-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Mastodon toolbar keyboard — focus URL · token · Save · Clear,
+ * then ←→ / h l / Home/End (Redmine settings toolbar parity).
+ */
+function wireMastodonSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('mastodon-setting');
+  if (!container) return;
+  ensureMastodonSettingsToolbarKbHint(container);
+  refreshMastodonSettingsToolbarRovingTabindex(container);
+  if (container.dataset.mastodonSettingsToolbarKbWired === '1') return;
+  container.dataset.mastodonSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Mastodon URL and access token');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getMastodonSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshMastodonSettingsToolbarRovingTabindex(container, e.target);
+      ensureMastodonSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getMastodonSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isMastodonSettingsInput(active) ||
+        active?.id === 'mastodon-save' ||
+        active?.id === 'mastodon-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (isMastodonSettingsInput(active) && !mastodonSettingsInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainMastodonSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (isMastodonSettingsInput(active) && !mastodonSettingsInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainMastodonSettingsToolbarUrlBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshMastodonSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (isMastodonSettingsInput(items[next]) && typeof items[next].setSelectionRange === 'function') {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 function updateMastodonConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'mastodon-settings-status');
   if (el) el.textContent = statusText;
@@ -13667,6 +13873,8 @@ function initMastodonSettings() {
 
   refreshMastodonStatus();
   window.MastodonSettings = { refreshStatus: refreshMastodonStatus };
+  wireMastodonSettingsToolbarKeyboard();
+  window.ensureMastodonSettingsToolbarKeyboard = wireMastodonSettingsToolbarKeyboard;
 }
 
 function updateMcpConfigStatus(statusText, elId) {
