@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1384] - 2026-10-05
+
+### Changed
+- **Agent Ops row-selection keyboard hint on first paint** — the Tips line sits in the theme HTML under the tab-bar hint. It no longer pops in after JavaScript loads. The line says how to move across tabs, filters, and list rows. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1383] - 2026-10-05
 
 ### Changed

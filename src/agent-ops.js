@@ -1285,18 +1285,37 @@ function paintOpsOverviewHeadCount(cardId, text, opts) {
     el.classList.toggle('is-zero', zero);
 }
 
+const OPS_KEYBOARD_HINT =
+    'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k (no selection → first/last) · PgUp/PgDn Home/End · Space/Enter · c copy id (Copied) · / Esc · r refresh · R digest · ?';
+
+/** Theme HTML ships the row-selection tips under the tab-bar hint. Create it only on older shells. */
 function ensureOpsKeyboardHint() {
     const tabs = document.querySelector('.agent-ops-tabs');
-    if (!tabs) return;
+    if (!tabs || !tabs.parentNode) return;
     let hint = document.getElementById('ops-keyboard-hint');
+    if (!hint) {
+        hint = tabs.parentNode.querySelector(':scope > .ops-keyboard-hint');
+    }
     if (!hint) {
         hint = document.createElement('div');
         hint.id = 'ops-keyboard-hint';
         hint.className = 'ops-row-meta ops-keyboard-hint';
-        tabs.insertAdjacentElement('afterend', hint);
+        hint.setAttribute('aria-hidden', 'true');
+        hint.textContent = OPS_KEYBOARD_HINT;
+        const tabBarHint = document.getElementById('ops-tab-bar-kb-hint');
+        if (tabBarHint && tabBarHint.parentNode === tabs.parentNode) {
+            tabBarHint.insertAdjacentElement('afterend', hint);
+        } else {
+            tabs.insertAdjacentElement('afterend', hint);
+        }
     }
-    hint.textContent =
-        'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k (no selection → first/last) · PgUp/PgDn Home/End · Space/Enter · c copy id (Copied) · / Esc · r refresh · R digest · ?';
+    if (!hint.id) hint.id = 'ops-keyboard-hint';
+    const tabBarHint = document.getElementById('ops-tab-bar-kb-hint');
+    const wantPrev = tabBarHint && tabBarHint.parentNode === tabs.parentNode ? tabBarHint : tabs;
+    if (hint.previousElementSibling !== wantPrev) {
+        wantPrev.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent = OPS_KEYBOARD_HINT;
 }
 
 /** Hermes-style: ? flashes the keyboard tips row when not typing. */
