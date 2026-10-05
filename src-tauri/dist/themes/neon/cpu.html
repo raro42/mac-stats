@@ -276,6 +276,16 @@
           </div>
         </div>
         <div class="section-content-collapsible collapsed" id="perplexity-content">
+          <div id="perplexity-setup" class="perplexity-setup" hidden>
+            <p class="perplexity-setup-lead">Web search needs a Perplexity API key. Create a free key on their site, then paste it here. It is stored in the macOS Keychain.</p>
+            <p class="perplexity-setup-link"><a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer">Get an API key at perplexity.ai/settings/api</a></p>
+            <div class="perplexity-setup-row" role="toolbar" aria-label="Perplexity API key">
+              <input type="password" id="perplexity-inline-key" class="perplexity-inline-key" placeholder="Paste API key (pplx-…)" autocomplete="off" />
+              <button type="button" id="perplexity-inline-save" class="perplexity-inline-save">Save key</button>
+              <div id="perplexity-setup-kb-hint" class="perplexity-setup-kb-hint" hidden aria-hidden="true">← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field</div>
+            </div>
+            <p class="perplexity-setup-note" id="perplexity-setup-note" hidden></p>
+          </div>
           <div class="perplexity-search-box">
             <input type="text" id="perplexity-query" placeholder="Search the web..." />
             <button type="button" id="perplexity-search-btn">Search</button>

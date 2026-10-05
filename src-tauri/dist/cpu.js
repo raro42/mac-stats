@@ -16727,20 +16727,41 @@ function refreshPerplexitySetupRovingTabindex(container, preferred) {
   }
 }
 
+/** How to move across key · Save key on the Perplexity setup toolbar. */
+const PERPLEXITY_SETUP_KB_HINT =
+  '← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field';
+
+/**
+ * Theme HTML ships the hint under key · Save key.
+ * It stays hidden until the setup panel is on screen. Create it only on older shells.
+ */
 function ensurePerplexitySetupKbHint(container) {
   const row = container || document.querySelector('.perplexity-setup-row');
   if (!row) return;
-  let hint = row.querySelector('.perplexity-setup-kb-hint');
+  let hint = document.getElementById('perplexity-setup-kb-hint');
   if (!hint) {
-    hint = document.createElement('div');
-    hint.className = 'perplexity-setup-kb-hint';
-    hint.setAttribute('aria-hidden', 'true');
-    row.appendChild(hint);
+    hint = row.querySelector('.perplexity-setup-kb-hint');
   }
   const items = getPerplexitySetupToolbarItems(row);
-  hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field';
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'perplexity-setup-kb-hint';
+    hint.className = 'perplexity-setup-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = PERPLEXITY_SETUP_KB_HINT;
+    row.appendChild(hint);
+  }
+  if (!hint.id) hint.id = 'perplexity-setup-kb-hint';
+  if (hint.parentElement !== row) {
+    row.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = PERPLEXITY_SETUP_KB_HINT;
 }
 
 function wirePerplexitySetupToolbarKeyboard(row) {
@@ -17071,23 +17092,41 @@ let perplexitySearchBusyForGlance = false;
 
 const PERPLEXITY_API_KEY_HELP_URL = 'https://www.perplexity.ai/settings/api';
 
+/**
+ * Theme HTML ships #perplexity-setup (hidden) with the setup keyboard hint.
+ * Create the panel only on older shells. Always wire Save once.
+ */
 function ensurePerplexitySetupPanel() {
   const content = document.getElementById('perplexity-content');
-  if (!content || document.getElementById('perplexity-setup')) return;
+  if (!content) return;
 
-  const setup = document.createElement('div');
-  setup.id = 'perplexity-setup';
-  setup.className = 'perplexity-setup';
-  setup.hidden = true;
-  setup.innerHTML =
-    '<p class="perplexity-setup-lead">Web search needs a Perplexity API key. Create a free key on their site, then paste it here. It is stored in the macOS Keychain.</p>' +
-    '<p class="perplexity-setup-link"><a href="' + PERPLEXITY_API_KEY_HELP_URL + '" target="_blank" rel="noopener noreferrer">Get an API key at perplexity.ai/settings/api</a></p>' +
-    '<div class="perplexity-setup-row">' +
-    '<input type="password" id="perplexity-inline-key" class="perplexity-inline-key" placeholder="Paste API key (pplx-…)" autocomplete="off" />' +
-    '<button type="button" id="perplexity-inline-save" class="perplexity-inline-save">Save key</button>' +
-    '</div>' +
-    '<p class="perplexity-setup-note" id="perplexity-setup-note" hidden></p>';
-  content.insertBefore(setup, content.firstChild);
+  let setup = document.getElementById('perplexity-setup');
+  if (!setup) {
+    setup = document.createElement('div');
+    setup.id = 'perplexity-setup';
+    setup.className = 'perplexity-setup';
+    setup.hidden = true;
+    setup.innerHTML =
+      '<p class="perplexity-setup-lead">Web search needs a Perplexity API key. Create a free key on their site, then paste it here. It is stored in the macOS Keychain.</p>' +
+      '<p class="perplexity-setup-link"><a href="' +
+      PERPLEXITY_API_KEY_HELP_URL +
+      '" target="_blank" rel="noopener noreferrer">Get an API key at perplexity.ai/settings/api</a></p>' +
+      '<div class="perplexity-setup-row" role="toolbar" aria-label="Perplexity API key">' +
+      '<input type="password" id="perplexity-inline-key" class="perplexity-inline-key" placeholder="Paste API key (pplx-…)" autocomplete="off" />' +
+      '<button type="button" id="perplexity-inline-save" class="perplexity-inline-save">Save key</button>' +
+      '<div id="perplexity-setup-kb-hint" class="perplexity-setup-kb-hint" hidden aria-hidden="true">' +
+      PERPLEXITY_SETUP_KB_HINT +
+      '</div>' +
+      '</div>' +
+      '<p class="perplexity-setup-note" id="perplexity-setup-note" hidden></p>';
+    content.insertBefore(setup, content.firstChild);
+  }
+
+  if (setup.dataset.perplexitySetupSaveWired === '1') {
+    ensurePerplexitySearchToolbarKeyboard();
+    return;
+  }
+  setup.dataset.perplexitySetupSaveWired = '1';
 
   const inlineSave = document.getElementById('perplexity-inline-save');
   const inlineKey = document.getElementById('perplexity-inline-key');
