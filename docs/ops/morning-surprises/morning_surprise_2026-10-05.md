@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the Ollama settings toolbar keyboard hint in the theme HTML.
+Overnight Track B put the Perplexity settings toolbar keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1367** | Perplexity settings toolbar keyboard hint is in the theme HTML under the key field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Keyboard tips stay out of the layout. |
 | **v0.1.1366** | Ollama settings toolbar keyboard hint is in the theme HTML under the system prompt, Reset, and Save. It no longer pops in after JavaScript loads. It stays hidden until the popover is open. The line says how to move across those controls. Keyboard tips stay out of the layout. |
 | **v0.1.1365** | Ollama settings header keyboard hint is in the theme HTML between the title and Close. It no longer pops in after JavaScript loads. It stays hidden until the title and Close are both on screen. The line says how to move across those controls. Keyboard tips stay out of the layout. |
 | **v0.1.1364** | Settings header keyboard hint is in the theme HTML between the title and Close. It no longer pops in after JavaScript loads. It stays hidden until the title and Close are both on screen. The line says how to move across those controls. Keyboard tips stay out of the layout. |
@@ -22,6 +23,7 @@ Overnight Track B put the Ollama settings toolbar keyboard hint in the theme HTM
 - Digester open stayed empty (instant/direct noise filtered).
 - Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.5d).
 - Debug.log: single-instance lock WARN (another launch exited). No panic.
+- ~00:10 tick: Perplexity settings toolbar keyboard hint first paint in theme HTML (**v0.1.1367**); install/kickstart.
 - ~23:44 tick: Ollama settings toolbar keyboard hint first paint in theme HTML (**v0.1.1366**); install/kickstart.
 - ~23:18 tick: Ollama settings header keyboard hint first paint in theme HTML (**v0.1.1365**); install/kickstart.
 - ~22:52 tick: Settings header keyboard hint first paint in theme HTML (**v0.1.1364**); install/kickstart.

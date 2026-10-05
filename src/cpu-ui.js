@@ -492,6 +492,13 @@
     applySettingsSignalAttentionGlanceState();
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
+    const perplexitySetting = document.getElementById("perplexity-setting");
+    if (
+      perplexitySetting &&
+      typeof window.ensurePerplexitySettingsToolbarKeyboard === "function"
+    ) {
+      window.ensurePerplexitySettingsToolbarKeyboard(perplexitySetting);
+    }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;
     if (returnEl && typeof returnEl.focus === "function") {

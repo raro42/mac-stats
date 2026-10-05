@@ -15137,26 +15137,41 @@ function refreshPerplexitySettingsToolbarRovingTabindex(wrap, preferred) {
   }
 }
 
+/** How to move across the Perplexity key, Save, and Clear when Settings is open. */
+const PERPLEXITY_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at key start/end · key first ↑ → Perplexity icon · at end crosses to footer version';
+
+/**
+ * Theme HTML ships the hint under the key field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
 function ensurePerplexitySettingsToolbarKbHint(wrap) {
   const container = wrap || document.getElementById('perplexity-setting');
   if (!container) return;
   const actions = container.querySelector('.perplexity-actions');
   if (!actions) return;
   let hint = actions.querySelector('.perplexity-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getPerplexitySettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'perplexity-settings-toolbar-kb-hint';
     hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
     actions.appendChild(hint);
   }
-  const items = getPerplexitySettingsToolbarItems(container);
-  hint.hidden = items.length < 2;
-  const settingsOpen =
-    typeof window.isSettingsModalOpen === "function" &&
-    window.isSettingsModalOpen();
-  hint.textContent = settingsOpen
-    ? "← → / h l · Home/End move · arrows at key start/end · key first ↑ → Perplexity icon · at end crosses to footer version"
-    : "← → / h l · Home/End move · Enter saves from key field · buttons keep activate";
+  hint.hidden = false;
+  hint.textContent = PERPLEXITY_SETTINGS_TOOLBAR_KB_HINT;
 }
 
 /** Perplexity key first ← footer version when Settings is open. */
