@@ -475,6 +475,13 @@
     ) {
       window.ensureCursorAgentSettingsToolbarKeyboard(cursorAgentSetting);
     }
+    const telegramSetting = document.getElementById("telegram-setting");
+    if (
+      telegramSetting &&
+      typeof window.ensureTelegramSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureTelegramSettingsToolbarKeyboard(telegramSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -596,6 +603,13 @@
       typeof window.ensureCursorAgentSettingsToolbarKeyboard === "function"
     ) {
       window.ensureCursorAgentSettingsToolbarKeyboard(cursorAgentSetting);
+    }
+    const telegramSetting = document.getElementById("telegram-setting");
+    if (
+      telegramSetting &&
+      typeof window.ensureTelegramSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureTelegramSettingsToolbarKeyboard(telegramSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;

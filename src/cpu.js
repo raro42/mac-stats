@@ -15145,6 +15145,228 @@ function initTelegramSettings() {
 
   refreshTelegramStatus();
   window.TelegramSettings = { refreshStatus: refreshTelegramStatus };
+  wireTelegramSettingsToolbarKeyboard();
+  window.ensureTelegramSettingsToolbarKeyboard = wireTelegramSettingsToolbarKeyboard;
+}
+
+function telegramSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  if (start == null || end == null) return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return start === len && end === len;
+  }
+  return start === 0 && end === 0;
+}
+
+function isTelegramSettingsInput(el) {
+  return (
+    el?.id === 'telegram-bot-token-input' || el?.id === 'telegram-chat-id-input'
+  );
+}
+
+/** Focusable Settings Telegram toolbar items (token · chat id · Save · Clear). */
+function getTelegramSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('telegram-setting');
+  if (!container) return [];
+  const ids = [
+    'telegram-bot-token-input',
+    'telegram-chat-id-input',
+    'telegram-save',
+    'telegram-clear',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshTelegramSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('telegram-setting');
+  const items = getTelegramSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Telegram token, chat id, Save, and Clear when Settings is open. */
+const TELEGRAM_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at token/chat id start/end · token first crosses to Cursor · Clear last crosses to Slack';
+
+/**
+ * Theme HTML ships the hint under the token field, chat id field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureTelegramSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('telegram-setting');
+  if (!container) return;
+  const actions = container.querySelector('.telegram-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.telegram-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getTelegramSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'telegram-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = TELEGRAM_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Telegram token first ← Cursor Clear, else footer version, when Settings is open. */
+function tryChainTelegramSettingsToolbarTokenBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('cursor-agent-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Telegram Clear last → Slack webhook, else footer version, when Settings is open. */
+function tryChainTelegramSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('slack-webhook-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Telegram toolbar keyboard — focus token · chat id · Save · Clear,
+ * then ←→ / h l / Home/End (Cursor agent settings toolbar parity).
+ */
+function wireTelegramSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('telegram-setting');
+  if (!container) return;
+  ensureTelegramSettingsToolbarKbHint(container);
+  refreshTelegramSettingsToolbarRovingTabindex(container);
+  if (container.dataset.telegramSettingsToolbarKbWired === '1') return;
+  container.dataset.telegramSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Telegram bot token and chat id');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getTelegramSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshTelegramSettingsToolbarRovingTabindex(container, e.target);
+      ensureTelegramSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getTelegramSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isTelegramSettingsInput(active) ||
+        active?.id === 'telegram-save' ||
+        active?.id === 'telegram-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        isTelegramSettingsInput(active) &&
+        !telegramSettingsInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainTelegramSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (
+        isTelegramSettingsInput(active) &&
+        !telegramSettingsInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainTelegramSettingsToolbarTokenBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshTelegramSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (
+      isTelegramSettingsInput(items[next]) &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
 }
 
 function updateSlackConfigStatus(statusText, elId) {

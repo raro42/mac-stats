@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the Cursor agent settings toolbar keyboard hint in the theme HTML.
+Overnight Track B put the Telegram settings toolbar keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1375** | Telegram settings toolbar keyboard hint is in the theme HTML under the token field, the chat id field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Token first crosses to Cursor. Clear last crosses to Slack. Keyboard tips stay out of the layout. |
 | **v0.1.1374** | Cursor agent settings toolbar keyboard hint is in the theme HTML under the workspace field, the executable field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Workspace first crosses to Browser. Clear last crosses to Telegram. Keyboard tips stay out of the layout. |
 | **v0.1.1373** | Browser settings toolbar keyboard hint is in the theme HTML under the path field, the port field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Path first crosses to MCP. Clear last crosses to Cursor. Keyboard tips stay out of the layout. |
 | **v0.1.1372** | MCP settings toolbar keyboard hint is in the theme HTML under the URL field, the stdio field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. URL first crosses to Mastodon. Clear last crosses to Browser. Keyboard tips stay out of the layout. |
@@ -28,8 +29,9 @@ Overnight Track B put the Cursor agent settings toolbar keyboard hint in the the
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.6d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.69d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~03:40 tick: Telegram settings toolbar keyboard hint first paint in theme HTML (**v0.1.1375**); install/kickstart.
 - ~03:14 tick: Cursor agent settings toolbar keyboard hint first paint in theme HTML (**v0.1.1374**); install/kickstart.
 - ~02:48 tick: Browser settings toolbar keyboard hint first paint in theme HTML (**v0.1.1373**); install/kickstart.
 - ~02:26 tick: MCP settings toolbar keyboard hint first paint in theme HTML (**v0.1.1372**); install/kickstart.
