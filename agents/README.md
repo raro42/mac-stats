@@ -25,7 +25,7 @@ python3 scripts/install_mac_stats_agent_units.py   # Linux systemd + watchdog
 
 ## Standing rules (always)
 
-1. **Always test** after a runtime change (`cargo check` / relevant tests / task verification). Use [testing/](testing/) for queue work. GitHub Actions CI is **manual** (not on every push). Prefer local `cargo check`; only run `gh workflow run ci.yml --ref main` after a deliberate batch when you want macOS Actions proof.
+1. **Always test** after a runtime change (`cargo check` / relevant tests / task verification). Use [testing/](testing/) for queue work. GitHub Actions CI is **not** on every push. Prefer local `cargo check`. For a batch macOS proof use `python3 scripts/maybe_run_ci.py` (≥10 patches since last green CI, or release-due; max once/day) or `gh workflow run ci.yml --ref main`. Do **not** trigger CI on every issue close.
 2. **Always read logs** after start/restart or a failed behaviour. Skim `~/.mac-stats/debug.log` for related ERROR / WARN / panic. Use [log-monitor/](log-monitor/) for structured scans.
 
 ## What lives here

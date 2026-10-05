@@ -1,8 +1,9 @@
 # CI — compile check (badge target for README)
 #
-# Manual only: compile locally first (`cd src-tauri && cargo check`), then run
-# this when you want a macOS Actions proof after a batch of changes:
-#   gh workflow run ci.yml --ref main
+# Not on every push. Day-to-day: local `cd src-tauri && cargo check`.
+# Batch / overnight: python3 scripts/maybe_run_ci.py
+#   (≥10 patches since last green CI, or release-due; max once/day)
+# Manual: gh workflow run ci.yml --ref main
 # GitHub UI: Actions → CI → Run workflow
 
 name: CI

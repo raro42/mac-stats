@@ -12,8 +12,10 @@ Also runs a **~23:00 pending git flush** (commit+push dirty safe files) once per
 so finished work never sits uncommitted. See scripts/overnight_git_flush.py and
 .cursor/rules/no-uncommitted-leftovers.mdc.
 
-After a successful flush (same ~23:00 slot), may cut a **GitHub Release** when
-Cargo.toml is far enough ahead of Latest — scripts/maybe_cut_github_release.py.
+After a successful flush (same ~23:00 slot), may trigger **manual CI** when
+≥10 patches have landed since the last green run (or a release is due) —
+scripts/maybe_run_ci.py — then may cut a **GitHub Release** when Cargo.toml is
+far enough ahead of Latest — scripts/maybe_cut_github_release.py.
 
 Does not spawn agents during daytime — only prints AGENT_LOOP_SLEEP_harness then.
 """
@@ -31,6 +33,7 @@ SENTINEL = "AGENT_LOOP_TICK_harness"
 SLEEP_NOTE = "AGENT_LOOP_SLEEP_harness"
 FLUSH_NOTE = "AGENT_LOOP_FLUSH_git"
 CLEAN_NOTE = "AGENT_LOOP_RUST_CLEAN"
+CI_NOTE = "AGENT_LOOP_CI"
 RELEASE_NOTE = "AGENT_LOOP_RELEASE"
 AGENT_NOTE = "AGENT_LOOP_AGENT"
 START_H, END_H = 20, 6
@@ -50,6 +53,8 @@ PROMPT = (
     "Nightly minimum: ≥1 keep OR discard in results.tsv per 20:00–06:00 window; quiet is failure mode (max 1 quiet tick/night). "
     "Git discipline: when an experiment finishes, commit + push immediately (no dirty leftovers). "
     "Around 23:00 the loop also runs scripts/overnight_git_flush.py as a backstop, "
+    "then scripts/maybe_run_ci.py when ≥10 patches landed since last green CI "
+    "(or a release is due; at most once/day), "
     "then scripts/maybe_cut_github_release.py when Cargo.toml is ahead of GitHub Latest "
     "(do not wait for the user to ask for a release). "
     "(1) python3 scripts/digest_agent_runs.py "
@@ -163,10 +168,37 @@ def run_git_flush(now: datetime) -> None:
     # Stamp even on clean (exit 0) so we do not retry every tick; retry next night if failed hard.
     if proc.returncode == 0:
         FLUSH_STAMP.write_text(now.date().isoformat() + "\n")
+        run_maybe_ci(now)
         run_maybe_release(now)
     elif "clean" in (proc.stdout or ""):
         FLUSH_STAMP.write_text(now.date().isoformat() + "\n")
+        run_maybe_ci(now)
         run_maybe_release(now)
+
+
+def run_maybe_ci(now: datetime) -> None:
+    """Trigger macOS CI when a batch is due (not every push)."""
+    script = ROOT / "scripts" / "maybe_run_ci.py"
+    if not script.is_file():
+        return
+    print(
+        f'{CI_NOTE} {{"at":"{now.isoformat(timespec="seconds")}","script":"{script}"}}',
+        flush=True,
+    )
+    proc = subprocess.run(
+        ["python3", str(script)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    if proc.stdout:
+        print(proc.stdout.rstrip(), flush=True)
+    if proc.stderr:
+        print(proc.stderr.rstrip(), flush=True)
+    print(
+        f'{CI_NOTE} {{"exit":{proc.returncode}}}',
+        flush=True,
+    )
 
 
 def run_maybe_release(now: datetime) -> None:

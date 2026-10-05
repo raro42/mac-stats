@@ -11,7 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 ### Changed
-- **CI is manual** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally (`cd src-tauri && cargo check`), then run macOS CI when you want it: `gh workflow run ci.yml --ref main`.
+- **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
+
+
+## [0.1.1396] - 2026-10-05
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Metrics / history / process list / Discord / monitors / Agent Ops poll every 90s. Process cache TTL is 90s. `get_cpu_details` rate floor is 30s (was 2s). Backend metric loop and temp read interval are 30s. Sparklines keep 6 points. History availability probe is 5m. Data-poster history pauses on window blur. GPU sampler warm is deferred 3s after open. Debug Log auto-refresh is 60s. Aim: quieter `tauri://localhost` / Graphics and Media.
 
 
 ## [0.1.1395] - 2026-10-05
