@@ -344,8 +344,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~85% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.85 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~95% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.95 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -2775,8 +2775,7 @@ function stopRefresh() {
 
 // Initialize when DOM and Tauri are ready
 function init() {
-  // Force immediate process update on initial load
-  window._forceProcessUpdate = true;
+  // Keep warm PROCESS_CACHE on open — do not force a full process refresh (#14).
   wireMetricValueCopy();
   ensureCpuHeaderToolbarKeyboard();
   ensureRingGaugeKeyboard();
@@ -2788,8 +2787,8 @@ function init() {
   pruneMetricStripChips();
   ensurePowerStripKeyboard();
 
-  // Defer first get_cpu_details past first paint so open does not stack IPC
-  // with WebView compositor work (#14). Do not seed history IPC on open —
+  // Defer first get_cpu_details well past first paint so open does not stack
+  // IPC with WebView compositor work (#14). Do not seed history IPC on open —
   // live feed + focus resume seed when needed (chart-line boot already skips).
   const startMetrics = () => {
     if (windowOccluded()) return;
@@ -2808,9 +2807,9 @@ function init() {
     }
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startMetrics, { timeout: 8000 });
+    window.requestIdleCallback(startMetrics, { timeout: 30000 });
   } else {
-    setTimeout(startMetrics, 0);
+    setTimeout(startMetrics, 30000);
   }
 }
 
@@ -5325,25 +5324,39 @@ if (document.readyState === "loading") {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Fetch version once at startup (no polling)
-    fetchAppVersion().then((v) => {
-      showFirstLaunchTip();
-      checkForAppUpdate(v);
-    });
+    // Defer version / update IPC past first paint (#14).
+    const startVersion = () => {
+      fetchAppVersion().then((v) => {
+        showFirstLaunchTip();
+        checkForAppUpdate(v);
+      });
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(startVersion, { timeout: 30000 });
+    } else {
+      setTimeout(startVersion, 30000);
+    }
     initRingGauges();
     init();
   });
 } else {
-  showFirstLaunchTip();
-  (async () => {
-    try {
-      const inv = typeof getInvoke === "function" ? getInvoke() : null;
-      if (inv) {
-        const v = await inv("get_app_version");
-        checkForAppUpdate(v);
-      }
-    } catch (_) {}
-  })();
+  const startVersion = () => {
+    showFirstLaunchTip();
+    (async () => {
+      try {
+        const inv = typeof getInvoke === "function" ? getInvoke() : null;
+        if (inv) {
+          const v = await inv("get_app_version");
+          checkForAppUpdate(v);
+        }
+      } catch (_) {}
+    })();
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(startVersion, { timeout: 30000 });
+  } else {
+    setTimeout(startVersion, 30000);
+  }
   initRingGauges();
   init();
 }

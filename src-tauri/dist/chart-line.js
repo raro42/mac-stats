@@ -59,7 +59,9 @@
   let canvases = {};
   let contexts = {};
   const canvasLayoutCache = {};
-  let canvasesParked = false;
+  // Start parked so open does not allocate sparkline GPU buffers (#14).
+  let canvasesParked = true;
+  let listenersWired = false;
   const lastSample = {
     temperature: NaN,
     usage: NaN,
@@ -293,9 +295,9 @@
 
   function sampleEpsilon(metric) {
     // Wider deadband: skip canvas work when the sample barely moved (#14).
-    if (metric === "frequency") return 1.0;
-    if (metric === "temperature") return 12.0;
-    return 15.0;
+    if (metric === "frequency") return 2.0;
+    if (metric === "temperature") return 20.0;
+    return 25.0;
   }
 
   function canvasIsPaintable(metric) {
@@ -315,8 +317,10 @@
     lastSample[metric] = value;
     // Buffer even if the canvas is not ready yet (zero-size layout, late GPU inject).
     addValue(metric, value);
-    // Occluded / parked: keep the buffer, skip WebKit canvas invalidation (#14).
-    if (canvasesParked || windowOccluded()) return;
+    // Occluded: keep the buffer, skip WebKit canvas invalidation (#14).
+    if (windowOccluded()) return;
+    // Open starts parked (no focus event). First live sample unparks (#14).
+    if (canvasesParked) unparkCanvases();
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
     }
@@ -430,35 +434,32 @@
     window[name] = api;
   });
 
-  function boot() {
-    // Defer canvas setup past first paint so open does not stack with
-    // get_cpu_details IPC / ring DOM (#14).
-    const start = () => {
-      api.init();
-      let resizeTimer = null;
-      window.addEventListener("resize", () => {
+  function wireListeners() {
+    if (listenersWired) return;
+    listenersWired = true;
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      if (windowOccluded()) return;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
         if (windowOccluded()) return;
-        if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          if (windowOccluded()) return;
-          api.refreshLayout();
-        }, 200);
-      });
-      // Release sparkline GPU buffers when occluded; redraw on focus (#14).
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) parkCanvases();
-        else unparkCanvases();
-      });
-      window.addEventListener("blur", parkCanvases);
-      window.addEventListener("focus", unparkCanvases);
-      // Do not seed history IPC here — open already stacks get_cpu_details +
-      // ring DOM. Live feed + focus resume seed when needed (#14).
-    };
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 360000 });
-    } else {
-      setTimeout(start, 0);
-    }
+        api.refreshLayout();
+      }, 200);
+    });
+    // Release sparkline GPU buffers when occluded; redraw on focus (#14).
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) parkCanvases();
+      else unparkCanvases();
+    });
+    window.addEventListener("blur", parkCanvases);
+    window.addEventListener("focus", unparkCanvases);
+  }
+
+  function boot() {
+    // Stay parked through open. Wire blur/focus only; unpark on focus or
+    // first live sample. No idle auto-init / history IPC seed (#14).
+    parkCanvases();
+    wireListeners();
   }
 
   if (document.readyState === "loading") {

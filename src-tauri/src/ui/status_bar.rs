@@ -872,13 +872,8 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             // Keep PROCESS_CACHE + LAST_CPU_DETAILS_CALL warm on open (#14).
             // Clearing them stacked a full process refresh + rate-limit miss with
             // the first WebView paint and kept Graphics and Media hot.
-
-            // Defer AGX GPU-time warm so window open does not stack ioreg with
-            // the first get_cpu_details / WebView paint (#14).
-            std::thread::spawn(|| {
-                std::thread::sleep(std::time::Duration::from_secs(3600));
-                let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
-            });
+            // Do not spawn AGX GPU-time warm on open — first get_cpu_details
+            // (idle-deferred) warms the sampler lazily (#14).
 
             // Enable devtools for right-click inspect
             // In debug builds, devtools should be available by default
