@@ -233,9 +233,9 @@
 
   function sampleEpsilon(metric) {
     // Wider deadband: skip canvas work when the sample barely moved (#14).
-    if (metric === "frequency") return 0.15;
-    if (metric === "temperature") return 2.5;
-    return 3.5;
+    if (metric === "frequency") return 0.25;
+    if (metric === "temperature") return 4.0;
+    return 5.0;
   }
 
   function canvasIsPaintable(metric) {
@@ -373,7 +373,7 @@
       }
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 8000 });
+      window.requestIdleCallback(start, { timeout: 16000 });
     } else {
       setTimeout(start, 0);
     }

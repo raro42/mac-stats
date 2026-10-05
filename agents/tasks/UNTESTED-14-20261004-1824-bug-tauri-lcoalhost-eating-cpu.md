@@ -22,6 +22,27 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1403** (follow-up after v0.1.1402).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes:
+
+- `src/cpu.js` — metrics / process list / Discord / monitors / Process Details / logs glance / Disk Cleanup glance **3600s**; Debug Log auto-refresh **3600s**; history seed skips on focus if last seed &lt;3600s; focus resume skips `get_cpu_details` if last poll &lt;3600s; sparkline seed `maxDisplayPoints` 2; history availability **3600s**; ring paints skip under ~25%; skip `refresh` / ring / DOM rAF while `document.hidden`.
+- `src/agent-ops.js` — refresh / glance / updated-ago **3600s** (still no collapsed-glance IPC while icon-hidden).
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 3600`; `get_cpu_details` rate floor **600s**.
+- `src-tauri/src/lib.rs` — backend metric loop **600s**.
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s.
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **120s** after window open (single sample); keep warm process cache + rate limiter on open (no forced full refresh).
+- `src/history.js` — data-poster history poll **3600s**; `HISTORY_POINTS` 2; temp redraw **3600s**.
+- `src/chart-line.js` — sparkline buffer **2** points; wider sample deadband; boot deferred via `requestIdleCallback` (timeout 16000ms); skip paints when hidden or canvas client size &lt;2px.
+
+Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1402)
+
 Version **v0.1.1402** (follow-up after v0.1.1401).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -478,6 +499,40 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED
 - `src/chart-line.js` — `LINE_CHART_POINTS = 2`; wider sample deadband; boot deferred via `requestIdleCallback` (timeout 4000ms); skip paints when hidden or canvas client size <2px
 - `src/agent-ops.js` — refresh / glance / updated-ago **900s**; no collapsed-glance IPC while icon-hidden (`agentOpsCollapsed`)
 - `src/agent-ops.css` — collapsed section content uses `content-visibility: hidden` + `contain: strict`
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 timer/IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1402)
+
+**Date:** 2026-10-05 22:49 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1402)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1402**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 1800`; `get_cpu_details` rate floor **300s**
+- `src-tauri/src/lib.rs` — backend metric loop sleep **300s**
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 300s; `TEMP_CACHE_MAX_AGE` 450s
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **60s** after window open
+- `src/cpu.js` — metrics / process list / Discord / monitors / Process Details / logs glance **1800s**; Debug Log auto-refresh **1800s**; history seed skips on focus if last seed <1800s; focus resume skips `get_cpu_details` if last poll <1800s; sparkline seed `maxDisplayPoints` 2; ring paints skip under ~20%; skip `refresh` / ring / DOM rAF while `document.hidden`
+- `src/history.js` — `HISTORY_POLL_MS = 1800000`; `HISTORY_POINTS = 2`; temp redraw **1800s**
+- `src/chart-line.js` — `LINE_CHART_POINTS = 2`; wider sample deadband; boot deferred via `requestIdleCallback` (timeout 8000ms); skip paints when hidden or canvas client size <2px
+- `src/agent-ops.js` — refresh / glance / updated-ago **1800s**; no collapsed-glance IPC while icon-hidden (`agentOpsCollapsed`)
 
 **debug.log**
 

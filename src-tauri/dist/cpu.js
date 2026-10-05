@@ -273,7 +273,7 @@ const failedAttempts = {
 const FAILED_ATTEMPTS_THRESHOLD = 3;
 
 // Match main metrics poll — legacy 3s gate was leftover from 1s refresh (#14).
-const TEMPERATURE_UPDATE_INTERVAL_MS = 1800000;
+const TEMPERATURE_UPDATE_INTERVAL_MS = 3600000;
 let lastTemperatureUpdateMs = 0;
 
 // SVG Ring Gauge Animation
@@ -297,8 +297,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~20% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.20 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~25% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.25 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -335,11 +335,11 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 1800000;
+const CPU_WINDOW_REFRESH_MS = 3600000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
-const DISCORD_ICON_STATUS_MS = 1800000;
+const DISCORD_ICON_STATUS_MS = 3600000;
 /** Top Processes list / glance cadence (match PROCESS_CACHE_TTL_SECS in metrics). */
-const PROCESS_LIST_REFRESH_MS = 1800000;
+const PROCESS_LIST_REFRESH_MS = 3600000;
 let discordIconStatusInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
@@ -5624,7 +5624,7 @@ function resumeIdleWindowPolls() {
           updateMonitorsHeight();
         });
       }
-    }, 1800000);
+    }, 3600000);
   }
 }
 
@@ -5636,7 +5636,7 @@ function resumeVisibleWindowWork() {
     if (
       !sparklineHistoryReady ||
       !lastSparklineSeedMs ||
-      Date.now() - lastSparklineSeedMs >= 1800000
+      Date.now() - lastSparklineSeedMs >= 3600000
     ) {
       void seedThemeHistoryFromBackend();
     }
@@ -6684,7 +6684,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Live metrics every 600s. Faster polls forced full work + DOM rebuild (#14).
+    // Live metrics every 3600s. Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -6698,7 +6698,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 1800000);
+    }, 3600000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);
@@ -7069,7 +7069,7 @@ function initMonitorsSection() {
       }
       monitorsUpdateInterval = setInterval(() => {
         updateMonitorsSummary();
-      }, 1800000);
+      }, 3600000);
     } else {
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -7081,7 +7081,7 @@ function initMonitorsSection() {
         loadMonitors().then(() => {
           updateMonitorsHeight();
         });
-      }, 1800000);
+      }, 3600000);
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
@@ -7766,7 +7766,7 @@ function ensureMonitorsSectionExpanded() {
       loadMonitors().then(() => {
         updateMonitorsHeight();
       });
-    }, 1800000);
+    }, 3600000);
   }
 }
 
@@ -18532,7 +18532,7 @@ function startLogsGlancePoll() {
   stopLogsGlancePoll();
   ensureLogsErrorGlance();
   pollLogsGlanceCounts();
-  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 1800000);
+  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 3600000);
 }
 
 function stopLogsGlancePoll() {
@@ -19472,7 +19472,7 @@ function startLogsAutoRefresh() {
   logsAutoRefreshTimer = setInterval(() => {
     if (document.hidden) return;
     refreshLogsViewer(true);
-  }, 1800000);
+  }, 3600000);
 }
 
 function formatDiskBytes(n) {
@@ -19722,7 +19722,7 @@ function startDiskCleanupGlancePoll() {
     void refreshDiskCleanupPanel({ deep: false }).then(() => {
       syncDiskCleanupCollapsedGlance();
     });
-  }, 1800000);
+  }, 3600000);
 }
 
 /** Focus first disabled scope (or Add form) after empty-list CTA. */
@@ -24455,7 +24455,7 @@ function startHistoryAvailabilityPoll() {
   historyAvailabilityInterval = setInterval(() => {
     if (document.hidden) return;
     checkHistoryAvailability();
-  }, 1800000);
+  }, 3600000);
 }
 
 // Initialize history controls
