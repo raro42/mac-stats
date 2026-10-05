@@ -295,9 +295,9 @@
 
   function sampleEpsilon(metric) {
     // Wider deadband: skip canvas work when the sample barely moved (#14).
-    if (metric === "frequency") return 2.0;
-    if (metric === "temperature") return 20.0;
-    return 25.0;
+    if (metric === "frequency") return 3.0;
+    if (metric === "temperature") return 30.0;
+    return 40.0;
   }
 
   function canvasIsPaintable(metric) {
@@ -317,10 +317,9 @@
     lastSample[metric] = value;
     // Buffer even if the canvas is not ready yet (zero-size layout, late GPU inject).
     addValue(metric, value);
-    // Occluded: keep the buffer, skip WebKit canvas invalidation (#14).
-    if (windowOccluded()) return;
-    // Open starts parked (no focus event). First live sample unparks (#14).
-    if (canvasesParked) unparkCanvases();
+    // Stay parked through open: do not allocate GPU buffers on the first
+    // live sample. Focus / late idle unpark redraws from the buffer (#14).
+    if (canvasesParked || windowOccluded()) return;
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
     }
@@ -456,10 +455,20 @@
   }
 
   function boot() {
-    // Stay parked through open. Wire blur/focus only; unpark on focus or
-    // first live sample. No idle auto-init / history IPC seed (#14).
+    // Stay parked through open. Wire blur/focus only; buffer samples while
+    // parked. Late idle unpark so charts appear without stacking open paint
+    // with GPU buffer alloc. No history IPC seed (#14).
     parkCanvases();
     wireListeners();
+    const lateUnpark = () => {
+      if (windowOccluded()) return;
+      unparkCanvases();
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(lateUnpark, { timeout: 120000 });
+    } else {
+      setTimeout(lateUnpark, 120000);
+    }
   }
 
   if (document.readyState === "loading") {

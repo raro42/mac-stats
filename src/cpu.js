@@ -344,8 +344,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~95% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.95 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~99% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.99 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 
@@ -2776,40 +2776,52 @@ function stopRefresh() {
 // Initialize when DOM and Tauri are ready
 function init() {
   // Keep warm PROCESS_CACHE on open — do not force a full process refresh (#14).
-  wireMetricValueCopy();
-  ensureCpuHeaderToolbarKeyboard();
-  ensureRingGaugeKeyboard();
-  ensureHistorySparklineKeyboard();
-  ensureGpuHistoryChart();
-  alignRingGaugeLabels();
-  removeRingsFilterChips();
-  ensureRamStripStyles();
-  pruneMetricStripChips();
-  ensurePowerStripKeyboard();
+  // Defer DOM wiring past first paint so open does not stack layout with WebKit (#14).
+  const wireDom = () => {
+    if (windowOccluded()) return;
+    wireMetricValueCopy();
+    ensureCpuHeaderToolbarKeyboard();
+    ensureRingGaugeKeyboard();
+    ensureHistorySparklineKeyboard();
+    ensureGpuHistoryChart();
+    alignRingGaugeLabels();
+    removeRingsFilterChips();
+    ensureRamStripStyles();
+    pruneMetricStripChips();
+    ensurePowerStripKeyboard();
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(wireDom, { timeout: 60000 });
+  } else {
+    setTimeout(wireDom, 60000);
+  }
 
   // Defer first get_cpu_details well past first paint so open does not stack
   // IPC with WebView compositor work (#14). Do not seed history IPC on open —
   // live feed + focus resume seed when needed (chart-line boot already skips).
   const startMetrics = () => {
     if (windowOccluded()) return;
+    const afterFirst = () => {
+      // Ensure the slow interval exists even when first usage sample is 0 (#14).
+      if (!refreshInterval && !windowOccluded()) startRefresh();
+    };
     const immediateInvoke = getInvoke();
     if (immediateInvoke) {
       invoke = immediateInvoke;
-      refresh();
-      startRefresh();
+      // One-shot first; interval arms after the invoke returns (#14).
+      Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
     } else {
       waitForTauri((invokeFn) => {
         if (windowOccluded()) return;
         invoke = invokeFn;
-        refresh();
-        startRefresh();
+        Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
       });
     }
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startMetrics, { timeout: 30000 });
+    window.requestIdleCallback(startMetrics, { timeout: 120000 });
   } else {
-    setTimeout(startMetrics, 30000);
+    setTimeout(startMetrics, 120000);
   }
 }
 
@@ -2880,7 +2892,8 @@ function ensureGpuHistoryChart() {
     `;
     document.head.appendChild(style);
   }
-  if (window.themeHistory?.init) window.themeHistory.init();
+  // Do not call themeHistory.init() here — that unparks sparkline GPU
+  // buffers on open. Chart-line stays parked until focus / late idle (#14).
 }
 
 function feedThemeHistoryCharts(data, _includeTemperature) {
@@ -3968,6 +3981,22 @@ function updateRingHotStates(data) {
     freq: freq != null && !hotByKey.freq,
     temp: tempOk,
   };
+  // Skip classList churn when hot/fair/ok signature is unchanged (#14).
+  const hotSig = [
+    hotByKey.cpu ? 1 : 0,
+    hotByKey.gpu ? 1 : 0,
+    hotByKey.freq ? 1 : 0,
+    hotByKey.temp ? 1 : 0,
+    tempFair ? 1 : 0,
+    okByKey.cpu ? 1 : 0,
+    okByKey.gpu ? 1 : 0,
+    okByKey.freq ? 1 : 0,
+    okByKey.temp ? 1 : 0,
+  ].join('');
+  if (window.__macStatsRingHotSig === hotSig) {
+    return;
+  }
+  window.__macStatsRingHotSig = hotSig;
   for (const entry of getRingMetricCardEntries()) {
     const hot = !!hotByKey[entry.key];
     const fair = entry.key === 'temp' && tempFair;
@@ -5332,9 +5361,9 @@ if (document.readyState === "loading") {
       });
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(startVersion, { timeout: 30000 });
+      window.requestIdleCallback(startVersion, { timeout: 120000 });
     } else {
-      setTimeout(startVersion, 30000);
+      setTimeout(startVersion, 120000);
     }
     initRingGauges();
     init();
@@ -5353,9 +5382,9 @@ if (document.readyState === "loading") {
     })();
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startVersion, { timeout: 30000 });
+    window.requestIdleCallback(startVersion, { timeout: 120000 });
   } else {
-    setTimeout(startVersion, 30000);
+    setTimeout(startVersion, 120000);
   }
   initRingGauges();
   init();

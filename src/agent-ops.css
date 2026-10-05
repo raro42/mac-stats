@@ -18,13 +18,33 @@
   box-shadow: none !important;
   text-shadow: none !important;
   will-change: auto !important;
+  /* Blend modes keep extra compositor layers hot (#14). */
+  mix-blend-mode: normal !important;
+}
+
+/*
+ * Heavy always-visible paint trees: freeze transforms so WebKit does not keep
+ * promoted layers for decorative translate/scale. Do not apply to `*` — that
+ * breaks centered modals and other layout transforms (#14).
+ */
+.metric-card,
+.apple-metrics .metric-card,
+svg.ring,
+.ring,
+.ring-progress,
+.history-chart-container,
+.history-charts,
+.battery-power-strip,
+#battery-power-strip,
+#process-list {
+  transform: none !important;
 }
 
 /*
  * #14 follow-up: ring gauges must not CSS-tween stroke-dashoffset.
  * An 0.8s cubic transition re-composites the SVG every display tick after
  * each metrics poll (WKWebView Graphics and Media / tauri://localhost).
- * JS already paints rings instantly with an ~95% skip threshold.
+ * JS already paints rings instantly with an ~99% skip threshold.
  */
 .ring-progress,
 .ring .ring-progress,

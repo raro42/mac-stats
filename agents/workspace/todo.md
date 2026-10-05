@@ -1,11 +1,11 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1410)
+# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1411)
 
-- [x] Drop init `_forceProcessUpdate`; defer first metrics idle 30s; ring skip ~95%
-- [x] Chart-line: start parked, lazy init (no idle auto-boot); wider deadband
-- [x] Global CSS freeze filter/box-shadow/will-change; skip AGX warm on open
-- [x] Defer `get_app_version` / update check past first paint
+- [x] Defer first metrics/version IPC idle timeout to 120s; defer DOM wiring
+- [x] Ring paint skip ~99%; skip updateRingHotStates when signature unchanged
+- [x] Chart-line: no first-sample unpark; late idle unpark 120s; wider deadband
+- [x] CSS: freeze mix-blend-mode; transform freeze on heavy trees; no ensureGpuHistoryChart init unpark
 - [x] Bump version, CHANGELOG, sync-dist, cargo check
 - [x] Rename WIP → UNTESTED; commit + push origin/main
 
 ## Review
-v0.1.1410 open-path cut: no forced process refresh on init, metrics/version IPC idle 30s, sparklines start parked (lazy unpark), global CSS freezes filters/shadows/will-change, ring 95%, wider deadband, no AGX warm on open. `cargo check` pass. Hand to tester; do not close #14.
+v0.1.1411 open-path cut: metrics/version IPC idle 120s, DOM wiring idle 60s, sparklines stay parked through open (buffer + late 120s/focus unpark), mix-blend-mode freeze + transform freeze on metric/ring/history trees, ring 99%, hot-state signature skip, wider deadband. `cargo check` pass. Hand to tester; do not close #14.
