@@ -5,7 +5,7 @@
 - [x] Isolate rust-native digest test from shared latest.json race
 - [x] `cargo check` in src-tauri/
 - [x] Version bump + CHANGELOG + task → UNTESTED-
-- [ ] Commit and push origin/main (do not close GitHub #14)
+- [x] Commit and push origin/main (do not close GitHub #14)
 
 ## Review
 v0.1.1391: further cut open-window work (20s polls, 8s backend loop, 24 sparkline points, Light/Dark compositor flatten, process-details 15s) and isolate native digest test from shared latest.json races. macOS Activity Monitor remains the <1% acceptance gate.
