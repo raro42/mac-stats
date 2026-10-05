@@ -449,8 +449,8 @@
     return true;
   }
 
-  const OPS_REFRESH_INTERVAL = 180000;
-  const OPS_GLANCE_POLL_INTERVAL = 180000;
+  const OPS_REFRESH_INTERVAL = 300000;
+  const OPS_GLANCE_POLL_INTERVAL = 300000;
   let agentOpsInterval = null;
   let agentOpsGlanceInterval = null;
   let agentOpsCollapsed = true;
@@ -5044,7 +5044,7 @@ window.__macStatsResumeAgentOpsPolls = function () {
             opsUpdatedAgoTimer = setInterval(() => {
                 if (document.hidden || !opsLastRefreshMs) return;
                 paintOpsUpdatedAgo();
-            }, 180_000);
+            }, 300_000);
         }
     }
 };

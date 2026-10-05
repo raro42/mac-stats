@@ -22,6 +22,28 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1399** (follow-up after v0.1.1398).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes:
+
+- `src/cpu.js` — metrics / process list / Discord / monitors / Process Details / logs glance **300s**; Debug Log auto-refresh **300s**; history seed skips on focus if last seed &lt;300s; sparkline seed `maxDisplayPoints` 2; skip `refresh` / ring / DOM rAF while `document.hidden`.
+- `src/agent-ops.js` — refresh / updated-ago **300s** (still no collapsed-glance IPC while icon-hidden).
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 300`; `get_cpu_details` rate floor **90s**.
+- `src-tauri/src/lib.rs` — backend metric loop **90s**.
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 90s; `TEMP_CACHE_MAX_AGE` 120s.
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **12s** after window open.
+- `src/history.js` — data-poster history poll **300s**; `HISTORY_POINTS` 4.
+- `src/chart-line.js` — sparkline buffer **2** points; skip paints when hidden or canvas client size &lt;2px.
+- Themes apple/light/dark `cpu.css` — collapsed `.section-content-collapsible` uses `content-visibility: hidden` + `contain: strict` (settings modal rule kept).
+
+Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1398)
+
 Version **v0.1.1398** (follow-up after v0.1.1397).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

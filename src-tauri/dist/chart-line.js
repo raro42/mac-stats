@@ -236,6 +236,14 @@
     return 0.5;
   }
 
+  function canvasIsPaintable(metric) {
+    const canvas = canvases[metric];
+    if (!canvas) return false;
+    // Zero-size / display:none charts still buffered; skip WebKit paints (#14).
+    if (canvas.clientWidth < 2 || canvas.clientHeight < 2) return false;
+    return true;
+  }
+
   function updateCharts(metric, value) {
     if (value === null || value === undefined || !Number.isFinite(value)) return;
     const prev = lastSample[metric];
@@ -253,7 +261,7 @@
     if (!contexts[metric] && canvases[metric]) {
       setupCanvas(metric);
     }
-    if (!contexts[metric]) return;
+    if (!contexts[metric] || !canvasIsPaintable(metric)) return;
     drawLineChart(metric);
   }
 
@@ -307,7 +315,7 @@
     COLORS = getColors();
     Object.keys(dataBuffers).forEach((metric) => {
       if (!contexts[metric] && canvases[metric]) setupCanvas(metric);
-      if (contexts[metric]) drawLineChart(metric);
+      if (contexts[metric] && canvasIsPaintable(metric)) drawLineChart(metric);
     });
     return true;
   }

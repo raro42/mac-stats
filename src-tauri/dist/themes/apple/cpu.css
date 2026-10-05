@@ -553,6 +553,12 @@ border-radius: 24px;
   contain: strict;
 }
 
+/* Keep-header collapse: hide body from the compositor while glances stay (#14). */
+.section-content-collapsible.collapsed {
+  content-visibility: hidden;
+  contain: strict;
+}
+
 .settings-card {
   width: min(440px, 96vw);
   max-height: min(85vh, 720px);
