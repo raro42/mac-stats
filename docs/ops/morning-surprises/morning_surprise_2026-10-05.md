@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the Slack settings toolbar keyboard hint in the theme HTML.
+Overnight Track B put the Credentials section keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1377** | Credentials section keyboard hint is in the theme HTML at the end of the Credentials section. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Discord token first crosses to the Settings header. Keyboard tips stay out of the layout. |
 | **v0.1.1376** | Slack settings toolbar keyboard hint is in the theme HTML under the webhook field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Webhook first crosses to Telegram. Clear last crosses to the Settings header. Keyboard tips stay out of the layout. |
 | **v0.1.1375** | Telegram settings toolbar keyboard hint is in the theme HTML under the token field, the chat id field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Token first crosses to Cursor. Clear last crosses to Slack. Keyboard tips stay out of the layout. |
 | **v0.1.1374** | Cursor agent settings toolbar keyboard hint is in the theme HTML under the workspace field, the executable field, Save, and Clear. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Workspace first crosses to Browser. Clear last crosses to Telegram. Keyboard tips stay out of the layout. |
@@ -30,8 +31,9 @@ Overnight Track B put the Slack settings toolbar keyboard hint in the theme HTML
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.71d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.73d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~04:33 tick: Credentials section keyboard hint first paint in theme HTML (**v0.1.1377**); install/kickstart.
 - ~04:06 tick: Slack settings toolbar keyboard hint first paint in theme HTML (**v0.1.1376**); install/kickstart.
 - ~03:40 tick: Telegram settings toolbar keyboard hint first paint in theme HTML (**v0.1.1375**); install/kickstart.
 - ~03:14 tick: Cursor agent settings toolbar keyboard hint first paint in theme HTML (**v0.1.1374**); install/kickstart.

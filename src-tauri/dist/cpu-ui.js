@@ -625,6 +625,12 @@
     ) {
       window.ensureSlackSettingsToolbarKeyboard(slackSetting);
     }
+    const credentialsSection = settingsModal.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (credentialsSection) {
+      wireCredentialsSectionToolbarKeyboard(credentialsSection);
+    }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;
     if (returnEl && typeof returnEl.focus === "function") {
@@ -3344,18 +3350,35 @@
     }
   }
 
-  function ensureCredentialsSectionKbStyles() {
-    if (document.getElementById("mac-stats-credentials-section-kb-styles")) return;
-    const style = document.createElement("style");
-    style.id = "mac-stats-credentials-section-kb-styles";
-    style.textContent = `
-      .credentials-section-kb-hint {
-        margin: 8px 0 0;
-        font-size: 11px;
-        opacity: 0.72;
-      }
-    `;
-    document.head.appendChild(style);
+  /** How to move across Credentials controls when Settings is open. */
+  const CREDENTIALS_SECTION_KB_HINT =
+    "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header";
+
+  /**
+   * Theme HTML ships the hint at the end of the Credentials section.
+   * It stays hidden until Settings is open. Create it only on older shells.
+   */
+  function ensureCredentialsSectionKbHint(section) {
+    if (!section) return;
+    let hint = section.querySelector(":scope > .credentials-section-kb-hint");
+    if (!isSettingsModalOpen()) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    const items = getCredentialsSectionToolbarItems(section);
+    if (items.length < 2) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "credentials-section-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
+      section.appendChild(hint);
+    }
+    hint.hidden = false;
+    hint.textContent = CREDENTIALS_SECTION_KB_HINT;
   }
 
   /**
@@ -3365,19 +3388,7 @@
    */
   function wireCredentialsSectionToolbarKeyboard(section) {
     if (!section) return;
-    ensureCredentialsSectionKbStyles();
-    let hint = section.querySelector(":scope > .credentials-section-kb-hint");
-    if (!hint) {
-      hint = document.createElement("div");
-      hint.className = "credentials-section-kb-hint";
-      hint.setAttribute("aria-hidden", "true");
-      section.appendChild(hint);
-    }
-    const items = getCredentialsSectionToolbarItems(section);
-    hint.hidden = items.length < 2;
-    hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header"
-      : "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
+    ensureCredentialsSectionKbHint(section);
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
     section.dataset.credentialsSectionKbWired = "1";
@@ -3389,7 +3400,7 @@
       const controls = getCredentialsSectionToolbarItems(section);
       if (controls.includes(e.target)) {
         refreshCredentialsSectionRovingTabindex(section, e.target);
-        hint.hidden = controls.length < 2;
+        ensureCredentialsSectionKbHint(section);
       }
     });
     section.addEventListener(
