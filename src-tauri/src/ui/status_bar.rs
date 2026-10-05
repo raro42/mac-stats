@@ -877,8 +877,10 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 debug2!("Process cache cleared - will refresh immediately on first get_cpu_details() call");
             }
 
-            // Warm AGX GPU-time sampler (needs two samples ~400ms apart for %).
+            // Defer AGX GPU-time warm so window open does not stack ioreg with
+            // the first get_cpu_details / WebView paint (#14).
             std::thread::spawn(|| {
+                std::thread::sleep(std::time::Duration::from_secs(3));
                 let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
                 std::thread::sleep(std::time::Duration::from_millis(450));
                 let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();

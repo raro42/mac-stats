@@ -18,9 +18,9 @@
   }
 
   // Chart configuration
-  const HISTORY_POINTS = 60; // Number of points in history graph
-  // Chart-specific refresh: temperature redraw every 3s (changes slowly); usage/frequency every cycle
-  const TEMPERATURE_REDRAW_INTERVAL_MS = 3000;
+  const HISTORY_POINTS = 24; // Fewer points = less canvas work (#14)
+  // Match HISTORY_POLL_MS — legacy 3s gate was leftover from faster polls (#14).
+  const TEMPERATURE_REDRAW_INTERVAL_MS = 90000;
   let lastTemperatureDrawMs = 0;
 
   // Time range options (in seconds)
@@ -500,28 +500,38 @@
       updateChartsFromBackend();
 
       // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
-      const HISTORY_POLL_MS = 60000;
+      const HISTORY_POLL_MS = 90000;
       let historyPollInterval = setInterval(() => {
         if (document.hidden) return;
         updateChartsFromBackend();
       }, HISTORY_POLL_MS);
 
+      function pauseHistoryPoll() {
+        if (historyPollInterval) {
+          clearInterval(historyPollInterval);
+          historyPollInterval = null;
+        }
+      }
+
+      function resumeHistoryPoll() {
+        if (document.hidden || historyPollInterval) return;
+        updateChartsFromBackend();
+        historyPollInterval = setInterval(() => {
+          if (document.hidden) return;
+          updateChartsFromBackend();
+        }, HISTORY_POLL_MS);
+      }
+
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-          if (historyPollInterval) {
-            clearInterval(historyPollInterval);
-            historyPollInterval = null;
-          }
+          pauseHistoryPoll();
           return;
         }
-        if (!historyPollInterval) {
-          updateChartsFromBackend();
-          historyPollInterval = setInterval(() => {
-            if (document.hidden) return;
-            updateChartsFromBackend();
-          }, HISTORY_POLL_MS);
-        }
+        resumeHistoryPoll();
       });
+      // macOS often keeps visibilityState=visible when occluded (#14).
+      window.addEventListener('blur', pauseHistoryPoll);
+      window.addEventListener('focus', resumeHistoryPoll);
       
       // Handle window resize
       let resizeTimeout;

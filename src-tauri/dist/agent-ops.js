@@ -449,8 +449,8 @@
     return true;
   }
 
-  const OPS_REFRESH_INTERVAL = 60000;
-  const OPS_GLANCE_POLL_INTERVAL = 60000;
+  const OPS_REFRESH_INTERVAL = 90000;
+  const OPS_GLANCE_POLL_INTERVAL = 90000;
   let agentOpsInterval = null;
   let agentOpsGlanceInterval = null;
   let agentOpsCollapsed = true;
@@ -5044,7 +5044,7 @@ window.__macStatsResumeAgentOpsPolls = function () {
             opsUpdatedAgoTimer = setInterval(() => {
                 if (document.hidden || !opsLastRefreshMs) return;
                 paintOpsUpdatedAgo();
-            }, 15_000);
+            }, 60_000);
         }
     }
 };
@@ -7564,7 +7564,7 @@ function markOpsRefreshedAt(ms) {
     opsUpdatedAgoTimer = setInterval(() => {
         if (document.hidden || !opsLastRefreshMs) return;
         paintOpsUpdatedAgo();
-    }, 15_000);
+    }, 60_000);
 }
 
 function setOpsRefreshBusy(busy) {

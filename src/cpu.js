@@ -270,8 +270,8 @@ const failedAttempts = {
 // Number of consecutive failures before showing the hint
 const FAILED_ATTEMPTS_THRESHOLD = 3;
 
-// Chart-specific refresh: temperature updates every 3s (changes slowly); usage/frequency every 1s
-const TEMPERATURE_UPDATE_INTERVAL_MS = 3000;
+// Match main metrics poll — legacy 3s gate was leftover from 1s refresh (#14).
+const TEMPERATURE_UPDATE_INTERVAL_MS = 90000;
 let lastTemperatureUpdateMs = 0;
 
 // SVG Ring Gauge Animation
@@ -331,11 +331,11 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 60000;
+const CPU_WINDOW_REFRESH_MS = 90000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
-const DISCORD_ICON_STATUS_MS = 60000;
+const DISCORD_ICON_STATUS_MS = 90000;
 /** Top Processes list / glance cadence (match PROCESS_CACHE_TTL_SECS in metrics). */
-const PROCESS_LIST_REFRESH_MS = 60000;
+const PROCESS_LIST_REFRESH_MS = 90000;
 let discordIconStatusInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
@@ -1633,7 +1633,7 @@ async function refresh() {
     // Update chip info with uptime
     updateChipInfo(data.chip_info, data.uptime_secs);
     
-    // Update temperature (chart-specific refresh: only every 3s; usage/frequency stay at 1s)
+    // Update temperature (gated to TEMPERATURE_UPDATE_INTERVAL_MS; matches main poll)
     const nowMs = Date.now();
     const shouldUpdateTemperature = lastTemperatureUpdateMs === 0 || (nowMs - lastTemperatureUpdateMs >= TEMPERATURE_UPDATE_INTERVAL_MS);
     if (shouldUpdateTemperature) {
@@ -5604,7 +5604,7 @@ function resumeIdleWindowPolls() {
           updateMonitorsHeight();
         });
       }
-    }, 60000);
+    }, 90000);
   }
 }
 
@@ -6651,7 +6651,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Live metrics every 60s. Faster polls forced full work + DOM rebuild (#14).
+    // Live metrics every 90s. Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -6665,7 +6665,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 60000);
+    }, 90000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);
@@ -7036,7 +7036,7 @@ function initMonitorsSection() {
       }
       monitorsUpdateInterval = setInterval(() => {
         updateMonitorsSummary();
-      }, 60000);
+      }, 90000);
     } else {
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -7048,7 +7048,7 @@ function initMonitorsSection() {
         loadMonitors().then(() => {
           updateMonitorsHeight();
         });
-      }, 60000);
+      }, 90000);
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
@@ -7733,7 +7733,7 @@ function ensureMonitorsSectionExpanded() {
       loadMonitors().then(() => {
         updateMonitorsHeight();
       });
-    }, 60000);
+    }, 90000);
   }
 }
 
@@ -18499,7 +18499,7 @@ function startLogsGlancePoll() {
   stopLogsGlancePoll();
   ensureLogsErrorGlance();
   pollLogsGlanceCounts();
-  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 60000);
+  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 90000);
 }
 
 function stopLogsGlancePoll() {
@@ -19435,8 +19435,8 @@ function stopLogsAutoRefresh() {
 
 function startLogsAutoRefresh() {
   stopLogsAutoRefresh();
-  // 30s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
-  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 30000);
+  // 60s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
+  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 60000);
 }
 
 function formatDiskBytes(n) {
@@ -19686,7 +19686,7 @@ function startDiskCleanupGlancePoll() {
     void refreshDiskCleanupPanel({ deep: false }).then(() => {
       syncDiskCleanupCollapsedGlance();
     });
-  }, 60000);
+  }, 90000);
 }
 
 /** Focus first disabled scope (or Add form) after empty-list CTA. */
@@ -24349,7 +24349,7 @@ async function seedThemeHistoryFromBackend() {
       // the charts stayed empty and grew from the right on every open.
       const result = await inv('get_metrics_history', {
         timeRangeSeconds: 300,
-        maxDisplayPoints: 60,
+        maxDisplayPoints: 12,
       });
       if (result?.points?.length) {
         if (typeof window.themeHistory?.seedFromPoints === 'function') {
@@ -24411,10 +24411,11 @@ function startHistoryAvailabilityPoll() {
   stopHistoryAvailabilityPoll();
   if (document.hidden) return;
   checkHistoryAvailability();
+  // 24h history probe is heavy IPC; once every 5m is enough for the dropdown (#14).
   historyAvailabilityInterval = setInterval(() => {
     if (document.hidden) return;
     checkHistoryAvailability();
-  }, 60000);
+  }, 300000);
 }
 
 // Initialize history controls
