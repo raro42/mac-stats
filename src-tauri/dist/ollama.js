@@ -1620,22 +1620,36 @@ function focusChatMessagesLast(container) {
 }
 window.focusChatMessagesLast = focusChatMessagesLast;
 
-/** Hint above the message list (Monitors / Top Processes kb-hint parity). */
+/** How to move across chat messages when the list has turns. */
+const CHAT_MESSAGES_KB_HINT =
+  'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · last ↓ → composer · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
+
+/** Theme HTML ships the hint above the message list. It stays hidden until turns exist. Create it only on older shells. */
 function ensureChatMessagesKbHint(container, show) {
   if (!container || !container.parentNode) return;
   let hint = document.getElementById('chat-kb-hint');
+  if (!hint) {
+    hint = container.parentNode.querySelector(':scope > .chat-kb-hint');
+  }
   if (!show) {
-    hint?.remove();
+    if (hint) hint.hidden = true;
     return;
   }
   if (!hint) {
     hint = document.createElement('div');
     hint.className = 'chat-kb-hint';
     hint.id = 'chat-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    hint.textContent = CHAT_MESSAGES_KB_HINT;
     container.parentNode.insertBefore(hint, container);
   }
-  hint.textContent =
-    'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · last ↓ → composer · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
+  if (!hint.id) hint.id = 'chat-kb-hint';
+  if (hint.nextElementSibling !== container) {
+    container.parentNode.insertBefore(hint, container);
+  }
+  hint.hidden = false;
+  hint.textContent = CHAT_MESSAGES_KB_HINT;
 }
 
 /** Keep one selected + tabbable bubble (Monitors listbox parity). */

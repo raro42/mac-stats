@@ -4288,6 +4288,10 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+.chat-kb-hint[hidden] {
+  display: none !important;
+}
+
 .ollama-section.collapsed .chat-kb-hint,
 #ollama-content.collapsed .chat-kb-hint {
   display: none;
