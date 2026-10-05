@@ -503,6 +503,8 @@
     if (appearanceSection) {
       wireAppearanceSettingToolbarKeyboard(appearanceSection);
     }
+    const productSetting = settingsModal.querySelector("#product-setting");
+    if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
     requestAnimationFrame(() => {
       const closeBtn = document.getElementById("close-settings");
       if (closeBtn) {
@@ -643,6 +645,8 @@
     if (appearanceSection) {
       wireAppearanceSettingToolbarKeyboard(appearanceSection);
     }
+    const productSetting = settingsModal.querySelector("#product-setting");
+    if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;
     if (returnEl && typeof returnEl.focus === "function") {
@@ -1053,6 +1057,9 @@
         font-size: 11px;
         opacity: 0.72;
       }
+      .product-setting-kb-hint[hidden] {
+        display: none !important;
+      }
       #settings-help-sheet:focus-visible {
         outline: 2px solid color-mix(in srgb, var(--accent, #8bb4e8) 70%, transparent);
         outline-offset: 2px;
@@ -1065,19 +1072,40 @@
     document.head.appendChild(style);
   }
 
+  /** How to move across Product controls when Settings is open. */
+  const PRODUCT_SETTING_KB_HINT =
+    "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
+  const PRODUCT_SETTING_KB_HINT_SHEET =
+    "← → / h l · Home/End move · Space toggles · Enter / c copies cheat sheet · Esc closes sheet · at ends crosses Appearance / Credentials";
+
+  /**
+   * Theme HTML ships the hint at the end of the Product setting.
+   * It stays hidden until Settings is open. Create it only on older shells.
+   * An open Help sheet swaps the line to the copy keys.
+   */
   function updateProductSettingKbHint(wrap) {
     if (!wrap) return;
     let hint = wrap.querySelector(":scope > .product-setting-kb-hint");
+    if (!isSettingsModalOpen()) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    const controls = getProductSettingControls(wrap);
+    if (controls.length < 2) {
+      if (hint) hint.hidden = true;
+      return;
+    }
     if (!hint) {
       hint = document.createElement("div");
       hint.className = "product-setting-kb-hint";
       hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
       wrap.appendChild(hint);
     }
-    const sheetOpen = isSettingsHelpSheetOpen();
-    hint.textContent = sheetOpen
-      ? "← → / h l · Home/End move · Space toggles · Enter / c copies cheat sheet · Esc closes sheet · at ends crosses Appearance / Credentials"
-      : "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
+    hint.hidden = false;
+    hint.textContent = isSettingsHelpSheetOpen()
+      ? PRODUCT_SETTING_KB_HINT_SHEET
+      : PRODUCT_SETTING_KB_HINT;
   }
 
   function closeSettingsHelpSheet(focusHelp) {

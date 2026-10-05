@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 
+## [0.1.1379] - 2026-10-05
+
+### Changed
+- **Product setting keyboard hint on first paint** — the hint sits in the theme HTML at the end of the Product setting. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. An open Help sheet swaps the line to the copy keys. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1378] - 2026-10-05
 
 ### Changed
