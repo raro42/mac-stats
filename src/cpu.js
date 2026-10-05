@@ -268,12 +268,25 @@ function setDocumentOccluded(occluded) {
   // app is frontmost (macOS often keeps visibilityState=visible).
   try {
     const root = document.documentElement;
+    const body = document.body;
     if (occluded) {
       root.style.contentVisibility = "hidden";
       root.style.contain = "strict";
+      root.style.pointerEvents = "none";
+      if (body) {
+        body.style.display = "none";
+        body.style.contentVisibility = "hidden";
+        body.style.contain = "strict";
+      }
     } else {
       root.style.contentVisibility = "";
       root.style.contain = "";
+      root.style.pointerEvents = "";
+      if (body) {
+        body.style.display = "";
+        body.style.contentVisibility = "";
+        body.style.contain = "";
+      }
     }
   } catch (_) {
     /* ignore */
@@ -331,8 +344,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~50% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.50 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~60% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.60 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 

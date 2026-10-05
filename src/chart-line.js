@@ -96,6 +96,7 @@
       try {
         canvas.style.visibility = "hidden";
         canvas.style.contentVisibility = "hidden";
+        canvas.style.display = "none";
       } catch (_) {
         /* ignore */
       }
@@ -113,6 +114,7 @@
       try {
         canvas.style.visibility = "";
         canvas.style.contentVisibility = "";
+        canvas.style.display = "";
       } catch (_) {
         /* ignore */
       }
@@ -291,9 +293,9 @@
 
   function sampleEpsilon(metric) {
     // Wider deadband: skip canvas work when the sample barely moved (#14).
-    if (metric === "frequency") return 0.25;
-    if (metric === "temperature") return 4.0;
-    return 5.0;
+    if (metric === "frequency") return 0.5;
+    if (metric === "temperature") return 8.0;
+    return 10.0;
   }
 
   function canvasIsPaintable(metric) {
@@ -454,7 +456,7 @@
       }
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 60000 });
+      window.requestIdleCallback(start, { timeout: 120000 });
     } else {
       setTimeout(start, 0);
     }

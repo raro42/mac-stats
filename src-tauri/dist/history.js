@@ -181,6 +181,7 @@
       try {
         canvas.style.visibility = 'hidden';
         canvas.style.contentVisibility = 'hidden';
+        canvas.style.display = 'none';
       } catch (_) { /* ignore */ }
       delete contexts[metric];
     });
@@ -194,6 +195,7 @@
       try {
         canvas.style.visibility = '';
         canvas.style.contentVisibility = '';
+        canvas.style.display = '';
       } catch (_) { /* ignore */ }
       setupHistoryCanvas(metric);
     });

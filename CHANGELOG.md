@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1407] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Occlusion park now uses `display: none` on shell roots / `body > *` (plus pointer-events off) and freezes will-change / transforms; JS also parks `body` with `display: none`. Ring gauges skip paints under ~60%. Sparkline sample deadband is wider; chart-line boot idle timeout is 120s; parked canvases set `display: none`. GPU sampler warm deferred 960s after open. Aim: quieter `tauri://localhost` / Graphics and Media while another app is frontmost.
+
+
 ## [0.1.1406] - 2026-10-06
 
 ### Changed
