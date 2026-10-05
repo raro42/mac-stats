@@ -13877,6 +13877,207 @@ function initMastodonSettings() {
   window.ensureMastodonSettingsToolbarKeyboard = wireMastodonSettingsToolbarKeyboard;
 }
 
+function mcpSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+function isMcpSettingsInput(el) {
+  return el?.id === 'mcp-url-input' || el?.id === 'mcp-stdio-input';
+}
+
+/** Focusable Settings MCP toolbar items (URL · stdio · Save · Clear). */
+function getMcpSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('mcp-setting');
+  if (!container) return [];
+  const ids = ['mcp-url-input', 'mcp-stdio-input', 'mcp-save', 'mcp-clear'];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshMcpSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('mcp-setting');
+  const items = getMcpSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the MCP URL, stdio, Save, and Clear when Settings is open. */
+const MCP_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at URL/stdio start/end · URL first crosses to Mastodon · Clear last crosses to Browser';
+
+/**
+ * Theme HTML ships the hint under the URL field, stdio field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureMcpSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('mcp-setting');
+  if (!container) return;
+  const actions = container.querySelector('.mcp-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.mcp-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getMcpSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'mcp-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = MCP_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** MCP URL first ← Mastodon Clear, else footer version, when Settings is open. */
+function tryChainMcpSettingsToolbarUrlBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('mastodon-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** MCP Clear last → Browser path, else footer version, when Settings is open. */
+function tryChainMcpSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('browser-chromium-path-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings MCP toolbar keyboard — focus URL · stdio · Save · Clear,
+ * then ←→ / h l / Home/End (Mastodon settings toolbar parity).
+ */
+function wireMcpSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('mcp-setting');
+  if (!container) return;
+  ensureMcpSettingsToolbarKbHint(container);
+  refreshMcpSettingsToolbarRovingTabindex(container);
+  if (container.dataset.mcpSettingsToolbarKbWired === '1') return;
+  container.dataset.mcpSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'MCP URL and stdio command');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getMcpSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshMcpSettingsToolbarRovingTabindex(container, e.target);
+      ensureMcpSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getMcpSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isMcpSettingsInput(active) ||
+        active?.id === 'mcp-save' ||
+        active?.id === 'mcp-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (isMcpSettingsInput(active) && !mcpSettingsInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainMcpSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (isMcpSettingsInput(active) && !mcpSettingsInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainMcpSettingsToolbarUrlBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshMcpSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (isMcpSettingsInput(items[next]) && typeof items[next].setSelectionRange === 'function') {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 function updateMcpConfigStatus(statusText, elId) {
   const el = document.getElementById(elId || 'mcp-settings-status');
   if (el) el.textContent = statusText;
@@ -14034,6 +14235,8 @@ function initMcpSettings() {
 
   refreshMcpStatus();
   window.McpSettings = { refreshStatus: refreshMcpStatus };
+  wireMcpSettingsToolbarKeyboard();
+  window.ensureMcpSettingsToolbarKeyboard = wireMcpSettingsToolbarKeyboard;
 }
 
 function updateBrowserConfigStatus(statusText, elId) {
