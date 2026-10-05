@@ -331,7 +331,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
-const CPU_WINDOW_REFRESH_MS = 15000;
+const CPU_WINDOW_REFRESH_MS = 20000;
 /** Discord menu-bar icon status — slow; pause while the window is hidden. */
 const DISCORD_ICON_STATUS_MS = 30000;
 let discordIconStatusInterval = null;
@@ -1622,7 +1622,7 @@ async function refresh() {
         clearInterval(refreshInterval);
       }
       refreshInterval = setInterval(refresh, CPU_WINDOW_REFRESH_MS);
-      console.log("Got real data, switched to 12-second interval");
+      console.log("Got real data, switched to normal metrics interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -6623,7 +6623,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Live metrics every 5s (was 2s). Faster polls forced full work + DOM rebuild.
+    // Live metrics every 15s (was 5s). Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -6637,7 +6637,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 5000);
+    }, 15000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);

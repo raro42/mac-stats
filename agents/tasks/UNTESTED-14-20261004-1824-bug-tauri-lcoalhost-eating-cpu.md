@@ -22,23 +22,23 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1390** (follow-up after v0.1.1389 tester FAIL).
+Version **v0.1.1391** (follow-up after v0.1.1390 tester FAIL).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and timer work.
 
 Changes:
 
-- `src/cpu.js` — metrics poll 15s (was 12s).
-- `src/history.js` — data-poster history poll 15s.
-- `src/chart-line.js` — sparkline buffer 36 points (was 60).
-- `src-tauri/src/lib.rs` — backend metric loop 5s even when CPU window is open (was 2s open / 5s idle).
-- `src-tauri/dist/themes/apple/cpu.css` — no usage-card hover lift; metric/history `contain`; opaque history controls (no frosted rgba).
-- `src-tauri/dist/themes/light/cpu.css` — opaque flat metric cards; drop radial wash + soft shadow; `contain`.
-- `src-tauri/src/commands/harness_ops.rs` — `contains_age_token` whole-word match so `average` / `usage` / `agent` no longer false-positive age routes.
+- `src/cpu.js` — metrics poll 20s (was 15s); Process Details live refresh 15s (was 5s).
+- `src/history.js` — data-poster history poll 20s.
+- `src/chart-line.js` — sparkline buffer 24 points (was 36).
+- `src-tauri/src/lib.rs` — backend metric loop 8s open or idle (was 5s).
+- `src-tauri/dist/themes/light/cpu.css` — flat opaque body/shell (drop stacked radial + soft shadow).
+- `src-tauri/dist/themes/dark/cpu.css` — drop glass-panel glow shadow.
+- `src-tauri/src/commands/harness_ops.rs` — `write_digest_native` returns summary from the write; `MAC_STATS_DIGEST_JSON` isolates the unit test from shared `latest.json` races.
 
 Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphics and Media / `tauri://localhost` vs before. Rings and hot washes still update. Do not close GitHub #14.
 
-## Prior test report (v0.1.1389)
+## Prior test report (v0.1.1390)
 
 **Result: FAIL** → moved back to WIP
 
@@ -46,6 +46,6 @@ Tester: open CPU window on macOS, warm ≥30s, check Activity Monitor for Graphi
 
 **Why not CLOSED**
 1. Issue acceptance is **&lt;1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
-2. `cargo test` red (6 harness_ops) on that build — addressed in v0.1.1390 via whole-token age matcher.
+2. Full `cargo test` had a flaky shared-path digest assertion (`rust_native_digest_writes_json`) — addressed in v0.1.1391.
 
 Do **not** close GitHub #14.

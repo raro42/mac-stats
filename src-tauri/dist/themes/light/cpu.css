@@ -36,11 +36,8 @@ body {
   overflow: hidden;
   padding: 40px;
 
-  background:
-    radial-gradient(1200px 900px at 20% 15%, rgba(155, 190, 255, 0.8), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(1100px 900px at 85% 18%, rgba(255, 210, 255, 0.75), rgba(255, 255, 255, 0) 55%),
-    radial-gradient(900px 900px at 60% 92%, rgba(220, 220, 240, 0.9), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(180deg, #ffffff, #f2f2f6);
+  /* Flat fill — stacked radial washes kept Graphics and Media busy (#14). */
+  background: #f2f2f6;
 }
 
 .cpu-shell {
@@ -53,11 +50,10 @@ body {
   margin: 0 auto;
 
   border-radius: var(--radius-shell);
-  background:
-    linear-gradient(135deg, rgba(220, 232, 255, 0.40), rgba(255, 226, 248, 0.32)),
-    var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  /* Opaque shell — gradient wash + soft shadow re-blend every tick (#14). */
+  background: #f7f7fa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 
 
   padding: 44px 44px 34px;

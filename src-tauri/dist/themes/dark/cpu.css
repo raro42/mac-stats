@@ -44,7 +44,8 @@ body {
   border-radius: 22px;
   background: var(--panel, var(--panel-bg, #0a0a0a));
   border: 1px solid var(--border);
-  box-shadow: 0 20px 60px rgba(0, 255, 0, 0.10);
+  /* Flat border only — soft glow kept Graphics and Media busy (#14). */
+  box-shadow: none;
   position: relative;
 
   margin: 0 auto;
@@ -52,7 +53,7 @@ body {
 
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.3s ease;
+  transition: none;
   min-height: 0; /* Allow flex children to shrink below content size */
 }
 

@@ -584,6 +584,12 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
 }
 
 fn digest_json_path() -> PathBuf {
+    if let Ok(p) = std::env::var("MAC_STATS_DIGEST_JSON") {
+        let t = p.trim();
+        if !t.is_empty() {
+            return PathBuf::from(t);
+        }
+    }
     if let Ok(home) = std::env::var("HOME") {
         PathBuf::from(home)
             .join(".mac-stats")
@@ -597,6 +603,10 @@ fn digest_json_path() -> PathBuf {
 }
 
 fn digest_md_path() -> PathBuf {
+    let json = digest_json_path();
+    if json.file_name().and_then(|n| n.to_str()) == Some("latest.json") {
+        return json.with_extension("md");
+    }
     if let Ok(home) = std::env::var("HOME") {
         PathBuf::from(home)
             .join(".mac-stats")
@@ -1024,7 +1034,34 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
     );
     let _ = write_text_atomic(&md_path, &md);
 
-    Ok(load_digest_summary())
+    // Build summary from this write — do not re-read shared latest.json (python
+    // digester / parallel tests can race and flip source to "python").
+    Ok(DigestSummary {
+        open_count: open.len(),
+        stale_count: stale.len(),
+        turns,
+        generated_at: generated,
+        open_hints: open
+            .iter()
+            .filter_map(|item| {
+                item.get("hint")
+                    .and_then(|h| h.as_str())
+                    .map(|s| s.to_string())
+            })
+            .take(5)
+            .collect(),
+        stale_hints: stale
+            .iter()
+            .filter_map(|item| {
+                item.get("hint")
+                    .and_then(|h| h.as_str())
+                    .map(|s| s.to_string())
+            })
+            .take(5)
+            .collect(),
+        path: json_path.display().to_string(),
+        source: "rust-native".to_string(),
+    })
 }
 
 /// True for read-only digest open/candidate asks — cached summary only, no digester spawn.
@@ -79612,10 +79649,24 @@ mod tests {
 
     #[test]
     fn rust_native_digest_writes_json() {
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-digest-native-{}",
+            std::process::id()
+        ));
+        let _ = fs::create_dir_all(&dir);
+        let json = dir.join("latest.json");
+        // Isolate from shared ~/.mac-stats/improvements/latest.json (python race).
+        std::env::set_var("MAC_STATS_DIGEST_JSON", &json);
         let summary = write_digest_native(7).expect("native digest");
-        assert!(digest_json_path().is_file());
-        let loaded = load_digest_summary();
-        assert_eq!(loaded.source, "rust-native");
+        assert_eq!(summary.source, "rust-native");
+        assert!(json.is_file());
+        let text = fs::read_to_string(&json).expect("read isolated digest");
+        assert!(
+            text.contains("rust-native"),
+            "isolated digest missing rust-native source"
+        );
+        std::env::remove_var("MAC_STATS_DIGEST_JSON");
+        let _ = fs::remove_dir_all(&dir);
         let _ = summary.open_count + summary.stale_count + summary.turns;
     }
 

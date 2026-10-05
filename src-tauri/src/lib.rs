@@ -761,7 +761,7 @@ fn run_internal(open_cpu_window: bool) {
                     metrics::smc_temperature::SmcTemperatureReader::default();
 
                 loop {
-                    // Same 5s cadence open or idle (#14). Faster open loops only woke
+                    // Same 8s cadence open or idle (#14). Faster open loops only woke
                     // SMC/IOReport + history while Graphics and Media was already hot.
                     let cpu_window_visible = APP_HANDLE
                         .get()
@@ -771,7 +771,7 @@ fn run_internal(open_cpu_window: bool) {
                             })
                         })
                         .is_some();
-                    std::thread::sleep(std::time::Duration::from_secs(5));
+                    std::thread::sleep(std::time::Duration::from_secs(8));
 
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
