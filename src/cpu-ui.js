@@ -468,6 +468,13 @@
     ) {
       window.ensureBrowserSettingsToolbarKeyboard(browserSetting);
     }
+    const cursorAgentSetting = document.getElementById("cursor-agent-setting");
+    if (
+      cursorAgentSetting &&
+      typeof window.ensureCursorAgentSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureCursorAgentSettingsToolbarKeyboard(cursorAgentSetting);
+    }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     const credentialsSection = settingsModal.querySelector(
@@ -582,6 +589,13 @@
       typeof window.ensureBrowserSettingsToolbarKeyboard === "function"
     ) {
       window.ensureBrowserSettingsToolbarKeyboard(browserSetting);
+    }
+    const cursorAgentSetting = document.getElementById("cursor-agent-setting");
+    if (
+      cursorAgentSetting &&
+      typeof window.ensureCursorAgentSettingsToolbarKeyboard === "function"
+    ) {
+      window.ensureCursorAgentSettingsToolbarKeyboard(cursorAgentSetting);
     }
     const returnEl = settingsFocusReturn;
     settingsFocusReturn = null;

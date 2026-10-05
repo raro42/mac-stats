@@ -14677,6 +14677,227 @@ async function refreshCursorAgentStatus() {
   }
 }
 
+function cursorAgentSettingsInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  if (start == null || end == null) return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return start === len && end === len;
+  }
+  return start === 0 && end === 0;
+}
+
+function isCursorAgentSettingsInput(el) {
+  return (
+    el?.id === 'cursor-agent-workspace-input' ||
+    el?.id === 'cursor-agent-executable-input'
+  );
+}
+
+/** Focusable Settings Cursor agent toolbar items (workspace · executable · Save · Clear). */
+function getCursorAgentSettingsToolbarItems(wrap) {
+  const container = wrap || document.getElementById('cursor-agent-setting');
+  if (!container) return [];
+  const ids = [
+    'cursor-agent-workspace-input',
+    'cursor-agent-executable-input',
+    'cursor-agent-save',
+    'cursor-agent-clear',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !container.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || container.contains(el);
+    });
+}
+
+function refreshCursorAgentSettingsToolbarRovingTabindex(wrap, preferred) {
+  const container = wrap || document.getElementById('cursor-agent-setting');
+  const items = getCursorAgentSettingsToolbarItems(container);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** How to move across the Cursor workspace, executable, Save, and Clear when Settings is open. */
+const CURSOR_AGENT_SETTINGS_TOOLBAR_KB_HINT =
+  '← → / h l · Home/End move · arrows at workspace/executable start/end · workspace first crosses to Browser · Clear last crosses to Telegram';
+
+/**
+ * Theme HTML ships the hint under the workspace field, executable field, Save, and Clear.
+ * It stays hidden until Settings is open. Create it only on older shells.
+ */
+function ensureCursorAgentSettingsToolbarKbHint(wrap) {
+  const container = wrap || document.getElementById('cursor-agent-setting');
+  if (!container) return;
+  const actions = container.querySelector('.cursor-agent-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.cursor-agent-settings-toolbar-kb-hint');
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === 'function' &&
+    window.isSettingsModalOpen();
+  if (!settingsOpen) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  const items = getCursorAgentSettingsToolbarItems(container);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'cursor-agent-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    hint.hidden = true;
+    actions.appendChild(hint);
+  }
+  hint.hidden = false;
+  hint.textContent = CURSOR_AGENT_SETTINGS_TOOLBAR_KB_HINT;
+}
+
+/** Cursor workspace first ← Browser Clear, else footer version, when Settings is open. */
+function tryChainCursorAgentSettingsToolbarWorkspaceBack() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('browser-clear')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Cursor Clear last → Telegram token, else footer version, when Settings is open. */
+function tryChainCursorAgentSettingsToolbarClearForward() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (focusCredentialControl('telegram-bot-token-input')) return true;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/**
+ * Settings Cursor agent toolbar keyboard — focus workspace · executable · Save · Clear,
+ * then ←→ / h l / Home/End (Browser settings toolbar parity).
+ */
+function wireCursorAgentSettingsToolbarKeyboard(wrap) {
+  const container = wrap || document.getElementById('cursor-agent-setting');
+  if (!container) return;
+  ensureCursorAgentSettingsToolbarKbHint(container);
+  refreshCursorAgentSettingsToolbarRovingTabindex(container);
+  if (container.dataset.cursorAgentSettingsToolbarKbWired === '1') return;
+  container.dataset.cursorAgentSettingsToolbarKbWired = '1';
+  if (!container.getAttribute('role')) container.setAttribute('role', 'toolbar');
+  if (!container.getAttribute('aria-label')) {
+    container.setAttribute('aria-label', 'Cursor agent workspace and executable');
+  }
+  container.addEventListener('focusin', (e) => {
+    const items = getCursorAgentSettingsToolbarItems(container);
+    if (items.includes(e.target)) {
+      refreshCursorAgentSettingsToolbarRovingTabindex(container, e.target);
+      ensureCursorAgentSettingsToolbarKbHint(container);
+    }
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getCursorAgentSettingsToolbarItems(container);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        isCursorAgentSettingsInput(active) ||
+        active?.id === 'cursor-agent-save' ||
+        active?.id === 'cursor-agent-clear'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        isCursorAgentSettingsInput(active) &&
+        !cursorAgentSettingsInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      if (idx === items.length - 1) {
+        if (tryChainCursorAgentSettingsToolbarClearForward()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
+    } else if (back) {
+      if (
+        isCursorAgentSettingsInput(active) &&
+        !cursorAgentSettingsInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      if (idx === 0) {
+        if (tryChainCursorAgentSettingsToolbarWorkspaceBack()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshCursorAgentSettingsToolbarRovingTabindex(container, items[next]);
+    items[next].focus();
+    if (
+      isCursorAgentSettingsInput(items[next]) &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 /** Settings: Save / Clear Cursor agent workspace + binary (Browser parity; config.json). */
 function initCursorAgentSettings() {
   const saveBtn = document.getElementById('cursor-agent-save');
@@ -14785,6 +15006,8 @@ function initCursorAgentSettings() {
 
   refreshCursorAgentStatus();
   window.CursorAgentSettings = { refreshStatus: refreshCursorAgentStatus };
+  wireCursorAgentSettingsToolbarKeyboard();
+  window.ensureCursorAgentSettingsToolbarKeyboard = wireCursorAgentSettingsToolbarKeyboard;
 }
 
 function updateTelegramConfigStatus(statusText, elId) {
