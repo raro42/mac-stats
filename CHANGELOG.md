@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1397] - 2026-10-06
+
+### Changed
+- **Ollama-down `debug.log` spam cut (log-012 follow-up)** — "Circuit opened for Ollama" WARN is ≤1 per 5 minutes (further half-open reopenings stay DEBUG). Model-list fetch-fail cooldown is 5 minutes (was 30s). Shared `/api/tags` waiters only log once per in-flight result. Aim: quieter logs while Ollama stays offline.
+- **CPU window WebView idle cut (#14 follow-up)** — Metrics / history / process list / Discord / monitors / Agent Ops poll every 120s. Process cache TTL is 120s. `get_cpu_details` rate floor is 45s. Backend metric loop and temp read interval are 45s. Sparklines keep 4 points. History seed skips on focus if a seed ran in the last 120s. Debug Log auto-refresh is 120s and pauses on window blur. GPU sampler warm is deferred 5s after open. Aim: quieter `tauri://localhost` / Graphics and Media.
+
+
 ## [0.1.1396] - 2026-10-05
 
 ### Changed

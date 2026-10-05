@@ -5,7 +5,17 @@
 
 use std::time::{Duration, Instant};
 
-use crate::{mac_stats_info, mac_stats_warn};
+use crate::{mac_stats_debug, mac_stats_info, mac_stats_warn};
+
+/// Emit at most one "Circuit opened" WARN per this interval; further reopenings stay DEBUG
+/// (Ollama-down half-open retries every ~30s must not flood `debug.log`).
+const OPEN_WARN_INTERVAL: Duration = Duration::from_secs(5 * 60);
+
+fn should_warn_circuit_open(last_warn: Option<Instant>, now: Instant, interval: Duration) -> bool {
+    last_warn
+        .map(|t| now.duration_since(t) >= interval)
+        .unwrap_or(true)
+}
 
 /// Circuit breaker state machine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,6 +36,8 @@ pub struct CircuitBreaker {
     last_transition: Instant,
     /// In `HalfOpen`, whether the single probe slot is still available.
     half_open_probe_pending: bool,
+    /// Last time we emitted a "Circuit opened" WARN for this breaker.
+    last_open_warn: Option<Instant>,
 }
 
 impl CircuitBreaker {
@@ -42,6 +54,7 @@ impl CircuitBreaker {
             reset_interval,
             last_transition: Instant::now(),
             half_open_probe_pending: false,
+            last_open_warn: None,
         }
     }
 
@@ -137,26 +150,30 @@ impl CircuitBreaker {
                     self.state = CircuitState::Open;
                     self.last_transition = Instant::now();
                     self.half_open_probe_pending = false;
-                    mac_stats_warn!(
-                        "circuit",
-                        "Circuit opened for {} after {} consecutive failures",
-                        self.service_label,
-                        self.consecutive_failures
-                    );
+                    self.log_opened(self.consecutive_failures);
                 }
             }
             CircuitState::HalfOpen => {
                 self.state = CircuitState::Open;
                 self.last_transition = Instant::now();
                 self.half_open_probe_pending = false;
-                mac_stats_warn!(
-                    "circuit",
-                    "Circuit opened for {} after {} consecutive failures",
-                    self.service_label,
-                    self.failure_threshold
-                );
+                self.log_opened(self.failure_threshold);
             }
             CircuitState::Open => {}
+        }
+    }
+
+    fn log_opened(&mut self, failure_count: u32) {
+        let now = Instant::now();
+        let msg = format!(
+            "Circuit opened for {} after {} consecutive failures",
+            self.service_label, failure_count
+        );
+        if should_warn_circuit_open(self.last_open_warn, now, OPEN_WARN_INTERVAL) {
+            self.last_open_warn = Some(now);
+            mac_stats_warn!("circuit", "{}", msg);
+        } else {
+            mac_stats_debug!("circuit", "{} (rate-limited)", msg);
         }
     }
 }
@@ -188,5 +205,37 @@ mod tests {
         assert_eq!(c.state(), CircuitState::HalfOpen);
         c.record_success();
         assert_eq!(c.state(), CircuitState::Closed);
+    }
+
+    #[test]
+    fn open_warn_first_and_after_interval() {
+        let now = Instant::now();
+        assert!(should_warn_circuit_open(None, now, Duration::from_secs(60)));
+        assert!(!should_warn_circuit_open(
+            Some(now),
+            now + Duration::from_secs(30),
+            Duration::from_secs(60)
+        ));
+        assert!(should_warn_circuit_open(
+            Some(now),
+            now + Duration::from_secs(60),
+            Duration::from_secs(60)
+        ));
+    }
+
+    #[test]
+    fn half_open_reopen_rate_limits_warn_clock() {
+        let mut c = CircuitBreaker::new("test", 1, Duration::from_secs(0));
+        c.record_failure(true);
+        assert_eq!(c.state(), CircuitState::Open);
+        assert!(c.last_open_warn.is_some());
+        let first = c.last_open_warn;
+        std::thread::sleep(Duration::from_millis(5));
+        assert!(c.allow_request().is_ok());
+        assert_eq!(c.state(), CircuitState::HalfOpen);
+        c.record_failure(true);
+        assert_eq!(c.state(), CircuitState::Open);
+        // Same warn clock — half-open reopen inside the interval must not reset last_open_warn.
+        assert_eq!(c.last_open_warn, first);
     }
 }

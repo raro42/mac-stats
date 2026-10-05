@@ -1,11 +1,12 @@
-# Session todo — GitHub #14 tauri://localhost CPU (follow-up #10)
+# Session todo — GitHub #14 tauri://localhost CPU (follow-up #11)
 
-- [x] Align polls/TTL to 90s; backend metric loop 30s; sparkline 6 points
-- [x] Raise `get_cpu_details` rate limit 2s → 30s; Debug Log auto-refresh 60s
-- [x] History availability poll 5m; pause data-poster history on blur
-- [x] Defer GPU-sampler warm off the open path; TEMP read interval 30s
-- [x] `cargo check` in src-tauri/; bump v0.1.1396 + CHANGELOG
+- [x] Align UI polls/TTL to 120s; backend metric loop 45s; sparkline 4 points
+- [x] Raise `get_cpu_details` floor 30s → 45s; TEMP 45s / cache 60s
+- [x] History seed skip on focus if recent; HISTORY_POINTS 16; seed maxDisplayPoints 8
+- [x] Pause Debug Log auto-refresh on blur; auto-refresh interval 120s
+- [x] Defer GPU-sampler warm 5s; Agent Ops updated-ago 120s
+- [x] `cargo check` in src-tauri/; bump v0.1.1397 + CHANGELOG; sync-dist
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; gh-safe comment (do not close #14)
 
 ## Review
-v0.1.1396: 90s UI polls, 30s backend/`get_cpu_details` floor, 6 sparkline points, deferred GPU warm, history blur pause, 5m history-availability probe. macOS Activity Monitor remains the <1% acceptance gate.
+v0.1.1397: 120s UI polls, 45s backend/`get_cpu_details` floor, 4 sparkline points, Debug Log auto-refresh pauses on blur, history seed skip on rapid focus, GPU warm deferred 5s. macOS Activity Monitor remains the <1% acceptance gate.

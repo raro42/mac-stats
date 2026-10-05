@@ -18,9 +18,9 @@
   }
 
   // Chart configuration
-  const HISTORY_POINTS = 24; // Fewer points = less canvas work (#14)
+  const HISTORY_POINTS = 16; // Fewer points = less canvas work (#14)
   // Match HISTORY_POLL_MS — legacy 3s gate was leftover from faster polls (#14).
-  const TEMPERATURE_REDRAW_INTERVAL_MS = 90000;
+  const TEMPERATURE_REDRAW_INTERVAL_MS = 120000;
   let lastTemperatureDrawMs = 0;
 
   // Time range options (in seconds)
@@ -500,7 +500,7 @@
       updateChartsFromBackend();
 
       // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
-      const HISTORY_POLL_MS = 90000;
+      const HISTORY_POLL_MS = 120000;
       let historyPollInterval = setInterval(() => {
         if (document.hidden) return;
         updateChartsFromBackend();

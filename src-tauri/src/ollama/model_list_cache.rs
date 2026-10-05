@@ -17,7 +17,9 @@ const MODEL_LIST_TTL: Duration = Duration::from_secs(5 * 60);
 const STALE_IN_PROGRESS_LOG_INTERVAL: Duration = Duration::from_secs(60);
 /// When Ollama is down / circuit-open, skip re-hitting `/api/tags` for a short window
 /// so UI + idle callers do not stampede Connection refused / circuit-open WARNs.
-const FETCH_FAIL_COOLDOWN: Duration = Duration::from_secs(30);
+/// Aligned with circuit open-WARN interval so half-open retries do not re-arm a tags stampede
+/// every 30s while Ollama stays down.
+const FETCH_FAIL_COOLDOWN: Duration = Duration::from_secs(5 * 60);
 /// Emit at most one fetch-fail WARN per endpoint in this interval; further fails stay DEBUG
 /// (idle-thought timeout / single-instance busy parity).
 const FETCH_FAIL_WARN_INTERVAL: Duration = Duration::from_secs(5 * 60);
@@ -289,7 +291,9 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
 
     let out = {
         let mut g = cache().lock().await;
-        g.inflight.remove(&ep);
+        // Shared waiters all see the same Result — only the first to clear inflight logs.
+        // Others still refresh last_fail / last_success so cooldown stays correct.
+        let primary_waiter = g.inflight.remove(&ep).is_some();
         match result {
             Ok(list) if !list.models.is_empty() => {
                 let ent = g.endpoints.entry(ep.clone()).or_default();
@@ -300,23 +304,27 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
             Ok(list) => {
                 let prior_snapshot = g.endpoints.get(&ep).and_then(|e| e.last_success.clone());
                 let prior_list = prior_snapshot.as_ref().map(|(_, l)| l.clone());
-                mac_stats_warn!(
-                    "ollama/model_cache",
-                    "{} Ollama returned empty model list ({} entries); not replacing cached data",
-                    MCACHE_LOG_TAG,
-                    list.models.len()
-                );
+                if primary_waiter {
+                    mac_stats_warn!(
+                        "ollama/model_cache",
+                        "{} Ollama returned empty model list ({} entries); not replacing cached data",
+                        MCACHE_LOG_TAG,
+                        list.models.len()
+                    );
+                }
                 let merged = merge_tags_fetch_result(Ok(list), prior_list);
-                if let Some((age_start, stale)) = prior_snapshot.as_ref() {
-                    if !stale.models.is_empty() {
-                        let age = Instant::now().duration_since(*age_start);
-                        mac_stats_warn!(
-                            "ollama/model_cache",
-                            "{} Serving stale model list (last success {}s ago, {} models) after empty /api/tags",
-                            MCACHE_LOG_TAG,
-                            age.as_secs(),
-                            stale.models.len()
-                        );
+                if primary_waiter {
+                    if let Some((age_start, stale)) = prior_snapshot.as_ref() {
+                        if !stale.models.is_empty() {
+                            let age = Instant::now().duration_since(*age_start);
+                            mac_stats_warn!(
+                                "ollama/model_cache",
+                                "{} Serving stale model list (last success {}s ago, {} models) after empty /api/tags",
+                                MCACHE_LOG_TAG,
+                                age.as_secs(),
+                                stale.models.len()
+                            );
+                        }
                     }
                 }
                 merged
@@ -328,27 +336,31 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                 {
                     let ent = g.endpoints.entry(ep.clone()).or_default();
                     ent.last_fail = Some((now_err, e.clone()));
-                    log_fetch_fail_warn(
-                        ent,
-                        now_err,
-                        format!(
-                            "{} Model list fetch failed: {}; not updating cache",
-                            MCACHE_LOG_TAG, e
-                        ),
-                    );
+                    if primary_waiter {
+                        log_fetch_fail_warn(
+                            ent,
+                            now_err,
+                            format!(
+                                "{} Model list fetch failed: {}; not updating cache",
+                                MCACHE_LOG_TAG, e
+                            ),
+                        );
+                    }
                 }
                 let merged = merge_tags_fetch_result(Err(e), prior_list);
-                if let Some((age_start, stale)) = prior_snapshot.as_ref() {
-                    if !stale.models.is_empty() {
-                        let age = Instant::now().duration_since(*age_start);
-                        // Expected while Ollama is down — info, not a second WARN beside fetch-fail.
-                        mac_stats_info!(
-                            "ollama/model_cache",
-                            "{} Serving stale model list (last success {}s ago, {} models) after fetch error",
-                            MCACHE_LOG_TAG,
-                            age.as_secs(),
-                            stale.models.len()
-                        );
+                if primary_waiter {
+                    if let Some((age_start, stale)) = prior_snapshot.as_ref() {
+                        if !stale.models.is_empty() {
+                            let age = Instant::now().duration_since(*age_start);
+                            // Expected while Ollama is down — info, not a second WARN beside fetch-fail.
+                            mac_stats_info!(
+                                "ollama/model_cache",
+                                "{} Serving stale model list (last success {}s ago, {} models) after fetch error",
+                                MCACHE_LOG_TAG,
+                                age.as_secs(),
+                                stale.models.len()
+                            );
+                        }
                     }
                 }
                 merged
