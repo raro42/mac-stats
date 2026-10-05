@@ -1,20 +1,21 @@
 # Morning surprise — 2026-10-06
 
-Overnight Track B kept cutting CPU-window WebView idle work for GitHub #14, and fixed operator “age” matching so Linux `cargo test` harness_ops goes green again.
+Overnight autoresearch kept shipping against GitHub **#14** (tauri://localhost CPU). Digester open was empty; design review stayed in grace.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
-|---------|------|
-| **v0.1.1390** | Metrics / history poll **15s**. Backend metric loop stays **5s** while the CPU window is open (was 2s). Sparklines keep **36** points. Apple / Light use flat opaque panels + CSS `contain`. Whole-token `age` (not `average` / `usage` / `agent`). Empty digest-open still says **0 open candidates**. |
-| **v0.1.1389** | Stroke-only sparklines, 12s polls, blur pauses idle polls, lazy marked/hljs, Apple opaque chrome. |
-| **v0.1.1388** | Opaque macOS window, 8s polls, pause more when hidden, Ollama model-list WARN cooldown. |
+|--------|------|
+| **v0.1.1393** | Metrics/history **45s**; backend loop **15s**; sparklines **12** points + cached opaque backdrop; collapsed Top Processes → glance chips only; Debug Log auto-refresh **10s**; Apple/Light/Dark opaque action + power-strip chrome |
+| **v0.1.1392** | 30s polls; 12s backend; 16 sparkline points; warn/error-only tauri-logger; opacity-only icon imgs |
+| **v0.1.1391** | 20s polls; 8s backend; 24 sparkline points; Light/Dark flat chrome; digest test race fix |
+| **v0.1.1390** | 15s polls; 5s backend while open; 36 sparkline points; age-token matcher fix |
+| **v0.1.1388** | Ollama model-list fail cooldown + WARN ≤1/5min; earlier WebView idle cuts |
 
 ## Still open
 
-- GitHub **#14** — macOS Activity Monitor `tauri://localhost` / Graphics and Media under ~1% (Linux webkit2gtk blank-page floor is not that gate). Tester has TESTING-14.
-- Design-review screenshot for `feature-agent-ops` when Screen Recording TCC allows.
+- GitHub **#14** needs a **macOS** Activity Monitor pass (`tauri://localhost` / Graphics and Media under ~1%). Linux webkit2gtk still has a high blank-page floor, so this rack cannot CLOSE the issue alone.
 
-## Digester
+## Not a surprise (skipped)
 
-Open candidates: none this window. Night still moved the ratchet via standing backlog (#14).
+- Empty digester alone — standing backlog / #14 used instead.
