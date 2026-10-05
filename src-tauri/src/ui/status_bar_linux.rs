@@ -115,6 +115,8 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     }
 
     // Opaque fill; Suspend is macOS 14+ (no-op on Linux). Keeps parity with macOS (#14).
+    // Skip `.transparent(false)`: macOS needs `macos-private-api` for that API;
+    // opaque is already the default (Linux cargo check would miss a macOS CI break).
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
             .title("mac-stats · glad you're here")
@@ -123,7 +125,6 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
-            .transparent(false)
             .background_color(Color(242, 242, 246, 255))
             .background_throttling(BackgroundThrottlingPolicy::Suspend)
             .build();

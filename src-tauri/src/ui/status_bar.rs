@@ -834,8 +834,10 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         .map(|g| (g.width, g.height))
         .unwrap_or((default_w, default_h));
 
-    // Opaque fill + suspend-when-hidden: avoid transparent compositing and keep
-    // WKWebView from spinning Graphics and Media while the window is not frontmost (#14).
+    // Opaque fill + suspend-when-hidden: keep WKWebView from spinning Graphics
+    // and Media while the window is not frontmost (#14).
+    // Do not call `.transparent(false)`: on macOS that API needs the
+    // `macos-private-api` feature, and opaque is already the default.
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
             .title("mac-stats · glad you're here")
@@ -844,7 +846,6 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
-            .transparent(false)
             .background_color(Color(242, 242, 246, 255))
             .background_throttling(BackgroundThrottlingPolicy::Suspend)
             .build();
