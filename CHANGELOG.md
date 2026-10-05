@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.1358] - 2026-10-04
+
+### Changed
+- **Process Details name and PID keyboard hint on first paint** — the hint sits in the theme HTML inside the process detail hero. It no longer pops in after JavaScript loads. It stays hidden until the name and the PID are both on screen. The line says how to move across those controls. Keyboard tips stay out of the layout.
+
+
 ## [0.1.1357] - 2026-10-04
 
 ### Changed

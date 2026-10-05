@@ -5750,6 +5750,8 @@ function openProcessDetailsModal() {
   }
   const header = processDetailsModal.querySelector(".settings-header");
   if (header) wireProcessDetailsHeaderToolbarKeyboard(header);
+  const hero = processDetailsModal.querySelector(".process-detail-hero");
+  if (hero) ensureProcessDetailHeroToolbarKbHint(hero);
   requestAnimationFrame(() => {
     processDetailsModal.querySelector("#close-process-details")?.focus();
   });
@@ -5978,21 +5980,39 @@ function refreshProcessDetailHeroToolbarRovingTabindex(hero, preferred) {
   }
 }
 
+/** Closed Process Details panel: how to move across name and PID. */
+const PROCESS_DETAIL_HERO_KB_HINT_CLOSED =
+  "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
+
+/** Open Process Details modal: how to move across name and PID. */
+const PROCESS_DETAIL_HERO_KB_HINT_OPEN =
+  "← → / h l · Home/End move · name ← process row · Force Quit → footer · Enter / Space copies";
+
+function processDetailHeroKbHintText() {
+  return isProcessDetailsModalOpen()
+    ? PROCESS_DETAIL_HERO_KB_HINT_OPEN
+    : PROCESS_DETAIL_HERO_KB_HINT_CLOSED;
+}
+
+/** Theme HTML and the detail body ship the hint inside the hero. It stays hidden until name and PID are both on screen. Create it only on older shells. */
 function ensureProcessDetailHeroToolbarKbHint(hero) {
   const wrap = hero || document.querySelector(".process-detail-hero");
   if (!wrap) return;
   let hint = wrap.querySelector(".process-detail-hero-toolbar-kb-hint");
+  const items = getProcessDetailHeroToolbarItems(wrap);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement("div");
     hint.className = "process-detail-hero-toolbar-kb-hint";
     hint.setAttribute("aria-hidden", "true");
+    hint.hidden = true;
     wrap.appendChild(hint);
   }
-  const items = getProcessDetailHeroToolbarItems(wrap);
-  hint.hidden = items.length < 2;
-  hint.textContent = isProcessDetailsModalOpen()
-    ? "← → / h l · Home/End move · name ← process row · Force Quit → footer · Enter / Space copies"
-    : "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
+  hint.hidden = false;
+  hint.textContent = processDetailHeroKbHintText();
 }
 
 /**
@@ -6239,9 +6259,10 @@ function populateProcessDetailsBody(body, details, pid) {
     const nameUi = snapshotCopyFlash(prevNameEl);
     
     body.innerHTML = `
-      <div class="process-detail-hero">
+      <div class="process-detail-hero" role="toolbar" aria-label="Process name and PID">
         <button type="button" class="process-detail-name" title="Click to copy name" aria-label="Copy name ${name}">${name}</button>
         <button type="button" class="process-detail-pid" title="Click to copy PID" aria-label="Copy PID ${details.pid}">PID ${details.pid}</button>
+        <div class="process-detail-hero-toolbar-kb-hint" hidden aria-hidden="true">${PROCESS_DETAIL_HERO_KB_HINT_OPEN}</div>
       </div>
       <div class="process-detail-section">
         <div class="process-detail-row">
@@ -6451,7 +6472,11 @@ async function showProcessDetails(pid) {
             <h2 id="process-details-title">Process Details</h2>
             <button id="close-process-details" class="icon-btn" aria-label="Close">×</button>
           </div>
-          <div class="settings-body" id="process-details-body"></div>
+          <div class="settings-body" id="process-details-body">
+            <div class="process-detail-hero" role="toolbar" aria-label="Process name and PID" hidden>
+              <div class="process-detail-hero-toolbar-kb-hint" hidden aria-hidden="true">${PROCESS_DETAIL_HERO_KB_HINT_CLOSED}</div>
+            </div>
+          </div>
         </div>
       `;
       document.body.appendChild(processDetailsModal);
