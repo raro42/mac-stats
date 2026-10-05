@@ -5752,6 +5752,8 @@ function openProcessDetailsModal() {
   if (header) wireProcessDetailsHeaderToolbarKeyboard(header);
   const hero = processDetailsModal.querySelector(".process-detail-hero");
   if (hero) ensureProcessDetailHeroToolbarKbHint(hero);
+  const forceQuitSection = processDetailsModal.querySelector(".force-quit-section");
+  if (forceQuitSection) ensureForceQuitToolbarKbHint(forceQuitSection);
   requestAnimationFrame(() => {
     processDetailsModal.querySelector("#close-process-details")?.focus();
   });
@@ -6125,21 +6127,39 @@ function refreshForceQuitToolbarRovingTabindex(section, preferred) {
   }
 }
 
+/** Closed Process Details panel: how to move across Advanced and Force Quit. */
+const FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED =
+  "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
+
+/** Open Process Details modal: how to move across Advanced and Force Quit. */
+const FORCE_QUIT_TOOLBAR_KB_HINT_OPEN =
+  "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID · at end crosses to footer version";
+
+function forceQuitToolbarKbHintText() {
+  return isProcessDetailsModalOpen()
+    ? FORCE_QUIT_TOOLBAR_KB_HINT_OPEN
+    : FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED;
+}
+
+/** Theme HTML and the detail body ship the hint inside the force-quit section. It stays hidden until Advanced and Force Quit are both on screen. Create it only on older shells. */
 function ensureForceQuitToolbarKbHint(section) {
   const wrap = section || document.querySelector(".force-quit-section");
   if (!wrap) return;
   let hint = wrap.querySelector(".force-quit-toolbar-kb-hint");
+  const items = getForceQuitToolbarItems(wrap);
+  if (items.length < 2) {
+    if (hint) hint.hidden = true;
+    return;
+  }
   if (!hint) {
     hint = document.createElement("div");
     hint.className = "force-quit-toolbar-kb-hint";
     hint.setAttribute("aria-hidden", "true");
+    hint.hidden = true;
     wrap.appendChild(hint);
   }
-  const items = getForceQuitToolbarItems(wrap);
-  hint.hidden = items.length < 2;
-  hint.textContent = isProcessDetailsModalOpen()
-    ? "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID · at end crosses to footer version"
-    : "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
+  hint.hidden = false;
+  hint.textContent = forceQuitToolbarKbHintText();
 }
 
 /**
@@ -6316,12 +6336,13 @@ function populateProcessDetailsBody(body, details, pid) {
           </div>
         </div>
       </div>
-      <div class="force-quit-section">
+      <div class="force-quit-section" role="toolbar" aria-label="Force quit process">
         <details class="force-quit-advanced"${advancedWasOpen ? " open" : ""}>
           <summary>Advanced</summary>
           <p class="force-quit-hint">Force Quit ends the process immediately.</p>
           <button id="force-quit-process-btn" class="force-quit-btn" type="button">Force Quit Process</button>
         </details>
+        <div class="force-quit-toolbar-kb-hint" hidden aria-hidden="true">${FORCE_QUIT_TOOLBAR_KB_HINT_OPEN}</div>
       </div>
     `;
 
@@ -6475,6 +6496,9 @@ async function showProcessDetails(pid) {
           <div class="settings-body" id="process-details-body">
             <div class="process-detail-hero" role="toolbar" aria-label="Process name and PID" hidden>
               <div class="process-detail-hero-toolbar-kb-hint" hidden aria-hidden="true">${PROCESS_DETAIL_HERO_KB_HINT_CLOSED}</div>
+            </div>
+            <div class="force-quit-section" role="toolbar" aria-label="Force quit process" hidden>
+              <div class="force-quit-toolbar-kb-hint" hidden aria-hidden="true">${FORCE_QUIT_TOOLBAR_KB_HINT_CLOSED}</div>
             </div>
           </div>
         </div>
