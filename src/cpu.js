@@ -264,6 +264,20 @@ function windowOccluded() {
 function setDocumentOccluded(occluded) {
   if (typeof document === "undefined" || !document.documentElement) return;
   document.documentElement.classList.toggle("is-occluded", !!occluded);
+  // Park the document root so WebKit drops compositor layers while another
+  // app is frontmost (macOS often keeps visibilityState=visible).
+  try {
+    const root = document.documentElement;
+    if (occluded) {
+      root.style.contentVisibility = "hidden";
+      root.style.contain = "strict";
+    } else {
+      root.style.contentVisibility = "";
+      root.style.contain = "";
+    }
+  } catch (_) {
+    /* ignore */
+  }
 }
 
 function scheduleDOMUpdate(updateFn) {
@@ -317,8 +331,8 @@ function updateRingGauge(ringId, percent, key) {
   }
 
   const diff = Math.abs(prev.current - targetOffset);
-  // Skip paints under ~40% of the ring (imperceptible; avoids WebKit invalidation).
-  if (diff < CIRCUMFERENCE * 0.40 && prev.current !== CIRCUMFERENCE) {
+  // Skip paints under ~50% of the ring (imperceptible; avoids WebKit invalidation).
+  if (diff < CIRCUMFERENCE * 0.50 && prev.current !== CIRCUMFERENCE) {
     return;
   }
 

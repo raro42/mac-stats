@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1406** (follow-up after v0.1.1405).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (compositor / occlusion park; prior 3600s poll floor kept):
+
+- `src/cpu.js` — blur / `document.hidden` toggles `html.is-occluded` and parks the document root (`content-visibility` / `contain`); ring paints skip under ~50%; still skip `refresh` / ring / DOM rAF while occluded.
+- `src/agent-ops.css` — `html.is-occluded` parks shell roots, `body > *`, metric cards, SVG rings, history, power strip, process list, Agent Ops / section bodies via `visibility` + `content-visibility: hidden` + freeze transitions/filters/shadows; metric cards / rings use `contain: layout paint style` when visible.
+- `src/chart-line.js` — parked canvases also set `visibility` / `content-visibility` hidden; boot idle timeout **60s**; resize layout skips while occluded.
+- `src/history.js` — same visibility park; skip canvas init when open already occluded.
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **480s** after window open.
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and hot washes still update when focused. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1405)
+
 Version **v0.1.1405** (follow-up after v0.1.1404).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -637,6 +655,40 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s) before CLOSED
 - `src/history.js` — park canvases on blur/focus; DPR capped at 1; opaque `getContext('2d', { alpha: false })`; `HISTORY_POLL_MS = 3600000`; `HISTORY_POINTS = 2`
 - `src/agent-ops.css` — history chart containers `content-visibility: auto` + `contain: paint`; canvases `contain: strict`
 - `src/agent-ops.js` — refresh / glance **3600s**
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 park/occlusion/compositor cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1405)
+
+**Date:** 2026-10-05 23:09 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1405)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 compositor / occlusion park cuts present)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1405**
+- `src-tauri/src/metrics/mod.rs` — `PROCESS_CACHE_TTL_SECS = 3600`; `get_cpu_details` rate floor **600s**
+- `src-tauri/src/lib.rs` — backend metric loop sleep **600s**
+- `src-tauri/src/state.rs` — `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s
+- `src-tauri/src/ui/status_bar.rs` — AGX GPU sampler warm deferred **240s** after window open
+- `src/cpu.js` — `windowOccluded()`; `setDocumentOccluded` toggles `html.is-occluded`; skip `refresh` / ring / DOM rAF while occluded; ring paints skip under ~40%; metrics / process list / Discord / glances **3600s**; park/unpark history via idle pause/resume
+- `src/chart-line.js` — park sets `visibility` / `contentVisibility` hidden + 1×1; boot idle timeout **30s**; `LINE_CHART_POINTS = 2`
+- `src/history.js` — same visibility park; skip canvas init when open already occluded; `HISTORY_POLL_MS = 3600000`; `HISTORY_POINTS = 2`
+- `src/agent-ops.css` — `html.is-occluded` parks metric cards / rings / history / power strip / process list / Agent Ops / section bodies via `content-visibility: hidden`; metric cards / rings `contain: layout paint style` when visible
 
 **debug.log**
 

@@ -84,7 +84,17 @@ svg.ring,
 /*
  * Another app frontmost: macOS often keeps visibilityState=visible. JS toggles
  * html.is-occluded so heavy trees skip layout/paint (Graphics and Media / #14).
+ * Shell roots + body children are parked with visibility so WebKit drops layers.
  */
+html.is-occluded .apple-shell,
+html.is-occluded .arch-sheet,
+html.is-occluded .mat-card,
+html.is-occluded .swiss-shell,
+html.is-occluded .glass-panel,
+html.is-occluded .cpu-shell,
+html.is-occluded .neon-frame,
+html.is-occluded .poster-panel,
+html.is-occluded body > *,
 html.is-occluded .apple-metrics,
 html.is-occluded .metric-card,
 html.is-occluded svg.ring,
@@ -101,11 +111,13 @@ html.is-occluded .logs-viewer,
 html.is-occluded .apple-details-body {
   content-visibility: hidden !important;
   contain: strict !important;
+  visibility: hidden !important;
 }
 
 html.is-occluded,
 html.is-occluded body {
   scroll-behavior: auto !important;
+  contain: strict !important;
 }
 
 html.is-occluded *,
@@ -113,6 +125,9 @@ html.is-occluded *::before,
 html.is-occluded *::after {
   transition: none !important;
   animation: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 /*

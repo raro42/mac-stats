@@ -435,8 +435,12 @@
       api.init();
       let resizeTimer = null;
       window.addEventListener("resize", () => {
+        if (windowOccluded()) return;
         if (resizeTimer) clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => api.refreshLayout(), 200);
+        resizeTimer = setTimeout(() => {
+          if (windowOccluded()) return;
+          api.refreshLayout();
+        }, 200);
       });
       // Release sparkline GPU buffers when occluded; redraw on focus (#14).
       document.addEventListener("visibilitychange", () => {
@@ -450,7 +454,7 @@
       }
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(start, { timeout: 30000 });
+      window.requestIdleCallback(start, { timeout: 60000 });
     } else {
       setTimeout(start, 0);
     }
