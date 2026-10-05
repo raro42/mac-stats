@@ -502,6 +502,9 @@
     );
     if (appearanceSection) {
       wireAppearanceSettingToolbarKeyboard(appearanceSection);
+    } else {
+      const themeList = document.getElementById("theme-list");
+      if (themeList) wireThemeListToolbarKeyboard(themeList);
     }
     const productSetting = settingsModal.querySelector("#product-setting");
     if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
@@ -644,6 +647,9 @@
     );
     if (appearanceSection) {
       wireAppearanceSettingToolbarKeyboard(appearanceSection);
+    } else {
+      const themeList = document.getElementById("theme-list");
+      if (themeList) wireThemeListToolbarKeyboard(themeList);
     }
     const productSetting = settingsModal.querySelector("#product-setting");
     if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
@@ -768,8 +774,46 @@
         opacity: 0.72;
         grid-column: 1 / -1;
       }
+      .theme-list-kb-hint[hidden] {
+        display: none !important;
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  /** How to move across theme buttons when the Appearance section is missing. */
+  const THEME_LIST_KB_HINT =
+    "← → / h l · Home/End move · Enter / Space applies theme";
+
+  /**
+   * Theme HTML ships the hint at the end of the theme list.
+   * It stays hidden until Settings is open and the Appearance section is missing.
+   * Create it only on older shells.
+   */
+  function ensureThemeListKbHint(themeList) {
+    if (!themeList) return;
+    let hint = themeList.querySelector(":scope > .theme-list-kb-hint");
+    const appearanceSection = themeList.closest(
+      'section[aria-labelledby="settings-appearance-heading"]'
+    );
+    if (appearanceSection || !isSettingsModalOpen()) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    const buttons = getThemeListButtons(themeList);
+    if (buttons.length < 2) {
+      if (hint) hint.hidden = true;
+      return;
+    }
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "theme-list-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      hint.hidden = true;
+      themeList.appendChild(hint);
+    }
+    hint.hidden = false;
+    hint.textContent = THEME_LIST_KB_HINT;
   }
 
   /** Theme buttons + window-frame toggle in Settings Appearance (visible only). */
@@ -928,15 +972,7 @@
   function wireThemeListToolbarKeyboard(themeList) {
     if (!themeList) return;
     ensureThemeListKbStyles();
-    let hint = themeList.querySelector(":scope > .theme-list-kb-hint");
-    if (!hint) {
-      hint = document.createElement("div");
-      hint.className = "theme-list-kb-hint";
-      hint.setAttribute("aria-hidden", "true");
-      themeList.appendChild(hint);
-    }
-    hint.textContent =
-      "← → / h l · Home/End move · Enter / Space applies theme";
+    ensureThemeListKbHint(themeList);
     refreshThemeListRovingTabindex(themeList);
     if (themeList.dataset.themeListKbWired === "1") return;
     themeList.dataset.themeListKbWired = "1";
@@ -946,7 +982,10 @@
     }
     themeList.addEventListener("focusin", (e) => {
       const buttons = getThemeListButtons(themeList);
-      if (buttons.includes(e.target)) refreshThemeListRovingTabindex(themeList, e.target);
+      if (buttons.includes(e.target)) {
+        refreshThemeListRovingTabindex(themeList, e.target);
+        ensureThemeListKbHint(themeList);
+      }
     });
     themeList.addEventListener("keydown", (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;

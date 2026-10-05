@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-05
 
-Overnight Track B put the Product setting keyboard hint in the theme HTML.
+Overnight Track B put the theme-list fallback keyboard hint in the theme HTML.
 
 ## Shipped
 
 | Version | What |
 |---------|------|
+| **v0.1.1380** | Theme-list fallback keyboard hint is in the theme HTML at the end of the theme list. It no longer pops in after JavaScript loads. It stays hidden until Settings is open and the Appearance section is missing. The line says how to move across those buttons. When Appearance is present, that section hint stays in charge. Keyboard tips stay out of the layout. |
 | **v0.1.1379** | Product setting keyboard hint is in the theme HTML at the end of the Product setting. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. An open Help sheet swaps the line to the copy keys. Keyboard tips stay out of the layout. |
 | **v0.1.1378** | Appearance section keyboard hint is in the theme HTML at the end of the Appearance section. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. The first theme crosses to the Settings header. Window frame last crosses to Product. Keyboard tips stay out of the layout. |
 | **v0.1.1377** | Credentials section keyboard hint is in the theme HTML at the end of the Credentials section. It no longer pops in after JavaScript loads. It stays hidden until Settings is open. The line says how to move across those controls. Discord token first crosses to the Settings header. Keyboard tips stay out of the layout. |
@@ -33,8 +34,9 @@ Overnight Track B put the Product setting keyboard hint in the theme HTML.
 ## Context
 
 - Digester open stayed empty (instant/direct noise filtered).
-- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.76d).
+- Design review `due=false` (grace); recommended surface still `feature-agent-ops` (~19.78d).
 - Debug.log: no ERROR/WARN/panic in the 180 minute window.
+- ~05:50 tick: Theme-list fallback keyboard hint first paint in theme HTML (**v0.1.1380**); install/kickstart.
 - ~05:28 tick: Product setting keyboard hint first paint in theme HTML (**v0.1.1379**); install/kickstart.
 - ~05:02 tick: Appearance section keyboard hint first paint in theme HTML (**v0.1.1378**); install/kickstart.
 - ~04:33 tick: Credentials section keyboard hint first paint in theme HTML (**v0.1.1377**); install/kickstart.
