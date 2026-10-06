@@ -20,6 +20,18 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1442
+
+- CPU window: Discord icon skips `is_discord_gateway_ready` on open/resume; localStorage last-known paint. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1441
+
+- CPU window: Settings credential Save/Clear wiring deferred to Settings open (not monitoring idle). P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1440
+
+- CPU window: collapsed Debug Log skips `read_debug_log` glance IPC. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1439
 
 - Idle-thought Ollama timeout warnings: one WARN per five minutes even when several channels time out together. Later lines in that window stay debug. P2 reliability / debug.log.

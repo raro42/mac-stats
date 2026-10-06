@@ -430,8 +430,6 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 let refreshInterval = null;
 /** Main CPU-window poll. Faster than this mostly hits the backend cache and still wakes WebKit. */
 const CPU_WINDOW_REFRESH_MS = 3600000;
-/** Discord menu-bar icon status — slow; pause while the window is hidden. */
-const DISCORD_ICON_STATUS_MS = 3600000;
 /** Top Processes list / glance cadence (match PROCESS_CACHE_TTL_SECS in metrics). */
 const PROCESS_LIST_REFRESH_MS = 3600000;
 let discordIconStatusInterval = null;
@@ -6077,6 +6075,7 @@ function applyDeferredResumeIdleWindowPolls() {
     const hc = window.historyCharts;
     if (hc && typeof hc.unpark === "function") hc.unpark();
   }
+  // Discord icon: localStorage paint only — skip is_discord_gateway_ready (#14).
   startDiscordIconStatus();
   // Collapsed Debug Log: skip read_debug_log glance IPC (glance hidden anyway, #14).
   if (typeof logsSectionCollapsed === "undefined" || !logsSectionCollapsed) {
@@ -6152,6 +6151,9 @@ function applyDeferredResumeIdleWindowPolls() {
       void window.__macStatsLoadProductToggleStates({ aiOnly: false });
     }
     // Credential / decorations status deferred from open (#14).
+    if (typeof window.__macStatsEnsureSettingsCredentialWiring === "function") {
+      window.__macStatsEnsureSettingsCredentialWiring();
+    }
     if (typeof window.__macStatsRefreshSettingsCredentialStatuses === "function") {
       window.__macStatsRefreshSettingsCredentialStatuses();
     }
@@ -11296,10 +11298,44 @@ function updateOllamaIconStatus(status) {
     : 'Hide AI Chat';
 }
 
+const DISCORD_GATEWAY_READY_LOCAL_KEY = 'discord_gateway_ready';
+
+function readDiscordReadyLocal() {
+  try {
+    const raw = localStorage.getItem(DISCORD_GATEWAY_READY_LOCAL_KEY);
+    if (raw === null) return null;
+    return raw === 'true';
+  } catch (_) {
+    return null;
+  }
+}
+
+function persistDiscordReadyLocal(ready) {
+  try {
+    localStorage.setItem(DISCORD_GATEWAY_READY_LOCAL_KEY, ready ? 'true' : 'false');
+  } catch (_) {}
+}
+
 function updateDiscordIconStatus(connected) {
+  persistDiscordReadyLocal(!!connected);
   const discordIcon = document.getElementById('icon-discord');
   if (!discordIcon) return;
   if (connected) {
+    discordIcon.classList.add('status-good');
+    discordIcon.title = 'Discord connected — click to disconnect';
+  } else {
+    discordIcon.classList.remove('status-good');
+    discordIcon.title = 'Discord disconnected — click to connect';
+  }
+}
+
+/** Last-known gateway paint — no is_discord_gateway_ready IPC (#14). */
+function paintDiscordIconFromLocal() {
+  const cached = readDiscordReadyLocal();
+  if (cached === null) return;
+  const discordIcon = document.getElementById('icon-discord');
+  if (!discordIcon) return;
+  if (cached) {
     discordIcon.classList.add('status-good');
     discordIcon.title = 'Discord connected — click to disconnect';
   } else {
@@ -11380,11 +11416,8 @@ function startDiscordIconStatus() {
   stopDiscordIconStatus();
   // macOS often keeps visibilityState=visible when another app is frontmost (#14).
   if (windowWorkPaused()) return;
-  refreshDiscordIconStatus();
-  discordIconStatusInterval = setInterval(() => {
-    if (windowWorkPaused()) return;
-    refreshDiscordIconStatus();
-  }, DISCORD_ICON_STATUS_MS);
+  // Common open/resume: cache only. IPC on click / Settings (#14).
+  paintDiscordIconFromLocal();
 }
 
 function initDiscordIconStatus() {
@@ -11397,6 +11430,8 @@ function initDiscordIconStatus() {
   }
   startDiscordIconStatus();
 }
+
+window.refreshDiscordIconStatus = refreshDiscordIconStatus;
 
 function showAddMonitorDialog() {
   console.log('showAddMonitorDialog called');
@@ -25305,6 +25340,25 @@ function initHistoryControls() {
   }
 }
 
+/**
+ * Settings Save/Clear + status APIs. Monitoring idle used to wire every
+ * credential pane; Settings is closed on the common path (#14).
+ */
+function ensureSettingsCredentialWiring() {
+  if (window.__macStatsSettingsCredentialWired) return;
+  window.__macStatsSettingsCredentialWired = true;
+  initBraveSettings();
+  initRedmineSettings();
+  initMastodonSettings();
+  initMcpSettings();
+  initBrowserSettings();
+  initCursorAgentSettings();
+  initTelegramSettings();
+  initSlackSettings();
+  initSignalSettings();
+}
+window.__macStatsEnsureSettingsCredentialWiring = ensureSettingsCredentialWiring;
+
 // Initialize monitoring features when DOM is ready
 function initMonitoringFeatures() {
   if (window.__macStatsMonitoringFeaturesStarted) return;
@@ -25321,15 +25375,7 @@ function initMonitoringFeatures() {
     initCollapsibleSections();
     initMonitorsSection();
     initPerplexitySection();
-    initBraveSettings();
-    initRedmineSettings();
-    initMastodonSettings();
-    initMcpSettings();
-    initBrowserSettings();
-    initCursorAgentSettings();
-    initTelegramSettings();
-    initSlackSettings();
-    initSignalSettings();
+    // Settings credential Save/Clear wiring waits for Settings open (#14).
     initLogsSection();
     initDiskCleanupSection();
     initOllamaSection();

@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1442] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Discord menu-bar icon no longer calls `is_discord_gateway_ready` on monitoring warm-up or focus resume (no hourly poll on the common open path). Last-known connected state paints from localStorage. Clicking the icon still toggles the gateway; opening Settings still checks. Aim: quieter `tauri://localhost` / Graphics and Media on the common open path.
+
+## [0.1.1441] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Settings credential Save/Clear (Brave, Redmine, Mastodon, MCP, Browser, Cursor, Telegram, Slack, Signal) wires on Settings open, not on monitoring idle. Status IPC still waits until Settings is open. Aim: quieter `tauri://localhost` / Graphics and Media on the common open path, and Save works as soon as Settings opens.
+
 ## [0.1.1440] - 2026-10-06
 
 ### Changed

@@ -471,6 +471,10 @@
     if (typeof window.__macStatsLoadWindowDecorationsPreference === "function") {
       void window.__macStatsLoadWindowDecorationsPreference();
     }
+    // Save/Clear + status APIs: not on monitoring idle (#14).
+    if (typeof window.__macStatsEnsureSettingsCredentialWiring === "function") {
+      window.__macStatsEnsureSettingsCredentialWiring();
+    }
     if (!uiWorkPaused()) {
       refreshSettingsCredentialStatuses();
     }
@@ -4433,6 +4437,14 @@
         } catch (_) {
           /* ignore mid-flight park */
         }
+      }
+    }
+    // Gateway icon is not token status — check once when Settings opens (#14).
+    if (typeof window.refreshDiscordIconStatus === "function") {
+      try {
+        void window.refreshDiscordIconStatus();
+      } catch (_) {
+        /* ignore mid-flight park */
       }
     }
   }

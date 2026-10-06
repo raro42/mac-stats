@@ -22,6 +22,36 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1442** (follow-up after v0.1.1441).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Discord icon skips gateway IPC on open/resume):
+
+- `src/cpu.js` — `startDiscordIconStatus` paints last-known `discord_gateway_ready` from localStorage (no `is_discord_gateway_ready`, no hourly interval). `updateDiscordIconStatus` persists that cache. Icon click still toggles via gateway IPC.
+- `src/cpu-ui.js` — opening Settings still calls `refreshDiscordIconStatus` once (with credential status fan-out).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s without opening Settings. Confirm no `is_discord_gateway_ready` until Discord icon click or Settings open. Icon may show last-known green/off from localStorage. Click icon — gateway toggle still works. Open Settings — gateway check runs. Alt-tab during that check — no icon paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1441)
+
+Version **v0.1.1441** (follow-up after v0.1.1440).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Settings credential DOM wiring deferred to Settings open):
+
+- `src/cpu.js` — `ensureSettingsCredentialWiring()` runs Brave/Redmine/Mastodon/MCP/Browser/Cursor/Telegram/Slack/Signal Save/Clear once. `initMonitoringFeatures` no longer calls those inits. Focus resume still ensures wiring if Settings stayed open.
+- `src/cpu-ui.js` — `openSettingsModal` ensures wiring before credential status IPC and toolbar keyboard.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s without opening Settings. Confirm no Brave/Redmine/… Save handlers until Settings opens. Open Settings — Save/Clear and status glances work. Alt-tab during status refresh — no glance paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1440)
+
 Version **v0.1.1440** (follow-up after v0.1.1439).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
