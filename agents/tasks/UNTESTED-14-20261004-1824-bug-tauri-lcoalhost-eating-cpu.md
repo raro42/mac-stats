@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1535** (follow-up after v0.1.1534).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Redmine Save Saved flash skip glass blend):
+
+- `src/agent-ops.css` — `#redmine-save.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Press Redmine Save. Confirm the Saved flash still shows green on the save control, then reverts. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1534)
+
 Version **v0.1.1534** (follow-up after v0.1.1533).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -5687,3 +5701,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Monitors; add a monitor and press Save; confirm the Saved flash still shows green on the add control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1534)
+
+**Date:** 2026-10-06 13:54 UTC (15:54 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1534**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1534)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Perplexity Save key Saved flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1534**
+- `CHANGELOG.md` **[0.1.1534]** documents the Perplexity Save key Saved flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `#perplexity-save-key.is-just-saved` mixes against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/cpu.js` matches `src-tauri/dist/cpu.js`. After a successful save, `flashPerplexityKeyBtn(saveBtn, 'Saved')` calls `flashSaveButton(btn, { savedLabel, durationMs: 1600 })` which adds `.is-just-saved`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Perplexity Save key success flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Perplexity Save key Saved flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Perplexity settings; press Save key; confirm the Saved flash still shows green on the save control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
