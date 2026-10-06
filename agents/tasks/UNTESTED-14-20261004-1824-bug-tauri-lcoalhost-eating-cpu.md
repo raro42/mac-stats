@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1480** (follow-up after v0.1.1479).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (AI Chat offline attention glance skip glass blend):
+
+- `src/agent-ops.css` — AI Chat offline attention glance mixes offline, no-model, not-set, circuit, ready, continue, sending, filter, errors, last-answer, and copied washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm AI Chat offline attention glance still shows offline / no-model / ready / continue / sending / filter / errors / last-answer / copied wash when that pane is on. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1479)
+
 Version **v0.1.1479** (follow-up after v0.1.1478).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -3675,4 +3689,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat last-answer glance still shows ready / error / copied wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1479)
+
+**Date:** 2026-10-06 08:02 UTC (10:02 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1479**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1479)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 AI Chat errors glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1479**
+- `CHANGELOG.md` **[0.1.1479]** documents the AI Chat errors glance mixing the failed-turn wash against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css`: `.chat-errors-glance` (base, hover, `:focus-visible`, `.has-errors`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/ollama.js` `applyChatErrorsGlanceState` still copies failed-turn (`has-errors`) onto `#chat-errors-glance` when the AI Chat pane is expanded
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): `applyChatErrorsGlanceState` returns after `syncOllamaCollapsedGlance` when the section is collapsed, so the errors glance paint is the expanded-pane path. MacOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque AI Chat errors glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat errors glance still shows the failed-turn wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 

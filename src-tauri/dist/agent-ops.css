@@ -4654,6 +4654,7 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* AI Chat — Offline / No-model / Ready / Continue attention glance (Errors parity; expanded) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .chat-offline-attention-glance {
   display: flex;
   align-items: center;
@@ -4662,8 +4663,8 @@ textarea.ops-agent-editor.is-dirty {
   margin: 2px 0 2px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font-size: 13px;
   font-weight: 520;
   line-height: 1.35;
@@ -4671,7 +4672,6 @@ textarea.ops-agent-editor.is-dirty {
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -4680,83 +4680,83 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .chat-offline-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .chat-offline-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 /* Soft alert (Monitors Slow / Down soft 7%/30% parity). */
 .chat-offline-attention-glance.is-offline {
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
 }
 
 .chat-offline-attention-glance.is-circuit {
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 52%, currentColor);
 }
 
 .chat-offline-attention-glance.is-no-model {
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 48%, currentColor);
 }
 
 .chat-offline-attention-glance.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
 /* Calm wash when Chat · Ready (model-online / empty Ready / Monitors all-up parity). */
 .chat-offline-attention-glance.is-ready {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: inherit;
 }
 
 .chat-offline-attention-glance.is-continue {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   color: color-mix(in srgb, var(--accent, #007aff) 48%, currentColor);
 }
 
 .chat-offline-attention-glance.is-sending {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 38%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 38%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ffffff);
   color: color-mix(in srgb, var(--accent, #007aff) 55%, currentColor);
 }
 
 .chat-offline-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 5.5%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 5.5%, #ffffff);
   color: color-mix(in srgb, var(--accent, #007aff) 42%, currentColor);
 }
 
 .chat-offline-attention-glance.is-errors {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
 /* Last-answer attention calm (Ready / chat-answer-glance soft 7% parity). */
 .chat-offline-attention-glance.is-last-answer {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: color-mix(in srgb, #34c759 50%, currentColor);
 }
 
 .chat-offline-attention-glance.is-just-copied {
-  border-color: color-mix(in srgb, #34c759 42%, transparent);
-  background: color-mix(in srgb, #34c759 14%, transparent);
+  border-color: color-mix(in srgb, #34c759 42%, #ffffff);
+  background: color-mix(in srgb, #34c759 14%, #ffffff);
   color: color-mix(in srgb, #34c759 62%, currentColor);
 }
 
