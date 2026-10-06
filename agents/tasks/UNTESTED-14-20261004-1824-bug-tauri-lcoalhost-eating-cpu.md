@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1576** (follow-up after v0.1.1575).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Monitors row Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.monitor-item.is-just-copied` mixes the green wash against opaque `#ffffff`. Opaque border. No glass outline shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors. Click a monitor row to copy the URL (or select a row and press `c`). Confirm the Copied flash still shows green on the row, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1575)
+
 Version **v0.1.1575** (follow-up after v0.1.1574).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

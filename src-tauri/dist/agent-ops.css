@@ -7157,10 +7157,11 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Click / c copy URL — green Copied wash (Top Processes / Disk Cleanup parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item.is-just-copied {
-  background: color-mix(in srgb, #34c759 12%, transparent);
-  border-color: color-mix(in srgb, #34c759 32%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 32%, #ffffff);
+  box-shadow: none;
 }
 
 .monitor-item.is-just-copied::after {
