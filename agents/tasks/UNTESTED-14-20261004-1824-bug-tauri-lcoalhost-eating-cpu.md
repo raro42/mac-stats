@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1489** (follow-up after v0.1.1488).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Agent Ops Filter attention glance skip glass blend):
+
+- `src/agent-ops.css` — Agent Ops Filter attention glance mixes All, On/Live/Jobs/Core/Instant/Lite/Direct, Off/Files/Deliveries/Discord, Slow, and Fail washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops and pick On, Off, Live, Files, Jobs, Deliveries, Discord, Core, Instant, Lite, Direct, Slow, or Fail. Confirm Filter glance still shows that wash. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1488)
+
 Version **v0.1.1488** (follow-up after v0.1.1487).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -4010,3 +4024,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Debug Log; confirm Error/Warn glance still shows error / warn-only wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1488)
+
+**Date:** 2026-10-06 08:54 UTC (10:54 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1488**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1488)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops Runs Fail/Slow attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1488**
+- `CHANGELOG.md` **[0.1.1488]** documents the Agent Ops Runs Fail/Slow glance mixing fail and slow washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css`: `.ops-runs-attention-glance` (base, hover, `:focus-visible`, `.has-fail`, `.has-slow`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/agent-ops.js` `applyOpsRunsAttentionGlanceState` still copies those mode classes onto `#ops-runs-attention-glance` when Agent Ops is expanded and recent runs have Fail or Slow hits (hidden when collapsed, when both counts are zero, or when the Runs Fail/Slow filter glance already owns the lane)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + fail/slow path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops Runs Fail/Slow attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Fail/Slow glance still shows fail / slow wash when a failed or slow run is listed; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+

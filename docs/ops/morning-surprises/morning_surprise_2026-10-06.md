@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1489** | The Agent Ops Filter glance mixes All, On/Live/Jobs/Core/Instant/Lite/Direct, Off/Files/Deliveries/Discord, Slow, and Fail washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1488** | The Agent Ops Runs Fail/Slow glance mixes fail and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1487** | The Debug Log Error/Warn glance mixes error and warn-only washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1486** | The Disk Cleanup Reclaim/Due glance mixes Big, Reclaim, and Due washes against an opaque fill. No glass alpha or hover shadow. |
