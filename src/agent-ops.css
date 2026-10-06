@@ -9113,9 +9113,10 @@ button.is-just-saved,
 }
 
 /* Force Quit — green success flash on destructive control */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #force-quit-process-btn.is-just-saved {
-  background: rgba(52, 199, 89, 0.95) !important;
-  border-color: transparent !important;
+  background: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ffffff) !important;
   color: #fff !important;
   animation: none;
   box-shadow: none;
