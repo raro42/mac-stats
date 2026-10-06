@@ -1,12 +1,11 @@
-# Coder — #14 v0.1.1432
+# Coder — #14 v0.1.1433
 
 ## Plan
-- [x] Park Settings credential status refreshes (Brave…Slack) mid-flight
-- [x] Park Agent Ops digest refresh mid-flight; skip flash while away
-- [x] Buffer AI Chat stream chunks while parked; flush on resume
-- [x] Bump to v0.1.1432; CHANGELOG; sync-dist
+- [x] Park Settings product-toggle IPC/DOM (cpu-ui) mid-flight; defer non-AI until Settings open
+- [x] Park Discord settings status + decorations/changelog/version paint while occluded
+- [x] Bump to v0.1.1433; CHANGELOG; sync-dist
 - [x] `cargo check` in src-tauri/
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1432** for GitHub #14. Settings status / digest / chat-stream park while occluded; resume flushes stream buffer. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1433** for GitHub #14. Product toggles AI-only on open; Discord / decorations / changelog / version park while occluded; resume reloads AI (+ full Product if Settings open). Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).

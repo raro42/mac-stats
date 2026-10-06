@@ -6088,6 +6088,18 @@ function applyDeferredResumeIdleWindowPolls() {
   if (window.Ollama && typeof window.Ollama.flushParkedStream === "function") {
     window.Ollama.flushParkedStream();
   }
+  // Product toggles: recheck AI visibility if open-path load was parked (#14).
+  if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
+    void window.__macStatsLoadProductToggleStatesAiOnly();
+  }
+  // Settings open while away: finish full Product toggle fan-out on resume (#14).
+  if (
+    typeof window.isSettingsModalOpen === "function" &&
+    window.isSettingsModalOpen() &&
+    typeof window.__macStatsLoadProductToggleStates === "function"
+  ) {
+    void window.__macStatsLoadProductToggleStates({ aiOnly: false });
+  }
   // Monitors: restart light summary poll (full list only when expanded).
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {

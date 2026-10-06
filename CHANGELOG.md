@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1433] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Settings Product toggles load AI visibility only on open; judge / downloads / Ori / Having Fun / voice STT / compact fan-out waits until Settings opens. Discord settings status, decorations preference, changelog Markdown rebuild, and footer version inject skip IPC and DOM when the shell is parked (mid-flight drop after alt-tab). Settings open rAF glance batch and AI-enabled event paint also bail while away; focus resume rechecks AI visibility (and full Product toggles if Settings is still open). Aim: quieter `tauri://localhost` / Graphics and Media on open and when Settings warm-up finishes while away.
+
 ## [0.1.1432] - 2026-10-06
 
 ### Changed

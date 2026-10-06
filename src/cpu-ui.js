@@ -26,6 +26,18 @@
     }
     return null;
   }
+
+  /** Shared #14 park gate (cpu.js) — fall back to document.hidden. */
+  function uiWorkPaused() {
+    try {
+      if (typeof window.__macStatsWindowWorkPaused === "function") {
+        return !!window.__macStatsWindowWorkPaused();
+      }
+    } catch (_) {
+      /* ignore */
+    }
+    return typeof document !== "undefined" && !!document.hidden;
+  }
   function getSavedTheme() {
     return localStorage.getItem("theme") || "apple";
   }
@@ -417,8 +429,14 @@
         settingsModal.setAttribute("aria-labelledby", title.id);
       }
     }
-    if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
-    if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+    // Full Product toggles (judge/downloads/…) deferred from open (#14).
+    if (typeof window.__macStatsLoadProductToggleStates === "function") {
+      void window.__macStatsLoadProductToggleStates({ aiOnly: false });
+    }
+    if (!uiWorkPaused()) {
+      if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
+      if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+    }
     const discordSetting = document.getElementById("discord-setting");
     if (
       discordSetting &&
@@ -509,6 +527,8 @@
     const productSetting = settingsModal.querySelector("#product-setting");
     if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
     requestAnimationFrame(() => {
+      // Alt-tab before Settings rAF: skip focus + glance paint (#14).
+      if (uiWorkPaused()) return;
       const closeBtn = document.getElementById("close-settings");
       if (closeBtn) {
         refreshModalHeaderRovingTabindex(
@@ -3873,51 +3893,93 @@
       }
     };
 
-    (async () => {
+    /**
+     * Load Product toggle state from the backend.
+     * Open path: AI only (gates icon/section visibility).
+     * Full fan-out waits for Settings open so open does not stack 8+ IPC (#14).
+     */
+    async function loadProductToggleStates(opts) {
+      const aiOnly = !!(opts && opts.aiOnly);
+      // Parked: skip product-toggle IPC + glance paint (#14).
+      if (uiWorkPaused()) return;
       try {
         const invoke = getInvoke();
         if (!invoke) return;
-        if (aiToggle) aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
-        applySettingsAiAttentionGlanceState();
+        if (aiToggle) {
+          aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
+          if (uiWorkPaused()) return;
+          applyAiUiVisibility(aiToggle.checked);
+          if (!aiOnly) applySettingsAiAttentionGlanceState();
+        } else if (!aiOnly) {
+          applyAiUiVisibility(true);
+        }
+        if (aiOnly) return;
+
         if (judgeToggle) {
+          if (uiWorkPaused()) return;
           judgeToggle.checked = !!(await invoke("get_agent_judge_enabled"));
         }
         if (judgeFailureOnlyToggle) {
+          if (uiWorkPaused()) return;
           judgeFailureOnlyToggle.checked = !!(await invoke(
             "get_agent_judge_on_failure_only"
           ));
         }
+        if (uiWorkPaused()) return;
         syncJudgeFailureOnlyEnabled();
         applySettingsJudgeAttentionGlanceState();
         if (downloadsToggle) {
+          if (uiWorkPaused()) return;
           const st = await invoke("get_downloads_organizer_status");
+          if (uiWorkPaused()) return;
           downloadsToggle.checked = !!(st && st.enabled);
         }
         applySettingsDownloadsAttentionGlanceState();
         if (oriToggle) {
+          if (uiWorkPaused()) return;
           oriToggle.checked = !!(await invoke("get_ori_lifecycle_enabled"));
+          if (uiWorkPaused()) return;
         }
         applySettingsOriAttentionGlanceState();
         if (havingFunToggle) {
+          if (uiWorkPaused()) return;
           havingFunToggle.checked = !!(await invoke("get_having_fun_enabled"));
+          if (uiWorkPaused()) return;
         }
         applySettingsHavingFunAttentionGlanceState();
         if (voiceSttToggle) {
+          if (uiWorkPaused()) return;
           voiceSttToggle.checked = !!(await invoke(
             "get_discord_voice_stt_enabled"
           ));
+          if (uiWorkPaused()) return;
         }
         applySettingsVoiceSttAttentionGlanceState();
-        if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
+        if (compactToggle) {
+          if (uiWorkPaused()) return;
+          compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
+          if (uiWorkPaused()) return;
+        }
         if (cpuWindowCompactToggle) {
-          cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
+          if (uiWorkPaused()) return;
+          cpuWindowCompactToggle.checked = !!(await invoke(
+            "get_cpu_window_compact"
+          ));
+          if (uiWorkPaused()) return;
         }
         applySettingsCompactAttentionGlanceState();
-        applyAiUiVisibility(aiToggle ? aiToggle.checked : true);
+        applySettingsAiAttentionGlanceState();
       } catch (e) {
         console.warn("product toggles load", e);
       }
-    })();
+    }
+
+    // Open: AI visibility only. Full toggles load when Settings opens (#14).
+    void loadProductToggleStates({ aiOnly: true });
+    window.__macStatsLoadProductToggleStates = (opts) =>
+      loadProductToggleStates(opts || { aiOnly: false });
+    window.__macStatsLoadProductToggleStatesAiOnly = () =>
+      loadProductToggleStates({ aiOnly: true });
 
     if (aiToggle) {
       aiToggle.addEventListener("change", async () => {
@@ -3925,6 +3987,7 @@
           const invoke = getInvoke();
           if (!invoke) return;
           const v = await invoke("set_ai_agent_enabled", { enabled: aiToggle.checked });
+          if (uiWorkPaused()) return;
           applyAiUiVisibility(!!v);
           applySettingsAiAttentionGlanceState();
           flashToggleLabelSaved(aiToggle);
@@ -3937,6 +4000,8 @@
       try {
         const { listen } = window.__TAURI__.event;
         listen("ai-agent-enabled-changed", (ev) => {
+          // Parked: drop toggle/icon paint until focus (#14).
+          if (uiWorkPaused()) return;
           const on = !!ev.payload;
           aiToggle.checked = on;
           applyAiUiVisibility(on);
@@ -4282,10 +4347,14 @@
 
       // Load saved preference from Tauri command (reads from config file)
       async function loadPreference() {
+        // Parked: skip decorations IPC + toggle paint (#14).
+        if (uiWorkPaused()) return;
         try {
           const invoke = getInvoke();
           if (invoke) {
             const decorations = await invoke("get_window_decorations");
+            // Alt-tab during get_window_decorations: drop toggle paint (#14).
+            if (uiWorkPaused()) return;
             toggle.checked = decorations;
             // Also sync to localStorage for consistency
             localStorage.setItem("windowDecorations", decorations.toString());
@@ -4296,6 +4365,7 @@
             toggle.checked = decorations;
           }
         } catch (err) {
+          if (uiWorkPaused()) return;
           console.error("Failed to load window decorations preference:", err);
           // Fallback to localStorage
           const saved = localStorage.getItem("windowDecorations");
@@ -4610,6 +4680,8 @@
     wireChangelogBodyToolbarKeyboard(changelogBody);
     
     (async () => {
+      // Parked: skip changelog IPC + Markdown DOM rebuild (#14).
+      if (uiWorkPaused()) return;
       try {
         const invoke = getInvoke();
         if (!invoke) {
@@ -4621,6 +4693,8 @@
 
         console.log("Calling get_changelog Tauri command...");
         const changelogText = await invoke("get_changelog");
+        // Alt-tab during get_changelog: drop Markdown rebuild (#14).
+        if (uiWorkPaused()) return;
         console.log("Changelog received, length:", changelogText?.length || 0);
         
         if (!changelogText || changelogText.trim().length === 0) {
@@ -4631,9 +4705,11 @@
         
         // Convert markdown to HTML (simple conversion for changelog format)
         const html = convertMarkdownToHtml(changelogText);
+        if (uiWorkPaused()) return;
         changelogBody.innerHTML = html;
         wireChangelogBodyToolbarKeyboard(changelogBody);
       } catch (error) {
+        if (uiWorkPaused()) return;
         console.error("Failed to load changelog:", error);
         const errorMessage = error?.toString() || String(error) || "Unknown error";
         changelogBody.innerHTML = `<div class="changelog-error">Failed to load changelog:<br><br>${errorMessage}<br><br>Please ensure the app has been rebuilt after adding the changelog feature.</div>`;
@@ -4645,6 +4721,8 @@
   async function injectAppVersion() {
     // OPTIMIZATION Phase 2: Cache app version in localStorage
     // Fetch app version from Rust backend and inject into all version elements
+    // Parked: skip version IPC + footer DOM (#14).
+    if (uiWorkPaused()) return;
     try {
       let version = localStorage.getItem('appVersion');
 
@@ -4657,6 +4735,15 @@
         }
 
         version = await invoke("get_app_version");
+        if (uiWorkPaused()) {
+          // Keep cache even when parked so resume can paint without IPC.
+          try {
+            if (version) localStorage.setItem('appVersion', version);
+          } catch (_) {
+            /* ignore */
+          }
+          return;
+        }
 
         // Cache for future loads
         try {
@@ -4665,6 +4752,8 @@
           console.warn("Failed to cache version:", e);
         }
       }
+
+      if (uiWorkPaused()) return;
 
       // Update all version elements (theme name varies per theme)
       // .theme-version, .arch-version, etc.

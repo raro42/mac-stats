@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1433** (follow-up after v0.1.1432).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Settings Product toggles defer + Discord / decorations / changelog park):
+
+- `src/cpu-ui.js` — Product toggles load AI visibility only on open; judge / downloads / Ori / Having Fun / voice STT / compact wait until Settings opens. Shared `uiWorkPaused` gate. Mid-flight drop for decorations preference, changelog Markdown rebuild, footer version inject, Settings open rAF glance batch, and AI-enabled event paint. Focus resume rechecks AI (and full Product toggles if Settings is still open).
+- `src/discord.js` — `refreshStatus` skips IPC and glance paint while parked (start + mid-flight).
+- `src/cpu.js` — deferred resume reloads Product toggle AI visibility / Settings fan-out after park.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Confirm Product toggles beyond AI do not fan-out until Settings opens. Open Settings and/or Changelog, then alt-tab before IPC returns — Product glances / Discord status / decorations toggle / changelog body / footer version must not paint while away. Alt-tab back — AI visibility and open Settings fan-out refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1432)
+
 Version **v0.1.1432** (follow-up after v0.1.1431).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -33,8 +49,6 @@ Changes (Settings status + digest + chat stream park):
 - `src/ollama.js` — stream chunks buffer while `ollamaWorkPaused` and flush on resume; final answer while parked uses plain text only (no Markdown / filter / scroll).
 
 Tester: open CPU window on macOS (already focused), warm ≥30s. Open Settings (or trigger a credential status refresh) and/or start an AI Chat stream / Agent Ops Refresh digest, then alt-tab before IPC returns — Settings glances / digest flash / stream scroll must not paint while away. Alt-tab back — status re-open or stream flush refreshes; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
-
----
 
 ## Prior implementation (v0.1.1431)
 

@@ -32,7 +32,21 @@
     statusEl.style.fontWeight = isSuccess ? "600" : "inherit";
   }
 
+  /** Shared #14 park gate (cpu.js) — fall back to document.hidden. */
+  function discordWorkPaused() {
+    try {
+      if (typeof window.__macStatsWindowWorkPaused === "function") {
+        return !!window.__macStatsWindowWorkPaused();
+      }
+    } catch (_) {
+      /* ignore */
+    }
+    return typeof document !== "undefined" && !!document.hidden;
+  }
+
   async function refreshStatus() {
+    // Parked: skip Discord key-status IPC + Settings glance paint (#14).
+    if (discordWorkPaused()) return;
     const statusEl = document.getElementById("discord-status");
     if (!statusEl) return;
     const invoke = getInvoke();
@@ -43,14 +57,18 @@
     }
     try {
       const configured = await invoke("is_discord_configured");
+      // Alt-tab during is_discord_configured: drop status/glance paint (#14).
+      if (discordWorkPaused()) return;
       statusEl.textContent = configured
         ? "Configured"
         : "Not configured";
       statusEl.style.fontWeight = "";
       statusEl.style.color = "";
     } catch (_) {
+      if (discordWorkPaused()) return;
       statusEl.textContent = "Unknown";
     }
+    if (discordWorkPaused()) return;
     if (
       typeof window.applySettingsDiscordTokenAttentionGlanceState === "function"
     ) {
