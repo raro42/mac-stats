@@ -22,6 +22,30 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1477** (follow-up after v0.1.1476).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (AI Chat turn glance skip glass blend):
+
+- `src/agent-ops.css` — AI Chat turn glance mixes sending and calm washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm AI Chat turn glance still shows sending / calm wash when that pane is on. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1476)
+
+Version **v0.1.1476** (follow-up after v0.1.1475).
+
+Changes (hover lift / press scale):
+
+- `src/agent-ops.css` — Agent Ops, process rows, logs, and Disk Cleanup no longer lift on hover or scale on press. Copied badges sit with margin, not a vertical translate.
+
+---
+
+## Prior implementation (v0.1.1475)
+
 Version **v0.1.1475** (follow-up after v0.1.1474).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -3513,4 +3537,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm sparklines still show hot / calm / Fair wash under the gauges; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1475)
+
+**Date:** 2026-10-06 07:38 UTC (09:38 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1475**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1475)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 AI Chat model glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1475**
+- `CHANGELOG.md` **[0.1.1475]** documents the AI Chat model / connection glance mixing online, no-model, offline, and circuit washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css`: `.chat-model-glance` (base, hover, `:focus-visible`, `.is-online`, `.is-online.is-no-model`, `.is-offline`, `.is-offline.is-circuit`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/ollama.js` `applyChatModelGlanceState` still copies online / no-model / offline / circuit washes onto `#chat-model-glance` when the AI Chat pane is expanded
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): `applyChatModelGlanceState` returns after `syncOllamaCollapsedGlance` when the section is collapsed, so the model glance paint is the expanded-pane path. MacOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque AI Chat model glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat model glance still shows online / no-model / offline / circuit wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
