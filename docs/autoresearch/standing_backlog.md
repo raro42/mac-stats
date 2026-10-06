@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1458
+
+- Section icons skip transform layers. Hover and press do not lift or scale those chips. The Monitors status dot uses offset, not translate. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1457
 
 - Header Refresh and Settings skip transform layers. The divider uses offset, not translate. Hover and press do not lift or scale those buttons. P2 reliability / GitHub #14.

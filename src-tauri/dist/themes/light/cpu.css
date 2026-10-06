@@ -1329,7 +1329,8 @@ body {
   padding: 0;
   cursor: pointer;
   color: rgba(12, 12, 16, 0.42);
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   border-radius: 9px;
   flex-shrink: 0;
   -webkit-font-smoothing: antialiased;
@@ -1343,7 +1344,7 @@ body {
 }
 
 .icon-line-item:active {
-  transform: scale(0.96);
+  transform: none;
 }
 
 .icon-line-item svg {
@@ -1384,7 +1385,6 @@ body {
   background: color-mix(in srgb, #34c759 10%, transparent);
   border-color: color-mix(in srgb, #34c759 36%, transparent);
   box-shadow: 0 3px 10px color-mix(in srgb, #34c759 10%, transparent);
-  transform: translateY(-1px);
 }
 
 .icon-line-item.status-good svg {
@@ -1903,8 +1903,9 @@ body {
   display: inline-block;
   position: absolute;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  top: calc(50% - 3px);
+  transform: none;
   pointer-events: none;
 }
 

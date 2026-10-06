@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1458** (follow-up after v0.1.1457).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (section icons / Monitors status skip transform layers):
+
+- Theme `cpu.css` — section icons have no transform tween, hover lift, or press scale. The Monitors status dot sits with size and offset.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm section icons still open panes. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1457)
+
 Version **v0.1.1457** (follow-up after v0.1.1456).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
