@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1520** (follow-up after v0.1.1519).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Settings Compact On attention glance skip glass blend):
+
+- `src/agent-ops.css` — Settings Compact glance mixes the on wash against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Product. Confirm Compact On glance still shows on wash when a compact toggle is on. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1519)
+
 Version **v0.1.1519** (follow-up after v0.1.1518).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -5060,3 +5074,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Credentials; confirm Signal glance still shows not-wired wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+## Test report (v0.1.1519)
+
+**Date:** 2026-10-06 12:11 UTC (14:11 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1519**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1519)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings AI Off attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1519**
+- `CHANGELOG.md` **[0.1.1519]** documents the Settings AI Off glance mixing the off wash against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.settings-ai-attention-glance` (base, hover, `:focus-visible`, `.is-off`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. `applySettingsAiAttentionGlanceState` adds `.is-off` onto `#settings-ai-attention-glance` when Settings is open and `#ai-agent-enabled-toggle` is unchecked. Hidden when Settings is closed or AI is on. Copy: "AI · Off · enable local AI"
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings → Product path while the local AI agent toggle is off. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings AI Off attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Product; confirm AI Off glance still shows off wash when the AI agent toggle is off; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
