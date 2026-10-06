@@ -3910,3 +3910,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 3. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a green `cargo test` plus a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes and pick Pinned or Hot; confirm Filter glance still shows All / Pinned / Hot wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1486)
+
+**Date:** 2026-10-06 08:42 UTC (10:42 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1486**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1486)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Disk Cleanup Reclaim/Due attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1486**
+- `CHANGELOG.md` **[0.1.1486]** documents the Disk Cleanup Reclaim/Due glance mixing Big, Reclaim, and Due washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css`: `.disk-cleanup-attention-glance` (base, hover, `:focus-visible`, `.has-big`, `.has-reclaim`, `.is-due`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/cpu.js` `applyDiskCleanupAttentionGlanceState` still copies those mode classes onto `#disk-cleanup-attention-glance` when Disk Cleanup is expanded and reclaim/big/due is on (hidden when collapsed, empty, or when the Filter attention glance already owns the filter)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + reclaim/due path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Disk Cleanup Reclaim/Due attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; confirm Reclaim/Due glance still shows Big / Reclaim / Due wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
