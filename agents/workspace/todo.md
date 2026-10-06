@@ -8,7 +8,7 @@
 - [x] Defer Agent Ops init + slow open-section retries
 - [x] Bump 0.1.1414, CHANGELOG, sync-dist
 - [x] cargo check; rename WIP→UNTESTED
-- [ ] commit + push origin/main
+- [x] commit + push origin/main
 
 ## Review
-Shipped v0.1.1414 open-path IPC deferrals. Task at `UNTESTED-14-…`. Issue #14 left open.
+Shipped `566bec58` v0.1.1414. Task at `UNTESTED-14-…`. Issue #14 left open.
