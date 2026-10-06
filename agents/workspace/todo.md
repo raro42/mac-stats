@@ -1,10 +1,11 @@
-# WIP-14 (v0.1.1443) — collapsed Monitors localStorage icon
+# Coder — #14 v0.1.1443
 
-- [x] Pick lowest GitHub FEAT/WIP (`WIP-14`)
-- [x] Implement: collapsed Monitors skips `list_monitor_statuses`; paint from localStorage
-- [x] `cargo check` in `src-tauri/` (pass; pre-existing warnings only)
-- [x] Rename `WIP-14-…` → `UNTESTED-14-…`
-- [ ] Commit + push `origin/main` (do not close #14)
+## Plan
+- [x] Collapsed Monitors: skip `list_monitor_statuses`; last-known icon from localStorage
+- [x] Persist cache in `updateMonitorsIconStatus`; expand still hydrates
+- [x] Bump to v0.1.1443; CHANGELOG; sync-dist; task notes
+- [x] `cargo check`
+- [x] Commit + push; do not close #14
 
 ## Review
-Shipped v0.1.1443: collapsed Monitors paints last-known icon wash from localStorage (no `list_monitor_statuses` / hourly poll). Expand still hydrates. Hand off to tester; leave GitHub #14 open.
+Shipped **v0.1.1443** for GitHub #14. Collapsed Monitors skips `list_monitor_statuses` and paints last-known icon wash from localStorage. Issue left open for tester / 004 (macOS Activity Monitor).
