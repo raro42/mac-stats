@@ -4975,6 +4975,7 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Debug Log — Error/Warn attention glance (Monitors Down/Slow / Hot parity; expanded) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .logs-attention-glance {
   display: flex;
   align-items: center;
@@ -4983,8 +4984,8 @@ textarea.ops-agent-editor.is-dirty {
   margin: 2px 0 6px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font-size: 13px;
   font-weight: 520;
   line-height: 1.35;
@@ -4992,7 +4993,6 @@ textarea.ops-agent-editor.is-dirty {
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -5001,27 +5001,27 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .logs-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .logs-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 /* Error count — soft alert (Monitors Down soft 7%/30% parity). */
 .logs-attention-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
   color: color-mix(in srgb, #ff3b30 48%, currentColor);
 }
 
 .logs-attention-glance.has-warns-only {
-  border-color: color-mix(in srgb, #ff9500 26%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 26%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 42%, currentColor);
 }
 

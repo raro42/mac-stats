@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1487
+
+- Debug Log Error/Warn attention glance mixes error and warn-only washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1486
 
 - Disk Cleanup Reclaim/Due attention glance mixes Big, Reclaim, and Due washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
