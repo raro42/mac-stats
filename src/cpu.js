@@ -2796,9 +2796,18 @@ function stopRefresh() {
   }
 }
 
+function setHistoryGpuUnparkedClass(on) {
+  try {
+    document.documentElement.classList.toggle("is-history-gpu-unparked", !!on);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 /** Sparkline / data-poster GPU: unpark on resume, Refresh, or history hover — not open idle (#14). */
 function unparkCpuWindowHistoryGpu() {
   if (windowOccluded() || windowPollsPaused) return;
+  setHistoryGpuUnparkedClass(true);
   const hist = window.themeHistory;
   if (hist && typeof hist.unpark === "function") {
     hist.unpark();
@@ -6032,6 +6041,7 @@ function pauseIdleWindowPolls() {
     window.__macStatsPauseAgentOpsPolls();
   }
   // Drop sparkline GPU backing stores while occluded (#14).
+  setHistoryGpuUnparkedClass(false);
   const hist = window.themeHistory;
   if (hist && typeof hist.park === "function") {
     hist.park();
@@ -6056,6 +6066,7 @@ function applyDeferredResumeIdleWindowPolls() {
   if (windowPollsPaused || document.hidden) return;
   // Arm slow metrics interval on idle — not on the focus event (#14).
   if (!refreshInterval) startRefresh();
+  setHistoryGpuUnparkedClass(true);
   const hist = window.themeHistory;
   if (hist && typeof hist.unpark === "function") {
     hist.unpark();
@@ -11693,8 +11704,8 @@ function initOllamaSection() {
   syncSectionIcon('icon-ollama', !ollamaCollapsed);
   if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
     window.Ollama.syncCollapsedGlance();
-  } else {
-    // Ollama module may load after this init — retry once for collapsed glance.
+  } else if (!ollamaCollapsed) {
+    // Expand path only: collapsed open must not arm a 250ms wake (#14).
     setTimeout(() => {
       if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
         window.Ollama.syncCollapsedGlance();

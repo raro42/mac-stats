@@ -25,6 +25,13 @@
     return "#8bb4e8";
   }
 
+  let COLORS = null;
+
+  function ensureColors() {
+    if (!COLORS) COLORS = getColors();
+    return COLORS;
+  }
+
   function getColors() {
     const sampleElement = document.body || document.documentElement;
     const computedStyle = window.getComputedStyle(sampleElement);
@@ -46,8 +53,6 @@
     }
     return out;
   }
-
-  let COLORS = getColors();
 
   const dataBuffers = {
     temperature: { line: new Array(LINE_CHART_POINTS).fill(EMPTY_POINT) },
@@ -111,10 +116,31 @@
     }
   }
 
+  function setHistoryGpuUnparkedClass(on) {
+    try {
+      document.documentElement.classList.toggle("is-history-gpu-unparked", !!on);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function bindCanvasElements() {
+    canvases = {
+      temperature: document.getElementById("temperature-history-chart"),
+      usage: document.getElementById("usage-history-chart"),
+      gpu: document.getElementById("gpu-history-chart"),
+      frequency: document.getElementById("frequency-history-chart"),
+    };
+  }
+
   function parkCanvases() {
     canvasesParked = true;
+    setHistoryGpuUnparkedClass(false);
     // Drop pending focus/visibility unpark so blur does not still alloc GPU (#14).
     cancelDeferredUnparkCanvases();
+    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
+      bindCanvasElements();
+    }
     Object.keys(canvases).forEach((metric) => {
       const canvas = canvases[metric];
       if (!canvas) return;
@@ -139,6 +165,7 @@
   function unparkCanvases() {
     if (!canvasesParked && Object.keys(contexts).length) return;
     canvasesParked = false;
+    setHistoryGpuUnparkedClass(true);
     Object.keys(canvases).forEach((metric) => {
       const canvas = canvases[metric];
       if (!canvas) return;
@@ -150,8 +177,11 @@
         /* ignore */
       }
     });
+    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
+      bindCanvasElements();
+    }
     initializeCanvases();
-    COLORS = getColors();
+    ensureColors();
     Object.keys(dataBuffers).forEach((metric) => {
       if (contexts[metric] && canvasIsPaintable(metric)) drawLineChart(metric);
     });
@@ -213,12 +243,7 @@
   }
 
   function initializeCanvases() {
-    canvases = {
-      temperature: document.getElementById("temperature-history-chart"),
-      usage: document.getElementById("usage-history-chart"),
-      gpu: document.getElementById("gpu-history-chart"),
-      frequency: document.getElementById("frequency-history-chart"),
-    };
+    bindCanvasElements();
     contexts = {};
     Object.keys(canvases).forEach((metric) => {
       delete canvasLayoutCache[metric];
@@ -260,7 +285,8 @@
     const ctx = contexts[metric];
     if (!canvas || !ctx) return;
     const buffer = dataBuffers[metric];
-    const colors = COLORS[metric] || COLORS.usage;
+    const palette = ensureColors();
+    const colors = palette[metric] || palette.usage;
     const { width, height } = canvasLayoutSize(canvas);
     const finiteValues = buffer.line.filter((val) => Number.isFinite(val));
     const backdrop = sparklineBackdrop();
@@ -408,7 +434,7 @@
     }
     if (canvasesParked || windowOccluded()) return true;
     if (!canvases.usage) initializeCanvases();
-    COLORS = getColors();
+    ensureColors();
     Object.keys(dataBuffers).forEach((metric) => {
       if (!contexts[metric] && canvases[metric]) setupCanvas(metric);
       if (contexts[metric] && canvasIsPaintable(metric)) drawLineChart(metric);
@@ -425,25 +451,17 @@
     park: parkCanvases,
     unpark: unparkCanvases,
     init: () => {
-      if (windowOccluded()) {
-        canvasesParked = true;
-        return;
-      }
-      canvasesParked = false;
-      initializeCanvases();
-      COLORS = getColors();
-      Object.keys(canvases).forEach((metric) => {
-        if (canvases[metric] && contexts[metric]) drawLineChart(metric);
-      });
+      // Stay parked through open. Resize / geometry restore must not alloc GPU (#14).
+      bindCanvasElements();
+      parkCanvases();
     },
     refreshLayout: () => {
-      if (windowOccluded()) {
-        parkCanvases();
+      if (windowOccluded() || canvasesParked) {
+        if (windowOccluded()) parkCanvases();
         return;
       }
-      canvasesParked = false;
       initializeCanvases();
-      COLORS = getColors();
+      ensureColors();
       Object.keys(canvases).forEach((metric) => {
         if (canvases[metric] && contexts[metric]) drawLineChart(metric);
       });
@@ -472,7 +490,7 @@
       if (windowOccluded()) return;
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        if (windowOccluded()) return;
+        if (windowOccluded() || canvasesParked) return;
         api.refreshLayout();
       }, 200);
     });
@@ -485,7 +503,8 @@
   }
 
   function boot() {
-    // Stay parked through open. Buffer samples while parked. cpu.js unparks (#14).
+    // Bind + hide DOM canvases. Empty canvases{} used to skip park on open (#14).
+    bindCanvasElements();
     parkCanvases();
     wireListeners();
   }

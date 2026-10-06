@@ -94,8 +94,15 @@
     return false;
   }
 
+  function setHistoryGpuUnparkedClass(on) {
+    try {
+      document.documentElement.classList.toggle('is-history-gpu-unparked', !!on);
+    } catch (_) { /* ignore */ }
+  }
+
   function parkPosterCanvases() {
     canvasesParked = true;
+    setHistoryGpuUnparkedClass(false);
     Object.keys(canvases).forEach((metric) => {
       ['bar', 'line'].forEach((kind) => {
         const canvas = canvases[metric] && canvases[metric][kind];
@@ -137,6 +144,7 @@
   function unparkPosterCanvases() {
     if (posterWorkPaused()) return;
     canvasesParked = false;
+    setHistoryGpuUnparkedClass(true);
     Object.keys(canvases).forEach((metric) => {
       const pair = canvases[metric];
       if (!pair || !pair.bar || !pair.line) return;

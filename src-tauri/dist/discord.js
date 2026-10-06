@@ -541,16 +541,13 @@
 
   window.Discord = { refreshStatus: refreshStatus };
 
-  function runInit() {
+  let discordSettingsWired = false;
+  function ensureDiscordSettingsWired() {
+    if (discordSettingsWired) return;
+    discordSettingsWired = true;
     init();
   }
+  window.__macStatsEnsureDiscordSettingsWiring = ensureDiscordSettingsWired;
 
-  // Defer init so Tauri inject runs first (theme page loads after redirect)
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      setTimeout(runInit, 100);
-    });
-  } else {
-    setTimeout(runInit, 100);
-  }
+  // Settings Save/Clear only — do not arm a 100ms timer on every CPU-window open (#14).
 })();

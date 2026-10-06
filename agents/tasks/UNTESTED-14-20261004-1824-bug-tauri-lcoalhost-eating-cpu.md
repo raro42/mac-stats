@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1451** (follow-up after v0.1.1450).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (sparkline GPU stays parked through open resize):
+
+- `src/chart-line.js` — bind canvas nodes on boot so park actually hides HTML canvases (empty map skipped park). `refreshLayout` / `init` stay parked. No `getComputedStyle` at parse. Resize does not unpark.
+- `src/cpu.js` / `src/agent-ops.css` — `html.is-history-gpu-unparked` gates compositor; canvases stay `display:none` until hover / Refresh / resume.
+- `src/discord.js` — Settings Save/Clear wires on Settings open (no 100ms open timer).
+- `src/cpu-ui.js` — skip open-path version DOM walk; drop changelog idle rescan.
+- `src/cpu.js` — collapsed AI Chat skips the 250ms glance retry.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm history canvases stay hidden / 1×1 until hover or Refresh. Gauges still update. Hover history or press Refresh — sparklines draw. Alt-tab away and back — unpark on resume idle. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1450)
+
 Version **v0.1.1450** (follow-up after v0.1.1449).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -2507,3 +2525,42 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with Agent Ops collapsed (default); confirm no Agent Ops list/filter IPC (`list_agents`, `list_live_sessions`, …) until expand; expand Agent Ops — overview, tabs, and refresh still work; capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens and hydrates; toggle a section — persist still writes; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1450)
+
+**Date:** 2026-10-06 04:32 UTC (06:32 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1450**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1450)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 keep sparkline GPU parked on focused open)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1450**
+- `CHANGELOG.md` **[0.1.1450]** documents parked sparkline/data-poster canvases after first metrics poll; hover / Refresh / alt-tab resume unpark; theme markup 1×1; data-poster unpark caps DPR at 1 and opaque context
+- `src/cpu.js` — first `get_cpu_details` `afterFirst` no longer unparks history GPU (`requestIdleCallback` idle would still alloc). `unparkCpuWindowHistoryGpu` + hover on history; `applyDeferredResumeIdleWindowPolls` unparks on resume idle. Injected GPU sparkline canvas is 1×1
+- `src/cpu-ui.js` — Refresh click calls `__macStatsUnparkHistoryGpu` before `refreshData`
+- `src/chart-line.js` — park on blur/hidden only; no focus/visibility unpark; boot stays parked
+- Theme `cpu.html` history canvases start at `width="1" height="1"` (including data-poster bars/lines)
+- `src-tauri/dist/themes/data-poster/poster-charts.js` — `sizePosterCanvas` caps DPR at 1 and `getContext('2d', { alpha: false })`
+- `src-tauri/dist/cpu.js`, `cpu-ui.js`, `chart-line.js` match the park/unpark comments
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 sparkline park-on-open cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm history canvases stay 1×1 / hidden until hover or Refresh; gauges still update; hover history or press Refresh — sparklines draw; alt-tab away and back — unpark on resume idle; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

@@ -99,6 +99,25 @@ svg.ring,
 }
 
 /*
+ * Bind+park used to miss HTML canvases (empty JS map). Keep sparkline /
+ * data-poster bitmaps out of the compositor until hover / Refresh / resume (#14).
+ */
+html:not(.is-history-gpu-unparked) .history-chart-container canvas,
+html:not(.is-history-gpu-unparked) #temperature-history-chart,
+html:not(.is-history-gpu-unparked) #usage-history-chart,
+html:not(.is-history-gpu-unparked) #gpu-history-chart,
+html:not(.is-history-gpu-unparked) #frequency-history-chart,
+html:not(.is-history-gpu-unparked) .poster-metrics canvas.bar-chart,
+html:not(.is-history-gpu-unparked) .poster-metrics canvas.line-chart {
+  display: none !important;
+  visibility: hidden !important;
+  content-visibility: hidden !important;
+  contain: strict !important;
+  width: 1px !important;
+  height: 1px !important;
+}
+
+/*
  * Ring cards / SVG rings: contain paint so WebKit does not keep four gauge
  * layers compositing when only text values change (#14).
  */

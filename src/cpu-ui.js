@@ -475,6 +475,9 @@
     if (typeof window.__macStatsEnsureSettingsCredentialWiring === "function") {
       window.__macStatsEnsureSettingsCredentialWiring();
     }
+    if (typeof window.__macStatsEnsureDiscordSettingsWiring === "function") {
+      window.__macStatsEnsureDiscordSettingsWiring();
+    }
     if (!uiWorkPaused()) {
       refreshSettingsCredentialStatuses();
     }
@@ -5321,15 +5324,7 @@
       });
     };
     wireVersionClicks();
-    // injectAppVersion() also wires clicks; one idle follow-up for late DOM (#14).
-    // No body MutationObserver — wildcard rescans wake WebKit on every tick.
-    const scheduleWire =
-      typeof window.requestIdleCallback === "function"
-        ? (fn) => window.requestIdleCallback(fn, { timeout: 2000 })
-        : (fn) => window.setTimeout(fn, 0);
-    scheduleWire(() => {
-      if (!uiWorkPaused()) wireVersionClicks();
-    });
+    // No idle follow-up rescan — that woke WebKit ~2s after open (#14).
 
     // Close modal handlers
     if (closeChangelog) {
@@ -5379,7 +5374,8 @@
     initProductToggles();
     // Initialize changelog modal first, then inject version (so version elements are ready)
     initChangelogModal();
-    injectAppVersion();
+    // Footer version: cpu.js fetchAppVersion (idle after gauges). Skip
+    // injectAppVersion here — wildcard [class*='version'] walks the tree on open (#14).
   }
 
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;
