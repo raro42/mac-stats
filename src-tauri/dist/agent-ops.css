@@ -9164,6 +9164,15 @@ button.is-just-saved,
   box-shadow: none;
 }
 
+/* Brave Search Save key (settings-btn-primary) — solid green flash */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+#brave-save-key.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
 /* Settings Reset to monitor defaults — soft green flash */
 #settings-reset-defaults-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, transparent) !important;
