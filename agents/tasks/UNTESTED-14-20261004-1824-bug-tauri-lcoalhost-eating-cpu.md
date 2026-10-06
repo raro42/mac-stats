@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1418** (follow-up after v0.1.1416 / tree had v0.1.1417 FEAT-D468).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (defer first metrics further + focus-gated Agent Ops):
+
+- `src/cpu.js` — first `get_cpu_details` idle ≤**60s** on focus/open (was 30s). `wireCpuWindowDomOnce` runs inside `startCpuWindowMetricsOnce` (not open paint). Sparkline `unpark` idle ≤**60s** after first poll. Focus resume version/update IPC idle ≤**120s**. Monitoring features idle ≤**600s**.
+- `src/agent-ops.js` — Agent Ops init idle ≤**600s**; no longer arms on `DOMContentLoaded` (cpu.js `scheduleMonitoringFeaturesOnce` calls `__macStatsScheduleAgentOpsInit`).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Rings appear after idle metrics; sparklines unpark shortly after. Monitors / Agent Ops wire after longer idle. Alt-tab away and watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1416)
+
 Version **v0.1.1416** (follow-up after v0.1.1415).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

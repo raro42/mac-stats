@@ -10761,22 +10761,19 @@ function escapeHtml(s) {
   }
 
   // Defer Agent Ops DOM wiring past first gauge paint (#14).
+  // Do not arm on DOMContentLoaded — cpu.js schedules after focus/monitoring (#14).
   function scheduleInitAgentOps() {
     if (window.__macStatsAgentOpsInitScheduled) return;
     window.__macStatsAgentOpsInitScheduled = true;
     const start = () => initAgentOps();
     if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(start, { timeout: 300000 });
+      window.requestIdleCallback(start, { timeout: 600000 });
     } else {
-      setTimeout(start, 300000);
+      setTimeout(start, 600000);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scheduleInitAgentOps);
-  } else {
-    scheduleInitAgentOps();
-  }
+  window.__macStatsScheduleAgentOpsInit = scheduleInitAgentOps;
 
   window.addEventListener('beforeunload', () => stopAgentOpsAutoRefresh());
 

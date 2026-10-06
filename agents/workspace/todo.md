@@ -1,13 +1,16 @@
-# Session todo — FEAT-D468 virtual orbitals overflow
+# Session todo — WIP-14 tauri://localhost CPU (#14)
 
-No GitHub `FEAT-*` / `WIP-*` under `agents/tasks/` (only `UNTESTED-14-…`). Open/deferred FEAT-D empty after D467 → add and implement **FEAT-D468**.
+GitHub WIP-14 is the lowest-numbered open GitHub task. Continue WebView idle cuts.
 
-- [x] Add `virtual orbitals exceed` / `virtual orbital exceed` arm in `content_reduction/mod.rs` (ident-boundary + context-slot guard, parallel to occupied/canonical)
-- [x] Unit tests in `content_reduction/tests.rs` (positives, HTTP/no-slot negatives, micro/meta/sub compounds)
-- [x] FEATURE-CODER.md: Recently closed + When empty → D468
-- [x] CHANGELOG + bump `0.1.1417`
-- [x] `cargo check` + targeted `cargo test` for overflow
+- [x] Defer first metrics idle ≤60s; wire DOM with metrics arm
+- [x] Defer sparkline unpark ≤60s after first poll
+- [x] Focus-gate Agent Ops (no DOMContentLoaded); monitoring/Agent Ops idle ≤600s
+- [x] Defer version IPC on focus resume ≤120s
+- [x] CHANGELOG + bump `0.1.1418`
+- [x] `cargo check` in `src-tauri/`
+- [x] Rename WIP-14 → UNTESTED-14
 - [ ] Commit + push `origin/main`
+- [x] Do **not** close GitHub #14
 
 ## Review
-Shipped **FEAT-D468** / v0.1.1417: `is_context_overflow_error` recognizes `virtual orbitals exceed` / `virtual orbital exceed` with the same context-slot + ident-boundary rules as occupied/canonical. No GitHub issue to close. `UNTESTED-14-…` left for tester.
+Shipped **v0.1.1418** #14 follow-up: metrics idle ≤60s, DOM wire with metrics, deferred sparkline unpark, focus-gated Agent Ops (600s), deferred version IPC on resume. `cargo check` pass. Left as UNTESTED for macOS Activity Monitor pass. Issue #14 stays open.
