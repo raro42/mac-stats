@@ -1147,14 +1147,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  /* Opaque chips — glass alpha stays in Graphics and Media (#14). */
+  background: #16161e;
+  border: 1px solid #3a3a44;
   box-shadow: none;
   padding: 0;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.95);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
   border-radius: 9px;
   flex-shrink: 0;
   -webkit-font-smoothing: antialiased;
@@ -1163,8 +1164,8 @@ body {
 
 .icon-line-item:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.36);
+  background: #1e1e28;
+  border-color: #4a4a54;
 }
 
 .icon-line-item:active {
@@ -1199,16 +1200,16 @@ body {
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
   color: rgba(36, 160, 90, 0.78);
-  background: color-mix(in srgb, #34c759 7%, transparent);
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
   color: rgba(36, 160, 90, 0.92);
-  background: color-mix(in srgb, #34c759 10%, transparent);
-  border-color: color-mix(in srgb, #34c759 36%, transparent);
-  box-shadow: 0 3px 10px color-mix(in srgb, #34c759 10%, transparent);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 36%, #0b0b10);
+  box-shadow: none;
 }
 
 .icon-line-item.status-good svg {
@@ -1230,15 +1231,15 @@ body {
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
   color: rgba(200, 130, 20, 0.72);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
   color: rgba(200, 130, 20, 0.88);
-  background: color-mix(in srgb, #ff9f0a 10%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 36%, transparent);
+  background: color-mix(in srgb, #ff9f0a 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #0b0b10);
 }
 
 .icon-line-item.status-warning img {
@@ -1253,15 +1254,15 @@ body {
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
   color: rgba(200, 55, 50, 0.78);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
   color: rgba(200, 55, 50, 0.92);
-  background: color-mix(in srgb, #ff3b30 10%, transparent);
-  border-color: color-mix(in srgb, #ff3b30 36%, transparent);
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 36%, #0b0b10);
 }
 
 .icon-line-item.status-bad svg {

@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1461
+
+- Section icon chips use opaque fills. No glass alpha, inset highlight, or hover drop shadow. Status washes mix against an opaque color. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1460
 
 - Ring numbers and the line under them center without `transform: translate`. Those labels no longer keep a Graphics and Media layer on the open CPU window. P2 reliability / GitHub #14.

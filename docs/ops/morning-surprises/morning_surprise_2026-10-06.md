@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1461** | Section icon chips sit on opaque fills. No glass alpha, inset highlight, or hover drop shadow. Status washes mix against an opaque color. |
 | **v0.1.1460** | Ring numbers and the line under them center without a translate. Those labels no longer keep a Graphics and Media layer while the window is open. |
 | **v0.1.1459** | Low Power Mode knob sits with left offset, not a translate. The battery strip does not keep a transform layer while LPM is on. |
 | **v0.1.1458** | Section icons skip transform layers. Hover and press do not lift or scale those chips. The Monitors status dot uses offset, not translate. |
