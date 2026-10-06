@@ -6172,17 +6172,21 @@ function applyDeferredResumeIdleWindowPolls() {
       void refreshMonitorsSettingsList();
     }
   }
-  // Monitors: restart light summary poll (full list only when expanded).
-  if (!monitorsUpdateInterval) {
+  // Monitors: collapsed uses last-known icon wash; expanded restarts list poll (#14).
+  if (monitorsCollapsed) {
+    if (monitorsUpdateInterval) {
+      clearInterval(monitorsUpdateInterval);
+      monitorsUpdateInterval = null;
+    }
+    paintMonitorsIconFromLocal();
+  } else if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
       if (windowWorkPaused()) return;
       updateMonitorsSummary();
-      if (!monitorsCollapsed) {
-        loadMonitors().then(() => {
-          if (windowWorkPaused()) return;
-          updateMonitorsHeight();
-        });
-      }
+      loadMonitors().then(() => {
+        if (windowWorkPaused()) return;
+        updateMonitorsHeight();
+      });
     }, 3600000);
   }
   // Process Details: blur cleared the live interval — re-arm if still open (#14).
@@ -7696,9 +7700,9 @@ function initMonitorsSection() {
 
   // Restore saved state before IPC — collapsed skips history + full list (#14).
   monitorsCollapsed = getMonitorsCollapsedState();
-  // Collapsed: icon/status summary only. Expanded: history + list + height (#14).
+  // Collapsed: last-known icon wash (no list_monitor_statuses). Expanded: history + list (#14).
   if (monitorsCollapsed) {
-    updateMonitorsSummary();
+    paintMonitorsIconFromLocal();
   } else {
     void ensureMonitorsListHydrated();
     updateMonitorsSummary();
@@ -7718,15 +7722,12 @@ function initMonitorsSection() {
     setIconPaneVisibility(section, content, monitorsCollapsed, divider);
 
     if (monitorsCollapsed) {
-      // Keep a light summary poll so the icon status stays fresh (no list rebuild).
+      // Last-known icon wash — no hourly list_monitor_statuses while collapsed (#14).
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
         monitorsUpdateInterval = null;
       }
-      monitorsUpdateInterval = setInterval(() => {
-        if (windowWorkPaused()) return;
-        updateMonitorsSummary();
-      }, 3600000);
+      paintMonitorsIconFromLocal();
     } else {
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -10242,8 +10243,12 @@ async function updateMonitorsSummary() {
   if (!summaryText) return;
   // Parked shell: skip monitors IPC + summary DOM (#14).
   if (windowWorkPaused()) return;
-  // Collapsed: icon wash only — skip summary prose (#14).
-  const iconOnly = !!monitorsCollapsed;
+  // Collapsed: last-known icon wash — skip list_monitor_statuses (#14).
+  if (monitorsCollapsed) {
+    paintMonitorsIconFromLocal();
+    return;
+  }
+  const iconOnly = false;
 
   try {
     // One IPC: ids + names/urls + cached statuses (no N+1 status/details, #14).
@@ -11241,6 +11246,7 @@ function updateMonitorsStatusDot() {
 }
 
 function updateMonitorsIconStatus({ anyDown = false, allUp = false, upCount = 0, totalCount = 0 } = {}) {
+  persistMonitorsIconStatusLocal({ anyDown, allUp, upCount, totalCount });
   const monitorsIcon = document.getElementById('icon-monitors');
   if (monitorsIcon) {
     monitorsIcon.classList.remove('status-good', 'status-bad');
@@ -11296,6 +11302,45 @@ function updateOllamaIconStatus(status) {
   ollamaIcon.title = ollamaCollapsed
     ? 'AI Chat (Ollama) · ↓ → glance'
     : 'Hide AI Chat';
+}
+
+const MONITORS_ICON_STATUS_LOCAL_KEY = 'monitors_icon_status';
+
+function readMonitorsIconStatusLocal() {
+  try {
+    const raw = localStorage.getItem(MONITORS_ICON_STATUS_LOCAL_KEY);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || typeof o !== 'object') return null;
+    return {
+      anyDown: !!o.anyDown,
+      allUp: !!o.allUp,
+      upCount: Number(o.upCount) || 0,
+      totalCount: Number(o.totalCount) || 0,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function persistMonitorsIconStatusLocal(st) {
+  try {
+    localStorage.setItem(
+      MONITORS_ICON_STATUS_LOCAL_KEY,
+      JSON.stringify({
+        anyDown: !!(st && st.anyDown),
+        allUp: !!(st && st.allUp),
+        upCount: Number(st && st.upCount) || 0,
+        totalCount: Number(st && st.totalCount) || 0,
+      })
+    );
+  } catch (_) {}
+}
+
+function paintMonitorsIconFromLocal() {
+  const cached = readMonitorsIconStatusLocal();
+  if (!cached) return;
+  updateMonitorsIconStatus(cached);
 }
 
 const DISCORD_GATEWAY_READY_LOCAL_KEY = 'discord_gateway_ready';

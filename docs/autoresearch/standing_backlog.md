@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1443
+
+- CPU window: collapsed Monitors skips `list_monitor_statuses`; last-known icon wash from localStorage. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1442
 
 - CPU window: Discord icon skips `is_discord_gateway_ready` on open/resume; localStorage last-known paint. P2 reliability / GitHub #14.

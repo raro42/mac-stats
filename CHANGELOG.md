@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1443] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Collapsed External / Monitors no longer calls `list_monitor_statuses` on monitoring warm-up, focus resume, or an hourly timer. The icon paints last-known up/down from localStorage. Expand still hydrates the list and refreshes the icon. Aim: quieter `tauri://localhost` / Graphics and Media when Monitors stays collapsed (the common open path).
+
 ## [0.1.1442] - 2026-10-06
 
 ### Changed

@@ -1,13 +1,10 @@
-# Tester — #14 v0.1.1442
+# WIP-14 (v0.1.1443) — collapsed Monitors localStorage icon
 
-## Plan
-- [x] Read `agents/testing/TESTER.md` + `agents/workspace/lessons.md`
-- [x] Pick GitHub TESTING task: `TESTING-14-…` (v0.1.1442 Discord icon gateway IPC skip)
-- [x] `cargo check` / `cargo test` in `src-tauri/`
-- [x] Static verify Discord localStorage paint + Settings/click IPC paths
-- [x] Read `~/.mac-stats/debug.log` (no #14-tied errors)
-- [x] Append test report; move to `WIP-14-…` (macOS Activity Monitor still required)
-- [x] Do **not** close GitHub #14
+- [x] Pick lowest GitHub FEAT/WIP (`WIP-14`)
+- [x] Implement: collapsed Monitors skips `list_monitor_statuses`; paint from localStorage
+- [x] `cargo check` in `src-tauri/` (pass; pre-existing warnings only)
+- [x] Rename `WIP-14-…` → `UNTESTED-14-…`
+- [ ] Commit + push `origin/main` (do not close #14)
 
 ## Review
-**FAIL → WIP.** Linux host: `cargo check` / `cargo test` pass for tree at **v0.1.1442**; static Discord icon gateway skip looks correct. Cannot prove issue bar (`<1%` `tauri://localhost` / Graphics and Media on macOS). Mid-run concurrent **v0.1.1443** draft notes appeared; not verified. Issue left open.
+Shipped v0.1.1443: collapsed Monitors paints last-known icon wash from localStorage (no `list_monitor_statuses` / hourly poll). Expand still hydrates. Hand off to tester; leave GitHub #14 open.
