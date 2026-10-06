@@ -1142,3 +1142,35 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1416 / tree at v0.1.1417)
+
+**Date:** 2026-10-06 00:29 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Preflight:** Task already under `agents/testing/active/TESTING-14-…` (GitHub #14). Implementation notes claim **v0.1.1416**; `src-tauri/Cargo.toml` is **0.1.1417** at verify time.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1417)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 focused-open monitoring schedule restore)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1417**
+- `src/cpu.js` — `init()` when `!windowOccluded()` calls `scheduleCpuWindowMetricsOnce(30000)` **and** `scheduleMonitoringFeaturesOnce()` (idle ≤300s); late open fallback also schedules monitoring; comment notes Focused(true) can race past load
+- `src/cpu.js` — `scheduleMonitoringFeaturesOnce` idle timeout **300000**; `resumeVisibleWindowWork` schedules monitoring and does **not** set `_forceProcessUpdate`
+- `src/agent-ops.js` — Agent Ops init idle ≤**300000**
+- Prior 3600s poll floor / occlusion park / Focused pause-resume / no idle sparkline unpark kept (`PROCESS_CACHE_TTL_SECS = 3600`)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 focused-open monitoring schedule restore.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
