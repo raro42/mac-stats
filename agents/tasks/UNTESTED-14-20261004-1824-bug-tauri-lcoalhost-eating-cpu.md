@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1426** (follow-up after v0.1.1425).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (mid-flight DOM / version / history-seed cancel while occluded):
+
+- `src/cpu.js` — blur/pause clears queued gauge/DOM `requestAnimationFrame` batches (`clearPendingDOMUpdates`). rAF callback drops the batch when already occluded/paused. Mid-flight `get_app_version` keeps the cache but skips footer/title/reload DOM; version tip/update chrome skipped after alt-tab. History-seed retry loop aborts while parked and skips sparkline/poster seed paint after history IPC returns occluded.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Trigger a metrics/version/history path then alt-tab before IPC returns — queued rAF / version tip / history seed must not paint while away. Alt-tab back — gauges and sections eventually wire; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1425)
+
 Version **v0.1.1425** (follow-up after v0.1.1424).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1507,3 +1521,32 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away during first minutes — open-path metrics idle / late fallback / sparkline unpark must not fire while away; alt-tab back — gauges eventually refresh) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1425)
+
+**Date:** 2026-10-06 01:26 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1425)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 structural occlusion cancel for remaining untracked idles)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1425**
+- `src/cpu.js` — `pauseIdleWindowPolls` cancels pending version IPC (`cancelDeferredCpuWindowVersionOnce`), after-first sparkline unpark (`cancelDeferredAfterFirstUnpark`), history seed (`cancelDeferredHistorySeed`), monitoring features (`cancelDeferredMonitoringFeaturesOnce`) plus prior open-path metrics / late-open / focus-resume cancels; `startCpuWindowVersionOnce` / `startCpuWindowMetricsOnce` / monitoring `start` bail without arming while occluded/paused; focus/resume re-schedules (`scheduleCpuWindowVersionOnce`, `scheduleMonitoringFeaturesOnce`); tracked idle handles present for those paths
+- `src/agent-ops.js` — `__macStatsPauseAgentOpsPolls` calls `__macStatsCancelAgentOpsInit`; init `start` bails without arming while occluded/unfocused and drops scheduled flag for re-schedule; exposes `__macStatsCancelAgentOpsInit` / `__macStatsScheduleAgentOpsInit`; init idle ≤**7200000**
+- Prior 3600s poll floor / occlusion park / Focused pause-resume kept (`PROCESS_CACHE_TTL_SECS = 3600`; `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 version/monitoring/Agent Ops occlusion-cancel cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away during first minutes — version IPC / after-first unpark / history seed / monitoring / Agent Ops init must not fire while away; alt-tab back — gauges and sections eventually wire) before CLOSED. Do **not** close GitHub #14.

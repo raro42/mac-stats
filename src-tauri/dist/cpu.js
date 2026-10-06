@@ -300,17 +300,28 @@ function setDocumentOccluded(occluded) {
   }
 }
 
+/** Drop queued rAF DOM work so blur does not still paint after park (#14). */
+function clearPendingDOMUpdates() {
+  pendingDOMUpdates = [];
+  domUpdateScheduled = false;
+}
+
 function scheduleDOMUpdate(updateFn) {
   // Occluded window: do not wake WebKit with rAF batches (#14).
-  if (windowOccluded()) return;
+  if (windowOccluded() || windowPollsPaused) return;
   pendingDOMUpdates.push(updateFn);
   if (!domUpdateScheduled) {
     domUpdateScheduled = true;
     requestAnimationFrame(() => {
-      // Apply all pending updates in one batch
-      pendingDOMUpdates.forEach(fn => fn());
-      pendingDOMUpdates = [];
       domUpdateScheduled = false;
+      // Alt-tab between schedule and rAF: drop the batch (#14).
+      if (windowOccluded() || windowPollsPaused) {
+        pendingDOMUpdates = [];
+        return;
+      }
+      // Apply all pending updates in one batch
+      pendingDOMUpdates.forEach((fn) => fn());
+      pendingDOMUpdates = [];
     });
   }
 }
@@ -2806,6 +2817,8 @@ function startCpuWindowVersionOnce() {
   if (windowOccluded() || windowPollsPaused) return;
   window.__macStatsCpuVersionArmed = true;
   fetchAppVersion().then((v) => {
+    // Alt-tab during version IPC: do not mount tip/update chrome (#14).
+    if (windowOccluded() || windowPollsPaused) return;
     showFirstLaunchTip();
     checkForAppUpdate(v);
   });
@@ -5553,6 +5566,10 @@ async function fetchAppVersion() {
 
   try {
     appVersionCache = await inv("get_app_version");
+    // Alt-tab during get_app_version: keep cache, skip DOM/reload wake (#14).
+    if (windowOccluded() || windowPollsPaused) {
+      return appVersionCache;
+    }
     try {
       document.title = "mac-stats · glad you're here";
     } catch (_) {}
@@ -5962,6 +5979,8 @@ function pauseIdleWindowPolls() {
   cancelDeferredAfterFirstUnpark();
   cancelDeferredHistorySeed();
   cancelDeferredMonitoringFeaturesOnce();
+  // Drop queued gauge/DOM rAF so a scheduled frame does not paint after park (#14).
+  clearPendingDOMUpdates();
   setDocumentOccluded(true);
   stopRefresh();
   stopDiscordIconStatus();
@@ -24826,6 +24845,8 @@ async function seedThemeHistoryFromBackend() {
   const inv = getInvoke() || (typeof invoke !== 'undefined' ? invoke : null);
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   for (let attempt = 0; attempt < 8; attempt++) {
+    // Blur mid-seed: stop retry IPC so parked WebView stays quiet (#14).
+    if (windowOccluded() || windowPollsPaused) return false;
     const canSeed =
       typeof window.themeHistory?.seedFromPoints === 'function' ||
       typeof window.posterCharts?.seedFromPoints === 'function';
@@ -24840,6 +24861,8 @@ async function seedThemeHistoryFromBackend() {
         timeRangeSeconds: 600,
         maxDisplayPoints: 2,
       });
+      // Alt-tab during history IPC: do not wake sparkline/poster paint (#14).
+      if (windowOccluded() || windowPollsPaused) return false;
       if (result?.points?.length) {
         if (typeof window.themeHistory?.seedFromPoints === 'function') {
           window.themeHistory.seedFromPoints(result.points);
