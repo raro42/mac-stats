@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1500** | The Agent Ops Telegram glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1499** | The Agent Ops Mastodon glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1498** | The Agent Ops Perplexity Search Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1497** | The Agent Ops Cursor Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
