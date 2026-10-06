@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1420
+
+- CPU window focus resume idle-defers sparkline unpark + Discord/logs/history/Disk Cleanup/Agent Ops/Monitors polls (≤30s). Blur cancels pending resume. Fixes resumeIdleWindowPolls undoing chart-line deferred unpark. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1416
 
 - CPU window focused-open restores `scheduleMonitoringFeaturesOnce` (idle ≤300s). v0.1.1415 left that to Focused/resume or the 10m late fallback; Focused can race past load. P2 reliability / GitHub #14.
