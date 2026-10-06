@@ -22,6 +22,26 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1522** (follow-up after v0.1.1521).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Settings Judge Off attention glance skip glass blend):
+
+- `src/agent-ops.css` — Settings Judge glance mixes the off wash against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Product. Confirm Judge Off glance still shows off wash when agent judge is off. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1521)
+
+Version **v0.1.1521** (follow-up after v0.1.1520). Origin shipped the Settings Voice STT Off opaque wash.
+
+---
+
+## Prior implementation (v0.1.1520)
+
 Version **v0.1.1520** (follow-up after v0.1.1519).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
