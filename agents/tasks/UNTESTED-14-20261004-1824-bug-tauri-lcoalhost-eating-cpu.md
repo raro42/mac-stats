@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1580** (follow-up after v0.1.1579).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (AI Chat message Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.chat-message[role='option'].is-just-copied` / `.chat-message[role='button'].is-just-copied` mixes the green wash against opaque `#ffffff`. No glass outline shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat. Click a message to copy (or select a message and press `c`). Confirm the Copied flash still shows green on the message, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1579)
+
 Version **v0.1.1579** (follow-up after v0.1.1578).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
