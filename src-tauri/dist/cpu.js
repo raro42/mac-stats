@@ -3526,14 +3526,15 @@ function ensureRamStripStyles() {
       border-radius: 50%;
       background: #fff;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
-      transition: transform 0.2s ease;
+      /* No transform tween — a transform layer stays in Graphics and Media (#14). */
     }
     .lpm-info.is-on .lpm-toggle {
       background: color-mix(in srgb, #30d158 85%, #fff);
       box-shadow: inset 0 0 0 1px color-mix(in srgb, #248a3d 40%, transparent);
     }
     .lpm-info.is-on .lpm-toggle::after {
-      transform: translateX(16px);
+      left: 18px;
+      transform: none;
     }
     .lpm-info.is-busy {
       opacity: 0.72;

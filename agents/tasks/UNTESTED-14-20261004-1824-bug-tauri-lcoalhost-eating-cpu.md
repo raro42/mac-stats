@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1459** (follow-up after v0.1.1458).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (LPM knob skip transform layer):
+
+- `src/cpu.js` — Low Power Mode knob uses `left: 18px` when on. No transform tween.
+- Theme `cpu.css` — same offset. The battery strip does not keep a translate layer while LPM is on.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm LPM knob still sits left (off) and right (on). Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1458)
+
 Version **v0.1.1458** (follow-up after v0.1.1457).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -2851,3 +2866,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Refresh and Settings still work; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1458)
+
+**Date:** 2026-10-06 05:38 UTC (07:38 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1458**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1458)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 section icons / Monitors status skip transform layers)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1458**
+- `CHANGELOG.md` **[0.1.1458]** documents section icons no longer keeping a transform layer; hover and press do not lift or scale those chips; Monitors status dot sits with size and offset
+- Theme `cpu.css` (all 9 themes): `.icon-line-item` has no transform tween (`transition` is color/background/border/box-shadow only). Hover is wash/color only (no lift). `:active` is `transform: none`
+- Theme `cpu.html`: section chips remain `class="icon-line-item"` (`#icon-monitors`, `#icon-ollama`, …)
+- `.monitors-status-dot` uses `top: calc(50% - 3px)` and `transform: none` (not `translateY`)
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 section-icon transform cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm section icons still open panes; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

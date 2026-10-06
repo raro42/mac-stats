@@ -1260,6 +1260,12 @@ body {
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
+}
+
+.lpm-info.is-on .lpm-toggle::after {
+  left: 18px;
+  transform: none;
 }
 
 .battery-icon {
