@@ -1959,3 +1959,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm credential/decorations IPC does not fan-out until Settings opens; open Monitors settings or click a process for Process Details, then alt-tab before IPC returns — Settings credential glances / Monitors settings list / Process Details modal must not paint while away; alt-tab back — open Settings fan-out and Monitors list refresh when still open) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1435)
+
+**Date:** 2026-10-06 02:48 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1435**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1435)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 monitoring idle park + Compact localStorage + drop duplicate Ollama configure)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1435**
+- `src/cpu.js` — `loadCpuUiSections` bails UI-state retry while parked and clears the promise (`parkBail`) so focus resume re-merges; `hydratePinnedProcessNamesFromDisk` skips start + mid-flight; Compact applies from localStorage via `applyCpuWindowCompactFromLocalStorage` / `initCpuWindowCompactPreference` (no `get_cpu_window_compact` on open); monitoring idle `initMonitoringFeatures` no longer calls `autoConfigureOllama` (comment: Ollama module init owns configure); focus resume retries UI-state / pin hydrate and re-applies Compact from localStorage when monitoring features started
+- `src/cpu-ui.js` — Settings Product toggle load syncs `get_cpu_window_compact` into localStorage + body class + compact layout; toggle change persists localStorage; boot path applies Compact from localStorage before Settings Product IPC
+- `src/agent-ops.js` — `loadCpuUiSections` wait loop and `take_open_ui_section` retries bail while `agentOpsWorkPaused`; collapsed state still applies from localStorage while parked
+- Prior v0.1.1434 credential/decorations / Process Details / Monitors settings park and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise and normal Linux CPU-window activity. No new errors tied to the #14 Compact localStorage / UI-state park / monitoring-idle Ollama configure cut.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm Compact layout can appear from localStorage without Settings open, and `get_cpu_window_compact` waits until Settings Product toggles; trigger monitoring idle / Agent Ops init, then alt-tab before UI-state or pin hydrate returns — section merge / pin disk sync / open-section capture must not continue while away; alt-tab back — UI-state re-merge and pin hydrate retry; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
