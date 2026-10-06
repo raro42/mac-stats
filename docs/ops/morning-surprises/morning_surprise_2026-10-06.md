@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1490** | The Agent Ops Digest glance mixes the open-candidate wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1489** | The Agent Ops Filter glance mixes All, On/Live/Jobs/Core/Instant/Lite/Direct, Off/Files/Deliveries/Discord, Slow, and Fail washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1488** | The Agent Ops Runs Fail/Slow glance mixes fail and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1487** | The Debug Log Error/Warn glance mixes error and warn-only washes against an opaque fill. No glass alpha or hover shadow. |
@@ -72,10 +73,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-A Disk Cleanup filter (All, Reclaim, Big, or Clean) no longer paints that glance with a glass blend. The fill is opaque.
+An Agent Ops Digest glance no longer paints an open queue with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Disk Cleanup Reclaim/Due glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches. Agent Ops filter glances still use a glass fill.
+- The Agent Ops Discord glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

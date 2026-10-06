@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1490
+
+- Agent Ops Digest glance mixes the open-candidate wash against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1489
 
 - Agent Ops Filter attention glance mixes All, On/Live/Jobs/Core/Instant/Lite/Direct, Off/Files/Deliveries/Discord, Slow, and Fail washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
