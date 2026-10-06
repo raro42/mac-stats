@@ -6,6 +6,11 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1526** | The header Refresh button stays dim while metrics load. It no longer spins. |
+| **v0.1.1525** | The Settings Having fun Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1524** | The Settings Ori Mnemos Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1523** | The Settings Downloads organizer Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1522** | The Settings Judge Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1521** | The Settings Voice STT glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1520** | The Settings Compact On glance mixes the on wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1519** | The Settings AI Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
@@ -104,10 +109,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-The Settings Voice STT glance no longer paints the off state with a glass blend. The fill is opaque.
+The header Refresh button no longer spins while metrics load. It stays dim. The rotate animation is gone.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Settings Judge glance still uses a glass fill. Downloads, Ori, and Having fun glances still use a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- Monitor tick tips still use a translate.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
