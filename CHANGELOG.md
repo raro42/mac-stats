@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1419] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — First `get_cpu_details` waits for idle (≤120s) on focus/open (was 60s). Sparkline GPU unpark waits for idle (≤120s) after the first poll. Focus/visibility sparkline unpark is idle-deferred (≤30s) so alt-tab back does not instantly reallocate canvas buffers. History seed on focus resume is idle-deferred (≤120s). Version/update IPC idle timeout is 300s. Monitoring features and Agent Ops init idle timeout is 900s. Aim: quieter `tauri://localhost` / Graphics and Media on open and after alt-tab.
+
+
 ## [0.1.1418] - 2026-10-06
 
 ### Changed

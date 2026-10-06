@@ -433,6 +433,20 @@
     window[name] = api;
   });
 
+  function scheduleUnparkCanvases(idleTimeoutMs) {
+    const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 30000;
+    const run = () => {
+      if (windowOccluded()) return;
+      unparkCanvases();
+    };
+    // Idle-defer GPU alloc so focus/resume does not stack with IPC (#14).
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(run, { timeout: ms });
+    } else {
+      setTimeout(run, ms);
+    }
+  }
+
   function wireListeners() {
     if (listenersWired) return;
     listenersWired = true;
@@ -445,13 +459,13 @@
         api.refreshLayout();
       }, 200);
     });
-    // Release sparkline GPU buffers when occluded; redraw on focus (#14).
+    // Park immediately when occluded; unpark on idle after focus (#14).
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) parkCanvases();
-      else unparkCanvases();
+      else scheduleUnparkCanvases(30000);
     });
     window.addEventListener("blur", parkCanvases);
-    window.addEventListener("focus", unparkCanvases);
+    window.addEventListener("focus", () => scheduleUnparkCanvases(30000));
   }
 
   function boot() {

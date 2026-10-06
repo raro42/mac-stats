@@ -2813,20 +2813,30 @@ function startCpuWindowVersionOnce() {
 function startCpuWindowMetricsOnce() {
   if (window.__macStatsCpuMetricsArmed) return;
   window.__macStatsCpuMetricsArmed = true;
+  // Rings/keyboard just before first poll — not on open paint (#14).
+  wireCpuWindowDomOnce();
   // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 120000 });
+    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 300000 });
   } else {
-    setTimeout(startCpuWindowVersionOnce, 120000);
+    setTimeout(startCpuWindowVersionOnce, 300000);
   }
   const afterFirst = () => {
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
     if (!refreshInterval) startRefresh();
-    // Sparkline GPU: unpark after first poll when focused (no idle timer) (#14).
+    // Sparkline GPU: defer unpark so first poll DOM + canvas alloc do not stack (#14).
     if (!windowOccluded()) {
-      const hist = window.themeHistory;
-      if (hist && typeof hist.unpark === "function") {
-        hist.unpark();
+      const unparkSparklines = () => {
+        if (windowOccluded()) return;
+        const hist = window.themeHistory;
+        if (hist && typeof hist.unpark === "function") {
+          hist.unpark();
+        }
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(unparkSparklines, { timeout: 120000 });
+      } else {
+        setTimeout(unparkSparklines, 120000);
       }
     }
   };
@@ -2845,7 +2855,7 @@ function startCpuWindowMetricsOnce() {
 
 /** Idle-defer first get_cpu_details so open paint does not stack IPC (#14). */
 function scheduleCpuWindowMetricsOnce(idleTimeoutMs) {
-  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 30000;
+  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 120000;
   if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: ms });
   } else {
@@ -2873,11 +2883,11 @@ function init() {
     setTimeout(lateOpenFallback, 600000);
   }
 
-  // Already focused on open: arm metrics on idle ≤30s (was 5s). Heavy
-  // sections still idle ≤300s so open does not stack with first gauges (#14).
+  // Already focused on open: arm metrics on idle ≤120s (was 60s). Heavy
+  // sections still idle ≤900s so open does not stack with first gauges (#14).
   // Keep scheduling here — Focused(true) can race past load (#14).
   if (!windowOccluded()) {
-    scheduleCpuWindowMetricsOnce(30000);
+    scheduleCpuWindowMetricsOnce(120000);
     scheduleMonitoringFeaturesOnce();
   }
 }
@@ -5773,12 +5783,21 @@ function resumeVisibleWindowWork() {
   scheduleMonitoringFeaturesOnce();
   if (invoke) {
     // Skip history reseed on rapid focus churn (alt-tab) — gauges refresh below (#14).
+    // Idle-defer seed so focus does not stack get_metrics_history with refresh (#14).
     if (
       !sparklineHistoryReady ||
       !lastSparklineSeedMs ||
       Date.now() - lastSparklineSeedMs >= 3600000
     ) {
-      void seedThemeHistoryFromBackend();
+      const seed = () => {
+        if (windowOccluded()) return;
+        void seedThemeHistoryFromBackend();
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(seed, { timeout: 120000 });
+      } else {
+        setTimeout(seed, 120000);
+      }
     }
     // Skip get_cpu_details IPC on focus if a poll already ran recently (#14).
     if (
@@ -5790,12 +5809,17 @@ function resumeVisibleWindowWork() {
     if (!refreshInterval) {
       startRefresh();
     }
-    startCpuWindowVersionOnce();
+    // Version/update IPC idle ≤300s — do not stack with focus refresh (#14).
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 300000 });
+    } else {
+      setTimeout(startCpuWindowVersionOnce, 300000);
+    }
     resumeIdleWindowPolls();
   } else {
     init();
-    // Defer first get_cpu_details (idle ≤30s) so open paint does not stack IPC (#14).
-    scheduleCpuWindowMetricsOnce(30000);
+    // Defer first get_cpu_details (idle ≤120s) so open paint does not stack IPC (#14).
+    scheduleCpuWindowMetricsOnce(120000);
   }
 }
 
@@ -24654,17 +24678,21 @@ function initMonitoringFeatures() {
 }
 
 /**
- * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤300s after
+ * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤900s after
  * focus/schedule so open does not stack with first gauge paint (#14).
  */
 function scheduleMonitoringFeaturesOnce() {
   if (window.__macStatsMonitoringFeaturesScheduled) return;
   window.__macStatsMonitoringFeaturesScheduled = true;
+  // Agent Ops was arming on DOMContentLoaded; gate it with monitoring (#14).
+  if (typeof window.__macStatsScheduleAgentOpsInit === "function") {
+    window.__macStatsScheduleAgentOpsInit();
+  }
   const start = () => initMonitoringFeatures();
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(start, { timeout: 300000 });
+    window.requestIdleCallback(start, { timeout: 900000 });
   } else {
-    setTimeout(start, 300000);
+    setTimeout(start, 900000);
   }
 }
 

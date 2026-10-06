@@ -2817,9 +2817,9 @@ function startCpuWindowMetricsOnce() {
   wireCpuWindowDomOnce();
   // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 120000 });
+    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 300000 });
   } else {
-    setTimeout(startCpuWindowVersionOnce, 120000);
+    setTimeout(startCpuWindowVersionOnce, 300000);
   }
   const afterFirst = () => {
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
@@ -2834,9 +2834,9 @@ function startCpuWindowMetricsOnce() {
         }
       };
       if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(unparkSparklines, { timeout: 60000 });
+        window.requestIdleCallback(unparkSparklines, { timeout: 120000 });
       } else {
-        setTimeout(unparkSparklines, 60000);
+        setTimeout(unparkSparklines, 120000);
       }
     }
   };
@@ -2855,7 +2855,7 @@ function startCpuWindowMetricsOnce() {
 
 /** Idle-defer first get_cpu_details so open paint does not stack IPC (#14). */
 function scheduleCpuWindowMetricsOnce(idleTimeoutMs) {
-  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 60000;
+  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 120000;
   if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: ms });
   } else {
@@ -2883,11 +2883,11 @@ function init() {
     setTimeout(lateOpenFallback, 600000);
   }
 
-  // Already focused on open: arm metrics on idle ≤60s (was 30s). Heavy
-  // sections still idle ≤600s so open does not stack with first gauges (#14).
+  // Already focused on open: arm metrics on idle ≤120s (was 60s). Heavy
+  // sections still idle ≤900s so open does not stack with first gauges (#14).
   // Keep scheduling here — Focused(true) can race past load (#14).
   if (!windowOccluded()) {
-    scheduleCpuWindowMetricsOnce(60000);
+    scheduleCpuWindowMetricsOnce(120000);
     scheduleMonitoringFeaturesOnce();
   }
 }
@@ -5783,12 +5783,21 @@ function resumeVisibleWindowWork() {
   scheduleMonitoringFeaturesOnce();
   if (invoke) {
     // Skip history reseed on rapid focus churn (alt-tab) — gauges refresh below (#14).
+    // Idle-defer seed so focus does not stack get_metrics_history with refresh (#14).
     if (
       !sparklineHistoryReady ||
       !lastSparklineSeedMs ||
       Date.now() - lastSparklineSeedMs >= 3600000
     ) {
-      void seedThemeHistoryFromBackend();
+      const seed = () => {
+        if (windowOccluded()) return;
+        void seedThemeHistoryFromBackend();
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(seed, { timeout: 120000 });
+      } else {
+        setTimeout(seed, 120000);
+      }
     }
     // Skip get_cpu_details IPC on focus if a poll already ran recently (#14).
     if (
@@ -5800,17 +5809,17 @@ function resumeVisibleWindowWork() {
     if (!refreshInterval) {
       startRefresh();
     }
-    // Version/update IPC idle ≤120s — do not stack with focus refresh (#14).
+    // Version/update IPC idle ≤300s — do not stack with focus refresh (#14).
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 120000 });
+      window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 300000 });
     } else {
-      setTimeout(startCpuWindowVersionOnce, 120000);
+      setTimeout(startCpuWindowVersionOnce, 300000);
     }
     resumeIdleWindowPolls();
   } else {
     init();
-    // Defer first get_cpu_details (idle ≤60s) so open paint does not stack IPC (#14).
-    scheduleCpuWindowMetricsOnce(60000);
+    // Defer first get_cpu_details (idle ≤120s) so open paint does not stack IPC (#14).
+    scheduleCpuWindowMetricsOnce(120000);
   }
 }
 
@@ -24669,7 +24678,7 @@ function initMonitoringFeatures() {
 }
 
 /**
- * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤600s after
+ * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤900s after
  * focus/schedule so open does not stack with first gauge paint (#14).
  */
 function scheduleMonitoringFeaturesOnce() {
@@ -24681,9 +24690,9 @@ function scheduleMonitoringFeaturesOnce() {
   }
   const start = () => initMonitoringFeatures();
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(start, { timeout: 600000 });
+    window.requestIdleCallback(start, { timeout: 900000 });
   } else {
-    setTimeout(start, 600000);
+    setTimeout(start, 900000);
   }
 }
 
