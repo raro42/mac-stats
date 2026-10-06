@@ -9,8 +9,8 @@ GitHub WIP-14 is the lowest-numbered open GitHub task. Continue WebView idle cut
 - [x] CHANGELOG + bump `0.1.1422`
 - [x] sync-dist + `cargo check` in `src-tauri/`
 - [x] Update WIP-14 implementation notes; rename → UNTESTED-14
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Do **not** close GitHub #14
 
 ## Review
-Shipped **v0.1.1422** #14 follow-up: defer first metrics / sparkline / history / version / monitoring / late fallback further; focus resume secondary polls and chart-line unpark idle ≤120s; focus `get_cpu_details` + metrics-interval re-arm idle-deferred ≤120s (cancelled on blur). `cargo check` pending/pass. Left as UNTESTED for macOS Activity Monitor pass. Issue #14 stays open.
+Shipped **v0.1.1422** #14 follow-up: defer first metrics / sparkline / history / version / monitoring / late fallback further; focus resume secondary polls and chart-line unpark idle ≤120s; focus `get_cpu_details` + metrics-interval re-arm idle-deferred ≤120s (cancelled on blur). `cargo check` pass. Left as UNTESTED for macOS Activity Monitor pass. Issue #14 stays open.
