@@ -6,6 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1443** | Collapsed External / Monitors skips `list_monitor_statuses` on open, resume, and the hourly timer. The icon paints last-known up/down from localStorage. Expand still hydrates the list. |
+| **v0.1.1442** | Discord icon skips `is_discord_gateway_ready` on open/resume. Last-known connected state paints from localStorage. Click and Settings still check. |
+| **v0.1.1441** | Settings credential Save/Clear (Brave through Signal) wires on Settings open, not on monitoring idle. |
+| **v0.1.1440** | Collapsed Debug Log skips `read_debug_log` glance IPC. Expand arms the glance poll. |
 | **v0.1.1439** | Idle-thought Ollama timeouts log one warning per five minutes, even when several fire in the same second. The rest stay debug. |
 | **v0.1.1438** | Monitors summary, list, and settings list use one `list_monitor_statuses` IPC. The 24h history probe waits until sparkline unpark or history seed. |
 | **v0.1.1437** | Collapsed External / Monitors skips history Map + full list IPC on monitoring warm-up. Icon wash uses a light `list_monitors` + `get_monitor_status` walk (no per-host details). Expand hydrates list/history once. |
@@ -22,10 +26,9 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Monitors stays collapsed for most open sessions. Skipping history + list rebuild (and host-detail IPC on the icon walk) cuts a fat fan-out that used to stack with every monitoring warm-up. Expand still gets the full list once.
+Monitors stays collapsed for most open sessions. After the bulk-status cut, the collapsed path still called `list_monitor_statuses` on every warm-up. Last-known icon wash from localStorage drops that IPC until you expand. Settings Save wiring waits until you open Settings, so monitoring idle is not attaching nine credential panes.
 
 ## Still open
 
-- ~20:00 tick: idle-thought timeout WARN is one line per burst (**v0.1.1439**). A duplicate changelog-hint commit on stale v0.1.1380 was dropped (already shipped as v0.1.1385).
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
