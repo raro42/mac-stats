@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1506** (follow-up after v0.1.1505).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Perplexity last-search glance skip glass blend):
+
+- `src/agent-ops.css` — Perplexity last-search glance mixes results, searching, error, key-needed, and ready washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Perplexity Search. Confirm last-search glance still shows results / searching / error / key-needed / ready wash. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1505)
+
 Version **v0.1.1505** (follow-up after v0.1.1504).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -4575,3 +4589,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity Search; confirm Key-not-set glance still shows not-set wash when the Perplexity key is missing; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1505)
+
+**Date:** 2026-10-06 10:43 UTC (12:43 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1505**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1505)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Perplexity Top/error/filter attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1505**
+- `CHANGELOG.md` **[0.1.1505]** documents the Perplexity Top/error/filter glance mixing error, top, and filter washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.perplexity-attention-glance` (base, hover, `:focus-visible`, `.has-error`, `.has-top`, `.is-filter`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu.js` `applyPerplexityAttentionGlanceState` still copies `.is-filter` / `.has-error` / `.has-top` onto `#perplexity-attention-glance` when Perplexity Search is expanded and a filter is active, the last search failed, or the last search has more than Top-N hits. Hidden when collapsed, busy, unconfigured, or none of those states
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + error/top/filter path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Perplexity Top/error/filter attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity Search; confirm Top/error/filter glance still shows error, top, or filter wash when a search has an error, a top hit, or an active filter; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

@@ -8803,6 +8803,7 @@ button.monitor-detail-url.is-just-saved {
 }
 
 /* Perplexity — last-search / key glance (AI Chat last-answer / Debug Log parity) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .perplexity-last-glance {
   display: flex;
   align-items: center;
@@ -8811,8 +8812,8 @@ button.monitor-detail-url.is-just-saved {
   margin: 2px 0 2px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font-size: 13px;
   font-weight: 520;
   line-height: 1.35;
@@ -8820,7 +8821,6 @@ button.monitor-detail-url.is-just-saved {
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -8829,42 +8829,42 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .perplexity-last-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .perplexity-last-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 .perplexity-last-glance.has-results {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ffffff);
 }
 
 .perplexity-last-glance.is-searching {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 /* Soft alert (Monitors Down / Key-not-set soft 7%/30% parity). */
 .perplexity-last-glance.has-error {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 .perplexity-last-glance.needs-key {
-  border-color: color-mix(in srgb, #ff9f0a 32%, transparent);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 32%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
 }
 
 /* Calm wash when Ready · search (Monitors all-up / Disk is-clean / Debug Log quiet parity). */
 .perplexity-last-glance.is-ready {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 /* Perplexity — Key-not-set attention glance (AI Chat Offline parity; expanded) */
