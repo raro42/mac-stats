@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1440** (follow-up after v0.1.1439).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (collapsed Debug Log skips read_debug_log glance IPC):
+
+- `src/cpu.js` — `initLogsSection` no longer polls before collapse state. Collapsed stops `startLogsGlancePoll` / `read_debug_log` (keep-header glance stays hidden). Expand and `ensureLogsSectionExpanded` arm the glance poll. Focus-resume idle polls skip logs glance while collapsed. `pollLogsGlanceCounts` / `startLogsGlancePoll` bail when collapsed or parked.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with Debug Log collapsed (default). Confirm no `read_debug_log` glance IPC until expand. Expand Debug Log — error/warn glance poll runs; collapse again — poll stops. Alt-tab during expand refresh — no glance paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1438)
+
+
 Version **v0.1.1438** (follow-up after v0.1.1437).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -2095,3 +2110,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm icon status still updates without list/history fan-out; expand Monitors — list + history hydrate once; alt-tab during expand warm-up — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1438)
+
+**Date:** 2026-10-06 03:12 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1438**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1438)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 bulk monitor statuses + defer 24h history probe)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1438**
+- `src-tauri/src/commands/monitors.rs` — `list_monitor_statuses` returns id/name/url/type + backoff-enriched cached status; registered in `lib.rs`
+- `src/cpu.js` — `updateMonitorsSummary`, `loadMonitors`, `refreshMonitorsSettingsList` invoke one `list_monitor_statuses` (no N+1 `get_monitor_status` / details walk)
+- `src/cpu.js` — `startHistoryAvailabilityPoll` / `initHistoryControls` gate on `__macStatsSparklinesUnparked` or `sparklineHistoryReady`; seed path calls `startHistoryAvailabilityPoll` after warm history IPC; after-first sparkline unpark sets the flag and starts the probe
+- Prior v0.1.1437 collapsed Monitors skip list/history hydration and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 bulk monitor IPC or deferred 24h history probe.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm icon status still updates via single bulk IPC; expand Monitors — list hydrates without N+1 status/details; history time-range control may appear only after sparklines unpark; alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

@@ -1,12 +1,13 @@
-# Coder — #14 v0.1.1438
+# Coder — #14 v0.1.1440
 
 ## Plan
-- [x] Add `list_monitor_statuses` Tauri command (one IPC: id/name/url + cached status)
-- [x] `updateMonitorsSummary` / `loadMonitors` / settings list use bulk statuses
-- [x] Defer 24h history availability probe until sparkline unpark / seed
-- [x] Bump to v0.1.1438; CHANGELOG; sync-dist; task notes
+- [x] Collapsed Debug Log: skip `read_debug_log` glance poll on monitoring init + focus resume
+- [x] Start/stop glance poll on expand/collapse (mirror Perplexity)
+- [x] Harden `startLogsGlancePoll` / `pollLogsGlanceCounts` for collapsed + park
+- [x] `ensureLogsSectionExpanded` arms glance poll
+- [x] Bump to v0.1.1440; CHANGELOG; sync-dist; task notes
 - [x] `cargo check`
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1438** for GitHub #14. One `list_monitor_statuses` IPC for Monitors summary/list/settings; 24h history probe waits for sparkline unpark/seed. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1440** for GitHub #14 (v0.1.1439 was taken by idle-thought timeout log). Collapsed Debug Log skips `read_debug_log` glance IPC on monitoring warm-up and focus resume; expand arms the poll. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).

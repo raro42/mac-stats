@@ -6078,7 +6078,12 @@ function applyDeferredResumeIdleWindowPolls() {
     if (hc && typeof hc.unpark === "function") hc.unpark();
   }
   startDiscordIconStatus();
-  startLogsGlancePoll();
+  // Collapsed Debug Log: skip read_debug_log glance IPC (glance hidden anyway, #14).
+  if (typeof logsSectionCollapsed === "undefined" || !logsSectionCollapsed) {
+    startLogsGlancePoll();
+  } else {
+    stopLogsGlancePoll();
+  }
   // 24h history probe only after sparklines have unparked once (#14).
   if (window.__macStatsSparklinesUnparked || sparklineHistoryReady) {
     startHistoryAvailabilityPoll();
@@ -19047,7 +19052,7 @@ function filterLogsBody(body, mode) {
   return out.join('\n');
 }
 
-/** Error/warn glance under Debug Log header (filter-chip parity; polls when collapsed). */
+/** Error/warn glance under Debug Log header (filter-chip parity; polls when expanded, #14). */
 function ensureLogsErrorGlance() {
   const header = document.getElementById('logs-header');
   if (!header) return null;
@@ -19281,6 +19286,8 @@ function ensureLogsSectionExpanded() {
   if (icon) icon.title = icon.getAttribute('data-title-base') || 'Hide Debug Log';
   applyLogsGlanceState(logsGlanceCounts);
   refreshLogsViewer(true);
+  // Expand path (icon / glance CTA): arm error/warn glance IPC (#14).
+  startLogsGlancePoll();
   const autoCb = document.getElementById('logs-autorefresh');
   if (autoCb && autoCb.checked) startLogsAutoRefresh();
 }
@@ -19288,12 +19295,14 @@ function ensureLogsSectionExpanded() {
 async function pollLogsGlanceCounts() {
   // Parked shell: skip log IPC + glance DOM (#14).
   if (windowWorkPaused()) return;
+  // Collapsed: keep-header glance is hidden — skip up-to-64KiB read (#14).
+  if (logsSectionCollapsed) return;
   const inv = getInvoke() || invoke;
   if (!inv || !document.getElementById('logs-header')) return;
   try {
     const tail = await inv('read_debug_log', { maxBytes: 65536 });
-    // Alt-tab during read_debug_log: do not wake glance paint (#14).
-    if (windowWorkPaused()) return;
+    // Alt-tab / collapse during read_debug_log: do not wake glance paint (#14).
+    if (windowWorkPaused() || logsSectionCollapsed) return;
     const body = tail.content || '';
     const counts = countLogsByKind(body);
     applyLogsGlanceState(counts);
@@ -19305,6 +19314,8 @@ async function pollLogsGlanceCounts() {
 function startLogsGlancePoll() {
   stopLogsGlancePoll();
   if (windowWorkPaused()) return;
+  // Collapsed Debug Log: no glance poll until expand (#14).
+  if (logsSectionCollapsed) return;
   ensureLogsErrorGlance();
   pollLogsGlanceCounts();
   logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 3600000);
@@ -23902,7 +23913,7 @@ function initLogsSection() {
   ensureLogsErrorGlance();
   ensureLogsAttentionGlance();
   paintLogsViewerFirstPaint(document.getElementById('logs-viewer'));
-  startLogsGlancePoll();
+  // Do not poll read_debug_log before collapse state — collapsed skips IPC (#14).
 
   const logsIcon = document.getElementById('icon-logs');
   if (logsIcon && !logsIcon.getAttribute('data-title-base')) {
@@ -23914,7 +23925,11 @@ function initLogsSection() {
     setIconPaneVisibility(section, content, logsSectionCollapsed, divider);
     if (logsSectionCollapsed) {
       stopLogsAutoRefresh();
+      // Collapsed: glance hidden — stop 64KiB log IPC (#14).
+      stopLogsGlancePoll();
     } else {
+      // Expanded: arm glance poll + viewer (mirror Perplexity status, #14).
+      startLogsGlancePoll();
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
     }
