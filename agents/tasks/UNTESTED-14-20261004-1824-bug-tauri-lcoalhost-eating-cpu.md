@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1561** (follow-up after v0.1.1560).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops Sessions kind filter Clear flash skip glass blend):
+
+- `src/agent-ops.css` — `.ops-session-kind-filter-clear.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Agent Ops → Sessions. Choose a kind filter (Live / Files) so Clear appears. Press Clear. Confirm the Cleared flash still shows green on Clear, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1560)
+
 Version **v0.1.1560** (follow-up after v0.1.1559).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -6990,3 +7004,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Disk Cleanup; choose a filter (Reclaim / Big / Clean) so Clear appears; press Clear; confirm the Cleared flash still shows green on Clear, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1560)
+
+**Date:** 2026-10-06 17:05 UTC (19:05 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1560**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1560)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Disk Cleanup scope filter Clear flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1560**
+- `CHANGELOG.md` **[0.1.1560]** documents the Disk Cleanup scope filter Clear flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.disk-cleanup-scope-filter-clear.is-just-saved` mixes against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/cpu.js` matches `src-tauri/dist/cpu.js`. Disk Cleanup scope Clear path uses `flashDiskCleanupScopeFilterClearBtn` → adds `.is-just-saved` on `#disk-cleanup-scope-filter-clear` / `.disk-cleanup-scope-filter-clear`, label **Cleared**, then restores via `syncDiskCleanupScopeFilterClearBtn`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Disk Cleanup scope filter Clear flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Disk Cleanup scope filter Clear flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched this session's shell / cargo tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Disk Cleanup; choose a scope filter (On / Off) so Clear appears; press Clear; confirm the Cleared flash still shows green on Clear, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
