@@ -8,8 +8,8 @@
 - [x] sync-dist.sh
 - [x] cargo check in src-tauri/
 - [x] Update task file + rename WIP → UNTESTED
-- [ ] Commit + push origin/main
+- [x] Commit + push origin/main (`90b7af80`)
 - [x] Do not close GitHub #14
 
 ## Review
-Structural occlusion cancel for remaining untracked idles after v0.1.1424. Blur drops version IPC, after-first unpark, history seed, monitoring, and Agent Ops init. Focus re-schedules. `cargo check` pass.
+Structural occlusion cancel for remaining untracked idles after v0.1.1424. Blur drops version IPC, after-first unpark, history seed, monitoring, and Agent Ops init. Focus re-schedules. `cargo check` pass. Pushed to origin/main.
