@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1527** | The header Refresh Saved flash mixes the green wash against an opaque fill. No glass alpha. |
 | **v0.1.1526** | The header Refresh button stays dim while metrics load. It no longer spins. |
 | **v0.1.1525** | The Settings Having fun Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1524** | The Settings Ori Mnemos Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |

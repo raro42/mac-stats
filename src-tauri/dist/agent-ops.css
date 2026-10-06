@@ -10187,10 +10187,12 @@ button.is-just-saved,
   transform: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #refresh-btn.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
   color: color-mix(in srgb, #34c759 85%, currentColor) !important;
   animation: none;
+  box-shadow: none;
 }
 
 /* AI Chat Clear — secondary control next to Send */
