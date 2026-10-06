@@ -20,6 +20,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1416
+
+- CPU window focused-open restores `scheduleMonitoringFeaturesOnce` (idle ≤300s). v0.1.1415 left that to Focused/resume or the 10m late fallback; Focused can race past load. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1415
+
+- CPU window first metrics idle ≤30s; no focus `_forceProcessUpdate`; version IPC idle ≤120s after metrics; monitoring/Agent Ops idle ≤300s. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1412
 
 - CPU window deferred open wiring: always bind DOM + arm metrics interval even when occluded; refresh() still no-ops while occluded. P2 reliability / GitHub #14.
