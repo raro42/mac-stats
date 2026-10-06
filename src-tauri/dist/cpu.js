@@ -6084,6 +6084,10 @@ function applyDeferredResumeIdleWindowPolls() {
   if (window.Ollama && typeof window.Ollama.checkConnection === "function") {
     void checkOllamaConnection();
   }
+  // Flush stream chunks buffered while the shell was parked (#14).
+  if (window.Ollama && typeof window.Ollama.flushParkedStream === "function") {
+    window.Ollama.flushParkedStream();
+  }
   // Monitors: restart light summary poll (full list only when expanded).
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
@@ -13557,6 +13561,8 @@ function updateBraveConfigStatus(statusText, elId) {
 }
 
 async function refreshBraveStatus() {
+  // Parked: skip key-status IPC + Settings glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateBraveConfigStatus('Unknown');
@@ -13564,10 +13570,14 @@ async function refreshBraveStatus() {
   }
   try {
     const configured = await invoke('is_brave_configured');
+    // Alt-tab during is_brave_configured: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     updateBraveConfigStatus(configured ? 'Key set' : 'No key');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateBraveConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsBraveKeyAttentionGlanceState === 'function') {
     window.applySettingsBraveKeyAttentionGlanceState();
   }
@@ -13908,6 +13918,8 @@ function updateRedmineConfigStatus(statusText, elId) {
 }
 
 async function refreshRedmineStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateRedmineConfigStatus('Unknown');
@@ -13915,6 +13927,8 @@ async function refreshRedmineStatus() {
   }
   try {
     const st = await invoke('get_redmine_settings_status');
+    // Alt-tab during get_redmine_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const url = !!(st && st.url);
     const key = !!(st && st.key);
     if (url && key) updateRedmineConfigStatus('Ready');
@@ -13922,8 +13936,10 @@ async function refreshRedmineStatus() {
     else if (key) updateRedmineConfigStatus('Key set · no URL');
     else updateRedmineConfigStatus('Not set');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateRedmineConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsRedmineAttentionGlanceState === 'function') {
     window.applySettingsRedmineAttentionGlanceState();
   }
@@ -14481,6 +14497,8 @@ function updateMastodonConfigStatus(statusText, elId) {
 }
 
 async function refreshMastodonStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateMastodonConfigStatus('Unknown');
@@ -14488,6 +14506,8 @@ async function refreshMastodonStatus() {
   }
   try {
     const st = await invoke('get_mastodon_settings_status');
+    // Alt-tab during get_mastodon_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const url = !!(st && st.url);
     const token = !!(st && st.token);
     if (url && token) updateMastodonConfigStatus('Ready');
@@ -14495,8 +14515,10 @@ async function refreshMastodonStatus() {
     else if (token) updateMastodonConfigStatus('Token set · no URL');
     else updateMastodonConfigStatus('Not set');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateMastodonConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsMastodonAttentionGlanceState === 'function') {
     window.applySettingsMastodonAttentionGlanceState();
   }
@@ -14843,6 +14865,8 @@ function updateMcpConfigStatus(statusText, elId) {
 }
 
 async function refreshMcpStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateMcpConfigStatus('Unknown');
@@ -14850,6 +14874,8 @@ async function refreshMcpStatus() {
   }
   try {
     const st = await invoke('get_mcp_settings_status');
+    // Alt-tab during get_mcp_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const url = !!(st && st.url);
     const stdio = !!(st && st.stdio);
     if (url && stdio) updateMcpConfigStatus('Ready · URL + stdio');
@@ -14857,8 +14883,10 @@ async function refreshMcpStatus() {
     else if (url) updateMcpConfigStatus('Ready · URL');
     else updateMcpConfigStatus('Not set');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateMcpConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsMcpAttentionGlanceState === 'function') {
     window.applySettingsMcpAttentionGlanceState();
   }
@@ -15217,6 +15245,8 @@ function updateBrowserConfigStatus(statusText, elId) {
 }
 
 async function refreshBrowserStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateBrowserConfigStatus('Unknown');
@@ -15224,6 +15254,8 @@ async function refreshBrowserStatus() {
   }
   try {
     const st = await invoke('get_browser_settings_status');
+    // Alt-tab during get_browser_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const tools = !(st && st.toolsEnabled === false);
     const ready = !!(st && st.ready);
     const exists = !!(st && st.pathExists);
@@ -15256,8 +15288,10 @@ async function refreshBrowserStatus() {
       portInput.placeholder = String(port);
     }
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateBrowserConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsBrowserAttentionGlanceState === 'function') {
     window.applySettingsBrowserAttentionGlanceState();
   }
@@ -15390,6 +15424,8 @@ function updateCursorAgentConfigStatus(statusText, elId) {
 }
 
 async function refreshCursorAgentStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateCursorAgentConfigStatus('Unknown');
@@ -15397,6 +15433,8 @@ async function refreshCursorAgentStatus() {
   }
   try {
     const st = await invoke('get_cursor_agent_settings_status');
+    // Alt-tab during get_cursor_agent_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const ready = !!(st && st.ready);
     const execConfigured = !!(st && st.executableConfigured);
     const wsConfigured = !!(st && st.workspaceConfigured);
@@ -15429,8 +15467,10 @@ async function refreshCursorAgentStatus() {
     }
     void wsConfigured;
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateCursorAgentConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsCursorAgentAttentionGlanceState === 'function') {
     window.applySettingsCursorAgentAttentionGlanceState();
   }
@@ -15775,6 +15815,8 @@ function updateTelegramConfigStatus(statusText, elId) {
 }
 
 async function refreshTelegramStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateTelegramConfigStatus('Unknown');
@@ -15782,6 +15824,8 @@ async function refreshTelegramStatus() {
   }
   try {
     const st = await invoke('get_telegram_settings_status');
+    // Alt-tab during get_telegram_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const token = !!(st && st.token);
     const chat = !!(st && st.chat);
     if (token && chat) updateTelegramConfigStatus('Ready');
@@ -15789,8 +15833,10 @@ async function refreshTelegramStatus() {
     else if (chat) updateTelegramConfigStatus('Chat id set · no token');
     else updateTelegramConfigStatus('Not set');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateTelegramConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsTelegramAttentionGlanceState === 'function') {
     window.applySettingsTelegramAttentionGlanceState();
   }
@@ -16134,6 +16180,8 @@ function updateSlackConfigStatus(statusText, elId) {
 }
 
 async function refreshSlackStatus() {
+  // Parked: skip settings-status IPC + glance paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     updateSlackConfigStatus('Unknown');
@@ -16141,12 +16189,16 @@ async function refreshSlackStatus() {
   }
   try {
     const st = await invoke('get_slack_settings_status');
+    // Alt-tab during get_slack_settings_status: drop status/glance paint (#14).
+    if (windowWorkPaused()) return;
     const webhook = !!(st && st.webhook);
     if (webhook) updateSlackConfigStatus('Ready');
     else updateSlackConfigStatus('Not set');
   } catch (_) {
+    if (windowWorkPaused()) return;
     updateSlackConfigStatus('Unknown');
   }
+  if (windowWorkPaused()) return;
   if (typeof window.applySettingsSlackAttentionGlanceState === 'function') {
     window.applySettingsSlackAttentionGlanceState();
   }

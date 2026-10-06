@@ -3571,11 +3571,32 @@ function addChatMessage(role, content, isHtml = false) {
   updateChatClearButton();
 }
 
+/** Stream chunks received while the shell is parked — flush on next focused paint (#14). */
+let parkedStreamTail = '';
+
+/** Flush buffered stream text after focus resume (#14). */
+function flushParkedStreamPaint() {
+  if (ollamaWorkPaused()) return;
+  if (!parkedStreamTail) return;
+  const t = parkedStreamTail;
+  parkedStreamTail = '';
+  appendToLastAssistantMessage(t);
+}
+
 /**
  * Replace an assistant bubble's content (used for instant replies into an empty stream bubble).
  */
 function setAssistantMessageContent(el, content) {
   if (!el) return;
+  parkedStreamTail = '';
+  // Final answer while parked: plain text only — no Markdown / filter / scroll (#14).
+  if (ollamaWorkPaused()) {
+    const plain = String(content ?? '');
+    el.textContent = plain;
+    el.classList.toggle('is-error', isChatErrorText(plain));
+    if (el.dataset) el.dataset.copyText = plain;
+    return;
+  }
   el.replaceChildren();
   el.classList.toggle('is-error', isChatErrorText(content));
   if (typeof marked !== 'undefined' && !isChatErrorText(content)) {
@@ -3601,14 +3622,21 @@ function setAssistantMessageContent(el, content) {
  * Append text to the last assistant message (for streaming). Safe: appends as text node.
  */
 function appendToLastAssistantMessage(text) {
+  // Stream chunks while parked: buffer only — no scroll / text-node paint (#14).
+  if (ollamaWorkPaused()) {
+    parkedStreamTail += String(text ?? '');
+    return;
+  }
+  const chunk = parkedStreamTail ? parkedStreamTail + String(text ?? '') : text;
+  parkedStreamTail = '';
   const messagesContainer = document.getElementById('chat-messages');
   if (!messagesContainer) return;
   const assistantMessages = messagesContainer.querySelectorAll('.chat-message.assistant');
   const last = assistantMessages[assistantMessages.length - 1];
   if (!last) return;
-  last.appendChild(document.createTextNode(text));
+  last.appendChild(document.createTextNode(chunk));
   const prev = (last.dataset && last.dataset.copyText) || '';
-  last.dataset.copyText = `${prev}${text}`;
+  last.dataset.copyText = `${prev}${chunk}`;
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
@@ -4003,6 +4031,7 @@ window.Ollama = {
   addMessage: addChatMessage,
   ensureMarkdownLibs: ensureMarkdownLibs,
   setAssistantMessageContent: setAssistantMessageContent,
+  flushParkedStream: flushParkedStreamPaint,
   initListeners: initOllamaChatListeners,
   syncCollapsedGlance: syncOllamaCollapsedGlance,
   focusEmptySuggestionFirst: focusChatEmptySuggestionFirst,

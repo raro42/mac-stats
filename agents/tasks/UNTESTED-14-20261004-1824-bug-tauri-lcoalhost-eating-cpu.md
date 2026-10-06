@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1432** (follow-up after v0.1.1431).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Settings status + digest + chat stream park):
+
+- `src/cpu.js` — Brave / Redmine / Mastodon / MCP / Browser / Cursor Agent / Telegram / Slack settings status refreshes skip IPC and glance paint while `windowWorkPaused`; mid-flight after await also drops. Focus resume flushes parked Ollama stream buffer via `Ollama.flushParkedStream`.
+- `src/agent-ops.js` — `refreshOpsDigest` bails when parked (start + mid-flight); clears busy chrome; skips success flash while away. User-triggered Ops fan-out after digest still uses `{ userTriggered: true }`.
+- `src/ollama.js` — stream chunks buffer while `ollamaWorkPaused` and flush on resume; final answer while parked uses plain text only (no Markdown / filter / scroll).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Open Settings (or trigger a credential status refresh) and/or start an AI Chat stream / Agent Ops Refresh digest, then alt-tab before IPC returns — Settings glances / digest flash / stream scroll must not paint while away. Alt-tab back — status re-open or stream flush refreshes; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1431)
+
 Version **v0.1.1431** (follow-up after v0.1.1430).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

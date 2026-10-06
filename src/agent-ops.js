@@ -5354,22 +5354,31 @@ function flashOpsDigestRefreshed() {
 
 async function refreshOpsDigest() {
     if (opsDigestRefreshInFlight) return;
+    // Parked: do not start digest IPC / busy chrome (#14).
+    if (agentOpsWorkPaused()) return;
     opsDigestRefreshInFlight = true;
     const digestEl = document.getElementById('ops-health-digest');
     setOpsDigestRefreshBusy(true);
     let ok = false;
     try {
         const msg = await invoke('refresh_agent_digest');
+        // Alt-tab during digest refresh: drop digest DOM + fan-out (#14).
+        if (agentOpsWorkPaused()) return;
         if (digestEl) digestEl.textContent = String(msg).slice(0, 80);
-        await refreshAgentOps();
+        // User clicked Refresh digest — finish Ops fan-out like manual Refresh (#14).
+        await refreshAgentOps({ userTriggered: true });
+        if (agentOpsWorkPaused()) return;
         ok = true;
     } catch (err) {
         console.warn('[Agent Ops] digest refresh', err);
+        if (agentOpsWorkPaused()) return;
         if (digestEl) digestEl.textContent = `Refresh failed`;
     } finally {
         opsDigestRefreshInFlight = false;
+        // Always clear busy so the button does not stick on "Refreshing…".
+        // Skip the success flash while parked (extra paint) (#14).
         setOpsDigestRefreshBusy(false);
-        if (ok) flashOpsDigestRefreshed();
+        if (ok && !agentOpsWorkPaused()) flashOpsDigestRefreshed();
     }
 }
 

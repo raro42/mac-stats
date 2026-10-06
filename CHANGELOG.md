@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+
+## [0.1.1432] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Settings credential status refreshes (Brave, Redmine, Mastodon, MCP, Browser, Cursor Agent, Telegram, Slack) skip IPC and glance paint when the shell is parked. Agent Ops digest refresh bails mid-flight after alt-tab (busy chrome clears; success flash skipped while away). AI Chat stream chunks buffer while parked and flush on focus resume; final answers while parked use plain text only (no Markdown rebuild). Aim: quieter `tauri://localhost` / Graphics and Media when Settings or chat warm-up finishes while away.
+
 ## [0.1.1431] - 2026-10-06
 
 ### Changed
