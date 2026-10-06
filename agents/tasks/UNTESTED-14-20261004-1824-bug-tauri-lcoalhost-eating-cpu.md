@@ -22,17 +22,21 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1515** (follow-up after v0.1.1514).
+Version **v0.1.1516** (follow-up after v0.1.1515).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
-Changes (Settings Telegram not-set/partial attention glance skip glass blend):
+Changes (Settings Slack not-set/partial attention glance skip glass blend):
 
-- `src/agent-ops.css` — Settings Telegram glance mixes the not-set and partial washes against opaque `#ffffff`. No hover or focus drop shadow.
+- `src/agent-ops.css` — Settings Slack glance mixes the not-set and partial washes against opaque `#ffffff`. No hover or focus drop shadow.
 
-Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Confirm Telegram glance still shows not-set/partial wash when Telegram is missing or only partly set. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Confirm Slack glance still shows not-set/partial wash when Slack is missing or only partly set. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
 
 ---
+
+## Prior implementation (v0.1.1515)
+
+Version **v0.1.1515** (follow-up after v0.1.1514). Origin shipped the Settings Telegram not-set/partial opaque wash.
 
 ## Prior implementation (v0.1.1514)
 
