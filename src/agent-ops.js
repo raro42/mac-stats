@@ -7583,7 +7583,8 @@ function markOpsRefreshedAt(ms) {
     paintOpsUpdatedAgo();
     if (opsUpdatedAgoTimer) return;
     opsUpdatedAgoTimer = setInterval(() => {
-        if (document.hidden || !opsLastRefreshMs) return;
+        // Prefer shared pause — macOS alt-tab often keeps visibilityState=visible (#14).
+        if (agentOpsWorkPaused() || !opsLastRefreshMs) return;
         paintOpsUpdatedAgo();
     }, 3_600_000);
 }
@@ -7640,19 +7641,43 @@ async function refreshAgentOps(opts = {}) {
     if (userTriggered) setOpsRefreshBusy(true);
     let ok = false;
     try {
-        const [agents, live, files, memory, insights, version, sched, deliveries, schedules, features] =
-            await Promise.all([
-                invoke('list_agents'),
-                invoke('list_live_sessions'),
-                invoke('list_session_files', { limit: 40 }),
-                invoke('list_memory_files'),
-                invoke('get_runs_insights', { limit: 40 }),
-                invoke('get_app_version').catch(() => null),
-                invoke('get_scheduler_snapshot').catch(() => null),
-                invoke('list_scheduler_delivery_awareness').catch(() => null),
-                invoke('list_schedules').catch(() => []),
-                invoke('get_feature_health', { refresh: false }).catch(() => []),
-            ]);
+        // Batched IPC so auto-refresh can abort between batches after alt-tab (#14).
+        // Manual Refresh still runs the full fan-out even if focus blurs mid-flight.
+        const batches = [
+            [
+                () => invoke('list_agents'),
+                () => invoke('list_live_sessions'),
+                () => invoke('list_session_files', { limit: 40 }),
+            ],
+            [
+                () => invoke('list_memory_files'),
+                () => invoke('get_runs_insights', { limit: 40 }),
+                () => invoke('get_app_version').catch(() => null),
+            ],
+            [
+                () => invoke('get_scheduler_snapshot').catch(() => null),
+                () => invoke('list_scheduler_delivery_awareness').catch(() => null),
+                () => invoke('list_schedules').catch(() => []),
+                () => invoke('get_feature_health', { refresh: false }).catch(() => []),
+            ],
+        ];
+        const collected = [];
+        for (const batch of batches) {
+            if (!userTriggered && agentOpsWorkPaused()) return;
+            collected.push(...(await Promise.all(batch.map((fn) => fn()))));
+        }
+        const [
+            agents,
+            live,
+            files,
+            memory,
+            insights,
+            version,
+            sched,
+            deliveries,
+            schedules,
+            features,
+        ] = collected;
         // Alt-tab during Agent Ops IPC: drop the big DOM rebuild (#14).
         if (agentOpsWorkPaused()) {
             return;

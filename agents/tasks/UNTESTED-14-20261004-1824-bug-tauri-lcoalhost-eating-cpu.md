@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1429** (follow-up after v0.1.1428).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (shared-pause holdouts + mid-flight DOM + Agent Ops batched abort):
+
+- `src/cpu.js` — history-availability poll and monitors collapse/expand/ensure intervals use `windowWorkPaused` (not `document.hidden` alone). `updateRingGauge` skips when parked. Mid-flight Disk Cleanup glance sync, Debug Log viewer catch, monitors summary catch, and monitors height layout drop when parked.
+- `src/agent-ops.js` — Updated-ago timer uses `agentOpsWorkPaused`. Auto `refreshAgentOps` runs IPC in three batches and aborts remaining invokes after alt-tab; manual Refresh still finishes the fan-out. Mid-flight DOM skip kept.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Expand Monitors / Debug Log / Disk Cleanup / Agent Ops, trigger a poll, then alt-tab before IPC returns — history probe / Updated-ago / glance / error catch / monitors height must not paint; Agent Ops auto-refresh should stop further invokes after park. Alt-tab back — sections eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1428)
+
 Version **v0.1.1428** (follow-up after v0.1.1427).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -39,7 +54,6 @@ Changes (focused backend gate + history/chart mid-flight park):
 Tester: open CPU window on macOS (already focused), warm ≥30s. Expand History / Agent Ops glance, trigger a poll, then alt-tab before IPC returns — history canvas / sparkline draw / pinned list / Agent Ops glance must not paint while away. Backend must not refresh processes/SMC while unfocused. Alt-tab back — sections eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
 
 ---
-
 ## Prior implementation (v0.1.1427)
 
 Version **v0.1.1427** (follow-up after v0.1.1426).
@@ -1643,3 +1657,37 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Monitors / Debug Log / Disk Cleanup / Agent Ops, trigger a poll, alt-tab before IPC returns — Discord icon / monitors / logs / disk / Agent Ops DOM / Process Details / update banner must not paint while away; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1428)
+
+**Date:** 2026-10-06 01:52 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1428)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 backend focus gate + history/chart mid-flight park)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1428**
+- `src-tauri/src/state.rs` — `CPU_WINDOW_FOCUSED` + `cpu_window_active_for_metrics()` (focused and visible)
+- `src-tauri/src/ui/status_bar.rs` / `status_bar_linux.rs` — set/clear focused on Focused / destroy / open
+- `src-tauri/src/lib.rs` / `metrics/mod.rs` — temp/freq loop, battery, power, process collect/refresh use `cpu_window_active_for_metrics()`
+- `src/history.js` — shared `historyWorkPaused()` via `__macStatsWindowWorkPaused`; mid-flight skip after history IPC; `park`/`unpark` + `__macStatsPauseHistoryCharts`
+- `src/chart-line.js` — shared park gate; `drawLineChart` no-ops while parked/occluded
+- `src/agent-ops.js` — collapsed glance poll uses shared pause; mid-flight skip after IPC (`agentOpsWorkPaused`)
+- `src/cpu.js` — mid-flight pinned process-list DOM skip after `get_processes_by_names`; blur parks history charts via `__macStatsPauseHistoryCharts`
+- Prior mid-flight secondary IPC / Agent Ops / rAF cancel and structural occlusion cancel kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 focus-gate / history mid-flight park cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand History / Agent Ops glance, trigger a poll, alt-tab before IPC returns — history canvas / sparkline draw / pinned list / Agent Ops glance must not paint while away; backend must not refresh processes/SMC while unfocused; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.

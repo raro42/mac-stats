@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1429] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Leftover timers (history availability, Agent Ops Updated-ago) and monitors collapse/expand polls use the shared pause gate instead of `document.hidden` alone. Ring gauges skip paint when parked (`windowWorkPaused`). Mid-flight Disk Cleanup glance, Debug Log error path, and monitors summary error / height layout drop when parked. Agent Ops auto-refresh runs IPC in batches and aborts remaining invokes after alt-tab (manual Refresh still finishes). Aim: quieter `tauri://localhost` / Graphics and Media when secondary work finishes while away.
+
+
 ## [0.1.1428] - 2026-10-06
 
 ### Changed

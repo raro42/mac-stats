@@ -366,8 +366,9 @@ const ringAnimations = new Map();
 const CIRCUMFERENCE = 2 * Math.PI * 42; // radius = 42
 
 function updateRingGauge(ringId, percent, key) {
-  // Occluded window: skip SVG invalidation (#14).
-  if (windowOccluded()) return;
+  // Parked / Focused(false): skip SVG invalidation (#14). Prefer shared pause
+  // over windowOccluded alone — macOS can keep hasFocus() true briefly after park.
+  if (windowWorkPaused()) return;
   const clamped = Math.max(0, Math.min(100, percent));
   const progressEl = document.getElementById(ringId);
   if (!progressEl) return;
@@ -7582,6 +7583,7 @@ function initMonitorsSection() {
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
+    if (windowWorkPaused()) return;
     updateMonitorsHeight();
   });
   updateMonitorsSummary();
@@ -7609,6 +7611,7 @@ function initMonitorsSection() {
         monitorsUpdateInterval = null;
       }
       monitorsUpdateInterval = setInterval(() => {
+        if (windowWorkPaused()) return;
         updateMonitorsSummary();
       }, 3600000);
     } else {
@@ -7618,8 +7621,10 @@ function initMonitorsSection() {
       }
       // Start interval if not already running (but don't call immediately)
       monitorsUpdateInterval = setInterval(() => {
+        if (windowWorkPaused()) return;
         updateMonitorsSummary();
         loadMonitors().then(() => {
+          if (windowWorkPaused()) return;
           updateMonitorsHeight();
         });
       }, 3600000);
@@ -8303,8 +8308,10 @@ function ensureMonitorsSectionExpanded() {
   syncMonitorsCollapsedGlance();
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
+      if (windowWorkPaused()) return;
       updateMonitorsSummary();
       loadMonitors().then(() => {
+        if (windowWorkPaused()) return;
         updateMonitorsHeight();
       });
     }, 3600000);
@@ -10258,6 +10265,8 @@ async function updateMonitorsSummary() {
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
+    // Alt-tab during monitors IPC: do not paint error fallback DOM (#14).
+    if (windowWorkPaused()) return;
     applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: false });
     updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
   }
@@ -20024,6 +20033,8 @@ async function refreshLogsViewer(scrollToEnd = true) {
     };
     applyLogsFilter(scrollToEnd);
   } catch (err) {
+    // Alt-tab during read_debug_log: do not rebuild the viewer on error (#14).
+    if (windowWorkPaused()) return;
     logsViewerRaw = { prefix: '', body: 'Failed to read log: ' + String(err), hasContent: false };
     applyLogsFilter(false);
   }
@@ -20292,7 +20303,9 @@ function startDiskCleanupGlancePoll() {
       stopDiskCleanupGlancePoll();
       return;
     }
-    void refreshDiskCleanupPanel({ deep: false }).then(() => {
+    void refreshDiskCleanupPanel({ deep: false }).then((st) => {
+      // Mid-flight park / null status: skip glance DOM (#14).
+      if (windowWorkPaused() || st == null) return;
       syncDiskCleanupCollapsedGlance();
     });
   }, 3600000);
@@ -25038,7 +25051,8 @@ function startHistoryAvailabilityPoll() {
   checkHistoryAvailability();
   // 24h history probe is heavy IPC; once every 10m is enough for the dropdown (#14).
   historyAvailabilityInterval = setInterval(() => {
-    if (document.hidden) return;
+    // Prefer shared pause — macOS alt-tab often keeps visibilityState=visible (#14).
+    if (windowWorkPaused()) return;
     checkHistoryAvailability();
   }, 3600000);
 }
