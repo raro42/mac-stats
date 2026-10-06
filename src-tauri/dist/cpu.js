@@ -2802,6 +2802,8 @@ function wireCpuWindowDomOnce() {
 /** Version + update-check IPC once (focus / late fallback — not on open idle) (#14). */
 function startCpuWindowVersionOnce() {
   if (window.__macStatsCpuVersionArmed) return;
+  // Blur before idle fires: do not arm — focus/resume will schedule again (#14).
+  if (windowOccluded() || windowPollsPaused) return;
   window.__macStatsCpuVersionArmed = true;
   fetchAppVersion().then((v) => {
     showFirstLaunchTip();
@@ -2815,6 +2817,18 @@ let metricsOnceTimeoutId = null;
 /** Pending late-open fallback idle (cancel on blur) (#14). */
 let lateOpenIdleHandle = null;
 let lateOpenTimeoutId = null;
+/** Pending version/update IPC idle (cancel on blur) (#14). */
+let versionOnceIdleHandle = null;
+let versionOnceTimeoutId = null;
+/** Pending after-first sparkline unpark idle (cancel on blur) (#14). */
+let afterFirstUnparkIdleHandle = null;
+let afterFirstUnparkTimeoutId = null;
+/** Pending focus-resume history seed idle (cancel on blur) (#14). */
+let historySeedIdleHandle = null;
+let historySeedTimeoutId = null;
+/** Pending monitoring-features idle (cancel on blur) (#14). */
+let monitoringFeaturesIdleHandle = null;
+let monitoringFeaturesTimeoutId = null;
 
 function cancelDeferredCpuWindowMetricsOnce() {
   if (
@@ -2852,6 +2866,99 @@ function cancelDeferredLateOpenFallback() {
   }
 }
 
+function cancelDeferredCpuWindowVersionOnce() {
+  if (
+    versionOnceIdleHandle != null &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    try {
+      window.cancelIdleCallback(versionOnceIdleHandle);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  versionOnceIdleHandle = null;
+  if (versionOnceTimeoutId != null) {
+    clearTimeout(versionOnceTimeoutId);
+    versionOnceTimeoutId = null;
+  }
+}
+
+function cancelDeferredAfterFirstUnpark() {
+  if (
+    afterFirstUnparkIdleHandle != null &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    try {
+      window.cancelIdleCallback(afterFirstUnparkIdleHandle);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  afterFirstUnparkIdleHandle = null;
+  if (afterFirstUnparkTimeoutId != null) {
+    clearTimeout(afterFirstUnparkTimeoutId);
+    afterFirstUnparkTimeoutId = null;
+  }
+}
+
+function cancelDeferredHistorySeed() {
+  if (
+    historySeedIdleHandle != null &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    try {
+      window.cancelIdleCallback(historySeedIdleHandle);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  historySeedIdleHandle = null;
+  if (historySeedTimeoutId != null) {
+    clearTimeout(historySeedTimeoutId);
+    historySeedTimeoutId = null;
+  }
+}
+
+function cancelDeferredMonitoringFeaturesOnce() {
+  if (
+    monitoringFeaturesIdleHandle != null &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    try {
+      window.cancelIdleCallback(monitoringFeaturesIdleHandle);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  monitoringFeaturesIdleHandle = null;
+  if (monitoringFeaturesTimeoutId != null) {
+    clearTimeout(monitoringFeaturesTimeoutId);
+    monitoringFeaturesTimeoutId = null;
+  }
+  // Allow focus/resume to re-schedule after blur cancel (#14).
+  if (!window.__macStatsMonitoringFeaturesArmed) {
+    window.__macStatsMonitoringFeaturesScheduled = false;
+  }
+}
+
+/** Idle-defer version/update IPC; cancel on blur (#14). */
+function scheduleCpuWindowVersionOnce(idleTimeoutMs) {
+  if (window.__macStatsCpuVersionArmed) return;
+  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 2400000;
+  cancelDeferredCpuWindowVersionOnce();
+  const run = () => {
+    versionOnceIdleHandle = null;
+    versionOnceTimeoutId = null;
+    startCpuWindowVersionOnce();
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    versionOnceIdleHandle = window.requestIdleCallback(run, { timeout: ms });
+  } else {
+    versionOnceTimeoutId = setTimeout(run, ms);
+  }
+}
+
 /**
  * First get_cpu_details + slow refresh interval. Prefer focus/resume so open
  * does not stack IPC with WebView compositor work (#14).
@@ -2864,18 +2971,17 @@ function startCpuWindowMetricsOnce() {
   // Rings/keyboard just before first poll — not on open paint (#14).
   wireCpuWindowDomOnce();
   // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 2400000 });
-  } else {
-    setTimeout(startCpuWindowVersionOnce, 2400000);
-  }
+  scheduleCpuWindowVersionOnce(2400000);
   const afterFirst = () => {
     // Occluded after IPC: do not arm the slow interval or unpark GPU (#14).
     if (windowOccluded() || windowPollsPaused) return;
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
     if (!refreshInterval) startRefresh();
     // Sparkline GPU: defer unpark so first poll DOM + canvas alloc do not stack (#14).
+    cancelDeferredAfterFirstUnpark();
     const unparkSparklines = () => {
+      afterFirstUnparkIdleHandle = null;
+      afterFirstUnparkTimeoutId = null;
       if (windowOccluded() || windowPollsPaused) return;
       const hist = window.themeHistory;
       if (hist && typeof hist.unpark === "function") {
@@ -2883,9 +2989,11 @@ function startCpuWindowMetricsOnce() {
       }
     };
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(unparkSparklines, { timeout: 960000 });
+      afterFirstUnparkIdleHandle = window.requestIdleCallback(unparkSparklines, {
+        timeout: 960000,
+      });
     } else {
-      setTimeout(unparkSparklines, 960000);
+      afterFirstUnparkTimeoutId = setTimeout(unparkSparklines, 960000);
     }
   };
   const immediateInvoke = getInvoke();
@@ -5846,10 +5954,14 @@ function pauseIdleWindowPolls() {
   windowPollsPaused = true;
   cancelDeferredResumeIdleWindowPolls();
   cancelDeferredFocusRefresh();
-  // Drop pending open-path first metrics / late fallback so blur does not
-  // still arm gauges + intervals while the shell is parked (#14).
+  // Drop pending open-path / focus-resume idles so blur does not still arm
+  // gauges, version IPC, sparkline GPU, history seed, or monitoring (#14).
   cancelDeferredCpuWindowMetricsOnce();
   cancelDeferredLateOpenFallback();
+  cancelDeferredCpuWindowVersionOnce();
+  cancelDeferredAfterFirstUnpark();
+  cancelDeferredHistorySeed();
+  cancelDeferredMonitoringFeaturesOnce();
   setDocumentOccluded(true);
   stopRefresh();
   stopDiscordIconStatus();
@@ -5959,14 +6071,19 @@ function resumeVisibleWindowWork() {
       !lastSparklineSeedMs ||
       Date.now() - lastSparklineSeedMs >= 3600000
     ) {
+      cancelDeferredHistorySeed();
       const seed = () => {
-        if (windowOccluded()) return;
+        historySeedIdleHandle = null;
+        historySeedTimeoutId = null;
+        if (windowOccluded() || windowPollsPaused) return;
         void seedThemeHistoryFromBackend();
       };
       if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(seed, { timeout: 960000 });
+        historySeedIdleHandle = window.requestIdleCallback(seed, {
+          timeout: 960000,
+        });
       } else {
-        setTimeout(seed, 960000);
+        historySeedTimeoutId = setTimeout(seed, 960000);
       }
     }
     // Idle-defer get_cpu_details / interval arm on focus (≤240s) — not on the
@@ -5976,13 +6093,7 @@ function resumeVisibleWindowWork() {
     }
     scheduleDeferredFocusRefresh();
     // Version/update IPC idle ≤2400s — do not stack with focus refresh (#14).
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(startCpuWindowVersionOnce, {
-        timeout: 2400000,
-      });
-    } else {
-      setTimeout(startCpuWindowVersionOnce, 2400000);
-    }
+    scheduleCpuWindowVersionOnce(2400000);
     // Secondary polls + sparkline unpark: idle ≤240s (not on the focus event) (#14).
     resumeIdleWindowPolls();
   } else {
@@ -24851,17 +24962,34 @@ function initMonitoringFeatures() {
  * focus/schedule so open does not stack with first gauge paint (#14).
  */
 function scheduleMonitoringFeaturesOnce() {
-  if (window.__macStatsMonitoringFeaturesScheduled) return;
+  if (
+    window.__macStatsMonitoringFeaturesScheduled ||
+    window.__macStatsMonitoringFeaturesArmed
+  ) {
+    return;
+  }
   window.__macStatsMonitoringFeaturesScheduled = true;
   // Agent Ops was arming on DOMContentLoaded; gate it with monitoring (#14).
   if (typeof window.__macStatsScheduleAgentOpsInit === "function") {
     window.__macStatsScheduleAgentOpsInit();
   }
-  const start = () => initMonitoringFeatures();
+  const start = () => {
+    monitoringFeaturesIdleHandle = null;
+    monitoringFeaturesTimeoutId = null;
+    // Still occluded: drop flag so focus/resume can re-schedule (#14).
+    if (windowOccluded() || windowPollsPaused) {
+      window.__macStatsMonitoringFeaturesScheduled = false;
+      return;
+    }
+    window.__macStatsMonitoringFeaturesArmed = true;
+    initMonitoringFeatures();
+  };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(start, { timeout: 7200000 });
+    monitoringFeaturesIdleHandle = window.requestIdleCallback(start, {
+      timeout: 7200000,
+    });
   } else {
-    setTimeout(start, 7200000);
+    monitoringFeaturesTimeoutId = setTimeout(start, 7200000);
   }
 }
 

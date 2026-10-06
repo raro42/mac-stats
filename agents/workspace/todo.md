@@ -1,10 +1,15 @@
-# Session todo — overnight autoresearch #14 structural idle cut
+# WIP-14 tauri://localhost CPU — v0.1.1425
 
-- [x] Digester / sibling / design-review / debug scan
-- [x] Structural #14: cancel open-path metrics idle on blur; skip post-await DOM when occluded; cancel chart-line unpark on park
-- [x] Revert concurrent timeout-doubling WIP (1920s/14400s) — not the keep
-- [x] CHANGELOG + bump `0.1.1424`
-- [x] sync-dist + verify + keep @ 56c71c82
-- [x] loop_backlog + morning surprise archive
-- [x] Commit + push `origin/main`
-- [ ] Do **not** close GitHub #14
+## Plan
+- [x] Pick lowest GitHub FEAT/WIP: WIP-14
+- [x] Structural cancel: pending version IPC, after-first sparkline unpark, history seed, monitoring features, Agent Ops init on blur/pause
+- [x] Bail version / monitoring / Agent Ops start when occluded (do not arm flags)
+- [x] Bump Cargo.toml → 0.1.1425
+- [x] sync-dist.sh
+- [x] cargo check in src-tauri/
+- [x] Update task file + rename WIP → UNTESTED
+- [ ] Commit + push origin/main
+- [x] Do not close GitHub #14
+
+## Review
+Structural occlusion cancel for remaining untracked idles after v0.1.1424. Blur drops version IPC, after-first unpark, history seed, monitoring, and Agent Ops init. Focus re-schedules. `cargo check` pass.

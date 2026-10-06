@@ -5029,7 +5029,11 @@ window.__macStatsPauseAgentOpsPolls = function () {
     stopAgentOpsAutoRefresh();
     stopOpsGlancePoll();
     stopOpsUpdatedAgoTimer();
-};
+    // Drop pending init idle so blur does not still wire Agent Ops DOM (#14).
+    if (typeof window.__macStatsCancelAgentOpsInit === 'function') {
+      window.__macStatsCancelAgentOpsInit();
+    }
+  };
 
 window.__macStatsResumeAgentOpsPolls = function () {
     if (document.hidden) return;
@@ -10762,18 +10766,68 @@ function escapeHtml(s) {
 
   // Defer Agent Ops DOM wiring past first gauge paint (#14).
   // Do not arm on DOMContentLoaded — cpu.js schedules after focus/monitoring (#14).
+  let agentOpsInitIdleHandle = null;
+  let agentOpsInitTimeoutId = null;
+
+  function cancelInitAgentOps() {
+    if (
+      agentOpsInitIdleHandle != null &&
+      typeof window.cancelIdleCallback === 'function'
+    ) {
+      try {
+        window.cancelIdleCallback(agentOpsInitIdleHandle);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    agentOpsInitIdleHandle = null;
+    if (agentOpsInitTimeoutId != null) {
+      clearTimeout(agentOpsInitTimeoutId);
+      agentOpsInitTimeoutId = null;
+    }
+    // Allow focus/resume to re-schedule after blur cancel (#14).
+    if (!window.__macStatsAgentOpsInitArmed) {
+      window.__macStatsAgentOpsInitScheduled = false;
+    }
+  }
+
   function scheduleInitAgentOps() {
-    if (window.__macStatsAgentOpsInitScheduled) return;
+    if (
+      window.__macStatsAgentOpsInitScheduled ||
+      window.__macStatsAgentOpsInitArmed
+    ) {
+      return;
+    }
     window.__macStatsAgentOpsInitScheduled = true;
-    const start = () => initAgentOps();
+    const start = () => {
+      agentOpsInitIdleHandle = null;
+      agentOpsInitTimeoutId = null;
+      // Still occluded: drop flag so focus/resume can re-schedule (#14).
+      try {
+        if (
+          document.hidden ||
+          (typeof document.hasFocus === 'function' && !document.hasFocus())
+        ) {
+          window.__macStatsAgentOpsInitScheduled = false;
+          return;
+        }
+      } catch (_) {
+        /* ignore */
+      }
+      window.__macStatsAgentOpsInitArmed = true;
+      initAgentOps();
+    };
     if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(start, { timeout: 7200000 });
+      agentOpsInitIdleHandle = window.requestIdleCallback(start, {
+        timeout: 7200000,
+      });
     } else {
-      setTimeout(start, 7200000);
+      agentOpsInitTimeoutId = setTimeout(start, 7200000);
     }
   }
 
   window.__macStatsScheduleAgentOpsInit = scheduleInitAgentOps;
+  window.__macStatsCancelAgentOpsInit = cancelInitAgentOps;
 
   window.addEventListener('beforeunload', () => stopAgentOpsAutoRefresh());
 
