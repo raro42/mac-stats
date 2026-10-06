@@ -6,6 +6,11 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1481** | The External / Monitors Down/Slow glance mixes down and slow washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1480** | The AI Chat offline attention glance mixes offline, no-model, ready, continue, sending, filter, errors, last-answer, and copied washes against an opaque fill. |
+| **v0.1.1479** | The AI Chat errors glance mixes the failed-turn wash against an opaque fill. |
+| **v0.1.1478** | The AI Chat last-answer glance mixes ready, error, and copied washes against an opaque fill. |
+| **v0.1.1477** | The AI Chat turn glance mixes sending and calm washes against an opaque fill. |
 | **v0.1.1476** | Agent Ops, process rows, logs, and Disk Cleanup no longer lift on hover or scale on press. Copied badges sit with margin, not a vertical translate. |
 | **v0.1.1475** | The AI Chat model / connection glance mixes online, no-model, offline, and circuit washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1474** | CPU, GPU, Freq, and Temp history charts mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. |
@@ -59,10 +64,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-A hover on an Agent Ops card, or a press on Clean now, no longer starts a transform layer in Graphics and Media.
+A Down or Slow site no longer paints the Monitors glance with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- Monitor tick tips still use a translate. The refresh button still rotates while it fetches.
+- The Monitors filter glance (All · Up · Down · Slow) still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1481
+
+- External / Monitors Down/Slow attention glance mixes down and slow washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14. Rebased past origin v0.1.1477–1480.
+
 ## Overnight merge — v0.1.1476
 
 - Agent Ops, process rows, logs, and Disk Cleanup drop hover lift and press scale. Copied badges center with margin, not `translateY(-50%)`. P2 reliability / GitHub #14. Rebased past origin v0.1.1473–1475.
