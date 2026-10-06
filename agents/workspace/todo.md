@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1580`; CHANGELOG entry; standing_backlog note
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` / ratchet verify
-- [ ] Commit + push `origin/main`; do not close #14
+- [x] Commit + push `origin/main`; do not close #14
 
 ## Review
-Opaque wash on AI Chat message Copied flash. Same pattern as Debug Log / Perplexity / process-row. Issue #14 left open for tester / 004.
+Opaque wash on AI Chat message Copied flash. Same pattern as Debug Log / Perplexity / process-row. Ratchet keep @ `beb32a07`. Issue #14 left open for tester / 004.
