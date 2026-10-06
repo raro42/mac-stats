@@ -2451,3 +2451,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no `take_open_ui_section` IPC; Capture path: `MAC_STATS_OPEN_SECTION=agent-ops` still opens Agent Ops via `cpu.html?open=agent-ops`; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1448)
+
+**Date:** 2026-10-06 04:19 UTC (06:19 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1448**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1448)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapse Agent Ops setup; skip no-op UI persist)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1448**
+- `CHANGELOG.md` **[0.1.1448]** documents collapsed Agent Ops skipping filter/overview/keyboard wiring, expand/`?open=agent-ops` hydrate once, and skipping `set_cpu_window_ui_state` when the collapse value is unchanged
+- `src/agent-ops.js` — `ensureAgentOpsSetup()` gates `setupAgentOps`; `initAgentOps` skips setup while collapsed; `applyOpsCollapsed(false)` calls setup + `refreshAgentOps`; collapsed restore skips attention-glance node create; capture `?open=` still expands Agent Ops
+- `src/cpu.js` — `setSectionCollapsed` / `setCpuUiSectionValue` return without persist when the value is unchanged
+- `src-tauri/dist/agent-ops.js` and `src-tauri/dist/cpu.js` match the skip comments / setup gate
+- `list_agents` / `list_live_sessions` remain inside `refreshAgentOps` (expand / refresh path, not collapsed init)
+- Prior #14 cuts still present: capture URL bake, localStorage UI sections, collapsed Top Processes pin-disk skip, Monitors localStorage icon, Discord icon localStorage, Settings credential wiring defer, collapsed Debug Log skips `read_debug_log`, park gates
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 Agent Ops setup defer.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with Agent Ops collapsed (default); confirm no Agent Ops list/filter IPC (`list_agents`, `list_live_sessions`, …) until expand; expand Agent Ops — overview, tabs, and refresh still work; capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens and hydrates; toggle a section — persist still writes; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
