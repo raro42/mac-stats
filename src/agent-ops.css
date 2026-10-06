@@ -10319,7 +10319,10 @@ button.is-just-saved,
 }
 
 /* Settings product toggles — Saved flash on the label after persist */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .setting-toggle .toggle-label.is-just-saved {
   color: #1a7f37;
   font-weight: 600;
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  box-shadow: none;
 }

@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1573
+
+- Settings product-toggle Saved flash mixes the green wash against an opaque fill. No glass alpha. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1572
 
 - Shared Save / secondary-button Saved flash mixes the green wash against an opaque fill. No glass alpha. P2 reliability / GitHub #14.
