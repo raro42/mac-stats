@@ -1,14 +1,14 @@
-# WIP-14 — next compositor cut (v0.1.1577)
+# WIP-14 — next compositor cut (v0.1.1578)
 
 ## Plan
 - [x] Pick lowest GitHub FEAT/WIP: `WIP-14` (tauri://localhost CPU)
-- [x] Next cut after v0.1.1576: Disk Cleanup row Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied`) still mixed against transparent
-- [x] Add opaque green wash (`#ffffff` mix), opaque border, `box-shadow: none` (keep reclaim inset opaque)
+- [x] Next cut after v0.1.1577: Perplexity result Copied flash (`.perplexity-result-item[role='option'].is-just-copied`) still mixed against transparent
+- [x] Add opaque green wash (`#ffffff` mix), `box-shadow: none`
 - [x] Sync `src/agent-ops.css` → `src-tauri/dist/agent-ops.css`
-- [x] Bump `Cargo.toml` → `0.1.1577`; CHANGELOG entry; standing_backlog note
-- [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
-- [x] `cargo check` in `src-tauri/`
-- [x] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
+- [x] Bump `Cargo.toml` → `0.1.1578`; CHANGELOG entry; standing_backlog note
+- [x] Prepend Implementation notes on task file; keep UNTESTED
+- [x] `cargo check` / ratchet verify
+- [x] Commit + push `origin/main`; do not close #14
 
 ## Review
-Opaque wash on Disk Cleanup row Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied`). Reclaim inset mixes against `#ffffff`. Same pattern as monitor-item / process-row. `cargo check` green. Pushed `98818a29`. Issue #14 left open for tester / 004.
+Opaque wash on Perplexity result row Copied flash. Same pattern as monitor-item / process-row / disk-cleanup row. Ratchet keep @ `fc91df64`. Issue #14 left open for tester / 004.
