@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1563** (follow-up after v0.1.1562).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops Schedules kind filter Clear flash skip glass blend):
+
+- `src/agent-ops.css` — `.ops-schedules-kind-filter-clear.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Agent Ops → Schedules. Choose a kind filter so Clear appears. Press Clear. Confirm the Cleared flash still shows green on Clear, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1562)
+
 Version **v0.1.1562** (follow-up after v0.1.1561).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
