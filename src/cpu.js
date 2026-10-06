@@ -2817,9 +2817,9 @@ function startCpuWindowMetricsOnce() {
   wireCpuWindowDomOnce();
   // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 1200000 });
+    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 2400000 });
   } else {
-    setTimeout(startCpuWindowVersionOnce, 1200000);
+    setTimeout(startCpuWindowVersionOnce, 2400000);
   }
   const afterFirst = () => {
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
@@ -2834,9 +2834,9 @@ function startCpuWindowMetricsOnce() {
         }
       };
       if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(unparkSparklines, { timeout: 480000 });
+        window.requestIdleCallback(unparkSparklines, { timeout: 960000 });
       } else {
-        setTimeout(unparkSparklines, 480000);
+        setTimeout(unparkSparklines, 960000);
       }
     }
   };
@@ -2855,7 +2855,7 @@ function startCpuWindowMetricsOnce() {
 
 /** Idle-defer first get_cpu_details so open paint does not stack IPC (#14). */
 function scheduleCpuWindowMetricsOnce(idleTimeoutMs) {
-  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 480000;
+  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 960000;
   if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: ms });
   } else {
@@ -2878,16 +2878,16 @@ function init() {
     scheduleMonitoringFeaturesOnce();
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(lateOpenFallback, { timeout: 1200000 });
+    window.requestIdleCallback(lateOpenFallback, { timeout: 2400000 });
   } else {
-    setTimeout(lateOpenFallback, 1200000);
+    setTimeout(lateOpenFallback, 2400000);
   }
 
-  // Already focused on open: arm metrics on idle ≤480s (was 240s). Heavy
-  // sections still idle ≤3600s so open does not stack with first gauges (#14).
+  // Already focused on open: arm metrics on idle ≤960s (was 480s). Heavy
+  // sections still idle ≤7200s so open does not stack with first gauges (#14).
   // Keep scheduling here — Focused(true) can race past load (#14).
   if (!windowOccluded()) {
-    scheduleCpuWindowMetricsOnce(480000);
+    scheduleCpuWindowMetricsOnce(960000);
     scheduleMonitoringFeaturesOnce();
   }
 }
@@ -5775,10 +5775,10 @@ function scheduleDeferredFocusRefresh() {
   // Idle-defer get_cpu_details so focus does not stack IPC with shell unpark (#14).
   if (typeof window.requestIdleCallback === "function") {
     focusRefreshIdleHandle = window.requestIdleCallback(run, {
-      timeout: 120000,
+      timeout: 240000,
     });
   } else {
-    focusRefreshTimeoutId = setTimeout(run, 120000);
+    focusRefreshTimeoutId = setTimeout(run, 240000);
   }
 }
 
@@ -5860,7 +5860,7 @@ function resumeIdleWindowPolls() {
   windowPollsPaused = false;
   setDocumentOccluded(false);
   cancelDeferredResumeIdleWindowPolls();
-  // Match chart-line focus unpark (idle ≤120s) so alt-tab does not instantly
+  // Match chart-line focus unpark (idle ≤240s) so alt-tab does not instantly
   // reallocate canvas buffers + restart secondary IPC (#14).
   const run = () => {
     resumeIdlePollsIdleHandle = null;
@@ -5869,10 +5869,10 @@ function resumeIdleWindowPolls() {
   };
   if (typeof window.requestIdleCallback === "function") {
     resumeIdlePollsIdleHandle = window.requestIdleCallback(run, {
-      timeout: 120000,
+      timeout: 240000,
     });
   } else {
-    resumeIdlePollsTimeoutId = setTimeout(run, 120000);
+    resumeIdlePollsTimeoutId = setTimeout(run, 240000);
   }
 }
 
@@ -5900,28 +5900,28 @@ function resumeVisibleWindowWork() {
         void seedThemeHistoryFromBackend();
       };
       if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(seed, { timeout: 480000 });
+        window.requestIdleCallback(seed, { timeout: 960000 });
       } else {
-        setTimeout(seed, 480000);
+        setTimeout(seed, 960000);
       }
     }
-    // Idle-defer get_cpu_details / interval arm on focus (≤120s) — not on the
+    // Idle-defer get_cpu_details / interval arm on focus (≤240s) — not on the
     // focus event (#14). Always schedule so startRefresh can re-arm after pause.
     scheduleDeferredFocusRefresh();
-    // Version/update IPC idle ≤1200s — do not stack with focus refresh (#14).
+    // Version/update IPC idle ≤2400s — do not stack with focus refresh (#14).
     if (typeof window.requestIdleCallback === "function") {
       window.requestIdleCallback(startCpuWindowVersionOnce, {
-        timeout: 1200000,
+        timeout: 2400000,
       });
     } else {
-      setTimeout(startCpuWindowVersionOnce, 1200000);
+      setTimeout(startCpuWindowVersionOnce, 2400000);
     }
-    // Secondary polls + sparkline unpark: idle ≤120s (not on the focus event) (#14).
+    // Secondary polls + sparkline unpark: idle ≤240s (not on the focus event) (#14).
     resumeIdleWindowPolls();
   } else {
     init();
-    // Defer first get_cpu_details (idle ≤480s) so open paint does not stack IPC (#14).
-    scheduleCpuWindowMetricsOnce(480000);
+    // Defer first get_cpu_details (idle ≤960s) so open paint does not stack IPC (#14).
+    scheduleCpuWindowMetricsOnce(960000);
   }
 }
 
@@ -24780,7 +24780,7 @@ function initMonitoringFeatures() {
 }
 
 /**
- * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤1800s after
+ * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤7200s after
  * focus/schedule so open does not stack with first gauge paint (#14).
  */
 function scheduleMonitoringFeaturesOnce() {
@@ -24792,9 +24792,9 @@ function scheduleMonitoringFeaturesOnce() {
   }
   const start = () => initMonitoringFeatures();
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(start, { timeout: 3600000 });
+    window.requestIdleCallback(start, { timeout: 7200000 });
   } else {
-    setTimeout(start, 3600000);
+    setTimeout(start, 7200000);
   }
 }
 
