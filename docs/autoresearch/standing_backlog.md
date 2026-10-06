@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1485
+
+- Disk Cleanup filter glance mixes All, Reclaim, Big, and Clean washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14. Rebased past origin v0.1.1482–1484 (Monitors filter, Top Processes filter, Top Processes Hot).
+
 ## Overnight merge — v0.1.1484
 
 - Top Processes Hot attention glance mixes the hot-count wash against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14. Ollama base-URL unit tests no longer mutate process-wide `OLLAMA_HOST`.

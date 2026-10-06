@@ -6,9 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1485** | The Disk Cleanup filter glance mixes All, Reclaim, Big, and Clean washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1484** | The Top Processes Hot glance mixes the hot-count wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1483** | The Top Processes Filter glance mixes All, Pinned, and Hot washes against an opaque fill. No glass alpha or hover shadow. |
-| **v0.1.1482** | The External / Monitors Filter glance mixes All, Up, Down, and Slow washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1482** | The External / Monitors filter glance mixes All, Up, Down, and Slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1481** | The External / Monitors Down/Slow glance mixes down and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1480** | The AI Chat offline attention glance mixes offline, no-model, ready, continue, sending, filter, errors, last-answer, and copied washes against an opaque fill. |
 | **v0.1.1479** | The AI Chat errors glance mixes the failed-turn wash against an opaque fill. |
@@ -67,10 +68,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-A Down, Slow, or Filter chip on External / Monitors no longer paints that glance with a glass blend. The fill is opaque.
+A Disk Cleanup filter (All, Reclaim, Big, or Clean) no longer paints that glance with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Top Processes Filter glance (All · Pinned · Hot) still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Disk Cleanup Reclaim/Due glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches. Agent Ops filter glances still use a glass fill.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
