@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1484
+
+- Top Processes Hot attention glance mixes the hot-count wash against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14. Ollama base-URL unit tests no longer mutate process-wide `OLLAMA_HOST`.
+
 ## Overnight merge — v0.1.1483
 
 - Top Processes Filter attention glance mixes All, Pinned, and Hot washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.

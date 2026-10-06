@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1484** (follow-up after v0.1.1483).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Top Processes Hot attention glance skip glass blend):
+
+- `src/agent-ops.css` — Top Processes Hot attention glance mixes the hot-count wash against opaque `#ffffff`. No hover or focus drop shadow.
+- `src-tauri/src/ai_agent_stack.rs` — `local_ollama_base_url_from` so unit tests do not race on process-wide `OLLAMA_HOST`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes. Confirm Hot glance still shows the hot-count wash when a hot process is listed. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1483)
+
 Version **v0.1.1483** (follow-up after v0.1.1482).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -3837,3 +3852,44 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand External / Monitors and pick Up, Down, or Slow; confirm Filter glance still shows All / Up / Down / Slow wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1483)
+
+**Date:** 2026-10-06 08:22 UTC (10:22 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1483**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1483)
+- `cd src-tauri && cargo test` — **fail** (1358 passed in lib suite; 1 failed; 0 ignored)
+
+**Static verification (claimed #14 Top Processes Filter attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1483**
+- `CHANGELOG.md` **[0.1.1483]** documents the Top Processes Filter glance mixing All, Pinned, and Hot washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css`: `.processes-filter-attention-glance` (base, hover, `:focus-visible`, `.is-filter`, `.is-pinned`, `.is-hot-filter`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/cpu.js` `applyProcessesFilterAttentionGlanceState` still copies those mode classes onto `#processes-filter-attention-glance` when Top Processes is expanded and Pinned / Hot is active (hidden when empty or All)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + non-All filter path. macOS wash paint still needs a live window pass.
+
+**cargo test failure (unrelated to the CSS cut)**
+
+- `ai_agent_stack::tests::local_ollama_base_url_strips_trailing_slash` panicked: left `http://127.0.0.1:11434`, right `http://localhost:11434`. Likely a process-wide `OLLAMA_HOST` race with `local_ollama_base_url_adds_scheme` (both set/remove the same env var). Not introduced by the #14 glance CSS.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes Filter attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. `cargo test` in `src-tauri/` failed (1 lib test, env-host race above).
+2. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+3. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a green `cargo test` plus a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes and pick Pinned or Hot; confirm Filter glance still shows All / Pinned / Hot wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

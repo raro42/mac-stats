@@ -29,13 +29,16 @@ const CONFIG_WATCH_DEBOUNCE_MS: u64 = 400;
 
 /// Resolve the local Ollama base URL (same defaults as install.sh / Ollama docs).
 fn local_ollama_base_url() -> String {
-    let raw = std::env::var("OLLAMA_HOST")
-        .ok()
-        .map(|s| s.trim().to_string())
+    local_ollama_base_url_from(std::env::var("OLLAMA_HOST").ok().as_deref())
+}
+
+fn local_ollama_base_url_from(host: Option<&str>) -> String {
+    let raw = host
+        .map(str::trim)
         .filter(|s| !s.is_empty())
-        .unwrap_or_else(|| "http://127.0.0.1:11434".to_string());
+        .unwrap_or("http://127.0.0.1:11434");
     let with_scheme = if raw.starts_with("http://") || raw.starts_with("https://") {
-        raw
+        raw.to_string()
     } else {
         format!("http://{raw}")
     };
@@ -304,30 +307,23 @@ fn event_touches_config(event: &notify::Event, config_path: &Path) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::local_ollama_base_url;
+    use super::local_ollama_base_url_from;
 
     #[test]
     fn local_ollama_base_url_default() {
-        // Do not assert against a polluted OLLAMA_HOST from the parent process in CI;
-        // only check scheme/port shape when unset is hard — normalize helper instead.
-        let u = local_ollama_base_url();
-        assert!(u.starts_with("http://") || u.starts_with("https://"));
-        assert!(!u.ends_with('/'));
+        let u = local_ollama_base_url_from(None);
+        assert_eq!(u, "http://127.0.0.1:11434");
     }
 
     #[test]
     fn local_ollama_base_url_adds_scheme() {
-        std::env::set_var("OLLAMA_HOST", "127.0.0.1:11434");
-        let u = local_ollama_base_url();
-        std::env::remove_var("OLLAMA_HOST");
+        let u = local_ollama_base_url_from(Some("127.0.0.1:11434"));
         assert_eq!(u, "http://127.0.0.1:11434");
     }
 
     #[test]
     fn local_ollama_base_url_strips_trailing_slash() {
-        std::env::set_var("OLLAMA_HOST", "http://localhost:11434/");
-        let u = local_ollama_base_url();
-        std::env::remove_var("OLLAMA_HOST");
+        let u = local_ollama_base_url_from(Some("http://localhost:11434/"));
         assert_eq!(u, "http://localhost:11434");
     }
 }
