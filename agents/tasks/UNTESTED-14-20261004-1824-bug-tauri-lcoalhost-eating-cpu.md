@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1491** (follow-up after v0.1.1490).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Agent Ops Discord Offline/Reconnect attention glance skip glass blend):
+
+- `src/agent-ops.css` — Agent Ops Discord Offline/Reconnect attention glance mixes offline and reconnect washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Discord Offline/Reconnect glance still shows offline / reconnect wash when Discord is offline or reconnecting. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1490)
+
+Version **v0.1.1490** (follow-up after v0.1.1489). Origin shipped the Agent Ops Digest glance opaque wash (open-candidate).
+
+## Prior implementation (v0.1.1489)
+
 Version **v0.1.1489** (follow-up after v0.1.1488).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
