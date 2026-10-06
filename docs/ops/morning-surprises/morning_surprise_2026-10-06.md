@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1502** | The Agent Ops Signal glance mixes not-wired, not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1501** | The Agent Ops Slack glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1500** | The Agent Ops Telegram glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1499** | The Agent Ops Mastodon glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |

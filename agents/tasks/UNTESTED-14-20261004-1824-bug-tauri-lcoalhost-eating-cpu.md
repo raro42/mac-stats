@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1502** (follow-up after v0.1.1501).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Agent Ops Signal Not wired/Partial attention glance skip glass blend):
+
+- `src/agent-ops.css` — Agent Ops Signal attention glance mixes not-wired, not-set, partial, warn, and bad washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Signal glance still shows not-wired / not-set / partial / warn / bad wash when Signal is not wired, not set, partial, unavailable, or degraded. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1501)
+
 Version **v0.1.1501** (follow-up after v0.1.1500).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
