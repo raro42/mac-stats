@@ -401,9 +401,10 @@ body:hover {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .details-grid > .detail-value[role='option'].is-just-copied {
-  background: color-mix(in srgb, #34c759 12%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  box-shadow: none;
 }
 
 .details-grid > .detail-value[role='option'].is-just-copied::after {
