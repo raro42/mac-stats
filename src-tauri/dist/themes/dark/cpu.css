@@ -210,9 +210,15 @@ body {
 
 .metric-value {
   position: absolute;
-  top: 52%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  top: calc(52% - 0.5lh);
+  left: 0;
+  right: 0;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  transform: none;
   font-size: 26px;
   font-weight: 800;
   white-space: nowrap;
@@ -230,9 +236,15 @@ body {
 
 .metric-subtext {
   position: absolute;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
   top: calc(70% + 17px);
-  left: 50%;
-  transform: translate(-50%, 0);
+  left: 0;
+  right: 0;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  transform: none;
   font-size: 10px;
   color: var(--text-muted);
   white-space: nowrap;

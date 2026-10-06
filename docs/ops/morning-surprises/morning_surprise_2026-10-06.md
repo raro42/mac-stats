@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1460** | Ring numbers and the line under them center without a translate. Those labels no longer keep a Graphics and Media layer while the window is open. |
 | **v0.1.1459** | Low Power Mode knob sits with left offset, not a translate. The battery strip does not keep a transform layer while LPM is on. |
 | **v0.1.1458** | Section icons skip transform layers. Hover and press do not lift or scale those chips. The Monitors status dot uses offset, not translate. |
 | **v0.1.1457** | Header Refresh and Settings skip transform layers. The divider uses offset, not translate. Hover and press do not lift or scale those buttons. |
@@ -42,10 +43,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Ring gauges sit in the card without a translate. WebKit does not keep a transform layer for those four SVGs on every open.
+Ring numbers and the line under them sit in the card without a translate. WebKit does not keep a transform layer for those labels on every open.
 
 ## Still open
 
-- ~22:20 tick: ring gauges drop the translate layer (**v0.1.1456**, rebasing past origin v0.1.1455). Metric-value text still uses translate.
+- ~22:45 tick: ring numbers drop the translate layer (**v0.1.1460**, rebasing past origin v0.1.1457–1459). Settings toggle knobs still use `translateX` when on.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

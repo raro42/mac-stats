@@ -253,9 +253,13 @@ body {
 .metric-value {
   position: absolute;
   z-index: 2;
-  top: calc(50% + 14px);
-  left: 50%;
-  transform: translate(-50%, -50%);
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  top: calc(50% + 14px - 0.5lh);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+  transform: none;
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -286,9 +290,14 @@ body {
 .metric-subtext {
   position: absolute;
   z-index: 2;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
   top: 76%;
-  left: 50%;
-  transform: translate(-50%, 0);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
+  text-align: center;
+  transform: none;
 
   font-size: 10px;
   font-weight: 500;

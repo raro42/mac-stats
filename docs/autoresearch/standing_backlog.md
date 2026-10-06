@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1460
+
+- Ring numbers and the line under them center without `transform: translate`. Those labels no longer keep a Graphics and Media layer on the open CPU window. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1459
 
 - Low Power Mode knob sits with `left`, not a translate. The battery strip no longer keeps a transform layer while LPM is on. P2 reliability / GitHub #14.
