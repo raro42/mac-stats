@@ -1,11 +1,11 @@
-# Coder — #14 v0.1.1466
+# Coder — #14 v0.1.1468
 
 ## Plan
-- [x] Opaque Details collapsed glance status washes (no glass alpha)
+- [x] Opaque Top Processes keep-header glances (CPU · GPU · RAM)
 - [x] Mix against opaque fill; drop hover / focus box-shadow
-- [x] Bump v0.1.1466; CHANGELOG; standing backlog
+- [x] Bump v0.1.1468; CHANGELOG; standing backlog
 - [x] `cargo check` in src-tauri; sync dist
 - [x] Rename WIP-14 → UNTESTED; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1466** for GitHub #14. Details collapsed glance (Load · RAM · Up) hot / calm washes no longer keep a glass compositor blend on the open CPU window. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1468** for GitHub #14 (after remote **v0.1.1467** ring rotate). Top Processes keep-header glances (CPU · GPU · RAM) calm / hot washes no longer keep a glass compositor blend on the open CPU window. Issue left open for tester / 004 (macOS Activity Monitor).

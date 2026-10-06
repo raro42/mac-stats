@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1468** | Top Processes keep-header glances (CPU · GPU · RAM) mix calm and hot washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1467** | Ring progress strokes draw their start in the path. Dark, Futuristic, Neon, Material, and Swiss no longer use a CSS rotate. |
 | **v0.1.1466** | Details collapsed glance (Load · RAM · Up) mixes calm and hot washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1465** | CPU, GPU, Freq, and Temp ring cards mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. |

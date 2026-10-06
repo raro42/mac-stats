@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1468
+
+- Top Processes keep-header glances (CPU · GPU · RAM) mix calm and hot washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1467
 
 - Ring progress strokes draw their start in the path. Dark, Futuristic, Neon, Material, and Swiss no longer use CSS rotate. P2 reliability / GitHub #14.
