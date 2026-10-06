@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
 ### Added
 - **Overnight harness on Linux** — `python3 scripts/install_mac_stats_overnight_units.py` installs `mac-stats-overnight-harness.service` (restart on exit) plus the shared watchdog. Same 20:00–06:00 autoresearch as the macOS LaunchAgent. Logs under `~/.mac-stats/improvements/`.
 
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
+
+## [0.1.1505] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — The Perplexity Top/error/filter glance mixes error, top, and filter washes against an opaque fill. No glass alpha or hover shadow. A compositor blend no longer stays on that glance while a search has an error, a top hit, or an active filter.
 
 ## [0.1.1504] - 2026-10-06
 

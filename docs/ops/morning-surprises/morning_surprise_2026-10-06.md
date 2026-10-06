@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1505** | The Perplexity Top/error/filter glance mixes error, top, and filter washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1504** | The Perplexity Key-not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1503** | The Monitors summary mixes down, all-up, and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1502** | The Agent Ops Signal glance mixes not-wired, not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
