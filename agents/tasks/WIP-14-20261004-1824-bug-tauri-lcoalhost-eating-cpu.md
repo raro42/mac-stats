@@ -3726,3 +3726,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat errors glance still shows the failed-turn wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+## Test report (v0.1.1480)
+
+**Date:** 2026-10-06 08:10 UTC (10:10 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1480**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1480)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 AI Chat offline attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1480**
+- `CHANGELOG.md` **[0.1.1480]** documents the AI Chat offline attention glance mixing offline, no-model, ready, continue, sending, filter, errors, last-answer, and copied washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css`: `.chat-offline-attention-glance` (base, hover, `:focus-visible`, `.is-offline`, `.is-circuit`, `.is-no-model`, `.is-not-set`, `.is-ready`, `.is-continue`, `.is-sending`, `.is-filter`, `.is-errors`, `.is-last-answer`, `.is-just-copied`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/ollama.js` `applyChatOfflineAttentionGlanceState` still copies those mode classes onto `#chat-offline-attention-glance` when the AI Chat pane is expanded
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): `applyChatOfflineAttentionGlanceState` hides the glance and returns after `isOllamaSectionCollapsed()`, so the wash paint is the expanded-pane path. MacOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque AI Chat offline attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat offline attention glance still shows offline / no-model / ready / continue / sending / filter / errors / last-answer / copied wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
