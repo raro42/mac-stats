@@ -4625,3 +4625,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity Search; confirm Top/error/filter glance still shows error, top, or filter wash when a search has an error, a top hit, or an active filter; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1506)
+
+**Date:** 2026-10-06 10:51 UTC (12:51 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1506**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1506)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Perplexity last-search glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1506**
+- `CHANGELOG.md` **[0.1.1506]** documents the Perplexity last-search glance mixing results, searching, error, key-needed, and ready washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.perplexity-last-glance` (base, hover, `:focus-visible`, `.has-results`, `.is-searching`, `.has-error`, `.needs-key`, `.is-ready`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu.js` `applyPerplexityLastGlanceState` still copies `.is-searching` / `.has-error` / `.has-results` / `.needs-key` / `.is-ready` onto `#perplexity-last-glance` (searching, last error, last results, missing key, collapsed ready / collapsed filter). Hidden when the pane is expanded, configured, idle, and there is no last search
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint includes the collapsed keep-header path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Perplexity last-search glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity Search; confirm last-search glance still shows results / searching / error / key-needed / ready wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
