@@ -10,8 +10,8 @@
 - [x] sync-dist.sh
 - [x] cargo check in src-tauri/
 - [x] Update task file + rename WIP → UNTESTED
-- [ ] Commit + push origin/main
+- [x] Commit + push origin/main
 - [x] Do not close GitHub #14
 
 ## Review
-Mid-flight secondary IPC cancel after v0.1.1426. Shared `windowWorkPaused` gate; rAF cancel on blur; Discord/monitors/history/logs/disk/update banner/Process Details/Agent Ops skip paint when parked. `cargo check` pass.
+Mid-flight secondary IPC cancel after v0.1.1426. Shared `windowWorkPaused` gate; rAF cancel on blur; Discord/monitors/history/logs/disk/update banner/Process Details/Agent Ops skip paint when parked. `cargo check` pass. Pushed `54bc357a` to origin/main. Issue #14 left open for tester/004.
