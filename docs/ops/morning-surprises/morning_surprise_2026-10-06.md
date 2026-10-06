@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1499** | The Agent Ops Mastodon glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1498** | The Agent Ops Perplexity Search Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1497** | The Agent Ops Cursor Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1496** | The Agent Ops MCP Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
@@ -81,10 +82,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-An Agent Ops Browser glance no longer paints not-set, unavailable, or degraded with a glass blend. The fill is opaque.
+An Agent Ops Mastodon glance no longer paints not-set or partial with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Agent Ops MCP glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Agent Ops Telegram glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
