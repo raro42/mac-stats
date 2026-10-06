@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1538** (follow-up after v0.1.1537).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Browser / CDP Save Saved flash skip glass blend):
+
+- `src/agent-ops.css` — `#browser-save.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Press Browser / CDP Save. Confirm the Saved flash still shows green on the save control, then reverts. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1537)
+
 Version **v0.1.1537** (follow-up after v0.1.1536).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.

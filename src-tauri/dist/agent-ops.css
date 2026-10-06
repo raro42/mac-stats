@@ -9425,11 +9425,12 @@ button.is-just-saved,
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #browser-save.is-just-saved {
-  background: rgba(52, 199, 89, 0.95) !important;
-  border-color: transparent !important;
+  background: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ffffff) !important;
   color: #fff !important;
-  opacity: 1;
+  box-shadow: none;
 }
 
 /* Settings — Cursor agent not-set attention glance (Credentials; Browser parity) */
