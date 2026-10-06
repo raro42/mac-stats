@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1554** (follow-up after v0.1.1553).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Process Details PID Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.process-detail-pid.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Top Processes → Process Details (Advanced). Click the PID to copy. Confirm the Copied flash still shows green on the PID, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward &lt;1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1553)
+
 Version **v0.1.1553** (follow-up after v0.1.1552).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
