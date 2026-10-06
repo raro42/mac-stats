@@ -10166,12 +10166,16 @@ button.is-just-saved,
 }
 
 /* Theme / app version → changelog — soft green Opened flash */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .version-clickable.is-just-saved,
 .app-version.is-just-saved,
 .theme-version.is-just-saved,
 .arch-version.is-just-saved {
   color: color-mix(in srgb, #34c759 75%, currentColor) !important;
   pointer-events: none;
+  text-decoration: none;
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  box-shadow: none;
 }
 
 /* AI Chat system-prompt Reset to Default — soft green flash */
