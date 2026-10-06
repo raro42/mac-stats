@@ -9864,6 +9864,7 @@ button.is-just-saved,
 }
 
 /* Settings Product — Having fun Off attention glance (Ori / Downloads parity) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .settings-having-fun-attention-glance {
   display: flex;
   align-items: center;
@@ -9873,8 +9874,8 @@ button.is-just-saved,
   margin: 6px 0 8px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font: inherit;
   font-size: 13px;
   font-weight: 520;
@@ -9885,7 +9886,6 @@ button.is-just-saved,
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -9894,20 +9894,20 @@ button.is-just-saved,
 }
 
 .settings-having-fun-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .settings-having-fun-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 .settings-having-fun-attention-glance.is-off {
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 55%, currentColor);
 }
 
