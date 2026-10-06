@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1414** (follow-up after v0.1.1413).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (no parse-time UI-state IPC + deferred monitoring / Agent Ops):
+
+- `src/cpu.js` — parse-time `cpuUiSectionsReady` seeds localStorage only (no `get_cpu_window_ui_state` on script eval). UI-state retries every 500ms. `initMonitoringFeatures` idle ≤120s after focus/schedule (not 100ms on DOMContentLoaded). Version/update IPC + ring gauges arm with metrics/focus (no 60s/120s idle wake). DOM wire focus/late only.
+- `src/agent-ops.js` — Agent Ops init idle ≤120s; open-section / loadCpuUi wait retries every 500ms.
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and sparklines still appear when focused; section expand still works after idle. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1413)
+
 Version **v0.1.1413** (follow-up after v0.1.1412).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

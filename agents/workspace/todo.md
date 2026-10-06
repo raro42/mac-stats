@@ -1,11 +1,14 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1413)
+# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1414)
 
-- [x] Rename UNTESTED→WIP
-- [x] Gate first metrics + sparkline GPU on focus (no 120s idle wake)
-- [x] Guard init against double-arm; slow waitForTauri poll
-- [x] Bump 0.1.1413, CHANGELOG, sync-dist
+- [x] Stop parse-time `loadCpuUiSections()` IPC (localStorage seed only; backend on demand)
+- [x] Slow `get_cpu_window_ui_state` retry (50ms → 500ms)
+- [x] Defer `initMonitoringFeatures` (100ms → idle ≤120s); idempotent
+- [x] Focus-gate version/update IPC + DOM wire (no 60s/120s idle wake); late 10m fallback
+- [x] Defer `initRingGauges` into DOM wire
+- [x] Defer Agent Ops init + slow open-section retries
+- [x] Bump 0.1.1414, CHANGELOG, sync-dist
 - [x] cargo check; rename WIP→UNTESTED
-- [x] commit + push origin/main
+- [ ] commit + push origin/main
 
 ## Review
-Shipped `ea04144f` v0.1.1413. Focus-gated first metrics; no idle sparkline unpark; slower waitForTauri. Task at `UNTESTED-14-…`. Issue #14 left open.
+Shipped v0.1.1414 open-path IPC deferrals. Task at `UNTESTED-14-…`. Issue #14 left open.

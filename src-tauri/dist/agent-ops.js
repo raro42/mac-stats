@@ -10580,9 +10580,9 @@ function escapeHtml(s) {
     // Restore last open/closed state after config.json load (WebView is destroyed on close).
     void (async () => {
       try {
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 20; i++) {
           if (typeof window.loadCpuUiSections === 'function') break;
-          await new Promise((r) => setTimeout(r, 25));
+          await new Promise((r) => setTimeout(r, 500));
         }
         if (typeof window.loadCpuUiSections === 'function') {
           await window.loadCpuUiSections();
@@ -10611,12 +10611,12 @@ function escapeHtml(s) {
         }
       };
       let section = null;
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < 10; i++) {
         try {
           section = await invoke('take_open_ui_section');
           break;
         } catch (_) {
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 500));
         }
       }
       if (!section) return;
@@ -10760,10 +10760,22 @@ function escapeHtml(s) {
     setupAgentOps();
   }
 
+  // Defer Agent Ops DOM wiring past first gauge paint (#14).
+  function scheduleInitAgentOps() {
+    if (window.__macStatsAgentOpsInitScheduled) return;
+    window.__macStatsAgentOpsInitScheduled = true;
+    const start = () => initAgentOps();
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(start, { timeout: 120000 });
+    } else {
+      setTimeout(start, 120000);
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAgentOps);
+    document.addEventListener('DOMContentLoaded', scheduleInitAgentOps);
   } else {
-    initAgentOps();
+    scheduleInitAgentOps();
   }
 
   window.addEventListener('beforeunload', () => stopAgentOpsAutoRefresh());

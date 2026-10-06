@@ -64,7 +64,8 @@ async function loadCpuUiSections() {
     const inv = getInvoke();
     if (!inv) return cpuUiSectionsCache;
     // Tauri invoke may not be ready on first tick.
-    for (let i = 0; i < 30; i++) {
+    // Slow retries: a 50ms loop woke the WebView on open (#14).
+    for (let i = 0; i < 20; i++) {
       try {
         const remote = await inv('get_cpu_window_ui_state');
         if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
@@ -83,7 +84,7 @@ async function loadCpuUiSections() {
         }
         return cpuUiSectionsCache;
       } catch (_) {
-        await new Promise((r) => setTimeout(r, 50));
+        await new Promise((r) => setTimeout(r, 500));
       }
     }
     console.warn('cpuWindowUi load failed; using localStorage defaults');
@@ -184,8 +185,14 @@ function setIconPaneVisibility(section, content, hidden, divider) {
   }
 }
 window.setIconPaneVisibility = setIconPaneVisibility;
-// Kick off early so Agent Ops can await the same promise.
-window.cpuUiSectionsReady = loadCpuUiSections();
+// Seed from localStorage only at parse time — do not IPC get_cpu_window_ui_state
+// on script eval (that 50ms retry loop kept tauri://localhost hot on open) (#14).
+// Backend merge happens later via loadCpuUiSections() from monitoring init / focus.
+window.cpuUiSectionsReady = Promise.resolve().then(() => {
+  const seeded = seedCpuUiSectionsFromLocalStorage();
+  cpuUiSectionsCache = { ...seeded };
+  return cpuUiSectionsCache;
+});
 
 // Flush section state before WebView destroy (menu-bar toggle / title-bar close).
 window.addEventListener('pagehide', () => {
@@ -2776,6 +2783,7 @@ function stopRefresh() {
 function wireCpuWindowDomOnce() {
   if (window.__macStatsCpuDomWired) return;
   window.__macStatsCpuDomWired = true;
+  initRingGauges();
   wireMetricValueCopy();
   ensureCpuHeaderToolbarKeyboard();
   ensureRingGaugeKeyboard();
@@ -2788,6 +2796,16 @@ function wireCpuWindowDomOnce() {
   ensurePowerStripKeyboard();
 }
 
+/** Version + update-check IPC once (focus / late fallback — not on open idle) (#14). */
+function startCpuWindowVersionOnce() {
+  if (window.__macStatsCpuVersionArmed) return;
+  window.__macStatsCpuVersionArmed = true;
+  fetchAppVersion().then((v) => {
+    showFirstLaunchTip();
+    checkForAppUpdate(v);
+  });
+}
+
 /**
  * First get_cpu_details + slow refresh interval. Prefer focus/resume so open
  * does not stack IPC with WebView compositor work (#14).
@@ -2795,6 +2813,7 @@ function wireCpuWindowDomOnce() {
 function startCpuWindowMetricsOnce() {
   if (window.__macStatsCpuMetricsArmed) return;
   window.__macStatsCpuMetricsArmed = true;
+  startCpuWindowVersionOnce();
   const afterFirst = () => {
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
     if (!refreshInterval) startRefresh();
@@ -2826,24 +2845,17 @@ function init() {
   window.__macStatsCpuWindowInitStarted = true;
 
   // Keep warm PROCESS_CACHE on open — do not force a full process refresh (#14).
-  // Defer DOM wiring past first paint so open does not stack layout with WebKit (#14).
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(wireCpuWindowDomOnce, { timeout: 60000 });
-  } else {
-    setTimeout(wireCpuWindowDomOnce, 60000);
-  }
-
-  // Do not idle-start get_cpu_details — wait for focus/resume (#14).
+  // Do not idle-wire DOM or idle-start metrics — wait for focus/resume (#14).
   // Late fallback if Focused(true) never arrives (flaky hosts).
-  const lateMetricsFallback = () => {
-    if (!window.__macStatsCpuMetricsArmed) {
-      startCpuWindowMetricsOnce();
-    }
+  const lateOpenFallback = () => {
+    wireCpuWindowDomOnce();
+    startCpuWindowMetricsOnce();
+    scheduleMonitoringFeaturesOnce();
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(lateMetricsFallback, { timeout: 600000 });
+    window.requestIdleCallback(lateOpenFallback, { timeout: 600000 });
   } else {
-    setTimeout(lateMetricsFallback, 600000);
+    setTimeout(lateOpenFallback, 600000);
   }
 
   // If the window already has focus on open, arm metrics without waiting
@@ -2854,6 +2866,8 @@ function init() {
     } else {
       setTimeout(startCpuWindowMetricsOnce, 5000);
     }
+    // Heavy section wiring still waits (gauges first) (#14).
+    scheduleMonitoringFeaturesOnce();
   }
 }
 
@@ -5334,91 +5348,62 @@ function footerThemeLabel(el) {
 }
 window.footerThemeLabel = footerThemeLabel;
 
-// Try multiple initialization strategies
-if (document.readyState === "loading") {
-  // Fetch app version once at startup (no polling for CPU efficiency)
-  let appVersion = null;
-  
-  async function fetchAppVersion() {
-    if (appVersion !== null) {
-      return appVersion; // Already fetched, return cached value
-    }
-    
-    const invoke = getInvoke();
-    if (!invoke) {
-      appVersion = "unknown";
-      return appVersion;
-    }
-    
-    try {
-      appVersion = await invoke("get_app_version");
-      try {
-        document.title = "mac-stats · glad you're here";
-      } catch (_) {}
-      try {
-        const prev = localStorage.getItem("macStatsAssetVersion");
-        if (prev !== appVersion) {
-          localStorage.setItem("macStatsAssetVersion", appVersion);
-          // Hard reload theme shell once per version so gauge/layout HTML updates stick.
-          if (prev) {
-            window.location.replace(`../../cpu.html?v=${encodeURIComponent(appVersion)}`);
-            return appVersion;
-          }
-        }
-      } catch (_) {}
-      // Set version in all footer elements
-      const versionElements = document.querySelectorAll('.app-version, .theme-version, .arch-version');
-      versionElements.forEach(el => {
-        const themeName = footerThemeLabel(el);
-        if (themeName) {
-          el.textContent = `${themeName} v${appVersion}`;
-        } else {
-          el.textContent = `v${appVersion}`;
-        }
-      });
-      return appVersion;
-    } catch (error) {
-      console.error("Error fetching app version:", error);
-      appVersion = "unknown";
-      return appVersion;
-    }
+// App version cache — fetched once on focus / metrics arm (#14).
+let appVersionCache = null;
+
+async function fetchAppVersion() {
+  if (appVersionCache !== null) {
+    return appVersionCache;
   }
 
+  const inv = getInvoke();
+  if (!inv) {
+    appVersionCache = "unknown";
+    return appVersionCache;
+  }
+
+  try {
+    appVersionCache = await inv("get_app_version");
+    try {
+      document.title = "mac-stats · glad you're here";
+    } catch (_) {}
+    try {
+      const prev = localStorage.getItem("macStatsAssetVersion");
+      if (prev !== appVersionCache) {
+        localStorage.setItem("macStatsAssetVersion", appVersionCache);
+        // Hard reload theme shell once per version so gauge/layout HTML updates stick.
+        if (prev) {
+          window.location.replace(`../../cpu.html?v=${encodeURIComponent(appVersionCache)}`);
+          return appVersionCache;
+        }
+      }
+    } catch (_) {}
+    const versionElements = document.querySelectorAll(
+      ".app-version, .theme-version, .arch-version"
+    );
+    versionElements.forEach((el) => {
+      const themeName = footerThemeLabel(el);
+      if (themeName) {
+        el.textContent = `${themeName} v${appVersionCache}`;
+      } else {
+        el.textContent = `v${appVersionCache}`;
+      }
+    });
+    return appVersionCache;
+  } catch (error) {
+    console.error("Error fetching app version:", error);
+    appVersionCache = "unknown";
+    return appVersionCache;
+  }
+}
+
+// Try multiple initialization strategies
+if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
-    // Defer version / update IPC past first paint (#14).
-    const startVersion = () => {
-      fetchAppVersion().then((v) => {
-        showFirstLaunchTip();
-        checkForAppUpdate(v);
-      });
-    };
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(startVersion, { timeout: 120000 });
-    } else {
-      setTimeout(startVersion, 120000);
-    }
-    initRingGauges();
+    // Version / ring / monitoring arm on focus or late fallback (#14).
     init();
   });
 } else {
-  const startVersion = () => {
-    showFirstLaunchTip();
-    (async () => {
-      try {
-        const inv = typeof getInvoke === "function" ? getInvoke() : null;
-        if (inv) {
-          const v = await inv("get_app_version");
-          checkForAppUpdate(v);
-        }
-      } catch (_) {}
-    })();
-  };
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startVersion, { timeout: 120000 });
-  } else {
-    setTimeout(startVersion, 120000);
-  }
-  initRingGauges();
   init();
 }
 
@@ -5771,8 +5756,9 @@ function resumeVisibleWindowWork() {
   if (document.hidden) return;
   setDocumentOccluded(false);
   window._forceProcessUpdate = true;
-  // Focus path: wire keyboard/copy immediately (may beat the 60s idle) (#14).
+  // Focus path: wire keyboard/copy immediately (may beat the late fallback) (#14).
   wireCpuWindowDomOnce();
+  scheduleMonitoringFeaturesOnce();
   if (invoke) {
     // Skip history reseed on rapid focus churn (alt-tab) — gauges refresh below (#14).
     if (
@@ -5792,6 +5778,7 @@ function resumeVisibleWindowWork() {
     if (!refreshInterval) {
       startRefresh();
     }
+    startCpuWindowVersionOnce();
     resumeIdleWindowPolls();
   } else {
     init();
@@ -24621,44 +24608,56 @@ function initHistoryControls() {
 
 // Initialize monitoring features when DOM is ready
 function initMonitoringFeatures() {
-  // Use setTimeout to ensure DOM is fully ready; load persisted section state first
-  // (config.json) because the CPU WebView is destroyed on close.
-  setTimeout(() => {
-    void (async () => {
-      await loadCpuUiSections();
-      await hydratePinnedProcessNamesFromDisk();
-      initIconLine();
-      syncIconLineFromSavedSections();
-      initCollapsibleSections();
-      initMonitorsSection();
-      initPerplexitySection();
-      initBraveSettings();
-      initRedmineSettings();
-      initMastodonSettings();
-      initMcpSettings();
-      initBrowserSettings();
-      initCursorAgentSettings();
-      initTelegramSettings();
-      initSlackSettings();
-      initSignalSettings();
-      initLogsSection();
-      initDiskCleanupSection();
-      initOllamaSection();
-      initHistoryControls();
-      // Auto-configure Ollama with default endpoint (if module is available)
-      if (window.Ollama) {
-        autoConfigureOllama();
-      }
-      await initCpuWindowCompactPreference();
-    })();
-  }, 100);
+  if (window.__macStatsMonitoringFeaturesStarted) return;
+  window.__macStatsMonitoringFeaturesStarted = true;
+  // Load persisted section state first (config.json) because the CPU WebView
+  // is destroyed on close. Backend UI-state IPC was moved off parse-time (#14).
+  void (async () => {
+    await loadCpuUiSections();
+    await hydratePinnedProcessNamesFromDisk();
+    initIconLine();
+    syncIconLineFromSavedSections();
+    initCollapsibleSections();
+    initMonitorsSection();
+    initPerplexitySection();
+    initBraveSettings();
+    initRedmineSettings();
+    initMastodonSettings();
+    initMcpSettings();
+    initBrowserSettings();
+    initCursorAgentSettings();
+    initTelegramSettings();
+    initSlackSettings();
+    initSignalSettings();
+    initLogsSection();
+    initDiskCleanupSection();
+    initOllamaSection();
+    initHistoryControls();
+    // Auto-configure Ollama with default endpoint (if module is available)
+    if (window.Ollama) {
+      autoConfigureOllama();
+    }
+    await initCpuWindowCompactPreference();
+  })();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMonitoringFeatures);
-} else {
-  initMonitoringFeatures();
+/**
+ * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤120s after
+ * focus/schedule so open does not stack with first gauge paint (#14).
+ */
+function scheduleMonitoringFeaturesOnce() {
+  if (window.__macStatsMonitoringFeaturesScheduled) return;
+  window.__macStatsMonitoringFeaturesScheduled = true;
+  const start = () => initMonitoringFeatures();
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(start, { timeout: 120000 });
+  } else {
+    setTimeout(start, 120000);
+  }
 }
+
+// Do not arm monitoring on DOMContentLoaded — focus / late fallback schedules it (#14).
+window.__macStatsScheduleMonitoringFeatures = scheduleMonitoringFeaturesOnce;
 
 // Battery/power is now updated directly in the refresh() function
 // No need for wrapper since refresh() already calls get_cpu_details
