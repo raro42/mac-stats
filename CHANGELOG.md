@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1427] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Shared `__macStatsWindowWorkPaused` gate (occlusion + pause, not only `document.hidden`). Blur cancels queued gauge/DOM `requestAnimationFrame` with `cancelAnimationFrame`. Mid-flight Discord icon, monitors summary/list, history availability, Debug Log glance/viewer, Disk Cleanup panel, update banner, Process Details refresh, and Agent Ops auto-refresh skip IPC and DOM when parked. Blur stops Process Details live refresh; focus re-arms it if the modal is still open. Aim: quieter `tauri://localhost` / Graphics and Media when secondary IPC finishes after alt-tab.
+
+
 ## [0.1.1426] - 2026-10-06
 
 ### Changed

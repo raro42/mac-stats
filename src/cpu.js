@@ -252,6 +252,8 @@ function thermalLevelFromCpuDetails(data) {
 // Collect all DOM changes and apply them in a single requestAnimationFrame
 let pendingDOMUpdates = [];
 let domUpdateScheduled = false;
+/** Queued gauge/DOM rAF handle — cancel on blur so WebKit is not woken (#14). */
+let domUpdateRafId = null;
 
 /** macOS often keeps visibilityState=visible when another app is frontmost (#14). */
 function windowOccluded() {
@@ -266,6 +268,15 @@ function windowOccluded() {
   }
   return false;
 }
+
+/** True when blur/park or occlusion should drop IPC + DOM wake (#14). */
+function windowWorkPaused() {
+  return windowOccluded() || windowPollsPaused;
+}
+
+// Agent Ops / other modules cannot see cpu.js locals — share the gate (#14).
+window.__macStatsWindowWorkPaused = windowWorkPaused;
+window.__macStatsWindowOccluded = windowOccluded;
 
 /** Drive CSS paint parking for heavy layers while occluded (#14). */
 function setDocumentOccluded(occluded) {
@@ -304,18 +315,27 @@ function setDocumentOccluded(occluded) {
 function clearPendingDOMUpdates() {
   pendingDOMUpdates = [];
   domUpdateScheduled = false;
+  if (domUpdateRafId != null) {
+    try {
+      cancelAnimationFrame(domUpdateRafId);
+    } catch (_) {
+      /* ignore */
+    }
+    domUpdateRafId = null;
+  }
 }
 
 function scheduleDOMUpdate(updateFn) {
   // Occluded window: do not wake WebKit with rAF batches (#14).
-  if (windowOccluded() || windowPollsPaused) return;
+  if (windowWorkPaused()) return;
   pendingDOMUpdates.push(updateFn);
   if (!domUpdateScheduled) {
     domUpdateScheduled = true;
-    requestAnimationFrame(() => {
+    domUpdateRafId = requestAnimationFrame(() => {
+      domUpdateRafId = null;
       domUpdateScheduled = false;
       // Alt-tab between schedule and rAF: drop the batch (#14).
-      if (windowOccluded() || windowPollsPaused) {
+      if (windowWorkPaused()) {
         pendingDOMUpdates = [];
         return;
       }
@@ -1667,7 +1687,7 @@ let lastMetricsRefreshMs = 0;
 
 async function refresh() {
   // Blur/visibility pause clears the interval; still guard stray invokes (#14).
-  if (windowOccluded() || windowPollsPaused) return;
+  if (windowWorkPaused()) return;
   if (!invoke) {
     invoke = getInvoke();
     if (!invoke) {
@@ -1686,7 +1706,7 @@ async function refresh() {
     const data = await invoke("get_cpu_details");
     // Alt-tab during the IPC round-trip: drop DOM/paint so we do not wake
     // WebKit while the shell is parked (#14).
-    if (windowOccluded() || windowPollsPaused) return;
+    if (windowWorkPaused()) return;
     lastMetricsRefreshMs = Date.now();
     
     // Update battery/power with the data we just fetched
@@ -5850,6 +5870,8 @@ async function checkForAppUpdate(currentVersion) {
     console.debug("Update check skipped:", err);
     return;
   }
+  // Alt-tab during GitHub fetch: do not mount update chrome while parked (#14).
+  if (windowWorkPaused()) return;
   if (!latestTag || !isNewerVersion(latestTag, currentVersion)) return;
 
   const dismissKey = `mac_stats_update_dismissed_${latestTag}`;
@@ -5858,6 +5880,7 @@ async function checkForAppUpdate(currentVersion) {
   } catch (_) {}
 
   if (document.getElementById("mac-stats-update-banner")) return;
+  if (windowWorkPaused()) return;
   const banner = document.createElement("div");
   banner.id = "mac-stats-update-banner";
   banner.setAttribute("role", "status");
@@ -5988,6 +6011,11 @@ function pauseIdleWindowPolls() {
   stopLogsAutoRefresh();
   stopDiskCleanupGlancePoll();
   stopHistoryAvailabilityPoll();
+  // Process Details live refresh: stop while parked (#14).
+  if (processDetailsRefreshInterval) {
+    clearInterval(processDetailsRefreshInterval);
+    processDetailsRefreshInterval = null;
+  }
   if (monitorsUpdateInterval) {
     clearInterval(monitorsUpdateInterval);
     monitorsUpdateInterval = null;
@@ -6039,12 +6067,34 @@ function applyDeferredResumeIdleWindowPolls() {
   // Monitors: restart light summary poll (full list only when expanded).
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
-      if (document.hidden) return;
+      if (windowWorkPaused()) return;
       updateMonitorsSummary();
       if (!monitorsCollapsed) {
         loadMonitors().then(() => {
+          if (windowWorkPaused()) return;
           updateMonitorsHeight();
         });
+      }
+    }, 3600000);
+  }
+  // Process Details: blur cleared the live interval — re-arm if still open (#14).
+  if (
+    currentProcessPid != null &&
+    processDetailsModal &&
+    processDetailsModal.style.display !== "none" &&
+    !processDetailsRefreshInterval
+  ) {
+    processDetailsRefreshInterval = setInterval(() => {
+      if (windowWorkPaused()) return;
+      if (
+        currentProcessPid !== null &&
+        processDetailsModal &&
+        processDetailsModal.style.display !== "none"
+      ) {
+        updateProcessDetailsContent(currentProcessPid);
+      } else if (processDetailsRefreshInterval) {
+        clearInterval(processDetailsRefreshInterval);
+        processDetailsRefreshInterval = null;
       }
     }, 3600000);
   }
@@ -6443,6 +6493,8 @@ async function updateProcessDetailsContent(pid) {
     // Modal is not visible, don't refresh
     return;
   }
+  // Alt-tab with Process Details open: skip IPC + DOM while parked (#14).
+  if (windowWorkPaused()) return;
   
   if (!invoke) {
     invoke = getInvoke();
@@ -6459,6 +6511,8 @@ async function updateProcessDetailsContent(pid) {
     if (!processDetailsModal || processDetailsModal.style.display === "none") {
       return;
     }
+    // Alt-tab during get_process_details: do not rebuild modal DOM (#14).
+    if (windowWorkPaused()) return;
     
     const body = document.getElementById("process-details-body");
     if (!body) return;
@@ -7156,6 +7210,8 @@ async function showProcessDetails(pid) {
     
     // Live metrics every 3600s. Faster polls forced full work + DOM rebuild (#14).
     processDetailsRefreshInterval = setInterval(() => {
+      // Parked shell: keep the interval but skip IPC until focus returns (#14).
+      if (windowWorkPaused()) return;
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
           processDetailsModal && 
@@ -10041,9 +10097,13 @@ function toggleMonitorDetail(item) {
 async function updateMonitorsSummary() {
   const summaryText = document.getElementById('monitors-summary-text');
   if (!summaryText) return;
+  // Parked shell: skip monitors IPC + summary DOM (#14).
+  if (windowWorkPaused()) return;
 
   try {
     const monitorIds = await invoke('list_monitors');
+    // Alt-tab during list_monitors: do not walk statuses or paint (#14).
+    if (windowWorkPaused()) return;
     
     if (monitorIds.length === 0) {
       summaryText.textContent = 'No monitors configured';
@@ -10064,6 +10124,8 @@ async function updateMonitorsSummary() {
     // Use cached status from the background monitor thread — never live-probe here.
     // Live check_monitor waits on HTTP (up to timeout_secs) and freezes window open.
     for (const monitorId of monitorIds) {
+      // Alt-tab mid-loop: abort remaining status IPC (#14).
+      if (windowWorkPaused()) return;
       try {
         const status = await invoke('get_monitor_status', { monitorId });
         if (!status) continue;
@@ -10136,6 +10198,9 @@ async function updateMonitorsSummary() {
     const avgLabel =
       responseTimeCount > 0 ? `${avgResponseTime} ms` : 'None yet';
 
+    // Alt-tab after status walk: skip summary DOM wake (#14).
+    if (windowWorkPaused()) return;
+
     upLatencyHints.sort((a, b) => b.ms - a.ms);
     const anyDown = downCount > 0;
     const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
@@ -10186,12 +10251,16 @@ async function updateMonitorsSummary() {
 async function loadMonitors() {
   const monitorsList = document.getElementById('monitors-list');
   if (!monitorsList) return;
+  // Parked shell: skip monitors list IPC + DOM (#14).
+  if (windowWorkPaused()) return;
 
   try {
     // Pull real background-check ticks (not UI poll stamps).
     await refreshMonitorHistoryFromBackend();
+    if (windowWorkPaused()) return;
 
     const monitorIds = await invoke('list_monitors');
+    if (windowWorkPaused()) return;
     
     // Create a map of existing monitor items by their data-monitor-id attribute
     const existingItems = new Map();
@@ -10206,6 +10275,7 @@ async function loadMonitors() {
     const processedIds = new Set();
     
     for (const monitorId of monitorIds) {
+      if (windowWorkPaused()) return;
       processedIds.add(monitorId);
       
       try {
@@ -11106,12 +11176,17 @@ function updateDiscordIconStatus(connected) {
 }
 
 async function refreshDiscordIconStatus() {
+  // Parked shell: skip Discord IPC + icon DOM (#14).
+  if (windowWorkPaused()) return;
   const inv = getInvoke() || invoke;
   if (!inv) return;
   try {
     const ready = await inv('is_discord_gateway_ready');
+    // Alt-tab during Discord IPC: do not wake icon paint (#14).
+    if (windowWorkPaused()) return;
     updateDiscordIconStatus(!!ready);
   } catch (err) {
+    if (windowWorkPaused()) return;
     updateDiscordIconStatus(false);
   }
 }
@@ -11170,10 +11245,11 @@ function stopDiscordIconStatus() {
 
 function startDiscordIconStatus() {
   stopDiscordIconStatus();
-  if (document.hidden) return;
+  // macOS often keeps visibilityState=visible when another app is frontmost (#14).
+  if (windowWorkPaused()) return;
   refreshDiscordIconStatus();
   discordIconStatusInterval = setInterval(() => {
-    if (document.hidden) return;
+    if (windowWorkPaused()) return;
     refreshDiscordIconStatus();
   }, DISCORD_ICON_STATUS_MS);
 }
@@ -18986,10 +19062,14 @@ function ensureLogsSectionExpanded() {
 }
 
 async function pollLogsGlanceCounts() {
+  // Parked shell: skip log IPC + glance DOM (#14).
+  if (windowWorkPaused()) return;
   const inv = getInvoke() || invoke;
   if (!inv || !document.getElementById('logs-header')) return;
   try {
     const tail = await inv('read_debug_log', { maxBytes: 65536 });
+    // Alt-tab during read_debug_log: do not wake glance paint (#14).
+    if (windowWorkPaused()) return;
     const body = tail.content || '';
     const counts = countLogsByKind(body);
     applyLogsGlanceState(counts);
@@ -19000,6 +19080,7 @@ async function pollLogsGlanceCounts() {
 
 function startLogsGlancePoll() {
   stopLogsGlancePoll();
+  if (windowWorkPaused()) return;
   ensureLogsErrorGlance();
   pollLogsGlanceCounts();
   logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 3600000);
@@ -19894,6 +19975,8 @@ async function refreshLogsViewer(scrollToEnd = true) {
   const viewer = document.getElementById('logs-viewer');
   const pathHint = document.getElementById('logs-path-hint');
   if (!viewer) return;
+  // Parked shell: skip log tail IPC + viewer DOM (#14).
+  if (windowWorkPaused()) return;
   paintLogsViewerFirstPaint(viewer);
   if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
   ensureLogsFilterChips();
@@ -19905,6 +19988,8 @@ async function refreshLogsViewer(scrollToEnd = true) {
   }
   try {
     const tail = await inv('read_debug_log', { maxBytes: 262144 });
+    // Alt-tab during read_debug_log: do not rebuild the viewer (#14).
+    if (windowWorkPaused()) return;
     if (pathHint && tail.path) {
       pathHint.dataset.fullPath = tail.path;
       const display = tail.path.replace(/^\/Users\/[^/]+/, '~');
@@ -19938,9 +20023,10 @@ function stopLogsAutoRefresh() {
 
 function startLogsAutoRefresh() {
   stopLogsAutoRefresh();
+  if (windowWorkPaused()) return;
   // 600s is enough for live tails; faster kept WebKit + IPC hot while Debug Log was open (#14).
   logsAutoRefreshTimer = setInterval(() => {
-    if (document.hidden) return;
+    if (windowWorkPaused()) return;
     refreshLogsViewer(true);
   }, 3600000);
 }
@@ -20184,7 +20270,9 @@ function stopDiskCleanupGlancePoll() {
 
 function startDiskCleanupGlancePoll() {
   stopDiskCleanupGlancePoll();
+  if (windowWorkPaused()) return;
   diskCleanupGlanceInterval = setInterval(() => {
+    if (windowWorkPaused()) return;
     if (!diskCleanupCollapsed) {
       stopDiskCleanupGlancePoll();
       return;
@@ -22006,9 +22094,13 @@ async function refreshDiskCleanupPanel(opts) {
   const runBtn = document.getElementById('disk-cleanup-run-btn');
   const inv = getInvoke();
   if (!inv || !list) return null;
+  // Parked shell: skip disk-cleanup IPC + panel DOM (#14).
+  if (windowWorkPaused()) return null;
 
   try {
     const status = await inv('get_disk_cleanup_status', { deep });
+    // Alt-tab during get_disk_cleanup_status: do not wake panel paint (#14).
+    if (windowWorkPaused()) return null;
     window.__diskCleanupScopes = Array.isArray(status.scopes)
       ? status.scopes.map((s) => ({ ...s }))
       : [];
@@ -24846,7 +24938,7 @@ async function seedThemeHistoryFromBackend() {
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   for (let attempt = 0; attempt < 8; attempt++) {
     // Blur mid-seed: stop retry IPC so parked WebView stays quiet (#14).
-    if (windowOccluded() || windowPollsPaused) return false;
+    if (windowWorkPaused()) return false;
     const canSeed =
       typeof window.themeHistory?.seedFromPoints === 'function' ||
       typeof window.posterCharts?.seedFromPoints === 'function';
@@ -24862,7 +24954,7 @@ async function seedThemeHistoryFromBackend() {
         maxDisplayPoints: 2,
       });
       // Alt-tab during history IPC: do not wake sparkline/poster paint (#14).
-      if (windowOccluded() || windowPollsPaused) return false;
+      if (windowWorkPaused()) return false;
       if (result?.points?.length) {
         if (typeof window.themeHistory?.seedFromPoints === 'function') {
           window.themeHistory.seedFromPoints(result.points);
@@ -24887,6 +24979,8 @@ window.seedThemeHistoryFromBackend = seedThemeHistoryFromBackend;
 
 // Check if history data is available and show/hide dropdown accordingly
 async function checkHistoryAvailability() {
+  // Parked shell: skip 24h history probe + controls DOM (#14).
+  if (windowWorkPaused()) return;
   try {
     // Check if we have >24h of data available to show the dropdown
     const inv = getInvoke();
@@ -24895,6 +24989,8 @@ async function checkHistoryAvailability() {
       timeRangeSeconds: 86400, // 24 hours
       maxDisplayPoints: null
     });
+    // Alt-tab during history probe: do not toggle controls (#14).
+    if (windowWorkPaused()) return;
 
     if (result && result.oldest_available_timestamp) {
       const now = Math.floor(Date.now() / 1000);
@@ -24923,7 +25019,7 @@ function stopHistoryAvailabilityPoll() {
 
 function startHistoryAvailabilityPoll() {
   stopHistoryAvailabilityPoll();
-  if (document.hidden) return;
+  if (windowWorkPaused()) return;
   checkHistoryAvailability();
   // 24h history probe is heavy IPC; once every 10m is enough for the dropdown (#14).
   historyAvailabilityInterval = setInterval(() => {

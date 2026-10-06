@@ -5003,10 +5003,22 @@ function paintOpsSessionFilterFromCaches() {
     applyOpsSessionKindVisibility();
 }
 
+function agentOpsWorkPaused() {
+    try {
+        if (typeof window.__macStatsWindowWorkPaused === 'function') {
+            return !!window.__macStatsWindowWorkPaused();
+        }
+    } catch (_) {
+        /* ignore */
+    }
+    return !!document.hidden;
+}
+
 function startAgentOpsAutoRefresh() {
     if (agentOpsInterval) return;
     agentOpsInterval = setInterval(() => {
-        if (document.hidden || agentOpsCollapsed || opsRefreshInFlight) return;
+        // macOS often keeps visibilityState=visible when another app is frontmost (#14).
+        if (agentOpsWorkPaused() || agentOpsCollapsed || opsRefreshInFlight) return;
         refreshAgentOps();
     }, OPS_REFRESH_INTERVAL);
 }
@@ -5036,7 +5048,7 @@ window.__macStatsPauseAgentOpsPolls = function () {
   };
 
 window.__macStatsResumeAgentOpsPolls = function () {
-    if (document.hidden) return;
+    if (agentOpsWorkPaused()) return;
     // Collapsed Agent Ops is display:none (icon pane). Glance IPC only woke
     // Tauri while nothing was on screen (#14). Poll only when the pane is open.
     if (!agentOpsCollapsed) {
@@ -5046,7 +5058,7 @@ window.__macStatsResumeAgentOpsPolls = function () {
         paintOpsUpdatedAgo();
         if (!opsUpdatedAgoTimer) {
             opsUpdatedAgoTimer = setInterval(() => {
-                if (document.hidden || !opsLastRefreshMs) return;
+                if (agentOpsWorkPaused() || !opsLastRefreshMs) return;
                 paintOpsUpdatedAgo();
             }, 3_600_000);
         }
@@ -7617,6 +7629,8 @@ async function refreshAgentOps(opts = {}) {
     const userTriggered = !!opts.userTriggered;
     const healthRow = document.getElementById('ops-health-row');
     if (opsRefreshInFlight) return;
+    // Auto refresh while parked: skip the IPC fan-out (#14). Manual Refresh still runs.
+    if (!userTriggered && agentOpsWorkPaused()) return;
     opsRefreshInFlight = true;
     if (userTriggered) setOpsRefreshBusy(true);
     let ok = false;
@@ -7634,6 +7648,10 @@ async function refreshAgentOps(opts = {}) {
                 invoke('list_schedules').catch(() => []),
                 invoke('get_feature_health', { refresh: false }).catch(() => []),
             ]);
+        // Alt-tab during Agent Ops IPC: drop the big DOM rebuild (#14).
+        if (agentOpsWorkPaused()) {
+            return;
+        }
         const redmine = (features || []).find(
             (h) => String(h.name || '').toLowerCase() === 'redmine'
         );
@@ -10803,16 +10821,9 @@ function escapeHtml(s) {
       agentOpsInitIdleHandle = null;
       agentOpsInitTimeoutId = null;
       // Still occluded: drop flag so focus/resume can re-schedule (#14).
-      try {
-        if (
-          document.hidden ||
-          (typeof document.hasFocus === 'function' && !document.hasFocus())
-        ) {
-          window.__macStatsAgentOpsInitScheduled = false;
-          return;
-        }
-      } catch (_) {
-        /* ignore */
+      if (agentOpsWorkPaused()) {
+        window.__macStatsAgentOpsInitScheduled = false;
+        return;
       }
       window.__macStatsAgentOpsInitArmed = true;
       initAgentOps();

@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1427** (follow-up after v0.1.1426).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (mid-flight secondary IPC / Agent Ops / rAF cancel while occluded):
+
+- `src/cpu.js` — shared `windowWorkPaused()` / `__macStatsWindowWorkPaused` for occlusion + pause. Blur `cancelAnimationFrame`s queued gauge/DOM rAF. Mid-flight Discord icon, monitors summary/list, history availability, Debug Log glance/viewer, Disk Cleanup panel, update banner, and Process Details refresh skip IPC/DOM while parked. Blur clears Process Details live interval; focus resume re-arms if the modal is still open. Discord/history/monitors/logs/disk interval gates use the shared pause (not only `document.hidden`).
+- `src/agent-ops.js` — auto-refresh / Updated-ago / init / resume use the shared pause gate. After Agent Ops `Promise.all`, skip the big DOM rebuild when parked (manual Refresh still runs IPC).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Expand Monitors, Debug Log, Disk Cleanup, or Agent Ops, trigger a poll, then alt-tab before IPC returns — Discord icon / monitors summary / logs / disk panel / Agent Ops DOM / Process Details / update banner must not paint while away. Alt-tab back — sections eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1426)
+
+
 Version **v0.1.1426** (follow-up after v0.1.1425).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1550,3 +1566,31 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away during first minutes — version IPC / after-first unpark / history seed / monitoring / Agent Ops init must not fire while away; alt-tab back — gauges and sections eventually wire) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1426)
+
+**Date:** 2026-10-06 01:34 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1426)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 mid-flight DOM / version / history-seed cancel while occluded)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1426**
+- `src/cpu.js` — `clearPendingDOMUpdates` clears queued rAF batches; `scheduleDOMUpdate` rAF callback drops the batch when already occluded/paused; `pauseIdleWindowPolls` calls `clearPendingDOMUpdates`; mid-flight `get_app_version` keeps cache but skips footer/title/reload DOM when occluded; version tip/update chrome skipped after alt-tab (`startCpuWindowVersionOnce` post-await guard); history-seed retry loop aborts while parked and skips sparkline/poster seed paint after history IPC returns occluded (`seedThemeHistoryFromBackend`)
+- Prior structural occlusion cancel kept (`pauseIdleWindowPolls` cancels metrics/version/unpark/history/monitoring idles; Agent Ops init cancel in `agent-ops.js`)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / connection-refused noise. No new errors tied to the #14 mid-flight rAF / version / history-seed occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, trigger metrics/version/history then alt-tab before IPC returns — queued rAF / version tip / history seed must not paint while away; alt-tab back — gauges and sections eventually wire) before CLOSED. Do **not** close GitHub #14.
