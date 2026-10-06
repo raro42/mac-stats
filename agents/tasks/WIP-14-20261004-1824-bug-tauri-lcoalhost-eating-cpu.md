@@ -6889,3 +6889,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → View logs (or Debug Log); choose a filter so Clear appears; press Clear; confirm the Cleared flash still shows green on Clear, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1558)
+
+**Date:** 2026-10-06 16:49 UTC (18:49 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1558**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1558)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Monitors filter Clear flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1558**
+- `CHANGELOG.md` **[0.1.1558]** documents the Monitors filter Clear flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.monitors-filter-clear.is-just-saved` mixes against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/cpu.js` matches `src-tauri/dist/cpu.js`. Monitors Clear path uses `flashMonitorsFilterClearBtn` → adds `.is-just-saved` on `#monitors-filter-clear` / `.monitors-filter-clear`, label **Cleared**, then restores via `syncMonitorsFilterClearBtn`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Monitors filter Clear flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Monitors filter Clear flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched this session's shell / cargo tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Monitors; choose a filter (Up / Down / Slow) so Clear appears; press Clear; confirm the Cleared flash still shows green on Clear, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
