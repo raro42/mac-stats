@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1486** | The Disk Cleanup Reclaim/Due glance mixes Big, Reclaim, and Due washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1485** | The Disk Cleanup filter glance mixes All, Reclaim, Big, and Clean washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1484** | The Top Processes Hot glance mixes the hot-count wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1483** | The Top Processes Filter glance mixes All, Pinned, and Hot washes against an opaque fill. No glass alpha or hover shadow. |
