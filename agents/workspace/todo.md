@@ -4,7 +4,7 @@
 - [x] Bump 0.1.1416, CHANGELOG, sync-dist
 - [x] ratchet verify
 - [x] commit + push + keep
-- [ ] loop_backlog + morning surprise (this tick)
+- [x] loop_backlog + morning surprise + archive
 
 ## Review
-Shipped v0.1.1416. Task at `UNTESTED-14-…`. Issue #14 left open.
+Shipped v0.1.1416. Task at `UNTESTED-14-…`. Issue #14 left open. Morning surprise archived.
