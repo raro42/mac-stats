@@ -5711,7 +5711,33 @@ window.addEventListener("load", () => {
   }
 });
 
+/** Cancel a pending idle resume so blur/focus churn does not stack work (#14). */
+let resumeIdlePollsIdleHandle = null;
+let resumeIdlePollsTimeoutId = null;
+/** True while Focused(false) / blur has parked secondary polls (#14). */
+let windowPollsPaused = false;
+
+function cancelDeferredResumeIdleWindowPolls() {
+  if (
+    resumeIdlePollsIdleHandle != null &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    try {
+      window.cancelIdleCallback(resumeIdlePollsIdleHandle);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  resumeIdlePollsIdleHandle = null;
+  if (resumeIdlePollsTimeoutId != null) {
+    clearTimeout(resumeIdlePollsTimeoutId);
+    resumeIdlePollsTimeoutId = null;
+  }
+}
+
 function pauseIdleWindowPolls() {
+  windowPollsPaused = true;
+  cancelDeferredResumeIdleWindowPolls();
   setDocumentOccluded(true);
   stopRefresh();
   stopDiscordIconStatus();
@@ -5733,9 +5759,15 @@ function pauseIdleWindowPolls() {
   }
 }
 
-function resumeIdleWindowPolls() {
-  if (document.hidden) return;
-  setDocumentOccluded(false);
+/**
+ * Secondary polls + sparkline GPU after focus. Do not unpark or restart IPC
+ * on the focus event itself — that undid chart-line idle unpark and stacked
+ * Discord/logs/history/Agent Ops with get_cpu_details (#14).
+ */
+function applyDeferredResumeIdleWindowPolls() {
+  // Prefer pause flag over hasFocus — macOS Focused(true) can resume while
+  // document.hasFocus() is still false (#14).
+  if (windowPollsPaused || document.hidden) return;
   const hist = window.themeHistory;
   if (hist && typeof hist.unpark === "function") {
     hist.unpark();
@@ -5773,8 +5805,32 @@ function resumeIdleWindowPolls() {
   }
 }
 
+function resumeIdleWindowPolls() {
+  if (document.hidden) return;
+  windowPollsPaused = false;
+  setDocumentOccluded(false);
+  cancelDeferredResumeIdleWindowPolls();
+  // Match chart-line focus unpark (idle ≤30s) so alt-tab does not instantly
+  // reallocate canvas buffers + restart secondary IPC (#14).
+  const run = () => {
+    resumeIdlePollsIdleHandle = null;
+    resumeIdlePollsTimeoutId = null;
+    applyDeferredResumeIdleWindowPolls();
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    resumeIdlePollsIdleHandle = window.requestIdleCallback(run, {
+      timeout: 30000,
+    });
+  } else {
+    resumeIdlePollsTimeoutId = setTimeout(run, 30000);
+  }
+}
+
 function resumeVisibleWindowWork() {
   if (document.hidden) return;
+  // Clear park flag before showing shell — Focused(true) may arrive while
+  // document.hasFocus() is still false (#14).
+  windowPollsPaused = false;
   setDocumentOccluded(false);
   // Do not force a full process-list rebuild on every focus/alt-tab (#14).
   // First refresh still forces once when lastProcessUpdate === 0.
@@ -5815,6 +5871,7 @@ function resumeVisibleWindowWork() {
     } else {
       setTimeout(startCpuWindowVersionOnce, 300000);
     }
+    // Secondary polls + sparkline unpark: idle ≤30s (not on the focus event) (#14).
     resumeIdleWindowPolls();
   } else {
     init();

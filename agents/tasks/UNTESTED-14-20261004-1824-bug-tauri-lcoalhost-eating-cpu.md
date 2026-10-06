@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1420** (follow-up after v0.1.1419).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (idle-defer focus-resume secondary polls + sparkline unpark):
+
+- `src/cpu.js` — `resumeIdleWindowPolls` no longer unparks sparklines or restarts Discord / logs / history / Disk Cleanup / Agent Ops / Monitors polls on the focus event. Those wait for idle (≤**30s**), matching chart-line focus unpark. Blur / pause cancels a pending idle resume. `windowPollsPaused` cleared on all resume paths (Focused(true) may beat `document.hasFocus()`).
+- Prior open-path cuts kept: first metrics idle ≤120s; sparkline unpark after first poll ≤120s; history seed on resume ≤120s; version IPC ≤300s; monitoring / Agent Ops ≤900s; chart-line focus unpark ≤30s.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Rings appear after idle metrics; sparklines unpark shortly after. Alt-tab away then back — secondary polls / sparkline GPU should not restart on the focus event itself. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1419)
+
 Version **v0.1.1419** (follow-up after v0.1.1418).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
