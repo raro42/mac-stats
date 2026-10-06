@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1546] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — The Agent Ops Load into AI Chat Loaded flash mixes the green wash against an opaque fill. No glass alpha. A compositor blend no longer stays on that control after loading a preview into the composer.
+
 ## [0.1.1545] - 2026-10-06
 
 ### Changed

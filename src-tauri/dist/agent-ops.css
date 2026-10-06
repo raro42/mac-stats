@@ -9127,14 +9127,16 @@ button.is-just-saved,
 }
 
 /* Agent Ops Load into AI Chat (btn-secondary) — Loaded flash */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #ops-session-load-chat.is-just-saved,
 #ops-runs-load-chat.is-just-saved,
 #ops-schedules-load-chat.is-just-saved,
 #ops-memory-load-chat.is-just-saved,
 #ops-agent-load-chat.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
-  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #ffffff) !important;
   color: inherit;
+  box-shadow: none;
 }
 
 /* AI Chat system-prompt Save (popover-btn-primary) — solid green flash */
