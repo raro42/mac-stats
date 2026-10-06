@@ -6,6 +6,8 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1447** | Capture `MAC_STATS_OPEN_SECTION` / `openUiSection` is baked into `cpu.html?open=` when the window is created. Agent Ops no longer calls `take_open_ui_section` after load. |
+| **v0.1.1446** | Section collapse skips `get_cpu_window_ui_state` on monitoring warm-up. Agent Ops capture is one invoke (no retry loop). Collapsed Disk Cleanup skips glance IPC on resume. |
 | **v0.1.1445** | Data-poster history charts stay parked on open. First paint does not allocate canvas buffers or fetch history. The same idle unpark as the other themes draws them later. |
 | **v0.1.1444** | Collapsed Top Processes skips `get_pinned_process_names` on open and resume. Pins paint from localStorage. Expand hydrates from disk. |
 | **v0.1.1443** | Collapsed External / Monitors skips `list_monitor_statuses` on open, resume, and the hourly timer. The icon paints last-known up/down from localStorage. Expand still hydrates the list. |
@@ -28,10 +30,9 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Data-poster was the theme that still drew history charts on the first paint. Other themes already wait for the idle unpark. Open no longer stacks canvas buffers and a history fetch with that first paint.
+Most opens keep Agent Ops collapsed. Capture used to call `take_open_ui_section` after load anyway (config.json read from the WebView). The window URL now carries `?open=` only when a capture is requested. That drops one more IPC on the common path.
 
 ## Still open
 
-- ~20:50 tick: data-poster history charts stay parked on open (**v0.1.1445**).
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
