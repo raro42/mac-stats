@@ -7349,10 +7349,12 @@ button.monitor-detail-url:focus-visible {
   outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
   outline-offset: 2px;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 button.monitor-detail-url.is-just-saved {
   color: #34c759;
   text-decoration: none;
-  background: color-mix(in srgb, #34c759 12%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  box-shadow: none;
 }
 
 .monitor-detail-log-title {

@@ -1,14 +1,14 @@
-# WIP-14 — next compositor cut (v0.1.1568)
+# WIP-14 — next compositor cut (v0.1.1569)
 
 ## Plan
 - [x] Pick lowest GitHub FEAT/WIP: `WIP-14` (tauri://localhost CPU)
-- [x] Next cut after v0.1.1567: Monitors URL Copied flash still mixes against `transparent`
-- [x] Make `.monitor-url.is-just-saved` opaque (`#ffffff`), `box-shadow: none`
+- [x] Next cut after v0.1.1568: Monitor detail URL Copied flash still mixes against `transparent`
+- [x] Make `button.monitor-detail-url.is-just-saved` opaque (`#ffffff`), `box-shadow: none`
 - [x] Sync `src/agent-ops.css` → `src-tauri/dist/agent-ops.css`
-- [x] Bump `Cargo.toml` → `0.1.1568`; CHANGELOG entry
+- [x] Bump `Cargo.toml` → `0.1.1569`; CHANGELOG entry
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` in `src-tauri/`
-- [x] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
+- [ ] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
 
 ## Review
-Opaque wash on Monitors URL Copied flash (`.monitor-url.is-just-saved`). Same pattern as Debug Log path / process-name Copied flashes. cargo check green (warnings only). Needs macOS Activity Monitor pass for #14 acceptance.
+Opaque wash on Monitor detail URL Copied flash (`button.monitor-detail-url.is-just-saved`). Same pattern as list URL / Debug Log path Copied flashes. cargo check green. Needs macOS Activity Monitor pass for #14 acceptance.
