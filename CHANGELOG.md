@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1438] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Monitors summary, list, and settings list use one `list_monitor_statuses` IPC (id/name/url + cached status) instead of N+1 `list_monitors` / `get_monitor_status` / `get_monitor_details` walks. The 24h history availability probe waits until sparkline unpark or history seed, not monitoring idle. Aim: quieter `tauri://localhost` / Graphics and Media on open and when Monitors expands.
+
 ## [0.1.1437] - 2026-10-06
 
 ### Changed

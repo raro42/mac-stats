@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1438** (follow-up after v0.1.1437).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (bulk monitor statuses + defer 24h history probe):
+
+- `src-tauri/src/commands/monitors.rs` — new `list_monitor_statuses` (id/name/url + cached status, backoff enriched).
+- `src-tauri/src/lib.rs` — register command.
+- `src/cpu.js` — `updateMonitorsSummary`, `loadMonitors`, `refreshMonitorsSettingsList` use one IPC. 24h `get_metrics_history` availability probe waits for sparkline unpark / history seed (not monitoring idle).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with External / Monitors collapsed. Confirm icon status still updates (single bulk IPC). Expand Monitors — list hydrates without N+1 status/details. History time-range control may appear only after sparklines unpark. Alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1437)
+
 Version **v0.1.1437** (follow-up after v0.1.1436).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -31,8 +47,6 @@ Changes (collapsed Monitors skip list/history IPC):
 - `src/cpu.js` — Collapsed External / Monitors no longer runs `initMonitorHistory` or full `loadMonitors` on monitoring warm-up. Collapsed summary keeps icon wash via light `list_monitors` + `get_monitor_status` (no per-host `get_monitor_details` / summary prose). Expand / `ensureMonitorsSectionExpanded` hydrates history + list once via `ensureMonitorsListHydrated`.
 
 Tester: open CPU window on macOS (already focused), warm ≥30s with External / Monitors collapsed (default). Confirm icon status still updates without list/history fan-out. Expand Monitors — list + history hydrate once. Alt-tab during expand warm-up — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
-
----
 
 ## Prior implementation (v0.1.1436)
 
@@ -2051,3 +2065,33 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm AI chrome can appear/hide from localStorage without Settings open, and `get_ai_agent_enabled` waits until Settings Product toggles; with AI Chat collapsed, confirm no early `configure_ollama` / connection fan-out on open; expand AI Chat — configure + connection run once; alt-tab during expand warm-up — no glance paint while away; alt-tab back with AI on — ensureInitialized/recheck; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1437)
+
+**Date:** 2026-10-06 03:03 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1437**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1437)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapsed Monitors skip list/history IPC)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1437**
+- `src/cpu.js` — `ensureMonitorsListHydrated()` runs `initMonitorHistory` + `loadMonitors` + height (park-gated); `initMonitorsSection` restores collapsed state first and skips hydration when collapsed (calls `updateMonitorsSummary` only); expand path / `ensureMonitorsSectionExpanded` hydrate once via `ensureMonitorsListHydrated`
+- `src/cpu.js` — `updateMonitorsSummary` with `iconOnly = !!monitorsCollapsed`: still uses light `list_monitors` + `get_monitor_status` for icon wash; skips per-host `get_monitor_details` and summary prose while collapsed
+- Prior v0.1.1436 AI localStorage / deferred Ollama init and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 collapsed Monitors list/history skip.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm icon status still updates without list/history fan-out; expand Monitors — list + history hydrate once; alt-tab during expand warm-up — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

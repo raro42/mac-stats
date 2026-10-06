@@ -367,6 +367,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::monitors::check_monitor,
             commands::monitors::list_monitors,
             commands::monitors::list_monitors_with_details,
+            commands::monitors::list_monitor_statuses,
             commands::monitors::remove_monitor,
             commands::monitors::get_monitor_details,
             commands::monitors::get_monitor_status,

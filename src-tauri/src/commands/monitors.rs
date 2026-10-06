@@ -1054,6 +1054,49 @@ pub fn get_monitor_status(
     )))
 }
 
+/// One monitor row with cached status (CPU window summary / list; no live HTTP).
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MonitorStatusRow {
+    pub id: String,
+    pub name: String,
+    pub url: Option<String>,
+    pub monitor_type: String,
+    /// `None` when never checked (first background tick pending).
+    pub status: Option<crate::monitors::MonitorStatus>,
+}
+
+/// List all monitors with cached status in one IPC (avoids N+1 status/details, #14).
+#[tauri::command]
+pub fn list_monitor_statuses() -> Result<Vec<MonitorStatusRow>, String> {
+    let configs = get_monitor_configs().lock().map_err(|e| e.to_string())?;
+    let stats = get_monitor_stats().lock().map_err(|e| e.to_string())?;
+    let urls = get_monitor_urls().lock().map_err(|e| e.to_string())?;
+    let mut rows: Vec<MonitorStatusRow> = configs
+        .values()
+        .map(|pm| {
+            let st = stats.get(&pm.id);
+            let status = st.and_then(|s| {
+                s.last_status.as_ref().cloned().map(|status| {
+                    enrich_status_with_backoff(status, s.last_check, Some(pm.check_interval_secs))
+                })
+            });
+            MonitorStatusRow {
+                id: pm.id.clone(),
+                name: pm.name.clone(),
+                url: urls
+                    .get(&pm.id)
+                    .cloned()
+                    .or_else(|| Some(pm.url.clone())),
+                monitor_type: pm.monitor_type.clone(),
+                status,
+            }
+        })
+        .collect();
+    // Stable order for UI walks (id); list sort still applies after paint.
+    rows.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(rows)
+}
+
 #[cfg(test)]
 mod monitor_interval_tests {
     use super::{

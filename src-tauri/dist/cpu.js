@@ -3036,6 +3036,9 @@ function startCpuWindowMetricsOnce() {
       if (hist && typeof hist.unpark === "function") {
         hist.unpark();
       }
+      // 24h history probe waits for sparkline unpark (#14).
+      window.__macStatsSparklinesUnparked = true;
+      startHistoryAvailabilityPoll();
     };
     if (typeof window.requestIdleCallback === "function") {
       afterFirstUnparkIdleHandle = window.requestIdleCallback(unparkSparklines, {
@@ -6076,7 +6079,10 @@ function applyDeferredResumeIdleWindowPolls() {
   }
   startDiscordIconStatus();
   startLogsGlancePoll();
-  startHistoryAvailabilityPoll();
+  // 24h history probe only after sparklines have unparked once (#14).
+  if (window.__macStatsSparklinesUnparked || sparklineHistoryReady) {
+    startHistoryAvailabilityPoll();
+  }
   // Debug Log live tail — only when the section is open and auto-refresh is on.
   const logsAuto = document.getElementById("logs-autorefresh");
   if (
@@ -8148,11 +8154,13 @@ async function refreshMonitorsSettingsList() {
   settingsList.innerHTML = '';
   
   try {
-    const monitorIds = await invoke('list_monitors');
-    // Alt-tab during list_monitors: leave the empty shell; resume re-opens Settings (#14).
+    // One IPC: ids + urls + cached statuses (no N+1 details, #14).
+    const rows = await invoke('list_monitor_statuses');
+    // Alt-tab during list_monitor_statuses: leave the empty shell; resume re-opens Settings (#14).
     if (windowWorkPaused()) return;
+    const list = Array.isArray(rows) ? rows : [];
     
-    if (monitorIds.length === 0) {
+    if (list.length === 0) {
       settingsList.innerHTML =
         `<div class="monitors-empty monitors-settings-empty" role="status">` +
         `<div class="monitors-empty-msg">No monitors configured</div>` +
@@ -8175,20 +8183,14 @@ async function refreshMonitorsSettingsList() {
       return;
     }
     
-    for (const monitorId of monitorIds) {
+    for (const row of list) {
       if (windowWorkPaused()) return;
+      const monitorId = row?.id;
+      if (!monitorId) continue;
       try {
-        // Get monitor details including URL
-        let monitorUrl = monitorId; // Fallback to ID if details not available
-        try {
-          const details = await invoke('get_monitor_details', { monitorId });
-          if (windowWorkPaused()) return;
-          if (details.url) {
-            monitorUrl = details.url;
-          }
-        } catch (e) {
-          if (windowWorkPaused()) return;
-          console.warn(`Failed to get details for monitor ${monitorId}:`, e);
+        const monitorUrl = row.url || monitorId;
+        if (row.status) {
+          monitorStatusCache.set(monitorId, row.status);
         }
         
         // Empty URL: match list/detail "Unknown" (bare monitor id reads like a placeholder).
@@ -10233,15 +10235,17 @@ async function updateMonitorsSummary() {
   if (!summaryText) return;
   // Parked shell: skip monitors IPC + summary DOM (#14).
   if (windowWorkPaused()) return;
-  // Collapsed: icon wash only — skip host-detail IPC + summary prose (#14).
+  // Collapsed: icon wash only — skip summary prose (#14).
   const iconOnly = !!monitorsCollapsed;
 
   try {
-    const monitorIds = await invoke('list_monitors');
-    // Alt-tab during list_monitors: do not walk statuses or paint (#14).
+    // One IPC: ids + names/urls + cached statuses (no N+1 status/details, #14).
+    const rows = await invoke('list_monitor_statuses');
+    // Alt-tab during list_monitor_statuses: do not walk or paint (#14).
     if (windowWorkPaused()) return;
-    
-    if (monitorIds.length === 0) {
+    const list = Array.isArray(rows) ? rows : [];
+
+    if (list.length === 0) {
       if (!iconOnly) {
         summaryText.textContent = 'No monitors configured';
         summaryText.removeAttribute('title');
@@ -10261,73 +10265,54 @@ async function updateMonitorsSummary() {
 
     // Use cached status from the background monitor thread — never live-probe here.
     // Live check_monitor waits on HTTP (up to timeout_secs) and freezes window open.
-    for (const monitorId of monitorIds) {
-      // Alt-tab mid-loop: abort remaining status IPC (#14).
+    for (const row of list) {
       if (windowWorkPaused()) return;
-      try {
-        const status = await invoke('get_monitor_status', { monitorId });
-        if (!status) continue;
-        monitorStatusCache.set(monitorId, status);
-        checkedCount++;
-        if (status.is_up) {
-          upCount++;
-          if (!iconOnly && status.response_time_ms) {
-            let name = monitorId;
-            let url = '';
-            try {
-              const details = await invoke('get_monitor_details', { monitorId });
-              if (details?.name) name = details.name;
-              if (details?.url) url = details.url;
-            } catch (_) {
-              /* keep id */
-            }
+      const monitorId = row?.id;
+      if (!monitorId) continue;
+      const status = row.status || null;
+      if (!status) continue;
+      monitorStatusCache.set(monitorId, status);
+      checkedCount++;
+      const name = row.name || monitorId;
+      const url = row.url || '';
+      if (status.is_up) {
+        upCount++;
+        if (!iconOnly && status.response_time_ms) {
+          const host = shortMonitorHostLabel(name, url);
+          const ago = formatMonitorCheckedAgo(status);
+          upLatencyHints.push({
+            id: monitorId,
+            host,
+            ms: status.response_time_ms,
+            label: ago
+              ? `${host} ${status.response_time_ms}ms (${ago})`
+              : `${host} ${status.response_time_ms}ms`,
+          });
+        }
+      } else {
+        downCount++;
+        if (!iconOnly) {
+          const pending =
+            !status.response_time_ms || String(status.error || '').includes('Waiting');
+          if (!pending) {
             const host = shortMonitorHostLabel(name, url);
+            // Empty failure: match list/detail "Unknown".
+            const reason = shortMonitorFailReason(status.error) || 'Unknown';
             const ago = formatMonitorCheckedAgo(status);
-            upLatencyHints.push({
-              id: monitorId,
-              host,
-              ms: status.response_time_ms,
-              label: ago
-                ? `${host} ${status.response_time_ms}ms (${ago})`
-                : `${host} ${status.response_time_ms}ms`,
-            });
-          }
-        } else {
-          downCount++;
-          if (!iconOnly) {
-            const pending =
-              !status.response_time_ms || String(status.error || '').includes('Waiting');
-            if (!pending) {
-              let name = monitorId;
-              let url = '';
-              try {
-                const details = await invoke('get_monitor_details', { monitorId });
-                if (details?.name) name = details.name;
-                if (details?.url) url = details.url;
-              } catch (_) {
-                /* keep id */
-              }
-              const host = shortMonitorHostLabel(name, url);
-              // Empty failure: match list/detail "Unknown".
-              const reason = shortMonitorFailReason(status.error) || 'Unknown';
-              const ago = formatMonitorCheckedAgo(status);
-              const downInfo = resolveMonitorDownSince(monitorId, status);
-              const downLabel = formatMonitorDownSinceLabel(downInfo);
-              const base = `${host} (${reason})`;
-              const parts = [base];
-              if (downLabel) parts.push(downLabel);
-              else if (ago) parts.push(ago);
-              else parts.push('None yet');
-              downHints.push(parts.join(' · '));
-            }
+            const downInfo = resolveMonitorDownSince(monitorId, status);
+            const downLabel = formatMonitorDownSinceLabel(downInfo);
+            const base = `${host} (${reason})`;
+            const parts = [base];
+            if (downLabel) parts.push(downLabel);
+            else if (ago) parts.push(ago);
+            else parts.push('None yet');
+            downHints.push(parts.join(' · '));
           }
         }
-        if (status.response_time_ms) {
-          totalResponseTime += status.response_time_ms;
-          responseTimeCount++;
-        }
-      } catch (err) {
-        console.error(`Failed to read monitor status ${monitorId}:`, err);
+      }
+      if (status.response_time_ms) {
+        totalResponseTime += status.response_time_ms;
+        responseTimeCount++;
       }
     }
 
@@ -10343,7 +10328,7 @@ async function updateMonitorsSummary() {
 
     upLatencyHints.sort((a, b) => b.ms - a.ms);
     const anyDown = downCount > 0;
-    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
+    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === list.length;
     const slowest = upLatencyHints[0];
     // Amber slowest hint: relative (≥2 UP) or absolute (any UP ≥ 2000 ms — menu-bar Mon parity).
     const anySlowAbs = upLatencyHints.some((h) => h.ms >= MONITOR_SLOW_MS);
@@ -10360,7 +10345,7 @@ async function updateMonitorsSummary() {
         const shown = downHints.slice(0, 2);
         const more = downHints.length > 2 ? ` +${downHints.length - 2}` : '';
         summaryText.textContent =
-          `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
+          `${upCount} / ${list.length} up · DOWN: ${shown.join(', ')}${more}`;
         summaryText.title = downHints.join('; ');
       } else if (upCount === 0 && responseTimeCount === 0) {
         // No sample yet: match first paint "None yet" (bare "0 / N sites up" reads like an outage).
@@ -10368,11 +10353,11 @@ async function updateMonitorsSummary() {
         summaryText.removeAttribute('title');
       } else if (slowest && upLatencyHints.length >= 2) {
         summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
+          `${upCount} / ${list.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
         summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
       } else {
         summaryText.textContent =
-          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
+          `${upCount} / ${list.length} sites up · Avg ${avgLabel}`;
         if (upLatencyHints.length > 0) {
           summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
         } else {
@@ -10384,7 +10369,7 @@ async function updateMonitorsSummary() {
       applyMonitorsSummaryState({ anyDown, allUp, empty: false, slowestId: slowestHint });
     }
     
-    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
+    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: list.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
     // Alt-tab during monitors IPC: do not paint error fallback DOM (#14).
@@ -10407,8 +10392,10 @@ async function loadMonitors() {
     await refreshMonitorHistoryFromBackend();
     if (windowWorkPaused()) return;
 
-    const monitorIds = await invoke('list_monitors');
+    // One IPC for ids + urls + cached statuses (no N+1 details/status, #14).
+    const rows = await invoke('list_monitor_statuses');
     if (windowWorkPaused()) return;
+    const list = Array.isArray(rows) ? rows : [];
     
     // Create a map of existing monitor items by their data-monitor-id attribute
     const existingItems = new Map();
@@ -10422,24 +10409,15 @@ async function loadMonitors() {
     // Track which monitor IDs we've processed
     const processedIds = new Set();
     
-    for (const monitorId of monitorIds) {
+    for (const row of list) {
       if (windowWorkPaused()) return;
+      const monitorId = row?.id;
+      if (!monitorId) continue;
       processedIds.add(monitorId);
       
       try {
-        // Get monitor details to fetch URL
-        let monitorUrl = monitorId; // Fallback to ID if details not available
-        try {
-          const details = await invoke('get_monitor_details', { monitorId });
-          if (details.url) {
-            monitorUrl = details.url;
-          }
-        } catch (e) {
-          console.warn(`Failed to get details for monitor ${monitorId}:`, e);
-        }
-        
-        // Cached status only — background thread owns live HTTP checks
-        const status = await invoke('get_monitor_status', { monitorId });
+        const monitorUrl = row.url || monitorId;
+        const status = row.status || null;
         if (!status) {
           if (existingItems.has(monitorId)) {
             // Keep existing row until first background check lands
@@ -10476,7 +10454,7 @@ async function loadMonitors() {
       }
     });
 
-    if (monitorIds.length === 0) {
+    if (list.length === 0) {
       ensureMonitorsListEmptyState(monitorsList, true);
       updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
       updateMonitorsHeight();
@@ -10488,16 +10466,16 @@ async function loadMonitors() {
     let upCount = 0;
     let downCount = 0;
     let checkedCount = 0;
-    for (const monitorId of monitorIds) {
-      const status = monitorStatusCache.get(monitorId);
+    for (const row of list) {
+      const status = monitorStatusCache.get(row.id);
       if (!status) continue;
       checkedCount++;
       if (status.is_up) upCount++;
       else downCount++;
     }
     const anyDown = downCount > 0;
-    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
-    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
+    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === list.length;
+    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: list.length });
 
     sortMonitorsListByHealth(monitorsList);
     applyMonitorsListFilter();
@@ -25282,8 +25260,10 @@ function stopHistoryAvailabilityPoll() {
 function startHistoryAvailabilityPoll() {
   stopHistoryAvailabilityPoll();
   if (windowWorkPaused()) return;
+  // Skip until sparkline GPU / history seed has unparked once (#14).
+  if (!window.__macStatsSparklinesUnparked && !sparklineHistoryReady) return;
   checkHistoryAvailability();
-  // 24h history probe is heavy IPC; once every 10m is enough for the dropdown (#14).
+  // 24h history probe is heavy IPC; once every hour is enough for the dropdown (#14).
   historyAvailabilityInterval = setInterval(() => {
     // Prefer shared pause — macOS alt-tab often keeps visibilityState=visible (#14).
     if (windowWorkPaused()) return;
@@ -25301,7 +25281,10 @@ function initHistoryControls() {
     });
   }
 
-  startHistoryAvailabilityPoll();
+  // Do not probe 24h history on monitoring idle — wait for sparkline unpark (#14).
+  if (window.__macStatsSparklinesUnparked || sparklineHistoryReady) {
+    startHistoryAvailabilityPoll();
+  }
 }
 
 // Initialize monitoring features when DOM is ready

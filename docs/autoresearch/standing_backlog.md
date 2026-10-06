@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1438
+
+- CPU window: one `list_monitor_statuses` IPC for Monitors summary/list/settings; defer 24h history availability probe until sparkline unpark/seed. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1437
 
 - CPU window: collapsed Monitors skips history + full list IPC; icon-only summary walk (no per-host details); expand hydrates once. P2 reliability / GitHub #14.
