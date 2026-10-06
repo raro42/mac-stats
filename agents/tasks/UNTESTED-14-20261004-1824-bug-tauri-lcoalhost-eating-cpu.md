@@ -22,7 +22,19 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1462** (follow-up after v0.1.1461).
+Version **v0.1.1464** (follow-up after v0.1.1463).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (battery strip status washes skip glass blend):
+
+- `src/cpu.js` — Battery, power, LPM, and time-remaining status washes mix against opaque `#ececf1`. No ring box-shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm Bat / LPM / Power / time-remaining still show calm or hot washes. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1462)
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
@@ -3007,4 +3019,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm section icons still open panes; Ready / Slow / Down washes still show; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1462)
+
+**Date:** 2026-10-06 06:08 UTC (08:08 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1462**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1462)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 LPM toggle skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1462**
+- `CHANGELOG.md` **[0.1.1462]** documents Low Power Mode toggle on an opaque track; no glass alpha, inset highlight, or knob drop shadow
+- `src/cpu.js` injected CSS: `.lpm-toggle` mixes against opaque `#ececf1`; `box-shadow: none`; no inset highlight. Knob `::after` has `box-shadow: none`. On-state `.lpm-info.is-on .lpm-toggle` mixes against `#ffffff`. Knob still sits `left: 2px` (off) and `left: 18px` (on)
+- Theme `cpu.css` (all 9 themes): same opaque off-track and knob (`box-shadow: none`). On-state track mix lives in `cpu.js` (theme files only restyle `::after` left/transform)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 LPM opaque-track cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm LPM knob still sits left (off) and right (on); gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
