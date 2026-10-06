@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1579`; CHANGELOG entry; standing_backlog note
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` / ratchet verify
-- [ ] Commit + push `origin/main`; do not close #14
+- [x] Commit + push `origin/main`; do not close #14
 
 ## Review
-Opaque wash on Debug Log line Copied flash. Same pattern as Perplexity / process-row / monitor-item. Issue #14 left open for tester / 004.
+Opaque wash on Debug Log line Copied flash. Same pattern as Perplexity / process-row / monitor-item. Ratchet keep @ `6324507e`. Issue #14 left open for tester / 004.
