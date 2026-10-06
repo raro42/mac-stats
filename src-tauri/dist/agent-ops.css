@@ -9623,6 +9623,7 @@ button.is-just-saved,
 }
 
 /* Settings Product — AI Off attention glance (Judge / Voice STT parity) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .settings-ai-attention-glance {
   display: flex;
   align-items: center;
@@ -9632,8 +9633,8 @@ button.is-just-saved,
   margin: 6px 0 8px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font: inherit;
   font-size: 13px;
   font-weight: 520;
@@ -9644,7 +9645,6 @@ button.is-just-saved,
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -9653,21 +9653,21 @@ button.is-just-saved,
 }
 
 .settings-ai-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .settings-ai-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 /* Product Off / Compact On — soft alert (Help open / Monitors Slow soft 7%/30% parity). */
 .settings-ai-attention-glance.is-off {
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
   color: color-mix(in srgb, #ff9500 55%, currentColor);
 }
 
