@@ -5637,3 +5637,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open AI Chat settings; press Save; confirm the Saved flash still shows green on the save control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1533)
+
+**Date:** 2026-10-06 13:43 UTC (15:43 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1533**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1533)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Monitors Add Saved flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1533**
+- `CHANGELOG.md` **[0.1.1533]** documents the Monitors Add Saved flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `#monitors-add-save.is-just-saved` mixes against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/cpu.js` matches `src-tauri/dist/cpu.js`. After a successful add, `#monitors-add-save` calls `flashSaveButton(addSave, { savedLabel: 'Added', durationMs: 1600 })` which adds `.is-just-saved`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Monitors Add success flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Monitors Add Saved flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Monitors; add a monitor and press Save; confirm the Saved flash still shows green on the add control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
