@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1434** (follow-up after v0.1.1433).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Settings credential/decorations defer + Process Details / Monitors settings park):
+
+- `src/cpu-ui.js` — Settings credential status IPC (Brave…Signal, Discord, Perplexity) and window-decorations preference load wait until Settings opens. Shared open fan-out + `uiWorkPaused` gate. Collapsed Perplexity skips key-status until expand. Changelog version wiring drops the body MutationObserver.
+- `src/cpu.js` — Process Details open skips IPC and modal mount while parked (mid-flight drop; no alert while away). Monitors settings list skips wipe/IPC/rebuild while parked and aborts mid-flight `list_monitors` / `get_monitor_details`. Focus resume refreshes credential/decorations statuses when Settings stayed open, and rebuilds the Monitors settings list only if that popover is still open.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Confirm credential/decorations IPC does not fan-out until Settings opens. Open Monitors settings or click a process for Process Details, then alt-tab before IPC returns — Settings credential glances / Monitors settings list / Process Details modal must not paint while away. Alt-tab back — open Settings fan-out and Monitors list refresh when still open; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1433)
+
 Version **v0.1.1433** (follow-up after v0.1.1432).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1867,3 +1882,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, open Settings or trigger a credential status refresh and/or start an AI Chat stream / Agent Ops Refresh digest, then alt-tab before IPC returns — Settings glances / digest flash / stream scroll must not paint while away; alt-tab back — status re-open or stream flush refreshes) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1433)
+
+**Date:** 2026-10-06 02:29 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1433**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1433)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Product toggles defer + Discord / decorations / changelog park)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1433**
+- `src/cpu-ui.js` — `uiWorkPaused()` shared gate; open path calls `loadProductToggleStates({ aiOnly: true })`; Settings open triggers full fan-out via `__macStatsLoadProductToggleStates({ aiOnly: false })`; mid-flight park drops after each Product toggle IPC and AI-enabled event paint; decorations preference load skips start + mid-flight toggle paint; changelog Markdown rebuild and footer `injectAppVersion` skip start + mid-flight DOM while parked
+- `src/discord.js` — `refreshStatus` uses `discordWorkPaused()` at start and mid-flight after `is_discord_configured`
+- `src/cpu.js` — focus resume reloads Product toggle AI visibility (`__macStatsLoadProductToggleStatesAiOnly`) and full fan-out when Settings is still open
+- Prior v0.1.1432 Settings status / digest / stream park and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise and normal Linux CPU-window activity. No new errors tied to the #14 Product toggle / Discord / decorations / changelog occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm Product toggles beyond AI do not fan-out until Settings opens; open Settings and/or Changelog, then alt-tab before IPC returns — Product glances / Discord status / decorations toggle / changelog body / footer version must not paint while away; alt-tab back — AI visibility and open Settings fan-out refresh) before CLOSED. Do **not** close GitHub #14.

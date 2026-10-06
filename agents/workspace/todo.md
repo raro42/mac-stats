@@ -1,11 +1,13 @@
-# Coder — #14 v0.1.1433
+# Coder — #14 v0.1.1434
 
 ## Plan
-- [x] Park Settings product-toggle IPC/DOM (cpu-ui) mid-flight; defer non-AI until Settings open
-- [x] Park Discord settings status + decorations/changelog/version paint while occluded
-- [x] Bump to v0.1.1433; CHANGELOG; sync-dist
-- [x] `cargo check` in src-tauri/
+- [x] Defer Settings credential status IPC (Brave…Signal) from open to Settings open
+- [x] Defer decorations preference load to Settings open; resume if Settings stays open
+- [x] Skip collapsed Perplexity key-status IPC; drop version MutationObserver
+- [x] Park Process Details open + Settings Monitors list mid-flight; resume list rebuild
+- [x] Bump to v0.1.1434; CHANGELOG; sync-dist
+- [x] `cargo check` / ratchet verify
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1433** for GitHub #14. Product toggles AI-only on open; Discord / decorations / changelog / version park while occluded; resume reloads AI (+ full Product if Settings open). Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1434** for GitHub #14. Settings credential/decorations deferred to Settings open; Process Details open + Settings Monitors list park mid-flight; resume rebuilds Monitors list. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).

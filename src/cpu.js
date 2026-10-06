@@ -6095,10 +6095,29 @@ function applyDeferredResumeIdleWindowPolls() {
   // Settings open while away: finish full Product toggle fan-out on resume (#14).
   if (
     typeof window.isSettingsModalOpen === "function" &&
-    window.isSettingsModalOpen() &&
-    typeof window.__macStatsLoadProductToggleStates === "function"
+    window.isSettingsModalOpen()
   ) {
-    void window.__macStatsLoadProductToggleStates({ aiOnly: false });
+    if (typeof window.__macStatsLoadProductToggleStates === "function") {
+      void window.__macStatsLoadProductToggleStates({ aiOnly: false });
+    }
+    // Credential / decorations status deferred from open (#14).
+    if (typeof window.__macStatsRefreshSettingsCredentialStatuses === "function") {
+      window.__macStatsRefreshSettingsCredentialStatuses();
+    }
+    if (typeof window.__macStatsLoadWindowDecorationsPreference === "function") {
+      void window.__macStatsLoadWindowDecorationsPreference();
+    }
+  }
+  // Monitors settings popover may have been wiped then parked mid-flight (#14).
+  {
+    const monitorsPopover = document.getElementById("monitors-settings-popover");
+    if (
+      monitorsPopover &&
+      monitorsPopover.style.display !== "none" &&
+      monitorsPopover.getAttribute("aria-hidden") !== "true"
+    ) {
+      void refreshMonitorsSettingsList();
+    }
   }
   // Monitors: restart light summary poll (full list only when expanded).
   if (!monitorsUpdateInterval) {
@@ -7154,6 +7173,8 @@ function populateProcessDetailsBody(body, details, pid) {
 }
 
 async function showProcessDetails(pid) {
+  // Parked shell: do not start Process Details IPC / modal open (#14).
+  if (windowWorkPaused()) return;
   if (!invoke) {
     invoke = getInvoke();
     if (!invoke) {
@@ -7164,6 +7185,8 @@ async function showProcessDetails(pid) {
   
   try {
     const details = await invoke("get_process_details", { pid });
+    // Alt-tab during get_process_details: do not mount or paint the modal (#14).
+    if (windowWorkPaused()) return;
     
     // Use existing modal from HTML or create it
     processDetailsModal = document.getElementById("process-details-modal");
@@ -7262,6 +7285,8 @@ async function showProcessDetails(pid) {
       }
     }, 3600000);
   } catch (error) {
+    // Alt-tab during open: do not alert while parked (#14).
+    if (windowWorkPaused()) return;
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);
   }
@@ -8063,11 +8088,15 @@ function wireMonitorRemoveDelegation() {
 async function refreshMonitorsSettingsList() {
   const settingsList = document.getElementById('monitors-settings-list');
   if (!settingsList) return;
+  // Parked shell: keep prior list; skip wipe + IPC + rebuild (#14).
+  if (windowWorkPaused()) return;
   
   settingsList.innerHTML = '';
   
   try {
     const monitorIds = await invoke('list_monitors');
+    // Alt-tab during list_monitors: leave the empty shell; resume re-opens Settings (#14).
+    if (windowWorkPaused()) return;
     
     if (monitorIds.length === 0) {
       settingsList.innerHTML =
@@ -8093,15 +8122,18 @@ async function refreshMonitorsSettingsList() {
     }
     
     for (const monitorId of monitorIds) {
+      if (windowWorkPaused()) return;
       try {
         // Get monitor details including URL
         let monitorUrl = monitorId; // Fallback to ID if details not available
         try {
           const details = await invoke('get_monitor_details', { monitorId });
+          if (windowWorkPaused()) return;
           if (details.url) {
             monitorUrl = details.url;
           }
         } catch (e) {
+          if (windowWorkPaused()) return;
           console.warn(`Failed to get details for monitor ${monitorId}:`, e);
         }
         
@@ -8147,6 +8179,7 @@ async function refreshMonitorsSettingsList() {
       }
     }
   } catch (err) {
+    if (windowWorkPaused()) return;
     console.error('Failed to refresh monitors list:', err);
     settingsList.innerHTML = '<div class="monitors-empty monitors-error" role="alert">Error loading monitors</div>';
   }
@@ -13919,7 +13952,7 @@ function initBraveSettings() {
 
   wireBraveSettingsToolbarKeyboard();
 
-  refreshBraveStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.BraveSettings = { refreshStatus: refreshBraveStatus };
   window.ensureBraveSettingsToolbarKeyboard = wireBraveSettingsToolbarKeyboard;
 }
@@ -14291,7 +14324,7 @@ function initRedmineSettings() {
     });
   }
 
-  refreshRedmineStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.RedmineSettings = { refreshStatus: refreshRedmineStatus };
   wireRedmineSettingsToolbarKeyboard();
   window.ensureRedmineSettingsToolbarKeyboard = wireRedmineSettingsToolbarKeyboard;
@@ -14664,7 +14697,7 @@ function initMastodonSettings() {
     });
   }
 
-  refreshMastodonStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.MastodonSettings = { refreshStatus: refreshMastodonStatus };
   wireMastodonSettingsToolbarKeyboard();
   window.ensureMastodonSettingsToolbarKeyboard = wireMastodonSettingsToolbarKeyboard;
@@ -15032,7 +15065,7 @@ function initMcpSettings() {
     });
   }
 
-  refreshMcpStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.McpSettings = { refreshStatus: refreshMcpStatus };
   wireMcpSettingsToolbarKeyboard();
   window.ensureMcpSettingsToolbarKeyboard = wireMcpSettingsToolbarKeyboard;
@@ -15424,7 +15457,7 @@ function initBrowserSettings() {
     });
   }
 
-  refreshBrowserStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.BrowserSettings = { refreshStatus: refreshBrowserStatus };
   wireBrowserSettingsToolbarKeyboard();
   window.ensureBrowserSettingsToolbarKeyboard = wireBrowserSettingsToolbarKeyboard;
@@ -15815,7 +15848,7 @@ function initCursorAgentSettings() {
     });
   }
 
-  refreshCursorAgentStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.CursorAgentSettings = { refreshStatus: refreshCursorAgentStatus };
   wireCursorAgentSettingsToolbarKeyboard();
   window.ensureCursorAgentSettingsToolbarKeyboard = wireCursorAgentSettingsToolbarKeyboard;
@@ -15960,7 +15993,7 @@ function initTelegramSettings() {
     });
   }
 
-  refreshTelegramStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.TelegramSettings = { refreshStatus: refreshTelegramStatus };
   wireTelegramSettingsToolbarKeyboard();
   window.ensureTelegramSettingsToolbarKeyboard = wireTelegramSettingsToolbarKeyboard;
@@ -16317,7 +16350,7 @@ function initSlackSettings() {
     });
   }
 
-  refreshSlackStatus();
+  // Settings open loads status; open path skips credential IPC (#14).
   window.SlackSettings = { refreshStatus: refreshSlackStatus };
   wireSlackSettingsToolbarKeyboard();
   window.ensureSlackSettingsToolbarKeyboard = wireSlackSettingsToolbarKeyboard;
@@ -16551,7 +16584,7 @@ function refreshSignalStatus() {
 }
 
 function initSignalSettings() {
-  refreshSignalStatus();
+  // Settings open loads status; open path skips glance paint (#14).
   window.SignalSettings = { refreshStatus: refreshSignalStatus };
 }
 
@@ -18593,7 +18626,10 @@ function initPerplexitySection() {
     setIconPaneVisibility(section, content, perplexityCollapsed, divider);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     applyPerplexityLastGlanceState();
-    refreshPerplexityStatus();
+    // Collapsed: glance is hidden — skip key-status IPC until expand / Settings (#14).
+    if (!perplexityCollapsed) {
+      refreshPerplexityStatus();
+    }
     syncSectionIcon('icon-perplexity', !perplexityCollapsed);
     const icon = document.getElementById('icon-perplexity');
     if (icon) {
@@ -18899,7 +18935,7 @@ function initPerplexitySection() {
 
   wirePerplexitySettingsToolbarKeyboard();
 
-  refreshPerplexityStatus();
+  // Collapse apply already refreshed; Settings open refreshes again (#14).
   window.Perplexity = { refreshStatus: refreshPerplexityStatus };
   window.ensurePerplexitySettingsToolbarKeyboard = wirePerplexitySettingsToolbarKeyboard;
 }

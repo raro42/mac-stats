@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1434] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Settings credential status IPC (Brave, Redmine, Mastodon, MCP, Browser, Cursor Agent, Telegram, Slack, Signal) and window-decorations preference load wait until Settings opens (not on CPU-window open). Discord / Perplexity join the same Settings-open fan-out; focus resume refreshes them if Settings stayed open. Collapsed Perplexity skips key-status IPC until expand. Changelog version wiring drops the body MutationObserver (idle follow-up + injectAppVersion only). Process Details open skips IPC and modal mount while parked (mid-flight drop after alt-tab; no alert while away). Monitors settings list skips wipe/IPC/rebuild while parked and aborts mid-flight `list_monitors` / `get_monitor_details`; focus resume rebuilds the list only if that popover is still open. Aim: quieter `tauri://localhost` / Graphics and Media on open and when Process Details or Monitors settings warm-up finishes while away.
+
 ## [0.1.1433] - 2026-10-06
 
 ### Changed

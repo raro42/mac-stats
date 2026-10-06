@@ -20,6 +20,18 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1434
+
+- CPU window: Settings credential/decorations IPC deferred to Settings open; Process Details open + Monitors settings list skip IPC/DOM while parked; resume rebuilds list if popover still open. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1433
+
+- CPU window: Settings Product toggles AI-only on open; Discord / decorations / changelog / footer version park while occluded. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1432
+
+- CPU window: Settings credential status + chat stream + Agent Ops digest park while occluded. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1431
 
 - Agent Ops: session / schedule / run / knowledge previews skip DOM while parked; mid-flight live/session/knowledge reads drop paint. P2 reliability / GitHub #14.

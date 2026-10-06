@@ -433,9 +433,12 @@
     if (typeof window.__macStatsLoadProductToggleStates === "function") {
       void window.__macStatsLoadProductToggleStates({ aiOnly: false });
     }
+    // Decorations toggle lives in Settings — load preference on open (#14).
+    if (typeof window.__macStatsLoadWindowDecorationsPreference === "function") {
+      void window.__macStatsLoadWindowDecorationsPreference();
+    }
     if (!uiWorkPaused()) {
-      if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
-      if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+      refreshSettingsCredentialStatuses();
     }
     const discordSetting = document.getElementById("discord-setting");
     if (
@@ -4341,6 +4344,33 @@
     }
   }
 
+  /** Settings credential statuses — Discord / Perplexity / Brave… (open deferred, #14). */
+  function refreshSettingsCredentialStatuses() {
+    if (uiWorkPaused()) return;
+    const refreshers = [
+      window.Discord,
+      window.Perplexity,
+      window.BraveSettings,
+      window.RedmineSettings,
+      window.MastodonSettings,
+      window.McpSettings,
+      window.BrowserSettings,
+      window.CursorAgentSettings,
+      window.TelegramSettings,
+      window.SlackSettings,
+      window.SignalSettings,
+    ];
+    for (const api of refreshers) {
+      if (api && typeof api.refreshStatus === "function") {
+        try {
+          void api.refreshStatus();
+        } catch (_) {
+          /* ignore mid-flight park */
+        }
+      }
+    }
+  }
+
   function initWindowDecorations() {
     const toggle = document.getElementById("window-decorations-toggle");
     if (!toggle) return;
@@ -4374,6 +4404,9 @@
         }
       }
 
+    // Settings open loads preference; open path skips decorations IPC (#14).
+    window.__macStatsLoadWindowDecorationsPreference = loadPreference;
+
     // Save preference when toggled
     toggle.addEventListener("change", async (e) => {
       const enabled = e.target.checked;
@@ -4404,8 +4437,6 @@
         console.warn("Could not find toggle-label element to show message");
       }
     });
-
-    loadPreference();
   }
 
   function initExternalLinks() {
@@ -5209,22 +5240,15 @@
       });
     };
     wireVersionClicks();
-    // One deferred pass for late injectAppVersion(); then stop watching.
-    const observer = new MutationObserver(() => {
-      wireVersionClicks();
+    // injectAppVersion() also wires clicks; one idle follow-up for late DOM (#14).
+    // No body MutationObserver — wildcard rescans wake WebKit on every tick.
+    const scheduleWire =
+      typeof window.requestIdleCallback === "function"
+        ? (fn) => window.requestIdleCallback(fn, { timeout: 2000 })
+        : (fn) => window.setTimeout(fn, 0);
+    scheduleWire(() => {
+      if (!uiWorkPaused()) wireVersionClicks();
     });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    window.setTimeout(() => {
-      try {
-        observer.disconnect();
-      } catch (_) {
-        /* ignore */
-      }
-      wireVersionClicks();
-    }, 4000);
 
     // Close modal handlers
     if (closeChangelog) {
@@ -5315,6 +5339,8 @@
   window.applySettingsCompactAttentionGlanceState =
     applySettingsCompactAttentionGlanceState;
   window.openSettingsModal = openSettingsModal;
+  window.__macStatsRefreshSettingsCredentialStatuses =
+    refreshSettingsCredentialStatuses;
   window.applyAiUiVisibility = applyAiUiVisibility;
   window.tryEnableAiFromGatedIcon = tryEnableAiFromGatedIcon;
 

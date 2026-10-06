@@ -6,7 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
-| **v0.1.1431** | Agent Ops session / schedule / run / knowledge previews skip DOM after alt-tab. Mid-flight live session, session-file, and knowledge reads drop preview paint while parked. |
+| **v0.1.1434** | Settings credential/decorations IPC waits until Settings opens. Process Details open + Settings Monitors list skip IPC/DOM while parked; resume rebuilds the Monitors list. Changelog version wiring drops the body MutationObserver. |
+| **v0.1.1433** | Settings Product toggles load AI only on open; Discord / decorations / changelog / footer version park while occluded. |
+| **v0.1.1432** | Settings credential status + AI Chat stream buffer + Agent Ops digest park while occluded. |
+| **v0.1.1431** | Agent Ops session / schedule / run / knowledge previews skip DOM after alt-tab. |
 | **v0.1.1430** | AI Chat / Ollama connection checks and model-list loads skip IPC/DOM when parked. Perplexity key-status and monitor history Map rebuilds drop mid-flight. |
 | v0.1.1428–1429 | Backend metrics require focus; history/charts shared park; leftover timer holdouts + Agent Ops batched IPC abort. |
 | v0.1.1427 | Shared park gate for secondary IPC (Discord / Monitors / Process Details / Agent Ops). |
@@ -14,7 +17,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Opening an Agent Ops preview then alt-tabbing used to still mount a large preview pane when the read returned. That woke WebKit the same way Ollama connection warm-up did. Parking preview paint closes that gap.
+Opening Settings or Process Details then alt-tabbing used to still fan out credential IPC and mount a heavy modal when the read returned. Deferring open-path Settings work and parking Process Details / Monitors-list paint keeps WebKit quieter while you are away.
 
 ## Still open
 
