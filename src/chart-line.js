@@ -456,19 +456,9 @@
 
   function boot() {
     // Stay parked through open. Wire blur/focus only; buffer samples while
-    // parked. Late idle unpark so charts appear without stacking open paint
-    // with GPU buffer alloc. No history IPC seed (#14).
+    // parked. No idle unpark — focus / first metrics poll unparks (#14).
     parkCanvases();
     wireListeners();
-    const lateUnpark = () => {
-      if (windowOccluded()) return;
-      unparkCanvases();
-    };
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(lateUnpark, { timeout: 120000 });
-    } else {
-      setTimeout(lateUnpark, 120000);
-    }
   }
 
   if (document.readyState === "loading") {

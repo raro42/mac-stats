@@ -1,11 +1,11 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1412)
+# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1413)
 
-- [x] Fix deferred wireDom/startMetrics skipping forever when occluded
-- [x] Bump version, CHANGELOG, sync-dist
-- [x] cargo check / autoresearch verify
-- [x] Rename task → UNTESTED
+- [x] Rename UNTESTED→WIP
+- [x] Gate first metrics + sparkline GPU on focus (no 120s idle wake)
+- [x] Guard init against double-arm; slow waitForTauri poll
+- [x] Bump 0.1.1413, CHANGELOG, sync-dist
+- [x] cargo check; rename WIP→UNTESTED
 - [ ] commit + push origin/main
-- [ ] keep + loop_backlog + morning surprise
 
 ## Review
-Verify OK. Deferred open wiring no longer skips when occluded.
+Focus-gated first metrics; no idle sparkline unpark; slower waitForTauri. `cargo check` pass.

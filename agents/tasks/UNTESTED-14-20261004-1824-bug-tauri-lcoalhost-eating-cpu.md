@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1413** (follow-up after v0.1.1412).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (focus-gated first metrics + no idle sparkline unpark):
+
+- `src/cpu.js` — `init()` is idempotent. First `get_cpu_details` arms on focus/resume (5s idle when already focused; 10m fallback). No 120s idle metrics start. Focus also wires keyboard/copy immediately. `waitForTauri` polls every 500ms (was 50ms).
+- `src/chart-line.js` — remove 120s idle unpark; focus / first focused poll unparks GPU buffers.
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and sparklines still appear when focused. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1412)
+
+
 Version **v0.1.1412** (follow-up after v0.1.1411).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

@@ -2735,23 +2735,22 @@ async function refresh() {
   }
 }
 
-// Wait for Tauri to be available
-// CRITICAL: Keep trying even after maxAttempts - Tauri might not be ready when window first opens
-function waitForTauri(callback, maxAttempts = 200) {
+// Wait for Tauri to be available.
+// Slow polls: a 50ms/100ms loop kept waking the WebView on open (#14).
+function waitForTauri(callback, maxAttempts = 40) {
   const invokeFn = getInvoke();
-  
+
   if (invokeFn) {
     callback(invokeFn);
     return;
   }
-  
+
   if (maxAttempts > 0) {
-    setTimeout(() => waitForTauri(callback, maxAttempts - 1), 50);
+    setTimeout(() => waitForTauri(callback, maxAttempts - 1), 500);
   } else {
-    // Don't give up - keep trying every 100ms until Tauri is ready
-    // This ensures we call refresh() as soon as Tauri becomes available
+    // Rare: keep a slow retry so a late IPC bridge still arms metrics (#14).
     console.warn("Tauri API not available yet, continuing to wait...");
-    setTimeout(() => waitForTauri(callback, 0), 100);
+    setTimeout(() => waitForTauri(callback, 0), 2000);
   }
 }
 
@@ -2773,54 +2772,88 @@ function stopRefresh() {
   }
 }
 
+/** Idempotent DOM wiring for keyboard/copy/strip (#14). */
+function wireCpuWindowDomOnce() {
+  if (window.__macStatsCpuDomWired) return;
+  window.__macStatsCpuDomWired = true;
+  wireMetricValueCopy();
+  ensureCpuHeaderToolbarKeyboard();
+  ensureRingGaugeKeyboard();
+  ensureHistorySparklineKeyboard();
+  ensureGpuHistoryChart();
+  alignRingGaugeLabels();
+  removeRingsFilterChips();
+  ensureRamStripStyles();
+  pruneMetricStripChips();
+  ensurePowerStripKeyboard();
+}
+
+/**
+ * First get_cpu_details + slow refresh interval. Prefer focus/resume so open
+ * does not stack IPC with WebView compositor work (#14).
+ */
+function startCpuWindowMetricsOnce() {
+  if (window.__macStatsCpuMetricsArmed) return;
+  window.__macStatsCpuMetricsArmed = true;
+  const afterFirst = () => {
+    // Ensure the slow interval exists even when first usage sample is 0 (#14).
+    if (!refreshInterval) startRefresh();
+    // Sparkline GPU: unpark after first poll when focused (no idle timer) (#14).
+    if (!windowOccluded()) {
+      const hist = window.themeHistory;
+      if (hist && typeof hist.unpark === "function") {
+        hist.unpark();
+      }
+    }
+  };
+  const immediateInvoke = getInvoke();
+  if (immediateInvoke) {
+    invoke = immediateInvoke;
+    // One-shot first; interval arms after the invoke returns (#14).
+    Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
+  } else {
+    waitForTauri((invokeFn) => {
+      invoke = invokeFn;
+      Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
+    });
+  }
+}
+
 // Initialize when DOM and Tauri are ready
 function init() {
+  // Focused(true) + DOMContentLoaded + load can each call init — arm once (#14).
+  if (window.__macStatsCpuWindowInitStarted) return;
+  window.__macStatsCpuWindowInitStarted = true;
+
   // Keep warm PROCESS_CACHE on open — do not force a full process refresh (#14).
   // Defer DOM wiring past first paint so open does not stack layout with WebKit (#14).
-  // Always wire (cheap); do not skip when occluded or keyboard/copy never bind.
-  const wireDom = () => {
-    wireMetricValueCopy();
-    ensureCpuHeaderToolbarKeyboard();
-    ensureRingGaugeKeyboard();
-    ensureHistorySparklineKeyboard();
-    ensureGpuHistoryChart();
-    alignRingGaugeLabels();
-    removeRingsFilterChips();
-    ensureRamStripStyles();
-    pruneMetricStripChips();
-    ensurePowerStripKeyboard();
-  };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(wireDom, { timeout: 60000 });
+    window.requestIdleCallback(wireCpuWindowDomOnce, { timeout: 60000 });
   } else {
-    setTimeout(wireDom, 60000);
+    setTimeout(wireCpuWindowDomOnce, 60000);
   }
 
-  // Defer first get_cpu_details well past first paint so open does not stack
-  // IPC with WebView compositor work (#14). Do not seed history IPC on open —
-  // live feed + focus resume seed when needed (chart-line boot already skips).
-  // Always arm invoke + interval; refresh() no-ops while occluded (#14).
-  const startMetrics = () => {
-    const afterFirst = () => {
-      // Ensure the slow interval exists even when first usage sample is 0 (#14).
-      if (!refreshInterval) startRefresh();
-    };
-    const immediateInvoke = getInvoke();
-    if (immediateInvoke) {
-      invoke = immediateInvoke;
-      // One-shot first; interval arms after the invoke returns (#14).
-      Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
-    } else {
-      waitForTauri((invokeFn) => {
-        invoke = invokeFn;
-        Promise.resolve(refresh()).then(afterFirst).catch(afterFirst);
-      });
+  // Do not idle-start get_cpu_details — wait for focus/resume (#14).
+  // Late fallback if Focused(true) never arrives (flaky hosts).
+  const lateMetricsFallback = () => {
+    if (!window.__macStatsCpuMetricsArmed) {
+      startCpuWindowMetricsOnce();
     }
   };
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startMetrics, { timeout: 120000 });
+    window.requestIdleCallback(lateMetricsFallback, { timeout: 600000 });
   } else {
-    setTimeout(startMetrics, 120000);
+    setTimeout(lateMetricsFallback, 600000);
+  }
+
+  // If the window already has focus on open, arm metrics without waiting
+  // for another focus event (Tauri Focused(true) can race past load) (#14).
+  if (!windowOccluded()) {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: 5000 });
+    } else {
+      setTimeout(startCpuWindowMetricsOnce, 5000);
+    }
   }
 }
 
@@ -5738,6 +5771,8 @@ function resumeVisibleWindowWork() {
   if (document.hidden) return;
   setDocumentOccluded(false);
   window._forceProcessUpdate = true;
+  // Focus path: wire keyboard/copy immediately (may beat the 60s idle) (#14).
+  wireCpuWindowDomOnce();
   if (invoke) {
     // Skip history reseed on rapid focus churn (alt-tab) — gauges refresh below (#14).
     if (
@@ -5760,6 +5795,8 @@ function resumeVisibleWindowWork() {
     resumeIdleWindowPolls();
   } else {
     init();
+    // Focus arms first metrics — do not wait for the late idle fallback (#14).
+    startCpuWindowMetricsOnce();
   }
 }
 
