@@ -6,6 +6,8 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1512** | The Settings Discord token glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1511** | The Settings MCP not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1510** | The Settings Mastodon not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1509** | The Settings Redmine not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1508** | The Settings Brave Key-not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
@@ -93,10 +95,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-The Settings Perplexity key glance no longer paints a missing API key with a glass blend. The fill is opaque.
+The Settings Discord token glance no longer paints a missing token with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Settings Discord token glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Settings Help glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
