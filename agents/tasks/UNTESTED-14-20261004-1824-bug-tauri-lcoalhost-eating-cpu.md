@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1431** (follow-up after v0.1.1430).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Agent Ops preview mid-flight park):
+
+- `src/agent-ops.js` — `showOpsSessionPreview` / `showOpsSchedulePreview` / `showOpsRunPreview` no-op while `agentOpsWorkPaused`. Mid-flight live session, session-file, and knowledge `read_*` paths drop preview/status paint after alt-tab (Overview + Sessions/Knowledge tabs).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Expand Agent Ops → Sessions / Knowledge / Runs / Schedules, open a row preview, then alt-tab before IPC returns — preview pane / Load into AI Chat must not paint while away. Alt-tab back — re-open a row refreshes; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1430)
+
 Version **v0.1.1430** (follow-up after v0.1.1429).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

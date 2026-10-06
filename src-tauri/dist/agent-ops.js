@@ -6801,6 +6801,8 @@ function renderOverviewLive(rows, insights) {
                     source: r.source,
                     sessionId: r.session_id,
                 });
+                // Alt-tab during live session read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 if (matchedRow) markOpsSessionRowSelected(matchedRow);
                 showOpsSessionPreview(msgs, `Live ${source} · ${sessionId}`, r.session_id);
                 showOpsSessionStatus(
@@ -6808,6 +6810,7 @@ function renderOverviewLive(rows, insights) {
                     true
                 );
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
@@ -6884,6 +6887,8 @@ function renderOverviewKnowledge(files) {
             const label = fileTitle === 'Unknown' ? (f.path || 'knowledge') : fileTitle;
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
+                // Alt-tab during knowledge read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 const bodyText = String(text || '').slice(0, 12000);
                 if (preview) {
                     preview.hidden = false;
@@ -6904,6 +6909,7 @@ function renderOverviewKnowledge(files) {
                     showOpsMemoryLoadStatus('File is empty.', false);
                 }
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 if (preview) {
                     preview.hidden = false;
                     preview.textContent = String(err);
@@ -7005,6 +7011,8 @@ function renderOverviewRecent(files) {
             });
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
+                // Alt-tab during session-file read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 const copyId = fileTitle === 'Unknown' ? '' : fileTitle;
                 if (msgs && msgs.length) {
                     if (matchedRow) markOpsSessionRowSelected(matchedRow);
@@ -7015,6 +7023,7 @@ function renderOverviewRecent(files) {
                     );
                 } else {
                     const text = await invoke('read_session_file', { path: f.path });
+                    if (agentOpsWorkPaused()) return;
                     const preview = document.getElementById('ops-session-preview');
                     const loadBtn = document.getElementById('ops-session-load-chat');
                     if (preview) {
@@ -7027,6 +7036,7 @@ function renderOverviewRecent(files) {
                     showOpsSessionStatus('No messages to load — raw file preview only.', false);
                 }
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
@@ -7038,6 +7048,8 @@ function renderOverviewRecent(files) {
 
 /** Show full schedule or delivery text (rows truncate task/summary). */
 function showOpsSchedulePreview(text, copyValue, loadText) {
+    // Alt-tab during schedule/delivery open: do not mount preview DOM (#14).
+    if (agentOpsWorkPaused()) return;
     const preview = document.getElementById('ops-schedule-preview');
     if (!preview) return;
     const body = String(text || '').trim();
@@ -9172,6 +9184,8 @@ function setOpsSessionCopyChip(copyValue) {
 }
 
 function showOpsSessionPreview(rows, label, copyValue) {
+    // Alt-tab during live/file session read: do not mount preview DOM (#14).
+    if (agentOpsWorkPaused()) return;
     const preview = document.getElementById('ops-session-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
     opsSessionLoadRows = rows && rows.length ? rows : null;
@@ -9306,10 +9320,13 @@ function renderOpsLive(rows) {
                     source: r.source,
                     sessionId: r.session_id,
                 });
+                // Alt-tab during live session read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 markOpsSessionRowSelected(btn);
                 showOpsSessionPreview(msgs, `Live ${source} · ${sessionId}`, r.session_id);
                 showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
@@ -9378,6 +9395,8 @@ function renderOpsSessionFiles(files) {
             try {
                 const copyId = fileTitle === 'Unknown' ? '' : fileTitle;
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
+                // Alt-tab during session-file read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 if (msgs && msgs.length) {
                     markOpsSessionRowSelected(btn);
                     showOpsSessionPreview(msgs, fileTitle === 'Unknown' ? '' : f.name, copyId);
@@ -9385,6 +9404,7 @@ function renderOpsSessionFiles(files) {
                 } else {
                     markOpsSessionRowSelected(btn);
                     const text = await invoke('read_session_file', { path: f.path });
+                    if (agentOpsWorkPaused()) return;
                     preview.hidden = false;
                     preview.textContent = text.slice(0, 12000);
                     opsSessionLoadRows = null;
@@ -9393,6 +9413,7 @@ function renderOpsSessionFiles(files) {
                     showOpsSessionStatus('No parseable turns — raw file shown.', false);
                 }
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 preview.hidden = false;
                 preview.textContent = String(err);
                 opsSessionLoadRows = null;
@@ -9463,6 +9484,8 @@ function renderOpsMemory(files) {
             const label = fileTitle === 'Unknown' ? (f.path || 'knowledge') : fileTitle;
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
+                // Alt-tab during knowledge read: drop preview paint (#14).
+                if (agentOpsWorkPaused()) return;
                 const body = String(text || '').slice(0, 12000);
                 preview.hidden = false;
                 preview.textContent = body;
@@ -9481,6 +9504,7 @@ function renderOpsMemory(files) {
                     showOpsMemoryLoadStatus('File is empty.', false);
                 }
             } catch (err) {
+                if (agentOpsWorkPaused()) return;
                 preview.hidden = false;
                 preview.textContent = String(err);
                 opsMemoryLoadText = null;
@@ -9991,6 +10015,8 @@ function openOpsDiscordGatewayPreviewNavigate(gateway) {
 
 /** Show full run turn details (list rows truncate question / tools). */
 function showOpsRunPreview(text, requestId, question) {
+    // Alt-tab during run open: do not mount preview DOM (#14).
+    if (agentOpsWorkPaused()) return;
     const preview = ensureOpsRunsPreview();
     if (!preview) return;
     const body = String(text || '').trim();

@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1431
+
+- Agent Ops: session / schedule / run / knowledge previews skip DOM while parked; mid-flight live/session/knowledge reads drop paint. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1430
 
 - CPU window: AI Chat / Ollama connection + model-list and Perplexity key-status skip IPC/DOM while parked; monitor history Map rebuild drops mid-flight. P2 reliability / GitHub #14.
