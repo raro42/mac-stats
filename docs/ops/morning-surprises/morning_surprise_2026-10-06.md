@@ -6,6 +6,8 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1445** | Data-poster history charts stay parked on open. First paint does not allocate canvas buffers or fetch history. The same idle unpark as the other themes draws them later. |
+| **v0.1.1444** | Collapsed Top Processes skips `get_pinned_process_names` on open and resume. Pins paint from localStorage. Expand hydrates from disk. |
 | **v0.1.1443** | Collapsed External / Monitors skips `list_monitor_statuses` on open, resume, and the hourly timer. The icon paints last-known up/down from localStorage. Expand still hydrates the list. |
 | **v0.1.1442** | Discord icon skips `is_discord_gateway_ready` on open/resume. Last-known connected state paints from localStorage. Click and Settings still check. |
 | **v0.1.1441** | Settings credential Save/Clear (Brave through Signal) wires on Settings open, not on monitoring idle. |
@@ -26,9 +28,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Monitors stays collapsed for most open sessions. After the bulk-status cut, the collapsed path still called `list_monitor_statuses` on every warm-up. Last-known icon wash from localStorage drops that IPC until you expand. Settings Save wiring waits until you open Settings, so monitoring idle is not attaching nine credential panes.
+Data-poster was the theme that still drew history charts on the first paint. Other themes already wait for the idle unpark. Open no longer stacks canvas buffers and a history fetch with that first paint.
 
 ## Still open
 
+- ~20:50 tick: data-poster history charts stay parked on open (**v0.1.1445**).
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

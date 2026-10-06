@@ -124,9 +124,9 @@
   // Tooltip element
   let tooltipElement = null;
 
-  // Canvas contexts - initialize immediately (like poster-charts.js)
+  // Canvas contexts — start parked so open does not allocate GPU (#14).
   const contexts = {};
-  let canvasesParked = false;
+  let canvasesParked = true;
 
   function windowOccluded() {
     if (typeof document === 'undefined') return false;
@@ -214,12 +214,8 @@
     });
   }
 
-  // Skip canvas GPU layers when the data-poster window opens occluded (#14).
-  if (windowOccluded()) {
-    parkHistoryCanvases();
-  } else {
-    Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
-  }
+  // Stay parked through open. cpu.js idle unpark / focus resume draws later (#14).
+  parkHistoryCanvases();
 
   // Create tooltip element
   function createTooltip() {
@@ -550,28 +546,16 @@
         }
       });
 
-      // Fetch initial history
-      console.log('[history] Fetching initial history data');
-      updateChartsFromBackend();
-
-      // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
-      if (!historyPollInterval) {
-        historyPollInterval = setInterval(() => {
-          if (historyWorkPaused() || canvasesParked) return;
-          updateChartsFromBackend();
-        }, HISTORY_POLL_MS);
-      }
+      // Do not fetch or arm the poll here. A focused open used to allocate
+      // canvas buffers and call get_metrics_history on the first paint (#14).
+      // cpu.js unparks on the same idle as the other themes.
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          pauseHistoryPoll();
-          return;
-        }
-        resumeHistoryPoll();
+        if (document.hidden) pauseHistoryPoll();
       });
       // macOS often keeps visibilityState=visible when occluded (#14).
+      // Focus resume stays on cpu.js so this file does not unpark on the event.
       window.addEventListener('blur', pauseHistoryPoll);
-      window.addEventListener('focus', resumeHistoryPoll);
       
       // Handle window resize
       let resizeTimeout;

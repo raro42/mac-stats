@@ -3035,6 +3035,10 @@ function startCpuWindowMetricsOnce() {
       if (hist && typeof hist.unpark === "function") {
         hist.unpark();
       }
+      // Data-poster history.js has no themeHistory. Same idle unpark (#14).
+      if (typeof window.__macStatsResumeHistoryCharts === "function") {
+        window.__macStatsResumeHistoryCharts();
+      }
       // 24h history probe waits for sparkline unpark (#14).
       window.__macStatsSparklinesUnparked = true;
       startHistoryAvailabilityPoll();

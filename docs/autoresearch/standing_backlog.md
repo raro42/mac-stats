@@ -20,6 +20,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1445
+
+- Data-poster history charts stay parked on open. First paint does not allocate canvas buffers or fetch history. The same idle unpark as the other themes draws them later. Focus does not unpark them on the event. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1444
+
+- CPU window: collapsed Top Processes skips `get_pinned_process_names` on warm-up and focus resume. Pins paint from localStorage. Expand hydrates from disk. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1443
 
 - CPU window: collapsed Monitors skips `list_monitor_statuses`; last-known icon wash from localStorage. P2 reliability / GitHub #14.
