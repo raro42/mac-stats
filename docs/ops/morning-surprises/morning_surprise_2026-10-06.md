@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1503** | The Monitors summary mixes down, all-up, and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1502** | The Agent Ops Signal glance mixes not-wired, not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1501** | The Agent Ops Slack glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1500** | The Agent Ops Telegram glance mixes not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
@@ -85,10 +86,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-An Agent Ops Mastodon glance no longer paints not-set or partial with a glass blend. The fill is opaque.
+The Monitors summary no longer paints down, slow, or all-up with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Agent Ops Telegram glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Perplexity key glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

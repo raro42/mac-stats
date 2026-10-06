@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1503
+
+- External / Monitors summary mixes down, all-up, and slow washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1502
 
 - Agent Ops Signal Not wired/Partial attention glance mixes not-wired, not-set, partial, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
