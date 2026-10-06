@@ -446,6 +446,8 @@
   }
 
   function openSettingsModal() {
+    // Theme/product/changelog chrome waits until Settings is used (#14).
+    ensureSettingsChromeWired();
     const settingsModal = document.getElementById("settings-modal");
     if (!settingsModal) return;
     settingsFocusReturn = document.activeElement;
@@ -728,14 +730,18 @@
     }
   }
 
-  function initSettingsModal() {
+  /** Settings button only — close/keyboard/theme waits for first open (#14). */
+  function initSettingsOpenButton() {
     const settingsBtn = document.getElementById("settings-btn");
     const settingsModal = document.getElementById("settings-modal");
-    const closeSettings = document.getElementById("close-settings");
-
     if (settingsBtn && settingsModal) {
       settingsBtn.addEventListener("click", () => openSettingsModal());
     }
+  }
+
+  function initSettingsModalChrome() {
+    const settingsModal = document.getElementById("settings-modal");
+    const closeSettings = document.getElementById("close-settings");
 
     if (closeSettings) {
       closeSettings.addEventListener("click", () => closeSettingsModal());
@@ -756,6 +762,16 @@
         closeSettingsModal();
       }
     });
+  }
+
+  /** Product/theme/decorations listeners — Settings is closed on the common path (#14). */
+  function ensureSettingsChromeWired() {
+    if (window.__macStatsSettingsChromeWired) return;
+    window.__macStatsSettingsChromeWired = true;
+    initSettingsModalChrome();
+    initThemePicker();
+    initWindowDecorations();
+    initProductToggles();
   }
 
   // One-time inject of style for theme-switch fade-out (no per-theme CSS edits)
@@ -4067,22 +4083,6 @@
           alert("Could not save aiAgentEnabled: " + e);
         }
       });
-      // install.sh / hand-edit of config.json can flip AI without restart
-      try {
-        const { listen } = window.__TAURI__.event;
-        listen("ai-agent-enabled-changed", (ev) => {
-          const on = !!ev.payload;
-          // Always cache so resume/open can paint without IPC (#14).
-          persistAiAgentEnabledLocal(on);
-          // Parked: drop toggle/icon paint until focus (#14).
-          if (uiWorkPaused()) return;
-          aiToggle.checked = on;
-          applyAiUiVisibility(on);
-          applySettingsAiAttentionGlanceState();
-        });
-      } catch (_) {
-        /* event bridge optional when not in Tauri */
-      }
     }
     if (judgeToggle) {
       judgeToggle.addEventListener("change", async () => {
@@ -5279,53 +5279,6 @@
     if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
     wireChangelogBodyToolbarKeyboard(changelogBody);
 
-    // Get version elements - try multiple selectors to catch all cases
-    const versionElements = document.querySelectorAll(
-      ".app-version, .theme-version, .arch-version, [class*='version']"
-    );
-    
-    console.log(`Found ${versionElements.length} version elements for changelog`);
-
-    // Open modal when version is clicked
-    versionElements.forEach((el) => {
-      if (el.dataset.changelogHandler) return;
-      el.dataset.changelogHandler = "true";
-      el.style.cursor = "pointer";
-      el.setAttribute("title", "Click to view changelog");
-      el.classList.add("version-clickable");
-      console.log("Adding click handler to version element:", el.className, el.textContent);
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (el.classList.contains("is-just-saved")) return;
-        console.log("Version clicked, opening changelog modal");
-        openChangelogModal(changelogModal, changelogBody, el);
-      });
-    });
-    
-    // Wire version elements once; avoid a permanent body MutationObserver
-    // (wildcard [class*='version'] rescans on every DOM tick and wakes WebKit, #14).
-    const wireVersionClicks = () => {
-      const newVersionElements = document.querySelectorAll(
-        ".app-version, .theme-version, .arch-version"
-      );
-      newVersionElements.forEach((el) => {
-        if (!el.dataset.changelogHandler) {
-          el.dataset.changelogHandler = "true";
-          el.style.cursor = "pointer";
-          el.setAttribute("title", "Click to view changelog");
-          el.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (el.classList.contains("is-just-saved")) return;
-            openChangelogModal(changelogModal, changelogBody, el);
-          });
-        }
-      });
-    };
-    wireVersionClicks();
-    // No idle follow-up rescan — that woke WebKit ~2s after open (#14).
-
     // Close modal handlers
     if (closeChangelog) {
       closeChangelog.addEventListener("click", () => {
@@ -5347,6 +5300,54 @@
     });
   }
 
+  function ensureChangelogModalWired() {
+    if (window.__macStatsChangelogModalWired) return;
+    window.__macStatsChangelogModalWired = true;
+    initChangelogModal();
+  }
+
+  /**
+   * One delegated footer click — no [class*='version'] tree walk on open (#14).
+   */
+  function wireChangelogVersionClicksOnce() {
+    if (window.__macStatsChangelogClickWired) return;
+    window.__macStatsChangelogClickWired = true;
+    document.addEventListener("click", (e) => {
+      const el =
+        e.target &&
+        e.target.closest &&
+        e.target.closest(".app-version, .theme-version, .arch-version");
+      if (!el || el.classList.contains("is-just-saved")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      ensureChangelogModalWired();
+      const changelogModal = document.getElementById("changelog-modal");
+      const changelogBody = document.getElementById("changelog-body");
+      if (!changelogModal || !changelogBody) return;
+      openChangelogModal(changelogModal, changelogBody, el);
+    });
+  }
+
+  /** install.sh / config.json can flip AI without Settings open (#14). */
+  function wireAiAgentEnabledLive() {
+    if (window.__macStatsAiAgentLiveWired) return;
+    window.__macStatsAiAgentLiveWired = true;
+    try {
+      const { listen } = window.__TAURI__.event;
+      listen("ai-agent-enabled-changed", (ev) => {
+        const on = !!ev.payload;
+        persistAiAgentEnabledLocal(on);
+        if (uiWorkPaused()) return;
+        const toggle = document.getElementById("ai-agent-enabled-toggle");
+        if (toggle) toggle.checked = on;
+        applyAiUiVisibility(on);
+        applySettingsAiAttentionGlanceState();
+      });
+    } catch (_) {
+      /* event bridge optional when not in Tauri */
+    }
+  }
+
   function bootstrap() {
     const savedTheme = getSavedTheme();
     paintThemeBoot(savedTheme);
@@ -5366,16 +5367,13 @@
     }
     // AI gate from localStorage before Product toggle IPC (#14).
     applyAiUiVisibilityFromLocalStorage();
-    initSettingsModal();
-    initThemePicker();
+    wireAiAgentEnabledLive();
+    initSettingsOpenButton();
     initRefresh();
     initExternalLinks();
-    initWindowDecorations();
-    initProductToggles();
-    // Initialize changelog modal first, then inject version (so version elements are ready)
-    initChangelogModal();
-    // Footer version: cpu.js fetchAppVersion (idle after gauges). Skip
-    // injectAppVersion here — wildcard [class*='version'] walks the tree on open (#14).
+    wireChangelogVersionClicksOnce();
+    // Theme picker, Product toggles, decorations, Settings keyboard, and
+    // changelog modal wait for Settings / footer click (#14).
   }
 
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;

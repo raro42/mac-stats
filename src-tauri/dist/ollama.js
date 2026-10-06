@@ -3913,6 +3913,7 @@ async function setupCompactionStatusListener() {
 }
 
 function initOllamaChatListeners() {
+  if (window.__macStatsOllamaChatListenersWired) return;
   const chatInput = document.getElementById('chat-input');
   const chatSendBtn = document.getElementById('chat-send-btn');
   const chatClearBtn = document.getElementById('chat-clear-btn');
@@ -3921,6 +3922,7 @@ function initOllamaChatListeners() {
     console.warn('[Ollama] Chat input or send button not found');
     return;
   }
+  window.__macStatsOllamaChatListenersWired = true;
 
   void setupCompactionStatusListener();
 

@@ -11790,6 +11790,10 @@ function initOllamaSection() {
       hideModelDropdown();
     } else {
       if (chat) chat.style.display = 'block';
+      // Chat send/clear/composer waits for expand (collapsed open path, #14).
+      if (window.Ollama && typeof window.Ollama.initListeners === 'function') {
+        window.Ollama.initListeners();
+      }
       // Expand arms configure once (no DOMContentLoaded Ollama init, #14).
       const afterInit = () => {
         if (windowWorkPaused()) return;
@@ -11873,9 +11877,8 @@ function initOllamaSection() {
     applyOllamaCollapsed();
   });
 
-  // Chat event listeners - handled by Ollama module
-  // Initialize Ollama module listeners if available
-  if (window.Ollama) {
+  // Chat composer listeners wait until AI Chat is expanded (#14).
+  if (!ollamaCollapsed && window.Ollama && typeof window.Ollama.initListeners === 'function') {
     window.Ollama.initListeners();
   }
 
@@ -23602,25 +23605,28 @@ function initDiskCleanupSection() {
   const icon = document.getElementById('icon-disk-cleanup');
   if (!header || !content) return;
 
-  wireDiskCleanupScopesKeyboard();
-  wireDiskCleanupListKeyboard();
-  wireDiskCleanupReclaimCard();
-  wireDiskCleanupEnabledScopesCard();
-  wireDiskCleanupNextRunCard();
-  wireDiskCleanupRunsWhenCard();
-  ensureDiskCleanupMetaKeyboard();
-  ensureDiskCleanupToolbarKeyboard();
-  ensureDiskCleanupAddScopeToolbarKeyboard();
-  wireDiskCleanupLastRunPanel();
-  ensureDiskCleanupCollapsedGlance();
-  // First-paint HTML already includes the empty category list. Wire Review scopes before status loads.
-  const cleanupList = document.getElementById('disk-cleanup-list');
-  if (cleanupList && !cleanupList.querySelector('.disk-cleanup-item')) {
-    renderDiskCleanupListEmpty(cleanupList);
-  }
-  // First-paint HTML already includes the empty scope list. Wire Add a scope before status loads.
-  if (scopesEl && !scopesEl.querySelector('.disk-cleanup-scope-row')) {
-    renderDiskCleanupScopesEmpty(scopesEl);
+  function ensureDiskCleanupBodyWired() {
+    if (window.__macStatsDiskCleanupBodyWired) return;
+    window.__macStatsDiskCleanupBodyWired = true;
+    wireDiskCleanupScopesKeyboard();
+    wireDiskCleanupListKeyboard();
+    wireDiskCleanupReclaimCard();
+    wireDiskCleanupEnabledScopesCard();
+    wireDiskCleanupNextRunCard();
+    wireDiskCleanupRunsWhenCard();
+    ensureDiskCleanupMetaKeyboard();
+    ensureDiskCleanupToolbarKeyboard();
+    ensureDiskCleanupAddScopeToolbarKeyboard();
+    wireDiskCleanupLastRunPanel();
+    ensureDiskCleanupCollapsedGlance();
+    const cleanupList = document.getElementById('disk-cleanup-list');
+    if (cleanupList && !cleanupList.querySelector('.disk-cleanup-item')) {
+      renderDiskCleanupListEmpty(cleanupList);
+    }
+    if (scopesEl && !scopesEl.querySelector('.disk-cleanup-scope-row')) {
+      renderDiskCleanupScopesEmpty(scopesEl);
+    }
+    wireDiskCleanupSectionBodyControls();
   }
 
   if (icon && !icon.getAttribute('data-title-base')) {
@@ -23634,6 +23640,7 @@ function initDiskCleanupSection() {
       stopDiskCleanupGlancePoll();
     } else {
       stopDiskCleanupGlancePoll();
+      ensureDiskCleanupBodyWired();
       refreshDiskCleanupPanel();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
@@ -23699,6 +23706,7 @@ function initDiskCleanupSection() {
     applyCollapsed();
   });
 
+  function wireDiskCleanupSectionBodyControls() {
   if (refreshBtn) {
     if (!refreshBtn.dataset.idleLabel) {
       refreshBtn.dataset.idleLabel = refreshBtn.textContent || 'Refresh';
@@ -23958,6 +23966,7 @@ function initDiskCleanupSection() {
       }
     });
   }
+  }
 }
 
 async function copyTextToClipboard(text) {
@@ -23998,11 +24007,16 @@ function initLogsSection() {
   const pathHint = document.getElementById('logs-path-hint');
   if (!header || !content) return;
 
-  ensureLogsFilterChips();
-  ensureLogsToolbarKeyboard();
-  ensureLogsErrorGlance();
-  ensureLogsAttentionGlance();
-  paintLogsViewerFirstPaint(document.getElementById('logs-viewer'));
+  function ensureLogsSectionBodyWired() {
+    if (window.__macStatsLogsSectionBodyWired) return;
+    window.__macStatsLogsSectionBodyWired = true;
+    ensureLogsFilterChips();
+    ensureLogsToolbarKeyboard();
+    ensureLogsErrorGlance();
+    ensureLogsAttentionGlance();
+    paintLogsViewerFirstPaint(document.getElementById('logs-viewer'));
+    wireLogsSectionBodyControls();
+  }
   // Do not poll read_debug_log before collapse state — collapsed skips IPC (#14).
 
   const logsIcon = document.getElementById('icon-logs');
@@ -24019,6 +24033,7 @@ function initLogsSection() {
       stopLogsGlancePoll();
     } else {
       // Expanded: arm glance poll + viewer (mirror Perplexity status, #14).
+      ensureLogsSectionBodyWired();
       startLogsGlancePoll();
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
@@ -24066,6 +24081,7 @@ function initLogsSection() {
     applyCollapsed();
   });
 
+  function wireLogsSectionBodyControls() {
   if (pathHint) {
     pathHint.setAttribute('role', 'button');
     pathHint.tabIndex = 0;
@@ -24174,6 +24190,7 @@ function initLogsSection() {
       if (autoCb.checked && !logsSectionCollapsed) startLogsAutoRefresh();
       else stopLogsAutoRefresh();
     });
+  }
   }
 }
 

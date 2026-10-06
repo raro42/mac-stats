@@ -117,6 +117,21 @@ html:not(.is-history-gpu-unparked) .poster-metrics canvas.line-chart {
   height: 1px !important;
 }
 
+/* Closed modals stay out of the compositor until Settings / changelog open (#14). */
+#settings-modal[style*="display: none"],
+#settings-modal[aria-hidden="true"],
+#changelog-modal[style*="display: none"],
+#changelog-modal[aria-hidden="true"] {
+  content-visibility: hidden;
+  contain: strict;
+}
+
+.app-version,
+.theme-version,
+.arch-version {
+  cursor: pointer;
+}
+
 /*
  * Ring cards / SVG rings: contain paint so WebKit does not keep four gauge
  * layers compositing when only text values change (#14).

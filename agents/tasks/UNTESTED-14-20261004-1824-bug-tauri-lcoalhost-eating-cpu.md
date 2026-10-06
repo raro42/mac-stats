@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1453** (follow-up after v0.1.1452).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and listener work.
+
+Changes (Settings / changelog / collapsed bodies stay off the open path):
+
+- `src/cpu-ui.js` — Settings button only on boot. Theme picker, Product toggles, decorations, and Settings keyboard wait for Settings open. Changelog modal waits for footer version click (no `[class*='version']` tree walk). AI enabled event still updates the gate without opening Settings.
+- `src/cpu.js` / `src/ollama.js` — collapsed AI Chat skips composer listeners. Collapsed Debug Log and Disk cleanup skip filter/keyboard/button wiring until expand.
+- `src/agent-ops.css` — closed Settings/changelog `content-visibility: hidden`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm no Settings theme/product wiring and no changelog modal keyboard until Settings or footer version click. Expand Debug Log / Disk cleanup / AI Chat — filters, composer, and Refresh still work. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1452)
+
 Version **v0.1.1452** (follow-up after v0.1.1451).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -2578,3 +2594,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm history canvases stay 1×1 / hidden until hover or Refresh; gauges still update; hover history or press Refresh — sparklines draw; alt-tab away and back — unpark on resume idle; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1451)
+
+**Date:** 2026-10-06 04:45 UTC (06:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1451**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1451)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 sparkline GPU stays parked through open resize)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1451**
+- `CHANGELOG.md` **[0.1.1451]** documents bind+hide canvases on open, resize/geometry restore no GPU while parked, deferred theme `getComputedStyle`, Discord Settings wiring off open path, collapsed AI Chat 250ms glance skip, footer version not walked on load
+- `src/chart-line.js` — `bindCanvasElements` on `boot` / `init` so park hides HTML canvases; `init` / `refreshLayout` stay parked; `COLORS` stays null until unpark draw (`ensureColors`); resize timer returns while `canvasesParked`
+- `src/cpu.js` / `src/agent-ops.css` — `html.is-history-gpu-unparked` compositor gate; canvases `display:none` until hover / Refresh / resume; collapsed AI Chat skips the 250ms glance retry
+- `src/discord.js` — Settings Save/Clear via `__macStatsEnsureDiscordSettingsWiring` from `openSettingsModal` (no 100ms open timer)
+- `src/cpu-ui.js` — skips `injectAppVersion` on boot (wildcard `[class*='version']`); no changelog idle follow-up rescan; Refresh still unparks before `refreshData`
+- `src-tauri/dist/chart-line.js`, `cpu.js`, `cpu-ui.js`, `discord.js`, `agent-ops.css` match the park / skip comments
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 park-through-resize cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm history canvases stay hidden / 1×1 until hover or Refresh; gauges still update; hover history or press Refresh — sparklines draw; alt-tab away and back — unpark on resume idle; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
