@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1576`; CHANGELOG entry; standing_backlog note
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
+- [x] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
 
 ## Review
-Opaque wash on Monitors row Copied flash (`.monitor-item.is-just-copied`). Same pattern as process-row / other opaque flashes. `cargo check` pending/green. Issue #14 left open for tester / 004.
+Opaque wash on Monitors row Copied flash (`.monitor-item.is-just-copied`). Same pattern as process-row / other opaque flashes. `cargo check` green. Pushed `4d5afe93`. Issue #14 left open for tester / 004.
