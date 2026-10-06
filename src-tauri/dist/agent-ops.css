@@ -9121,11 +9121,13 @@ button.is-just-saved,
 }
 
 /* Agent Ops agent Save (btn-primary) — same solid green flash */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #ops-agent-save.is-just-saved {
-  background: rgba(52, 199, 89, 0.95) !important;
-  border-color: transparent !important;
+  background: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ffffff) !important;
   color: #fff !important;
   opacity: 1;
+  box-shadow: none;
 }
 
 /* Agent Ops Load into AI Chat (btn-secondary) — Loaded flash */

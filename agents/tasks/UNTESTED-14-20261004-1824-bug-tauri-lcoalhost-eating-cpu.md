@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1548** (follow-up after v0.1.1547).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Agent Ops agent Save Saved flash skip glass blend):
+
+- `src/agent-ops.css` — `#ops-agent-save.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Agent Ops. Preview an agent. Edit soul, mood, or skill enough to enable Save. Press Save. Confirm the Saved flash still shows green on the control, then reverts. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1547)
+
 Version **v0.1.1547** (follow-up after v0.1.1546).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
