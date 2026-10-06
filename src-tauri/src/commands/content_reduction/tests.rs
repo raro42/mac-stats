@@ -462,6 +462,9 @@ use super::*;
             "gateway: canonical orbitals exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
+            "gateway: virtual orbitals exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
             "gateway: electrons exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
@@ -4114,6 +4117,45 @@ use super::*;
         ));
         assert!(!is_context_overflow_error(
             "recanonicalorbital exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: virtual orbitals exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: virtual orbitals exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: virtual orbital exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: virtual orbital exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: virtual orbitals exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: virtual orbitals exceeded virtual-space / correlating-orbital cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: virtual orbital exceed max variational budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microvirtualorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metavirtualorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subvirtual orbital exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supervirtualorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "previrtualorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "revirtualorbital exceed the model's context window on this request"
         ));
         assert!(!is_context_overflow_error(
             "config: microcicoefficients exceed the model's context window on this request"

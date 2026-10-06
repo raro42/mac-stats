@@ -563,6 +563,12 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// inside `supercanonicalorbital exceed` does not match; no space inside `canonicalorbitals`, so the
 /// contiguous phrase `canonical orbitals exceed` is absent there; a spaced `micro canonical orbitals …`
 /// still matches at the boundary before `canonical`; `microcanonical` as one token breaks the boundary before `canonical`);
+/// `virtual orbitals exceed` does not match inside `microvirtualorbitals exceed` / `metavirtualorbitals exceed`, and
+/// `virtual orbital exceed` does not match inside `subvirtual orbital exceed` (left-boundary at `virtual`
+/// rejects `previrtualorbital exceed` and `revirtualorbital exceed`; embedded `virtual orbital exceed`
+/// inside `supervirtualorbital exceed` does not match; no space inside `virtualorbitals`, so the
+/// contiguous phrase `virtual orbitals exceed` is absent there; a spaced `micro virtual orbitals …`
+/// still matches at the boundary before `virtual`);
 /// `electrons exceed` does not match inside `microelectrons exceed` / `metaelectrons exceed`, and
 /// `electron exceed` does not match inside `subelectron exceed` (left-boundary rejects
 /// `preelectron exceed` and `reelectron exceed`; embedded `electron exceed` inside `superelectron exceed`
@@ -2626,6 +2632,23 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "canonical orbitals exceed")
             || contains_phrase_after_ident_boundary(&lower, "canonical orbitals exceeded")
             || contains_phrase_after_ident_boundary(&lower, "canonical orbital exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "virtual orbitals / virtual orbital exceed(s/ed)" (FEAT-D468). Parallel to
+        // `occupied orbitals exceed` / `occupied orbital exceed`. `virtual orbital exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `virtual orbitals exceed` (the `s` in `orbitals` prevents the singular `orbital` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `virtual` so `microvirtual orbitals exceed` / `metavirtual orbitals exceed` /
+        // `subvirtual orbital exceed` do not false-positive (no space inside `virtualorbitals`, so the
+        // phrase `virtual orbitals exceed` is absent there; a spaced `micro virtual orbitals …`
+        // still matches at the boundary before `virtual`). `previrtualorbital exceed` and
+        // `revirtualorbital exceed` document compounds without a contiguous `virtual orbital exceed` substring;
+        // spaced `previrtual orbital exceed` matches the generic `orbital exceed` arm when a slot is present.
+        // Same explicit context-slot phrases as `messages exceed`. Negatives: HTTP `virtual orbitals exceed`
+        // rate limits, virtual-space / correlating-orbital caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "virtual orbitals exceed")
+            || contains_phrase_after_ident_boundary(&lower, "virtual orbitals exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "virtual orbital exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`

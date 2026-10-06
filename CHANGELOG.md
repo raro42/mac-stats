@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1417] - 2026-10-06
+
+### Changed
+- **Ollama errors** — `is_context_overflow_error` recognizes plural **`virtual orbitals exceed`** / **`virtual orbitals exceeded`** and singular **`virtual orbital exceed`** (present/past via the same **`exceed`** prefix as **`occupied orbital exceed`**) when paired with the same explicit context-slot phrases as **`messages exceed`** / **`occupied orbitals exceed`**, so batch / JSON / quantum-chemistry-style APIs that describe request **`virtual orbitals`** still map to the overflow message; phrases require an ASCII alnum/`_` left boundary at **`virtual`**. HTTP rate limits and virtual-space caps without slot wording stay unmatched. (FEAT-D468.)
+
+
 ## [0.1.1416] - 2026-10-06
 
 ### Changed

@@ -1,10 +1,13 @@
-# Session todo — GitHub #14 tauri://localhost CPU (v0.1.1416)
+# Session todo — FEAT-D468 virtual orbitals overflow
 
-- [x] Restore focused-open `scheduleMonitoringFeaturesOnce` (v0.1.1415 race)
-- [x] Bump 0.1.1416, CHANGELOG, sync-dist
-- [x] ratchet verify
-- [x] commit + push + keep
-- [x] loop_backlog + morning surprise + archive
+No GitHub `FEAT-*` / `WIP-*` under `agents/tasks/` (only `UNTESTED-14-…`). Open/deferred FEAT-D empty after D467 → add and implement **FEAT-D468**.
+
+- [x] Add `virtual orbitals exceed` / `virtual orbital exceed` arm in `content_reduction/mod.rs` (ident-boundary + context-slot guard, parallel to occupied/canonical)
+- [x] Unit tests in `content_reduction/tests.rs` (positives, HTTP/no-slot negatives, micro/meta/sub compounds)
+- [x] FEATURE-CODER.md: Recently closed + When empty → D468
+- [x] CHANGELOG + bump `0.1.1417`
+- [x] `cargo check` + targeted `cargo test` for overflow
+- [ ] Commit + push `origin/main`
 
 ## Review
-Shipped v0.1.1416. Task at `UNTESTED-14-…`. Issue #14 left open. Morning surprise archived.
+Shipped **FEAT-D468** / v0.1.1417: `is_context_overflow_error` recognizes `virtual orbitals exceed` / `virtual orbital exceed` with the same context-slot + ident-boundary rules as occupied/canonical. No GitHub issue to close. `UNTESTED-14-…` left for tester.
