@@ -89,8 +89,13 @@
     };
   }
 
-  // Color schemes (will be initialized from CSS)
-  let COLORS = getColors();
+  // Color schemes. Do not read computed style at parse — that flushes layout on open (#14).
+  let COLORS = null;
+
+  function ensureColors() {
+    if (!COLORS) COLORS = getColors();
+    return COLORS;
+  }
 
   // Data buffers for each metric
   const dataBuffers = {
@@ -224,7 +229,8 @@
       tooltipElement.className = 'history-tooltip';
       tooltipElement.style.position = 'fixed';
       tooltipElement.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-      tooltipElement.style.color = COLORS.temperature.text;
+      const tipColor = ensureColors().temperature.text;
+      tooltipElement.style.color = tipColor;
       tooltipElement.style.padding = '8px 12px';
       tooltipElement.style.borderRadius = '4px';
       tooltipElement.style.fontSize = '12px';
@@ -232,7 +238,7 @@
       tooltipElement.style.pointerEvents = 'none';
       tooltipElement.style.zIndex = '10000';
       tooltipElement.style.display = 'none';
-      tooltipElement.style.border = `1px solid ${COLORS.temperature.text}`;
+      tooltipElement.style.border = `1px solid ${tipColor}`;
       tooltipElement.style.whiteSpace = 'nowrap';
       document.body.appendChild(tooltipElement);
     }
@@ -285,7 +291,7 @@
     }
 
     const buffer = dataBuffers[metric];
-    const colors = COLORS[metric];
+    const colors = ensureColors()[metric];
     
     // Get logical size (accounting for device pixel ratio scaling)
     const dpr = window.devicePixelRatio || 1;
@@ -540,11 +546,8 @@
         frequencyContext: !!contexts.frequency
       });
       
-      // Refresh colors from CSS (in case theme changed)
-      COLORS = getColors();
-      
-      // Create tooltip
-      createTooltip();
+      // Colors and the tooltip wait for the first draw or hover.
+      // getComputedStyle here used to flush layout on every data-poster open (#14).
 
       // Add hover handlers to all canvases
       Object.keys(canvases).forEach(metric => {

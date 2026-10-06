@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1452** (follow-up after v0.1.1451).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (data-poster history skips computed style on open):
+
+- `src/history.js` — do not call `getComputedStyle` at parse or in `init()`. Theme colors load on the first chart draw or tooltip.
+
+Tester: open the CPU window on the data-poster theme (already focused), warm ≥30s with sections collapsed. History charts stay hidden until hover or Refresh. Hover a history chart — the line draws and the tooltip can show. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1451)
+
 Version **v0.1.1451** (follow-up after v0.1.1450).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.

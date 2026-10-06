@@ -6,6 +6,9 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1452** | Data-poster history charts skip theme-color reads on open. Colors load when a chart draws or a tooltip shows. |
+| **v0.1.1451** | Sparkline park binds and hides the HTML canvases on open. Window resize does not allocate GPU buffers while parked. |
+| **v0.1.1450** | History sparklines stay parked after the first metrics poll. Theme markup starts at 1×1. Hover, Refresh, or alt-tab resume still draws them. |
 | **v0.1.1449** | Data-poster metric cards stay parked on open. Bar and line charts do not allocate buffers or draw on first paint. The same idle unpark as the history charts draws them later. Canvas markup starts at 1×1. |
 | **v0.1.1448** | Collapsed Agent Ops skips filter, overview, and keyboard wiring on monitoring idle. Expand still hydrates once. |
 | **v0.1.1447** | Capture `MAC_STATS_OPEN_SECTION` / `openUiSection` is baked into `cpu.html?open=` when the window is created. Agent Ops no longer calls `take_open_ui_section` after load. |
@@ -32,10 +35,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Data-poster metric cards no longer draw bar and line charts on the first paint. Those charts wait for the same idle unpark as the history charts. Open does not allocate full canvas bitmaps for them.
+Data-poster no longer flushes layout to read chart colors on open. Those colors wait until a chart draws or a tooltip shows.
 
 ## Still open
 
-- ~21:10 tick: data-poster metric-card charts stay parked on open (**v0.1.1449**). Rebased past parallel #14 ships v0.1.1446–1448.
+- ~21:40 tick: data-poster history skips computed style on open (**v0.1.1452**). A local 1×1 canvas commit was reset because origin already shipped that in v0.1.1450.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

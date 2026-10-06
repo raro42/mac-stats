@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1452
+
+- Data-poster history charts skip `getComputedStyle` on open. Colors load on the first draw or tooltip. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1449
 
 - Data-poster metric-card bar and line charts stay parked on open. First paint does not allocate canvas buffers or draw. The same idle unpark as the history charts draws them later. Canvas markup starts at 1×1. P2 reliability / GitHub #14.
