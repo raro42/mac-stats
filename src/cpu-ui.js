@@ -3965,10 +3965,25 @@
         }
         if (cpuWindowCompactToggle) {
           if (uiWorkPaused()) return;
-          cpuWindowCompactToggle.checked = !!(await invoke(
-            "get_cpu_window_compact"
-          ));
+          const windowCompact = !!(await invoke("get_cpu_window_compact"));
           if (uiWorkPaused()) return;
+          cpuWindowCompactToggle.checked = windowCompact;
+          // Backend sync for Compact (open path uses localStorage only, #14).
+          try {
+            localStorage.setItem(
+              "cpu_window_compact",
+              windowCompact ? "true" : "false"
+            );
+          } catch (_) {
+            /* localStorage optional */
+          }
+          document.body.classList.toggle("cpu-window-compact", windowCompact);
+          if (
+            windowCompact &&
+            typeof window.applyCpuWindowCompactLayout === "function"
+          ) {
+            window.applyCpuWindowCompactLayout(true);
+          }
         }
         applySettingsCompactAttentionGlanceState();
         applySettingsAiAttentionGlanceState();
@@ -4130,6 +4145,11 @@
           if (!invoke) return;
           const on = !!cpuWindowCompactToggle.checked;
           await invoke("set_cpu_window_compact", { compact: on });
+          try {
+            localStorage.setItem("cpu_window_compact", on ? "true" : "false");
+          } catch (_) {
+            /* localStorage optional */
+          }
           document.body.classList.toggle("cpu-window-compact", on);
           if (on && typeof window.applyCpuWindowCompactLayout === "function") {
             window.applyCpuWindowCompactLayout(true);
@@ -5275,6 +5295,19 @@
     const savedTheme = getSavedTheme();
     paintThemeBoot(savedTheme);
     syncThemeClass(savedTheme);
+    // Compact layout from localStorage before Settings Product IPC (#14).
+    if (typeof window.__macStatsApplyCpuWindowCompactFromLocal === "function") {
+      window.__macStatsApplyCpuWindowCompactFromLocal();
+    } else {
+      try {
+        const raw = localStorage.getItem("cpu_window_compact");
+        if (raw !== null) {
+          document.body.classList.toggle("cpu-window-compact", raw === "true");
+        }
+      } catch (_) {
+        /* localStorage optional */
+      }
+    }
     initSettingsModal();
     initThemePicker();
     initRefresh();

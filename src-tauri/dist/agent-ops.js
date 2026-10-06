@@ -10668,14 +10668,19 @@ function escapeHtml(s) {
     void (async () => {
       try {
         for (let i = 0; i < 20; i++) {
+          // Alt-tab while waiting for cpu.js: stop waking WebView (#14).
+          if (agentOpsWorkPaused()) break;
           if (typeof window.loadCpuUiSections === 'function') break;
           await new Promise((r) => setTimeout(r, 500));
         }
-        if (typeof window.loadCpuUiSections === 'function') {
-          await window.loadCpuUiSections();
-        } else if (window.cpuUiSectionsReady) {
-          await window.cpuUiSectionsReady;
+        if (!agentOpsWorkPaused()) {
+          if (typeof window.loadCpuUiSections === 'function') {
+            await window.loadCpuUiSections();
+          } else if (window.cpuUiSectionsReady) {
+            await window.cpuUiSectionsReady;
+          }
         }
+        // else: localStorage seed is enough while parked; resume re-merges (#14).
       } catch (_) {}
       let startsCollapsed = true;
       if (typeof window.getSectionCollapsed === 'function') {
@@ -10689,6 +10694,8 @@ function escapeHtml(s) {
         }
       }
       applyOpsCollapsed(!!startsCollapsed);
+      // Capture open-section IPC is optional; skip while parked (#14).
+      if (agentOpsWorkPaused()) return;
       // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
       const scrollStart = (el) => {
         try {
@@ -10699,13 +10706,16 @@ function escapeHtml(s) {
       };
       let section = null;
       for (let i = 0; i < 10; i++) {
+        if (agentOpsWorkPaused()) return;
         try {
           section = await invoke('take_open_ui_section');
           break;
         } catch (_) {
+          if (agentOpsWorkPaused()) return;
           await new Promise((r) => setTimeout(r, 500));
         }
       }
+      if (agentOpsWorkPaused()) return;
       if (!section) return;
       const key = String(section).trim().toLowerCase();
       if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {

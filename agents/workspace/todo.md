@@ -1,13 +1,14 @@
-# Coder — #14 v0.1.1434
+# Coder — #14 v0.1.1435
 
 ## Plan
-- [x] Defer Settings credential status IPC (Brave…Signal) from open to Settings open
-- [x] Defer decorations preference load to Settings open; resume if Settings stays open
-- [x] Skip collapsed Perplexity key-status IPC; drop version MutationObserver
-- [x] Park Process Details open + Settings Monitors list mid-flight; resume list rebuild
-- [x] Bump to v0.1.1434; CHANGELOG; sync-dist
-- [x] `cargo check` / ratchet verify
+- [x] Park `loadCpuUiSections` retry + clear promise on park; resume re-merge
+- [x] Park `hydratePinnedProcessNamesFromDisk` start + mid-flight
+- [x] Compact: localStorage on open; Settings Product syncs backend + layout
+- [x] Drop duplicate `autoConfigureOllama` from monitoring idle
+- [x] Agent Ops: bail `loadCpuUiSections` / `take_open_ui_section` wait while parked
+- [x] Bump to v0.1.1435; CHANGELOG; sync-dist
+- [x] `cargo check`
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1434** for GitHub #14. Settings credential/decorations deferred to Settings open; Process Details open + Settings Monitors list park mid-flight; resume rebuilds Monitors list. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1435** for GitHub #14. Monitoring idle UI-state/pin hydrate park; Compact localStorage open path; no second Ollama configure; Agent Ops wait-loop park. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).

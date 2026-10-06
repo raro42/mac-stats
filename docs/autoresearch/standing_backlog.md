@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1435
+
+- CPU window: monitoring idle parks UI-state retry + pin hydrate; Compact from localStorage on open (backend sync on Settings Product); drop duplicate Ollama configure; Agent Ops wait loops bail while parked. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1434
 
 - CPU window: Settings credential/decorations IPC deferred to Settings open; Process Details open + Monitors settings list skip IPC/DOM while parked; resume rebuilds list if popover still open. P2 reliability / GitHub #14.

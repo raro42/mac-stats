@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1435] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Monitoring idle parks `get_cpu_window_ui_state` retry and pinned-process hydrate while occluded (clears the UI-state promise so focus resume re-merges). Compact CPU window uses localStorage on open; `get_cpu_window_compact` waits for Settings Product toggles (which also apply layout + cache). Drops the second `autoConfigureOllama` on monitoring idle (Ollama module init already configures). Agent Ops stops waking on `loadCpuUiSections` / `take_open_ui_section` wait loops after alt-tab. Aim: quieter `tauri://localhost` / Graphics and Media when monitoring warm-up finishes while away.
+
 ## [0.1.1434] - 2026-10-06
 
 ### Changed

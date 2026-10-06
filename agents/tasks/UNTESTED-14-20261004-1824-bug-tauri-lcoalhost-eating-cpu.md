@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1435** (follow-up after v0.1.1434).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (monitoring idle park + Compact localStorage + drop duplicate Ollama configure):
+
+- `src/cpu.js` — `loadCpuUiSections` bails UI-state retry while parked and clears the promise so focus resume re-merges. `hydratePinnedProcessNamesFromDisk` skips start + mid-flight. Compact CPU window applies from localStorage on open (no `get_cpu_window_compact` IPC). Monitoring idle no longer calls `autoConfigureOllama` (Ollama module init owns configure). Focus resume retries UI-state / pin hydrate and re-applies Compact from localStorage.
+- `src/cpu-ui.js` — Settings Product toggle load syncs `get_cpu_window_compact` into localStorage + body class + compact layout. Toggle change persists localStorage.
+- `src/agent-ops.js` — `loadCpuUiSections` wait loop and `take_open_ui_section` retries bail while parked; collapsed state still applies from localStorage.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Confirm Compact layout can appear from localStorage without Settings open, and `get_cpu_window_compact` waits until Settings Product toggles. Trigger monitoring idle / Agent Ops init, then alt-tab before UI-state or pin hydrate returns — section merge / pin disk sync / open-section capture must not continue while away. Alt-tab back — UI-state re-merge and pin hydrate retry; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1434)
+
 Version **v0.1.1434** (follow-up after v0.1.1433).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

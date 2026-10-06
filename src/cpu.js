@@ -65,9 +65,16 @@ async function loadCpuUiSections() {
     if (!inv) return cpuUiSectionsCache;
     // Tauri invoke may not be ready on first tick.
     // Slow retries: a 50ms loop woke the WebView on open (#14).
+    // Alt-tab mid-retry: clear promise so focus resume can re-merge (#14).
+    const parkBail = () => {
+      cpuUiSectionsLoadPromise = null;
+      return cpuUiSectionsCache;
+    };
     for (let i = 0; i < 20; i++) {
+      if (windowWorkPaused()) return parkBail();
       try {
         const remote = await inv('get_cpu_window_ui_state');
+        if (windowWorkPaused()) return parkBail();
         if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
           cpuUiSectionsCache = { ...seeded, ...remote };
           for (const [k, v] of Object.entries(cpuUiSectionsCache)) {
@@ -84,6 +91,7 @@ async function loadCpuUiSections() {
         }
         return cpuUiSectionsCache;
       } catch (_) {
+        if (windowWorkPaused()) return parkBail();
         await new Promise((r) => setTimeout(r, 500));
       }
     }
@@ -492,11 +500,15 @@ function setPinnedProcessNames(names) {
  * non-empty local always rewrites disk so Discord sees the same list.
  */
 async function hydratePinnedProcessNamesFromDisk() {
+  // Parked: skip pin hydrate IPC (localStorage already seeds the list) (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) return;
   let disk = [];
   try {
     const raw = await invoke("get_pinned_process_names");
+    // Alt-tab during get_pinned_process_names: drop merge / persist (#14).
+    if (windowWorkPaused()) return;
     if (Array.isArray(raw)) {
       disk = raw
         .filter((n) => typeof n === "string" && n.trim())
@@ -504,6 +516,7 @@ async function hydratePinnedProcessNamesFromDisk() {
         .slice(0, MAX_PINNED_PROCESSES);
     }
   } catch (e) {
+    if (windowWorkPaused()) return;
     console.warn("get_pinned_process_names failed", e);
     return;
   }
@@ -6091,6 +6104,14 @@ function applyDeferredResumeIdleWindowPolls() {
   // Product toggles: recheck AI visibility if open-path load was parked (#14).
   if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
     void window.__macStatsLoadProductToggleStatesAiOnly();
+  }
+  // Monitoring idle may have parked mid UI-state / pin hydrate — retry (#14).
+  if (window.__macStatsMonitoringFeaturesStarted) {
+    void loadCpuUiSections();
+    void hydratePinnedProcessNamesFromDisk();
+    if (typeof window.__macStatsApplyCpuWindowCompactFromLocal === "function") {
+      window.__macStatsApplyCpuWindowCompactFromLocal();
+    }
   }
   // Settings open while away: finish full Product toggle fan-out on resume (#14).
   if (
@@ -24052,17 +24073,29 @@ window.applyCpuWindowCompactLayout = function applyCpuWindowCompactLayout(compac
   }
 };
 
-async function initCpuWindowCompactPreference() {
+/** Apply Compact CPU window from localStorage only (no IPC). Open-path seed (#14). */
+function applyCpuWindowCompactFromLocalStorage() {
   try {
-    const inv = getInvoke();
-    if (!inv) return;
-    const compact = !!(await inv('get_cpu_window_compact'));
+    const raw = localStorage.getItem('cpu_window_compact');
+    if (raw === null) return;
+    const compact = raw === 'true';
     document.body.classList.toggle('cpu-window-compact', compact);
     if (compact) window.applyCpuWindowCompactLayout(true);
-  } catch (e) {
-    console.warn('cpu window compact pref', e);
+  } catch (_) {
+    /* localStorage optional */
   }
 }
+
+/**
+ * Compact layout: localStorage on open; backend sync waits for Settings Product
+ * toggles (`get_cpu_window_compact`) so monitoring idle does not add IPC (#14).
+ */
+function initCpuWindowCompactPreference() {
+  applyCpuWindowCompactFromLocalStorage();
+}
+
+window.__macStatsApplyCpuWindowCompactFromLocal =
+  applyCpuWindowCompactFromLocalStorage;
 
 /** CPU window header actions (Refresh · Settings). */
 function getCpuHeaderActionsElement() {
@@ -25218,6 +25251,8 @@ function initMonitoringFeatures() {
   // Load persisted section state first (config.json) because the CPU WebView
   // is destroyed on close. Backend UI-state IPC was moved off parse-time (#14).
   void (async () => {
+    // UI-state / pin hydrate IPC bail while parked; resume retries (#14).
+    // DOM wiring below still runs once so sections stay interactive.
     await loadCpuUiSections();
     await hydratePinnedProcessNamesFromDisk();
     initIconLine();
@@ -25238,11 +25273,10 @@ function initMonitoringFeatures() {
     initDiskCleanupSection();
     initOllamaSection();
     initHistoryControls();
-    // Auto-configure Ollama with default endpoint (if module is available)
-    if (window.Ollama) {
-      autoConfigureOllama();
-    }
-    await initCpuWindowCompactPreference();
+    // Ollama module init (`initializeOllama`) owns configure_ollama — do not
+    // stack a second autoConfigure here on monitoring idle (#14).
+    // Compact: localStorage only here; Settings Product path syncs backend (#14).
+    initCpuWindowCompactPreference();
   })();
 }
 

@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1435** | Monitoring idle parks UI-state retry + pin hydrate while occluded. Compact uses localStorage on open; backend compact sync waits for Settings Product. Drops duplicate Ollama configure on monitoring idle. Agent Ops wait loops bail after alt-tab. |
 | **v0.1.1434** | Settings credential/decorations IPC waits until Settings opens. Process Details open + Settings Monitors list skip IPC/DOM while parked; resume rebuilds the Monitors list. Changelog version wiring drops the body MutationObserver. |
 | **v0.1.1433** | Settings Product toggles load AI only on open; Discord / decorations / changelog / footer version park while occluded. |
 | **v0.1.1432** | Settings credential status + AI Chat stream buffer + Agent Ops digest park while occluded. |
