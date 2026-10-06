@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1492** | The Agent Ops Redmine Not set/Degraded/Unavailable glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1491** | The Agent Ops Discord Offline/Reconnect glance mixes offline and reconnect washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1490** | The Agent Ops Digest glance mixes the open-candidate wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1489** | The Agent Ops Filter glance mixes All, On/Live/Jobs/Core/Instant/Lite/Direct, Off/Files/Deliveries/Discord, Slow, and Fail washes against an opaque fill. No glass alpha or hover shadow. |
