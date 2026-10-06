@@ -496,6 +496,7 @@ function setPinnedProcessNames(names) {
 /**
  * Sync localStorage ↔ disk: UI keeps local favorites; empty WebView hydrates from disk;
  * non-empty local always rewrites disk so Discord sees the same list.
+ * Collapsed Top Processes skips this IPC (localStorage seeds pins; expand hydrates) (#14).
  */
 async function hydratePinnedProcessNamesFromDisk() {
   // Parked: skip pin hydrate IPC (localStorage already seeds the list) (#14).
@@ -6134,10 +6135,13 @@ function applyDeferredResumeIdleWindowPolls() {
   } else if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
     void window.__macStatsLoadProductToggleStatesAiOnly();
   }
-  // Monitoring idle may have parked mid UI-state / pin hydrate — retry (#14).
+  // Monitoring idle may have parked mid UI-state merge — retry (#14).
   if (window.__macStatsMonitoringFeaturesStarted) {
     void loadCpuUiSections();
-    void hydratePinnedProcessNamesFromDisk();
+    // Collapsed Top Processes: skip get_pinned_process_names (localStorage seeds) (#14).
+    if (!isProcessesSectionCollapsed()) {
+      void hydratePinnedProcessNamesFromDisk();
+    }
     if (typeof window.__macStatsApplyCpuWindowCompactFromLocal === "function") {
       window.__macStatsApplyCpuWindowCompactFromLocal();
     }
@@ -13570,12 +13574,17 @@ function initCollapsibleSections() {
       processesDivider.style.display = '';
     }
     syncProcessesCollapseA11y();
-    // Collapsed path skips list DOM (#14); force one rebuild on expand.
+    // Collapsed path skips list DOM + pin-disk IPC (#14); hydrate then rebuild on expand.
     window._forceProcessUpdate = true;
-    if (refreshInterval && typeof refresh === 'function') {
-      void refresh();
-    }
     applyProcessesListFilter();
+    void hydratePinnedProcessNamesFromDisk().then(() => {
+      if (windowWorkPaused() || isProcessesSectionCollapsed()) return;
+      window._forceProcessUpdate = true;
+      if (typeof refresh === 'function') {
+        void refresh();
+      }
+      applyProcessesListFilter();
+    });
     const topGlance = document.getElementById('processes-top-glance');
     if (topGlance && !window.__processesTopPid) {
       applyProcessesTopGlanceState({
@@ -25411,10 +25420,10 @@ function initMonitoringFeatures() {
   // Load persisted section state first (config.json) because the CPU WebView
   // is destroyed on close. Backend UI-state IPC was moved off parse-time (#14).
   void (async () => {
-    // UI-state / pin hydrate IPC bail while parked; resume retries (#14).
+    // UI-state IPC bail while parked; resume retries (#14).
     // DOM wiring below still runs once so sections stay interactive.
     await loadCpuUiSections();
-    await hydratePinnedProcessNamesFromDisk();
+    // Collapsed Top Processes: skip get_pinned_process_names (expand hydrates) (#14).
     initIconLine();
     syncIconLineFromSavedSections();
     initCollapsibleSections();

@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1444** (follow-up after v0.1.1443).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (collapsed Top Processes skips pin-disk IPC):
+
+- `src/cpu.js` — Monitoring idle and focus resume skip `get_pinned_process_names` while Top Processes is collapsed (localStorage still seeds pins). `showProcesses` hydrates from disk, then force-rebuilds the list.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with Top Processes collapsed (default). Confirm no `get_pinned_process_names` until expand. Expand Top Processes — pins hydrate from disk and the list rebuilds. Alt-tab during expand hydrate — no list paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1443)
+
 Version **v0.1.1443** (follow-up after v0.1.1442).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
