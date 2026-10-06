@@ -20,6 +20,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1571
+
+- Disk Cleanup scope path Copied flash mixes the green wash against an opaque fill. No glass alpha. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1570
+
+- Disk Cleanup category path Copied flash mixes the green wash against an opaque fill. No glass alpha. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1529
 
 - Settings Help Saved flash mixes the green wash against an opaque fill. No glass alpha. P2 reliability / GitHub #14.
