@@ -7904,11 +7904,12 @@ button.monitor-detail-url.is-just-saved {
   background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-item.is-just-copied,
 .disk-cleanup-scope-row.is-just-copied {
-  background: color-mix(in srgb, #34c759 12%, transparent);
-  border-color: color-mix(in srgb, #34c759 32%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 32%, #ffffff);
+  box-shadow: none;
 }
 
 .disk-cleanup-item.is-just-copied::after,
@@ -7931,9 +7932,7 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .disk-cleanup-item.has-reclaim.is-just-copied {
-  box-shadow:
-    inset 3px 0 0 color-mix(in srgb, #34c759 70%, transparent),
-    0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #34c759 70%, #ffffff);
 }
 
 .disk-cleanup-item.has-reclaim {
