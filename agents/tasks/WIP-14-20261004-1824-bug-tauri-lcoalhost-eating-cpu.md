@@ -1822,3 +1822,34 @@ Coder advanced the task to **v0.1.1431** before this report could land as WIP; s
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Agent Ops → Sessions / Knowledge / Runs / Schedules, open a row preview, then alt-tab before IPC returns — preview pane / Load into AI Chat must not paint while away; alt-tab back — re-open a row refreshes) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1432)
+
+**Date:** 2026-10-06 02:23 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1432**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1432)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings status + digest + chat stream park)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1432**
+- `src/cpu.js` — Brave / Redmine / Mastodon / MCP / Browser / Cursor Agent / Telegram / Slack (and Perplexity) settings status refreshes bail on `windowWorkPaused()` at start and mid-flight after await; focus resume calls `Ollama.flushParkedStream`
+- `src/agent-ops.js` — `refreshOpsDigest` bails when `agentOpsWorkPaused()` (start + mid-flight); clears busy chrome; skips success flash while away; user-triggered Ops fan-out after digest still uses `{ userTriggered: true }`
+- `src/ollama.js` — stream chunks buffer in `parkedStreamTail` while `ollamaWorkPaused`; `flushParkedStream` / `flushParkedStreamPaint` on resume; final answer while parked uses plain text only (no Markdown / filter / scroll)
+- Prior v0.1.1431 Agent Ops preview mid-flight park and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise and normal Linux CPU-window create. No new errors tied to the #14 Settings / digest / stream occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, open Settings or trigger a credential status refresh and/or start an AI Chat stream / Agent Ops Refresh digest, then alt-tab before IPC returns — Settings glances / digest flash / stream scroll must not paint while away; alt-tab back — status re-open or stream flush refreshes) before CLOSED. Do **not** close GitHub #14.
