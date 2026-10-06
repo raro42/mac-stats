@@ -2398,3 +2398,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no `take_open_ui_section` IPC; Capture `MAC_STATS_OPEN_SECTION` still opens the named section from `cpu.html?open=`; alt-tab during Agent Ops init — no take-IPC wake; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+
+## Test report (v0.1.1447)
+
+**Date:** 2026-10-06 04:10 UTC (06:10 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1447**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1447)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 bake capture `?open=` at window create; no take_open_ui_section IPC)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1447**
+- `CHANGELOG.md` **[0.1.1447]** documents baking `MAC_STATS_OPEN_SECTION` / `openUiSection` into `cpu.html?open=` and skipping Agent Ops `take_open_ui_section` after load
+- `src-tauri/src/config/mod.rs` — `cpu_window_app_url()` / `cpu_window_app_url_with_open` append sanitized `&open=`; `take_open_ui_section` still reads env / config at create
+- `src-tauri/src/ui/status_bar.rs` + `status_bar_linux.rs` — load `Config::cpu_window_app_url()`
+- `src/agent-ops.js` — reads `URLSearchParams(...).get('open')`; **no** `invoke('take_open_ui_section')` on the common path
+- Unit tests `cpu_window_app_url_with_open_bakes_capture_token` and `sanitize_open_ui_section_allows_capture_tokens` — **ok**
+- `src-tauri/dist/agent-ops.js` matches the URL-query open path / IPC skip comment
+- Prior #14 cuts still present: localStorage UI sections, collapsed Top Processes pin-disk skip, Monitors localStorage icon, Discord icon localStorage, Settings credential wiring defer, collapsed Debug Log skips `read_debug_log`, park gates
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 capture-URL bake.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no `take_open_ui_section` IPC; Capture path: `MAC_STATS_OPEN_SECTION=agent-ops` still opens Agent Ops via `cpu.html?open=agent-ops`; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
