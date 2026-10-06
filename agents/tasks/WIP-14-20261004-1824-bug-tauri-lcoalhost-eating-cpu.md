@@ -5348,3 +5348,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Product; confirm Having fun Off glance still shows off wash when idle thoughts are off; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1527)
+
+**Date:** 2026-10-06 13:00 UTC (15:00 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1527**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1527)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 header Refresh Saved flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1527**
+- `CHANGELOG.md` **[0.1.1527]** documents the header Refresh Saved flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `#refresh-btn.is-just-saved` mixes against opaque `#ffffff`; `animation: none`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` in that block
+- `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. `initRefresh` on `#refresh-btn` uses `.is-refreshing` while `refreshData()` runs (no rotate), then `flashSaveButton(..., { savedLabel: "✓", durationMs: 1200 })` which adds `.is-just-saved`. Unparks history GPU for the fetch
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the header Refresh success flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque header Refresh Saved flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); press header Refresh; confirm the Saved flash still shows green on the button, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
