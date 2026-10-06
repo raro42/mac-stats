@@ -10105,11 +10105,12 @@ button.is-just-saved,
   color: color-mix(in srgb, #34c759 50%, currentColor);
 }
 
-/* Settings Help / cheat sheet — soft green flash after open */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #settings-help-btn.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
-  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #ffffff) !important;
   color: inherit;
+  box-shadow: none;
 }
 
 /* Footer GitHub — local SVG mark (no network) */
