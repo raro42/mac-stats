@@ -7,7 +7,7 @@
 - [x] Agent Ops: abort remaining IPC batches when parked mid-flight
 - [x] Bump to v0.1.1429; CHANGELOG; sync-dist
 - [x] `cargo check` in src-tauri/
-- [ ] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
+- [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped v0.1.1429 for GitHub #14. Shared-pause holdouts, mid-flight DOM skips, Agent Ops batched IPC abort. Left issue open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1429** (`717efa1e`) for GitHub #14. Shared-pause holdouts, mid-flight DOM skips, Agent Ops batched IPC abort. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
