@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1508** | The Settings Brave Key-not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1507** | The Settings Perplexity key glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1506** | The Perplexity last-search glance mixes results, searching, error, key-needed, and ready washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1505** | The Perplexity Top/error/filter glance mixes error, top, and filter washes against an opaque fill. No glass alpha or hover shadow. |

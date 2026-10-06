@@ -1,10 +1,10 @@
-# Coder — #14 v0.1.1506
+# Coder tick — GitHub #14
 
-- [x] Opaque-wash Perplexity last-search glance
-- [x] Sync dist, bump `0.1.1506`, CHANGELOG + overnight notes
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename WIP-14 → UNTESTED-14, commit and push, leave #14 open
+- [x] Pick lowest GitHub task: WIP-14 (tauri://localhost CPU)
+- [x] Settings Brave key-not-set glance: mix against opaque `#ffffff`, drop hover/focus shadows
+- [x] Version 0.1.1508 + CHANGELOG + sync-dist + cargo check
+- [x] Rename WIP-14 → UNTESTED-14, commit, push, comment (do not close)
 
 ## Review
 
-GitHub #14 follow-up **v0.1.1506**: Perplexity last-search glance mixes results, searching, error, key-needed, and ready washes against opaque fill; no glass alpha or hover shadow. Dist CSS matches `src/`. Issue **#14 left open**.
+Settings Credentials Brave Key-not-set glance no longer composites a glass alpha wash or hover drop shadow. Same pattern as Settings Perplexity key (v0.1.1507). `cargo check` in `src-tauri/` passed (existing unused-import warning only). Linux cannot measure macOS Graphics and Media; tester should use Activity Monitor on a focused CPU window.
