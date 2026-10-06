@@ -121,13 +121,13 @@
       canvas.style.contentVisibility = '';
       canvas.style.display = '';
     } catch (_) { /* ignore */ }
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(1, window.devicePixelRatio || 1);
     const rect = canvas.getBoundingClientRect();
     const width = rect.width > 0 ? rect.width : fallbackW;
     const height = rect.height > 0 ? rect.height : fallbackH;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';

@@ -2796,6 +2796,45 @@ function stopRefresh() {
   }
 }
 
+/** Sparkline / data-poster GPU: unpark on resume, Refresh, or history hover — not open idle (#14). */
+function unparkCpuWindowHistoryGpu() {
+  if (windowOccluded() || windowPollsPaused) return;
+  const hist = window.themeHistory;
+  if (hist && typeof hist.unpark === "function") {
+    hist.unpark();
+  }
+  if (typeof window.__macStatsResumeHistoryCharts === "function") {
+    window.__macStatsResumeHistoryCharts();
+  } else {
+    const hc = window.historyCharts;
+    if (hc && typeof hc.unpark === "function") hc.unpark();
+  }
+  window.__macStatsSparklinesUnparked = true;
+  startHistoryAvailabilityPoll();
+}
+window.__macStatsUnparkHistoryGpu = unparkCpuWindowHistoryGpu;
+
+function wireHistoryGpuUnparkOnHoverOnce() {
+  if (window.__macStatsHistoryGpuHoverWired) return;
+  window.__macStatsHistoryGpuHoverWired = true;
+  const onIntent = () => {
+    if (window.__macStatsSparklinesUnparked) return;
+    unparkCpuWindowHistoryGpu();
+  };
+  const roots = [
+    document.querySelector(".history-section"),
+    document.querySelector(".poster-metrics"),
+    document.getElementById("gpu-history-chart")?.closest(".history-chart-container"),
+  ].filter(Boolean);
+  const seen = new Set();
+  for (const el of roots) {
+    if (seen.has(el)) continue;
+    seen.add(el);
+    el.addEventListener("pointerenter", onIntent, { passive: true });
+    el.addEventListener("focusin", onIntent);
+  }
+}
+
 /** Idempotent DOM wiring for keyboard/copy/strip (#14). */
 function wireCpuWindowDomOnce() {
   if (window.__macStatsCpuDomWired) return;
@@ -2806,6 +2845,7 @@ function wireCpuWindowDomOnce() {
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
+  wireHistoryGpuUnparkOnHoverOnce();
   alignRingGaugeLabels();
   removeRingsFilterChips();
   ensureRamStripStyles();
@@ -2989,35 +3029,13 @@ function startCpuWindowMetricsOnce() {
   // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
   scheduleCpuWindowVersionOnce(2400000);
   const afterFirst = () => {
-    // Occluded after IPC: do not arm the slow interval or unpark GPU (#14).
+    // Occluded after IPC: do not arm the slow interval (#14).
     if (windowOccluded() || windowPollsPaused) return;
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
     if (!refreshInterval) startRefresh();
-    // Sparkline GPU: defer unpark so first poll DOM + canvas alloc do not stack (#14).
-    cancelDeferredAfterFirstUnpark();
-    const unparkSparklines = () => {
-      afterFirstUnparkIdleHandle = null;
-      afterFirstUnparkTimeoutId = null;
-      if (windowOccluded() || windowPollsPaused) return;
-      const hist = window.themeHistory;
-      if (hist && typeof hist.unpark === "function") {
-        hist.unpark();
-      }
-      // Data-poster history.js has no themeHistory. Same idle unpark (#14).
-      if (typeof window.__macStatsResumeHistoryCharts === "function") {
-        window.__macStatsResumeHistoryCharts();
-      }
-      // 24h history probe waits for sparkline unpark (#14).
-      window.__macStatsSparklinesUnparked = true;
-      startHistoryAvailabilityPoll();
-    };
-    if (typeof window.requestIdleCallback === "function") {
-      afterFirstUnparkIdleHandle = window.requestIdleCallback(unparkSparklines, {
-        timeout: 960000,
-      });
-    } else {
-      afterFirstUnparkTimeoutId = setTimeout(unparkSparklines, 960000);
-    }
+    // Keep sparkline / data-poster canvases parked on the common open path.
+    // requestIdleCallback timeouts fire as soon as the thread is idle, so a
+    // deferred unpark still allocated GPU during a focused warm-up (#14).
   };
   const immediateInvoke = getInvoke();
   if (immediateInvoke) {
@@ -3135,8 +3153,8 @@ function ensureGpuHistoryChart() {
   const canvas = document.createElement('canvas');
   canvas.className = 'history-chart';
   canvas.id = 'gpu-history-chart';
-  canvas.width = 200;
-  canvas.height = 40;
+  canvas.width = 1;
+  canvas.height = 1;
   gpuContainer.appendChild(caption);
   gpuContainer.appendChild(canvas);
   freqContainer.parentNode.insertBefore(gpuContainer, freqContainer);

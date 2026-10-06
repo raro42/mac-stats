@@ -3836,6 +3836,9 @@
 
       let ok = false;
       try {
+        if (typeof window.__macStatsUnparkHistoryGpu === "function") {
+          window.__macStatsUnparkHistoryGpu();
+        }
         await window.refreshData();
         ok = true;
       } catch (e) {

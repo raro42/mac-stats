@@ -464,24 +464,6 @@
     window[name] = api;
   });
 
-  function scheduleUnparkCanvases(idleTimeoutMs) {
-    const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 240000;
-    cancelDeferredUnparkCanvases();
-    const run = () => {
-      unparkIdleHandle = null;
-      unparkTimeoutId = null;
-      // Still parked (Focused false / pause flag): drop GPU alloc (#14).
-      if (windowOccluded()) return;
-      unparkCanvases();
-    };
-    // Idle-defer GPU alloc so focus/resume does not stack with IPC (#14).
-    if (typeof window.requestIdleCallback === "function") {
-      unparkIdleHandle = window.requestIdleCallback(run, { timeout: ms });
-    } else {
-      unparkTimeoutId = setTimeout(run, ms);
-    }
-  }
-
   function wireListeners() {
     if (listenersWired) return;
     listenersWired = true;
@@ -494,18 +476,16 @@
         api.refreshLayout();
       }, 200);
     });
-    // Park immediately when occluded; unpark on idle after focus (#14).
+    // Park immediately when occluded. cpu.js unparks on resume / Refresh / hover (#14).
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) parkCanvases();
-      else scheduleUnparkCanvases(240000);
     });
     window.addEventListener("blur", parkCanvases);
-    window.addEventListener("focus", () => scheduleUnparkCanvases(240000));
+    // Do not unpark on focus/visibility — cpu.js owns resume / Refresh / hover (#14).
   }
 
   function boot() {
-    // Stay parked through open. Wire blur/focus only; buffer samples while
-    // parked. No idle unpark — focus / first metrics poll unparks (#14).
+    // Stay parked through open. Buffer samples while parked. cpu.js unparks (#14).
     parkCanvases();
     wireListeners();
   }

@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1450** (follow-up after v0.1.1449).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (sparkline GPU stays parked on focused open):
+
+- `src/cpu.js` — first `get_cpu_details` no longer unparks history/sparkline canvases (`requestIdleCallback` timeouts fire as soon as idle). Hover on history, Refresh, or alt-tab resume still unparks. Injected GPU sparkline canvas is 1×1 until then.
+- `src/chart-line.js` — park on blur/hidden only; no focus/visibility unpark.
+- `src/cpu-ui.js` — Refresh unparks before `refreshData`.
+- Theme `cpu.html` (except data-poster, already 1×1) — history canvases start at 1×1.
+- `src-tauri/dist/themes/data-poster/poster-charts.js` — unpark caps DPR at 1 and uses opaque `getContext('2d')`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm history canvases stay 1×1 / hidden until hover or Refresh. Gauges still update. Hover history or press Refresh — sparklines draw. Alt-tab away and back — unpark on resume idle. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1448)
+
 Version **v0.1.1448** (follow-up after v0.1.1447).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
