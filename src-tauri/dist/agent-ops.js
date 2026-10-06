@@ -1650,10 +1650,14 @@ function setupAgentOps() {
             }
         });
     }
-    if (!agentOpsCollapsed) {
-      refreshAgentOps();
-      startAgentOpsAutoRefresh();
-    }
+    // Expand path (applyOpsCollapsed(false)) owns refresh + interval (#14).
+}
+
+let agentOpsSetupDone = false;
+function ensureAgentOpsSetup() {
+    if (agentOpsSetupDone) return;
+    agentOpsSetupDone = true;
+    setupAgentOps();
 }
 
 function ensureOpsSessionFilter() {
@@ -10552,20 +10556,23 @@ function escapeHtml(s) {
     stopOpsGlancePoll();
     const glance = document.getElementById('agent-ops-collapsed-glance');
     if (glance) glance.hidden = true;
-    applyOpsRunsAttentionGlanceState();
-    applyOpsDigestAttentionGlanceState();
-    applyOpsDiscordAttentionGlanceState();
-    applyOpsRedmineAttentionGlanceState();
-    applyOpsOllamaAttentionGlanceState();
-    applyOpsBraveAttentionGlanceState();
-    applyOpsBrowserAttentionGlanceState();
-    applyOpsMcpAttentionGlanceState();
-    applyOpsCursorAttentionGlanceState();
-    applyOpsPerplexityAttentionGlanceState();
-    applyOpsMastodonAttentionGlanceState();
-    applyOpsTelegramAttentionGlanceState();
-    applyOpsSlackAttentionGlanceState();
-    refreshOpsPanelFilterAttentionGlances();
+    // Collapsed pane is display:none — do not create attention-glance nodes (#14).
+    if (!collapsed) {
+      applyOpsRunsAttentionGlanceState();
+      applyOpsDigestAttentionGlanceState();
+      applyOpsDiscordAttentionGlanceState();
+      applyOpsRedmineAttentionGlanceState();
+      applyOpsOllamaAttentionGlanceState();
+      applyOpsBraveAttentionGlanceState();
+      applyOpsBrowserAttentionGlanceState();
+      applyOpsMcpAttentionGlanceState();
+      applyOpsCursorAttentionGlanceState();
+      applyOpsPerplexityAttentionGlanceState();
+      applyOpsMastodonAttentionGlanceState();
+      applyOpsTelegramAttentionGlanceState();
+      applyOpsSlackAttentionGlanceState();
+      refreshOpsPanelFilterAttentionGlances();
+    }
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
@@ -10577,6 +10584,7 @@ function escapeHtml(s) {
     if (collapsed) {
       stopAgentOpsAutoRefresh();
     } else {
+      ensureAgentOpsSetup();
       restoreAgentOpsTab();
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -10677,7 +10685,10 @@ function escapeHtml(s) {
           startsCollapsed = true;
         }
       }
-      applyOpsCollapsed(!!startsCollapsed);
+      // initAgentOps already applied localStorage; skip a second apply (#14).
+      if (agentOpsCollapsed !== !!startsCollapsed) {
+        applyOpsCollapsed(!!startsCollapsed);
+      }
       // Capture / design-review: `?open=` is baked at window create (Rust take).
       // Skip take_open_ui_section IPC on the common collapsed path (#14).
       if (agentOpsWorkPaused()) return;
@@ -10837,7 +10848,8 @@ function escapeHtml(s) {
     if (!document.getElementById('ops-health-row')) return;
     applyOpsCollapsed(readQuickAgentOpsCollapsed());
     wireCollapse();
-    setupAgentOps();
+    // Collapsed default: skip filter/keyboard/overview DOM wiring (#14).
+    if (!agentOpsCollapsed) ensureAgentOpsSetup();
   }
 
   // Defer Agent Ops DOM wiring past first gauge paint (#14).

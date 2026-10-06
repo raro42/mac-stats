@@ -78,15 +78,19 @@ function getSectionCollapsed(key) {
 function setSectionCollapsed(key, collapsed) {
   const value = !!collapsed;
   if (!cpuUiSectionsCache) cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  const prev = cpuUiSectionsCache[key];
   cpuUiSectionsCache[key] = value;
   try {
     localStorage.setItem(key, value ? 'true' : 'false');
   } catch (_) {}
+  // Restore on open already matches localStorage — skip set_cpu_window_ui_state (#14).
+  if (prev === value) return;
   schedulePersistCpuUiSections();
 }
 
 function setCpuUiSectionValue(key, value) {
   if (!cpuUiSectionsCache) cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  const prev = cpuUiSectionsCache[key];
   cpuUiSectionsCache[key] = value;
   try {
     if (typeof value === 'boolean') {
@@ -95,6 +99,7 @@ function setCpuUiSectionValue(key, value) {
       localStorage.setItem(key, value);
     }
   } catch (_) {}
+  if (prev === value) return;
   schedulePersistCpuUiSections();
 }
 

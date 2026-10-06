@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1448** (follow-up after v0.1.1447).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (collapsed Agent Ops skips setup wiring; no-op UI persist):
+
+- `src/agent-ops.js` — `setupAgentOps` (filters, overview cards, document keyboard) waits until the pane expands or capture `?open=agent-ops`. Collapsed restore does not create attention-glance nodes. Duplicate localStorage apply is skipped.
+- `src/cpu.js` — `setSectionCollapsed` / `setCpuUiSectionValue` skip `set_cpu_window_ui_state` when the value is unchanged (open-path restore).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with Agent Ops collapsed (default). Confirm no Agent Ops list/filter IPC (`list_agents`, `list_live_sessions`, …) until expand. Expand Agent Ops — overview, tabs, and refresh still work. Capture path: `MAC_STATS_OPEN_SECTION=agent-ops` still opens and hydrates. Toggle a section — persist still writes. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1447)
+
 Version **v0.1.1447** (follow-up after v0.1.1446).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
