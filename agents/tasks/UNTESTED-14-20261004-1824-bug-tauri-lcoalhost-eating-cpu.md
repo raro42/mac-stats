@@ -22,17 +22,21 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1496** (follow-up after v0.1.1495).
+Version **v0.1.1497** (follow-up after v0.1.1496).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
-Changes (Agent Ops MCP Not set/Unavailable/Degraded attention glance skip glass blend):
+Changes (Agent Ops Cursor Not set/Unavailable/Degraded attention glance skip glass blend):
 
-- `src/agent-ops.css` — Agent Ops MCP attention glance mixes not-set, warn, and bad washes against opaque `#ffffff`. No hover or focus drop shadow.
+- `src/agent-ops.css` — Agent Ops Cursor attention glance mixes not-set, warn, and bad washes against opaque `#ffffff`. No hover or focus drop shadow.
 
-Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm MCP glance still shows not-set / warn / bad wash when MCP is not set, unavailable, or degraded. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Cursor glance still shows not-set / warn / bad wash when the Cursor agent is not set, unavailable, or degraded. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
 
 ---
+
+## Prior implementation (v0.1.1496)
+
+Version **v0.1.1496** (follow-up after v0.1.1495). Origin shipped the Agent Ops MCP glance opaque wash (not-set / warn / bad).
 
 ## Prior implementation (v0.1.1495)
 
