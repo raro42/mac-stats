@@ -1749,3 +1749,60 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Monitors / Debug Log / Disk Cleanup / Agent Ops, trigger a poll, then alt-tab before IPC returns — history probe / Updated-ago / glance / error catch / monitors height must not paint; Agent Ops auto-refresh should stop further invokes after park; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1430)
+
+**Date:** 2026-10-06 02:11 UTC
+**Result: FAIL** → (intermediate; tree advanced to v0.1.1431 during this tester run)
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; tree was v0.1.1430 at first check)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Ollama / Perplexity / monitor-history park while occluded)**
+
+- `src/ollama.js` — shared `ollamaWorkPaused()` via `__macStatsWindowWorkPaused` (falls back to `document.hidden`); `checkOllamaConnection` skips start and mid-flight DOM/icon/glance paint when parked; collapsed + model/turn/answer/errors/offline glances no-op while parked; module init (`initializeOllama`) defers configure + connection check when parked
+- `src/cpu.js` — `updateOllamaIconStatus`, `loadAvailableModels`, `autoConfigureOllama`, expand/load connection timeouts, and `checkOllamaConnection` wrapper respect `windowWorkPaused`; resume idle polls recheck Ollama after park; mid-flight Perplexity key-status (`refreshPerplexityStatus`) and monitor history Map rebuild (`refreshMonitorHistoryFromBackend`) drop when parked
+- Prior shared-pause holdouts / Agent Ops batch abort / focus-gate / history mid-flight park / structural occlusion cancel kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 Ollama / Perplexity / monitor-history occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Coder advanced the task to **v0.1.1431** before this report could land as WIP; see next report. Do **not** close GitHub #14.
+
+## Test report (v0.1.1431)
+
+**Date:** 2026-10-06 02:15 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Re-claimed after coder race to v0.1.1431 during tester run
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1431)
+- `cd src-tauri && cargo test` / `cargo test --lib` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops preview mid-flight park)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1431**
+- `src/agent-ops.js` — `showOpsSessionPreview` / `showOpsSchedulePreview` / `showOpsRunPreview` early-return on `agentOpsWorkPaused()`; mid-flight live session, session-file, and knowledge `read_*` paths skip preview/status paint after park (Overview + Sessions/Knowledge tabs)
+- Prior v0.1.1430 Ollama / Perplexity / monitor-history park and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 Agent Ops preview occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Agent Ops → Sessions / Knowledge / Runs / Schedules, open a row preview, then alt-tab before IPC returns — preview pane / Load into AI Chat must not paint while away; alt-tab back — re-open a row refreshes) before CLOSED. Do **not** close GitHub #14.
