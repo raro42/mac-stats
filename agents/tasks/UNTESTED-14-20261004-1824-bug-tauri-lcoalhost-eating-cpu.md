@@ -22,17 +22,25 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1516** (follow-up after v0.1.1515).
+Version **v0.1.1518** (follow-up after v0.1.1517).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
-Changes (Settings Slack not-set/partial attention glance skip glass blend):
+Changes (Settings Signal not-wired attention glance skip glass blend):
 
-- `src/agent-ops.css` — Settings Slack glance mixes the not-set and partial washes against opaque `#ffffff`. No hover or focus drop shadow.
+- `src/agent-ops.css` — Settings Signal glance mixes the not-wired wash against opaque `#ffffff`. No hover or focus drop shadow.
 
-Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Confirm Slack glance still shows not-set/partial wash when Slack is missing or only partly set. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Credentials. Confirm Signal glance still shows not-wired wash. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
 
 ---
+
+## Prior implementation (v0.1.1517)
+
+Version **v0.1.1517** (follow-up after v0.1.1516). Origin shipped the Settings Help closed/open opaque wash.
+
+## Prior implementation (v0.1.1516)
+
+Version **v0.1.1516** (follow-up after v0.1.1515). Origin shipped the Settings Slack not-set/partial opaque wash.
 
 ## Prior implementation (v0.1.1515)
 
@@ -4965,3 +4973,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Credentials; confirm Telegram glance still shows not-set/partial wash when Telegram is missing or only partly set; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1516)
+
+**Date:** 2026-10-06 11:55 UTC (13:55 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1516**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1516)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings Slack not-set/partial attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1516**
+- `CHANGELOG.md` **[0.1.1516]** documents the Settings Slack not-set/partial glance mixing the not-set and partial washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.settings-slack-attention-glance` (base, hover, `:focus-visible`, `.is-not-set`, `.is-partial`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. `applySettingsSlackAttentionGlanceState` copies `.is-not-set` onto `#settings-slack-attention-glance` when Settings is open and Slack status is "not set". Hidden otherwise. Copy: "Slack · Not set · add webhook URL". Runtime never adds `.is-partial` (webhook is one field; `isSlackNotFullyConfiguredForGlance` only matches "not set"). CSS still lists `.is-partial` for Telegram-style parity. CHANGELOG "partly set" is unused on this glance
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings → Credentials path when Slack is missing. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings Slack not-set/partial attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Credentials; confirm Slack glance still shows not-set/partial wash when Slack is missing or only partly set; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
