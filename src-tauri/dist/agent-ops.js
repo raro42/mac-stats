@@ -10664,24 +10664,8 @@ function escapeHtml(s) {
         toggleAgentOpsSection();
       });
     }
-    // Restore last open/closed state after config.json load (WebView is destroyed on close).
+    // Restore last open/closed from localStorage (no get_cpu_window_ui_state, #14).
     void (async () => {
-      try {
-        for (let i = 0; i < 20; i++) {
-          // Alt-tab while waiting for cpu.js: stop waking WebView (#14).
-          if (agentOpsWorkPaused()) break;
-          if (typeof window.loadCpuUiSections === 'function') break;
-          await new Promise((r) => setTimeout(r, 500));
-        }
-        if (!agentOpsWorkPaused()) {
-          if (typeof window.loadCpuUiSections === 'function') {
-            await window.loadCpuUiSections();
-          } else if (window.cpuUiSectionsReady) {
-            await window.cpuUiSectionsReady;
-          }
-        }
-        // else: localStorage seed is enough while parked; resume re-merges (#14).
-      } catch (_) {}
       let startsCollapsed = true;
       if (typeof window.getSectionCollapsed === 'function') {
         startsCollapsed = window.getSectionCollapsed('agent_ops_collapsed');
@@ -10697,6 +10681,7 @@ function escapeHtml(s) {
       // Capture open-section IPC is optional; skip while parked (#14).
       if (agentOpsWorkPaused()) return;
       // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
+      // One invoke — no 500ms retry loop on the common collapsed path (#14).
       const scrollStart = (el) => {
         try {
           el?.scrollIntoView?.({ behavior: 'auto', block: 'start' });
@@ -10705,15 +10690,10 @@ function escapeHtml(s) {
         }
       };
       let section = null;
-      for (let i = 0; i < 10; i++) {
-        if (agentOpsWorkPaused()) return;
-        try {
-          section = await invoke('take_open_ui_section');
-          break;
-        } catch (_) {
-          if (agentOpsWorkPaused()) return;
-          await new Promise((r) => setTimeout(r, 500));
-        }
+      try {
+        section = await invoke('take_open_ui_section');
+      } catch (_) {
+        section = null;
       }
       if (agentOpsWorkPaused()) return;
       if (!section) return;

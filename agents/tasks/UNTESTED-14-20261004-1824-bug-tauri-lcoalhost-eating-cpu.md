@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1446** (follow-up after v0.1.1445).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (section collapse from localStorage; skip UI-state + capture retry loops):
+
+- `src/cpu.js` — `loadCpuUiSections` no longer calls `get_cpu_window_ui_state`. Monitoring init wires sections from localStorage without awaiting IPC. Focus resume skips UI-state merge. Collapsed Disk Cleanup does not arm `get_disk_cleanup_status` glance poll on resume.
+- `src/agent-ops.js` — restore collapse from localStorage (no cpu.js wait / UI-state IPC). Capture `take_open_ui_section` is one invoke (no 500ms retry loop).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm no `get_cpu_window_ui_state` until a section is toggled (persist still writes). Expand a section — layout matches localStorage. Capture path: `MAC_STATS_OPEN_SECTION` still opens once when invoke is ready. Alt-tab during Agent Ops init — no wait-loop wake; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1444)
+
 Version **v0.1.1444** (follow-up after v0.1.1443).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -2292,3 +2307,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm no `list_monitor_statuses` until expand; icon may show last-known up/down from localStorage; expand Monitors — list hydrates and icon refreshes; alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1444)
+
+**Date:** 2026-10-06 03:45 UTC (05:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1444**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1444)
+- `cd src-tauri && cargo test` — **pass** (1357 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapsed Top Processes skips get_pinned_process_names)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1444**
+- `CHANGELOG.md` **[0.1.1444]** documents the collapsed pin-disk IPC skip
+- `src/cpu.js` — `hydratePinnedProcessNamesFromDisk` is **not** called from `initMonitoringFeatures` (comment: expand hydrates)
+- `src/cpu.js` — focus resume calls hydrate only when `!isProcessesSectionCollapsed()`
+- `src/cpu.js` — `showProcesses` hydrates from disk, then force-rebuilds the list (drops if parked or collapsed again)
+- `src-tauri/dist/cpu.js` matches those call sites
+- Prior #14 cuts still present: Monitors localStorage icon, Discord icon localStorage, Settings credential wiring defer, collapsed Debug Log skips `read_debug_log`, park gates
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py` — no ERROR/WARN/panic clusters in the 180-minute window. No new errors tied to the #14 pin-disk IPC skip.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with Top Processes collapsed (default); confirm no `get_pinned_process_names` until expand; expand Top Processes — pins hydrate from disk and the list rebuilds; alt-tab during expand hydrate — no list paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

@@ -32,7 +32,6 @@ const CPU_UI_SECTION_DEFAULTS = {
 
 let cpuUiSectionsCache = null;
 let cpuUiSectionsPersistTimer = null;
-let cpuUiSectionsLoadPromise = null;
 
 function readCpuUiSectionFromLocalStorage(key, defaultCollapsed) {
   try {
@@ -57,48 +56,13 @@ function seedCpuUiSectionsFromLocalStorage() {
 }
 
 async function loadCpuUiSections() {
-  if (cpuUiSectionsLoadPromise) return cpuUiSectionsLoadPromise;
-  cpuUiSectionsLoadPromise = (async () => {
-    const seeded = seedCpuUiSectionsFromLocalStorage();
-    cpuUiSectionsCache = { ...seeded };
-    const inv = getInvoke();
-    if (!inv) return cpuUiSectionsCache;
-    // Tauri invoke may not be ready on first tick.
-    // Slow retries: a 50ms loop woke the WebView on open (#14).
-    // Alt-tab mid-retry: clear promise so focus resume can re-merge (#14).
-    const parkBail = () => {
-      cpuUiSectionsLoadPromise = null;
-      return cpuUiSectionsCache;
-    };
-    for (let i = 0; i < 20; i++) {
-      if (windowWorkPaused()) return parkBail();
-      try {
-        const remote = await inv('get_cpu_window_ui_state');
-        if (windowWorkPaused()) return parkBail();
-        if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
-          cpuUiSectionsCache = { ...seeded, ...remote };
-          for (const [k, v] of Object.entries(cpuUiSectionsCache)) {
-            if (typeof v === 'boolean') {
-              try {
-                localStorage.setItem(k, v ? 'true' : 'false');
-              } catch (_) {}
-            } else if (k === 'agent_ops_tab' && typeof v === 'string') {
-              try {
-                localStorage.setItem(k, v);
-              } catch (_) {}
-            }
-          }
-        }
-        return cpuUiSectionsCache;
-      } catch (_) {
-        if (windowWorkPaused()) return parkBail();
-        await new Promise((r) => setTimeout(r, 500));
-      }
-    }
-    console.warn('cpuWindowUi load failed; using localStorage defaults');
-    return cpuUiSectionsCache;
-  })();
-  return cpuUiSectionsLoadPromise;
+  // localStorage is SoT on the common open path — skip get_cpu_window_ui_state
+  // (that invoke + retry loop woke tauri://localhost on monitoring idle, #14).
+  // Toggles still persist to config.json via set_cpu_window_ui_state.
+  if (!cpuUiSectionsCache) {
+    cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  }
+  return cpuUiSectionsCache;
 }
 
 function getSectionCollapsed(key) {
@@ -193,9 +157,8 @@ function setIconPaneVisibility(section, content, hidden, divider) {
   }
 }
 window.setIconPaneVisibility = setIconPaneVisibility;
-// Seed from localStorage only at parse time — do not IPC get_cpu_window_ui_state
-// on script eval (that 50ms retry loop kept tauri://localhost hot on open) (#14).
-// Backend merge happens later via loadCpuUiSections() from monitoring init / focus.
+// Seed from localStorage only — do not IPC get_cpu_window_ui_state on parse,
+// monitoring idle, or focus resume (#14). Persist still writes config.json.
 window.cpuUiSectionsReady = Promise.resolve().then(() => {
   const seeded = seedCpuUiSectionsFromLocalStorage();
   cpuUiSectionsCache = { ...seeded };
@@ -6102,8 +6065,9 @@ function applyDeferredResumeIdleWindowPolls() {
   ) {
     startLogsAutoRefresh();
   }
+  // Collapsed Disk Cleanup: skip get_disk_cleanup_status glance IPC (#14).
   if (typeof diskCleanupCollapsed !== "undefined" && diskCleanupCollapsed) {
-    startDiskCleanupGlancePoll();
+    stopDiskCleanupGlancePoll();
   }
   if (typeof window.__macStatsResumeAgentOpsPolls === "function") {
     window.__macStatsResumeAgentOpsPolls();
@@ -6139,9 +6103,8 @@ function applyDeferredResumeIdleWindowPolls() {
   } else if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
     void window.__macStatsLoadProductToggleStatesAiOnly();
   }
-  // Monitoring idle may have parked mid UI-state merge — retry (#14).
+  // Monitoring idle: localStorage section cache only (no get_cpu_window_ui_state, #14).
   if (window.__macStatsMonitoringFeaturesStarted) {
-    void loadCpuUiSections();
     // Collapsed Top Processes: skip get_pinned_process_names (localStorage seeds) (#14).
     if (!isProcessesSectionCollapsed()) {
       void hydratePinnedProcessNamesFromDisk();
@@ -25421,28 +25384,26 @@ window.__macStatsEnsureSettingsCredentialWiring = ensureSettingsCredentialWiring
 function initMonitoringFeatures() {
   if (window.__macStatsMonitoringFeaturesStarted) return;
   window.__macStatsMonitoringFeaturesStarted = true;
-  // Load persisted section state first (config.json) because the CPU WebView
-  // is destroyed on close. Backend UI-state IPC was moved off parse-time (#14).
-  void (async () => {
-    // UI-state IPC bail while parked; resume retries (#14).
-    // DOM wiring below still runs once so sections stay interactive.
-    await loadCpuUiSections();
-    // Collapsed Top Processes: skip get_pinned_process_names (expand hydrates) (#14).
-    initIconLine();
-    syncIconLineFromSavedSections();
-    initCollapsibleSections();
-    initMonitorsSection();
-    initPerplexitySection();
-    // Settings credential Save/Clear wiring waits for Settings open (#14).
-    initLogsSection();
-    initDiskCleanupSection();
-    initOllamaSection();
-    initHistoryControls();
-    // Ollama module init (`initializeOllama`) owns configure_ollama — do not
-    // stack a second autoConfigure here on monitoring idle (#14).
-    // Compact: localStorage only here; Settings Product path syncs backend (#14).
-    initCpuWindowCompactPreference();
-  })();
+  // Section collapse: localStorage only (no get_cpu_window_ui_state, #14).
+  // Persist still writes config.json on toggle. Do not await IPC before wiring.
+  if (!cpuUiSectionsCache) {
+    cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  }
+  // Collapsed Top Processes: skip get_pinned_process_names (expand hydrates) (#14).
+  initIconLine();
+  syncIconLineFromSavedSections();
+  initCollapsibleSections();
+  initMonitorsSection();
+  initPerplexitySection();
+  // Settings credential Save/Clear wiring waits for Settings open (#14).
+  initLogsSection();
+  initDiskCleanupSection();
+  initOllamaSection();
+  initHistoryControls();
+  // Ollama module init (`initializeOllama`) owns configure_ollama — do not
+  // stack a second autoConfigure here on monitoring idle (#14).
+  // Compact: localStorage only here; Settings Product path syncs backend (#14).
+  initCpuWindowCompactPreference();
 }
 
 /**
