@@ -9,7 +9,7 @@ GitHub WIP-14 is the lowest-numbered open GitHub task. Continue WebView idle cut
 - [x] CHANGELOG + bump `0.1.1418`
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Do **not** close GitHub #14
 
 ## Review
