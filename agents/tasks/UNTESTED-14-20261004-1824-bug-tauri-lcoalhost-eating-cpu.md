@@ -22,17 +22,21 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1492** (follow-up after v0.1.1491).
+Version **v0.1.1493** (follow-up after v0.1.1492).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
-Changes (Agent Ops Redmine Not set/Degraded/Unavailable attention glance skip glass blend):
+Changes (Agent Ops Ollama Not set/Offline/Degraded attention glance skip glass blend):
 
-- `src/agent-ops.css` — Agent Ops Redmine attention glance mixes not-set, warn, and bad washes against opaque `#ffffff`. No hover or focus drop shadow.
+- `src/agent-ops.css` — Agent Ops Ollama attention glance mixes not-set, warn, and bad washes against opaque `#ffffff`. No hover or focus drop shadow.
 
-Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Redmine glance still shows not-set / warn / bad wash when Redmine is not set, degraded, or unavailable. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Ollama glance still shows not-set / warn / bad wash when Ollama is not set, offline, or degraded. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
 
 ---
+
+## Prior implementation (v0.1.1492)
+
+Version **v0.1.1492** (follow-up after v0.1.1491). Origin shipped the Agent Ops Redmine glance opaque wash (not-set / warn / bad).
 
 ## Prior implementation (v0.1.1491)
 
@@ -4129,3 +4133,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Discord Offline/Reconnect glance still shows offline / reconnect wash when Discord is offline or reconnecting; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1492)
+
+**Date:** 2026-10-06 09:20 UTC (11:20 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1492**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1492)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops Redmine Not set/Degraded/Unavailable attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1492**
+- `CHANGELOG.md` **[0.1.1492]** documents the Agent Ops Redmine glance mixing not-set, warn, and bad washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-redmine-attention-glance` (base, hover, `:focus-visible`, `.has-not-set`, `.has-warn`, `.has-bad`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/agent-ops.js` `applyOpsRedmineAttentionGlanceState` still copies those mode classes onto `#ops-redmine-attention-glance` when Agent Ops is expanded and Redmine wash is not-set, warn (degraded), or bad (unavailable). Hidden when collapsed, when wash is ok, or when there is no glance line
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + not-set/warn/bad path. Neighbor Agent Ops glances (Ollama and later) still use glass `transparent` + hover shadow. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops Redmine attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Redmine glance still shows not-set / warn / bad wash when Redmine is not set, degraded, or unavailable; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
