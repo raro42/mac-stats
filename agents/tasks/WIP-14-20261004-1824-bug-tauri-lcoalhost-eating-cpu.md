@@ -4421,3 +4421,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Telegram glance still shows not-set / partial / warn / bad wash when Telegram is not set, partial, unavailable, or degraded; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1501)
+
+**Date:** 2026-10-06 10:18 UTC (12:18 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1501**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1501)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops Slack Not set/Partial attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1501**
+- `CHANGELOG.md` **[0.1.1501]** documents the Agent Ops Slack glance mixing not-set, partial, warn, and bad washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-slack-attention-glance` (base, hover, `:focus-visible`, `.has-not-set`, `.has-partial`, `.has-warn`, `.has-bad`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/agent-ops.js` `applyOpsSlackAttentionGlanceState` still copies those mode classes onto `#ops-slack-attention-glance` when Agent Ops is expanded and Slack wash is not-set, partial, warn (degraded), or bad (unavailable). Hidden when collapsed, when wash is ok, or when there is no glance line
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + not-set/partial/warn/bad path. Neighbor Agent Ops glances (Signal and later) still use glass `transparent` + hover shadow. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops Slack attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Slack glance still shows not-set / partial / warn / bad wash when Slack is not set, partial, unavailable, or degraded; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
