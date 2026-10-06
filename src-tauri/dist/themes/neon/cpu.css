@@ -301,13 +301,17 @@ body::before {
 
 .ring-gauge {
   position: absolute;
-  top: 54%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  --ring-size: 120px;
+  top: calc(54% - var(--ring-size) / 2);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: var(--ring-size);
+  height: var(--ring-size);
   pointer-events: none;
   z-index: 0;
+  transform: none;
   /* Show a top arc like the screenshot - clip to show only top semicircle */
   clip-path: inset(0 0 42% 0);
 }

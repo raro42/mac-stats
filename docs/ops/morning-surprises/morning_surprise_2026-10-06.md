@@ -6,6 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1456** | Ring gauges center without a translate. The SVG no longer keeps a Graphics and Media layer while the window is open. |
+| **v0.1.1455** | Sparkline canvases skip GPU bind on open. Hover or Refresh still draws them. |
+| **v0.1.1454** | Collapsed monitors, chat, logs, and Agent Ops skip idle-callback wiring on open. A click or Tab still opens them. |
+| **v0.1.1453** | Settings and the changelog stay unwired until you open them. Collapsed AI Chat, Debug Log, and Disk Cleanup wait for expand. |
 | **v0.1.1452** | Data-poster history charts skip theme-color reads on open. Colors load when a chart draws or a tooltip shows. |
 | **v0.1.1451** | Sparkline park binds and hides the HTML canvases on open. Window resize does not allocate GPU buffers while parked. |
 | **v0.1.1450** | History sparklines stay parked after the first metrics poll. Theme markup starts at 1×1. Hover, Refresh, or alt-tab resume still draws them. |
@@ -35,10 +39,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Data-poster no longer flushes layout to read chart colors on open. Those colors wait until a chart draws or a tooltip shows.
+Ring gauges sit in the card without a translate. WebKit does not keep a transform layer for those four SVGs on every open.
 
 ## Still open
 
-- ~21:40 tick: data-poster history skips computed style on open (**v0.1.1452**). A local 1×1 canvas commit was reset because origin already shipped that in v0.1.1450.
+- ~22:20 tick: ring gauges drop the translate layer (**v0.1.1456**, rebasing past origin v0.1.1455). Metric-value text still uses translate.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

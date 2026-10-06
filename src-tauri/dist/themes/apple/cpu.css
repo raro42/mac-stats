@@ -376,13 +376,17 @@ border-radius: 24px;
 
 .ring {
   position: absolute;
-  top: 58%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  --ring-size: 120px;
+  top: calc(58% - var(--ring-size) / 2);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: var(--ring-size);
+  height: var(--ring-size);
   pointer-events: none;
   z-index: 1;
+  transform: none;
 }
 
 .ring-track {
@@ -1088,8 +1092,7 @@ padding: 18px 18px 16px;
   }
 
   .ring {
-    width: 120px;
-    height: 120px;
+    --ring-size: 120px;
   }
 
   .details-grid {

@@ -307,12 +307,16 @@ body {
 .ring {
   position: absolute;
   z-index: 1;
-  top: 58%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 112px;
-  height: 112px;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  --ring-size: 112px;
+  top: calc(58% - var(--ring-size) / 2);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: var(--ring-size);
+  height: var(--ring-size);
   pointer-events: none;
+  transform: none;
 }
 
 .history-section {
@@ -968,8 +972,7 @@ body {
   }
 
   .ring {
-    width: 104px;
-    height: 104px;
+    --ring-size: 104px;
   }
 
   .details-grid {

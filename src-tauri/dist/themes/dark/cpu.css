@@ -246,12 +246,16 @@ body {
 
 .ring-gauge {
   position: absolute;
-  top: 52%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 92px;
-  height: 92px;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  --ring-size: 92px;
+  top: calc(52% - var(--ring-size) / 2);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: var(--ring-size);
+  height: var(--ring-size);
   pointer-events: none;
+  transform: none;
 }
 
 .ring-track {

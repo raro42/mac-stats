@@ -20,6 +20,22 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1456
+
+- Ring gauges center without `transform: translate`. The SVG no longer keeps a Graphics and Media layer on the open CPU window. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1455
+
+- Sparkline and data-poster canvases skip bind and `canvas.width` on open. History containers stay out of the compositor until hover or Refresh. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1454
+
+- Collapsed monitors, chat, logs, and Agent Ops skip `requestIdleCallback` wiring on open. Section chrome waits for a click or Tab. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1453
+
+- Settings chrome and the changelog modal stay unwired until opened. Collapsed AI Chat, Debug Log, and Disk Cleanup skip filter wiring until expand. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1452
 
 - Data-poster history charts skip `getComputedStyle` on open. Colors load on the first draw or tooltip. P2 reliability / GitHub #14.

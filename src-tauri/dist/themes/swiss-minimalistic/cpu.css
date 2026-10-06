@@ -245,12 +245,16 @@ body {
 
 .ring {
   position: absolute;
-  top: 56%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 185px;
-  height: 185px;
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  --ring-size: 185px;
+  top: calc(56% - var(--ring-size) / 2);
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: var(--ring-size);
+  height: var(--ring-size);
   pointer-events: none;
+  transform: none;
   /* Show a top arc like the screenshot - clip to show only top semicircle */
   clip-path: inset(0 0 42% 0);
 }
@@ -912,8 +916,7 @@ body {
   }
 
   .ring {
-    width: 140px;
-    height: 140px;
+    --ring-size: 140px;
   }
 
   .details-grid {
