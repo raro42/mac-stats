@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1421** (follow-up after v0.1.1420).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (defer metrics further + idle-defer focus refresh):
+
+- `src/cpu.js` — first `get_cpu_details` idle ≤**240s** on focus/open (was 120s). Sparkline `unpark` idle ≤**240s** after first poll. Focus resume history seed idle ≤**240s**. Version/update IPC idle ≤**600s**. Monitoring features idle ≤**1800s**. Focus resume secondary polls idle ≤**60s** (was 30s). Stale focus `refresh()` / `get_cpu_details` idle ≤**60s** via `scheduleDeferredFocusRefresh` (cancelled on blur/pause) — not on the focus event.
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**60s** (was 30s).
+- `src/agent-ops.js` — Agent Ops init idle ≤**1800s**.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Rings appear after idle metrics; sparklines unpark shortly after. Alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC should not restart on the focus event itself. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1420)
+
 Version **v0.1.1420** (follow-up after v0.1.1419).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
