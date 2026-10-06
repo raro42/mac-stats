@@ -8038,11 +8038,13 @@ button.monitor-detail-url.is-just-saved {
   outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
   outline-offset: 2px;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-item-path.is-just-saved {
   color: #34c759;
   opacity: 1;
   text-decoration: none;
-  background: color-mix(in srgb, #34c759 12%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
+  box-shadow: none;
 }
 
 .disk-cleanup-item-samples {
