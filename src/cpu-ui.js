@@ -5321,6 +5321,9 @@
       e.preventDefault();
       e.stopPropagation();
       ensureChangelogModalWired();
+      if (typeof window.__macStatsStartCpuWindowVersionOnce === "function") {
+        window.__macStatsStartCpuWindowVersionOnce();
+      }
       const changelogModal = document.getElementById("changelog-modal");
       const changelogBody = document.getElementById("changelog-body");
       if (!changelogModal || !changelogBody) return;

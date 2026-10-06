@@ -22,6 +22,24 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1454** (follow-up after v0.1.1453).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and listener work.
+
+`requestIdleCallback({ timeout: N })` runs as soon as the event loop is idle. The old 7200s monitoring/Agent Ops schedule still wired collapsed sections during a focused warm-up.
+
+Changes (collapsed sections stay off the open path):
+
+- `src/cpu.js` — monitors, chat, logs, Details/Processes, and Agent Ops wait for a click/Tab on section chrome. Capture `?open=` still hydrates now. Ring/header keyboard and the extra GPU canvas wait for Tab/focus or history unpark. Version/GitHub IPC waits for footer version click.
+- `src/agent-ops.js` — skip idle init; start on capture or section intent.
+- `src/cpu-ui.js` — footer version click paints version then opens changelog.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm no monitors/chat/logs/Agent Ops header wiring and no GitHub update fetch until a section click or footer version click. Expand Debug Log / Disk cleanup / AI Chat / Agent Ops — still works. Gauges still update. History canvases stay hidden until hover or Refresh. Capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1453)
+
 Version **v0.1.1453** (follow-up after v0.1.1452).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and listener work.

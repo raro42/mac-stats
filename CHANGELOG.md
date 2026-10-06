@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1454] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Collapsed monitors, chat, logs, and Agent Ops no longer wire on `requestIdleCallback` (that callback runs as soon as the page is idle). Section chrome waits for a click or Tab. Capture `?open=` still opens immediately. Ring keyboard and the extra GPU chart wait for Tab or history hover. Footer version click still loads the changelog and update check.
+
 ## [0.1.1453] - 2026-10-06
 
 ### Changed

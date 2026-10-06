@@ -2819,6 +2819,7 @@ function unparkCpuWindowHistoryGpu() {
     if (hc && typeof hc.unpark === "function") hc.unpark();
   }
   window.__macStatsSparklinesUnparked = true;
+  wireCpuWindowChromeOnce();
   startHistoryAvailabilityPoll();
 }
 window.__macStatsUnparkHistoryGpu = unparkCpuWindowHistoryGpu;
@@ -2845,21 +2846,45 @@ function wireHistoryGpuUnparkOnHoverOnce() {
 }
 
 /** Idempotent DOM wiring for keyboard/copy/strip (#14). */
-function wireCpuWindowDomOnce() {
-  if (window.__macStatsCpuDomWired) return;
-  window.__macStatsCpuDomWired = true;
-  initRingGauges();
+/** Keyboard / copy / extra GPU canvas: first Tab/focus or history unpark (#14). */
+function wireCpuWindowChromeOnce() {
+  if (window.__macStatsCpuChromeWired) return;
+  window.__macStatsCpuChromeWired = true;
   wireMetricValueCopy();
   ensureCpuHeaderToolbarKeyboard();
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
+  ensurePowerStripKeyboard();
+}
+
+function wireCpuWindowChromeOnIntentOnce() {
+  if (window.__macStatsCpuChromeIntentWired) return;
+  window.__macStatsCpuChromeIntentWired = true;
+  const run = () => {
+    wireCpuWindowChromeOnce();
+  };
+  document.addEventListener("focusin", run, true);
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Tab" || e.key === "Enter" || e.key === " ") run();
+    },
+    true
+  );
+}
+
+/** Idempotent DOM wiring for gauges (#14). Keyboard waits for Tab/focus. */
+function wireCpuWindowDomOnce() {
+  if (window.__macStatsCpuDomWired) return;
+  window.__macStatsCpuDomWired = true;
+  initRingGauges();
   wireHistoryGpuUnparkOnHoverOnce();
   alignRingGaugeLabels();
   removeRingsFilterChips();
   ensureRamStripStyles();
   pruneMetricStripChips();
-  ensurePowerStripKeyboard();
+  wireCpuWindowChromeOnIntentOnce();
 }
 
 /** Version + update-check IPC once (focus / late fallback — not on open idle) (#14). */
@@ -3033,10 +3058,9 @@ function startCpuWindowMetricsOnce() {
   // Blur before idle fires: do not arm — focus/resume will schedule again (#14).
   if (windowOccluded() || windowPollsPaused) return;
   window.__macStatsCpuMetricsArmed = true;
-  // Rings/keyboard just before first poll — not on open paint (#14).
+  // Rings just before first poll — not on open paint (#14).
   wireCpuWindowDomOnce();
-  // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
-  scheduleCpuWindowVersionOnce(2400000);
+  // Version/GitHub update waits for footer click (not first poll, #14).
   const afterFirst = () => {
     // Occluded after IPC: do not arm the slow interval (#14).
     if (windowOccluded() || windowPollsPaused) return;
@@ -3101,8 +3125,8 @@ function init() {
     lateOpenTimeoutId = setTimeout(lateOpenFallback, 2400000);
   }
 
-  // Already focused on open: arm metrics on idle ≤960s. Heavy sections still
-  // idle ≤7200s so open does not stack with first gauges (#14).
+  // Already focused on open: arm metrics on idle. Heavy sections wait for
+  // capture `?open=` or a click/Tab on section chrome (#14).
   // Keep scheduling here — Focused(true) can race past load (#14).
   if (!windowOccluded()) {
     scheduleCpuWindowMetricsOnce(960000);
@@ -6278,8 +6302,7 @@ function resumeVisibleWindowWork() {
       scheduleCpuWindowMetricsOnce(960000);
     }
     scheduleDeferredFocusRefresh();
-    // Version/update IPC idle ≤2400s — do not stack with focus refresh (#14).
-    scheduleCpuWindowVersionOnce(2400000);
+    // Version/GitHub IPC waits for footer click — not alt-tab resume (#14).
     // Secondary polls + sparkline unpark: idle ≤240s (not on the focus event) (#14).
     resumeIdleWindowPolls();
   } else {
@@ -25457,9 +25480,77 @@ function initMonitoringFeatures() {
   initCpuWindowCompactPreference();
 }
 
+function cpuWindowOpenSectionToken() {
+  try {
+    const raw = new URLSearchParams(window.location.search).get("open");
+    const t = String(raw || "").trim();
+    if (t && /^[A-Za-z0-9_-]+$/.test(t)) return t;
+  } catch (_) {
+    /* ignore */
+  }
+  return "";
+}
+
+function startMonitoringFeaturesNow() {
+  if (window.__macStatsMonitoringFeaturesStarted) return;
+  if (windowOccluded() || windowPollsPaused) {
+    window.__macStatsMonitoringFeaturesScheduled = false;
+    return;
+  }
+  window.__macStatsMonitoringFeaturesArmed = true;
+  window.__macStatsMonitoringFeaturesScheduled = true;
+  initMonitoringFeatures();
+  if (typeof window.__macStatsStartAgentOpsNow === "function") {
+    window.__macStatsStartAgentOpsNow();
+  }
+}
+
+function wireMonitoringFeaturesOnIntentOnce() {
+  if (window.__macStatsMonitoringIntentWired) return;
+  window.__macStatsMonitoringIntentWired = true;
+  const sel = [
+    "#icon-line",
+    ".icon-line",
+    "[id^='icon-']",
+    "#details-header",
+    "#processes-header",
+    "#details-section",
+    "#processes-section",
+    "#cpu-usage-card",
+    "#monitors-header",
+    ".monitors-section",
+    "#ollama-header",
+    ".ollama-section",
+    "#perplexity-header",
+    ".perplexity-section",
+    "#logs-header",
+    ".logs-section",
+    "#disk-cleanup-header",
+    ".disk-cleanup-section",
+    "#agent-ops-header",
+    ".agent-ops-section",
+    "#ops-health-row",
+    ".history-section",
+    "#history-section",
+    ".history-charts",
+  ].join(",");
+  const kick = (e) => {
+    if (window.__macStatsMonitoringFeaturesStarted) return;
+    const t = e.target;
+    if (!t || typeof t.closest !== "function") return;
+    if (!t.closest(sel)) return;
+    startMonitoringFeaturesNow();
+  };
+  document.addEventListener("pointerdown", kick, true);
+  document.addEventListener("keydown", kick, true);
+  document.addEventListener("focusin", kick, true);
+}
+
 /**
- * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤7200s after
- * focus/schedule so open does not stack with first gauge paint (#14).
+ * Heavy section wiring (monitors, chat, logs, Agent Ops, …).
+ * requestIdleCallback timeouts fire as soon as the thread is idle, so a
+ * deferred open-path schedule still stacked this work with first gauges (#14).
+ * Capture `?open=` hydrates now. Common collapsed path waits for section intent.
  */
 function scheduleMonitoringFeaturesOnce() {
   if (
@@ -25468,33 +25559,16 @@ function scheduleMonitoringFeaturesOnce() {
   ) {
     return;
   }
-  window.__macStatsMonitoringFeaturesScheduled = true;
-  // Agent Ops was arming on DOMContentLoaded; gate it with monitoring (#14).
-  if (typeof window.__macStatsScheduleAgentOpsInit === "function") {
-    window.__macStatsScheduleAgentOpsInit();
+  if (cpuWindowOpenSectionToken()) {
+    startMonitoringFeaturesNow();
+    return;
   }
-  const start = () => {
-    monitoringFeaturesIdleHandle = null;
-    monitoringFeaturesTimeoutId = null;
-    // Still occluded: drop flag so focus/resume can re-schedule (#14).
-    if (windowOccluded() || windowPollsPaused) {
-      window.__macStatsMonitoringFeaturesScheduled = false;
-      return;
-    }
-    window.__macStatsMonitoringFeaturesArmed = true;
-    initMonitoringFeatures();
-  };
-  if (typeof window.requestIdleCallback === "function") {
-    monitoringFeaturesIdleHandle = window.requestIdleCallback(start, {
-      timeout: 7200000,
-    });
-  } else {
-    monitoringFeaturesTimeoutId = setTimeout(start, 7200000);
-  }
+  wireMonitoringFeaturesOnIntentOnce();
 }
 
-// Do not arm monitoring on DOMContentLoaded — focus / late fallback schedules it (#14).
+// Do not arm monitoring on DOMContentLoaded — capture URL or section intent (#14).
 window.__macStatsScheduleMonitoringFeatures = scheduleMonitoringFeaturesOnce;
+window.__macStatsStartCpuWindowVersionOnce = startCpuWindowVersionOnce;
 
 // Battery/power is now updated directly in the refresh() function
 // No need for wrapper since refresh() already calls get_cpu_details

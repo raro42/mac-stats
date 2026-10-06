@@ -10898,16 +10898,22 @@ function escapeHtml(s) {
       window.__macStatsAgentOpsInitArmed = true;
       initAgentOps();
     };
-    if (typeof window.requestIdleCallback === 'function') {
-      agentOpsInitIdleHandle = window.requestIdleCallback(start, {
-        timeout: 7200000,
-      });
-    } else {
-      agentOpsInitTimeoutId = setTimeout(start, 7200000);
-    }
+    // Capture `?open=` / section intent calls start now. Do not use
+    // requestIdleCallback here — its timeout fires as soon as idle (#14).
+    start();
+  }
+
+  function startAgentOpsNow() {
+    if (window.__macStatsAgentOpsInitArmed) return;
+    cancelInitAgentOps();
+    if (agentOpsWorkPaused()) return;
+    window.__macStatsAgentOpsInitScheduled = true;
+    window.__macStatsAgentOpsInitArmed = true;
+    initAgentOps();
   }
 
   window.__macStatsScheduleAgentOpsInit = scheduleInitAgentOps;
+  window.__macStatsStartAgentOpsNow = startAgentOpsNow;
   window.__macStatsCancelAgentOpsInit = cancelInitAgentOps;
 
   window.addEventListener('beforeunload', () => stopAgentOpsAutoRefresh());
