@@ -1313,12 +1313,13 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 /* c / chip copy — green Copied wash + badge (Top Processes / Monitors parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-row.is-copied,
 .ops-row.is-selected.is-copied,
 .ops-row.is-selected.is-copied:hover {
-  border-color: color-mix(in srgb, #34c759 48%, transparent);
-  background: color-mix(in srgb, #34c759 14%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
+  border-color: color-mix(in srgb, #34c759 48%, #ffffff);
+  background: color-mix(in srgb, #34c759 14%, #ffffff);
+  box-shadow: none;
 }
 
 .ops-row.is-copied::after {
