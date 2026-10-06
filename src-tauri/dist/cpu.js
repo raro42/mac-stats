@@ -2873,10 +2873,12 @@ function init() {
     setTimeout(lateOpenFallback, 600000);
   }
 
-  // Already focused on open: arm metrics on idle ≤30s (was 5s). Monitoring
-  // waits for focus resume / late fallback so open does not stack section IPC (#14).
+  // Already focused on open: arm metrics on idle ≤30s (was 5s). Heavy
+  // sections still idle ≤300s so open does not stack with first gauges (#14).
+  // Keep scheduling here — Focused(true) can race past load (#14).
   if (!windowOccluded()) {
     scheduleCpuWindowMetricsOnce(30000);
+    scheduleMonitoringFeaturesOnce();
   }
 }
 

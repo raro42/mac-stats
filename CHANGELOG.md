@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1416] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Focused-open again schedules monitoring features (idle ≤300s). v0.1.1415 left that to Focused/resume or the 10m late fallback; when Focused(true) races past load, sections could stay unwired. Metrics stay idle ≤30s; version IPC stays after gauges.
+
+
 ## [0.1.1415] - 2026-10-06
 
 ### Changed

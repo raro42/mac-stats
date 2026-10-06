@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1416** (follow-up after v0.1.1415).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (focused-open monitoring schedule restore):
+
+- `src/cpu.js` — when the window is already focused on open, call `scheduleMonitoringFeaturesOnce()` again (idle ≤300s). v0.1.1415 left that to Focused/resume or the 10m late fallback; Focused(true) can race past load and leave sections unwired. Metrics stay idle ≤30s; version IPC stays after gauges.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Monitors / AI Chat / Disk Cleanup still wire after idle without needing an alt-tab. Alt-tab away and watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1415)
+
 Version **v0.1.1415** (follow-up after v0.1.1414).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1092,6 +1106,35 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 **debug.log**
 
 - Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-init / no parse-time UI-state IPC cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1415)
+
+**Date:** 2026-10-06 00:20 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1415)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 defer first metrics further + no focus process rebuild)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1415**
+- `src/cpu.js` — `scheduleCpuWindowMetricsOnce` helper; first metrics idle ≤**30000** on focus/open; late open fallback **600000**; `startCpuWindowVersionOnce` idle ≤**120000** after metrics arm; `scheduleMonitoringFeaturesOnce` idle ≤**300000**; `resumeVisibleWindowWork` does **not** set `_forceProcessUpdate` (comment: no full process-list rebuild on every focus/alt-tab)
+- `src/agent-ops.js` — Agent Ops init idle ≤**300000**
+- Prior 3600s poll floor / occlusion park / Focused pause-resume / no idle sparkline unpark kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-metrics / no-focus-process-rebuild cuts.
 
 **Why not CLOSED**
 
