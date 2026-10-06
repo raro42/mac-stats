@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1437** | Collapsed External / Monitors skips history Map + full list IPC on monitoring warm-up. Icon wash uses a light `list_monitors` + `get_monitor_status` walk (no per-host details). Expand hydrates list/history once. |
 | **v0.1.1436** | AI visibility from localStorage on open; `get_ai_agent_enabled` waits for Settings Product. Ollama no longer auto-configures on DOMContentLoaded; expand / AI-on resume arms `ensureInitialized`. |
 | **v0.1.1435** | Monitoring idle parks UI-state retry + pin hydrate while occluded. Compact uses localStorage on open; backend compact sync waits for Settings Product. Drops duplicate Ollama configure on monitoring idle. Agent Ops wait loops bail after alt-tab. |
 | **v0.1.1434** | Settings credential/decorations IPC waits until Settings opens. Process Details open + Settings Monitors list skip IPC/DOM while parked; resume rebuilds the Monitors list. Changelog version wiring drops the body MutationObserver. |
@@ -19,7 +20,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Opening Settings or Process Details then alt-tabbing used to still fan out credential IPC and mount a heavy modal when the read returned. Deferring open-path Settings work and parking Process Details / Monitors-list paint keeps WebKit quieter while you are away.
+Monitors stays collapsed for most open sessions. Skipping history + list rebuild (and host-detail IPC on the icon walk) cuts a fat fan-out that used to stack with every monitoring warm-up. Expand still gets the full list once.
 
 ## Still open
 
