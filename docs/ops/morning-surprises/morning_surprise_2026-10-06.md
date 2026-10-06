@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1465** | CPU, GPU, Freq, and Temp ring cards mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. |
 | **v0.1.1464** | Battery, power, Low Power Mode, and time-remaining status washes mix against an opaque fill. No glass alpha or ring shadow. |
 | **v0.1.1463** | Settings toggle knobs sit with left offset, not a translate. An on switch no longer keeps a Graphics and Media layer. |
 | **v0.1.1462** | Low Power Mode toggle sits on an opaque track. No glass alpha, inset highlight, or knob drop shadow. |

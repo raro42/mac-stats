@@ -2128,16 +2128,17 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Hot ring — static wash only (KISS). Infinite filter/box-shadow pulses kept WKWebView hot. */
+/* Opaque washes — glass alpha + ring shadows stay in Graphics and Media (#14). */
 .metric-card.is-hot {
-  background-color: color-mix(in srgb, #ff9500 7%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
+  background-color: color-mix(in srgb, #ff9500 7%, #ffffff);
+  box-shadow: none;
   border-radius: 12px;
 }
 
 /* CPU · GPU · FREQ · Temp rings — calm below hot (Temp Nominal / Details is-ok parity). */
 .metric-card.is-ok:not(.is-hot):not(.is-fair) {
-  background-color: color-mix(in srgb, #34c759 7%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
+  background-color: color-mix(in srgb, #34c759 7%, #ffffff);
+  box-shadow: none;
   border-radius: 12px;
 }
 
@@ -2149,8 +2150,8 @@ textarea.ops-agent-editor.is-dirty {
 
 /* Temp ring — Fair thermal (power-strip Heat parity); soft static wash, no pulse. */
 .metric-card.is-fair:not(.is-hot) {
-  background-color: color-mix(in srgb, #ff9500 7%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 18%, transparent);
+  background-color: color-mix(in srgb, #ff9500 7%, #ffffff);
+  box-shadow: none;
   border-radius: 12px;
 }
 
