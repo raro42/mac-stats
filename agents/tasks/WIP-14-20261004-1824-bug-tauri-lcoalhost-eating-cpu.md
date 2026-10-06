@@ -1691,3 +1691,32 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand History / Agent Ops glance, trigger a poll, alt-tab before IPC returns — history canvas / sparkline draw / pinned list / Agent Ops glance must not paint while away; backend must not refresh processes/SMC while unfocused; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1429)
+
+**Date:** 2026-10-06 02:05 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1429)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 shared-pause holdouts + Agent Ops batched abort)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1429**
+- `src/cpu.js` — `updateRingGauge` early-returns on `windowWorkPaused()`; history-availability poll (`startHistoryAvailabilityPoll` / interval) gated on shared pause (not `document.hidden` alone); monitors collapse/expand/ensure intervals and `updateMonitorsHeight` after `loadMonitors` skip when parked; mid-flight Disk Cleanup glance sync, Debug Log viewer catch, and monitors summary catch drop DOM when parked
+- `src/agent-ops.js` — Updated-ago timer uses `agentOpsWorkPaused`; auto `refreshAgentOps` runs IPC in three batches and aborts remaining invokes after park; manual Refresh still finishes the fan-out; mid-flight DOM skip kept
+- Prior focus-gate / history mid-flight park / structural occlusion cancel kept (`CPU_WINDOW_FOCUSED`, `cpu_window_active_for_metrics`, chart/history park)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 shared-pause holdouts / Agent Ops batch abort cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Monitors / Debug Log / Disk Cleanup / Agent Ops, trigger a poll, then alt-tab before IPC returns — history probe / Updated-ago / glance / error catch / monitors height must not paint; Agent Ops auto-refresh should stop further invokes after park; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.
