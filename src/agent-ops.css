@@ -2494,11 +2494,12 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Pin/unpin confirmation flash (see save-button-feedback) */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-pin.is-just-saved {
   opacity: 1 !important;
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
   color: color-mix(in srgb, #34c759 90%, currentColor) !important;
-  box-shadow: 0 0 0 2px color-mix(in srgb, #34c759 40%, transparent);
+  box-shadow: none;
 }
 
 .process-row.is-pinned {
