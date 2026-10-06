@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1462
+
+- Low Power Mode toggle uses an opaque track. No glass alpha, inset highlight, or knob drop shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1461
 
 - Section icon chips use opaque fills. No glass alpha, inset highlight, or hover drop shadow. Status washes mix against an opaque color. P2 reliability / GitHub #14.

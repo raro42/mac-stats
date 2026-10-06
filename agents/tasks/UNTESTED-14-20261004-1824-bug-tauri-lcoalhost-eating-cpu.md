@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1462** (follow-up after v0.1.1461).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (LPM toggle skip glass blend):
+
+- `src/cpu.js` — LPM track uses an opaque mix. No inset highlight. Knob has no drop shadow. On-state mixes against an opaque color.
+- Theme `cpu.css` — same track and knob. The battery strip does not keep a glass blend on that switch.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm LPM knob still sits left (off) and right (on). Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1461)
+
 Version **v0.1.1461** (follow-up after v0.1.1460).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -2956,4 +2971,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm LPM knob still sits left (off) and right (on); gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1461)
+
+**Date:** 2026-10-06 06:00 UTC (08:00 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1461**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1461)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 section icon chips skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1461**
+- `CHANGELOG.md` **[0.1.1461]** documents section icon chips on opaque fills; no glass alpha, inset highlight, or hover drop shadow; status washes mix against an opaque color
+- Theme `cpu.css` (all 9 themes): `.icon-line-item` comment `Opaque chips`; opaque hex fills (`#ffffff` / dark equivalents); `box-shadow: none`; hover is color/background/border only (no drop-shadow)
+- Status washes (`.status-good` / `.status-warning` / `.status-bad`) use `color-mix(..., opaque hex)` and `box-shadow: none`
+- Theme `cpu.html`: section chips remain `class="icon-line-item"` (`#icon-monitors`, `#icon-ollama`, …)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque section-icon cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm section icons still open panes; Ready / Slow / Down washes still show; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 

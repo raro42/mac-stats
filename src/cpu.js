@@ -3512,9 +3512,11 @@ function ensureRamStripStyles() {
       width: 34px;
       height: 18px;
       border-radius: 999px;
-      background: color-mix(in srgb, var(--muted, #888) 35%, transparent);
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted, #888) 25%, transparent);
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      /* Opaque track — alpha mix + inset shadow stay in Graphics and Media (#14). */
+      background: color-mix(in srgb, var(--muted, #888) 22%, #ececf1);
+      border: 1px solid color-mix(in srgb, var(--muted, #888) 28%, #ececf1);
+      box-shadow: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .lpm-toggle::after {
       content: "";
@@ -3525,12 +3527,13 @@ function ensureRamStripStyles() {
       height: 14px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+      box-shadow: none;
       /* No transform tween — a transform layer stays in Graphics and Media (#14). */
     }
     .lpm-info.is-on .lpm-toggle {
-      background: color-mix(in srgb, #30d158 85%, #fff);
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, #248a3d 40%, transparent);
+      background: color-mix(in srgb, #30d158 85%, #ffffff);
+      border-color: color-mix(in srgb, #248a3d 40%, #ffffff);
+      box-shadow: none;
     }
     .lpm-info.is-on .lpm-toggle::after {
       left: 18px;
