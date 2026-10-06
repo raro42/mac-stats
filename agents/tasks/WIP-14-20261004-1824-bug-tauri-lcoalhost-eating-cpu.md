@@ -4761,3 +4761,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Credentials; confirm Redmine glance still shows not-set / partial wash when Redmine is missing or only partly set; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1510)
+
+**Date:** 2026-10-06 11:16 UTC (13:16 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1510**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1510)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings Mastodon not-set/partial attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1510**
+- `CHANGELOG.md` **[0.1.1510]** documents the Settings Mastodon not-set/partial glance mixing the not-set and partial washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.settings-mastodon-attention-glance` (base, hover, `:focus-visible`, `.is-not-set`, `.is-partial`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. `applySettingsMastodonAttentionGlanceState` still copies `.is-not-set` / `.is-partial` onto `#settings-mastodon-attention-glance` when Settings is open and Mastodon is missing or only partly set. Hidden otherwise. Copy: "Mastodon · Not set · add URL + access token" / "Mastodon · Partial · missing access token" / "Mastodon · Partial · missing instance URL"
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings → Credentials path when Mastodon is not fully configured. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings Mastodon not-set/partial attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Credentials; confirm Mastodon glance still shows not-set / partial wash when Mastodon is missing or only partly set; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
