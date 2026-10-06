@@ -4079,3 +4079,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Fail/Slow glance still shows fail / slow wash when a failed or slow run is listed; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+
+## Test report (v0.1.1491)
+
+**Date:** 2026-10-06 09:15 UTC (11:15 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1491**; v0.1.1489 Filter and v0.1.1490 Digest glance cuts were not given a separate tester pass in this file)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1491)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops Discord Offline/Reconnect attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1491**
+- `CHANGELOG.md` **[0.1.1491]** documents the Agent Ops Discord Offline/Reconnect glance mixing offline and reconnect washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-discord-attention-glance` (base, hover, `:focus-visible`, `.has-offline`, `.has-warn`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/agent-ops.js` `applyOpsDiscordAttentionGlanceState` still copies those mode classes onto `#ops-discord-attention-glance` when Agent Ops is expanded and Discord gateway wash is offline or warn/reconnect (hidden when collapsed or when wash is neither)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + offline/reconnect path. Neighbor Agent Ops glances (Redmine and later) still use glass `transparent` + hover shadow. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops Discord Offline/Reconnect attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Discord Offline/Reconnect glance still shows offline / reconnect wash when Discord is offline or reconnecting; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
