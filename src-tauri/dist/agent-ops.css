@@ -3497,9 +3497,10 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff9f0a 78%, currentColor);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-line[role='option'].is-just-copied {
-  background: color-mix(in srgb, #34c759 18%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #34c759 32%, transparent);
+  background: color-mix(in srgb, #34c759 18%, #ffffff);
+  box-shadow: none;
 }
 
 .logs-line[role='option'].is-just-copied::after {

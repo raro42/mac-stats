@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1579** (follow-up after v0.1.1578).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Debug Log line Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.logs-line[role='option'].is-just-copied` mixes the green wash against opaque `#ffffff`. No glass outline shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Debug Log. Click a log line to copy (or select a line and press `c`). Confirm the Copied flash still shows green on the line, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1578)
+
 Version **v0.1.1578** (follow-up after v0.1.1577).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
