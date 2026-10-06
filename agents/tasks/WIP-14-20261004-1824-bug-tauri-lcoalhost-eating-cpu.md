@@ -2802,3 +2802,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm history canvases stay hidden / unbound until hover or Refresh; gauges still update; hover history or press Refresh — sparklines draw; expand Debug Log / Disk cleanup / AI Chat / Agent Ops — still works; capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1457)
+
+**Date:** 2026-10-06 05:30 UTC (07:30 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1457**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1457)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 header Refresh / Settings skip transform layers)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1457**
+- `CHANGELOG.md` **[0.1.1457]** documents header Refresh and Settings no longer keeping a transform layer; divider sits with size and offset; hover and press do not lift or scale those buttons
+- Theme `cpu.css` (apple and others): `.icon-btn` has no transform tween; `.icon-btn:not(:last-child)::after` uses `top: calc(50% - 10px)` not `translateY(-50%)`; hover is wash/color only; `:active` is `transform: none` where set
+- Theme `cpu.html` (apple): `#refresh-btn` and `#settings-btn` remain `class="icon-btn"`
+- Ring `.ring` still centers with size/margin (`top: calc(58% - var(--ring-size) / 2)`), `transform: none` (v0.1.1456 cut still present)
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 header transform cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Refresh and Settings still work; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
