@@ -3215,3 +3215,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Details glance still shows Load · RAM · Up with calm or hot wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+
+## Test report (v0.1.1468)
+
+**Date:** 2026-10-06 06:48 UTC (08:48 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1468**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1468)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Top Processes keep-header glances skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1468**
+- `CHANGELOG.md` **[0.1.1468]** documents Top Processes keep-header glances (CPU · GPU · RAM) mixing calm and hot washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css`: `.processes-top-glance`, `.processes-top-gpu-glance`, `.processes-top-ram-glance` (base, hover, `:focus-visible`, `.is-hot`, `.is-ok`) mix against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/cpu.js` still creates/paints CPU · GPU · RAM keep-header glances with `.is-hot` / `.is-ok` when Top Processes is collapsed
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Top Processes glances still show CPU · GPU · RAM with calm or hot wash; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
