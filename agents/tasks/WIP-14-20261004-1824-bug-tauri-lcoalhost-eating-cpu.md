@@ -4524,3 +4524,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Signal glance still shows not-wired / not-set / partial / warn / bad wash when Signal is not wired, not set, partial, unavailable, or degraded; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1504)
+
+**Date:** 2026-10-06 10:36 UTC (12:36 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1504**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1504)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Perplexity Key-not-set attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1504**
+- `CHANGELOG.md` **[0.1.1504]** documents the Perplexity Key-not-set glance mixing the not-set wash against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.perplexity-key-attention-glance` (base, hover, `:focus-visible`, `.is-not-set`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` in that glance block
+- `src/cpu.js` `applyPerplexityKeyAttentionGlanceState` still copies `.is-not-set` onto `#perplexity-key-attention-glance` when Perplexity Search is expanded and no API key is configured. Hidden when collapsed or when a key is set
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the expanded-pane + key-missing path. Settings Perplexity key glance (`.settings-perplexity-key-attention-glance`) still uses glass `transparent`. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Perplexity Key-not-set attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity Search; confirm Key-not-set glance still shows not-set wash when the Perplexity key is missing; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
