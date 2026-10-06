@@ -493,11 +493,18 @@
       historyPollInterval = null;
     }
     parkHistoryCanvases();
+    // Data-poster metric cards share this park gate (#14).
+    if (window.posterCharts && typeof window.posterCharts.park === 'function') {
+      window.posterCharts.park();
+    }
   }
 
   function resumeHistoryPoll() {
     if (historyWorkPaused() || historyPollInterval) return;
     unparkHistoryCanvases();
+    if (window.posterCharts && typeof window.posterCharts.unpark === 'function') {
+      window.posterCharts.unpark();
+    }
     updateChartsFromBackend();
     historyPollInterval = setInterval(() => {
       if (historyWorkPaused() || canvasesParked) return;

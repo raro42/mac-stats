@@ -6,6 +6,8 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1449** | Data-poster metric cards stay parked on open. Bar and line charts do not allocate buffers or draw on first paint. The same idle unpark as the history charts draws them later. Canvas markup starts at 1×1. |
+| **v0.1.1448** | Collapsed Agent Ops skips filter, overview, and keyboard wiring on monitoring idle. Expand still hydrates once. |
 | **v0.1.1447** | Capture `MAC_STATS_OPEN_SECTION` / `openUiSection` is baked into `cpu.html?open=` when the window is created. Agent Ops no longer calls `take_open_ui_section` after load. |
 | **v0.1.1446** | Section collapse skips `get_cpu_window_ui_state` on monitoring warm-up. Agent Ops capture is one invoke (no retry loop). Collapsed Disk Cleanup skips glance IPC on resume. |
 | **v0.1.1445** | Data-poster history charts stay parked on open. First paint does not allocate canvas buffers or fetch history. The same idle unpark as the other themes draws them later. |
@@ -30,9 +32,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Most opens keep Agent Ops collapsed. Capture used to call `take_open_ui_section` after load anyway (config.json read from the WebView). The window URL now carries `?open=` only when a capture is requested. That drops one more IPC on the common path.
+Data-poster metric cards no longer draw bar and line charts on the first paint. Those charts wait for the same idle unpark as the history charts. Open does not allocate full canvas bitmaps for them.
 
 ## Still open
 
+- ~21:10 tick: data-poster metric-card charts stay parked on open (**v0.1.1449**). Rebased past parallel #14 ships v0.1.1446–1448.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

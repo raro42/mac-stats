@@ -81,27 +81,73 @@
     }
   };
 
-  // Initialize canvas contexts
+  // Contexts stay empty until idle unpark. Open must not allocate GPU (#14).
   const contexts = {};
-  Object.keys(canvases).forEach(metric => {
-    if (canvases[metric].bar && canvases[metric].line) {
-      contexts[metric] = {
-        bar: canvases[metric].bar.getContext('2d'),
-        line: canvases[metric].line.getContext('2d')
-      };
-      // Set canvas size for high DPI displays
-      const dpr = window.devicePixelRatio || 1;
-      [canvases[metric].bar, canvases[metric].line].forEach(canvas => {
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        const ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
+  let canvasesParked = true;
+
+  function posterWorkPaused() {
+    try {
+      if (typeof window.__macStatsWindowWorkPaused === 'function') {
+        return !!window.__macStatsWindowWorkPaused();
+      }
+    } catch (_) { /* ignore */ }
+    return false;
+  }
+
+  function parkPosterCanvases() {
+    canvasesParked = true;
+    Object.keys(canvases).forEach((metric) => {
+      ['bar', 'line'].forEach((kind) => {
+        const canvas = canvases[metric] && canvases[metric][kind];
+        if (!canvas) return;
+        try {
+          canvas.width = 1;
+          canvas.height = 1;
+        } catch (_) { /* ignore */ }
+        try {
+          canvas.style.visibility = 'hidden';
+          canvas.style.contentVisibility = 'hidden';
+          canvas.style.display = 'none';
+        } catch (_) { /* ignore */ }
       });
-    }
-  });
+      delete contexts[metric];
+    });
+  }
+
+  function sizePosterCanvas(canvas, fallbackW, fallbackH) {
+    if (!canvas) return null;
+    try {
+      canvas.style.visibility = '';
+      canvas.style.contentVisibility = '';
+      canvas.style.display = '';
+    } catch (_) { /* ignore */ }
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width > 0 ? rect.width : fallbackW;
+    const height = rect.height > 0 ? rect.height : fallbackH;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    return ctx;
+  }
+
+  function unparkPosterCanvases() {
+    if (posterWorkPaused()) return;
+    canvasesParked = false;
+    Object.keys(canvases).forEach((metric) => {
+      const pair = canvases[metric];
+      if (!pair || !pair.bar || !pair.line) return;
+      const bar = sizePosterCanvas(pair.bar, 80, 60);
+      const line = sizePosterCanvas(pair.line, 200, 40);
+      if (!bar || !line) return;
+      contexts[metric] = { bar, line };
+      drawBarChart(metric);
+      drawLineChart(metric);
+    });
+  }
 
   // Moving average for display (reduces chart noise; raw values still used for scale)
   function movingAverage(arr, windowSize) {
@@ -137,6 +183,7 @@
 
   // Draw bar chart
   function drawBarChart(metric) {
+    if (canvasesParked || !contexts[metric]) return;
     const canvas = canvases[metric].bar;
     const ctx = contexts[metric].bar;
     if (!canvas || !ctx) return;
@@ -165,6 +212,7 @@
 
   // Draw line chart
   function drawLineChart(metric) {
+    if (canvasesParked || !contexts[metric]) return;
     const canvas = canvases[metric].line;
     const ctx = contexts[metric].line;
     if (!canvas || !ctx) return;
@@ -213,6 +261,7 @@
   // Update charts for a metric
   function updateCharts(metric, value) {
     addValue(metric, value);
+    if (canvasesParked) return;
     drawBarChart(metric);
     drawLineChart(metric);
   }
@@ -260,28 +309,21 @@
         dataBuffers[metric].bars = bars;
         const peak = Math.max(...values, 1);
         dataBuffers[metric].max = peak * 1.1;
-        drawBarChart(metric);
-        drawLineChart(metric);
+        if (!canvasesParked) {
+          drawBarChart(metric);
+          drawLineChart(metric);
+        }
       }
       return true;
     },
-    
-    // Initialize charts (call on page load)
+    park: parkPosterCanvases,
+    unpark: unparkPosterCanvases,
+    // Stay parked on open. history.js idle unpark draws later (#14).
     init: () => {
-      // Draw initial empty charts
-      Object.keys(canvases).forEach(metric => {
-        drawBarChart(metric);
-        drawLineChart(metric);
-      });
+      parkPosterCanvases();
     }
   };
 
-  // Initialize on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.posterCharts.init();
-    });
-  } else {
-    window.posterCharts.init();
-  }
+  // Shrink bitmaps before first paint. Do not getContext here (#14).
+  parkPosterCanvases();
 })();

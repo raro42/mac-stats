@@ -20,6 +20,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1449
+
+- Data-poster metric-card bar and line charts stay parked on open. First paint does not allocate canvas buffers or draw. The same idle unpark as the history charts draws them later. Canvas markup starts at 1×1. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1448
+
+- CPU window: collapsed Agent Ops skips filter, overview, and keyboard wiring on monitoring idle. Expand still hydrates once. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1447
 
 - CPU window: bake capture `?open=` at create; skip `take_open_ui_section` WebView IPC. P2 reliability / GitHub #14.
