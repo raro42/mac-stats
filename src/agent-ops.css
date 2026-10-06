@@ -9135,12 +9135,14 @@ button.monitor-detail-url.is-just-saved {
 }
 
 /* Shared Save-button confirmation (see .cursor/rules/save-button-feedback.mdc) */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 button.is-just-saved,
 .popover-btn-secondary.is-just-saved {
-  background: color-mix(in srgb, #34c759 18%, transparent) !important;
-  border-color: color-mix(in srgb, #34c759 40%, transparent) !important;
+  background: color-mix(in srgb, #34c759 18%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #ffffff) !important;
   color: inherit;
   transition: background 0.2s ease, border-color 0.2s ease;
+  box-shadow: none;
 }
 
 /* AI Chat Send uses solid accent fill — keep readable white text on green flash */
