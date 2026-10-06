@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1577`; CHANGELOG entry; standing_backlog note
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
+- [x] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
 
 ## Review
-Opaque wash on Disk Cleanup row Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied`). Reclaim inset mixes against `#ffffff`. Same pattern as monitor-item / process-row. `cargo check` green. Issue #14 left open for tester / 004.
+Opaque wash on Disk Cleanup row Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied`). Reclaim inset mixes against `#ffffff`. Same pattern as monitor-item / process-row. `cargo check` green. Pushed `98818a29`. Issue #14 left open for tester / 004.
