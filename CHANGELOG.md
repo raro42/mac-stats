@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1430] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — AI Chat / Ollama connection checks, auto-configure, and model-list loads skip IPC and DOM when the shell is parked (shared gate). Collapsed/model/turn/answer/errors glances and module init defer while parked; focus resume rechecks connection. Icon status, delayed re-checks, Perplexity key-status refresh, and monitor history Map rebuilds drop mid-flight after alt-tab. Aim: quieter `tauri://localhost` / Graphics and Media when Ollama or Perplexity warm-up finishes while away.
+
 ## [0.1.1429] - 2026-10-06
 
 ### Changed

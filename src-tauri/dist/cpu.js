@@ -6080,6 +6080,10 @@ function applyDeferredResumeIdleWindowPolls() {
   if (typeof window.__macStatsResumeAgentOpsPolls === "function") {
     window.__macStatsResumeAgentOpsPolls();
   }
+  // Ollama: recheck connection after park (module init / expand may have skipped) (#14).
+  if (window.Ollama && typeof window.Ollama.checkConnection === "function") {
+    void checkOllamaConnection();
+  }
   // Monitors: restart light summary poll (full list only when expanded).
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
@@ -7433,7 +7437,10 @@ const monitorHistory = new Map();
 /** Replace in-memory history from backend (`monitor_history.json` — works with window closed). */
 async function refreshMonitorHistoryFromBackend() {
   try {
+    if (windowWorkPaused()) return;
     const all = await invoke('get_all_monitor_check_histories');
+    // Alt-tab during history IPC: keep the prior Map (callers re-check) (#14).
+    if (windowWorkPaused()) return;
     monitorHistory.clear();
     if (all && typeof all === 'object') {
       for (const [monitorId, entries] of Object.entries(all)) {
@@ -11163,6 +11170,8 @@ function updateMonitorsIconStatus({ anyDown = false, allUp = false, upCount = 0,
 }
 
 function updateOllamaIconStatus(status) {
+  // Alt-tab during connection check: do not toggle icon classes (#14).
+  if (windowWorkPaused()) return;
   const ollamaIcon = document.getElementById('icon-ollama');
   if (!ollamaIcon) {
     console.warn('[CPU] Ollama icon not found when updating status');
@@ -11597,12 +11606,14 @@ function initOllamaSection() {
     } else {
       if (chat) chat.style.display = 'block';
       checkOllamaConnection().then((connected) => {
+        if (windowWorkPaused()) return;
         // Update icon based on connection result
         if (connected) {
           updateOllamaIconStatus('connected');
         } else {
           // Double-check the connection indicator after section is expanded
           setTimeout(() => {
+            if (windowWorkPaused()) return;
             const indicator = document.getElementById('ollama-connection-indicator');
             if (indicator) {
               const isConnected = indicator.classList.contains('connected');
@@ -11613,6 +11624,7 @@ function initOllamaSection() {
           }, 200);
         }
       }).catch((err) => {
+        if (windowWorkPaused()) return;
         // Connection check failed - Ollama not available
         console.error('[CPU] Ollama connection check failed:', err);
         updateOllamaIconStatus('error');
@@ -11679,8 +11691,10 @@ function initOllamaSection() {
   // Check connection on load
   if (window.Ollama) {
     checkOllamaConnection().then(() => {
+      if (windowWorkPaused()) return;
       // Double-check the connection indicator after initial load
       setTimeout(() => {
+        if (windowWorkPaused()) return;
         const indicator = document.getElementById('ollama-connection-indicator');
         if (indicator && indicator.classList.contains('connected')) {
           updateOllamaIconStatus(true);
@@ -12334,6 +12348,8 @@ async function loadAvailableModels() {
   const modelSelect = document.getElementById('ollama-model-select');
   const modelText = document.getElementById('ollama-model-text');
   if (!modelSelect) return;
+  // Already parked: skip model-list IPC (#14).
+  if (windowWorkPaused()) return;
 
   console.log('[Ollama] Loading available models...');
   
@@ -12345,6 +12361,9 @@ async function loadAvailableModels() {
     } else {
       models = await invoke('list_ollama_models');
     }
+
+    // Alt-tab during /api/tags: do not rebuild the select (#14).
+    if (windowWorkPaused()) return;
     
     console.log(`[Ollama] Loaded ${models.length} models:`, models);
     
@@ -12380,11 +12399,12 @@ async function loadAvailableModels() {
     }
 
     // Update Ollama config with selected model
-    if (selectedModel) {
+    if (selectedModel && !windowWorkPaused()) {
       await updateOllamaModel(selectedModel);
     }
   } catch (err) {
     console.error('[Ollama] Failed to load models:', err);
+    if (windowWorkPaused()) return;
     modelSelect.innerHTML = '<option value="">Error loading models</option>';
     if (modelText) modelText.style.display = 'none';
   }
@@ -12410,24 +12430,32 @@ async function updateOllamaModel(model) {
 async function autoConfigureOllama() {
   if (window.Ollama) {
     try {
+      // Already parked: do not start configure IPC (warm-up can race blur) (#14).
+      if (windowWorkPaused()) return;
       // Delegate entirely to ollama.js — it validates the model against /api/tags.
       // Do not pass cpu.js's sync getDefaultModel() (stale localStorage like qwen2.5:1.5b).
       await window.Ollama.autoConfigure();
+      if (windowWorkPaused()) return;
       setTimeout(async () => {
+        if (windowWorkPaused()) return;
         try {
           const connected = await checkOllamaConnection();
+          if (windowWorkPaused()) return;
           if (connected) {
             await loadAvailableModels();
+            if (windowWorkPaused()) return;
             updateOllamaIconStatus('connected');
           } else {
             updateOllamaIconStatus('unknown');
           }
         } catch (checkErr) {
+          if (windowWorkPaused()) return;
           console.error('[Ollama] Connection check failed:', checkErr);
           updateOllamaIconStatus('error');
         }
       }, 500);
     } catch (err) {
+      if (windowWorkPaused()) return;
       console.error('[Ollama] Failed to auto-configure:', err);
       updateOllamaIconStatus('error');
     }
@@ -12442,9 +12470,12 @@ async function showOllamaUrlDialog() {
 }
 
 async function checkOllamaConnection() {
+  if (windowWorkPaused()) return false;
   if (window.Ollama) {
     try {
       const connected = await window.Ollama.checkConnection();
+      // Alt-tab during check: skip icon / model-list DOM (#14).
+      if (windowWorkPaused()) return !!connected;
       // Update UI elements specific to CPU window
       const connectionIndicator = document.getElementById('ollama-connection-indicator');
       const modelText = document.getElementById('ollama-model-text');
@@ -12464,6 +12495,7 @@ async function checkOllamaConnection() {
       
       // Double-check after a brief delay to catch any late updates
       setTimeout(() => {
+        if (windowWorkPaused()) return;
         const indicator = document.getElementById('ollama-connection-indicator');
         if (indicator) {
           const isConnected = indicator.classList.contains('connected');
@@ -12474,12 +12506,13 @@ async function checkOllamaConnection() {
       if (connected && connectionIndicator) {
         // Load models when connected
         await loadAvailableModels();
-      } else if (modelText) {
+      } else if (modelText && !windowWorkPaused()) {
         modelText.style.display = 'none';
         hideModelDropdown();
       }
       return connected;
     } catch (error) {
+      if (windowWorkPaused()) return false;
       // Error means Ollama is not installed/not running - set yellow
       console.error('[CPU] Error checking Ollama connection:', error);
       updateOllamaIconStatus('error');
@@ -12487,7 +12520,7 @@ async function checkOllamaConnection() {
     }
   }
   console.warn('[CPU] Ollama module not available');
-  updateOllamaIconStatus('error');
+  if (!windowWorkPaused()) updateOllamaIconStatus('error');
   return false;
 }
 
@@ -17923,6 +17956,8 @@ function updatePerplexitySetupVisibility() {
 }
 
 async function refreshPerplexityStatus() {
+  // Parked: skip key-status IPC + glance/setup paint (#14).
+  if (windowWorkPaused()) return;
   const invoke = getInvoke();
   if (!invoke) {
     applyPerplexityLastGlanceState();
@@ -17930,6 +17965,10 @@ async function refreshPerplexityStatus() {
   }
   try {
     const configured = await invoke('is_perplexity_configured');
+    if (windowWorkPaused()) {
+      perplexityConfigured = !!configured;
+      return;
+    }
     perplexityConfigured = !!configured;
     // Header: never shout "No API key" on a fresh install — hide until section is open + key exists.
     const headerStatus = document.getElementById('perplexity-config-status');
@@ -17947,6 +17986,7 @@ async function refreshPerplexityStatus() {
       'perplexity-settings-status'
     );
   } catch (_) {
+    if (windowWorkPaused()) return;
     perplexityConfigured = false;
     const headerStatus = document.getElementById('perplexity-config-status');
     if (headerStatus) {
@@ -17955,6 +17995,7 @@ async function refreshPerplexityStatus() {
     }
     updatePerplexityConfigStatus('Unknown', 'perplexity-settings-status');
   }
+  if (windowWorkPaused()) return;
   updatePerplexitySetupVisibility();
   applyPerplexityLastGlanceState();
   if (

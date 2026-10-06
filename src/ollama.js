@@ -20,6 +20,18 @@ function getInvoke() {
 
 const invoke = (...args) => getInvoke()(...args);
 
+/** Shared CPU-window park gate (alt-tab / occlusion): skip IPC+DOM wake (#14). */
+function ollamaWorkPaused() {
+  try {
+    if (typeof window.__macStatsWindowWorkPaused === 'function') {
+      return !!window.__macStatsWindowWorkPaused();
+    }
+  } catch (_) {
+    /* ignore */
+  }
+  return typeof document !== 'undefined' && !!document.hidden;
+}
+
 /** Get Tauri event listen if available (for streaming chat chunks). */
 function getListen() {
   if (typeof window.__TAURI__ !== 'undefined' && window.__TAURI__.event?.listen) {
@@ -197,6 +209,11 @@ async function checkOllamaConnection() {
   
   if (!statusEl && !connectionIndicator) return;
 
+  // Already parked: do not start Ollama IPC (warm-up / expand can race blur) (#14).
+  if (ollamaWorkPaused()) {
+    return chatModelGlanceState.status === 'connected';
+  }
+
   try {
     // First check if Ollama is configured by trying to check connection
     let connected = false;
@@ -213,6 +230,11 @@ async function checkOllamaConnection() {
       connectionFailed = true; // This is a real error, not just "not configured"
       console.log('[Ollama] Connection check failed with error:', err);
     }
+
+    // Alt-tab during slow /api/tags: keep last glance, do not paint (#14).
+    if (ollamaWorkPaused()) {
+      return connected;
+    }
     
     // If not connected and no error, it might be because Ollama isn't configured yet
     // Try to auto-configure and then check again
@@ -220,12 +242,21 @@ async function checkOllamaConnection() {
       console.log('[Ollama] Connection check returned false, attempting auto-configuration...');
       try {
         const configured = await autoConfigureOllama();
+        if (ollamaWorkPaused()) {
+          return connected;
+        }
         if (configured) {
           // Wait a bit for configuration to take effect
           await new Promise(resolve => setTimeout(resolve, 200));
+          if (ollamaWorkPaused()) {
+            return connected;
+          }
           // Check connection again after auto-configuration
           try {
             connected = await invoke('check_ollama_connection');
+            if (ollamaWorkPaused()) {
+              return connected;
+            }
             if (!connected) {
               // Configuration succeeded but connection still fails - Ollama not running
               connectionFailed = true;
@@ -244,6 +275,10 @@ async function checkOllamaConnection() {
         connectionFailed = true; // Auto-config failed - Ollama not available
         console.error('[Ollama] Auto-configuration failed:', configErr);
       }
+    }
+
+    if (ollamaWorkPaused()) {
+      return connected;
     }
     
     // Update status element (dashboard.js style)
@@ -288,6 +323,9 @@ async function checkOllamaConnection() {
     }
 
     const circuitOpen = await readOllamaCircuitOpen();
+    if (ollamaWorkPaused()) {
+      return connected;
+    }
     // Circuit open blocks chat even when /api/tags still answers — prefer circuit cue.
     if (circuitOpen) {
       if (typeof window.updateOllamaIconStatus === 'function') {
@@ -319,6 +357,10 @@ async function checkOllamaConnection() {
     return connected;
   } catch (err) {
     console.error('[Ollama] Failed to check connection:', err);
+
+    if (ollamaWorkPaused()) {
+      return false;
+    }
     
     // Set error state on icon if available (for CPU window) - yellow
     if (typeof window.updateOllamaIconStatus === 'function') {
@@ -334,6 +376,9 @@ async function checkOllamaConnection() {
       connectionIndicator.title = 'Error: Ollama not available - Check if Ollama is running';
     }
     const circuitOpen = await readOllamaCircuitOpen();
+    if (ollamaWorkPaused()) {
+      return false;
+    }
     chatModelGlanceState = {
       status: 'error',
       model: String(localStorage.getItem('ollama_model') || '').trim(),
@@ -967,6 +1012,8 @@ function ensureOllamaCollapsedGlance() {
 }
 
 function syncOllamaCollapsedGlance() {
+  // Parked shell: do not rebuild collapsed AI Chat glance (#14).
+  if (ollamaWorkPaused()) return;
   const glance = ensureOllamaCollapsedGlance();
   if (!glance) return;
   const glanceText = document.getElementById('ollama-collapsed-glance-text');
@@ -1235,6 +1282,8 @@ function ensureChatModelGlance() {
 }
 
 function applyChatModelGlanceState() {
+  // Parked shell: do not rebuild model / collapsed glances (#14).
+  if (ollamaWorkPaused()) return;
   if (isOllamaSectionCollapsed()) {
     syncOllamaCollapsedGlance();
     return;
@@ -1391,6 +1440,7 @@ function ensureChatTurnGlance() {
 }
 
 function applyChatTurnGlanceState() {
+  if (ollamaWorkPaused()) return;
   if (isOllamaSectionCollapsed()) {
     syncOllamaCollapsedGlance();
     return;
@@ -1873,6 +1923,7 @@ function ensureChatAnswerGlance() {
 }
 
 function applyChatAnswerGlanceState() {
+  if (ollamaWorkPaused()) return;
   if (isOllamaSectionCollapsed()) {
     syncOllamaCollapsedGlance();
     return;
@@ -1975,6 +2026,7 @@ function ensureChatErrorsGlance() {
 }
 
 function applyChatErrorsGlanceState() {
+  if (ollamaWorkPaused()) return;
   if (isOllamaSectionCollapsed()) {
     const glance = document.getElementById('chat-errors-glance');
     if (glance) glance.hidden = true;
@@ -2057,6 +2109,7 @@ function ensureChatOfflineAttentionGlance() {
  * a non-All filter is active (Filter · …), or a reply is in flight (Sending · wait).
  */
 function applyChatOfflineAttentionGlanceState() {
+  if (ollamaWorkPaused()) return;
   if (isOllamaSectionCollapsed()) {
     const glance = document.getElementById('chat-offline-attention-glance');
     if (glance) glance.hidden = true;
@@ -3884,6 +3937,11 @@ function initOllamaChatListeners() {
 // ============================================================================
 // Auto-configure Ollama when the module loads (if DOM is ready)
 async function initializeOllama() {
+  // Alt-tab during module warm-up: skip IPC + glance paint; resume rechecks (#14).
+  if (ollamaWorkPaused()) {
+    console.log('[Ollama] Module load parked; defer configure until resume');
+    return;
+  }
   // Auto-configure after a short delay to ensure everything is ready
   console.log('[Ollama] Module loaded, auto-configuring...');
   ensureOllamaCollapsedGlance();
@@ -3894,8 +3952,10 @@ async function initializeOllama() {
   try {
     // Always auto-configure the backend, regardless of DOM elements
     await autoConfigureOllama();
+    if (ollamaWorkPaused()) return;
     // Check connection after auto-configuration (this will update UI if elements exist)
     setTimeout(() => {
+      if (ollamaWorkPaused()) return;
       checkOllamaConnection();
     }, 200);
   } catch (err) {

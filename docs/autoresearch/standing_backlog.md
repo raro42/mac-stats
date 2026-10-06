@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1430
+
+- CPU window: AI Chat / Ollama connection + model-list and Perplexity key-status skip IPC/DOM while parked; monitor history Map rebuild drops mid-flight. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1427
 
 - CPU window: mid-flight Discord / monitors / history / Process Details / Agent Ops skip IPC+DOM while parked (`__macStatsWindowWorkPaused`). Blur clears Process Details live refresh; focus re-arms if modal open. P2 reliability / GitHub #14.

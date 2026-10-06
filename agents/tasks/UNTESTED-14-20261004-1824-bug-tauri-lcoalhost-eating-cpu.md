@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1430** (follow-up after v0.1.1429).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (Ollama / Perplexity / monitor-history park while occluded):
+
+- `src/ollama.js` — shared `ollamaWorkPaused` gate. `checkOllamaConnection` skips start and mid-flight DOM/icon/glance paint when parked. Collapsed + model/turn/answer/errors/offline glances no-op while parked. Module init defers configure + connection check when parked.
+- `src/cpu.js` — `updateOllamaIconStatus`, `loadAvailableModels`, `autoConfigureOllama`, expand/load connection timeouts, and `checkOllamaConnection` wrapper respect `windowWorkPaused`. Resume idle polls recheck Ollama after park. Mid-flight Perplexity key-status and monitor history Map rebuild drop when parked.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Expand AI Chat / Perplexity (or trigger Ollama warm-up), then alt-tab before IPC returns — Ollama icon / model list / glances / Perplexity status / monitor history must not paint while away. Alt-tab back — connection recheck and sections eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1429)
+
 Version **v0.1.1429** (follow-up after v0.1.1428).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
