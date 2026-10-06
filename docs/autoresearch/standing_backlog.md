@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1495
+
+- Agent Ops Browser (CDP) Not set/Unavailable/Degraded attention glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1494
 
 - Agent Ops Brave Search Not set/Unavailable/Degraded attention glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.

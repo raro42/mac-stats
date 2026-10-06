@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1495** | The Agent Ops Browser glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1494** | The Agent Ops Brave Search Not set/Unavailable/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1493** | The Agent Ops Ollama Not set/Offline/Degraded glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1492** | The Agent Ops Redmine Not set/Degraded/Unavailable glance mixes not-set, warn, and bad washes against an opaque fill. No glass alpha or hover shadow. |
@@ -77,10 +78,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-An Agent Ops Digest glance no longer paints an open queue with a glass blend. The fill is opaque.
+An Agent Ops Browser glance no longer paints not-set, unavailable, or degraded with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Agent Ops Discord glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Agent Ops MCP glance still uses a glass fill. The Monitors summary still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
