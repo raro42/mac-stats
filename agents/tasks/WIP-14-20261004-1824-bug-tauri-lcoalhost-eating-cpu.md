@@ -2141,3 +2141,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm icon status still updates via single bulk IPC; expand Monitors — list hydrates without N+1 status/details; history time-range control may appear only after sparklines unpark; alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1440)
+
+**Date:** 2026-10-06 03:19 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1440**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1440)
+- `cd src-tauri && cargo test` — **pass** (1357 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapsed Debug Log skips read_debug_log glance IPC)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1440**
+- `src/cpu.js` — `initLogsSection` reads collapse state before any glance poll; collapsed path calls `stopLogsGlancePoll` (no `read_debug_log` until expand)
+- `src/cpu.js` — `pollLogsGlanceCounts` / `startLogsGlancePoll` bail when `logsSectionCollapsed` or parked; mid-flight after await also drops on collapse/park
+- `src/cpu.js` — `ensureLogsSectionExpanded` arms `startLogsGlancePoll`; focus-resume idle polls skip glance while collapsed (`stopLogsGlancePoll`)
+- Default `logs_collapsed: true` kept; prior #14 cuts (monitors bulk IPC, park gates, etc.) still present
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 Debug Log glance IPC skip.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with Debug Log collapsed; confirm no `read_debug_log` glance IPC until expand; expand Debug Log — error/warn glance poll runs; collapse again — poll stops; alt-tab during expand refresh — no glance paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
