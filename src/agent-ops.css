@@ -5256,11 +5256,13 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-scope-filter-clear.is-just-saved {
   opacity: 1;
-  background: color-mix(in srgb, #34c759 16%, transparent);
-  border-color: color-mix(in srgb, #34c759 38%, transparent);
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  border-color: color-mix(in srgb, #34c759 38%, #ffffff);
   color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+  box-shadow: none;
 }
 
 /* Disk Cleanup scopes — All · On · Off (Agents enabled-filter parity) */
