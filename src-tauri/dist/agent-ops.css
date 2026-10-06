@@ -9183,10 +9183,12 @@ button.is-just-saved,
 }
 
 /* Settings View logs — soft green flash after open */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #view-debug-log.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
-  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #ffffff) !important;
   color: inherit;
+  box-shadow: none;
 }
 
 /* Settings — Brave key-not-set attention glance (Credentials; Perplexity key-not-set parity) */
