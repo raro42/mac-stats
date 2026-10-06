@@ -2247,3 +2247,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s without opening Settings; confirm no `is_discord_gateway_ready` until Discord icon click or Settings open; icon may show last-known green/off from localStorage; click icon — gateway toggle still works; open Settings — gateway check runs; alt-tab during that check — no icon paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
 **Note:** While this pass ran, a concurrent coder draft for **v0.1.1443** (collapsed Monitors localStorage icon; skip `list_monitor_statuses`) appeared in the task body / dirty tree. That cut was **not** verified here.
+
+## Test report (v0.1.1443)
+
+**Date:** 2026-10-06 03:36 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1443**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1443)
+- `cd src-tauri && cargo test` — **pass** (1357 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapsed Monitors skips list_monitor_statuses)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1443**
+- `src/cpu.js` — collapsed init paints via `paintMonitorsIconFromLocal` / `monitors_icon_status` localStorage (no `list_monitor_statuses`, no hourly interval)
+- `src/cpu.js` — `updateMonitorsSummary` bails when `monitorsCollapsed` (local paint only); expand / `ensureMonitorsSectionExpanded` still hydrates list + live summary
+- `src/cpu.js` — `updateMonitorsIconStatus` persists cache; focus resume skips collapsed summary poll (clears interval, paints local)
+- Prior #14 cuts still present: Discord icon localStorage, Settings credential wiring defer, collapsed Debug Log skips `read_debug_log`, park gates, monitors bulk IPC when expanded
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 collapsed Monitors localStorage icon cut.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with External / Monitors collapsed; confirm no `list_monitor_statuses` until expand; icon may show last-known up/down from localStorage; expand Monitors — list hydrates and icon refreshes; alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
