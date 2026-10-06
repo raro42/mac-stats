@@ -20,6 +20,22 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1476
+
+- Agent Ops, process rows, logs, and Disk Cleanup drop hover lift and press scale. Copied badges center with margin, not `translateY(-50%)`. P2 reliability / GitHub #14. Rebased past origin v0.1.1473–1475.
+
+## Overnight merge — v0.1.1475
+
+- AI Chat model / connection glance mixes online, no-model, offline, and circuit washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1474
+
+- CPU, GPU, Freq, and Temp history charts mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1473
+
+- AI Chat collapsed glance mixes online, offline, active, and error washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1472
 
 - Press and hover no longer scale or lift. Add button, connection dot, and thinking-dots keyframes drop `scale`. Apple theme, result, log, and Send controls drop the one-pixel lift. P2 reliability / GitHub #14.

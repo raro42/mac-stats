@@ -6,6 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1476** | Agent Ops, process rows, logs, and Disk Cleanup no longer lift on hover or scale on press. Copied badges sit with margin, not a vertical translate. |
+| **v0.1.1475** | The AI Chat model / connection glance mixes online, no-model, offline, and circuit washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1474** | CPU, GPU, Freq, and Temp history charts mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. |
+| **v0.1.1473** | The AI Chat collapsed glance mixes online, offline, active, and error washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1472** | Press and hover no longer scale or lift. The Add button and the chat connection dot stay still. Apple theme, result, log, and Send controls drop the one-pixel lift. |
 | **v0.1.1471** | Agent Ops collapsed glance mixes ready, warn, and offline washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1470** | Disk Cleanup collapsed glance mixes reclaim, due, scopes-off, and clean washes against an opaque fill. No glass alpha or hover shadow. |
@@ -55,10 +59,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-A press on Add, or a hover on Send, no longer starts a transform layer in Graphics and Media.
+A hover on an Agent Ops card, or a press on Clean now, no longer starts a transform layer in Graphics and Media.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- Agent Ops CSS still scales some presses and lifts some hovers. Copied badges still use a vertical translate.
+- Monitor tick tips still use a translate. The refresh button still rotates while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
