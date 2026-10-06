@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1447
+
+- CPU window: bake capture `?open=` at create; skip `take_open_ui_section` WebView IPC. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1445
 
 - Data-poster history charts stay parked on open. First paint does not allocate canvas buffers or fetch history. The same idle unpark as the other themes draws them later. Focus does not unpark them on the event. P2 reliability / GitHub #14.

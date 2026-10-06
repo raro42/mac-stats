@@ -10678,10 +10678,9 @@ function escapeHtml(s) {
         }
       }
       applyOpsCollapsed(!!startsCollapsed);
-      // Capture open-section IPC is optional; skip while parked (#14).
+      // Capture / design-review: `?open=` is baked at window create (Rust take).
+      // Skip take_open_ui_section IPC on the common collapsed path (#14).
       if (agentOpsWorkPaused()) return;
-      // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
-      // One invoke — no 500ms retry loop on the common collapsed path (#14).
       const scrollStart = (el) => {
         try {
           el?.scrollIntoView?.({ behavior: 'auto', block: 'start' });
@@ -10691,7 +10690,11 @@ function escapeHtml(s) {
       };
       let section = null;
       try {
-        section = await invoke('take_open_ui_section');
+        const raw = new URLSearchParams(window.location.search).get('open');
+        const t = String(raw || '').trim();
+        if (t && /^[A-Za-z0-9_-]+$/.test(t)) {
+          section = t;
+        }
       } catch (_) {
         section = null;
       }

@@ -581,6 +581,38 @@ impl Config {
         Ok(ui_val)
     }
 
+    /// Query token for `cpu.html?open=` (capture / design-review). Letters, digits, `-`, `_`.
+    pub fn sanitize_open_ui_section(raw: &str) -> Option<String> {
+        let t = raw.trim();
+        if t.is_empty() {
+            return None;
+        }
+        if !t
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+        {
+            return None;
+        }
+        Some(t.to_ascii_lowercase())
+    }
+
+    /// CPU window app URL. Capture section is baked in at create (`?open=`), so the
+    /// WebView does not call `take_open_ui_section` on the common collapsed path (#14).
+    pub fn cpu_window_app_url() -> String {
+        Self::cpu_window_app_url_with_open(Self::take_open_ui_section())
+    }
+
+    pub fn cpu_window_app_url_with_open(section: Option<String>) -> String {
+        let mut url = format!("cpu.html?v={}", env!("CARGO_PKG_VERSION"));
+        if let Some(section) = section {
+            if let Some(safe) = Self::sanitize_open_ui_section(&section) {
+                url.push_str("&open=");
+                url.push_str(&safe);
+            }
+        }
+        url
+    }
+
     /// One-shot UI section to open on CPU window load (`agent-ops`, `monitors`, …).
     /// Prefers `MAC_STATS_OPEN_SECTION` env; else reads and clears `openUiSection` in config.json.
     pub fn take_open_ui_section() -> Option<String> {
@@ -3168,6 +3200,38 @@ mod tests {
         clamp_ollama_global_concurrency_n, write_bytes_atomic, write_text_atomic, Config,
         CpuWindowGeometry,
     };
+
+    #[test]
+    fn sanitize_open_ui_section_allows_capture_tokens() {
+        assert_eq!(
+            Config::sanitize_open_ui_section("agent-ops"),
+            Some("agent-ops".into())
+        );
+        assert_eq!(
+            Config::sanitize_open_ui_section(" AI_Chat "),
+            Some("ai_chat".into())
+        );
+        assert!(Config::sanitize_open_ui_section("").is_none());
+        assert!(Config::sanitize_open_ui_section("ai-chat/../etc").is_none());
+        assert!(Config::sanitize_open_ui_section("foo bar").is_none());
+    }
+
+    #[test]
+    fn cpu_window_app_url_with_open_bakes_capture_token() {
+        let v = env!("CARGO_PKG_VERSION");
+        assert_eq!(
+            Config::cpu_window_app_url_with_open(None),
+            format!("cpu.html?v={v}")
+        );
+        assert_eq!(
+            Config::cpu_window_app_url_with_open(Some("agent-ops".into())),
+            format!("cpu.html?v={v}&open=agent-ops")
+        );
+        assert_eq!(
+            Config::cpu_window_app_url_with_open(Some("not/a/section".into())),
+            format!("cpu.html?v={v}")
+        );
+    }
 
     #[test]
     fn cpu_window_geometry_sanitized() {

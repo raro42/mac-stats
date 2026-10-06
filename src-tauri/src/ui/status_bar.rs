@@ -822,7 +822,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         decorations
     );
 
-    let cpu_url = format!("cpu.html?v={}", env!("CARGO_PKG_VERSION"));
+    let cpu_url = Config::cpu_window_app_url();
     let saved = Config::cpu_window_geometry();
     let (default_w, default_h) = if Config::cpu_window_compact() {
         (520.0, 560.0)
