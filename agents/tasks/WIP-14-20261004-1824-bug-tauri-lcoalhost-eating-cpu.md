@@ -22,7 +22,19 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1442** (follow-up after v0.1.1441).
+Version **v0.1.1443** (follow-up after v0.1.1442).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (collapsed Monitors skips list_monitor_statuses):
+
+- `src/cpu.js` — Collapsed External / Monitors paints last-known icon wash from `monitors_icon_status` localStorage (no `list_monitor_statuses`, no hourly summary interval). `updateMonitorsIconStatus` persists that cache. Expand / `ensureMonitorsSectionExpanded` still hydrates list + live summary. Focus resume skips the collapsed summary poll.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with External / Monitors collapsed (default). Confirm no `list_monitor_statuses` until expand. Icon may show last-known up/down from localStorage. Expand Monitors — list hydrates and icon refreshes. Alt-tab during expand — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1442)
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
 
@@ -2202,3 +2214,36 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with Debug Log collapsed; confirm no `read_debug_log` glance IPC until expand; expand Debug Log — error/warn glance poll runs; collapse again — poll stops; alt-tab during expand refresh — no glance paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1442)
+
+**Date:** 2026-10-06 03:30 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1442**; tree also includes v0.1.1441 Settings credential wiring)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1442)
+- `cd src-tauri && cargo test` — **pass** (1357 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Discord icon skips gateway IPC on open/resume)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1442**
+- `src/cpu.js` — `startDiscordIconStatus` paints last-known via `paintDiscordIconFromLocal` / `discord_gateway_ready` localStorage; no `is_discord_gateway_ready`; no hourly `setInterval` (interval only cleared)
+- `src/cpu.js` — `updateDiscordIconStatus` persists cache; icon click `toggleDiscordGatewayFromIcon` still uses gateway IPC; `refreshDiscordIconStatus` remains for Settings / post-toggle
+- `src/cpu-ui.js` — Settings open fan-out calls `refreshDiscordIconStatus` once
+- Prior #14 cuts still present: `ensureSettingsCredentialWiring` deferred to Settings open; collapsed Debug Log skips `read_debug_log`; park gates; monitors bulk IPC
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 Discord icon gateway IPC skip.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s without opening Settings; confirm no `is_discord_gateway_ready` until Discord icon click or Settings open; icon may show last-known green/off from localStorage; click icon — gateway toggle still works; open Settings — gateway check runs; alt-tab during that check — no icon paint while away; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+**Note:** While this pass ran, a concurrent coder draft for **v0.1.1443** (collapsed Monitors localStorage icon; skip `list_monitor_statuses`) appeared in the task body / dirty tree. That cut was **not** verified here.

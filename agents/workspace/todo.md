@@ -1,14 +1,13 @@
-# Coder — #14 v0.1.1442
+# Tester — #14 v0.1.1442
 
 ## Plan
-- [x] Discord icon: skip `is_discord_gateway_ready` on monitoring init + focus resume
-- [x] Paint last-known connected state from localStorage (no IPC)
-- [x] Check gateway on icon click (already) and when Settings opens
-- [x] Stop hourly Discord icon poll on the common open path
-- [x] Keep v0.1.1441 Settings credential wiring already in the tree
-- [x] Bump to v0.1.1442; CHANGELOG; sync-dist; task notes
-- [x] `cargo check` in src-tauri/
-- [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
+- [x] Read `agents/testing/TESTER.md` + `agents/workspace/lessons.md`
+- [x] Pick GitHub TESTING task: `TESTING-14-…` (v0.1.1442 Discord icon gateway IPC skip)
+- [x] `cargo check` / `cargo test` in `src-tauri/`
+- [x] Static verify Discord localStorage paint + Settings/click IPC paths
+- [x] Read `~/.mac-stats/debug.log` (no #14-tied errors)
+- [x] Append test report; move to `WIP-14-…` (macOS Activity Monitor still required)
+- [x] Do **not** close GitHub #14
 
 ## Review
-Shipped **v0.1.1442** for GitHub #14 (tree also includes v0.1.1441 Settings credential wiring). Discord icon skips `is_discord_gateway_ready` on monitoring warm-up and focus resume; last-known paint from localStorage. Click and Settings still check. `cargo check` passed. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+**FAIL → WIP.** Linux host: `cargo check` / `cargo test` pass for tree at **v0.1.1442**; static Discord icon gateway skip looks correct. Cannot prove issue bar (`<1%` `tauri://localhost` / Graphics and Media on macOS). Mid-run concurrent **v0.1.1443** draft notes appeared; not verified. Issue left open.
