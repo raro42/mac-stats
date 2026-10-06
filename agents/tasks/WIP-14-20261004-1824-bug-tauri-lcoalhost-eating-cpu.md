@@ -8060,3 +8060,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; select a row and press `c` or use a copy chip; confirm the Copied flash still shows green on the row, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1582)
+
+**Date:** 2026-10-06 23:13 UTC (2026-10-07 01:13 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1582**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1582)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 ring / power-strip Copied flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1582**
+- `CHANGELOG.md` **[0.1.1582]** documents ring and power-strip Copied flash mixing the accent wash against an opaque fill; no glass alpha on the value or the Copied badge
+- `src/cpu.js` and `src-tauri/dist/cpu.js` are identical. `ensureMetricValueCopyStyles` paints `.metric-value` / `.battery-level` / `.power-value` `[data-metric-copy="1"].is-just-copied` with `color-mix(... 18%, #ffffff)`; Copied badge `::after` mixes against opaque `#1c1c1e`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Copied wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` (hover still uses accent-on-transparent; flash path is opaque)
+- `wireMetricValueCopy` / `copyMetricValueFromUi` still add `.is-just-copied`, set title/aria **Copied**, clear after ~1600ms (GPU · Freq · Temp · Bat · Power; CPU % click path unchanged)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the ring / power-strip Copied flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque ring / power-strip Copied flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); click a ring value (CPU · GPU · Freq · Temp) or Bat / Power to copy; confirm the Copied flash still shows on the value, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
