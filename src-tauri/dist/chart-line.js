@@ -434,7 +434,7 @@
   });
 
   function scheduleUnparkCanvases(idleTimeoutMs) {
-    const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 60000;
+    const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 120000;
     const run = () => {
       if (windowOccluded()) return;
       unparkCanvases();
@@ -462,10 +462,10 @@
     // Park immediately when occluded; unpark on idle after focus (#14).
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) parkCanvases();
-      else scheduleUnparkCanvases(60000);
+      else scheduleUnparkCanvases(120000);
     });
     window.addEventListener("blur", parkCanvases);
-    window.addEventListener("focus", () => scheduleUnparkCanvases(60000));
+    window.addEventListener("focus", () => scheduleUnparkCanvases(120000));
   }
 
   function boot() {

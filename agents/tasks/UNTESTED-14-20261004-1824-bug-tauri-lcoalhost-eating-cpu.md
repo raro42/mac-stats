@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1422** (follow-up after v0.1.1421).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (defer metrics further + idle-defer focus interval arm):
+
+- `src/cpu.js` — first `get_cpu_details` idle ≤**480s** on focus/open (was 240s). Sparkline `unpark` idle ≤**480s** after first poll. Focus resume history seed idle ≤**480s**. Version/update IPC idle ≤**1200s**. Monitoring features idle ≤**3600s**. Late open fallback idle ≤**1200s**. Focus resume secondary polls idle ≤**120s** (was 60s). Focus `refresh()` / `get_cpu_details` and metrics-interval re-arm idle ≤**120s** via `scheduleDeferredFocusRefresh` (cancelled on blur/pause) — not on the focus event. `startRefresh()` no longer runs on the focus event itself.
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**120s** (was 60s).
+- `src/agent-ops.js` — Agent Ops init idle ≤**3600s**.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Rings appear after idle metrics; sparklines unpark shortly after. Alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC / metrics interval should not restart on the focus event itself. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1421)
+
 Version **v0.1.1421** (follow-up after v0.1.1420).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1325,3 +1341,33 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away then back — secondary polls / sparkline GPU should not restart on the focus event itself) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1421)
+
+**Date:** 2026-10-06 00:59 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1421)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 defer metrics further + idle-defer focus refresh)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1421**
+- `src/cpu.js` — `scheduleCpuWindowMetricsOnce` default / focused-open idle ≤**240000**; sparkline unpark after first poll ≤**240000**; focus resume history seed idle ≤**240000**; version/update IPC idle ≤**600000**; `scheduleMonitoringFeaturesOnce` idle ≤**1800000**; `resumeIdleWindowPolls` / `applyDeferredResumeIdleWindowPolls` idle ≤**60000**; `scheduleDeferredFocusRefresh` idle ≤**60000** (cancelled on blur/pause; not on the focus event)
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**60000** (`scheduleUnparkCanvases`); park on blur/hidden stays immediate
+- `src/agent-ops.js` — Agent Ops init idle ≤**1800000**; exposes `__macStatsScheduleAgentOpsInit`
+- Prior 3600s poll floor / occlusion park / Focused pause-resume kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-metrics / focus-refresh idle cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC should not restart on the focus event itself) before CLOSED. Do **not** close GitHub #14.
