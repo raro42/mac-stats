@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1507** | The Settings Perplexity key glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1506** | The Perplexity last-search glance mixes results, searching, error, key-needed, and ready washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1505** | The Perplexity Top/error/filter glance mixes error, top, and filter washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1504** | The Perplexity Key-not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
@@ -89,10 +90,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-The Monitors summary no longer paints down, slow, or all-up with a glass blend. The fill is opaque.
+The Settings Perplexity key glance no longer paints a missing API key with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Perplexity key glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Settings Discord token glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
