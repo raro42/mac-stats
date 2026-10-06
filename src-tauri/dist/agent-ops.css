@@ -10143,12 +10143,13 @@ button.is-just-saved,
   outline-offset: 2px;
 }
 
-/* Footer GitHub — soft green flash after open */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #github-link.is-just-saved {
   color: color-mix(in srgb, #34c759 75%, currentColor) !important;
   text-decoration: none;
   pointer-events: none;
-  background: color-mix(in srgb, #34c759 16%, transparent);
+  background: color-mix(in srgb, #34c759 16%, #ffffff);
+  box-shadow: none;
 }
 
 #github-link[aria-busy="true"],
