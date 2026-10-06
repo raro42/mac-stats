@@ -6,6 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1521** | The Settings Voice STT glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1520** | The Settings Compact On glance mixes the on wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1519** | The Settings AI Off glance mixes the off wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1518** | The Settings Signal glance mixes the not-wired wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1517** | The Settings Help glance mixes closed and open washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1516** | The Settings Slack not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1515** | The Settings Telegram not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
@@ -100,10 +104,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-The Settings Help glance no longer paints the cheat sheet with a glass blend. The fill is opaque.
+The Settings Voice STT glance no longer paints the off state with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Settings Signal glance still uses a glass fill. Voice STT and other Product glances still use a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Settings Judge glance still uses a glass fill. Downloads, Ori, and Having fun glances still use a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
