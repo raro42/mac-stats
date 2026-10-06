@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1437
+
+- CPU window: collapsed Monitors skips history + full list IPC; icon-only summary walk (no per-host details); expand hydrates once. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1436
 
 - CPU window: AI visibility from localStorage on open; defer Ollama `configure_ollama` until AI Chat expand / AI-on resume; Settings Product syncs `get_ai_agent_enabled` + cache. P2 reliability / GitHub #14.

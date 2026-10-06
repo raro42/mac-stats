@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1437** (follow-up after v0.1.1436).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (collapsed Monitors skip list/history IPC):
+
+- `src/cpu.js` — Collapsed External / Monitors no longer runs `initMonitorHistory` or full `loadMonitors` on monitoring warm-up. Collapsed summary keeps icon wash via light `list_monitors` + `get_monitor_status` (no per-host `get_monitor_details` / summary prose). Expand / `ensureMonitorsSectionExpanded` hydrates history + list once via `ensureMonitorsListHydrated`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with External / Monitors collapsed (default). Confirm icon status still updates without list/history fan-out. Expand Monitors — list + history hydrate once. Alt-tab during expand warm-up — no list/summary paint while away; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1436)
+
 Version **v0.1.1436** (follow-up after v0.1.1435).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -2006,3 +2020,34 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm Compact layout can appear from localStorage without Settings open, and `get_cpu_window_compact` waits until Settings Product toggles; trigger monitoring idle / Agent Ops init, then alt-tab before UI-state or pin hydrate returns — section merge / pin disk sync / open-section capture must not continue while away; alt-tab back — UI-state re-merge and pin hydrate retry; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1436)
+
+**Date:** 2026-10-06 02:57 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1436**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1436)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 AI localStorage + defer Ollama module init)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1436**
+- `src/cpu-ui.js` — `AI_AGENT_ENABLED_LS_KEY` / `persistAiAgentEnabledLocal` / `applyAiUiVisibilityFromLocalStorage`; open-path `loadProductToggleStates({ aiOnly })` applies AI chrome from localStorage (no `get_ai_agent_enabled`); Settings Product open still invokes `get_ai_agent_enabled` and persists; exports `__macStatsApplyAiUiFromLocal` / `__macStatsReadAiAgentEnabledLocal`
+- `src/ollama.js` — no DOMContentLoaded +100ms auto-configure; `ensureInitialized()` idempotently arms `initializeOllama` (configure + connection) once when AI Chat needs it; parked init resets so resume/expand can retry
+- `src/cpu.js` — collapsed open path skips connection IPC; expand calls `ensureInitialized` then check; focus resume rechecks Ollama only when AI is on in localStorage; AI visibility re-applies from localStorage (no IPC)
+- Prior v0.1.1435 Compact localStorage / UI-state park / monitoring-idle Ollama configure cut and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise and normal Linux CPU-window activity. No new errors tied to the #14 AI localStorage / deferred Ollama init cut.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm AI chrome can appear/hide from localStorage without Settings open, and `get_ai_agent_enabled` waits until Settings Product toggles; with AI Chat collapsed, confirm no early `configure_ollama` / connection fan-out on open; expand AI Chat — configure + connection run once; alt-tab during expand warm-up — no glance paint while away; alt-tab back with AI on — ensureInitialized/recheck; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

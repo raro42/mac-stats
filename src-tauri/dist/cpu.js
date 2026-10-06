@@ -7649,6 +7649,20 @@ function saveMonitorsCollapsedState(collapsed) {
   setSectionCollapsed('monitors_collapsed', collapsed);
 }
 
+/** Expanded Monitors: history + list IPC (skipped while collapsed, #14). */
+function ensureMonitorsListHydrated() {
+  if (windowWorkPaused()) return Promise.resolve();
+  // Legacy localStorage fallback lives in initMonitorHistory; loadMonitors
+  // also refreshes from the backend when painting the list.
+  return initMonitorHistory().then(() => {
+    if (windowWorkPaused()) return;
+    return loadMonitors().then(() => {
+      if (windowWorkPaused()) return;
+      updateMonitorsHeight();
+    });
+  });
+}
+
 function initMonitorsSection() {
   const header = document.getElementById('monitors-header');
   const content = document.getElementById('monitors-content');
@@ -7661,23 +7675,21 @@ function initMonitorsSection() {
   
   console.log('Initializing monitors section', { header: !!header, content: !!content });
 
-  // Initialize monitor history from backend (real checks, including window-closed)
-  initMonitorHistory();
   wireMonitorRemoveDelegation();
   wireMonitorsListKeyboard();
   wireMonitorsSummaryClick();
   ensureMonitorsFilterChips();
   ensureMonitorsCollapsedGlance();
 
-  // Always load monitors to calculate height, even when collapsed
-  loadMonitors().then(() => {
-    if (windowWorkPaused()) return;
-    updateMonitorsHeight();
-  });
-  updateMonitorsSummary();
-  
-  // Restore saved state
+  // Restore saved state before IPC — collapsed skips history + full list (#14).
   monitorsCollapsed = getMonitorsCollapsedState();
+  // Collapsed: icon/status summary only. Expanded: history + list + height (#14).
+  if (monitorsCollapsed) {
+    updateMonitorsSummary();
+  } else {
+    void ensureMonitorsListHydrated();
+    updateMonitorsSummary();
+  }
   updateMonitorsStatusDot();
 
   // Make header clickable/keyboardable to toggle collapse/expand
@@ -7707,7 +7719,9 @@ function initMonitorsSection() {
         clearInterval(monitorsUpdateInterval);
         monitorsUpdateInterval = null;
       }
-      // Start interval if not already running (but don't call immediately)
+      // Expand: hydrate list/history once (may have been skipped while collapsed, #14).
+      void ensureMonitorsListHydrated();
+      updateMonitorsSummary();
       monitorsUpdateInterval = setInterval(() => {
         if (windowWorkPaused()) return;
         updateMonitorsSummary();
@@ -8400,7 +8414,9 @@ function ensureMonitorsSectionExpanded() {
   if (iconEl) {
     iconEl.title = iconEl.getAttribute('data-title-base') || 'Hide External / Monitors';
   }
-  updateMonitorsHeight();
+  // List/history may have been skipped while collapsed (#14).
+  void ensureMonitorsListHydrated();
+  updateMonitorsSummary();
   syncMonitorsCollapsedGlance();
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
@@ -10217,6 +10233,8 @@ async function updateMonitorsSummary() {
   if (!summaryText) return;
   // Parked shell: skip monitors IPC + summary DOM (#14).
   if (windowWorkPaused()) return;
+  // Collapsed: icon wash only — skip host-detail IPC + summary prose (#14).
+  const iconOnly = !!monitorsCollapsed;
 
   try {
     const monitorIds = await invoke('list_monitors');
@@ -10224,9 +10242,11 @@ async function updateMonitorsSummary() {
     if (windowWorkPaused()) return;
     
     if (monitorIds.length === 0) {
-      summaryText.textContent = 'No monitors configured';
-      summaryText.removeAttribute('title');
-      applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: true });
+      if (!iconOnly) {
+        summaryText.textContent = 'No monitors configured';
+        summaryText.removeAttribute('title');
+        applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: true });
+      }
       updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
       return;
     }
@@ -10251,7 +10271,7 @@ async function updateMonitorsSummary() {
         checkedCount++;
         if (status.is_up) {
           upCount++;
-          if (status.response_time_ms) {
+          if (!iconOnly && status.response_time_ms) {
             let name = monitorId;
             let url = '';
             try {
@@ -10274,30 +10294,32 @@ async function updateMonitorsSummary() {
           }
         } else {
           downCount++;
-          const pending =
-            !status.response_time_ms || String(status.error || '').includes('Waiting');
-          if (!pending) {
-            let name = monitorId;
-            let url = '';
-            try {
-              const details = await invoke('get_monitor_details', { monitorId });
-              if (details?.name) name = details.name;
-              if (details?.url) url = details.url;
-            } catch (_) {
-              /* keep id */
+          if (!iconOnly) {
+            const pending =
+              !status.response_time_ms || String(status.error || '').includes('Waiting');
+            if (!pending) {
+              let name = monitorId;
+              let url = '';
+              try {
+                const details = await invoke('get_monitor_details', { monitorId });
+                if (details?.name) name = details.name;
+                if (details?.url) url = details.url;
+              } catch (_) {
+                /* keep id */
+              }
+              const host = shortMonitorHostLabel(name, url);
+              // Empty failure: match list/detail "Unknown".
+              const reason = shortMonitorFailReason(status.error) || 'Unknown';
+              const ago = formatMonitorCheckedAgo(status);
+              const downInfo = resolveMonitorDownSince(monitorId, status);
+              const downLabel = formatMonitorDownSinceLabel(downInfo);
+              const base = `${host} (${reason})`;
+              const parts = [base];
+              if (downLabel) parts.push(downLabel);
+              else if (ago) parts.push(ago);
+              else parts.push('None yet');
+              downHints.push(parts.join(' · '));
             }
-            const host = shortMonitorHostLabel(name, url);
-            // Empty failure: match list/detail "Unknown".
-            const reason = shortMonitorFailReason(status.error) || 'Unknown';
-            const ago = formatMonitorCheckedAgo(status);
-            const downInfo = resolveMonitorDownSince(monitorId, status);
-            const downLabel = formatMonitorDownSinceLabel(downInfo);
-            const base = `${host} (${reason})`;
-            const parts = [base];
-            if (downLabel) parts.push(downLabel);
-            else if (ago) parts.push(ago);
-            else parts.push('None yet');
-            downHints.push(parts.join(' · '));
           }
         }
         if (status.response_time_ms) {
@@ -10329,41 +10351,47 @@ async function updateMonitorsSummary() {
       !anyDown && slowest && (upLatencyHints.length >= 2 || anySlowAbs)
         ? slowest.id || null
         : null;
-    window.__monitorsSlowestId = slowestHint;
+    if (!iconOnly) {
+      window.__monitorsSlowestId = slowestHint;
+    }
 
-    if (downHints.length > 0) {
-      const shown = downHints.slice(0, 2);
-      const more = downHints.length > 2 ? ` +${downHints.length - 2}` : '';
-      summaryText.textContent =
-        `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
-      summaryText.title = downHints.join('; ');
-    } else if (upCount === 0 && responseTimeCount === 0) {
-      // No sample yet: match first paint "None yet" (bare "0 / N sites up" reads like an outage).
-      summaryText.textContent = 'None yet';
-      summaryText.removeAttribute('title');
-    } else if (slowest && upLatencyHints.length >= 2) {
-      summaryText.textContent =
-        `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
-      summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
-    } else {
-      summaryText.textContent =
-        `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
-      if (upLatencyHints.length > 0) {
+    if (!iconOnly) {
+      if (downHints.length > 0) {
+        const shown = downHints.slice(0, 2);
+        const more = downHints.length > 2 ? ` +${downHints.length - 2}` : '';
+        summaryText.textContent =
+          `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
+        summaryText.title = downHints.join('; ');
+      } else if (upCount === 0 && responseTimeCount === 0) {
+        // No sample yet: match first paint "None yet" (bare "0 / N sites up" reads like an outage).
+        summaryText.textContent = 'None yet';
+        summaryText.removeAttribute('title');
+      } else if (slowest && upLatencyHints.length >= 2) {
+        summaryText.textContent =
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel} · slowest ${slowest.host} ${slowest.ms}ms`;
         summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
       } else {
-        summaryText.removeAttribute('title');
+        summaryText.textContent =
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgLabel}`;
+        if (upLatencyHints.length > 0) {
+          summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
+        } else {
+          summaryText.removeAttribute('title');
+        }
       }
+      // Green only when every configured monitor has checked in and is up.
+      // Red as soon as any checked monitor is down (pending checks stay neutral).
+      applyMonitorsSummaryState({ anyDown, allUp, empty: false, slowestId: slowestHint });
     }
     
-    // Green only when every configured monitor has checked in and is up.
-    // Red as soon as any checked monitor is down (pending checks stay neutral).
-    applyMonitorsSummaryState({ anyDown, allUp, empty: false, slowestId: slowestHint });
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
     // Alt-tab during monitors IPC: do not paint error fallback DOM (#14).
     if (windowWorkPaused()) return;
-    applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: false });
+    if (!monitorsCollapsed) {
+      applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: false });
+    }
     updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
   }
 }

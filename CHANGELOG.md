@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1437] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Collapsed External / Monitors skips history Map rebuild and full list IPC on monitoring warm-up (icon status uses a light `list_monitors` + `get_monitor_status` walk without per-host `get_monitor_details`). Expand hydrates list/history once. Aim: quieter `tauri://localhost` / Graphics and Media when Monitors stays collapsed (the common open path).
+
 ## [0.1.1436] - 2026-10-06
 
 ### Changed
