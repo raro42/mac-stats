@@ -6,6 +6,8 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1439** | Idle-thought Ollama timeouts log one warning per five minutes, even when several fire in the same second. The rest stay debug. |
+| **v0.1.1438** | Monitors summary, list, and settings list use one `list_monitor_statuses` IPC. The 24h history probe waits until sparkline unpark or history seed. |
 | **v0.1.1437** | Collapsed External / Monitors skips history Map + full list IPC on monitoring warm-up. Icon wash uses a light `list_monitors` + `get_monitor_status` walk (no per-host details). Expand hydrates list/history once. |
 | **v0.1.1436** | AI visibility from localStorage on open; `get_ai_agent_enabled` waits for Settings Product. Ollama no longer auto-configures on DOMContentLoaded; expand / AI-on resume arms `ensureInitialized`. |
 | **v0.1.1435** | Monitoring idle parks UI-state retry + pin hydrate while occluded. Compact uses localStorage on open; backend compact sync waits for Settings Product. Drops duplicate Ollama configure on monitoring idle. Agent Ops wait loops bail after alt-tab. |
@@ -24,5 +26,6 @@ Monitors stays collapsed for most open sessions. Skipping history + list rebuild
 
 ## Still open
 
+- ~20:00 tick: idle-thought timeout WARN is one line per burst (**v0.1.1439**). A duplicate changelog-hint commit on stale v0.1.1380 was dropped (already shipped as v0.1.1385).
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

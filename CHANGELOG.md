@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1439] - 2026-10-06
+
+### Changed
+- **Idle-thought timeout log** — a burst of Ollama timeouts logs one warning. The rest stay debug until five minutes pass. A quiet channel no longer fills the log with the same line.
+
+
 ## [0.1.1438] - 2026-10-06
 
 ### Changed

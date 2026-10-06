@@ -1504,6 +1504,23 @@ fn should_warn_idle_thought_timeout(prev_secs: u64, now_secs: u64, interval_secs
     prev_secs == 0 || now_secs.saturating_sub(prev_secs) >= interval_secs
 }
 
+/// One WARN per interval even when several idle thoughts time out together.
+/// A plain load-then-store lets every racer log WARN before the stamp lands.
+fn claim_idle_thought_timeout_warn(slot: &AtomicU64, now_secs: u64, interval_secs: u64) -> bool {
+    loop {
+        let prev = slot.load(Ordering::Relaxed);
+        if !should_warn_idle_thought_timeout(prev, now_secs, interval_secs) {
+            return false;
+        }
+        if slot
+            .compare_exchange(prev, now_secs, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+        {
+            return true;
+        }
+    }
+}
+
 fn idle_thought_ollama_wall_secs() -> u64 {
     crate::config::Config::ollama_chat_timeout_secs().min(IDLE_THOUGHT_OLLAMA_WALL_SECS)
 }
@@ -1536,9 +1553,11 @@ fn log_idle_thought_ollama_timeout(channel_id: u64, detail: &str) {
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
         .unwrap_or(0);
-    let prev = LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.load(Ordering::Relaxed);
-    if should_warn_idle_thought_timeout(prev, now, IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS) {
-        LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.store(now, Ordering::Relaxed);
+    if claim_idle_thought_timeout_warn(
+        &LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS,
+        now,
+        IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS,
+    ) {
         warn!(
             "Having fun: idle thought skipped for channel {} (Ollama timeout; best-effort): {}",
             channel_id, detail
@@ -1556,9 +1575,11 @@ fn log_idle_thought_send_timeout(part_index: usize, total: usize) {
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_secs())
         .unwrap_or(0);
-    let prev = LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.load(Ordering::Relaxed);
-    if should_warn_idle_thought_timeout(prev, now, IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS) {
-        LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.store(now, Ordering::Relaxed);
+    if claim_idle_thought_timeout_warn(
+        &LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS,
+        now,
+        IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS,
+    ) {
         outbound_pipeline::log_send_timeout("discord_idle_thought", part_index, total);
     } else {
         debug!(
@@ -4283,6 +4304,26 @@ mod tests {
         assert!(!super::should_warn_idle_thought_timeout(1000, 1000 + 60, interval));
         assert!(super::should_warn_idle_thought_timeout(
             1000,
+            1000 + interval,
+            interval
+        ));
+    }
+
+    #[test]
+    fn idle_thought_timeout_warn_claim_is_single() {
+        use std::sync::atomic::AtomicU64;
+
+        let slot = AtomicU64::new(0);
+        let interval = 5 * 60;
+        assert!(super::claim_idle_thought_timeout_warn(&slot, 1000, interval));
+        assert!(!super::claim_idle_thought_timeout_warn(&slot, 1000, interval));
+        assert!(!super::claim_idle_thought_timeout_warn(
+            &slot,
+            1000 + 60,
+            interval
+        ));
+        assert!(super::claim_idle_thought_timeout_warn(
+            &slot,
             1000 + interval,
             interval
         ));
