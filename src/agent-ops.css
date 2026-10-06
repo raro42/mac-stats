@@ -3170,12 +3170,14 @@ textarea.ops-agent-editor.is-dirty {
   outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
   outline-offset: 2px;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-path-hint.is-just-saved {
   color: #34c759;
   opacity: 1;
   text-decoration: none;
-  background: color-mix(in srgb, #34c759 12%, transparent);
+  background: color-mix(in srgb, #34c759 12%, #ffffff);
   padding: 0 4px;
+  box-shadow: none;
 }
 
 .logs-toolbar {
