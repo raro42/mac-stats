@@ -1,13 +1,13 @@
-# Tester — #14 v0.1.1427
+# Coder — #14 v0.1.1428
 
 ## Plan
-- [x] Read TESTER.md + lessons.md
-- [x] Pick `TESTING-14-…` (GitHub #14)
-- [x] Static-verify mid-flight secondary IPC / Agent Ops / rAF claims
-- [x] `cargo check` + `cargo test` in `src-tauri/`
-- [x] Skim `~/.mac-stats/debug.log` (no secrets pasted)
-- [x] Append Test report; move to `WIP-14-…`
-- [x] Do not close GitHub #14
+- [x] Extend shared park gate to history.js + chart-line.js
+- [x] Mid-flight skip: history chart paint, sparkline draw, pinned-process DOM, Agent Ops glance sync
+- [x] Agent Ops glance interval uses agentOpsWorkPaused
+- [x] Native `CPU_WINDOW_FOCUSED` gate for SMC/battery/power/processes
+- [x] Bump to v0.1.1428; CHANGELOG; sync-dist
+- [x] `cargo check` in src-tauri/
+- [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Linux tester pass for build/tests/static claims on v0.1.1427. **FAIL → WIP** because issue bar needs macOS Activity Monitor (`tauri://localhost` / Graphics and Media &lt;1%). GitHub #14 left open.
+Shipped v0.1.1428 for GitHub #14. Focused backend metrics gate + history/chart/Agent Ops mid-flight park. Left issue open for tester / 004 (macOS Activity Monitor).

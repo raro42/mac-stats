@@ -5276,8 +5276,12 @@ function stopOpsGlancePoll() {
 
 async function pollOpsCollapsedGlance() {
     if (!agentOpsCollapsed) return;
+    // Auto glance while parked: skip IPC (#14).
+    if (agentOpsWorkPaused()) return;
     try {
         const insights = await invoke('get_runs_insights', { limit: 8 });
+        // Alt-tab during glance IPC: drop DOM sync (#14).
+        if (agentOpsWorkPaused()) return;
         if (insights && typeof insights === 'object') {
             opsRunsInsightsCache = {
                 ...(opsRunsInsightsCache || {}),
@@ -5287,6 +5291,7 @@ async function pollOpsCollapsedGlance() {
         syncOpsCollapsedGlance();
     } catch (_) {
         /* glance poll is best-effort */
+        if (agentOpsWorkPaused()) return;
         syncOpsCollapsedGlance();
     }
 }
@@ -5296,7 +5301,7 @@ function startOpsGlancePoll() {
     ensureOpsCollapsedGlance();
     void pollOpsCollapsedGlance();
     agentOpsGlanceInterval = setInterval(() => {
-        if (document.hidden) return;
+        if (agentOpsWorkPaused()) return;
         if (!agentOpsCollapsed) {
             stopOpsGlancePoll();
             return;

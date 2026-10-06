@@ -137,6 +137,16 @@
     return false;
   }
 
+  /** Prefer shared park gate — macOS keeps visibilityState=visible when occluded (#14). */
+  function historyWorkPaused() {
+    try {
+      if (typeof window.__macStatsWindowWorkPaused === 'function') {
+        return !!window.__macStatsWindowWorkPaused();
+      }
+    } catch (_) { /* ignore */ }
+    return windowOccluded();
+  }
+
   function setupHistoryCanvas(metric) {
     const canvas = canvases[metric];
     if (!canvas) return;
@@ -398,10 +408,13 @@
 
   // Update charts from backend data
   async function updateChartsFromBackend() {
-    if (canvasesParked || windowOccluded()) return;
+    if (canvasesParked || historyWorkPaused()) return;
     const timeRangeSeconds = TIME_RANGES[currentTimeRange] || 300;
     
     const result = await fetchHistoryFromBackend(timeRangeSeconds, HISTORY_POINTS);
+
+    // Alt-tab during history IPC: keep buffers cold, skip canvas paint (#14).
+    if (canvasesParked || historyWorkPaused()) return;
 
     if (!result || !result.points) {
       // History data not available yet (normal on startup) - silent return
@@ -432,6 +445,9 @@
     dataBuffers.frequency.timestamps = frequencyData.map(d => d.timestamp);
     dataBuffers.frequency.max = Math.max(4.0, ...frequencyData.map(d => d.value || 0));
     dataBuffers.frequency.min = Math.min(0, ...frequencyData.map(d => d.value || 0));
+
+    // Alt-tab after buffer fill: drop canvas work (#14).
+    if (canvasesParked || historyWorkPaused()) return;
 
     // Redraw charts (temperature only every 3s; usage and frequency every cycle)
     const nowMs = Date.now();
@@ -465,11 +481,32 @@
 
   // Re-initialize canvas sizes (for window resize)
   function reinitializeCanvasSizes() {
-    if (canvasesParked || windowOccluded()) {
+    if (canvasesParked || historyWorkPaused()) {
       parkHistoryCanvases();
       return;
     }
     Object.keys(canvases).forEach((metric) => setupHistoryCanvas(metric));
+  }
+
+  let historyPollInterval = null;
+  const HISTORY_POLL_MS = 3600000;
+
+  function pauseHistoryPoll() {
+    if (historyPollInterval) {
+      clearInterval(historyPollInterval);
+      historyPollInterval = null;
+    }
+    parkHistoryCanvases();
+  }
+
+  function resumeHistoryPoll() {
+    if (historyWorkPaused() || historyPollInterval) return;
+    unparkHistoryCanvases();
+    updateChartsFromBackend();
+    historyPollInterval = setInterval(() => {
+      if (historyWorkPaused() || canvasesParked) return;
+      updateChartsFromBackend();
+    }, HISTORY_POLL_MS);
   }
 
   // Public API
@@ -482,6 +519,8 @@
     // New backend-integrated API
     fetchAndUpdateHistory: updateChartsFromBackend,
     setTimeRange: setTimeRange,
+    park: pauseHistoryPoll,
+    unpark: resumeHistoryPoll,
 
     // Initialize charts (call on page load)
     init: () => {
@@ -516,26 +555,9 @@
       updateChartsFromBackend();
 
       // Slow poll — 2s kept WebView + IPC hot on data-poster (#14).
-      const HISTORY_POLL_MS = 3600000;
-      let historyPollInterval = setInterval(() => {
-        if (document.hidden) return;
-        updateChartsFromBackend();
-      }, HISTORY_POLL_MS);
-
-      function pauseHistoryPoll() {
-        if (historyPollInterval) {
-          clearInterval(historyPollInterval);
-          historyPollInterval = null;
-        }
-        parkHistoryCanvases();
-      }
-
-      function resumeHistoryPoll() {
-        if (document.hidden || historyPollInterval) return;
-        unparkHistoryCanvases();
-        updateChartsFromBackend();
+      if (!historyPollInterval) {
         historyPollInterval = setInterval(() => {
-          if (document.hidden || canvasesParked) return;
+          if (historyWorkPaused() || canvasesParked) return;
           updateChartsFromBackend();
         }, HISTORY_POLL_MS);
       }
@@ -556,6 +578,7 @@
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
+          if (historyWorkPaused() || canvasesParked) return;
           reinitializeCanvasSizes();
           // Redraw charts after resize
           Object.keys(canvases).forEach(metric => {
@@ -567,6 +590,8 @@
       });
     }
   };
+  window.__macStatsPauseHistoryCharts = pauseHistoryPoll;
+  window.__macStatsResumeHistoryCharts = resumeHistoryPoll;
 
   // Initialize on load
   if (document.readyState === 'loading') {

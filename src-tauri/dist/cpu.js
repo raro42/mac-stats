@@ -2430,6 +2430,8 @@ async function refresh() {
         } catch (e) {
           console.warn("get_processes_by_names failed", e);
         }
+        // Alt-tab during pinned lookup: drop process-list DOM rebuild (#14).
+        if (windowWorkPaused()) return;
         processes = mergePinnedProcesses(pinnedNames, pinnedLookup, processes);
       }
       const processKey = processes.length > 0
@@ -6028,6 +6030,13 @@ function pauseIdleWindowPolls() {
   if (hist && typeof hist.park === "function") {
     hist.park();
   }
+  // Data-poster history canvases: same park gate (not only document.hidden) (#14).
+  if (typeof window.__macStatsPauseHistoryCharts === "function") {
+    window.__macStatsPauseHistoryCharts();
+  } else {
+    const hc = window.historyCharts;
+    if (hc && typeof hc.park === "function") hc.park();
+  }
 }
 
 /**
@@ -6044,6 +6053,12 @@ function applyDeferredResumeIdleWindowPolls() {
   const hist = window.themeHistory;
   if (hist && typeof hist.unpark === "function") {
     hist.unpark();
+  }
+  if (typeof window.__macStatsResumeHistoryCharts === "function") {
+    window.__macStatsResumeHistoryCharts();
+  } else {
+    const hc = window.historyCharts;
+    if (hc && typeof hc.unpark === "function") hc.unpark();
   }
   startDiscordIconStatus();
   startLogsGlancePoll();

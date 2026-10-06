@@ -23,11 +23,11 @@ use objc2::runtime::AnyObject;
 use objc2_app_kit::NSStatusItem;
 #[cfg(target_os = "macos")]
 use std::cell::RefCell;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use sysinfo::{Disks, System};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 // System state
 pub(crate) static SYSTEM: Mutex<Option<System>> = Mutex::new(None);
@@ -42,6 +42,26 @@ thread_local! {
     pub(crate) static CLICK_HANDLER: RefCell<Option<Retained<AnyObject>>> = const { RefCell::new(None) };
 }
 pub(crate) static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
+
+/// True while the CPU window is focused. Visible-but-unfocused still kept
+/// SMC / process work hot for Graphics and Media (#14).
+pub(crate) static CPU_WINDOW_FOCUSED: AtomicBool = AtomicBool::new(false);
+
+/// Expensive CPU-window metrics (temp/freq/processes) only when focused + visible.
+pub(crate) fn cpu_window_active_for_metrics() -> bool {
+    if !CPU_WINDOW_FOCUSED.load(Ordering::Relaxed) {
+        return false;
+    }
+    APP_HANDLE
+        .get()
+        .and_then(|app_handle| {
+            app_handle
+                .get_webview_window("cpu")
+                .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
+        })
+        .is_some()
+}
+
 pub(crate) static MENU_BAR_TEXT: Mutex<Option<String>> = Mutex::new(None);
 /// Latest metrics paired with the pending menu-bar title (for per-value coloring).
 pub(crate) static MENU_BAR_METRICS: Mutex<Option<crate::metrics::SystemMetrics>> =

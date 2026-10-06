@@ -752,15 +752,8 @@ pub fn get_battery_info() -> (f32, bool, bool) {
     // Battery reading via IOKit is lightweight, but we only read when window is visible
     if let Ok(cache) = crate::state::BATTERY_CACHE.try_lock() {
         if let Some((level, charging, timestamp)) = cache.as_ref() {
-            // Check if CPU window is visible before doing fresh read
-            let window_visible = crate::state::APP_HANDLE
-                .get()
-                .and_then(|app_handle| {
-                    app_handle
-                        .get_webview_window("cpu")
-                        .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
-                })
-                .is_some();
+            // Focused + visible: visible-but-unfocused still woke IOKit (#14).
+            let window_visible = crate::state::cpu_window_active_for_metrics();
 
             // If window is closed, always return cache (even if stale) to save CPU
             if !window_visible {
@@ -784,15 +777,8 @@ pub fn get_battery_info() -> (f32, bool, bool) {
                 return (*level, *charging, *level >= 0.0);
             }
         } else {
-            // No cache - check if window is visible before reading
-            let window_visible = crate::state::APP_HANDLE
-                .get()
-                .and_then(|app_handle| {
-                    app_handle
-                        .get_webview_window("cpu")
-                        .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
-                })
-                .is_some();
+            // No cache - require focused + visible before reading (#14).
+            let window_visible = crate::state::cpu_window_active_for_metrics();
 
             if !window_visible {
                 // Window closed and no cache - return default values to save CPU
@@ -863,15 +849,8 @@ pub fn get_battery_info() -> (f32, bool, bool) {
 /// Returns cached values when window is closed.
 /// Power is read from IOReport every 5 seconds when window is visible.
 pub fn get_power_consumption() -> (f32, f32) {
-    // Check if CPU window is visible - if not, return cache or 0.0 to save CPU
-    let window_visible = crate::state::APP_HANDLE
-        .get()
-        .and_then(|app_handle| {
-            app_handle
-                .get_webview_window("cpu")
-                .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
-        })
-        .is_some();
+    // Focused + visible: visible-but-unfocused still woke IOReport (#14).
+    let window_visible = crate::state::cpu_window_active_for_metrics();
 
     // Check cache first
     // IOReport power reading is expensive, so we cache longer
@@ -1775,14 +1754,8 @@ pub fn get_cpu_details() -> CpuDetails {
         // Check process cache age even when rate-limited.
         // If stale (>PROCESS_CACHE_TTL_SECS), refresh it now.
         let processes = if should_check_process_cache {
-            let should_collect_processes = crate::state::APP_HANDLE
-                .get()
-                .and_then(|app_handle| {
-                    app_handle
-                        .get_webview_window("cpu")
-                        .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
-                })
-                .is_some();
+            // Focused + visible: visible-but-unfocused still refreshed processes (#14).
+            let should_collect_processes = crate::state::cpu_window_active_for_metrics();
 
             if should_collect_processes {
                 match crate::state::PROCESS_CACHE.try_lock() {
@@ -1931,18 +1904,9 @@ pub fn get_cpu_details() -> CpuDetails {
 
     debug3!("get_cpu_details() called");
 
-    // CRITICAL: Only collect processes if CPU window exists and is visible to save CPU
-    // Check window existence and visibility before doing expensive process collection
-    // If window was closed (destroyed), get_webview_window returns None, so no processes collected
-    let should_collect_processes = APP_HANDLE
-        .get()
-        .and_then(|app_handle| {
-            app_handle.get_webview_window("cpu").and_then(|window| {
-                // Window exists - check if it's visible
-                window.is_visible().ok().filter(|&visible| visible)
-            })
-        })
-        .is_some();
+    // Focused + visible: visible-but-unfocused still refreshed the process list (#14).
+    // If window was closed (destroyed), get_webview_window returns None.
+    let should_collect_processes = crate::state::cpu_window_active_for_metrics();
 
     // CRITICAL: Use try_lock ONCE - if locked, return cached values immediately
     // This prevents blocking the main thread when the window opens
@@ -2373,19 +2337,11 @@ pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
 
     debug3!("get_process_details() called for PID: {}", pid);
 
-    // CRITICAL: Only refresh processes if CPU window is visible (saves CPU)
-    // Process details modal is part of the CPU window, so check window visibility
-    let should_refresh_processes = APP_HANDLE
-        .get()
-        .and_then(|app_handle| {
-            app_handle
-                .get_webview_window("cpu")
-                .and_then(|window| window.is_visible().ok().filter(|&visible| visible))
-        })
-        .is_some();
+    // Focused + visible: Process Details is part of the CPU window (#14).
+    let should_refresh_processes = crate::state::cpu_window_active_for_metrics();
 
     if !should_refresh_processes {
-        debug3!("CPU window not visible, skipping process refresh in get_process_details");
+        debug3!("CPU window not focused/visible, skipping process refresh in get_process_details");
         // Still try to get the process from cache if available, but don't refresh
     }
 

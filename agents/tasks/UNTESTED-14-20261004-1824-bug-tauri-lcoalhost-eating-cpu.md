@@ -22,6 +22,26 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1428** (follow-up after v0.1.1427).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (focused backend gate + history/chart mid-flight park):
+
+- `src-tauri/src/state.rs` — `CPU_WINDOW_FOCUSED` + `cpu_window_active_for_metrics()` (focused and visible).
+- `src-tauri/src/ui/status_bar.rs` / `status_bar_linux.rs` — set/clear focused on Focused / destroy / open.
+- `src-tauri/src/lib.rs` / `metrics/mod.rs` — temp/freq loop, battery, power, process collect/refresh require focused (not only visible).
+- `src/history.js` — shared park gate; mid-flight skip after history IPC; `park`/`unpark` + `__macStatsPauseHistoryCharts`.
+- `src/chart-line.js` — shared park gate; `drawLineChart` no-ops while parked.
+- `src/agent-ops.js` — collapsed glance poll uses shared pause; mid-flight skip after IPC.
+- `src/cpu.js` — mid-flight pinned process-list DOM skip; blur parks history charts.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Expand History / Agent Ops glance, trigger a poll, then alt-tab before IPC returns — history canvas / sparkline draw / pinned list / Agent Ops glance must not paint while away. Backend must not refresh processes/SMC while unfocused. Alt-tab back — sections eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1427)
+
 Version **v0.1.1427** (follow-up after v0.1.1426).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

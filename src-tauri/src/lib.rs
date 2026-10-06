@@ -763,15 +763,9 @@ fn run_internal(open_cpu_window: bool) {
                 loop {
                     // Same 600s cadence open or idle (#14). Faster open loops only woke
                     // SMC/IOReport + history while Graphics and Media was already hot.
+                    // Focused + visible: visible-but-unfocused still woke SMC (#14).
                     #[cfg(target_os = "macos")]
-                    let cpu_window_visible = APP_HANDLE
-                        .get()
-                        .and_then(|app_handle| {
-                            app_handle.get_webview_window("cpu").and_then(|window| {
-                                window.is_visible().ok().filter(|&visible| visible)
-                            })
-                        })
-                        .is_some();
+                    let cpu_window_visible = crate::state::cpu_window_active_for_metrics();
                     std::thread::sleep(std::time::Duration::from_secs(600));
 
                     debug3!("Update loop: getting metrics...");

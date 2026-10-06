@@ -74,6 +74,13 @@
   /** macOS often keeps visibilityState=visible when another app is frontmost (#14). */
   function windowOccluded() {
     if (typeof document === "undefined") return false;
+    try {
+      if (typeof window.__macStatsWindowWorkPaused === "function") {
+        return !!window.__macStatsWindowWorkPaused();
+      }
+    } catch (_) {
+      /* ignore */
+    }
     if (document.hidden) return true;
     try {
       if (typeof document.hasFocus === "function" && !document.hasFocus()) {
@@ -247,6 +254,8 @@
   }
 
   function drawLineChart(metric) {
+    // Mid-flight sample / unpark: do not wake WebKit while parked (#14).
+    if (canvasesParked || windowOccluded()) return;
     const canvas = canvases[metric];
     const ctx = contexts[metric];
     if (!canvas || !ctx) return;
@@ -461,6 +470,7 @@
     const run = () => {
       unparkIdleHandle = null;
       unparkTimeoutId = null;
+      // Still parked (Focused false / pause flag): drop GPU alloc (#14).
       if (windowOccluded()) return;
       unparkCanvases();
     };

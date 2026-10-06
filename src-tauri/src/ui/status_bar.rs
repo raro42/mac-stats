@@ -888,6 +888,9 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             let _ = window.show();
             let _ = window.set_focus();
             let _ = window.unminimize();
+            // Open path focuses the window; arm backend metrics gate (#14).
+            crate::state::CPU_WINDOW_FOCUSED
+                .store(true, std::sync::atomic::Ordering::Relaxed);
 
             // Title-bar close destroys the WebView so WebKit GPU ("Graphics and Media")
             // does not keep burning CPU while the menu bar is idle.
@@ -898,15 +901,22 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                     tauri::WindowEvent::CloseRequested { api, .. } => {
                         api.prevent_close();
                         save_cpu_window_geometry(&window_for_events);
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(false, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.destroy();
                         debug1!("CPU window close requested — destroyed for idle CPU");
                     }
                     tauri::WindowEvent::Focused(false) => {
+                        // Park backend SMC/process work while visible-but-unfocused (#14).
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(false, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.eval(
                             "try{if(typeof window.__macStatsPauseIdleWindowPolls==='function')window.__macStatsPauseIdleWindowPolls();}catch(e){}",
                         );
                     }
                     tauri::WindowEvent::Focused(true) => {
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(true, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.eval(
                             "try{if(typeof window.__macStatsResumeVisibleWindowWork==='function')window.__macStatsResumeVisibleWindowWork();}catch(e){}",
                         );

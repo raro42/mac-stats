@@ -141,6 +141,8 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             let _ = window.show();
             let _ = window.set_focus();
             let _ = window.unminimize();
+            crate::state::CPU_WINDOW_FOCUSED
+                .store(true, std::sync::atomic::Ordering::Relaxed);
 
             let window_for_events = window.clone();
             window.on_window_event(move |event| {
@@ -148,15 +150,21 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                     tauri::WindowEvent::CloseRequested { api, .. } => {
                         api.prevent_close();
                         save_cpu_window_geometry(&window_for_events);
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(false, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.destroy();
                         debug1!("CPU window close requested — destroyed");
                     }
                     tauri::WindowEvent::Focused(false) => {
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(false, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.eval(
                             "try{if(typeof window.__macStatsPauseIdleWindowPolls==='function')window.__macStatsPauseIdleWindowPolls();}catch(e){}",
                         );
                     }
                     tauri::WindowEvent::Focused(true) => {
+                        crate::state::CPU_WINDOW_FOCUSED
+                            .store(true, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_for_events.eval(
                             "try{if(typeof window.__macStatsResumeVisibleWindowWork==='function')window.__macStatsResumeVisibleWindowWork();}catch(e){}",
                         );
