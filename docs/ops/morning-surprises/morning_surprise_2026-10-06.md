@@ -6,6 +6,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1472** | Press and hover no longer scale or lift. The Add button and the chat connection dot stay still. Apple theme, result, log, and Send controls drop the one-pixel lift. |
+| **v0.1.1471** | Agent Ops collapsed glance mixes ready, warn, and offline washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1470** | Disk Cleanup collapsed glance mixes reclaim, due, scopes-off, and clean washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1469** | External / Monitors collapsed glance mixes up, down, and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1468** | Top Processes keep-header glances (CPU · GPU · RAM) mix calm and hot washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1467** | Ring progress strokes draw their start in the path. Dark, Futuristic, Neon, Material, and Swiss no longer use a CSS rotate. |
 | **v0.1.1466** | Details collapsed glance (Load · RAM · Up) mixes calm and hot washes against an opaque fill. No glass alpha or hover shadow. |
@@ -51,10 +55,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Settings switches that are on sit with `left`. WebKit does not keep a transform layer for those knobs.
+A press on Add, or a hover on Send, no longer starts a transform layer in Graphics and Media.
 
 ## Still open
 
-- ~23:07 tick: settings knobs drop `translateX` (**v0.1.1463**, rebasing past origin v0.1.1461–1462). Ring progress strokes still use `transform: rotate` on the open gauges.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
+- Agent Ops CSS still scales some presses and lifts some hovers. Copied badges still use a vertical translate.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

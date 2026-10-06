@@ -20,6 +20,22 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1472
+
+- Press and hover no longer scale or lift. Add button, connection dot, and thinking-dots keyframes drop `scale`. Apple theme, result, log, and Send controls drop the one-pixel lift. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1471
+
+- Agent Ops collapsed glance mixes ready, warn, and offline washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1470
+
+- Disk Cleanup collapsed glance mixes reclaim, due, scopes-off, and clean washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1469
+
+- External / Monitors collapsed glance mixes up, down, and slow washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1468
 
 - Top Processes keep-header glances (CPU · GPU · RAM) mix calm and hot washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.

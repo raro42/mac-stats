@@ -1755,7 +1755,6 @@ body {
 
 .add-btn-small:active {
   background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  transform: scale(0.98);
 }
 
 .monitors-list {
@@ -2083,7 +2082,6 @@ body {
 
 .connection-indicator:hover:not(.connected) {
   opacity: 0.8;
-  transform: scale(1.1);
 }
 
 .model-text {
@@ -2362,11 +2360,9 @@ body {
 @keyframes thinking-pulse {
   0%, 60%, 100% {
     opacity: 0.3;
-    transform: scale(0.8);
   }
   30% {
     opacity: 1;
-    transform: scale(1);
   }
 }
 

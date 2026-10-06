@@ -484,7 +484,6 @@ border-radius: 24px;
 }
 
 .process-row:active {
-  transform: translateY(0);
   opacity: 0.92;
 }
 
@@ -669,15 +668,13 @@ padding: 18px 18px 16px;
   text-align: left;
   padding: 0 10px;
   box-shadow: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
-    transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .theme-item:hover {
   background: color-mix(in srgb, var(--text, #0c0c10) 10%, transparent);
   border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, transparent);
   box-shadow: 0 2px 8px color-mix(in srgb, #000 8%, transparent);
-  transform: translateY(-1px);
 }
 
 .theme-item:focus-visible {
@@ -689,7 +686,6 @@ padding: 18px 18px 16px;
   border-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
   background: color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
-  transform: none;
 }
 
 .settings-input,
@@ -1792,13 +1788,12 @@ padding: 18px 18px 16px;
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: 10px;
   line-height: 1.5;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .perplexity-result-item:hover {
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
   border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
   box-shadow: 0 2px 8px color-mix(in srgb, #000 6%, transparent);
-  transform: translateY(-1px);
 }
 .perplexity-result-item:focus-within,
 .perplexity-result-item.is-selected {
@@ -1891,19 +1886,15 @@ padding: 18px 18px 16px;
   background: color-mix(in srgb, currentColor 5%, transparent);
   color: var(--text);
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .logs-toolbar button:hover {
   background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
   border-color: color-mix(in srgb, var(--accent, #007aff) 24%, transparent);
-  transform: translateY(-1px);
 }
 .logs-toolbar button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
   outline-offset: 2px;
-}
-.logs-toolbar button:active {
-  transform: translateY(0);
 }
 .logs-autorefresh {
   font-size: 12px;
@@ -2232,7 +2223,6 @@ padding: 0;
 
 .add-btn-small:active {
   background: rgba(255, 255, 255, 0.5);
-  transform: scale(0.98);
 }
 
 .monitors-list {
@@ -2625,7 +2615,6 @@ padding: 0;
 
 .connection-indicator:hover:not(.connected) {
   opacity: 0.8;
-  transform: scale(1.1);
 }
 
 .connection-indicator:focus-visible:not(.connected) {
@@ -3039,11 +3028,9 @@ padding: 0;
 @keyframes thinking-pulse {
   0%, 60%, 100% {
     opacity: 0.3;
-    transform: scale(0.8);
   }
   30% {
     opacity: 1;
-    transform: scale(1);
   }
 }
 
@@ -3112,13 +3099,12 @@ padding: 0;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
   font-family: inherit;
 }
 
 #chat-send-btn:hover {
   background: rgba(0, 122, 255, 1);
-  transform: translateY(-1px);
   box-shadow: 0 2px 8px color-mix(in srgb, #007aff 28%, transparent);
 }
 
@@ -3128,7 +3114,6 @@ padding: 0;
 }
 
 #chat-send-btn:active {
-  transform: translateY(0);
   box-shadow: none;
   background: rgba(0, 100, 220, 0.95);
 }
@@ -3136,6 +3121,5 @@ padding: 0;
 #chat-send-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
 }
