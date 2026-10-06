@@ -2632,3 +2632,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm history canvases stay hidden / 1×1 until hover or Refresh; gauges still update; hover history or press Refresh — sparklines draw; alt-tab away and back — unpark on resume idle; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1453)
+
+**Date:** 2026-10-06 04:53 UTC (06:53 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1453**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1453)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings/changelog/collapsed-body wiring off the open path)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1453**
+- `CHANGELOG.md` **[0.1.1453]** documents Settings theme/product/decorations and changelog modal staying unwired until Settings or footer version; collapsed AI Chat skips composer listeners; collapsed Debug Log / Disk cleanup skip body wiring; closed Settings/changelog `content-visibility: hidden`
+- `src/cpu-ui.js` — `bootstrap` only `initSettingsOpenButton` + `wireChangelogVersionClicksOnce`; `ensureSettingsChromeWired` (theme picker, product toggles, decorations, Settings keyboard) runs from `openSettingsModal`; changelog modal keyboard from `ensureChangelogModalWired` on footer version click; `ai-agent-enabled-changed` still updates the gate without opening Settings
+- `src/cpu.js` / `src/ollama.js` — collapsed AI Chat skips `Ollama.initListeners` until expand; `ensureLogsSectionBodyWired` / `ensureDiskCleanupBodyWired` wait for expand
+- `src/agent-ops.css` — closed `#settings-modal` / `#changelog-modal` use `content-visibility: hidden`
+- `src-tauri/dist/cpu-ui.js`, `cpu.js`, `agent-ops.css` match the skip comments
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 Settings/changelog defer.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no Settings theme/product wiring and no changelog modal keyboard until Settings or footer version click; expand Debug Log / Disk cleanup / AI Chat — filters, composer, and Refresh still work; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
