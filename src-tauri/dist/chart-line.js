@@ -62,6 +62,8 @@
   // Start parked so open does not allocate sparkline GPU buffers (#14).
   let canvasesParked = true;
   let listenersWired = false;
+  let unparkIdleHandle = null;
+  let unparkTimeoutId = null;
   const lastSample = {
     temperature: NaN,
     usage: NaN,
@@ -84,8 +86,28 @@
   }
 
   /** Drop GPU backing stores while occluded — keeps last buffer for unpark redraw (#14). */
+  function cancelDeferredUnparkCanvases() {
+    if (
+      unparkIdleHandle != null &&
+      typeof window.cancelIdleCallback === "function"
+    ) {
+      try {
+        window.cancelIdleCallback(unparkIdleHandle);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    unparkIdleHandle = null;
+    if (unparkTimeoutId != null) {
+      clearTimeout(unparkTimeoutId);
+      unparkTimeoutId = null;
+    }
+  }
+
   function parkCanvases() {
     canvasesParked = true;
+    // Drop pending focus/visibility unpark so blur does not still alloc GPU (#14).
+    cancelDeferredUnparkCanvases();
     Object.keys(canvases).forEach((metric) => {
       const canvas = canvases[metric];
       if (!canvas) return;
@@ -435,15 +457,18 @@
 
   function scheduleUnparkCanvases(idleTimeoutMs) {
     const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 240000;
+    cancelDeferredUnparkCanvases();
     const run = () => {
+      unparkIdleHandle = null;
+      unparkTimeoutId = null;
       if (windowOccluded()) return;
       unparkCanvases();
     };
     // Idle-defer GPU alloc so focus/resume does not stack with IPC (#14).
     if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(run, { timeout: ms });
+      unparkIdleHandle = window.requestIdleCallback(run, { timeout: ms });
     } else {
-      setTimeout(run, ms);
+      unparkTimeoutId = setTimeout(run, ms);
     }
   }
 

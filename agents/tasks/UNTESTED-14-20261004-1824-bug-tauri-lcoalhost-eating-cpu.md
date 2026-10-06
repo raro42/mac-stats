@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1424** (follow-up after v0.1.1423).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (structural occlusion cancel — not another timeout doubling):
+
+- `src/cpu.js` — blur/pause cancels pending open-path `scheduleCpuWindowMetricsOnce` and late-open fallback idle handles (previously only focus-resume deferred work was cancelled). `startCpuWindowMetricsOnce` / late-open bail without arming while occluded. Focus re-schedules first metrics if never armed. After `get_cpu_details` await, skip DOM/paint when occluded/paused so mid-IPC alt-tab does not wake WebKit. `afterFirst` does not arm the refresh interval or unpark sparklines while occluded.
+- `src/chart-line.js` — cancel pending idle sparkline unpark on `parkCanvases` / blur so focus churn does not still allocate GPU buffers.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Alt-tab away during the first minutes (before rings fill) — open-path metrics idle / late fallback / sparkline unpark must not fire while away. Alt-tab back — gauges eventually refresh; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1423)
+
 Version **v0.1.1423** (follow-up after v0.1.1422).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1405,6 +1420,36 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 - `src/cpu.js` — `scheduleCpuWindowMetricsOnce` default / focused-open idle ≤**480000**; sparkline unpark after first poll ≤**480000**; focus resume history seed idle ≤**480000**; version/update IPC idle ≤**1200000**; late open fallback idle ≤**1200000**; `scheduleMonitoringFeaturesOnce` idle ≤**3600000**; `resumeIdleWindowPolls` / `applyDeferredResumeIdleWindowPolls` idle ≤**120000**; `scheduleDeferredFocusRefresh` idle ≤**120000** (cancelled on blur/pause; not on the focus event); focus handler calls `resumeVisibleWindowWork` only (no immediate `startRefresh`)
 - `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**120000** (`scheduleUnparkCanvases`); park on blur/hidden stays immediate
 - `src/agent-ops.js` — Agent Ops init idle ≤**3600000**; exposes `__macStatsScheduleAgentOpsInit`
+- Prior 3600s poll floor / occlusion park / Focused pause-resume kept (`PROCESS_CACHE_TTL_SECS = 3600`; `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-metrics / focus-interval idle cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC / metrics interval should not restart on the focus event itself) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1423)
+
+**Date:** 2026-10-06 01:13 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1423)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 defer metrics further + idle-defer focus interval arm)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1423**
+- `src/cpu.js` — `scheduleCpuWindowMetricsOnce` default / focused-open idle ≤**960000**; sparkline unpark after first poll ≤**960000**; focus resume history seed idle ≤**960000**; version/update IPC idle ≤**2400000**; late open fallback idle ≤**2400000**; `scheduleMonitoringFeaturesOnce` idle ≤**7200000**; `resumeIdleWindowPolls` / `applyDeferredResumeIdleWindowPolls` idle ≤**240000**; `scheduleDeferredFocusRefresh` idle ≤**240000** (cancelled on blur/pause; not on the focus event); focus handler calls `resumeVisibleWindowWork` only (no immediate `startRefresh`)
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**240000** (`scheduleUnparkCanvases`); park on blur/hidden stays immediate
+- `src/agent-ops.js` — Agent Ops init idle ≤**7200000**; exposes `__macStatsScheduleAgentOpsInit`
 - Prior 3600s poll floor / occlusion park / Focused pause-resume kept (`PROCESS_CACHE_TTL_SECS = 3600`; `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s)
 
 **debug.log**

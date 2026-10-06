@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
 
+## [0.1.1424] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Blur cancels pending open-path first-metrics and late-open idle callbacks (not only focus-resume). First metrics will not arm while the window is occluded; focus re-schedules if arming never happened. After `get_cpu_details` returns, skip DOM/paint when the window is already occluded so an alt-tab mid-IPC does not wake WebKit. Chart-line cancels a pending sparkline unpark on park/blur. Aim: quieter `tauri://localhost` / Graphics and Media after alt-tab during open warm-up.
+
+
 ## [0.1.1423] - 2026-10-06
 
 ### Changed
