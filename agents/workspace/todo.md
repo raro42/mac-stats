@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1570`; CHANGELOG entry
 - [x] Prepend Implementation notes on task file; rename WIP → UNTESTED
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
+- [x] Commit + push `origin/main`; GitHub comment via `gh-safe.sh`; do not close #14
 
 ## Review
-Opaque wash on Disk Cleanup category path Copied flash (`.disk-cleanup-item-path.is-just-saved`). Same pattern as Monitor URL / Debug Log path Copied flashes. cargo check green. Issue #14 left open for tester / 004.
+Opaque wash on Disk Cleanup category path Copied flash (`.disk-cleanup-item-path.is-just-saved`). Same pattern as Monitor URL / Debug Log path Copied flashes. cargo check green. Pushed `bd3c5371`. Issue #14 left open for tester / 004.
