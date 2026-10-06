@@ -6,13 +6,15 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
-| **v0.1.1424** | Blur cancels open-path first-metrics + late-open idle (not only focus-resume). Skip gauge DOM after `get_cpu_details` if already occluded. Chart-line cancels pending sparkline unpark on park. Focus re-schedules metrics if arming never happened. |
-| v0.1.1423 | Further idle-defer of metrics / focus interval arm (prior tick). |
-| v0.1.1420–1422 | Idle-defer focus-resume secondary polls; longer open warm-up defers. |
+| **v0.1.1427** | Shared park gate for secondary IPC. Mid-flight Discord icon, monitors summary/list, history availability, Process Details, and Agent Ops auto-refresh skip paint after alt-tab. Blur clears Process Details live refresh; focus re-arms if the modal is still open. |
+| v0.1.1426 | Mid-flight DOM rAF clear; version tip/update skip; history-seed abort while parked. |
+| v0.1.1425 | Blur cancels remaining occluded idle schedules (version, unpark, history seed, monitoring, Agent Ops init). |
+| v0.1.1424 | Blur cancels open-path first-metrics + late-open idle; skip gauge DOM after mid-IPC alt-tab; chart-line cancels unpark on park. |
+| v0.1.1420–1423 | Idle-defer focus-resume secondary polls; longer open warm-up defers. |
 
 ## Why it matters
 
-Alt-tab during the first minutes used to leave idle callbacks armed. They could still wire gauges and allocate sparkline GPU while the shell was parked. Mid-IPC paint after an alt-tab could wake WebKit the same way.
+Alt-tab used to leave Discord / Monitors / Agent Ops / Process Details free to finish IPC and rebuild DOM while the shell was parked. That woke WebKit the same way gauge mid-flight paint did. The shared pause gate closes that gap for the secondary surfaces.
 
 ## Still open
 

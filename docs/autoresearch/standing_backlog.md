@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1427
+
+- CPU window: mid-flight Discord / monitors / history / Process Details / Agent Ops skip IPC+DOM while parked (`__macStatsWindowWorkPaused`). Blur clears Process Details live refresh; focus re-arms if modal open. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1424
 
 - CPU window: blur cancels open-path first-metrics + late-open idle; skip post-await DOM when occluded; chart-line cancels pending unpark on park. Focus re-schedules metrics if never armed. P2 reliability / GitHub #14.
