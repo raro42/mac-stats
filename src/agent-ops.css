@@ -10067,6 +10067,14 @@ button.is-just-saved,
   color: color-mix(in srgb, #ff3b30 45%, currentColor);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+#discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #ffffff) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
 /* Settings — Help cheat sheet attention glance (Product settings; Perplexity Key-not-set parity) */
 /* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .settings-help-attention-glance {
