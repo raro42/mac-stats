@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.1.1436] - 2026-10-06
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — AI agent visibility applies from localStorage on open (`get_ai_agent_enabled` waits for Settings Product toggles, which also cache the flag). Ollama module no longer auto-configures 100ms after DOMContentLoaded; `ensureInitialized` arms configure + connection check when AI Chat expands (or on focus resume only if AI is on in localStorage). Collapsed AI Chat skips connection IPC on monitoring warm-up. Aim: quieter `tauri://localhost` / Graphics and Media on open for monitor-only and collapsed-chat sessions.
+
 ## [0.1.1435] - 2026-10-06
 
 ### Changed

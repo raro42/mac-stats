@@ -6093,16 +6093,35 @@ function applyDeferredResumeIdleWindowPolls() {
   if (typeof window.__macStatsResumeAgentOpsPolls === "function") {
     window.__macStatsResumeAgentOpsPolls();
   }
-  // Ollama: recheck connection after park (module init / expand may have skipped) (#14).
-  if (window.Ollama && typeof window.Ollama.checkConnection === "function") {
-    void checkOllamaConnection();
+  // Ollama: recheck only when AI is on (localStorage) — avoid open-path configure (#14).
+  {
+    let aiOn = null;
+    if (typeof window.__macStatsReadAiAgentEnabledLocal === "function") {
+      aiOn = window.__macStatsReadAiAgentEnabledLocal();
+    } else {
+      try {
+        const raw = localStorage.getItem("ai_agent_enabled");
+        aiOn = raw === null ? null : raw === "true";
+      } catch (_) {
+        aiOn = null;
+      }
+    }
+    if (aiOn === true && window.Ollama) {
+      if (typeof window.Ollama.ensureInitialized === "function") {
+        void window.Ollama.ensureInitialized();
+      } else if (typeof window.Ollama.checkConnection === "function") {
+        void checkOllamaConnection();
+      }
+    }
   }
   // Flush stream chunks buffered while the shell was parked (#14).
   if (window.Ollama && typeof window.Ollama.flushParkedStream === "function") {
     window.Ollama.flushParkedStream();
   }
-  // Product toggles: recheck AI visibility if open-path load was parked (#14).
-  if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
+  // Product toggles: re-apply AI visibility from localStorage (no IPC) (#14).
+  if (typeof window.__macStatsApplyAiUiFromLocal === "function") {
+    window.__macStatsApplyAiUiFromLocal();
+  } else if (typeof window.__macStatsLoadProductToggleStatesAiOnly === "function") {
     void window.__macStatsLoadProductToggleStatesAiOnly();
   }
   // Monitoring idle may have parked mid UI-state / pin hydrate — retry (#14).
@@ -11675,30 +11694,36 @@ function initOllamaSection() {
       hideModelDropdown();
     } else {
       if (chat) chat.style.display = 'block';
-      checkOllamaConnection().then((connected) => {
+      // Expand arms configure once (no DOMContentLoaded Ollama init, #14).
+      const afterInit = () => {
         if (windowWorkPaused()) return;
-        // Update icon based on connection result
-        if (connected) {
-          updateOllamaIconStatus('connected');
-        } else {
-          // Double-check the connection indicator after section is expanded
-          setTimeout(() => {
-            if (windowWorkPaused()) return;
-            const indicator = document.getElementById('ollama-connection-indicator');
-            if (indicator) {
-              const isConnected = indicator.classList.contains('connected');
-              updateOllamaIconStatus(isConnected ? 'connected' : 'unknown');
-            } else {
-              updateOllamaIconStatus('unknown');
-            }
-          }, 200);
-        }
-      }).catch((err) => {
-        if (windowWorkPaused()) return;
-        // Connection check failed - Ollama not available
-        console.error('[CPU] Ollama connection check failed:', err);
-        updateOllamaIconStatus('error');
-      });
+        checkOllamaConnection().then((connected) => {
+          if (windowWorkPaused()) return;
+          if (connected) {
+            updateOllamaIconStatus('connected');
+          } else {
+            setTimeout(() => {
+              if (windowWorkPaused()) return;
+              const indicator = document.getElementById('ollama-connection-indicator');
+              if (indicator) {
+                const isConnected = indicator.classList.contains('connected');
+                updateOllamaIconStatus(isConnected ? 'connected' : 'unknown');
+              } else {
+                updateOllamaIconStatus('unknown');
+              }
+            }, 200);
+          }
+        }).catch((err) => {
+          if (windowWorkPaused()) return;
+          console.error('[CPU] Ollama connection check failed:', err);
+          updateOllamaIconStatus('error');
+        });
+      };
+      if (window.Ollama && typeof window.Ollama.ensureInitialized === 'function') {
+        void window.Ollama.ensureInitialized().then(afterInit);
+      } else {
+        afterInit();
+      }
     }
     // Update menu text
     const menuCollapse = document.getElementById('ollama-menu-collapse');
@@ -11758,21 +11783,28 @@ function initOllamaSection() {
     window.Ollama.initListeners();
   }
 
-  // Check connection on load
-  if (window.Ollama) {
-    checkOllamaConnection().then(() => {
+  // Connection IPC only when AI Chat is already expanded (lazy init, #14).
+  // Collapsed open path skips configure_ollama / check_ollama_connection.
+  if (!ollamaCollapsed && window.Ollama) {
+    const arm = () => {
       if (windowWorkPaused()) return;
-      // Double-check the connection indicator after initial load
-      setTimeout(() => {
+      checkOllamaConnection().then(() => {
         if (windowWorkPaused()) return;
-        const indicator = document.getElementById('ollama-connection-indicator');
-        if (indicator && indicator.classList.contains('connected')) {
-          updateOllamaIconStatus(true);
-        }
-      }, 300);
-    });
-  } else {
-    // If Ollama module not available, ensure icon is not green
+        setTimeout(() => {
+          if (windowWorkPaused()) return;
+          const indicator = document.getElementById('ollama-connection-indicator');
+          if (indicator && indicator.classList.contains('connected')) {
+            updateOllamaIconStatus(true);
+          }
+        }, 300);
+      });
+    };
+    if (typeof window.Ollama.ensureInitialized === 'function') {
+      void window.Ollama.ensureInitialized().then(arm);
+    } else {
+      arm();
+    }
+  } else if (!window.Ollama) {
     updateOllamaIconStatus(false);
   }
   

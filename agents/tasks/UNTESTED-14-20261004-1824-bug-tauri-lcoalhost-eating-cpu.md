@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1436** (follow-up after v0.1.1435).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (AI localStorage + defer Ollama module init):
+
+- `src/cpu-ui.js` — Open path applies AI section/icon gate from localStorage (`ai_agent_enabled`); no `get_ai_agent_enabled` until Settings Product toggles. Persist on toggle / Settings sync / enable-from-icon / `ai-agent-enabled-changed` (cache even when parked).
+- `src/ollama.js` — Drop DOMContentLoaded +100ms auto-configure. `ensureInitialized()` arms configure + connection once when AI Chat needs it.
+- `src/cpu.js` — Collapsed AI Chat skips connection IPC on monitoring init. Expand calls `ensureInitialized` then check. Focus resume rechecks Ollama only when AI is on in localStorage; AI visibility re-applies from localStorage (no IPC).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Confirm AI chrome can appear/hide from localStorage without Settings open, and `get_ai_agent_enabled` waits until Settings Product toggles. With AI Chat collapsed, confirm no early `configure_ollama` / connection fan-out on open. Expand AI Chat — configure + connection run once. Alt-tab during expand warm-up — no glance paint while away; alt-tab back with AI on — ensureInitialized/recheck; watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1435)
+
 Version **v0.1.1435** (follow-up after v0.1.1434).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.

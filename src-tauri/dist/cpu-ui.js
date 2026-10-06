@@ -38,6 +38,40 @@
     }
     return typeof document !== "undefined" && !!document.hidden;
   }
+
+  /** localStorage key for AI agent gate (open path skips get_ai_agent_enabled, #14). */
+  const AI_AGENT_ENABLED_LS_KEY = "ai_agent_enabled";
+
+  function persistAiAgentEnabledLocal(enabled) {
+    try {
+      localStorage.setItem(
+        AI_AGENT_ENABLED_LS_KEY,
+        enabled ? "true" : "false"
+      );
+    } catch (_) {
+      /* localStorage optional */
+    }
+  }
+
+  /** null = unset (leave HTML default); else boolean from localStorage. */
+  function readAiAgentEnabledLocal() {
+    try {
+      const raw = localStorage.getItem(AI_AGENT_ENABLED_LS_KEY);
+      if (raw === null) return null;
+      return raw === "true";
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /** Apply AI section/icon gate from localStorage only (no IPC). Open-path seed (#14). */
+  function applyAiUiVisibilityFromLocalStorage() {
+    const on = readAiAgentEnabledLocal();
+    if (on === null) return;
+    const toggle = document.getElementById("ai-agent-enabled-toggle");
+    if (toggle) toggle.checked = on;
+    applyAiUiVisibility(on);
+  }
   function getSavedTheme() {
     return localStorage.getItem("theme") || "apple";
   }
@@ -3898,11 +3932,16 @@
 
     /**
      * Load Product toggle state from the backend.
-     * Open path: AI only (gates icon/section visibility).
+     * Open path: AI visibility from localStorage (no get_ai_agent_enabled).
      * Full fan-out waits for Settings open so open does not stack 8+ IPC (#14).
      */
     async function loadProductToggleStates(opts) {
       const aiOnly = !!(opts && opts.aiOnly);
+      // Open / resume AI-only: localStorage seed — no IPC (#14).
+      if (aiOnly) {
+        applyAiUiVisibilityFromLocalStorage();
+        return;
+      }
       // Parked: skip product-toggle IPC + glance paint (#14).
       if (uiWorkPaused()) return;
       try {
@@ -3911,12 +3950,12 @@
         if (aiToggle) {
           aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
           if (uiWorkPaused()) return;
+          persistAiAgentEnabledLocal(aiToggle.checked);
           applyAiUiVisibility(aiToggle.checked);
-          if (!aiOnly) applySettingsAiAttentionGlanceState();
-        } else if (!aiOnly) {
+          applySettingsAiAttentionGlanceState();
+        } else {
           applyAiUiVisibility(true);
         }
-        if (aiOnly) return;
 
         if (judgeToggle) {
           if (uiWorkPaused()) return;
@@ -3992,12 +4031,15 @@
       }
     }
 
-    // Open: AI visibility only. Full toggles load when Settings opens (#14).
-    void loadProductToggleStates({ aiOnly: true });
+    // Open: AI visibility from localStorage. Full toggles when Settings opens (#14).
+    applyAiUiVisibilityFromLocalStorage();
     window.__macStatsLoadProductToggleStates = (opts) =>
       loadProductToggleStates(opts || { aiOnly: false });
     window.__macStatsLoadProductToggleStatesAiOnly = () =>
       loadProductToggleStates({ aiOnly: true });
+    window.__macStatsApplyAiUiFromLocal = applyAiUiVisibilityFromLocalStorage;
+    window.__macStatsPersistAiAgentEnabledLocal = persistAiAgentEnabledLocal;
+    window.__macStatsReadAiAgentEnabledLocal = readAiAgentEnabledLocal;
 
     if (aiToggle) {
       aiToggle.addEventListener("change", async () => {
@@ -4005,6 +4047,7 @@
           const invoke = getInvoke();
           if (!invoke) return;
           const v = await invoke("set_ai_agent_enabled", { enabled: aiToggle.checked });
+          persistAiAgentEnabledLocal(!!v);
           if (uiWorkPaused()) return;
           applyAiUiVisibility(!!v);
           applySettingsAiAttentionGlanceState();
@@ -4018,9 +4061,11 @@
       try {
         const { listen } = window.__TAURI__.event;
         listen("ai-agent-enabled-changed", (ev) => {
+          const on = !!ev.payload;
+          // Always cache so resume/open can paint without IPC (#14).
+          persistAiAgentEnabledLocal(on);
           // Parked: drop toggle/icon paint until focus (#14).
           if (uiWorkPaused()) return;
-          const on = !!ev.payload;
           aiToggle.checked = on;
           applyAiUiVisibility(on);
           applySettingsAiAttentionGlanceState();
@@ -4352,6 +4397,7 @@
         return false;
       }
       const v = await invoke("set_ai_agent_enabled", { enabled: true });
+      persistAiAgentEnabledLocal(!!v);
       applyAiUiVisibility(!!v);
       const toggle = document.getElementById("ai-agent-enabled-toggle");
       if (toggle) toggle.checked = !!v;
@@ -5308,6 +5354,8 @@
         /* localStorage optional */
       }
     }
+    // AI gate from localStorage before Product toggle IPC (#14).
+    applyAiUiVisibilityFromLocalStorage();
     initSettingsModal();
     initThemePicker();
     initRefresh();

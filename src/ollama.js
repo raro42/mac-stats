@@ -3961,43 +3961,54 @@ function initOllamaChatListeners() {
 }
 
 // ============================================================================
-// Auto-initialize on module load
+// Lazy initialize (not on DOMContentLoaded — open-path IPC cut, #14)
 // ============================================================================
-// Auto-configure Ollama when the module loads (if DOM is ready)
+let ollamaInitStarted = false;
+let ollamaInitPromise = null;
+
+/**
+ * Configure + connection check once, when AI Chat is actually needed.
+ * Open path no longer stacks configure_ollama 100ms after load (#14).
+ */
 async function initializeOllama() {
-  // Alt-tab during module warm-up: skip IPC + glance paint; resume rechecks (#14).
+  // Alt-tab during warm-up: skip IPC + glance paint; caller may retry (#14).
   if (ollamaWorkPaused()) {
-    console.log('[Ollama] Module load parked; defer configure until resume');
-    return;
+    console.log('[Ollama] Init parked; defer configure until resume');
+    return false;
   }
-  // Auto-configure after a short delay to ensure everything is ready
-  console.log('[Ollama] Module loaded, auto-configuring...');
+  console.log('[Ollama] Initializing (configure + connection)...');
   ensureOllamaCollapsedGlance();
   ensureChatModelGlance();
   ensureChatTurnGlance();
   applyChatModelGlanceState();
   syncOllamaCollapsedGlance();
   try {
-    // Always auto-configure the backend, regardless of DOM elements
     await autoConfigureOllama();
-    if (ollamaWorkPaused()) return;
-    // Check connection after auto-configuration (this will update UI if elements exist)
+    if (ollamaWorkPaused()) return false;
     setTimeout(() => {
       if (ollamaWorkPaused()) return;
       checkOllamaConnection();
     }, 200);
+    return true;
   } catch (err) {
     console.error('[Ollama] Failed to initialize:', err);
+    return false;
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initializeOllama, 100);
+/** Idempotent: first AI Chat / expand / resume need arms configure once (#14). */
+function ensureInitialized() {
+  if (ollamaInitStarted && ollamaInitPromise) return ollamaInitPromise;
+  ollamaInitStarted = true;
+  ollamaInitPromise = initializeOllama().then((ok) => {
+    // Parked before configure: allow a later resume/expand to retry (#14).
+    if (!ok && ollamaWorkPaused()) {
+      ollamaInitStarted = false;
+      ollamaInitPromise = null;
+    }
+    return ok;
   });
-} else {
-  // DOM already loaded, initialize immediately
-  setTimeout(initializeOllama, 100);
+  return ollamaInitPromise;
 }
 
 // ============================================================================
@@ -4010,6 +4021,7 @@ window.Ollama = {
   configure: configureOllama,
   showUrlDialog: showOllamaUrlDialog,
   autoConfigure: autoConfigureOllama,
+  ensureInitialized: ensureInitialized,
   
   // Models
   updateModel: updateOllamaModel,

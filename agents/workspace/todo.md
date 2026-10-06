@@ -1,14 +1,13 @@
-# Coder — #14 v0.1.1435
+# Coder — #14 v0.1.1436
 
 ## Plan
-- [x] Park `loadCpuUiSections` retry + clear promise on park; resume re-merge
-- [x] Park `hydratePinnedProcessNamesFromDisk` start + mid-flight
-- [x] Compact: localStorage on open; Settings Product syncs backend + layout
-- [x] Drop duplicate `autoConfigureOllama` from monitoring idle
-- [x] Agent Ops: bail `loadCpuUiSections` / `take_open_ui_section` wait while parked
-- [x] Bump to v0.1.1435; CHANGELOG; sync-dist
+- [x] AI agent visibility from localStorage on open (no `get_ai_agent_enabled` IPC)
+- [x] Persist AI flag on toggle / Settings sync / enable-from-icon / event
+- [x] Defer `initializeOllama` off DOMContentLoaded; arm on expand / AI-on need
+- [x] Focus resume: Ollama recheck only when AI on (localStorage)
+- [x] Bump to v0.1.1436; CHANGELOG; sync-dist; standing backlog; task notes
 - [x] `cargo check`
 - [x] Rename WIP-14 → UNTESTED-14; commit + push; do not close #14
 
 ## Review
-Shipped **v0.1.1435** for GitHub #14. Monitoring idle UI-state/pin hydrate park; Compact localStorage open path; no second Ollama configure; Agent Ops wait-loop park. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
+Shipped **v0.1.1436** for GitHub #14. AI visibility from localStorage on open; Ollama configure deferred until AI Chat expand / AI-on resume; Settings Product syncs backend + cache. Task file: `UNTESTED-14-…`. Issue left open for tester / 004 (macOS Activity Monitor).
