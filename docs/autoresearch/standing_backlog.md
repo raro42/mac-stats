@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1463
+
+- Settings toggle knobs sit with `left`, not a translate. An on switch no longer keeps a transform layer. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1462
 
 - Low Power Mode toggle uses an opaque track. No glass alpha, inset highlight, or knob drop shadow. P2 reliability / GitHub #14.

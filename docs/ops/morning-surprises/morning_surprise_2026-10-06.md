@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1463** | Settings toggle knobs sit with left offset, not a translate. An on switch no longer keeps a Graphics and Media layer. |
 | **v0.1.1462** | Low Power Mode toggle sits on an opaque track. No glass alpha, inset highlight, or knob drop shadow. |
 | **v0.1.1461** | Section icon chips sit on opaque fills. No glass alpha, inset highlight, or hover drop shadow. Status washes mix against an opaque color. |
 | **v0.1.1460** | Ring numbers and the line under them center without a translate. Those labels no longer keep a Graphics and Media layer while the window is open. |
@@ -45,10 +46,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-Ring numbers and the line under them sit in the card without a translate. WebKit does not keep a transform layer for those labels on every open.
+Settings switches that are on sit with `left`. WebKit does not keep a transform layer for those knobs.
 
 ## Still open
 
-- ~22:45 tick: ring numbers drop the translate layer (**v0.1.1460**, rebasing past origin v0.1.1457–1459). Settings toggle knobs still use `translateX` when on.
+- ~23:07 tick: settings knobs drop `translateX` (**v0.1.1463**, rebasing past origin v0.1.1461–1462). Ring progress strokes still use `transform: rotate` on the open gauges.
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

@@ -663,12 +663,13 @@ padding: 18px 18px 16px;
   background: white;
   top: 2px;
   left: 2px;
-  transition: transform 0.2s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
-  transform: translateX(20px);
+  left: 22px;
+  transform: none;
 }
 
 .toggle-label {
@@ -782,12 +783,13 @@ padding: 18px 18px 16px;
   background: white;
   top: 2px;
   left: 2px;
-  transition: transform 0.2s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
-  transform: translateX(20px);
+  left: 22px;
+  transform: none;
 }
 
 .toggle-label {
