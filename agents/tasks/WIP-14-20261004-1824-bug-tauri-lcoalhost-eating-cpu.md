@@ -1913,3 +1913,33 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm Product toggles beyond AI do not fan-out until Settings opens; open Settings and/or Changelog, then alt-tab before IPC returns — Product glances / Discord status / decorations toggle / changelog body / footer version must not paint while away; alt-tab back — AI visibility and open Settings fan-out refresh) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1434)
+
+**Date:** 2026-10-06 02:38 UTC
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1434**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1434)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings credential/decorations defer + Process Details / Monitors settings park)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1434**
+- `src/cpu-ui.js` — `uiWorkPaused()` shared gate; Settings open calls `refreshSettingsCredentialStatuses()` and `__macStatsLoadWindowDecorationsPreference`; open path skips decorations IPC (`__macStatsLoadWindowDecorationsPreference` assigned, not invoked at init); credential refresher gated at start; decorations `loadPreference` skips start + mid-flight toggle paint; changelog version wiring uses one idle follow-up (no body MutationObserver)
+- `src/cpu.js` — Process Details `showProcessDetails` / `updateProcessDetailsContent` skip IPC and modal mount/paint while parked (mid-flight drop); Monitors settings `refreshMonitorsSettingsList` skips wipe/IPC/rebuild while parked and aborts mid-flight `list_monitors` / `get_monitor_details`; focus resume refreshes credential/decorations when Settings stayed open and rebuilds Monitors settings list only if that popover is still open; collapsed Perplexity skips key-status IPC until expand / Settings
+- Prior v0.1.1433 Product toggles / Discord / decorations / changelog park and earlier #14 cuts kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise and normal Linux CPU-window activity. No new errors tied to the #14 credential / decorations / Process Details / Monitors settings occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; confirm credential/decorations IPC does not fan-out until Settings opens; open Monitors settings or click a process for Process Details, then alt-tab before IPC returns — Settings credential glances / Monitors settings list / Process Details modal must not paint while away; alt-tab back — open Settings fan-out and Monitors list refresh when still open) before CLOSED. Do **not** close GitHub #14.
