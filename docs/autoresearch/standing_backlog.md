@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1466
+
+- Details collapsed glance (Load · RAM · Up) mixes calm and hot washes against an opaque fill. No glass alpha or hover shadow. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1465
 
 - CPU, GPU, Freq, and Temp ring cards mix hot, calm, and Fair washes against an opaque fill. No glass alpha or ring shadow. P2 reliability / GitHub #14.
