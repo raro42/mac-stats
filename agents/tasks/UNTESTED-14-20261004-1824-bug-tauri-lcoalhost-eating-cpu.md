@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1547** (follow-up after v0.1.1546).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (Agent Ops copy-chip Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.ops-session-copy-chip.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow. Covers session, run, schedule, knowledge, and agent copy chips.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Agent Ops. Preview a session, run, schedule, knowledge item, or agent. Press the copy chip. Confirm the Copied flash still shows green on the chip, then reverts. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1546)
+
 Version **v0.1.1546** (follow-up after v0.1.1545).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -6290,3 +6304,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; press View logs; confirm the Opened flash still shows green on the control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1546)
+
+**Date:** 2026-10-06 15:17 UTC (17:17 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1546**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1546)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops Load into AI Chat Loaded flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1546**
+- `CHANGELOG.md` **[0.1.1546]** documents the Agent Ops Load into AI Chat Loaded flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `#ops-session-load-chat`, `#ops-runs-load-chat`, `#ops-schedules-load-chat`, `#ops-memory-load-chat`, `#ops-agent-load-chat` `.is-just-saved` mix against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/agent-ops.js` matches `src-tauri/dist/agent-ops.js`. After loading a session, run, schedule, knowledge item, or agent preview into AI Chat, `window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 })` adds `.is-just-saved`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Load into AI Chat Loaded flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Load into AI Chat Loaded flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched this session's `cargo check` rustc and the scan command itself.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Agent Ops; preview a session, run, schedule, knowledge item, or agent; press Load into AI Chat; confirm the Loaded flash still shows green on the control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
