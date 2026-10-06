@@ -1371,3 +1371,33 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC should not restart on the focus event itself) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1422)
+
+**Date:** 2026-10-06 01:02 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1422)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 defer metrics further + idle-defer focus interval arm)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1422**
+- `src/cpu.js` — `scheduleCpuWindowMetricsOnce` default / focused-open idle ≤**480000**; sparkline unpark after first poll ≤**480000**; focus resume history seed idle ≤**480000**; version/update IPC idle ≤**1200000**; late open fallback idle ≤**1200000**; `scheduleMonitoringFeaturesOnce` idle ≤**3600000**; `resumeIdleWindowPolls` / `applyDeferredResumeIdleWindowPolls` idle ≤**120000**; `scheduleDeferredFocusRefresh` idle ≤**120000** (cancelled on blur/pause; not on the focus event); focus handler calls `resumeVisibleWindowWork` only (no immediate `startRefresh`)
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**120000** (`scheduleUnparkCanvases`); park on blur/hidden stays immediate
+- `src/agent-ops.js` — Agent Ops init idle ≤**3600000**; exposes `__macStatsScheduleAgentOpsInit`
+- Prior 3600s poll floor / occlusion park / Focused pause-resume kept (`PROCESS_CACHE_TTL_SECS = 3600`; `TEMP_READ_INTERVAL` 600s; `TEMP_CACHE_MAX_AGE` 900s)
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-metrics / focus-interval idle cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away then back — secondary polls / sparkline GPU / stale gauge IPC / metrics interval should not restart on the focus event itself) before CLOSED. Do **not** close GitHub #14.
