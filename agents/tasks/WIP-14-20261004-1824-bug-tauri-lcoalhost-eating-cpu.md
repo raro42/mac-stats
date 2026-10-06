@@ -1011,3 +1011,32 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1413)
+
+**Date:** 2026-10-06 00:02 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1413)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 focus-gated first metrics + no idle sparkline unpark)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1413**
+- `src/cpu.js` — `init()` idempotent (`__macStatsCpuWindowInitStarted`); first `get_cpu_details` via `startCpuWindowMetricsOnce` on focus/resume (5s idle when already focused; 10m/`600000` late fallback); no 120s idle metrics start; focus path wires DOM via `wireCpuWindowDomOnce` immediately; `waitForTauri` polls every **500ms**
+- `src/chart-line.js` — stay parked through open; no idle unpark; focus / first focused poll unparks; `LINE_CHART_POINTS = 2`
+- Prior 3600s poll floor / occlusion park / Focused pause-resume hooks kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 focus-gated metrics / no-idle-unpark cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
