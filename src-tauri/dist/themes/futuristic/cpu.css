@@ -141,7 +141,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
+  transition: none;
 }
 
 .icon-btn svg {
@@ -150,7 +151,7 @@ body {
 }
 
 .icon-btn:hover {
-  transform: translateY(-1px);
+  transform: none;
   color: var(--text);
 }
 

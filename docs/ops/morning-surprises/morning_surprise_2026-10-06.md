@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1457** | Header Refresh and Settings skip transform layers. The divider uses offset, not translate. Hover and press do not lift or scale those buttons. |
 | **v0.1.1456** | Ring gauges center without a translate. The SVG no longer keeps a Graphics and Media layer while the window is open. |
 | **v0.1.1455** | Sparkline canvases skip GPU bind on open. Hover or Refresh still draws them. |
 | **v0.1.1454** | Collapsed monitors, chat, logs, and Agent Ops skip idle-callback wiring on open. A click or Tab still opens them. |

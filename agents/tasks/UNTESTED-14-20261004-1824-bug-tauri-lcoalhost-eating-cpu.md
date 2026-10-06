@@ -22,6 +22,28 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1457** (follow-up after v0.1.1456).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (header Refresh / Settings skip transform layers):
+
+- Theme `cpu.css` — Refresh/Settings divider uses offset, not `translateY`. No transform tween, hover lift, or press scale on those buttons.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm Refresh and Settings still work. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1456)
+
+Ring gauges center without `transform: translate`. Size and margin sit the SVG. A transform layer no longer stays in Graphics and Media while the window is open.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s. Rings still center in the cards. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1455)
+
 Version **v0.1.1455** (follow-up after v0.1.1454).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.

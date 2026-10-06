@@ -155,8 +155,8 @@ body {
   content: "";
   position: absolute;
   right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  top: calc(50% - 10px);
   width: 1px;
   height: 20px;
   background: rgba(35, 45, 65, 0.15);

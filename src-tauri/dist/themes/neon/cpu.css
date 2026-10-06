@@ -161,11 +161,12 @@ body::before {
   justify-content: center;
 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.40), 0 0 12px rgba(120, 255, 160, 0.16);
-  transition: transform 0.15s ease, color 0.15s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
+  transition: color 0.15s ease;
 }
 
 .icon-btn:hover {
-  transform: translateY(-1px);
+  transform: none;
   color: rgba(225, 255, 235, 0.95);
 }
 

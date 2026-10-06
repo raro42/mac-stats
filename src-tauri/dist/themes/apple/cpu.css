@@ -242,7 +242,8 @@ border-radius: 24px;
   font-size: 18px;
   cursor: pointer;
   position: relative;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
+  transition: background 0.15s ease, color 0.15s ease;
 
   display: inline-flex;
   align-items: center;
@@ -253,8 +254,8 @@ border-radius: 24px;
   content: "";
   position: absolute;
   right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  /* No translate — a transform layer stays in Graphics and Media (#14). */
+  top: calc(50% - 10px);
   width: 1px;
   height: 20px;
   background: rgba(0, 0, 0, 0.08);
@@ -273,7 +274,7 @@ border-radius: 24px;
 
 .icon-btn:active {
   background: rgba(255, 255, 255, 0.5);
-  transform: scale(0.96);
+  transform: none;
 }
 
 .icon-btn svg {
