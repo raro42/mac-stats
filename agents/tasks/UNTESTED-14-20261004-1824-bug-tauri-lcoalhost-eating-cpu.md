@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1553** (follow-up after v0.1.1552).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Process Details name Copied flash skip glass blend):
+
+- `src/agent-ops.css` — `.process-detail-name.is-just-saved` mixes the green wash against opaque `#ffffff`. No extra shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Top Processes → Process Details (Advanced). Click the process name to copy. Confirm the Copied flash still shows green on the name, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward &lt;1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1552)
+
+
 Version **v0.1.1552** (follow-up after v0.1.1551).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
@@ -6589,3 +6604,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Top Processes; pin or unpin a process; confirm the Saved flash still shows green on the pin control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1552)
+
+**Date:** 2026-10-06 16:10 UTC (18:10 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1552**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1552)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Top Processes name Copied flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1552**
+- `CHANGELOG.md` **[0.1.1552]** documents the Top Processes name Copied flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.process-name.is-just-saved` mixes against opaque `#ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved block
+- `src/cpu.js` matches `src-tauri/dist/cpu.js`. `applyProcessNameCopyFlash` / `processNameCopyFlash` adds `.is-just-saved` and sets label to `Copied`; timer clears the class after the flash window
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the process name Copied flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque process name Copied flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched this session's `cargo check`/`cargo test` rustc.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Top Processes; click a process name to copy; confirm the Copied flash still shows green on the name control, then reverts; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
