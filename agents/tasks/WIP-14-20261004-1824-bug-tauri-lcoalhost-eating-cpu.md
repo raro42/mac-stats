@@ -3365,3 +3365,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Disk Cleanup glance still shows reclaim / due / scopes-off / clean wash when that pane is in keep-header form; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+## Test report (v0.1.1471)
+
+**Date:** 2026-10-06 07:13 UTC (09:13 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1471**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1471)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops collapsed glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1471**
+- `CHANGELOG.md` **[0.1.1471]** documents Agent Ops collapsed glance mixing ready, warn, and offline washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css`: `.agent-ops-collapsed-glance` (base, hover, `:focus-visible`, `.is-ready`, `.is-warn`, `.is-offline`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/agent-ops.js` `syncOpsCollapsedGlance` still copies ready / warn / offline / empty washes onto `#agent-ops-collapsed-glance`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): `applyOpsCollapsed` / `setIconPaneVisibility` hide `.agent-ops-section` when the icon pane is off, and `applyOpsCollapsed` sets the glance `hidden`. Default collapsed is icon-off, not a keep-header glance like Details / Top Processes. MacOS glance paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Agent Ops glance still shows ready / warn / offline wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
