@@ -1,10 +1,12 @@
-# Coder — #14 v0.1.1482
+# Coder — #14 v0.1.1483
 
-- [x] Opaque External / Monitors Filter attention glance (no glass alpha / hover shadow)
-- [x] Bump v0.1.1482; CHANGELOG; standing backlog; morning surprise
-- [x] Sync dist; cargo check in src-tauri/
-- [x] Rename WIP-14 → UNTESTED-14; commit and push; leave GitHub #14 open
+- [x] Read FEATURE-CODER.md + lessons; pick GitHub WIP-14
+- [x] Opaque wash for Top Processes Filter glance (`src/agent-ops.css`)
+- [x] Sync dist, bump `0.1.1483`, CHANGELOG + overnight notes
+- [x] `cargo check` in src-tauri/
+- [x] Prepend implementation; rename WIP-14 → UNTESTED-14
+- [x] Commit and push origin/main (issue #14 stays open)
 
 ## Review
 
-Shipped **v0.1.1482** for GitHub #14 (after v0.1.1481 Down/Slow glance cut). External / Monitors Filter glance washes no longer keep a glass compositor blend. Issue left open for tester / 004 (macOS Activity Monitor). Linux webkit2gtk still has a host floor on a blank page. `cargo check` in src-tauri finished with warnings only.
+GitHub #14 follow-up **v0.1.1483**: Top Processes Filter glance mixes All / Pinned / Hot against opaque fill; no glass alpha or hover shadow. `cargo check` passed. Dist CSS matches `src/`. Issue **#14 left open**.

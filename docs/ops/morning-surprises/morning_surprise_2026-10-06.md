@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1483** | The Top Processes Filter glance mixes All, Pinned, and Hot washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1482** | The External / Monitors Filter glance mixes All, Up, Down, and Slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1481** | The External / Monitors Down/Slow glance mixes down and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1480** | The AI Chat offline attention glance mixes offline, no-model, ready, continue, sending, filter, errors, last-answer, and copied washes against an opaque fill. |
