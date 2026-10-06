@@ -5299,3 +5299,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Product; confirm Ori Off glance still shows off wash when Ori Mnemos lifecycle is off; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+
+## Test report (v0.1.1525)
+
+**Date:** 2026-10-06 12:47 UTC (14:47 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1525**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1525)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Settings Having fun Off attention glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1525**
+- `CHANGELOG.md` **[0.1.1525]** documents the Settings Having fun Off glance mixing the off wash against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.settings-having-fun-attention-glance` (base, hover, `:focus-visible`, `.is-off`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that glance block
+- `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. `applySettingsHavingFunAttentionGlanceState` adds `.is-off` onto `#settings-having-fun-attention-glance` when Settings is open and `#having-fun-enabled-toggle` is unchecked. Hidden when Settings is closed or Having fun is on. Copy: "Having fun · Off · enable idle thoughts"
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings → Product path while idle thoughts are off. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings Having fun Off attention glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Product; confirm Having fun Off glance still shows off wash when idle thoughts are off; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
