@@ -2813,7 +2813,12 @@ function startCpuWindowVersionOnce() {
 function startCpuWindowMetricsOnce() {
   if (window.__macStatsCpuMetricsArmed) return;
   window.__macStatsCpuMetricsArmed = true;
-  startCpuWindowVersionOnce();
+  // Version/update after gauges — GitHub fetch was stacking with first poll (#14).
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(startCpuWindowVersionOnce, { timeout: 120000 });
+  } else {
+    setTimeout(startCpuWindowVersionOnce, 120000);
+  }
   const afterFirst = () => {
     // Ensure the slow interval exists even when first usage sample is 0 (#14).
     if (!refreshInterval) startRefresh();
@@ -2838,6 +2843,16 @@ function startCpuWindowMetricsOnce() {
   }
 }
 
+/** Idle-defer first get_cpu_details so open paint does not stack IPC (#14). */
+function scheduleCpuWindowMetricsOnce(idleTimeoutMs) {
+  const ms = typeof idleTimeoutMs === "number" ? idleTimeoutMs : 30000;
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: ms });
+  } else {
+    setTimeout(startCpuWindowMetricsOnce, ms);
+  }
+}
+
 // Initialize when DOM and Tauri are ready
 function init() {
   // Focused(true) + DOMContentLoaded + load can each call init — arm once (#14).
@@ -2858,16 +2873,10 @@ function init() {
     setTimeout(lateOpenFallback, 600000);
   }
 
-  // If the window already has focus on open, arm metrics without waiting
-  // for another focus event (Tauri Focused(true) can race past load) (#14).
+  // Already focused on open: arm metrics on idle ≤30s (was 5s). Monitoring
+  // waits for focus resume / late fallback so open does not stack section IPC (#14).
   if (!windowOccluded()) {
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(startCpuWindowMetricsOnce, { timeout: 5000 });
-    } else {
-      setTimeout(startCpuWindowMetricsOnce, 5000);
-    }
-    // Heavy section wiring still waits (gauges first) (#14).
-    scheduleMonitoringFeaturesOnce();
+    scheduleCpuWindowMetricsOnce(30000);
   }
 }
 
@@ -5755,7 +5764,8 @@ function resumeIdleWindowPolls() {
 function resumeVisibleWindowWork() {
   if (document.hidden) return;
   setDocumentOccluded(false);
-  window._forceProcessUpdate = true;
+  // Do not force a full process-list rebuild on every focus/alt-tab (#14).
+  // First refresh still forces once when lastProcessUpdate === 0.
   // Focus path: wire keyboard/copy immediately (may beat the late fallback) (#14).
   wireCpuWindowDomOnce();
   scheduleMonitoringFeaturesOnce();
@@ -5782,8 +5792,8 @@ function resumeVisibleWindowWork() {
     resumeIdleWindowPolls();
   } else {
     init();
-    // Focus arms first metrics — do not wait for the late idle fallback (#14).
-    startCpuWindowMetricsOnce();
+    // Defer first get_cpu_details (idle ≤30s) so open paint does not stack IPC (#14).
+    scheduleCpuWindowMetricsOnce(30000);
   }
 }
 
@@ -24642,7 +24652,7 @@ function initMonitoringFeatures() {
 }
 
 /**
- * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤120s after
+ * Heavy section wiring (monitors, chat settings, logs, …) — idle ≤300s after
  * focus/schedule so open does not stack with first gauge paint (#14).
  */
 function scheduleMonitoringFeaturesOnce() {
@@ -24650,9 +24660,9 @@ function scheduleMonitoringFeaturesOnce() {
   window.__macStatsMonitoringFeaturesScheduled = true;
   const start = () => initMonitoringFeatures();
   if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(start, { timeout: 120000 });
+    window.requestIdleCallback(start, { timeout: 300000 });
   } else {
-    setTimeout(start, 120000);
+    setTimeout(start, 300000);
   }
 }
 

@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1415** (follow-up after v0.1.1414).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
+
+Changes (defer first metrics further + no focus process rebuild):
+
+- `src/cpu.js` — first `get_cpu_details` idle ≤**30s** on focus/open (was 5s / immediate). Focus resume does **not** set `_forceProcessUpdate`. Version/update IPC idle ≤**120s** after metrics arm. Monitoring features idle ≤**300s**. `scheduleCpuWindowMetricsOnce` helper.
+- `src/agent-ops.js` — Agent Ops init idle ≤**300s** (was 120s).
+
+Tester: open CPU window on macOS, warm ≥30s, alt-tab away and watch Graphics and Media / `tauri://localhost` drop vs before. Rings and sparklines still appear when focused; section expand still works after idle. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1414)
+
 Version **v0.1.1414** (follow-up after v0.1.1413).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real IPC, compositor, and timer work.
@@ -1048,6 +1063,35 @@ Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away)
 **debug.log**
 
 - Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 focus-gated metrics / no-idle-unpark cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1414)
+
+**Date:** 2026-10-06 00:13 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1414)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 no parse-time UI-state IPC + deferred monitoring / Agent Ops)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1414**
+- `src/cpu.js` — parse-time `cpuUiSectionsReady` seeds localStorage only (comment: no `get_cpu_window_ui_state` on script eval); UI-state retries every **500ms**; `initMonitoringFeatures` scheduled idle ≤**120s** via `scheduleMonitoringFeaturesOnce` (not on DOMContentLoaded); `startCpuWindowVersionOnce` arms with metrics/focus (not open idle); `initRingGauges` inside `wireCpuWindowDomOnce`; DOM wire / metrics focus or late **600000** fallback; `waitForTauri` polls every **500ms**
+- `src/agent-ops.js` — Agent Ops init idle ≤**120s**; open-section / `loadCpuUiSections` wait retries every **500ms**
+- Prior 3600s poll floor / occlusion park / Focused pause-resume / no idle sparkline unpark kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-init / no parse-time UI-state IPC cuts.
 
 **Why not CLOSED**
 

@@ -10766,9 +10766,9 @@ function escapeHtml(s) {
     window.__macStatsAgentOpsInitScheduled = true;
     const start = () => initAgentOps();
     if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(start, { timeout: 120000 });
+      window.requestIdleCallback(start, { timeout: 300000 });
     } else {
-      setTimeout(start, 120000);
+      setTimeout(start, 300000);
     }
   }
 
