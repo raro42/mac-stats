@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1482** | The External / Monitors Filter glance mixes All, Up, Down, and Slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1481** | The External / Monitors Down/Slow glance mixes down and slow washes against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1480** | The AI Chat offline attention glance mixes offline, no-model, ready, continue, sending, filter, errors, last-answer, and copied washes against an opaque fill. |
 | **v0.1.1479** | The AI Chat errors glance mixes the failed-turn wash against an opaque fill. |
@@ -64,10 +65,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-A Down or Slow site no longer paints the Monitors glance with a glass blend. The fill is opaque.
+A Down, Slow, or Filter chip on External / Monitors no longer paints that glance with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Monitors filter glance (All · Up · Down · Slow) still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Top Processes Filter glance (All · Pinned · Hot) still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.

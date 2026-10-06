@@ -22,7 +22,33 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1480** (follow-up after v0.1.1479).
+Version **v0.1.1482** (follow-up after v0.1.1481).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (External / Monitors Filter attention glance skip glass blend):
+
+- `src/agent-ops.css` — External / Monitors Filter attention glance mixes All, Up, Down, and Slow washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand External / Monitors and pick Up, Down, or Slow. Confirm Filter glance still shows All / Up / Down / Slow wash. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1481)
+
+Version **v0.1.1481** (follow-up after v0.1.1480).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (External / Monitors Down/Slow glance skip glass blend):
+
+- `src/agent-ops.css` — External / Monitors Down/Slow attention glance mixes down and slow washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm External / Monitors Down/Slow glance still shows down / slow wash when a site is down or slow. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1480)
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
 
