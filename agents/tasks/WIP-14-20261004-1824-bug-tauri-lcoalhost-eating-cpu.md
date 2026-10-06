@@ -1594,3 +1594,32 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, trigger metrics/version/history then alt-tab before IPC returns — queued rAF / version tip / history seed must not paint while away; alt-tab back — gauges and sections eventually wire) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1427)
+
+**Date:** 2026-10-06 01:45 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1427)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 mid-flight secondary IPC / Agent Ops / rAF cancel while occluded)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1427**
+- `src/cpu.js` — shared `windowWorkPaused()` / `__macStatsWindowWorkPaused` (occlusion + `windowPollsPaused`); `clearPendingDOMUpdates` cancels queued gauge/DOM rAF on blur/pause; mid-flight skip after IPC for Discord icon, monitors summary/list, history availability, Debug Log glance/viewer, Disk Cleanup panel, update banner, and Process Details; blur clears Process Details live interval; focus resume re-arms if modal still open; Discord/history/monitors/logs/disk interval gates use shared pause (not only `document.hidden`)
+- `src/agent-ops.js` — `agentOpsWorkPaused()` via `__macStatsWindowWorkPaused`; auto-refresh / Updated-ago / init / resume use shared pause; after Agent Ops `Promise.all`, skips big DOM rebuild when parked (manual Refresh still runs IPC via `userTriggered`)
+- Prior mid-flight rAF / version / history-seed cancel and structural occlusion cancel kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 mid-flight secondary IPC / Agent Ops occlusion cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, expand Monitors / Debug Log / Disk Cleanup / Agent Ops, trigger a poll, alt-tab before IPC returns — Discord icon / monitors / logs / disk / Agent Ops DOM / Process Details / update banner must not paint while away; alt-tab back — sections eventually refresh) before CLOSED. Do **not** close GitHub #14.

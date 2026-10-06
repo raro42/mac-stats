@@ -1,17 +1,13 @@
-# WIP-14 tauri://localhost CPU — v0.1.1427
+# Tester — #14 v0.1.1427
 
 ## Plan
-- [x] cancelAnimationFrame for pending DOM rAF on blur/pause
-- [x] Mid-flight skip: Discord icon, logs glance/viewer, history availability
-- [x] Mid-flight skip: monitors summary/load loops, disk cleanup panel, update banner
-- [x] Pause process-details refresh interval on blur; resume if modal still open
-- [x] Agent Ops refresh: skip paint when occluded mid-flight
-- [x] Bump Cargo.toml → 0.1.1427
-- [x] sync-dist.sh
-- [x] cargo check in src-tauri/
-- [x] Update task file + rename WIP → UNTESTED
-- [x] Commit + push origin/main
+- [x] Read TESTER.md + lessons.md
+- [x] Pick `TESTING-14-…` (GitHub #14)
+- [x] Static-verify mid-flight secondary IPC / Agent Ops / rAF claims
+- [x] `cargo check` + `cargo test` in `src-tauri/`
+- [x] Skim `~/.mac-stats/debug.log` (no secrets pasted)
+- [x] Append Test report; move to `WIP-14-…`
 - [x] Do not close GitHub #14
 
 ## Review
-Mid-flight secondary IPC cancel after v0.1.1426. Shared `windowWorkPaused` gate; rAF cancel on blur; Discord/monitors/history/logs/disk/update banner/Process Details/Agent Ops skip paint when parked. `cargo check` pass. Pushed `54bc357a` to origin/main. Issue #14 left open for tester/004.
+Linux tester pass for build/tests/static claims on v0.1.1427. **FAIL → WIP** because issue bar needs macOS Activity Monitor (`tauri://localhost` / Graphics and Media &lt;1%). GitHub #14 left open.
