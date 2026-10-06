@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1583** (follow-up after v0.1.1582).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (ring / power-strip copy hover + focus-visible skip glass blend):
+
+- `src/cpu.js` / `src-tauri/dist/cpu.js` `ensureMetricValueCopyStyles` — `.metric-value` / `.battery-level` / `.power-value` `[data-metric-copy="1"]:hover` mixes the accent wash against opaque `#ffffff`. `:focus-visible` ring mixes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover a ring value (CPU · GPU · Freq · Temp) or Bat / Power. Tab-focus one of those copy targets. Confirm the hover wash and focus ring still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1582)
+
 Version **v0.1.1582** (follow-up after v0.1.1581).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

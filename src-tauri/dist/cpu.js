@@ -3290,15 +3290,16 @@ function ensureMetricValueCopyStyles() {
     .power-value[data-metric-copy="1"] {
       position: relative;
     }
+    /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
     .metric-value[data-metric-copy="1"]:hover,
     .battery-level[data-metric-copy="1"]:hover,
     .power-value[data-metric-copy="1"]:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ffffff);
     }
     .metric-value[data-metric-copy="1"]:focus-visible,
     .battery-level[data-metric-copy="1"]:focus-visible,
     .power-value[data-metric-copy="1"]:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ffffff);
     }
     /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
     .metric-value[data-metric-copy="1"].is-just-copied,
