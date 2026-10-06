@@ -3300,10 +3300,11 @@ function ensureMetricValueCopyStyles() {
     .power-value[data-metric-copy="1"]:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
     }
+    /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
     .metric-value[data-metric-copy="1"].is-just-copied,
     .battery-level[data-metric-copy="1"].is-just-copied,
     .power-value[data-metric-copy="1"].is-just-copied {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, #ffffff);
     }
     .metric-value[data-metric-copy="1"].is-just-copied::after,
     .battery-level[data-metric-copy="1"].is-just-copied::after,
@@ -3321,7 +3322,7 @@ function ensureMetricValueCopyStyles() {
       border-radius: 999px;
       white-space: nowrap;
       color: var(--text, #fff);
-      background: color-mix(in srgb, var(--accent, #0a84ff) 55%, rgba(0, 0, 0, 0.45));
+      background: color-mix(in srgb, var(--accent, #0a84ff) 55%, #1c1c1e);
       pointer-events: none;
       z-index: 4;
     }

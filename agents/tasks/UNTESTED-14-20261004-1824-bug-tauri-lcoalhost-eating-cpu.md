@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1582** (follow-up after v0.1.1581).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (ring / power-strip Copied flash skip glass blend):
+
+- `src/cpu.js` / `src-tauri/dist/cpu.js` `ensureMetricValueCopyStyles` — `.metric-value` / `.battery-level` / `.power-value` `[data-metric-copy="1"].is-just-copied` mixes the accent wash against opaque `#ffffff`. Copied badge mixes against opaque `#1c1c1e` (no `rgba` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Click a ring value (CPU · GPU · Freq · Temp) or Bat / Power to copy. Confirm the Copied flash still shows on the value, then reverts. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1581)
+
 Version **v0.1.1581** (follow-up after v0.1.1580).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -8009,3 +8023,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; click a message to copy or select a message and press `c`; confirm the Copied flash still shows green on the message, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1581)
+
+**Date:** 2026-10-06 23:04 UTC (2026-10-07 01:04 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1581**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1581)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops row Copied flash skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1581**
+- `CHANGELOG.md` **[0.1.1581]** documents the Agent Ops row Copied flash mixing the green wash against an opaque fill; no glass alpha
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-row.is-copied` / `.ops-row.is-selected.is-copied` mixes against opaque `#ffffff`; opaque border mix; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). No `transparent` / `rgba(` / `hsla(` / `backdrop-filter` in that saved wash block (badge `::after` still uses a solid-ish chip paint)
+- `src/agent-ops.js` and `src-tauri/dist/agent-ops.js` are identical. `flashOpsRowCopied` adds `.is-copied` on the ops row, clears after timeout. Copy path calls that flash after clipboard success
+- `src/cpu.js` matches `src-tauri/dist/cpu.js` (no regression in shared history park wiring)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops row Copied flash. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops row Copied flash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; select a row and press `c` or use a copy chip; confirm the Copied flash still shows green on the row, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
