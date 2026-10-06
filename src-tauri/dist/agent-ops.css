@@ -10051,6 +10051,7 @@ button.is-just-saved,
 }
 
 /* Settings — Help cheat sheet attention glance (Product settings; Perplexity Key-not-set parity) */
+/* Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14). */
 .settings-help-attention-glance {
   display: flex;
   align-items: center;
@@ -10059,8 +10060,8 @@ button.is-just-saved,
   margin: 6px 0 8px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   font-size: 13px;
   font-weight: 520;
   line-height: 1.35;
@@ -10068,7 +10069,6 @@ button.is-just-saved,
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
     color 0.2s ease;
 }
 
@@ -10077,27 +10077,27 @@ button.is-just-saved,
 }
 
 .settings-help-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .settings-help-attention-glance:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+  box-shadow: none;
 }
 
 .settings-help-attention-glance.is-closed {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
   color: color-mix(in srgb, var(--accent, #007aff) 55%, currentColor);
 }
 
 /* Help open calm (Ready / Monitors all-up soft 7% parity). */
 .settings-help-attention-glance.is-open {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: color-mix(in srgb, #34c759 50%, currentColor);
 }
 

@@ -6,6 +6,11 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 | Version | What |
 |---------|------|
+| **v0.1.1517** | The Settings Help glance mixes closed and open washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1516** | The Settings Slack not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1515** | The Settings Telegram not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1514** | The Settings Cursor agent not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
+| **v0.1.1513** | The Settings Browser / CDP not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1512** | The Settings Discord token glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1511** | The Settings MCP not-set glance mixes the not-set wash against an opaque fill. No glass alpha or hover shadow. |
 | **v0.1.1510** | The Settings Mastodon not-set/partial glance mixes the not-set and partial washes against an opaque fill. No glass alpha or hover shadow. |
@@ -95,10 +100,10 @@ Overnight autoresearch (Track B) kept shipping for GitHub **#14** (`tauri://loca
 
 ## Why it matters
 
-The Settings Discord token glance no longer paints a missing token with a glass blend. The fill is opaque.
+The Settings Help glance no longer paints the cheat sheet with a glass blend. The fill is opaque.
 
 ## Still open
 
 - GitHub **#14** until macOS Activity Monitor shows the webview under ~1%.
-- The Settings Help glance still uses a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
+- The Settings Signal glance still uses a glass fill. Voice STT and other Product glances still use a glass fill. Monitor tick tips still use a translate. The refresh button still declares a rotate while it fetches.
 - Design-review screenshot for `feature-agent-ops` when TCC allows.
