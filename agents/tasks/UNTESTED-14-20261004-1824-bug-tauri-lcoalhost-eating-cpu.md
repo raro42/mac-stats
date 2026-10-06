@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1473** (follow-up after v0.1.1472).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+Changes (AI Chat collapsed glance skip glass blend):
+
+- `src/agent-ops.css` — AI Chat keep-header mixes online, offline, active, and error washes against opaque `#ffffff`. No hover or focus drop shadow.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm AI Chat glance still shows online / offline / active / error wash when that pane is on. Gauges still update. History canvases stay hidden until hover or Refresh. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1471)
+
 Version **v0.1.1471** (follow-up after v0.1.1470).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
