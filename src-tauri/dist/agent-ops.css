@@ -2162,10 +2162,11 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 
-/* Matching sparkline — same soft alert as the hot ring (7%/30%). Fair stays quieter. */
+/* Matching sparkline — same soft alert as the hot ring (7%). Fair stays quieter. */
+/* Opaque washes — glass alpha + ring shadows stay in Graphics and Media (#14). */
 .history-chart-container.is-hot {
-  background-color: color-mix(in srgb, #ff9500 7%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 30%, transparent);
+  background-color: color-mix(in srgb, #ff9500 7%, #ffffff);
+  box-shadow: none;
   border-radius: 10px;
 }
 
@@ -2176,8 +2177,8 @@ textarea.ops-agent-editor.is-dirty {
 
 /* CPU · GPU · FREQ · TEMP sparklines — calm below hot (ring is-ok parity). */
 .history-chart-container.is-ok:not(.is-hot):not(.is-fair) {
-  background-color: color-mix(in srgb, #34c759 5%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 14%, transparent);
+  background-color: color-mix(in srgb, #34c759 5%, #ffffff);
+  box-shadow: none;
   border-radius: 10px;
 }
 
@@ -2188,8 +2189,8 @@ textarea.ops-agent-editor.is-dirty {
 
 /* TEMP sparkline — Fair thermal cue (Temp ring Fair wash parity; quieter than Hot). */
 .history-chart-container.is-fair:not(.is-hot) {
-  background-color: color-mix(in srgb, #ff9500 5%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 14%, transparent);
+  background-color: color-mix(in srgb, #ff9500 5%, #ffffff);
+  box-shadow: none;
   border-radius: 10px;
 }
 
@@ -2199,8 +2200,7 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .history-chart-container.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);
-  transition: box-shadow 0.25s ease;
+  box-shadow: none;
 }
 
 /* History Hot · … glance — removed (KISS; card/chart wash is enough). */
