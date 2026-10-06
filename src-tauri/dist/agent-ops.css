@@ -10179,10 +10179,12 @@ button.is-just-saved,
 }
 
 /* AI Chat system-prompt Reset to Default — soft green flash */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #ollama-settings-reset.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, transparent) !important;
-  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  background: color-mix(in srgb, #34c759 22%, #ffffff) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #ffffff) !important;
   color: inherit;
+  box-shadow: none;
 }
 
 /* Header metrics Refresh (↻) — dim while fetching; no rotate (Graphics and Media #14). */
