@@ -1234,3 +1234,33 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1419)
+
+**Date:** 2026-10-06 00:47 UTC  
+**Result: FAIL** → move to WIP  
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1419)
+- `cd src-tauri && cargo test` — **pass** (1356 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 defer metrics further + idle-defer focus sparkline unpark)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1419**
+- `src/cpu.js` — `scheduleCpuWindowMetricsOnce` default / focused-open idle ≤**120000**; `wireCpuWindowDomOnce` inside `startCpuWindowMetricsOnce`; sparkline unpark idle ≤**120000** after first poll; focus resume history seed idle ≤**120000**; version/update IPC idle ≤**300000**; `scheduleMonitoringFeaturesOnce` idle ≤**900000** and calls `__macStatsScheduleAgentOpsInit`
+- `src/chart-line.js` — focus / visibility-visible sparkline `unpark` idle ≤**30000** (`scheduleUnparkCanvases`); park on blur/hidden stays immediate
+- `src/agent-ops.js` — Agent Ops init idle ≤**900000**; no `DOMContentLoaded` arm; exposes `__macStatsScheduleAgentOpsInit`
+- Prior 3600s poll floor / occlusion park / Focused pause-resume kept
+
+**debug.log**
+
+- Recent entries are Ollama endpoint unreachable / circuit-open noise. No new errors tied to the #14 deferred-metrics / sparkline unpark idle cuts.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s, alt-tab away) before CLOSED. Do **not** close GitHub #14.
