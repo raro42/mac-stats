@@ -348,8 +348,8 @@ body::before {
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
+  /* Path starts at 12 o'clock — CSS rotate kept a Graphics and Media layer (#14). */
+  transform: none;
   /* No drop-shadow — SVG filters keep the WebView compositor busy (#14). */
   filter: none;
 }
