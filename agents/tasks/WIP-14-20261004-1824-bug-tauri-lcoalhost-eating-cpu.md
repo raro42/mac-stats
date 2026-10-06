@@ -3415,3 +3415,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Agent Ops glance still shows ready / warn / offline wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+## Test report (v0.1.1473)
+
+**Date:** 2026-10-06 07:21 UTC (09:21 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1473**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1473)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 AI Chat collapsed glance skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1473**
+- `CHANGELOG.md` **[0.1.1473]** documents AI Chat collapsed glance mixing online, offline, active, and error washes against an opaque fill; no glass alpha or hover shadow
+- `src/agent-ops.css`: `.ollama-collapsed-glance` (base, hover, `:focus-visible`, `.is-online`, `.is-offline`, `.is-active`, `.has-errors`) mixes against opaque `#ffffff`; hover/focus `box-shadow: none`. Comment: Opaque washes — glass alpha + hover shadow stay in Graphics and Media (#14)
+- `src/ollama.js` `syncOllamaCollapsedGlance` still copies online / offline / active / error (`has-errors`) washes onto `#ollama-collapsed-glance`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`, `chart-line.js` `unparkCanvases`)
+- Note (not a CSS-cut regression): `applyOllamaCollapsed` / `setIconPaneVisibility` hide `.ollama-section` when the icon pane is off, and `applyOllamaCollapsed` sets the glance `hidden`. Default collapsed is icon-off, not a keep-header glance like Details / Top Processes. MacOS glance paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque AI Chat glance cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm AI Chat glance still shows online / offline / active / error wash when that pane is on; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
