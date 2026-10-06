@@ -166,6 +166,10 @@
     if (!canvasesParked && Object.keys(contexts).length) return;
     canvasesParked = false;
     setHistoryGpuUnparkedClass(true);
+    wireListeners();
+    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
+      bindCanvasElements();
+    }
     Object.keys(canvases).forEach((metric) => {
       const canvas = canvases[metric];
       if (!canvas) return;
@@ -177,9 +181,6 @@
         /* ignore */
       }
     });
-    if (!canvases.usage && !canvases.gpu && !canvases.frequency && !canvases.temperature) {
-      bindCanvasElements();
-    }
     initializeCanvases();
     ensureColors();
     Object.keys(dataBuffers).forEach((metric) => {
@@ -451,9 +452,7 @@
     park: parkCanvases,
     unpark: unparkCanvases,
     init: () => {
-      // Stay parked through open. Resize / geometry restore must not alloc GPU (#14).
-      bindCanvasElements();
-      parkCanvases();
+      // Stay parked. Do not bind canvases on open (#14).
     },
     refreshLayout: () => {
       if (windowOccluded() || canvasesParked) {
@@ -502,16 +501,6 @@
     // Do not unpark on focus/visibility — cpu.js owns resume / Refresh / hover (#14).
   }
 
-  function boot() {
-    // Bind + hide DOM canvases. Empty canvases{} used to skip park on open (#14).
-    bindCanvasElements();
-    parkCanvases();
-    wireListeners();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
+  // Do not bind or set canvas.width on open. CSS hides the nodes until
+  // hover / Refresh / resume calls unpark (#14).
 })();

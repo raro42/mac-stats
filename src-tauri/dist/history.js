@@ -505,8 +505,36 @@
     }
   }
 
+  let historyInited = false;
+
+  function ensureHistoryInit() {
+    if (historyInited) return;
+    historyInited = true;
+    Object.keys(canvases).forEach((metric) => {
+      if (canvases[metric]) addCanvasHoverHandler(metric);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pauseHistoryPoll();
+    });
+    window.addEventListener('blur', pauseHistoryPoll);
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (historyWorkPaused() || canvasesParked) return;
+        reinitializeCanvasSizes();
+        Object.keys(canvases).forEach((metric) => {
+          if (canvases[metric] && contexts[metric]) {
+            drawLineChart(metric);
+          }
+        });
+      }, 100);
+    });
+  }
+
   function resumeHistoryPoll() {
     if (historyWorkPaused() || historyPollInterval) return;
+    ensureHistoryInit();
     unparkHistoryCanvases();
     if (window.posterCharts && typeof window.posterCharts.unpark === 'function') {
       window.posterCharts.unpark();
@@ -531,68 +559,10 @@
     park: pauseHistoryPoll,
     unpark: resumeHistoryPoll,
 
-    // Initialize charts (call on page load)
-    init: () => {
-      console.log('[history] init() called');
-      console.log('[history] Canvas elements found:', {
-        temperature: !!canvases.temperature,
-        usage: !!canvases.usage,
-        frequency: !!canvases.frequency,
-        temperatureId: canvases.temperature?.id,
-        usageId: canvases.usage?.id,
-        frequencyId: canvases.frequency?.id,
-        temperatureContext: !!contexts.temperature,
-        usageContext: !!contexts.usage,
-        frequencyContext: !!contexts.frequency
-      });
-      
-      // Colors and the tooltip wait for the first draw or hover.
-      // getComputedStyle here used to flush layout on every data-poster open (#14).
-
-      // Add hover handlers to all canvases
-      Object.keys(canvases).forEach(metric => {
-        if (canvases[metric]) {
-          addCanvasHoverHandler(metric);
-        }
-      });
-
-      // Do not fetch or arm the poll here. A focused open used to allocate
-      // canvas buffers and call get_metrics_history on the first paint (#14).
-      // cpu.js unparks on the same idle as the other themes.
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) pauseHistoryPoll();
-      });
-      // macOS often keeps visibilityState=visible when occluded (#14).
-      // Focus resume stays on cpu.js so this file does not unpark on the event.
-      window.addEventListener('blur', pauseHistoryPoll);
-      
-      // Handle window resize
-      let resizeTimeout;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-          if (historyWorkPaused() || canvasesParked) return;
-          reinitializeCanvasSizes();
-          // Redraw charts after resize
-          Object.keys(canvases).forEach(metric => {
-            if (canvases[metric] && contexts[metric]) {
-              drawLineChart(metric);
-            }
-          });
-        }, 100);
-      });
-    }
+    init: ensureHistoryInit,
   };
   window.__macStatsPauseHistoryCharts = pauseHistoryPoll;
   window.__macStatsResumeHistoryCharts = resumeHistoryPoll;
 
-  // Initialize on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.historyCharts.init();
-    });
-  } else {
-    window.historyCharts.init();
-  }
+  // Do not init on load. Hover / Refresh / resume unpark hydrates (#14).
 })();

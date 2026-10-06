@@ -1680,7 +1680,7 @@ async function refresh() {
   try {
     // Force process update on first call (when lastProcessUpdate is 0)
     const isFirstCall = lastProcessUpdate === 0;
-    if (isFirstCall) {
+    if (isFirstCall && !isProcessesSectionCollapsed()) {
       window._forceProcessUpdate = true;
     }
     
@@ -2845,7 +2845,6 @@ function wireHistoryGpuUnparkOnHoverOnce() {
   }
 }
 
-/** Idempotent DOM wiring for keyboard/copy/strip (#14). */
 /** Keyboard / copy / extra GPU canvas: first Tab/focus or history unpark (#14). */
 function wireCpuWindowChromeOnce() {
   if (window.__macStatsCpuChromeWired) return;
@@ -3117,13 +3116,6 @@ function init() {
     startCpuWindowMetricsOnce();
     scheduleMonitoringFeaturesOnce();
   };
-  if (typeof window.requestIdleCallback === "function") {
-    lateOpenIdleHandle = window.requestIdleCallback(lateOpenFallback, {
-      timeout: 2400000,
-    });
-  } else {
-    lateOpenTimeoutId = setTimeout(lateOpenFallback, 2400000);
-  }
 
   // Already focused on open: arm metrics on idle. Heavy sections wait for
   // capture `?open=` or a click/Tab on section chrome (#14).
@@ -3131,7 +3123,11 @@ function init() {
   if (!windowOccluded()) {
     scheduleCpuWindowMetricsOnce(960000);
     scheduleMonitoringFeaturesOnce();
+    return;
   }
+  // Occluded at load: use a real timer. requestIdleCallback timeout is a
+  // deadline, so it still ran as soon as the page went idle (#14).
+  lateOpenTimeoutId = setTimeout(lateOpenFallback, 2400000);
 }
 
 // Initialize ring gauges

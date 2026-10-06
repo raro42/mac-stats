@@ -102,6 +102,14 @@ svg.ring,
  * Bind+park used to miss HTML canvases (empty JS map). Keep sparkline /
  * data-poster bitmaps out of the compositor until hover / Refresh / resume (#14).
  */
+html:not(.is-history-gpu-unparked) .history-charts,
+html:not(.is-history-gpu-unparked) .history-chart-container,
+html:not(.is-history-gpu-unparked) .history-section .history-charts,
+html:not(.is-history-gpu-unparked) #history-section .history-chart-container {
+  content-visibility: hidden;
+  contain: strict;
+}
+
 html:not(.is-history-gpu-unparked) .history-chart-container canvas,
 html:not(.is-history-gpu-unparked) #temperature-history-chart,
 html:not(.is-history-gpu-unparked) #usage-history-chart,

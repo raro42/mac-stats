@@ -22,7 +22,25 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1454** (follow-up after v0.1.1453).
+Version **v0.1.1455** (follow-up after v0.1.1454).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor work.
+
+`requestIdleCallback({ timeout: N })` runs as soon as the event loop is idle. The old 40-minute late-open fallback still armed gauges twice on a focused open.
+
+Changes (no canvas GPU until hover / Refresh):
+
+- `src/chart-line.js` — do not bind canvases or set `canvas.width` on open. Unpark binds and draws.
+- `src/history.js` — skip auto init; hover / Refresh hydrates listeners and poll.
+- `src-tauri/dist/themes/data-poster/poster-charts.js` — skip parse-time 1×1 park (that still allocated GPU).
+- `src/agent-ops.css` — history chart containers stay out of the compositor until `is-history-gpu-unparked`.
+- `src/cpu.js` — occluded late-open uses `setTimeout`, not idle-callback deadline. Collapsed Top Processes skips a forced first list refresh.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm history canvases stay hidden / unbound until hover or Refresh. Gauges still update. Hover history or press Refresh — sparklines draw. Expand Debug Log / Disk cleanup / AI Chat / Agent Ops — still works. Capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens. Watch Graphics and Media / `tauri://localhost`. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1454)
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still remove real compositor and listener work.
 
@@ -2688,3 +2706,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no Settings theme/product wiring and no changelog modal keyboard until Settings or footer version click; expand Debug Log / Disk cleanup / AI Chat — filters, composer, and Refresh still work; gauges still update; history canvases stay hidden until hover or Refresh; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
 
+
+## Test report (v0.1.1454)
+
+**Date:** 2026-10-06 05:09 UTC (07:09 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1454**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1454)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 skip rIC open-path monitoring / Agent Ops; chrome on intent)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1454**
+- `CHANGELOG.md` **[0.1.1454]** documents collapsed monitors/chat/logs/Agent Ops no longer wiring on `requestIdleCallback`; section chrome waits for click or Tab; `?open=` still opens immediately; ring keyboard and extra GPU chart wait for Tab or history hover; footer version click loads changelog and update check
+- `src/cpu.js` — `scheduleMonitoringFeaturesOnce` starts now only for capture `?open=`; otherwise `wireMonitoringFeaturesOnIntentOnce` (pointerdown / keydown / focusin on section chrome). `startCpuWindowMetricsOnce` does not call version/GitHub IPC. `wireCpuWindowDomOnce` defers header/ring keyboard and extra GPU chart via `wireCpuWindowChromeOnIntentOnce` (focusin / Tab / Enter / Space). `scheduleCpuWindowVersionOnce` is unused on the open path
+- `src/cpu-ui.js` — footer version click paints via `injectAppVersion` path after `__macStatsStartCpuWindowVersionOnce` then opens changelog (`wireChangelogVersionClicksOnce`)
+- `src/agent-ops.js` — skip idle init; `scheduleInitAgentOps` starts immediately (no rIC); `initAgentOps` still skips setup while collapsed; `__macStatsStartAgentOpsNow` from capture / section intent
+- `src-tauri/dist/cpu.js`, `cpu-ui.js`, `agent-ops.js` match the skip comments / intent gates
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 rIC section-defer cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm no monitors/chat/logs/Agent Ops header wiring and no GitHub update fetch until a section click or footer version click; expand Debug Log / Disk cleanup / AI Chat / Agent Ops — still works; gauges still update; history canvases stay hidden until hover or Refresh; capture `MAC_STATS_OPEN_SECTION=agent-ops` still opens; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

@@ -332,6 +332,5 @@
     }
   };
 
-  // Shrink bitmaps before first paint. Do not getContext here (#14).
-  parkPosterCanvases();
+  // Stay parked. Do not set canvas.width on parse (#14).
 })();
