@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1586** — Top Processes pin hover / focus-visible: opaque accent wash (no glass alpha on the pin control).
 - **v0.1.1585** — Top Processes row pinned / hover / focus / active / selected: opaque accent wash, no glass drop shadow.
 - **v0.1.1584** — Details value hover / focus / selected opaque wash.
 - **v0.1.1583** — Ring / power-strip copy hover + focus opaque wash.
@@ -15,4 +16,5 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate — each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `7a4a1177` — v0.1.1586 Top Processes pin hover/focus opaque wash (#14).
 - Keep @ `9538daaf` — v0.1.1585 Top Processes row interaction opaque wash (#14).
