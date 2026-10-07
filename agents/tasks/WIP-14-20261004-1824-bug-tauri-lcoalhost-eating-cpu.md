@@ -12970,3 +12970,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat with a markdown reply that includes inline code, a fenced block, a quote, and/or a table; confirm those shells stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1699)
+
+**Date:** 2026-10-07 18:37 UTC (2026-10-07 20:37 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1699**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1699)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple History sparkline tooltip skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1699**
+- `CHANGELOG.md` **[0.1.1699]** documents Apple History sparkline tooltip (`.history-tooltip`) uses an opaque fill; no glass alpha on the tip panel, border, or soft drop shadow; Match monitor tick tips opaque in v0.1.1594; Markdown shells opaque in v0.1.1698
+- `src-tauri/dist/themes/apple/cpu.css` — `.history-tooltip` opaque `#1c1c1e` fill / `#f5f5f7` text, border `color-mix` against tip fill, `box-shadow: none`. Claimed tip shell has no `transparent` / `hsla(` / `backdrop-filter` / `var(--panel)` / glass `rgba(`
+- Prior cuts still present: `.chat-message .markdown blockquote` · markdown shells opaque mixes (v0.1.1698); `.add-btn-small` opaque mixes (v0.1.1697); `.changelog-code` opaque wash (v0.1.1696)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css` / dist copy)
+- Note (not a CSS-cut regression): wash paint is the History sparkline tooltip path (hover a History sparkline point; confirm the tip stays solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.history-tooltip` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / `cursor-agent` / overnight harness scripts).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a History sparkline point; confirm the tip stays solid (no glass alpha / soft shadow); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
