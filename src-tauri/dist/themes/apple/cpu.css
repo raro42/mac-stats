@@ -1369,10 +1369,11 @@ padding: 18px 18px 16px;
   transform: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .battery-power-strip:focus-within {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, var(--hairline));
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ececf1);
   box-shadow: none;
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 40%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 40%, #ececf1);
   outline-offset: 2px;
 }
 

@@ -4008,14 +4008,16 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #battery-power-strip .battery-info.is-hot-attention-flash,
 #lpm-strip.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 28%, #ececf1);
   transition: box-shadow 0.25s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #lpm-strip.is-hot-attention-flash {
-  box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 28%, #ececf1);
 }
 
 /* Top Processes — Filter attention glance (AI Chat / Perplexity Filter parity) */

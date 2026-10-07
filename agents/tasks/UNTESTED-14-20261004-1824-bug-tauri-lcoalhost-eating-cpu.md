@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1644** (follow-up after v0.1.1643).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple power strip focus · Bat/LPM attention flash skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.battery-power-strip:focus-within`, mix border and outline against opaque `#ececf1` (no `transparent` / hairline glass alpha). Always-visible on the default collapsed layout (Bat · LPM · Power).
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `#battery-power-strip .battery-info.is-hot-attention-flash` and `#lpm-strip.is-hot-attention-flash`, mix flash rings against opaque `#ececf1`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Tab-focus Bat · LPM · Power on the strip; confirm the strip focus ring stays solid. Trigger Bat/LPM attention flash when useful. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1643)
+
+
 Version **v0.1.1643** (follow-up after v0.1.1642).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -10381,3 +10397,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus a section strip icon (`.icon-line-item`); confirm focus outline stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1643)
+
+**Date:** 2026-10-07 10:05 UTC (2026-10-07 12:05 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1643**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1643)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 footer GitHub / version focus skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1643**
+- `CHANGELOG.md` **[0.1.1643]** documents footer GitHub (`#github-link` hover · focus-visible) and Apple version chip (`.app-version:focus-visible` · `.apple-github-link:focus-visible`) mixing washes against an opaque fill; no glass alpha on the footer focus rings or GitHub hover wash; always-visible on the default collapsed layout
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — identical. `#github-link:hover` mixes background against opaque `#ffffff`; `#github-link:focus-visible` mixes outline against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Claimed wash rules have no `transparent` / `backdrop-filter`
+- `src-tauri/dist/themes/apple/cpu.css` — `.app-version:focus-visible` and `.apple-github-link:focus-visible` mix outlines against opaque `#ffffff`. Same opaque-wash comment. Claimed wash rules have no `transparent` / `backdrop-filter`
+- Apple `cpu.html` footer has `.app-version` and `#github-link.apple-github-link` (always-visible on the default collapsed layout)
+- Prior cut still present: `.ops-row.is-copied::after` mixes green wash against opaque `#ffffff` (v0.1.1642)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the always-visible footer version / GitHub focus · hover path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque footer GitHub / version focus wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash` during cargo).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus the footer version chip, then the GitHub mark; hover GitHub; confirm focus / hover washes stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
