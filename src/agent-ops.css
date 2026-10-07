@@ -10333,13 +10333,15 @@ button.is-just-saved,
   flex-shrink: 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #github-link:hover {
   color: var(--accent, var(--ring-active, currentColor));
-  background: color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #github-link:focus-visible {
-  outline: 2px solid color-mix(in srgb, currentColor 45%, transparent);
+  outline: 2px solid color-mix(in srgb, currentColor 45%, #ffffff);
   outline-offset: 2px;
 }
 

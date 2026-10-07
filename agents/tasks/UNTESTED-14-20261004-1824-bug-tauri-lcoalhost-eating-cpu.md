@@ -22,6 +22,32 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1643** (follow-up after v0.1.1642).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (footer GitHub / version focus skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `#github-link:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — `.app-version:focus-visible` and `.apple-github-link:focus-visible`, mix focus outlines against opaque `#ffffff`. Always-visible on the default collapsed layout (footer version chip · GitHub mark).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Tab-focus the footer version chip, then the GitHub mark; hover GitHub. Confirm focus / hover washes stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1642)
+
+Version **v0.1.1642** (follow-up after v0.1.1641; landed on origin while WIP notes still pointed at v0.1.1641).
+
+Changes (Agent Ops row Copied badge skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-row.is-copied::after`, mix green wash against opaque `#ffffff`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops; copy a row when useful. Confirm Copied badge wash stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1641)
 Version **v0.1.1641** (follow-up after v0.1.1640).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

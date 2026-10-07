@@ -1148,8 +1148,9 @@ padding: 18px 18px 16px;
   color: var(--text);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .app-version:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -1170,8 +1171,9 @@ padding: 18px 18px 16px;
   text-decoration: underline;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .apple-github-link:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
