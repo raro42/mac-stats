@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1711
+
+- Apple outer window shell (`.apple-shell`) mixes the hairline border against an opaque fill. No glass alpha on the always-visible window chrome border. History chart shells already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1710
 
 - Apple History sparkline shells (`.history-chart-container`) mix hairline borders against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp history chart borders. Metric cards already opaque. P2 reliability / GitHub #14.
