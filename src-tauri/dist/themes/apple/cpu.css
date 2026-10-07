@@ -527,6 +527,7 @@ border-radius: 24px;
   /* Inherit font styles from .process-table */
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-empty {
   margin: 4px 0 2px;
   padding: 14px 12px;
@@ -535,14 +536,14 @@ border-radius: 24px;
   font-size: 12px;
   line-height: 1.45;
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .process-empty:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
   color: var(--text);
 }
 
