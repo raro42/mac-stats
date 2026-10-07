@@ -8110,3 +8110,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); click a ring value (CPU · GPU · Freq · Temp) or Bat / Power to copy; confirm the Copied flash still shows on the value, then reverts; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1583)
+
+**Date:** 2026-10-07 00:25 UTC (2026-10-07 02:25 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1583**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1583)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 ring / power-strip copy hover + focus-visible skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1583**
+- `CHANGELOG.md` **[0.1.1583]** documents ring and power-strip copy hover and focus-visible mixing the accent wash against an opaque fill; no glass alpha on the value while the pointer rests or keyboard focus rings
+- `src/cpu.js` and `src-tauri/dist/cpu.js` are identical. `ensureMetricValueCopyStyles` paints `.metric-value` / `.battery-level` / `.power-value` `[data-metric-copy="1"]:hover` with `color-mix(... 12%, #ffffff)`; `:focus-visible` ring mixes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Hover / focus-visible / Copied wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- `wireMetricValueCopy` / `copyMetricValueFromUi` still add `.is-just-copied`, set title/aria **Copied**, clear after ~1600ms (GPU · Freq · Temp · Bat · Power; CPU % click path unchanged)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the ring / power-strip hover and focus-visible path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque ring / power-strip hover and focus-visible cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a ring value (CPU · GPU · Freq · Temp) or Bat / Power; Tab-focus one of those copy targets; confirm the hover wash and focus ring still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
