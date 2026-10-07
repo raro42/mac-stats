@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1718
+
+- Apple Settings / Monitors / AI Chat modal dimmers (`--modal-backdrop`) mix against an opaque fill. No glass alpha on the full-screen backdrop while those sheets are open. Ring tracks already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1717
 
 - Apple ring gauge tracks (`.ring-track` / `--ring-track`) mix against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp ring tracks. Markdown table/hr hairlines already opaque. P2 reliability / GitHub #14.

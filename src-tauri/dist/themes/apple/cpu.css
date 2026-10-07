@@ -28,7 +28,8 @@
   /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
   --ring-track: color-mix(in srgb, #000000 6%, #ffffff);
 
-  --modal-backdrop: rgba(0, 0, 0, 0.30);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --modal-backdrop: color-mix(in srgb, #000000 30%, #f2f2f6);
 }
 
 body {
