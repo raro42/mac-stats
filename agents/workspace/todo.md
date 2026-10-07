@@ -6,7 +6,7 @@
 - [x] Bump Cargo.toml → 0.1.1593, CHANGELOG, sync dist
 - [x] `cargo check` in src-tauri/
 - [x] Update task notes, rename WIP → UNTESTED, commit + push
-- [ ] GitHub comment via gh-safe (do not close #14)
+- [x] GitHub comment via gh-safe (do not close #14)
 
 ## Review
 v0.1.1593: Perplexity filter chips + Clear opaque washes (#14). `cargo check` pass.
