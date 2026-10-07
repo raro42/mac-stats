@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1724
+
+- Apple Details / Top Processes body type (`.details-grid` · `.process-table`) mixes against an opaque panel fill. No glass alpha on Detail labels or process rows. Battery glyph already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1723
 
 - Apple battery strip glyph (`.battery-icon` resting · charging) mixes type color against an opaque strip fill. No glass alpha on the always-visible Bat icon. Window title already opaque. P2 reliability / GitHub #14.

@@ -467,7 +467,8 @@ border-radius: 24px;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(60, 60, 67, 0.72);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #3c3c43 72%, #ffffff);
 }
 
 .detail-label {
@@ -495,7 +496,8 @@ border-radius: 24px;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(60, 60, 67, 0.72);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #3c3c43 72%, #ffffff);
 }
 
 .process-row {
