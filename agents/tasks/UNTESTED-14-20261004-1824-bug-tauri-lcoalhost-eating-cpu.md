@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1666** (follow-up after v0.1.1665).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple AI Chat empty-shell skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-empty` resting · hover, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Shared sheet opaque in v0.1.1615; Apple theme had put glass back. Monitors empty opaque in v0.1.1665.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat with an empty list; confirm the empty shell stays solid on rest / hover. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1665)
+
 Version **v0.1.1665** (follow-up after v0.1.1664).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
