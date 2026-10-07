@@ -7,9 +7,9 @@
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit + push `origin/main` (commit done; push blocked by GitHub HTTP 500 / GitRPC)
+- [x] Commit + push `origin/main`
 - [x] Do **not** close GitHub #14
 
 ## Review
 
-v0.1.1681: Apple AI Chat `.model-select` resting · hover · focus · focus-visible mix against opaque `#ffffff` (no glass alpha). `cargo check` pass. Task renamed to UNTESTED-14. Local commit `3b8e29d7` on `main`. Push to `origin/main` failed repeatedly (GitHub receive-pack / git blobs API HTTP 500, empty body). Issue #14 was already CLOSED on GitHub; left untouched.
+v0.1.1681: Apple AI Chat `.model-select` resting · hover · focus · focus-visible mix against opaque `#ffffff` (no glass alpha). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main (`50fd9b5f`). Issue #14 was already CLOSED on GitHub; left untouched.
