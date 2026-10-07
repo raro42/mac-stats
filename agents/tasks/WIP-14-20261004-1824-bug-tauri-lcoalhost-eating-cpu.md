@@ -10317,3 +10317,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a `.icon-btn` (Refresh / Settings); Tab-focus one; press it; confirm hover / focus / active washes stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1641)
+
+**Date:** 2026-10-07 09:53 UTC (2026-10-07 11:53 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1641**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1641)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple `.icon-line-item:focus-visible` skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1641**
+- `CHANGELOG.md` **[0.1.1641]** documents Apple section strip (`.icon-line-item:focus-visible`) mixing the focus outline against an opaque fill; no glass alpha on the Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops focus ring; always-visible on the default collapsed layout; `.icon-btn` opaque in v0.1.1640
+- `src-tauri/dist/themes/apple/cpu.css` — `.icon-line-item:focus-visible` mixes outline against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Claimed wash rule has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Apple `cpu.html` has 7 `.icon-line-item` buttons (Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops). This cut addresses the leftover glass alpha noted in the v0.1.1640 report (section strip uses `.icon-line-item`, not `.icon-btn`)
+- Prior cuts still present: `.icon-btn:hover` / `:focus-visible` / `:active` opaque (v0.1.1640)
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the always-visible section-strip focus path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.icon-line-item:focus-visible` wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus a section strip icon (`.icon-line-item`); confirm focus outline stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
