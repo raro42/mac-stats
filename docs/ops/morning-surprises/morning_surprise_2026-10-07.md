@@ -3,6 +3,8 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1641** — Agent Ops row Copied badge (`.ops-row.is-copied` `::after`): opaque green wash (no glass alpha on the badge).
+- **v0.1.1640** — Apple icon strip (`.icon-btn` hover · focus-visible · active): opaque wash (no glass alpha on the section icons). Always-visible on the default collapsed layout.
 - **v0.1.1639** — Details value Copied badge (`.details-grid > .detail-value[role='option'].is-just-copied` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1638** — Ring focus (`#cpu-usage-card:focus-visible` · `.metric-card:focus-within`): opaque focus wash; soft glass focus shadows dropped. Always-visible on the default collapsed layout.
 - **v0.1.1637** — Details / Top Processes headers (`.collapsible-header` hover · focus-visible): opaque wash in Apple theme (no glass alpha on hover or focus ring). Always-visible on the default collapsed layout.
@@ -62,6 +64,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `52a78cab` — v0.1.1641 Agent Ops row Copied badge opaque wash (#14). Rebased past origin v0.1.1640.
 - Keep @ `224ddf97` — v0.1.1639 Details value Copied badge opaque wash (#14). Rebased past origin v0.1.1638.
 - Keep @ `c664f2e9` — v0.1.1636 Top Processes row Copied badge opaque wash (#14). Rebased past origin v0.1.1635.
 - Keep @ `cf28617b` — v0.1.1633 Perplexity result Copied badge opaque wash (#14). Rebased past origin v0.1.1632.
