@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1654** — Apple Settings inputs (`.settings-input` · `.discord-token-input` resting · hover): opaque fill (no glass alpha on the field or the hover border). Rebased past origin v0.1.1653.
 - **v0.1.1650** — Apple Settings inputs (`.settings-input:focus` · `.discord-token-input:focus`): opaque focus wash (no glass alpha on the focus ring or the focused field). Rebased past origin v0.1.1649.
 - **v0.1.1649** — Disk Cleanup meta cards (`.disk-cleanup-meta-card` resting · hover · focus · Reclaim · Clean · scopes · due · periodic): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1648** — Disk Cleanup category and scope rows (resting · hover · focus · selected · Reclaim · Big): opaque wash (no glass alpha). Hover drops the soft glass shadow.
@@ -67,10 +68,12 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Tried / context
 - Digester open stayed empty; design review in grace (feature-agent-ops still the stale screenshot).
+- Origin moved during the tick: Disk Cleanup last-run v0.1.1651, empty shell v0.1.1652, filter-miss v0.1.1653. This tick rebased and shipped Settings input rest and hover as v0.1.1654.
 - Sibling scan this tick: OpenClaw and Hermes checkouts are present. No port this tick. Fuel stayed on GitHub #14.
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `6310600a` — v0.1.1654 Apple Settings input rest and hover opaque wash (#14). Rebased past origin v0.1.1653.
 - Keep @ `af16957c` — v0.1.1650 Apple Settings input focus opaque wash (#14). Rebased past origin v0.1.1649.
 - Keep @ `1557072d` — v0.1.1648 Disk Cleanup category and scope row opaque wash (#14).
 - Discard — local Disk Cleanup Copied-badge wash duplicated origin v0.1.1647.
