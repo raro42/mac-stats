@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1625** — Top Processes filter-miss (`.processes-filter-miss` · Hot · Pinned · Clear filter): opaque wash (no glass alpha).
 - **v0.1.1624** — Ring filter-miss (`.rings-filter-miss` · CTA): opaque wash (no glass alpha).
 - **v0.1.1623** — AI Chat filter-miss / Clear (`.chat-filter-miss` · CTA · `#chat-clear-btn`): opaque wash (no glass alpha).
 - **v0.1.1622** — AI Chat error bubbles (`.chat-message.assistant.is-error`): opaque wash (no glass alpha).
@@ -47,6 +48,8 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Discard — local AI Chat filter-miss wash duplicated origin v0.1.1623.
+- Keep — v0.1.1625 Top Processes filter-miss opaque wash (#14).
 - Keep — v0.1.1624 Ring filter-miss · CTA opaque wash (#14).
 - Keep — v0.1.1623 AI Chat filter-miss · Clear opaque wash (#14).
 - Keep — v0.1.1622 AI Chat error bubble opaque wash (#14).
