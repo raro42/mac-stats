@@ -7417,12 +7417,13 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #ff3b30 70%, currentColor);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-detail {
   margin: 8px 0 2px 22px;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--hairline, currentColor) 55%, transparent);
-  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--hairline, currentColor) 55%, #ffffff);
+  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, #ffffff);
   font-size: 11px;
   line-height: 1.4;
 }
@@ -7481,13 +7482,14 @@ button.monitor-detail-url.is-just-saved {
   color: var(--muted, currentColor);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-detail-log {
   margin: 0;
   padding: 6px 8px;
   max-height: 9.5rem;
   overflow: auto;
   border-radius: 6px;
-  background: color-mix(in srgb, #000 6%, transparent);
+  background: color-mix(in srgb, #000 6%, #ffffff);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 10px;
   line-height: 1.45;

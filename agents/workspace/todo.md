@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1669)
+# WIP-14 coder pass (v0.1.1670)
 
-- [x] Opaque-wash Monitors row selected · focus (`.monitor-item.is-selected` · `:focus-visible`) in `src/agent-ops.css` + dist
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1669
-- [x] CHANGELOG `[0.1.1669]` entry
+- [x] Opaque-wash Monitors detail panel (`.monitor-detail` · `.monitor-detail-log`) in `src/agent-ops.css` + dist
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1670
+- [x] CHANGELOG `[0.1.1670]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1669: Monitors `.monitor-item.is-selected` · `:focus-visible` mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1670: Monitors `.monitor-detail` · `.monitor-detail-log` mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
