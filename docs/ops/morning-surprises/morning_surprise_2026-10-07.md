@@ -3,6 +3,9 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1648** — Disk Cleanup category and scope rows (resting · hover · focus · selected · Reclaim · Big): opaque wash (no glass alpha). Hover drops the soft glass shadow.
+- **v0.1.1647** — Disk Cleanup Copied badge (`.disk-cleanup-item` / `.disk-cleanup-scope-row` `is-just-copied` `::after`): opaque green wash (no glass alpha on the badge).
+- **v0.1.1646** — Apple history time-range (`.time-range-dropdown:focus`): opaque focus wash (no glass alpha). Always-visible on the default collapsed layout.
 - **v0.1.1645** — Monitors row Copied badge (`.monitor-item.is-just-copied` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1642** — Agent Ops row Copied badge (`.ops-row.is-copied` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1641** — Apple section strip (`.icon-line-item:focus-visible`): opaque focus outline (no glass alpha on the section icons). Always-visible on the default collapsed layout.
@@ -66,6 +69,8 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `1557072d` — v0.1.1648 Disk Cleanup category and scope row opaque wash (#14).
+- Discard — local Disk Cleanup Copied-badge wash duplicated origin v0.1.1647.
 - Keep @ `1e86faf6` — v0.1.1645 Monitors row Copied badge opaque wash (#14). Rebased past origin v0.1.1644.
 - Keep @ `4f547aff` — v0.1.1642 Agent Ops row Copied badge opaque wash (#14). Rebased past origin v0.1.1641.
 - Keep @ `224ddf97` — v0.1.1639 Details value Copied badge opaque wash (#14). Rebased past origin v0.1.1638.
