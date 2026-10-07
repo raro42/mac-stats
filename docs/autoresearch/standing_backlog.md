@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1708
+
+- Apple Details / Top Processes shells (`.apple-details` · `.apple-processes` resting · hover) mix hairline borders against an opaque fill. No glass alpha on the section panel borders. Changelog scrollbar already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1707
 
 - Apple Changelog scrollbar (`.changelog-body` `::-webkit-scrollbar-track` · thumb resting · hover) mixes against an opaque fill. No glass alpha on the Changelog scroll chrome. Details / Top Processes thumbs already opaque. P2 reliability / GitHub #14.
