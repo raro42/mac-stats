@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1680** (follow-up after v0.1.1679).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat Send control skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `#chat-send-btn` resting · hover · focus-visible · active, mix fills / focus ring against opaque `#ffffff` and drop soft glass hover shadow (Apple had `rgba(0,122,255,0.9)` / `1` / `rgba(0,100,220,0.95)` glass + transparent focus / shadow mixes). Composer field opaque in v0.1.1679. Composer shell opaque in v0.1.1678.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat; confirm the Send control stays solid (no glass alpha) on rest / hover / active, focus ring solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1679)
+
 Version **v0.1.1679** (follow-up after v0.1.1678).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

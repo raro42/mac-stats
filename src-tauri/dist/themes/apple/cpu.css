@@ -3131,8 +3131,9 @@ padding: 0;
   color: var(--muted);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, var(--accent, #007aff) 90%, #ffffff);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -3142,21 +3143,22 @@ padding: 0;
   font-weight: 600;
   transition: background 0.15s ease, box-shadow 0.15s ease;
   font-family: inherit;
+  box-shadow: none;
 }
 
 #chat-send-btn:hover {
-  background: rgba(0, 122, 255, 1);
-  box-shadow: 0 2px 8px color-mix(in srgb, #007aff 28%, transparent);
+  background: var(--accent, #007aff);
+  box-shadow: none;
 }
 
 #chat-send-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
 #chat-send-btn:active {
   box-shadow: none;
-  background: rgba(0, 100, 220, 0.95);
+  background: color-mix(in srgb, #0064dc 95%, #ffffff);
 }
 
 #chat-send-btn:disabled {
