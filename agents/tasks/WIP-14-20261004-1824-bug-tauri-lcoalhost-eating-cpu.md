@@ -10550,3 +10550,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus the History time-range dropdown; confirm the focus ring and border stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1647)
+
+**Date:** 2026-10-07 10:43 UTC (2026-10-07 12:43 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1647**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1647)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Disk Cleanup Copied badge skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1647**
+- `CHANGELOG.md` **[0.1.1647]** documents Disk Cleanup row Copied badge (`.disk-cleanup-item` / `.disk-cleanup-scope-row` `is-just-copied` `::after`) mixing the green wash against an opaque fill; no glass alpha on the badge; History time-range focus opaque in v0.1.1646
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — identical. `.disk-cleanup-item.is-just-copied` / `.disk-cleanup-scope-row.is-just-copied` mixes background and border against opaque `#ffffff`; `box-shadow: none`. `::after` Copied badge mixes green wash against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: Apple `.time-range-dropdown:focus` mixes outline and border against opaque `#ffffff` (v0.1.1646)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Disk Cleanup Copied badge path (expand Disk Cleanup to exercise). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Disk Cleanup Copied badge wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash` during cargo).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; copy a category or scope row when useful; confirm Copied badge wash stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
