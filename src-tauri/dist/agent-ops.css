@@ -388,17 +388,18 @@ body:hover {
     box-shadow 0.2s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .details-grid > .detail-value[role='option']:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #ffffff);
 }
 
 .details-grid > .detail-value[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #ffffff);
 }
 
 .details-grid > .detail-value[role='option'].is-selected {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1584** (follow-up after v0.1.1583).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Details value hover + focus-visible + selected skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.details-grid > .detail-value[role='option']:hover` / `:focus-visible` / `.is-selected` mixes the accent wash against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Details. Hover a value (Load / RAM / Uptime). Tab-focus one; Arrow to select. Confirm the hover wash, focus ring, and selected wash still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1583)
+
 Version **v0.1.1583** (follow-up after v0.1.1582).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
