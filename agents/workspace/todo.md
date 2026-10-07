@@ -6,7 +6,7 @@
 - [x] Bump Cargo.toml → 0.1.1595 (1594 taken by monitor tick tips), CHANGELOG, sync dist
 - [x] `cargo check` in src-tauri/
 - [x] Update task notes, rename WIP → UNTESTED, commit + push
-- [ ] GitHub comment via gh-safe (do not close #14)
+- [x] GitHub comment via gh-safe (do not close #14)
 
 ## Review
-v0.1.1595: Debug Log filter chips + Clear opaque washes (#14). `cargo check` pass.
+v0.1.1595: Debug Log filter chips + Clear opaque washes (#14). `cargo check` pass. Pushed to origin/main. Issue #14 left open.
