@@ -50,6 +50,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Ratchet
 - Discard — local AI Chat filter-miss wash duplicated origin v0.1.1623.
+- Keep — v0.1.1626 Top Processes empty shell opaque wash (#14).
 - Keep — v0.1.1625 Top Processes filter-miss opaque wash (#14).
 - Keep — v0.1.1624 Ring filter-miss · CTA opaque wash (#14).
 - Keep — v0.1.1623 AI Chat filter-miss · Clear opaque wash (#14).
