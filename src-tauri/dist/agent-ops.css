@@ -3146,14 +3146,21 @@ textarea.ops-agent-editor.is-dirty {
     border-color 0.2s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-result-item[role='option']:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, #ffffff);
+}
+
+.perplexity-result-item:focus-within,
+.perplexity-result-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
 }
 
 .perplexity-result-item[role='option'].is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -3181,8 +3188,9 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .perplexity-result-item:hover {
-  background: color-mix(in srgb, #0a84ff 6%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 22%, transparent);
+  background: color-mix(in srgb, #0a84ff 6%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 22%, #ffffff);
+  box-shadow: none;
 }
 
 .perplexity-weather-card {
@@ -8854,13 +8862,15 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-result-item.is-top {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ffffff);
 }
 
 .perplexity-result-item.is-top:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, #ffffff);
+  box-shadow: none;
 }
 
 .perplexity-results {
@@ -8870,11 +8880,12 @@ button.monitor-detail-url.is-just-saved {
   max-height: none;
   overflow: visible;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-result-item {
   padding: 8px 10px;
   border-radius: 8px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 .perplexity-result-item a {
   color: inherit;

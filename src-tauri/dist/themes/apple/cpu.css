@@ -1781,27 +1781,28 @@ padding: 18px 18px 16px;
   border-color: color-mix(in srgb, #ff3b30 30%, transparent);
   background: color-mix(in srgb, #ff3b30 7%, transparent);
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-result-item {
   padding: 10px 12px;
   margin-bottom: 8px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
   border-radius: 10px;
   line-height: 1.5;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .perplexity-result-item:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
-  box-shadow: 0 2px 8px color-mix(in srgb, #000 6%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
+  box-shadow: none;
 }
 .perplexity-result-item:focus-within,
 .perplexity-result-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
 }
 .perplexity-result-item.is-selected {
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ffffff);
 }
 .perplexity-result-item a {
   color: var(--accent);
