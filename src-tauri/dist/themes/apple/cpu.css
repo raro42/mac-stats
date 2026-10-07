@@ -2287,9 +2287,10 @@ padding: 0;
   background: color-mix(in srgb, #ff3b30 10%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;
@@ -2298,11 +2299,9 @@ padding: 0;
 }
 
 .monitor-item:hover {
-  background: rgba(255, 255, 255, 0.42);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, var(--hairline));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 2px 8px rgba(0, 0, 0, 0.05);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
+  box-shadow: none;
 }
 
 .monitor-item-header {

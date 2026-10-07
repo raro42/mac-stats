@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1667** (follow-up after v0.1.1666).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple Monitors row skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.monitor-item` resting · hover, mix washes against opaque `#ffffff` (no `rgba` glass alpha). Soft glass hover shadow dropped. AI Chat empty opaque in v0.1.1666.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors with at least one row; confirm rows stay solid on rest / hover. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1666)
+
 Version **v0.1.1666** (follow-up after v0.1.1665).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -11313,3 +11327,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Monitors with an empty list or error empty; confirm the empty shell stays solid on rest / hover / error; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1666)
+
+**Date:** 2026-10-07 13:14 UTC (2026-10-07 15:14 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1666**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1666)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat empty-shell skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1666**
+- `CHANGELOG.md` **[0.1.1666]** documents Apple AI Chat empty shell (`.chat-empty` resting · hover) mixing the wash against an opaque fill; no glass alpha on the empty list; Monitors empty shell opaque in v0.1.1665
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-empty` resting · `:hover` mix border/background against opaque `#ffffff`; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cut still present: `.monitors-empty` mixes against opaque `#ffffff` (Apple theme; v0.1.1665)
+- Prior cut still present: `.monitors-filter-miss` / `.monitors-empty-cta` mix against opaque `#ffffff` (`src/agent-ops.css` / dist; v0.1.1664)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Apple AI Chat empty-shell path (expand AI Chat with an empty list). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque AI Chat empty-shell wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`cursor-agent` / shell / overnight harness).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat with an empty list; confirm the empty shell stays solid on rest / hover; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
