@@ -1,18 +1,18 @@
-# WIP-14 / #14 — tauri://localhost CPU (v0.1.1692)
+# WIP-14 / #14 — tauri://localhost CPU (v0.1.1693)
 
 ## Plan
 - [x] Pick lowest GitHub FEAT/WIP: `WIP-14-…` (issue #14)
-- [x] Next glass cut: Apple AI Chat model-select dropdown (`.model-select-dropdown` shell · option hover; `.model-text` focus-visible)
-- [x] Bump `Cargo.toml` → `0.1.1692`
-- [x] Opaque fill / border; drop soft glass shadow; focus rings against `#ffffff`
-- [x] CHANGELOG `[0.1.1692]` entry
-- [x] Refresh Implementation section → rename `UNTESTED-14-…`
+- [x] Next glass cut: Apple AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final) — shared sheet opaque in v0.1.1621; Apple put `transparent` glass back
+- [x] Bump `Cargo.toml` → `0.1.1693`
+- [x] Mix washes / borders against `#ffffff` (match shared `agent-ops.css`)
+- [x] CHANGELOG `[0.1.1693]` entry
+- [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/` (green; unused-import warnings pre-existing)
-- [x] Commit + push `origin/main` (`4c1ce291`; docs note `84e3a331`)
-- [x] GitHub comment via `gh-safe.sh` (issue not closed)
+- [ ] Commit + push `origin/main`
+- [ ] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
-- Cut: Apple `.model-select-dropdown` opaque `#ffffff` (was `var(--panel)` / `var(--panel-shadow)` glass). Option hover and model-text focus ring mix against `#ffffff` (was `var(--hairline)` / transparent).
-- Parallel to Monitors / AI Chat overflow menu opaque cuts in v0.1.1691 / v0.1.1690. Model select control opaque in v0.1.1681.
+- Cut: Apple `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final mix against opaque `#ffffff` (was `transparent` glass). Matches shared `agent-ops.css` from v0.1.1621.
+- Parallel to Apple message-bubble / empty-shell "glass put back" cuts. Model-select dropdown opaque in v0.1.1692.
 - Linux webkit2gtk blank-page floor still applies; macOS Graphics and Media gate remains tester check.
 - Task file: `agents/tasks/UNTESTED-14-20261004-1824-bug-tauri-lcoalhost-eating-cpu.md`

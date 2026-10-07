@@ -2994,13 +2994,14 @@ border-radius: 24px;
   opacity: 0.9;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-exec-card {
   margin: 2px 0;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #34c759 28%, transparent);
-  border-left: 3px solid color-mix(in srgb, #34c759 75%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, #34c759 28%, #ffffff);
+  border-left: 3px solid color-mix(in srgb, #34c759 75%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
 }
 
 .chat-exec-label {
@@ -3018,6 +3019,7 @@ border-radius: 24px;
   margin-top: 8px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-exec-code {
   margin: 0;
   padding: 8px 10px;
@@ -3025,8 +3027,8 @@ border-radius: 24px;
   overflow-x: auto;
   font-size: 12px;
   line-height: 1.4;
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .chat-exec-code code {
@@ -3052,16 +3054,17 @@ border-radius: 24px;
   gap: 10px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-answer-part {
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 
 .chat-answer-part.chat-answer-final {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
 }
 
 .thinking-animation {

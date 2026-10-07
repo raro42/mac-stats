@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1693** (follow-up after v0.1.1692).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat exec / answer cards skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-part.chat-answer-final` mix washes / borders against opaque `#ffffff` (Apple had `transparent` glass after the shared sheet went opaque in v0.1.1621). Model-select dropdown opaque in v0.1.1692.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat and trigger a turn that shows an exec card and/or answer-part panels; confirm those shells stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1692)
+
 Version **v0.1.1692** (follow-up after v0.1.1691).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -12624,3 +12637,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Monitors → open the ⋯ overflow menu; confirm the menu panel stays solid (no glass alpha), soft drop shadow gone, item hover / focus and menu-button focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1692)
+
+**Date:** 2026-10-07 17:02 UTC (2026-10-07 19:02 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1692**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1692)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat model-select dropdown skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1692**
+- `CHANGELOG.md` **[0.1.1692]** documents Apple AI Chat model-select dropdown (`.model-select-dropdown` shell · option hover; `.model-text` focus ring) mixing fills against an opaque fill; no glass alpha on the dropdown panel or focus ring; soft glass drop shadow removed; Model select control opaque in v0.1.1681; AI Chat overflow menu opaque in v0.1.1690
+- `src-tauri/dist/themes/apple/cpu.css` — `.model-select-dropdown` uses opaque `#ffffff` fill, opaque hairline border, `box-shadow: none`; `option:hover` and `.model-text:focus-visible` mix against `#ffffff`. Claimed wash fills / borders / focus rings have no `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `.monitors-menu` opaque shell / item mixes (v0.1.1691); `.ollama-menu` opaque shell / item mixes (v0.1.1690); `.monitor-remove-btn` opaque mixes (v0.1.1689)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the AI Chat model picker path (expand AI Chat → open the model picker / `.model-select-dropdown`; confirm the dropdown panel stays solid, soft drop shadow gone, option hover and model-text focus ring solid when focused). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.model-select-dropdown` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat → open the model picker / `.model-select-dropdown`; confirm the dropdown panel stays solid (no glass alpha), soft drop shadow gone, option hover and model-text focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
