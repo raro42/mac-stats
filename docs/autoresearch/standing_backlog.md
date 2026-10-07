@@ -30,7 +30,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Overnight merge — v0.1.1610
 
-- Agent Ops copy chips (`.ops-session-copy-chip` resting · hover · focus-visible) mix washes against an opaque fill. No glass alpha on id / slug / path / request-id chips before the Copied flash. P2 reliability / GitHub #14.>>>>>>> f1a01d70 (v0.1.1610: drop Agent Ops loading shell glass blend (#14).)
+- Agent Ops copy chips (`.ops-session-copy-chip` resting · hover · focus-visible) mix washes against an opaque fill. No glass alpha on id / slug / path / request-id chips before the Copied flash. P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1609
 
