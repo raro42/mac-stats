@@ -19,6 +19,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1713
+
+- Apple AI Chat message list (`.chat-messages`) mixes the hairline border against an opaque fill. No glass alpha on the message-list border (panel fill already opaque). Icon-strip / section dividers already opaque. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1712
+
+- Apple icon-strip dividers (`.icon-btn:not(:last-child)::after`) and section hairlines (`.apple-divider`) mix against an opaque fill. No glass alpha on the always-visible Monitors · AI Chat · … strip separators or section dividers. Outer shell border already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1711
 
 - Apple outer window shell (`.apple-shell`) mixes the hairline border against an opaque fill. No glass alpha on the always-visible window chrome border. History chart shells already opaque. P2 reliability / GitHub #14.

@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1713** (follow-up after v0.1.1712).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat `.chat-messages` border skips glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-messages` resting mix hairline border against opaque `#ffffff` (Apple still had `var(--hairline)` glass on the already-opaque panel fill from v0.1.1676). Icon-strip / section dividers opaque in v0.1.1712.
+
+Tester: open CPU window on macOS, expand AI Chat, warm ≥30s. Confirm the message-list border stays solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1712)
+
 Version **v0.1.1712** (follow-up after v0.1.1711).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -13532,3 +13545,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm the outer window shell border stays solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1712)
+
+**Date:** 2026-10-07 20:45 UTC (2026-10-07 22:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1712**)
+- No stale sibling `agents/tasks/WIP-14-…` or `UNTESTED-14-…` at start of this pass
+- `cd src-tauri && cargo check` — **pass** (warnings only; tree was v0.1.1712 at check time)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple icon-strip + section dividers skip glass blend)**
+
+- Claimed cut still present after concurrent tree bump: `.icon-btn:not(:last-child)::after` uses `background: color-mix(in srgb, #0c0c10 8%, #f7f7fa)`; `.apple-divider` uses `background: color-mix(in srgb, #0c0c10 5%, #f7f7fa)`. No `rgba(0,0,0,0.08)` / glass `--hairline` on those claimed paths.
+- `CHANGELOG.md` **[0.1.1712]** documents Apple icon-strip dividers and section hairlines mixing against an opaque fill; Outer shell border opaque in v0.1.1711
+- Prior cuts still present: `.apple-shell` opaque mix border against `#f7f7fa` (v0.1.1711); history park still present (`html:not(.is-history-gpu-unparked)` in `src-tauri/dist/agent-ops.css`)
+- Note: while this pass ran, the working tree advanced to **v0.1.1713** (`.chat-messages` opaque border mix). Claimed **v0.1.1712** paths remain intact. This report covers the 1712 claim only.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque icon-strip / section-divider cut.
+- Log tail still shows older Ollama localhost connection-refused noise (unrelated to #14 CSS).
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm header icon-strip separators and section hairlines stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
