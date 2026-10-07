@@ -3,6 +3,9 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1599** — Ring, battery, and power Copied flashes sit above the value with left and right. No translate.
+- **v0.1.1598** — Agent Ops filter input, match chip, Clear, and just-cleared flash: opaque wash.
+- **v0.1.1597** — Disk Cleanup scope filter chips (All · On · Off) and Clear: opaque wash (no glass alpha).
 - **v0.1.1596** — Disk Cleanup category filter chips (All · Reclaim · Big · Clean) and Clear: opaque wash (no glass alpha).
 - **v0.1.1595** — Debug Log filter chips (All · Error · Warn) and Clear: opaque wash.
 - **v0.1.1594** — Monitor history tick tips: left/top placement, opaque fill, no translate or shadow.
@@ -15,10 +18,11 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Tried / context
 - Digester open stayed empty; design review in grace (feature-agent-ops still the stale screenshot).
-- Sibling harnesses unavailable on this host (missing git checkouts).
+- Sibling scan saw OpenClaw docs commits and Hermes insights. No product port this tick.
 - Linux webkit floor still not the macOS Graphics and Media gate — each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep — v0.1.1599 metric Copied flash uses left and right. No translate (#14). Rebased onto origin v0.1.1598.
 - Keep @ `8f5d9e58` — v0.1.1596 Disk Cleanup category filter chip opaque wash (#14).
 - Keep @ `aec88e78` — v0.1.1595 Debug Log filter chip opaque wash (#14).
 - Keep @ `228fbb0e` — v0.1.1594 monitor tick tips without translate (#14).

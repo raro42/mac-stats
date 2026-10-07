@@ -3312,9 +3312,12 @@ function ensureMetricValueCopyStyles() {
     .power-value[data-metric-copy="1"].is-just-copied::after {
       content: "Copied";
       position: absolute;
-      left: 50%;
+      /* Center above the value. No CSS translate (#14). */
+      left: 0;
+      right: 0;
       bottom: calc(100% + 4px);
-      transform: translateX(-50%);
+      width: max-content;
+      margin-inline: auto;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.02em;
