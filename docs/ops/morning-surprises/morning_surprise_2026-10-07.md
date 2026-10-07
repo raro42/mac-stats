@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1619** — AI Chat message rows (hover · focus · selected · Copied badge): opaque wash (no glass alpha).
 - **v0.1.1618** — AI Chat empty starter chips (`.chat-empty-chip` resting · hover · focus-visible): opaque wash (no glass alpha).
 - **v0.1.1617** — Agent Ops refresh row (Refresh · Updated stamp · top hairline): opaque wash (no glass alpha).
 - **v0.1.1616** — Agent Ops agent editor (`textarea.ops-agent-editor` focus · dirty): opaque wash (no glass alpha).
@@ -41,6 +42,8 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Discard — local starter-chip wash duplicated origin v0.1.1618.
+- Keep — v0.1.1619 AI Chat message row hover · focus · selected · Copied badge opaque wash (#14).
 - Discard — local close-button wash duplicated origin v0.1.1613.
 - Keep — v0.1.1616 Agent Ops agent editor focus · dirty opaque wash (#14).
 - Keep — v0.1.1615 AI Chat empty shell opaque wash (#14).

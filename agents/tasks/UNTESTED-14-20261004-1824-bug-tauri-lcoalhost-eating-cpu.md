@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1619** (follow-up after v0.1.1618).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (AI Chat message rows skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.chat-message` hover / focus-visible / selected / Copied badge, mix washes against opaque `#ffffff` (no `transparent` glass alpha, no rgba badge).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat. Hover a message, Tab to it, select it, then copy it. Confirm the wash and the Copied badge stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1618)
+
 Version **v0.1.1618** (follow-up after v0.1.1617).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
