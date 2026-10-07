@@ -8,8 +8,8 @@
 - [x] CHANGELOG `[0.1.1688]` entry
 - [x] Refresh Implementation section → rename `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/` (green; unused-import warnings pre-existing)
-- [ ] Commit + push `origin/main`
-- [ ] GitHub comment via `gh-safe.sh` (issue not closed)
+- [x] Commit + push `origin/main` (`9855f3e7`)
+- [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
 - Cut: Apple `.ollama-settings-popover .popover-btn-primary` · `.popover-btn-secondary` resting · hover · focus-visible mixes against opaque `#ffffff` (was `rgba(0,122,255,0.9)` / `rgba(255,255,255,0.5)` / `0.7` + transparent focus).
