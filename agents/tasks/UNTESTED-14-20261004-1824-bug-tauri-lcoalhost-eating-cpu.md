@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1664** (follow-up after v0.1.1663).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Monitors filter-miss / empty CTA skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.monitors-filter-miss` · Down · Slow · Up empty and `.monitors-empty-cta` resting · hover · focus-visible, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Disk Cleanup soft-delete opaque in v0.1.1663.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors; set a filter that misses (Up / Down / Slow) or open an empty-shell CTA; confirm filter-miss shell and Add Monitor CTA stay solid on rest / hover / Tab-focus. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1663)
+
 Version **v0.1.1663** (follow-up after v0.1.1662).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -11161,3 +11175,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; confirm the Settings card shell stays solid (no translucent glass panel); gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1663)
+
+**Date:** 2026-10-07 12:51 UTC (2026-10-07 14:51 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1663**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1663)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Disk Cleanup soft-delete skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1663**
+- `CHANGELOG.md` **[0.1.1663]** documents Disk Cleanup soft-delete (`.disk-cleanup-soft-delete` resting · hover · focus-within) mixing the wash against an opaque fill; no glass alpha on the Move to Trash row; Top Processes empty shell opaque in v0.1.1662
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-soft-delete` resting · `:hover` · `:focus-within` mix border/background/focus ring against opaque `#ffffff`; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cut still present: Apple `.process-empty` mixes against opaque `#ffffff` (v0.1.1662)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Disk Cleanup soft-delete path (expand Disk Cleanup; Move to Trash / soft-delete row). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque soft-delete wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / shell).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; confirm the Move to Trash / soft-delete row stays solid on rest, hover, and Tab-focus; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

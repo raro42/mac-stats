@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1663)
+# WIP-14 coder pass (v0.1.1664)
 
-- [x] Opaque-wash Disk Cleanup soft-delete (`.disk-cleanup-soft-delete` resting · hover · focus-within) in `src/agent-ops.css` + sync dist
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1663 (0.1.1662 taken by process-empty on origin)
-- [x] CHANGELOG `[0.1.1663]` entry
+- [x] Opaque-wash Monitors filter-miss (`.monitors-filter-miss` · Down · Slow · Up empty) + empty CTA (`.monitors-empty-cta` resting · hover · focus) in `src/agent-ops.css` + sync dist
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1664
+- [x] CHANGELOG `[0.1.1664]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1663: Disk Cleanup `.disk-cleanup-soft-delete` resting · hover · focus-within mixes washes against opaque `#ffffff`. Rebased past origin v0.1.1662 process-empty. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1664: Monitors `.monitors-filter-miss` · Down · Slow · Up empty and `.monitors-empty-cta` resting · hover · focus-visible mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.

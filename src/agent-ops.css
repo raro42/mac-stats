@@ -7153,6 +7153,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.42;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-filter-miss {
   display: flex;
   flex-direction: column;
@@ -7162,23 +7163,23 @@ textarea.ops-agent-editor.is-dirty {
   padding: 18px 14px 16px;
   opacity: 1;
   /* Filter-miss calm — soft accent wash (Ready calm 7%). */
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   text-align: center;
 }
 
 /* Down / Slow empty = good news (Fail-empty / Ready calm soft green parity). */
 .monitors-filter-miss.is-down-empty,
 .monitors-filter-miss.is-slow-empty {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: inherit;
 }
 
 .monitors-filter-miss.is-up-empty {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 .monitors-filter-miss-title {
@@ -7207,10 +7208,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-empty-cta {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
   color: var(--text);
   font: inherit;
   font-size: 12px;
@@ -7225,13 +7227,13 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .monitors-empty-cta:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, #ffffff);
 }
 
 .monitors-empty-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 
 .monitors-list-empty {
