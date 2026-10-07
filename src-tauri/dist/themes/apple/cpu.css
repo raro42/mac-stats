@@ -1018,6 +1018,7 @@ border-radius: 24px;
 }
 
 /* History controls - time range dropdown */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .history-controls {
   display: flex;
   align-items: center;
@@ -1028,7 +1029,7 @@ border-radius: 24px;
   border-radius: 10px;
   /* Opaque — frosted rgba + inset highlight re-blends every tick (#14). */
   background: #ffffff;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   box-shadow: none;
 }
 
@@ -1039,9 +1040,10 @@ border-radius: 24px;
   opacity: 0.9;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .time-range-dropdown {
   background: #ffffff;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   border-radius: 8px;
   color: var(--text);
   padding: 5px 10px;
@@ -1053,7 +1055,7 @@ border-radius: 24px;
 
 .time-range-dropdown:hover {
   background: #ffffff;
-  border-color: var(--hairline);
+  border-color: color-mix(in srgb, #0c0c10 12%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
