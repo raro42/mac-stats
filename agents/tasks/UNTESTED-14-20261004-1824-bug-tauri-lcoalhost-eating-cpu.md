@@ -22,6 +22,37 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1630** (follow-up after v0.1.1629).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Debug Log toolbar · viewer · path focus skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.logs-toolbar`, `.logs-toolbar button` resting / `:hover` / `:focus-visible`, `.logs-viewer` resting / `:focus-visible`, and `.logs-path-hint:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — `.logs-toolbar` / buttons / `.logs-viewer` same opaque wash (theme-local rules).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Debug Log. Confirm the toolbar shell, Refresh / Open buttons, and viewer panel washes stay solid; Tab-focus path hint and a toolbar button; confirm focus rings. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1629)
+
+Version **v0.1.1629** (follow-up after v0.1.1628).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Perplexity weather card skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.perplexity-weather-card` mixes blue wash against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — `.perplexity-weather-card` same opaque wash (theme-local rules).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Perplexity with a weather result when available. Confirm the weather card wash stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1628)
+
+
 Version **v0.1.1628** (follow-up after v0.1.1627).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

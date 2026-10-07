@@ -1871,6 +1871,7 @@ padding: 18px 18px 16px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -1879,25 +1880,25 @@ padding: 18px 18px 16px;
   margin-bottom: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 .logs-toolbar button {
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
   color: var(--text);
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .logs-toolbar button:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, #ffffff);
 }
 .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 .logs-autorefresh {
@@ -1908,6 +1909,7 @@ padding: 18px 18px 16px;
   gap: 6px;
   margin-left: auto;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-viewer {
   margin: 0;
   padding: 12px;
@@ -1917,8 +1919,8 @@ padding: 18px 18px 16px;
   line-height: 1.45;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   color: var(--text);
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
   border-radius: 10px;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1926,8 +1928,8 @@ padding: 18px 18px 16px;
 }
 .logs-viewer:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
 }
 .logs-viewer.is-empty {
   color: var(--muted);

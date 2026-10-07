@@ -3215,8 +3215,9 @@ textarea.ops-agent-editor.is-dirty {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-path-hint:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -3229,6 +3230,7 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -3237,8 +3239,8 @@ textarea.ops-agent-editor.is-dirty {
   margin-bottom: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 
 .logs-toolbar-actions {
@@ -3255,37 +3257,39 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-toolbar button {
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
   color: inherit;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .logs-toolbar button:hover {
-  background: color-mix(in srgb, #0a84ff 8%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 24%, transparent);
+  background: color-mix(in srgb, #0a84ff 8%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 24%, #ffffff);
 }
 
 .logs-toolbar button:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-viewer {
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
   border-radius: 10px;
 }
 
 .logs-viewer:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 35%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 14%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 35%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 14%, #ffffff);
 }
 
 .logs-viewer.is-empty {
