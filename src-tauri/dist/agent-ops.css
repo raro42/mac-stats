@@ -8599,12 +8599,10 @@ button.monitor-detail-url.is-just-saved {
   display: block;
 }
 
+/* Opaque wash — glass alpha + soft glass shadows stay in Graphics and Media (#14). */
 #cpu-usage-card:focus-visible {
   outline: none;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent),
-    0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent),
-    0 14px 34px color-mix(in srgb, #000 12%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, #ffffff);
 }
 
 .ops-insights-card {

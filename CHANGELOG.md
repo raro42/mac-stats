@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1638] - 2026-10-07
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Ring focus (`#cpu-usage-card:focus-visible` · `.metric-card:focus-within`) mixes the focus wash against an opaque fill and drops soft glass focus shadows. No glass alpha on the CPU ring focus ring or the GPU · Freq · Temp card focus outlines. Always-visible on the default collapsed layout. Details / Top Processes headers opaque in v0.1.1637.
+
 ## [0.1.1637] - 2026-10-07
 
 ### Changed
