@@ -1350,12 +1350,13 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .ops-row-title { font-size: 13px; font-weight: 600; }
 .ops-row-meta { font-size: 11px; opacity: 0.58; }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-badge {
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 6px;
-  background: color-mix(in srgb, #30d158 28%, transparent);
-  border: 1px solid color-mix(in srgb, #30d158 35%, transparent);
+  background: color-mix(in srgb, #30d158 28%, #ffffff);
+  border: 1px solid color-mix(in srgb, #30d158 35%, #ffffff);
   color: inherit;
 }
 
@@ -1375,16 +1376,16 @@ button.ops-badge {
 
 button.ops-badge:hover {
   opacity: 1;
-  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #ffffff);
 }
 
 button.ops-badge.off:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #ffffff);
 }
 
 button.ops-badge:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, #ffffff);
 }
 
 button.ops-badge:disabled {
@@ -1393,8 +1394,8 @@ button.ops-badge:disabled {
 }
 
 .ops-badge.off {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  border-color: color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 12%, #ffffff);
   opacity: 0.6;
 }
 

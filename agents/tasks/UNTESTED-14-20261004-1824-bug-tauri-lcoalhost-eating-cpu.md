@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1608** (follow-up after v0.1.1607).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops On · Off badge skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-badge` resting / `button.ops-badge:hover` / `.off:hover` / `:focus-visible` / `.ops-badge.off`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops → Agents. Confirm On · Off badges on rows when present. Hover an On badge and an Off badge; Tab-focus a badge; confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1607)
+
 Version **v0.1.1607** (follow-up after v0.1.1606).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -9061,3 +9075,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Runs; confirm Lite · Slow · Fail rows when present (filter or inventory); hover a Lite, Slow, and Fail row; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1607)
+
+**Date:** 2026-10-07 04:34 UTC (2026-10-07 06:34 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1607**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1607)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops base list-row skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1607**
+- `CHANGELOG.md` **[0.1.1607]** documents Agent Ops list rows (`.ops-row` resting · hover · focus-visible · selected) mixing washes against an opaque fill; no glass alpha on shared list-row states
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-row` / `:hover` / `:focus-visible` / `.is-selected` / `.is-selected:hover` mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Soft hover blur shadow is absent (selected uses 0 0 0 1px ring only). Claimed wash rules have no `color-mix(…, transparent)` / `rgba(` / `hsla(` / `backdrop-filter`; resting `border: 1px solid transparent` is a layout placeholder only
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops base list-row path (Agents / Schedules / Sessions / Memory / Runs). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops list-row wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents / Schedules / Sessions / Memory / Runs; confirm list rows; hover a row; Tab-focus a row; select a row; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
