@@ -3026,8 +3026,9 @@ border-radius: 24px;
   margin: 16px 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown a {
-  color: rgba(0, 122, 255, 0.9);
+  color: color-mix(in srgb, #007aff 90%, #ffffff);
   text-decoration: none;
 }
 

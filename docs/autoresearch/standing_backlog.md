@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1728
+
+- Apple AI Chat markdown link type (`.chat-message .markdown a`) mixes against an opaque panel fill. No glass alpha on markdown link color. Force Quit type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1727
 
 - Apple Force Quit control type (`.force-quit-btn` resting) mixes against an opaque panel fill. No glass alpha on Force Quit label type. Changelog body already opaque. P2 reliability / GitHub #14.
