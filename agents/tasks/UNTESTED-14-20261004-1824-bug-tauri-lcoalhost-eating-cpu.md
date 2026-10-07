@@ -22,6 +22,31 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1637** (follow-up after v0.1.1636).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Details / Top Processes headers skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.collapsible-header:hover` and `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha on hover fill or focus ring). Details and Top Processes titles use this class on the default collapsed layout.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover Details and Top Processes headers; Tab-focus one. Confirm hover and focus washes stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1636)
+
+Version **v0.1.1636** (follow-up after v0.1.1635; landed on origin while this cut was in flight).
+
+Changes (Top Processes Copied badge skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.process-row.is-just-copied::after`, mix green wash against opaque `#ffffff`.
+
+---
+
+## Prior implementation (v0.1.1635)
+
+
 Version **v0.1.1635** (follow-up after v0.1.1634).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -10086,3 +10111,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Debug Log; hover a log line; select a line (click or keyboard); confirm hover and selected washes stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1635)
+
+**Date:** 2026-10-07 08:49 UTC (2026-10-07 10:49 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1635**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1635)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 collapsible section-header skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1635**
+- `CHANGELOG.md` **[0.1.1635]** documents collapsible section headers (`.section-header-collapsible` hover · focus-visible) mixing washes against an opaque fill; no glass alpha on the hover wash, focus ring, or Apple theme border; always-visible on the default collapsed layout
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.section-header-collapsible:hover` and `:focus-visible` mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- `src-tauri/dist/themes/apple/cpu.css` — `.section-header-collapsible:hover` / `:focus-visible` same opaque wash (theme-local border + background + focus ring). Claimed hover/focus blocks have no glass-alpha tokens
+- Prior cut still present: `.logs-line[role='option']:hover` / `.is-selected` opaque (v0.1.1634)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the always-visible collapsed section-header path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque section-header wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a section header (Details, Top Processes, …); Tab-focus one; confirm hover and focus washes stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

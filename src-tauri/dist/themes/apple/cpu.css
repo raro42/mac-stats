@@ -119,15 +119,16 @@ border-radius: 24px;
   margin: 0 -6px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .collapsible-header:hover {
   opacity: 1;
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
 .collapsible-header:focus-visible {
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
 }
 
 /* Usage card clickable */
