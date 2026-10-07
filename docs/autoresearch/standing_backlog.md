@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1710
+
+- Apple History sparkline shells (`.history-chart-container`) mix hairline borders against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp history chart borders. Metric cards already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1709
 
 - Apple ring metric cards (`.metric-card`) mix hairline borders against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp card borders. Details / Top Processes shells already opaque. P2 reliability / GitHub #14.

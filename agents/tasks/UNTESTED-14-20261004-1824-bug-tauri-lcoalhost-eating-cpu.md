@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1710** (follow-up after v0.1.1709).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple History chart-container borders skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.history-chart-container` resting mix hairline borders against opaque `#ffffff` (Apple had `rgba(0,0,0,0.06)` glass). Metric cards opaque in v0.1.1709.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm CPU · GPU · Freq · Temp history chart borders stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1709)
+
+
 Version **v0.1.1709** (follow-up after v0.1.1708).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

@@ -988,7 +988,8 @@ border-radius: 24px;
   border-radius: 12px;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  border: 1px solid color-mix(in srgb, #0c0c10 6%, #ffffff);
   box-shadow: none;
   transition: none;
   contain: layout paint style;
