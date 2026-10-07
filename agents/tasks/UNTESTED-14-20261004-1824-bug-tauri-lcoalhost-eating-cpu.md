@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1591** (follow-up after v0.1.1590).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops overview cards skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-overview-card` resting / `:hover` / `:focus-within` / clickable `:focus-visible` / `.is-active` / `.ops-health-ok` / `.ops-health-warn` / `.ops-health-bad` / active hover, plus `.ops-overview-head-count` resting / active and active `.ops-overview-link`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Soft hover drop shadows removed.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm overview cards (Agents · Schedules · Sessions · Memory) washes still show (ok/warn/bad when applicable). Hover a card; Tab-focus a clickable card; activate a linked card. Confirm washes and focus ring still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1590)
 Version **v0.1.1590** (follow-up after v0.1.1589).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
