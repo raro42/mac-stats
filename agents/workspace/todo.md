@@ -7,9 +7,9 @@
 - [x] Sync `src-tauri/dist/agent-ops.css`
 - [x] Bump Cargo.toml / lock / CHANGELOG / standing_backlog / Implementation notes
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Do **not** close GitHub #14
+- [x] Do **not** close GitHub #14
 
 ## Review
 - v0.1.1613 `.ops-close-btn` resting · hover: opaque wash (no glass alpha).
