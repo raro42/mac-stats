@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1657** (follow-up after v0.1.1656).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup primary toolbar rest · hover skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-toolbar .disk-cleanup-primary` resting · hover, mix fills against opaque `#ffffff` (no `transparent` glass alpha). Settings buttons opaque in v0.1.1656; scope filter-miss opaque in v0.1.1655.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; confirm Clean now / primary toolbar button stays solid on rest and hover. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1656)
+
 Version **v0.1.1656** (follow-up after v0.1.1655).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

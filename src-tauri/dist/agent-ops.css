@@ -7963,15 +7963,16 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-toolbar .disk-cleanup-primary {
-  background: color-mix(in srgb, #0a84ff 14%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 30%, transparent);
+  background: color-mix(in srgb, #0a84ff 14%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 30%, #ffffff);
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .disk-cleanup-toolbar .disk-cleanup-primary:hover {
-  background: color-mix(in srgb, #0a84ff 22%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 42%, transparent);
+  background: color-mix(in srgb, #0a84ff 22%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 42%, #ffffff);
 }
 
 .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
