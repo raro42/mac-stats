@@ -2482,16 +2482,17 @@ textarea.ops-agent-editor.is-dirty {
   transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-pin:hover {
   opacity: 0.95;
-  background: color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .process-pin:focus-visible {
   opacity: 0.95;
   outline: none;
-  background: color-mix(in srgb, #0a84ff 12%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, transparent);
+  background: color-mix(in srgb, #0a84ff 12%, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, #ffffff);
 }
 
 .process-pin.is-pinned {
