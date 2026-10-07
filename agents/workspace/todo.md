@@ -8,8 +8,8 @@
 - [x] CHANGELOG `[0.1.1690]` entry
 - [x] Refresh Implementation section → rename `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/` (green; unused-import warnings pre-existing)
-- [ ] Commit + push `origin/main`
-- [ ] GitHub comment via `gh-safe.sh` (issue not closed)
+- [x] Commit + push `origin/main` (`a773d844`)
+- [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
 - Cut: Apple `.ollama-menu` opaque `#ffffff` (was `var(--panel)` / `var(--panel-shadow)` glass). Item hover / focus and menu-button focus ring mix against `#ffffff` (was transparent).
