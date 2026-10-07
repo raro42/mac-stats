@@ -1758,35 +1758,40 @@ border-radius: 24px;
   gap: 8px;
   margin-bottom: 12px;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-search-box input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
   border-radius: 8px;
   padding: 8px 12px;
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease, outline-color 0.15s ease;
 }
 .perplexity-search-box input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 1px;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, var(--hairline));
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  background: #ffffff;
 }
 .perplexity-search-box button {
   padding: 8px 14px;
   border-radius: 8px;
-  border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, outline-color 0.15s ease;
 }
 .perplexity-search-box button:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in srgb, var(--text, #0c0c10) 7%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 .perplexity-search-box button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 .perplexity-results {

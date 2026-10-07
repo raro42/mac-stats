@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1682** (follow-up after v0.1.1681).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Perplexity search box skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.perplexity-search-box input` · `button` resting · hover · focus-visible, mix fills / borders / focus rings against opaque `#ffffff` (Apple had `rgba(255,255,255,0.5)` / `0.7` glass + transparent focus mixes). Model select opaque in v0.1.1681. Send control opaque in v0.1.1680.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Perplexity; confirm the search field and Search control stay solid (no glass alpha) on rest / hover, focus rings solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1681)
+
 Version **v0.1.1681** (follow-up after v0.1.1680).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
