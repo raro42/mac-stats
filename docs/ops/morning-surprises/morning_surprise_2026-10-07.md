@@ -3,6 +3,9 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1662** — Apple Top Processes empty shell (`.process-empty` resting · hover): opaque wash (no glass alpha). The shared sheet was already opaque; the Apple theme had put glass back.
+- **v0.1.1661** — Apple Settings card (`.settings-card` + header hairline): opaque fill. Soft panel drop shadow dropped.
+- **v0.1.1660** — Apple Settings toggles (`.setting-toggle` resting · checked · knob): opaque track. Soft knob shadow dropped.
 - **v0.1.1659** — Apple Settings help sheet (`.settings-help-sheet` resting · focus · copied): opaque wash (no glass alpha on the sheet).
 - **v0.1.1658** — Apple theme list (`.theme-item` resting · hover · focus · current): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1657** — Disk Cleanup primary toolbar (`.disk-cleanup-toolbar .disk-cleanup-primary` resting · hover): opaque wash (no glass alpha on Clean now).
@@ -73,12 +76,13 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Tried / context
 - Digester open stayed empty; design review in grace (feature-agent-ops still the stale screenshot).
-- This tick shipped the Settings help sheet as v0.1.1659. Focus and the copied flash mix against an opaque fill. The earlier tick discarded a local Settings button wash that duplicated origin v0.1.1656, then shipped the theme list as v0.1.1658.
+- This tick found origin already had the help sheet (v0.1.1659), toggles (v0.1.1660), and Settings card (v0.1.1661). The local help-sheet commit was not pushed. The Apple empty process list still mixed against transparent, so this tick shipped that as v0.1.1662.
 - Sibling scan this tick: OpenClaw and Hermes checkouts are present. No port this tick. Fuel stayed on GitHub #14.
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
-- Keep @ `39cfc86` — v0.1.1659 Apple Settings help sheet opaque wash (#14).
+- Keep @ `37f26e1` — v0.1.1662 Apple Top Processes empty shell opaque wash (#14).
+- Local keep @ `39cfc86` matched origin v0.1.1659 and was not pushed.
 - Keep @ `bbf627ab` — v0.1.1658 Apple theme list opaque wash (#14).
 - Discard — local Settings button wash duplicated origin v0.1.1656.
 - Keep @ `6310600a` — v0.1.1654 Apple Settings input rest and hover opaque wash (#14). Rebased past origin v0.1.1653.
