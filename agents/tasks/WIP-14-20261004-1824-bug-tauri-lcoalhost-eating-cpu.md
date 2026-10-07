@@ -12673,3 +12673,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat → open the model picker / `.model-select-dropdown`; confirm the dropdown panel stays solid (no glass alpha), soft drop shadow gone, option hover and model-text focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1693)
+
+**Date:** 2026-10-07 17:17 UTC (2026-10-07 19:17 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1693**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1693)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat exec / answer cards skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1693**
+- `CHANGELOG.md` **[0.1.1693]** documents Apple AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final) mixing washes against an opaque fill; no glass alpha on the code-exec shell, code block, or answer-part panels; shared sheet opaque in v0.1.1621; Model-select dropdown opaque in v0.1.1692
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-part.chat-answer-final` mix washes / borders against opaque `#ffffff`. Claimed wash fills / borders have no `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `.model-select-dropdown` opaque shell / option mixes (v0.1.1692); `.monitors-menu` opaque shell / item mixes (v0.1.1691); `.ollama-menu` opaque shell / item mixes (v0.1.1690)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css` / dist copy)
+- Note (not a CSS-cut regression): wash paint is the AI Chat exec / answer-part path (expand AI Chat and trigger a turn that shows an exec card and/or answer-part panels; confirm those shells stay solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.chat-exec-card` / `.chat-answer-part` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat and trigger a turn that shows an exec card and/or answer-part panels; confirm those shells stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
