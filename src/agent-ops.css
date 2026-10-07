@@ -2017,6 +2017,7 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .rings-filter-chip {
   appearance: none;
   display: inline-flex;
@@ -2029,8 +2030,8 @@ textarea.ops-agent-editor.is-dirty {
   line-height: 1;
   padding: 5px 9px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: var(--text);
   cursor: pointer;
   opacity: 0.88;
@@ -2043,28 +2044,28 @@ textarea.ops-agent-editor.is-dirty {
 
 .rings-filter-chip:hover {
   opacity: 1;
-  background: color-mix(in srgb, currentColor 7%, transparent);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
 }
 
 .rings-filter-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ffffff);
 }
 
 .rings-filter-chip.is-active {
   opacity: 1;
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ffffff);
 }
 
 .rings-filter-chip[data-rings-filter='hot'].has-hits {
-  background: color-mix(in srgb, #ff9500 12%, transparent);
-  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+  background: color-mix(in srgb, #ff9500 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
 }
 
 .rings-filter-chip[data-rings-filter='hot'].is-active {
-  background: color-mix(in srgb, #ff9500 20%, transparent);
-  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+  background: color-mix(in srgb, #ff9500 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff9500 40%, #ffffff);
 }
 
 .rings-filter-count {
