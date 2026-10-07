@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1624** (follow-up after v0.1.1623).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (ring filter-miss · CTA skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.rings-filter-miss` and `.rings-filter-miss-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Filter chips already opaque earlier.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Apply a rings filter that shows the filter-miss shell; hover Clear filter; confirm solid washes. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1623)
+
 Version **v0.1.1623** (follow-up after v0.1.1622).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

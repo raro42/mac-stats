@@ -2095,6 +2095,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .rings-filter-miss {
   grid-column: 1 / -1;
   display: flex;
@@ -2104,8 +2105,8 @@ textarea.ops-agent-editor.is-dirty {
   margin: 4px 2px 8px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .rings-filter-miss-msg {
@@ -2120,6 +2121,7 @@ textarea.ops-agent-editor.is-dirty {
   line-height: 1.35;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .rings-filter-miss-cta {
   appearance: none;
   font: inherit;
@@ -2127,19 +2129,19 @@ textarea.ops-agent-editor.is-dirty {
   font-weight: 600;
   padding: 5px 10px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #0a84ff) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 14%, #ffffff);
   color: var(--text);
   cursor: pointer;
 }
 
 .rings-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #0a84ff) 22%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 22%, #ffffff);
 }
 
 .rings-filter-miss-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ffffff);
 }
 
 /* Hot ring — static wash only (KISS). Infinite filter/box-shadow pulses kept WKWebView hot. */
