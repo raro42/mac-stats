@@ -11192,15 +11192,17 @@ function showMonitorTickTip(anchor, text) {
   tip.textContent = text;
   tip.hidden = false;
   const r = anchor.getBoundingClientRect();
-  const x = r.left + r.width / 2;
-  const y = r.top;
-  tip.style.left = `${Math.round(x)}px`;
-  tip.style.top = `${Math.round(y)}px`;
-  // Keep on screen horizontally
   const tw = tip.offsetWidth || 160;
-  const minX = tw / 2 + 8;
-  const maxX = window.innerWidth - tw / 2 - 8;
-  tip.style.left = `${Math.round(Math.min(maxX, Math.max(minX, x)))}px`;
+  const th = tip.offsetHeight || 28;
+  const gap = 6;
+  // Place above the bar and center it. No CSS translate (#14).
+  let left = r.left + r.width / 2 - tw / 2;
+  const minX = 8;
+  const maxX = Math.max(minX, window.innerWidth - tw - 8);
+  left = Math.min(maxX, Math.max(minX, left));
+  const top = Math.max(8, r.top - th - gap);
+  tip.style.left = `${Math.round(left)}px`;
+  tip.style.top = `${Math.round(top)}px`;
 }
 
 function updateMonitorHistory(container, monitorId) {

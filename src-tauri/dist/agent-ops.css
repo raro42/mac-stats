@@ -7653,22 +7653,23 @@ button.monitor-detail-url.is-just-saved {
   background: #ff3b30 !important;
 }
 
-/* Custom tick tip — anchored to the bar, not the OS title balloon */
+/* Custom tick tip — anchored to the bar, not the OS title balloon.
+   Left/top come from JS. No translate or glass alpha (#14). */
 .monitor-tick-tip {
   position: fixed;
   z-index: 100000;
   max-width: min(280px, calc(100vw - 24px));
   padding: 6px 8px;
   border-radius: 6px;
-  background: rgba(28, 28, 30, 0.92);
+  background: #1c1c1e;
   color: #f5f5f7;
   font-size: 11px;
   font-weight: 500;
   line-height: 1.35;
   white-space: pre-line;
   pointer-events: none;
-  transform: translate(-50%, calc(-100% - 6px));
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transform: none;
+  box-shadow: none;
 }
 
 .monitor-tick-tip[hidden] {
