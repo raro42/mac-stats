@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1612** — Agent Ops loading shell: opaque wash (no glass alpha).
 - **v0.1.1611** — Agent Ops Overview Open links (resting · hover · focus-visible): opaque wash (no glass alpha).
 - **v0.1.1610** — Agent Ops copy chips (resting · hover · focus-visible): opaque wash (no glass alpha).
 - **v0.1.1609** — Agent Ops empty panels and the Clear filter button: opaque wash (no glass alpha).
@@ -34,6 +35,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep — v0.1.1612 Agent Ops loading shell opaque wash (#14).
 - Discard — local Runs chip wash duplicated origin v0.1.1605.
 - Discard — local tab wash duplicated origin v0.1.1600. Local Schedules wash duplicated origin v0.1.1603.
 - Keep — v0.1.1611 Agent Ops Overview Open link resting · hover · focus-visible opaque wash (#14).
