@@ -1837,13 +1837,14 @@ padding: 18px 18px 16px;
 .perplexity-result-list li {
   margin: 2px 0;
 }
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-weather-card {
   margin: 0 0 10px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #0a84ff 22%, transparent);
-  border-left: 3px solid color-mix(in srgb, #0a84ff 70%, transparent);
-  background: color-mix(in srgb, #0a84ff 6%, transparent);
+  border: 1px solid color-mix(in srgb, #0a84ff 22%, #ffffff);
+  border-left: 3px solid color-mix(in srgb, #0a84ff 70%, #ffffff);
+  background: color-mix(in srgb, #0a84ff 6%, #ffffff);
 }
 .perplexity-weather-body {
   font-size: 13px;
