@@ -7986,31 +7986,32 @@ button.monitor-detail-url.is-just-saved {
   list-style: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-item {
   position: relative;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3%, #ffffff);
   transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
   cursor: default;
 }
 
 .disk-cleanup-item:hover {
-  background: color-mix(in srgb, currentColor 5.5%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 4px 14px color-mix(in srgb, #000 7%, transparent);
+  background: color-mix(in srgb, currentColor 5.5%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .disk-cleanup-item:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 34%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ffffff);
 }
 
 .disk-cleanup-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -8045,45 +8046,47 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: inset 3px 0 0 color-mix(in srgb, #34c759 70%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-item.has-reclaim {
-  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
-  background: color-mix(in srgb, #ff9f0a 6%, transparent);
-  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 6%, #ffffff);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, #ffffff);
 }
 
 .disk-cleanup-item.has-reclaim:hover {
-  background: color-mix(in srgb, #ff9f0a 10%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 38%, transparent);
+  background: color-mix(in srgb, #ff9f0a 10%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #ffffff);
 }
 
 .disk-cleanup-item.has-reclaim.is-selected,
 .disk-cleanup-item.has-reclaim:focus-visible {
-  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
-  background: color-mix(in srgb, #ff9f0a 11%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 11%, #ffffff);
   box-shadow:
-    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, transparent),
-    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, transparent);
+    inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, #ffffff),
+    0 0 0 3px color-mix(in srgb, #ff9f0a 18%, #ffffff);
 }
 
 /* Big list row — soft alert (Big attention / Monitors Slow soft 7%/30% parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-item.has-reclaim.is-big {
-  border-color: color-mix(in srgb, #ff453a 30%, transparent);
-  background: color-mix(in srgb, #ff453a 7%, transparent);
-  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, transparent);
+  border-color: color-mix(in srgb, #ff453a 30%, #ffffff);
+  background: color-mix(in srgb, #ff453a 7%, #ffffff);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, #ffffff);
 }
 
 .disk-cleanup-item.has-reclaim.is-big:hover {
-  background: color-mix(in srgb, #ff453a 12%, transparent);
-  border-color: color-mix(in srgb, #ff453a 44%, transparent);
+  background: color-mix(in srgb, #ff453a 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff453a 44%, #ffffff);
 }
 
 .disk-cleanup-item.has-reclaim.is-big.is-selected,
 .disk-cleanup-item.has-reclaim.is-big:focus-visible {
-  border-color: color-mix(in srgb, #ff453a 52%, transparent);
-  background: color-mix(in srgb, #ff453a 13%, transparent);
+  border-color: color-mix(in srgb, #ff453a 52%, #ffffff);
+  background: color-mix(in srgb, #ff453a 13%, #ffffff);
   box-shadow:
-    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, transparent),
-    0 0 0 3px color-mix(in srgb, #ff453a 20%, transparent);
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, #ffffff),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, #ffffff);
 }
 
 .disk-cleanup-list-kb-hint {
@@ -8332,6 +8335,7 @@ button.monitor-detail-url.is-just-saved {
   margin-bottom: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-scope-row {
   position: relative;
   display: grid;
@@ -8340,26 +8344,26 @@ button.monitor-detail-url.is-just-saved {
   align-items: center;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3%, #ffffff);
   transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .disk-cleanup-scope-row:hover {
-  background: color-mix(in srgb, currentColor 5.5%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, currentColor 5.5%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
 }
 
 .disk-cleanup-scope-row:focus-visible,
 .disk-cleanup-scope-row:focus-within {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 34%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ffffff);
 }
 
 .disk-cleanup-scope-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, #ffffff);
 }
 
 .disk-cleanup-scope-row.is-disabled {
