@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1674
+
+- Top Processes usage bar tracks (`.process-bar` / `#process-list .process-bar`) mix against an opaque fill. No glass alpha on the bar track. Process Details row hairlines already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1673
 
 - Process Details metric row hairlines (`.process-detail-row` border-bottom) mix against an opaque fill. No glass alpha on the row dividers. Force Quit control already opaque. P2 reliability / GitHub #14.

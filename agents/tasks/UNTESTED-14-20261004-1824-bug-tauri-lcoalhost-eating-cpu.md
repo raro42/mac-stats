@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1674** (follow-up after v0.1.1673).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Top Processes bar track skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `#process-list .process-bar` track, mix against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — `.process-bar` track, mix against opaque `#ffffff` (Apple had `rgba(0,0,0,0.10)` glass). Process Details row hairlines opaque in v0.1.1673.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes with at least one row; confirm usage bar tracks stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1673)
+
+
 Version **v0.1.1673** (follow-up after v0.1.1672).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -11670,3 +11686,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes with at least one row; open Process Details; arm Force Quit once (confirming state); confirm Force Quit control and section hairline stay solid; gauges/sparklines stay readable; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1673)
+
+**Date:** 2026-10-07 14:07 UTC (2026-10-07 16:07 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1673**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1673)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Process Details row hairlines skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1673**
+- `CHANGELOG.md` **[0.1.1673]** documents Process Details metric row hairlines (`.process-detail-row` border-bottom) mixing against an opaque fill; no glass alpha on the row dividers; Force Quit control opaque in v0.1.1672
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.process-detail-section .process-detail-row` border-bottom mixes against opaque `#ffffff`; claimed wash blocks have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`; src and dist blocks match
+- `src-tauri/dist/themes/apple/cpu.css` — `.process-detail-row` border-bottom mixes against opaque `#ffffff`; no glass alpha in that block
+- Prior cut still present: `.force-quit-section` / `.force-quit-btn` opaque wash comments (v0.1.1672)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Process Details row path (expand Top Processes with at least one row; open Process Details). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Process Details row hairline cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes with at least one row; open Process Details; confirm metric row hairlines stay solid; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

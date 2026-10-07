@@ -2594,11 +2594,12 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #process-list .process-bar {
   height: 6px;
   border-radius: 99px;
   overflow: hidden;
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
 }
 
 #process-list .process-bar-fill {
