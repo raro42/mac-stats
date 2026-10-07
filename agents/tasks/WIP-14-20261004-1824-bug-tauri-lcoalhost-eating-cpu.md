@@ -12028,3 +12028,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; confirm the composer field stays solid (no glass alpha) on rest / hover, focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1680)
+
+**Date:** 2026-10-07 15:02 UTC (2026-10-07 17:02 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1680**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1680)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat Send control skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1680**
+- `CHANGELOG.md` **[0.1.1680]** documents Apple AI Chat Send control (`#chat-send-btn` resting · hover · focus-visible · active) mixing the wash against an opaque fill; no glass alpha on the Send fill, soft hover shadow, or focus ring; composer field opaque in v0.1.1679; composer shell opaque in v0.1.1678
+- `src-tauri/dist/themes/apple/cpu.css` — `#chat-send-btn` background `color-mix(..., #ffffff)`; `:hover` opaque accent + `box-shadow: none`; `:focus-visible` outline mix against `#ffffff`; `:active` mix against `#ffffff` + `box-shadow: none`. Claimed blocks have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `#chat-input` opaque mixes (v0.1.1679); `.chat-input-container` resting / `:focus-within` opaque mixes (v0.1.1678); `.chat-message.user` / `.chat-message.assistant` opaque mixes (v0.1.1677)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the AI Chat Send control path (expand AI Chat; confirm Send stays solid on rest / hover / active, focus ring solid when focused). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `#chat-send-btn` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash` / build helpers).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; confirm the Send control stays solid (no glass alpha) on rest / hover / active, focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
