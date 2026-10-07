@@ -9124,3 +9124,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents / Schedules / Sessions / Memory / Runs; confirm list rows; hover a row; Tab-focus a row; select a row; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1608)
+
+**Date:** 2026-10-07 04:38 UTC (2026-10-07 06:38 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1608**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1608)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops On · Off badge skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1608**
+- `CHANGELOG.md` **[0.1.1608]** documents Agent Ops On · Off badges (`.ops-badge` resting · hover · focus-visible · off) mixing washes against an opaque fill; no glass alpha on list-row status badges
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-badge` resting / `button.ops-badge:hover` / `.off:hover` / `:focus-visible` / `.ops-badge.off` mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed badge wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops On · Off badge path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops On · Off badge wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents; confirm On · Off badges on rows when present; hover an On badge and an Off badge; Tab-focus a badge; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
