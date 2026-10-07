@@ -9758,3 +9758,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; apply a filter that shows the filter-miss shell; hover Clear; confirm solid washes; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1626)
+
+**Date:** 2026-10-07 07:36 UTC (2026-10-07 09:36 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1626**)
+- `cd src-tauri && cargo check`: **pass** (warnings only; v0.1.1626)
+- `cd src-tauri && cargo test`: **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Top Processes empty shell skip glass blend)**
+
+- `src-tauri/Cargo.toml`: version **0.1.1626**
+- `CHANGELOG.md` **[0.1.1626]** documents Top Processes empty shell (`.process-empty`) mixing its wash against an opaque fill; no glass alpha on the dashed empty-list panel
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.process-empty` mixes border / background against opaque `#ffffff`. Comment: Opaque wash: glass alpha stays in Graphics and Media (#14). That claimed rule has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: `.processes-filter-miss` (+ Hot / Pinned / Clear filter CTA) mixes against opaque `#ffffff` (v0.1.1625)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Top Processes empty-shell path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` , no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes empty-shell wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes with an empty list or a filter that yields no rows and shows the empty shell; confirm the dashed empty panel wash stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
