@@ -2254,6 +2254,7 @@ padding: 0;
   margin-top: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-empty {
   margin: 4px 0;
   padding: 16px 14px;
@@ -2262,28 +2263,28 @@ padding: 0;
   line-height: 1.45;
   color: var(--muted);
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
-  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .monitors-empty:hover {
   color: var(--text);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
 }
 
 /* Soft alert (Monitors Down / changelog-error soft 7%/30% parity). */
 .monitors-empty.monitors-error {
   color: #ff3b30;
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 .monitors-empty.monitors-error:hover {
   color: #ff3b30;
-  border-color: color-mix(in srgb, #ff3b30 40%, transparent);
-  background: color-mix(in srgb, #ff3b30 10%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
 }
 
 .monitor-item {

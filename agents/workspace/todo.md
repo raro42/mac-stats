@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1664)
+# WIP-14 coder pass (v0.1.1665)
 
-- [x] Opaque-wash Monitors filter-miss (`.monitors-filter-miss` · Down · Slow · Up empty) + empty CTA (`.monitors-empty-cta` resting · hover · focus) in `src/agent-ops.css` + sync dist
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1664
-- [x] CHANGELOG `[0.1.1664]` entry
+- [x] Opaque-wash Apple Monitors empty shell (`.monitors-empty` resting · hover · error) in `src-tauri/dist/themes/apple/cpu.css`
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1665
+- [x] CHANGELOG `[0.1.1665]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1664: Monitors `.monitors-filter-miss` · Down · Slow · Up empty and `.monitors-empty-cta` resting · hover · focus-visible mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1665: Apple `.monitors-empty` resting · hover · `.monitors-error` mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
