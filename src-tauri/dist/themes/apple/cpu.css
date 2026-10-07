@@ -2707,18 +2707,19 @@ border-radius: 24px;
 }
 
 .model-text:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .model-select-dropdown {
   position: absolute;
-  background: var(--panel);
-  border: 1px solid var(--hairline);
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
   z-index: 1000;
   min-width: 200px;
   max-height: 300px;
@@ -2733,7 +2734,7 @@ border-radius: 24px;
 }
 
 .model-select-dropdown option:hover {
-  background: var(--hairline);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
 }
 
 .ollama-model-selector {

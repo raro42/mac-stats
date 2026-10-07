@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1692** (follow-up after v0.1.1691).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat model-select dropdown skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.model-select-dropdown` opaque `#ffffff` fill, opaque hairline border, no soft glass drop shadow; option hover and `.model-text:focus-visible` mix against opaque `#ffffff` (Apple had `var(--panel)` / `var(--panel-shadow)` glass + transparent focus mix). Model select control opaque in v0.1.1681. AI Chat overflow menu opaque in v0.1.1690.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat → open the model picker / `.model-select-dropdown`; confirm the dropdown panel stays solid (no glass alpha), soft drop shadow gone, option hover and model-text focus ring solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1691)
+
 Version **v0.1.1691** (follow-up after v0.1.1690).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
