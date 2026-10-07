@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1626
+
+- Top Processes empty shell (`.process-empty`) mixes its wash against an opaque fill. No glass alpha on the dashed empty-list panel. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1625
 
 - Top Processes filter-miss (`.processes-filter-miss` · Hot · Pinned · Clear filter) mixes the wash against an opaque fill. No glass alpha on the empty panel or the Clear filter button. P2 reliability / GitHub #14.

@@ -22,6 +22,34 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1626** (follow-up after v0.1.1625).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Top Processes empty shell skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.process-empty` mixes border / background against opaque `#ffffff` (no `transparent` glass alpha). Processes filter-miss already opaque in v0.1.1625.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes with an empty list (or a filter that yields no rows and shows the empty shell). Confirm the dashed empty panel wash stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1625)
+
+Version **v0.1.1625** (follow-up after v0.1.1624).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Top Processes filter-miss · CTA skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.processes-filter-miss` (+ `.is-hot-empty` / `.is-pinned-empty`) and `.processes-filter-miss-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Rings filter-miss already opaque in v0.1.1624.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes. Apply a filter that shows the filter-miss shell (Hot/Pinned empty when useful); hover Clear filter; confirm solid washes. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1624)
+
 Version **v0.1.1624** (follow-up after v0.1.1623).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
