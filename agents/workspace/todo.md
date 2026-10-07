@@ -8,8 +8,8 @@
 - [x] CHANGELOG `[0.1.1695]` entry
 - [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`
-- [ ] Optional GitHub note via `gh-safe.sh` (issue not closed)
+- [x] Commit + push `origin/main` (`f5899d26`; HTTPS after SSH key deny)
+- [x] Issue left open (004 closes)
 
 ## Review
 - Cut: Apple `.changelog-loading` / `.changelog-error` mix against opaque `#ffffff` (was `transparent` glass on dashed border + wash + soft-alert).
