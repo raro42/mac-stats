@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1677** (follow-up after v0.1.1676).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat message bubbles skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-message.user` · `.chat-message.assistant`, mix fills and accent borders against opaque `#ffffff` (Apple had `rgba(0,122,255,0.1)` / `rgba(255,255,255,0.5)` glass + transparent border mixes). Message list shell opaque in v0.1.1676. Empty shell opaque in v0.1.1666.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat with at least one user and one assistant turn; confirm bubbles stay solid (no glass alpha) and accent borders stay solid. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1676)
+
 Version **v0.1.1676** (follow-up after v0.1.1675).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -31,7 +45,6 @@ Changes (Apple AI Chat message list skip glass blend):
 - `src-tauri/dist/themes/apple/cpu.css` — `.chat-messages` resting · `:focus-within`, opaque `#ffffff` fill and focus ring mixed against `#ffffff` (Apple had `rgba(255,255,255,0.3)` glass + transparent focus wash). Empty shell opaque in v0.1.1666. Top Processes bar fills opaque in v0.1.1675.
 
 Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat; confirm the message list shell stays solid (no glass alpha), focus ring solid when the list is focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
-
 ---
 
 ## Prior implementation (v0.1.1675)

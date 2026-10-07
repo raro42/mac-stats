@@ -2808,18 +2808,19 @@ padding: 0;
   white-space: normal;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message.user {
-  background: rgba(0, 122, 255, 0.1);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ffffff);
   margin-left: 20px;
   color: var(--text);
-  border-left: 3px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  border-left: 3px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
 }
 
 .chat-message.assistant {
-  background: rgba(255, 255, 255, 0.5);
+  background: #ffffff;
   margin-right: 20px;
   color: var(--text);
-  border-left: 3px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-left: 3px solid color-mix(in srgb, currentColor 18%, #ffffff);
 }
 
 .chat-message:last-child {
