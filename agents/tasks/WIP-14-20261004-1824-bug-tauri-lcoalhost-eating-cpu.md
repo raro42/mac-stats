@@ -11928,3 +11928,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat with at least one user and one assistant turn; confirm bubbles stay solid (no glass alpha) and accent borders stay solid; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1678)
+
+**Date:** 2026-10-07 14:50 UTC (2026-10-07 16:50 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1678**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1678)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat composer shell skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1678**
+- `CHANGELOG.md` **[0.1.1678]** documents Apple AI Chat composer shell (`.chat-input-container` resting · `:focus-within`) mixing the wash against an opaque fill; no glass alpha on the composer shell or focus ring; message bubbles opaque in v0.1.1677; message list shell opaque in v0.1.1676
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-input-container` border/background `color-mix(..., #ffffff)`; `:focus-within` border / box-shadow / background mix against `#ffffff`. Claimed blocks have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `.chat-message.user` / `.chat-message.assistant` opaque mixes (v0.1.1677); `.chat-messages` resting opaque `#ffffff` (v0.1.1676)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the AI Chat composer path (expand AI Chat; confirm composer shell stays solid, focus ring solid when focused). `#chat-input` itself still uses `rgba(255,255,255,0.5)` (out of this slice). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque chat-input-container cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; confirm the composer shell stays solid (no glass alpha), focus ring solid when the composer is focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
