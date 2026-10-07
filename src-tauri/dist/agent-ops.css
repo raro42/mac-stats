@@ -1787,6 +1787,7 @@ textarea.ops-agent-editor.is-dirty {
   overflow: visible !important;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-empty {
   margin: 4px 0;
   padding: 20px 16px;
@@ -1795,8 +1796,8 @@ textarea.ops-agent-editor.is-dirty {
   letter-spacing: 0.01em;
   opacity: 1;
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   text-align: center;
   cursor: text;
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
@@ -1805,8 +1806,8 @@ textarea.ops-agent-editor.is-dirty {
 /* Ready + model: soft ok wash (model-online / turn is-ok / Monitors all-up parity). */
 .chat-empty.is-ready {
   border-style: solid;
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: inherit;
 }
 
@@ -1821,21 +1822,21 @@ textarea.ops-agent-editor.is-dirty {
 /* Soft alert (Monitors Slow / Settings Off soft 7%/30% parity). */
 .chat-empty.is-no-model {
   border-style: solid;
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
 }
 
 .chat-empty.is-offline,
 .chat-empty.is-circuit {
   border-style: solid;
-  border-color: color-mix(in srgb, #ff9500 30%, transparent);
-  background: color-mix(in srgb, #ff9500 7%, transparent);
+  border-color: color-mix(in srgb, #ff9500 30%, #ffffff);
+  background: color-mix(in srgb, #ff9500 7%, #ffffff);
 }
 
 .chat-empty.is-not-set {
   border-style: solid;
-  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 .chat-empty-title {
