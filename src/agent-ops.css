@@ -3261,54 +3261,68 @@ textarea.ops-agent-editor.is-dirty {
   margin-left: auto;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-toolbar .logs-filter-chip {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  font: inherit;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
   padding: 5px 9px;
   border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  color: inherit;
+  cursor: pointer;
   transform: none;
   opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .logs-toolbar .logs-filter-chip:hover {
   transform: none;
   opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 20%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip.is-active {
   opacity: 1;
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
-  background: color-mix(in srgb, #ff3b30 12%, transparent);
-  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+  background: color-mix(in srgb, #ff3b30 12%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
-  background: color-mix(in srgb, #ff3b30 18%, transparent);
-  border-color: color-mix(in srgb, #ff3b30 38%, transparent);
+  background: color-mix(in srgb, #ff3b30 18%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 38%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
-  background: color-mix(in srgb, #ff9f0a 14%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 14%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
 }
 
 .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
-  background: color-mix(in srgb, #ff9f0a 20%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 40%, transparent);
+  background: color-mix(in srgb, #ff9f0a 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 40%, #ffffff);
 }
 
 .logs-filter-count {
@@ -3325,12 +3339,13 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Clear beside All·Error·Warn when a filter is active (Disk / Monitors / Processes / AI Chat Clear parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .logs-filter-clear {
   flex: 0 0 auto;
   margin-left: 4px;
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ffffff);
   color: inherit;
   font: inherit;
   font-size: 11px;
@@ -3354,13 +3369,13 @@ textarea.ops-agent-editor.is-dirty {
 
 .logs-filter-clear:hover {
   opacity: 1;
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ffffff);
 }
 
 .logs-filter-clear:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

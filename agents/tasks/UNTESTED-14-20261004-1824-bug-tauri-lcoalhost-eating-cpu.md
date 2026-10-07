@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1595** (follow-up after v0.1.1594).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Debug Log filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.logs-toolbar .logs-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / error·warn `.has-hits` / `.is-active`, and `.logs-filter-clear` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha; overrides toolbar button glass).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Debug Log. Confirm filter chips (All · Error · Warn) when present. Hover All · Error · Warn; Tab-focus a chip; activate Error or Warn when they have hits; use Clear when a filter is active. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1593)
+
 Version **v0.1.1593** (follow-up after v0.1.1592).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -8527,3 +8541,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; confirm filter chips (All · You · Assistant · Errors) when present; hover All · You · Assistant · Errors; Tab-focus a chip; activate You, Assistant, or Errors when they have hits; use Clear when a filter is active; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1593)
+
+**Date:** 2026-10-07 03:09 UTC (2026-10-07 05:09 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1593**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1593)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Perplexity filter chips + Clear skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1593**
+- `CHANGELOG.md` **[0.1.1593]** documents Perplexity filter chips (All · Top · Snippet) and Clear mixing washes against an opaque fill; no glass alpha on resting, hover, focus-visible, active, or has-hits chip states
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.perplexity-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / top·snippet `.has-hits` / `.is-active`, and `.perplexity-filter-clear` resting / `:hover` / `:focus-visible` / `.is-just-saved`, mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed filter-chip / Clear wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Perplexity filter-chip path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Perplexity filter-chip / Clear wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity; confirm filter chips (All · Top · Snippet) when present; hover All · Top · Snippet; Tab-focus a chip; activate Top or Snippet when they have hits; use Clear when a filter is active; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
