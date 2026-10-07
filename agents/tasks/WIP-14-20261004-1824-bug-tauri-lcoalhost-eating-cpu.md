@@ -13479,3 +13479,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm CPU · GPU · Freq · Temp history chart borders stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1711)
+
+**Date:** 2026-10-07 20:35 UTC (2026-10-07 22:35 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1711**)
+- No stale sibling `agents/tasks/WIP-14-…` or `UNTESTED-14-…` at start of this pass
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1711)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple outer shell border skips glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1711**
+- `CHANGELOG.md` **[0.1.1711]** documents Apple outer window shell (`.apple-shell`) mixes the hairline border against an opaque fill; no glass alpha on the always-visible window chrome border; History chart shells opaque in v0.1.1710
+- `src-tauri/dist/themes/apple/cpu.css` — `.apple-shell` uses `background-color: #f7f7fa`, `background-image: none`, `border: 1px solid color-mix(in srgb, #0c0c10 6%, #f7f7fa)`, `box-shadow: none`. No `rgba(0,0,0,0.06)` glass border on the claimed path.
+- Prior cuts still present: `.history-chart-container` opaque mix border against `#ffffff` (v0.1.1710); `.metric-card` resting mix hairline against opaque `#ffffff` (v0.1.1709)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the outer `.apple-shell` border path (sections collapsed by default; confirm shell border stays solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Apple shell-border cut.
+- Log tail still shows older Ollama localhost connection-refused noise (unrelated to #14 CSS).
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm the outer window shell border stays solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
