@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1631** — Debug Log filter-miss (`.logs-viewer-empty.logs-filter-miss` · Error · Warn · Clear filter): opaque wash (no glass alpha).
 - **v0.1.1630** — Debug Log chrome (`.logs-toolbar` · buttons · `.logs-viewer` · path focus): opaque wash (no glass alpha).
 - **v0.1.1629** — Perplexity weather card (`.perplexity-weather-card`): opaque blue wash (no glass alpha on the card background, border, or accent edge).
 - **v0.1.1628** — Perplexity empty / filter-miss (`.perplexity-empty` · error · Top · Snippet · Clear filter): opaque wash (no glass alpha).

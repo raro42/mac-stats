@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1631** (follow-up after v0.1.1630).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Debug Log filter-miss · Error · Warn · Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.logs-viewer-empty.logs-filter-miss` (+ Error · Warn empty), and `.logs-filter-miss-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Toolbar / viewer already opaque in v0.1.1630.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Debug Log. Apply Error or Warn filter so the filter-miss shell shows; hover Clear filter; Tab-focus Clear. Confirm solid washes. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1630)
+
+
 Version **v0.1.1630** (follow-up after v0.1.1629).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
