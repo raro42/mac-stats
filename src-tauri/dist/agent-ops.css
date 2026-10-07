@@ -2508,23 +2508,24 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-row.is-pinned {
-  background: color-mix(in srgb, #0a84ff 6%, transparent);
+  background: color-mix(in srgb, #0a84ff 6%, #ffffff);
 }
 
 .process-row:hover {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  box-shadow: 0 2px 8px color-mix(in srgb, #000 7%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  box-shadow: none;
 }
 
 .process-row:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 
 .process-row:active {
   box-shadow: none;
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
 }
 
 .process-name {
