@@ -1,12 +1,14 @@
-# Todo — WIP-14 WebView CPU cut (v0.1.1638)
+# FEAT/WIP-14 — tauri://localhost CPU (coder)
 
-- [x] Pick lowest GitHub task: WIP-14 (`raro42/mac-stats` #14)
-- [x] Survey next glass-alpha surface after v0.1.1637 collapsible-header
-- [x] Opaque wash: ring focus (`#cpu-usage-card:focus-visible` · `.metric-card:focus-within`); drop soft glass focus shadows in agent-ops
-- [x] Sync docs: bump to 0.1.1638, CHANGELOG, standing_backlog, morning surprise
+## Plan
+- [x] Pick lowest GitHub FEAT/WIP (`WIP-14`)
+- [x] Opaque Apple `.icon-btn` hover / focus-visible / active washes (always-visible icon strip)
+- [x] Bump to v0.1.1640; CHANGELOG; standing_backlog; WIP Implementation notes
 - [x] `cargo check` in `src-tauri/`
-- [x] Prepend Implementation on task file; rename WIP- → UNTESTED-
-- [x] Commit + push `origin/main` (do not close GitHub issue)
+- [x] Commit + push `origin/main`
+- [x] Rename `WIP-14-…` → `UNTESTED-14-…`; comment via `gh-safe.sh` (do not close #14)
 
 ## Review
-v0.1.1638: Ring focus (`#cpu-usage-card:focus-visible` · `.metric-card:focus-within`) opaque washes; agent-ops soft glass focus shadows dropped. Always-visible on default collapsed CPU window. Follow-up after v0.1.1637 headers. `cargo check` pass. Task renamed to UNTESTED-14. GitHub #14 left open for tester / closing reviewer / macOS Activity Monitor gate.
+- v0.1.1640: Apple `.icon-btn` hover · focus-visible · active mix against `#ffffff` (no glass alpha).
+- `cargo check` clean (pre-existing unused import warning in `feature_health.rs` only).
+- Issue #14 left open for tester / 004.

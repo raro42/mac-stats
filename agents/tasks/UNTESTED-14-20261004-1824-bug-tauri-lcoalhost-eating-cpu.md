@@ -22,6 +22,33 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1640** (follow-up after v0.1.1639).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple icon strip skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.icon-btn:hover` / `:focus-visible` / `:active`, mix washes against opaque `#ffffff` (no `rgba` / `transparent` glass alpha on hover fill, focus ring, or active press). Always-visible on the default collapsed layout (Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops icons).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover a section icon; Tab-focus one; press it. Confirm hover / focus / active washes stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1639)
+
+Version **v0.1.1639** (follow-up after v0.1.1638; landed on origin while WIP notes still pointed at v0.1.1638).
+
+Changes (Details Copied badge skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.details-grid > .detail-value[role='option'].is-just-copied` / `::after`, mix green wash against opaque `#ffffff`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Details when useful; copy a value. Confirm Copied badge wash stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1638)
+
+
 Version **v0.1.1638** (follow-up after v0.1.1637).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

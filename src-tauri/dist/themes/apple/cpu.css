@@ -263,19 +263,22 @@ border-radius: 24px;
   background: rgba(0, 0, 0, 0.08);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.65);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
   color: rgba(30, 30, 34, 0.82);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .icon-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 1px;
   z-index: 1;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .icon-btn:active {
-  background: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, currentColor 10%, #ffffff);
   transform: none;
 }
 
