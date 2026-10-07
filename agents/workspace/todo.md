@@ -8,7 +8,7 @@
 - [x] CHANGELOG `[0.1.1694]` entry
 - [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/`
-- [x] Commit + push `origin/main` (`cfffa04e`)
+- [x] Commit + push `origin/main` (`cfffa04e` / docs `79f2aa37`; HTTPS after SSH key deny)
 - [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
