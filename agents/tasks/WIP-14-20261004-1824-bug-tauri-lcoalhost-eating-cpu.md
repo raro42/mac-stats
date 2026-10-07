@@ -31,4 +31,33 @@ Opaque hairline / wash series through **v0.1.1720** (icon-line type · text/mute
 
 ## Test report
 
-_(tester fills)_
+**Date:** 2026-10-08 ~00:05 CEST (local) / 2026-10-07 ~22:05 UTC  
+**Host:** Linux (Arch), not macOS  
+
+**Result:** FAIL / blocked (macOS gate not verified)
+
+### Commands
+
+| Command | Result |
+|---|---|
+| `cargo check` in `src-tauri/` | PASS (v0.1.1721; warnings only, unused imports/dead code) |
+| `cargo test` in `src-tauri/` | PASS (1359 lib tests; 0 failed) |
+
+### Static (this cut)
+
+- `src-tauri/dist/themes/apple/cpu.css` `.icon-btn` resting color: `color-mix(in srgb, #1e1e22 60%, #ececf1)` — present.
+- `.icon-btn:hover` color: `color-mix(in srgb, #1e1e22 82%, #ffffff)` — present.
+- No glass `rgba(...)` on `.icon-btn` / `:hover` glyph color (opaque chip-mix as claimed).
+
+### macOS acceptance (required)
+
+- Open CPU window, warm ≥30s, strip icons solid, gauges/sparklines update, Activity Monitor Graphics and Media / `tauri://localhost` toward below 1%: **not run** (Linux host).
+- Task notes Linux webkit2gtk blank-`cpu.html` floor is not the macOS gate; product CSS still matters on macOS only.
+
+### Logs
+
+- `~/.mac-stats/debug.log` tail: Ollama localhost refused / circuit-open noise only; nothing tied to this Apple icon-strip CSS cut.
+
+### Outcome
+
+Back to `agents/tasks/WIP-14-…`. Needs a macOS tester pass on Activity Monitor before CLOSED. GitHub #14 left open.
