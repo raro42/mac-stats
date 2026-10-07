@@ -5,7 +5,7 @@
 - [x] Opaque `#ffffff` mix for Monitors / AI Chat settings popover header hairlines (v0.1.1714)
 - [x] `cargo check` in `src-tauri/`
 - [x] Keep `UNTESTED-14-…` for tester (no FEAT/WIP sibling; claim updated in place)
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Leave GitHub issue alone (004 closes; #14 already closed on GitHub)
 
 ## Review
