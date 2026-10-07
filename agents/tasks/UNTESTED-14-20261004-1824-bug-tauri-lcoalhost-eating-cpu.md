@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1701** (follow-up after v0.1.1700).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Monitors / AI Chat overflow menu trigger hover skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.monitors-menu-btn:hover` · `.ollama-menu-btn:hover` mix wash against opaque `#ffffff` (Apple had `var(--hairline)` glass hover). Menu shells opaque in v0.1.1691 / v0.1.1690. Collapse control opaque in v0.1.1700.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors or AI Chat; hover the ⋯ overflow control (`.monitors-menu-btn` / `.ollama-menu-btn`); confirm hover wash stays solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1700)
+
 Version **v0.1.1700** (follow-up after v0.1.1699).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -13020,3 +13033,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a History sparkline point; confirm the tip stays solid (no glass alpha / soft shadow); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1700)
+
+**Date:** 2026-10-07 18:48 UTC (2026-10-07 20:48 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1700**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1700)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple section collapse control skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1700**
+- `CHANGELOG.md` **[0.1.1700]** documents Apple section collapse control (`.collapse-btn` hover · focus-visible) mixes fills against an opaque fill; no glass alpha on the chevron hover wash or focus ring; section headers opaque in v0.1.1635; History tooltip opaque in v0.1.1699
+- `src-tauri/dist/themes/apple/cpu.css` — `.collapse-btn:hover` uses `color-mix(..., #ffffff)`; `.collapse-btn:focus-visible` outline mixes accent against `#ffffff`. No `var(--hairline)` glass hover; no `transparent` focus mix on the claimed wash path. Resting `.collapse-btn` background remains `transparent` (control chrome only; not a glass panel wash).
+- Prior cuts still present: `.history-tooltip` opaque `#1c1c1e` / `#f5f5f7`, border mix against tip fill (v0.1.1699)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the section collapse chevron path (hover / keyboard-focus a Details or Top Processes `.collapse-btn`; confirm hover wash and focus ring stay solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.collapse-btn` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / `cursor-agent` / overnight harness scripts).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover / keyboard-focus a Details or Top Processes collapse chevron (`.collapse-btn`); confirm hover wash and focus ring stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.

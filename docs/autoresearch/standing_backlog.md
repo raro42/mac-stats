@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1701
+
+- Apple Monitors / AI Chat overflow menu triggers (`.monitors-menu-btn` · `.ollama-menu-btn` hover) mix fills against an opaque fill. No glass alpha on the ⋯ hover wash. Menu shells already opaque. Collapse control already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1700
 
 - Apple section collapse control (`.collapse-btn` hover · focus-visible) mixes fills against an opaque fill. No glass alpha on the chevron hover wash or focus ring. Section headers already opaque. History tooltip already opaque. P2 reliability / GitHub #14.
