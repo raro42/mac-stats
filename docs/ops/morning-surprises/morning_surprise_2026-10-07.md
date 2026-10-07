@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1616** — Agent Ops agent editor (`textarea.ops-agent-editor` focus · dirty): opaque wash (no glass alpha).
 - **v0.1.1615** — AI Chat empty shell (default · Ready · no model · offline · not set): opaque wash (no glass alpha).
 - **v0.1.1614** — Agent Ops detail preview (`.ops-preview`): opaque wash (no glass alpha).
 - **v0.1.1613** — Agent Ops close button (resting · hover): opaque wash (no glass alpha).
@@ -39,6 +40,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Ratchet
 - Discard — local close-button wash duplicated origin v0.1.1613.
+- Keep — v0.1.1616 Agent Ops agent editor focus · dirty opaque wash (#14).
 - Keep — v0.1.1615 AI Chat empty shell opaque wash (#14).
 - Keep — v0.1.1614 Agent Ops detail preview opaque wash (#14).
 - Keep — v0.1.1613 Agent Ops close button resting · hover opaque wash (#14).

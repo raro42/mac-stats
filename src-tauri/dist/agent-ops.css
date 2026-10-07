@@ -1490,6 +1490,7 @@ button.ops-badge:disabled {
   margin: 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 textarea.ops-agent-editor {
   display: block;
   width: 100%;
@@ -1504,12 +1505,12 @@ textarea.ops-agent-editor {
 
 textarea.ops-agent-editor:focus {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
 }
 
 textarea.ops-agent-editor.is-dirty {
-  border-color: color-mix(in srgb, #ff9f0a 50%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 50%, #ffffff);
 }
 
 .ops-agent-edit-actions {

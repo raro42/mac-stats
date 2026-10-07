@@ -1,17 +1,11 @@
-# Coder todo — UNTESTED-14 (tauri://localhost CPU)
+# WIP-14 — tauri://localhost CPU (#14)
 
 ## Plan
-- [x] Pick lowest GitHub WIP/FEAT under `agents/tasks/` → WIP-14
-- [x] Read FEATURE-CODER.md + lessons.md
-- [x] v0.1.1614: Agent Ops detail preview (`.ops-preview`) opaque wash
-- [x] Sync `src-tauri/dist/agent-ops.css`
-- [x] Bump Cargo.toml / lock / CHANGELOG / standing_backlog / Implementation notes
-- [x] `cargo check` in `src-tauri/`
-- [x] Commit + push `origin/main`
-- [x] Rename WIP-14 → UNTESTED-14
-- [x] Do **not** close GitHub #14
+- [x] Read FEATURE-CODER / agents.md / lessons; pick lowest GitHub FEAT/WIP (WIP-14)
+- [x] Convert next Agent Ops glass blend: `textarea.ops-agent-editor` focus · dirty → opaque `#ffffff`
+- [x] Sync `src-tauri/dist/agent-ops.css`; bump Cargo.toml to 0.1.1615; CHANGELOG
+- [x] Prepend Implementation notes on WIP-14; `cargo check` in `src-tauri/`
+- [ ] Rename WIP- → UNTESTED-; commit + push origin/main; GitHub comment via gh-safe (do not close issue)
 
 ## Review
-- v0.1.1614 `.ops-preview`: opaque wash (no glass alpha on background/border).
-- Tester still needs macOS Activity Monitor gate (`tauri://localhost` / Graphics and Media toward <1%).
-- Task is `agents/tasks/UNTESTED-14-20261004-1824-bug-tauri-lcoalhost-eating-cpu.md`.
+- **v0.1.1615** — Agent Ops agent editor focus · dirty mixes against opaque `#ffffff` (no glass alpha on focus ring / dirty border). Continues #14 WebView compositor cuts. Issue left open for tester / 004.
