@@ -7,7 +7,7 @@
 - [x] Sync dist, bump to 0.1.1634, CHANGELOG, standing_backlog, morning surprise
 - [x] `cargo check` in `src-tauri/`
 - [x] Prepend Implementation on task file; rename WIP- → UNTESTED-
-- [ ] Commit + push `origin/main` (do not close GitHub issue)
+- [x] Commit + push `origin/main` (do not close GitHub issue)
 
 ## Review
-v0.1.1634: Debug Log line hover/selected (`.logs-line`) opaque washes in `agent-ops.css`. Copied flash already opaque; error-glance in v0.1.1632; v0.1.1633 was Perplexity Copied-badge on main. `cargo check` pass. Task renamed to UNTESTED-14. GitHub #14 left for closing reviewer / macOS Activity Monitor gate.
+v0.1.1634: Debug Log line hover/selected (`.logs-line`) opaque washes in `agent-ops.css`. Copied flash already opaque; error-glance in v0.1.1632; v0.1.1633 was Perplexity Copied-badge on main. `cargo check` pass. Task renamed to UNTESTED-14. GitHub #14 left open for tester / closing reviewer / macOS Activity Monitor gate.
