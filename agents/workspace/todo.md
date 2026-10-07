@@ -1,11 +1,11 @@
-# WIP-14 — tauri://localhost CPU (#14)
+# UNTESTED-14 — tauri://localhost CPU (#14)
 
 ## Plan
 - [x] Read FEATURE-CODER / agents.md / lessons; pick lowest GitHub FEAT/WIP (WIP-14)
-- [x] Convert next Agent Ops glass blend: `textarea.ops-agent-editor` focus · dirty → opaque `#ffffff`
-- [x] Sync `src-tauri/dist/agent-ops.css`; bump Cargo.toml to 0.1.1615; CHANGELOG
-- [x] Prepend Implementation notes on WIP-14; `cargo check` in `src-tauri/`
-- [ ] Rename WIP- → UNTESTED-; commit + push origin/main; GitHub comment via gh-safe (do not close issue)
+- [x] Convert Agent Ops agent editor focus · dirty → opaque `#ffffff` (v0.1.1616; remote took 1615 for AI Chat empty)
+- [x] Sync dist; CHANGELOG; cargo check
+- [x] Rename WIP- → UNTESTED-; rebase onto remote 1615
+- [x] Commit + push origin/main; GitHub comment via gh-safe (issue left open)
 
 ## Review
-- **v0.1.1615** — Agent Ops agent editor focus · dirty mixes against opaque `#ffffff` (no glass alpha on focus ring / dirty border). Continues #14 WebView compositor cuts. Issue left open for tester / 004.
+- **v0.1.1616** — Agent Ops agent editor (`textarea.ops-agent-editor` focus · dirty) mixes washes against opaque `#ffffff`. No glass alpha on focus ring / dirty border. Continues #14 WebView compositor cuts. Issue left open for tester / 004.
