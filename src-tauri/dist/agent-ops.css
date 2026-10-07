@@ -1585,11 +1585,12 @@ textarea.ops-agent-editor.is-dirty {
   margin: 0 4px 12px;
 }
 
-/* Re-homed under health (see ensureOpsRefreshRowPlacement) — stays in view with overview. */
+/* Re-homed under health (see ensureOpsRefreshRowPlacement) — stays in view with overview.
+ * Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-refresh-row.ops-refresh-row-top {
   margin: 0 4px 14px;
   padding: 0 0 10px;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .ops-updated-ago {
@@ -1615,11 +1616,11 @@ textarea.ops-agent-editor.is-dirty {
 
 .ops-updated-ago[role='button']:hover {
   opacity: 0.92;
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
 
 .ops-updated-ago[role='button']:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
@@ -8623,10 +8624,11 @@ button.monitor-detail-url.is-just-saved {
   opacity: 1;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .btn-secondary.ops-refresh,
 .agent-ops-section .btn-secondary {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
   color: inherit;
   border-radius: 8px;
   padding: 6px 12px;
@@ -8637,13 +8639,13 @@ button.monitor-detail-url.is-just-saved {
 
 .btn-secondary.ops-refresh:hover,
 .agent-ops-section .btn-secondary:hover {
-  background: color-mix(in srgb, currentColor 12%, transparent);
-  border-color: color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 22%, #ffffff);
 }
 
 .btn-secondary.ops-refresh:focus-visible,
 .agent-ops-section .btn-secondary:focus-visible {
-  outline: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  outline: 2px solid color-mix(in srgb, currentColor 35%, #ffffff);
   outline-offset: 2px;
 }
 

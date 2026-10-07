@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1617** (follow-up after v0.1.1616).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops refresh row skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-refresh-row.ops-refresh-row-top` hairline, `.ops-updated-ago` hover / focus-visible, and `.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Refresh · Refresh digest · Updated in the refresh row. Hover Refresh and Updated; Tab-focus them; confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1616)
+
 Version **v0.1.1616** (follow-up after v0.1.1615).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
