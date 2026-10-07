@@ -2721,33 +2721,35 @@ padding: 0;
   font-weight: 500;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .model-select {
   flex: 1;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease, outline-color 0.15s ease;
 }
 
 .model-select:focus {
   outline: none;
-  border-color: rgba(0, 122, 255, 0.3);
-  background: rgba(255, 255, 255, 0.7);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 30%, #ffffff);
+  background: #ffffff;
 }
 
 .model-select:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, var(--hairline));
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
 }
 
 .model-select:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: color-mix(in srgb, var(--text, #0c0c10) 7%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 
 .ollama-chat {
