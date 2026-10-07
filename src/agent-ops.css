@@ -8168,11 +8168,13 @@ button.monitor-detail-url.is-just-saved {
   word-break: break-all;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-last {
   margin-top: 12px;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 14%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 2%, #ffffff);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -8186,38 +8188,38 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .disk-cleanup-last.is-action:hover {
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  border-color: color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 22%, #ffffff);
 }
 
 .disk-cleanup-last.is-action:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
 .disk-cleanup-last.is-action.has-last-run {
   border-style: solid;
-  border-color: color-mix(in srgb, currentColor 18%, transparent);
+  border-color: color-mix(in srgb, currentColor 18%, #ffffff);
 }
 
 /* Last run has-skip — soft alert (Monitors Slow / reclaim soft 7%/30% parity). */
 .disk-cleanup-last.is-action.has-skip {
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
 }
 
 .disk-cleanup-last.is-action.has-skip:focus-visible {
-  outline-color: color-mix(in srgb, #ff9f0a 55%, transparent);
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #ffffff);
 }
 
 /* Calm wash when last run succeeded without skips (Reclaimable is-clean / Details is-ok parity). */
 .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
-  outline-color: color-mix(in srgb, #34c759 55%, transparent);
+  outline-color: color-mix(in srgb, #34c759 55%, #ffffff);
 }
 
 .disk-cleanup-last strong {
