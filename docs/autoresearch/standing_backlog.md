@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1725
+
+- Apple icon-line status washes (`.icon-line-item.status-good` · `.status-warning` · `.status-bad` resting · hover) mix type color against an opaque chip fill. No glass alpha on Ready / Slow / Down strip status type. Details / Top Processes body already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1724
 
 - Apple Details / Top Processes body type (`.details-grid` · `.process-table`) mixes against an opaque panel fill. No glass alpha on Detail labels or process rows. Battery glyph already opaque. P2 reliability / GitHub #14.

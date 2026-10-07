@@ -15,15 +15,15 @@ When opening the mac-stats window, `tauri://localhost` eats CPU. Reduce Graphics
 
 ## Implementation (coder)
 
-Version **v0.1.1724** (follow-up after v0.1.1723).
+Version **v0.1.1725** (follow-up after v0.1.1724).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
 
-Changes (Apple Details / Top Processes body type skips glass blend):
+Changes (Apple icon-line status type skips glass blend):
 
-- `src-tauri/dist/themes/apple/cpu.css` — `.details-grid` · `.process-table` body `color` mix against opaque panel fill (`color-mix(in srgb, #3c3c43 72%, #ffffff)`). Was `rgba(60, 60, 67, 0.72)` glass under Detail labels and process rows. Battery glyph opaque in v0.1.1723.
+- `src-tauri/dist/themes/apple/cpu.css` — `.icon-line-item.status-good` · `.status-warning` · `.status-bad` resting · hover `color` mix against opaque chip fill. Was `rgba(36,160,90,…)` / `rgba(200,130,20,…)` / `rgba(200,55,50,…)` glass on Ready / Slow / Down strip status type. Details / Top Processes body opaque in v0.1.1724.
 
-Tester: open CPU window on macOS, warm ≥30s. Confirm Details labels and Top Processes rows stay solid. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+Tester: open CPU window on macOS, warm ≥30s. Confirm Monitors/Ops icon-line Ready · Slow · Down status type stays solid (no glass blend). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
 
 ## Prior cuts (summary)
 
