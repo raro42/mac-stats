@@ -9400,3 +9400,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents / Schedules / Sessions / Knowledge / Runs; select a row so the detail preview shows; confirm the preview panel wash; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1616)
+
+**Date:** 2026-10-07 05:40 UTC (2026-10-07 07:40 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1616**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1616)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops agent editor focus · dirty skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1616**
+- `CHANGELOG.md` **[0.1.1616]** documents Agent Ops agent editor (`textarea.ops-agent-editor` focus · dirty) mixing washes against an opaque fill; no glass alpha on the Agents edit textarea focus ring or dirty border
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `textarea.ops-agent-editor:focus` / `.is-dirty` mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: `.chat-empty` resting / state washes also mix against opaque `#ffffff` (v0.1.1615)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops Agents edit textarea path (focus ring + dirty border). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops agent-editor focus/dirty wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents; select an agent so the editor shows; focus the textarea; edit until dirty; confirm focus ring and dirty border washes; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
