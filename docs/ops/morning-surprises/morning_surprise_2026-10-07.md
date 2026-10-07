@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1600** — Agent Ops tab strip (tabs, file tabs, count pills): opaque wash.
 - **v0.1.1599** — Ring, battery, and power Copied flashes sit above the value with left and right. No translate.
 - **v0.1.1598** — Agent Ops filter input, match chip, Clear, and just-cleared flash: opaque wash.
 - **v0.1.1597** — Disk Cleanup scope filter chips (All · On · Off) and Clear: opaque wash (no glass alpha).

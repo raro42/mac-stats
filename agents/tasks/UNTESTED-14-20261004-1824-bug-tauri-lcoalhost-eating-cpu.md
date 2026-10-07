@@ -22,6 +22,34 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1600** (follow-up after v0.1.1599).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops tab strip + count pills skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-tab-count` resting / active, and `.agent-ops-tab` / `.ops-file-tab` resting / `:hover` / `:focus-visible` / `.active` / `.active:hover`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm Overview / Agents / Schedules / Sessions / Memory (and file tabs if shown). Hover tabs; Tab-focus a tab; activate another tab; confirm count pills on tabs with inventory. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1599)
+
+Version **v0.1.1599** (follow-up after v0.1.1598).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (center metric Copied flash without translate):
+
+- `src/cpu.js` / `src-tauri/dist/cpu.js` — ring / battery / power `.is-just-copied::after` uses left/right + `margin-inline: auto` instead of `translateX(-50%)`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Click a ring / battery / power value to copy; confirm Copied badge sits above the value centered. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1598)
+
 Version **v0.1.1598** (follow-up after v0.1.1597).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
