@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1596
+
+- Disk Cleanup category filter chips (All · Reclaim · Big · Clean) and Clear mix washes against an opaque fill. No glass alpha on resting, hover, focus-visible, active, or has-hits chip states. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1594
 
 - Monitor history tick tips sit above the bar with left and top. Opaque fill. No translate or shadow. P2 reliability / GitHub #14.
