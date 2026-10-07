@@ -25,7 +25,8 @@
   --accent-usage: #9db5c4; /* Pastel blue-grey for usage */
   --accent-freq: #a8c5e8; /* Pastel blue for frequency */
   --accent-gpu: #c4a8d8; /* Pastel purple for GPU */
-  --ring-track: rgba(0, 0, 0, 0.06);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --ring-track: color-mix(in srgb, #000000 6%, #ffffff);
 
   --modal-backdrop: rgba(0, 0, 0, 0.30);
 }
@@ -405,6 +406,7 @@ border-radius: 24px;
 
 .ring-track {
   fill: none;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
   stroke: var(--ring-track);
   stroke-width: 5;
   stroke-linecap: round;
