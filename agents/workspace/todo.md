@@ -8,8 +8,8 @@
 - [x] CHANGELOG `[0.1.1693]` entry
 - [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/` (green; unused-import warnings pre-existing)
-- [ ] Commit + push `origin/main`
-- [ ] GitHub comment via `gh-safe.sh` (issue not closed)
+- [x] Commit + push `origin/main` (`11d8b0e4`; HTTPS push after SSH key deny)
+- [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
 - Cut: Apple `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final mix against opaque `#ffffff` (was `transparent` glass). Matches shared `agent-ops.css` from v0.1.1621.
