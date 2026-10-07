@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1679** (follow-up after v0.1.1678).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat composer field skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `#chat-input` resting · hover · focus, mix fills / borders / focus ring against opaque `#ffffff` (Apple had `rgba(255,255,255,0.5)` / `0.58` / `0.72` glass + transparent focus mixes). Composer shell opaque in v0.1.1678. Message bubbles opaque in v0.1.1677.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat; confirm the composer field stays solid (no glass alpha) on rest / hover, focus ring solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1678)
+
 Version **v0.1.1678** (follow-up after v0.1.1677).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

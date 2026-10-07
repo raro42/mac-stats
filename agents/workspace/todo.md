@@ -1,14 +1,15 @@
-# TESTING-14 → WIP-14 (v0.1.1678)
+# WIP-14 coder pass (v0.1.1679)
 
-- [x] Read TESTER.md + lessons.md
-- [x] Verify claimed v0.1.1678 Apple AI Chat composer shell opaque wash
-- [x] `cargo check` in `src-tauri/` — pass
-- [x] `cargo test` in `src-tauri/` — pass (1359 lib)
-- [x] Static CSS check on `.chat-input-container` / `:focus-within`
-- [x] `scan_debug_log_errors.py --minutes 180` — clean
-- [x] Append Test report (v0.1.1678); move TESTING-14 → WIP-14
+- [x] Opaque-wash Apple AI Chat `#chat-input` resting · hover · focus
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1679
+- [x] CHANGELOG `[0.1.1679]` entry
+- [x] Prepend Implementation note on WIP-14 task file
+- [x] Update `docs/autoresearch/standing_backlog.md` #14 line
+- [x] `cargo check` in `src-tauri/`
+- [x] Rename WIP-14 → UNTESTED-14
+- [x] Commit + push `origin/main`
 - [x] Do **not** close GitHub #14
 
 ## Review
 
-v0.1.1678 static + cargo pass on Linux. Cannot measure macOS Graphics and Media / `tauri://localhost` <1% from this host → WIP (same gate as v0.1.1677). Needs macOS Activity Monitor pass before CLOSED.
+v0.1.1679: Apple AI Chat `#chat-input` resting · hover · focus mix against opaque `#ffffff` (no glass alpha). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 left for 004 (do not close).
