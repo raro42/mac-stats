@@ -1,14 +1,14 @@
-# UNTESTED-14 / #14 — tauri://localhost CPU (v0.1.1713 shipped)
+# UNTESTED-14 / #14 — tauri://localhost CPU (v0.1.1714 shipped)
 
 ## Plan
-- [x] Pick fuel: standing P2 / GitHub #14 after v0.1.1712 (icon-strip / section dividers)
-- [x] Opaque `#ffffff` mix for `.chat-messages` resting border (v0.1.1713)
+- [x] Pick fuel: standing P2 / GitHub #14 after v0.1.1713 (chat-messages border)
+- [x] Opaque `#ffffff` mix for Monitors / AI Chat settings popover header hairlines (v0.1.1714)
 - [x] `cargo check` in `src-tauri/`
-- [x] Rename `WIP-14-…` → `UNTESTED-14-…`
-- [x] Commit + push `origin/main`
+- [x] Keep `UNTESTED-14-…` for tester (no FEAT/WIP sibling; claim updated in place)
+- [ ] Commit + push `origin/main`
 - [x] Leave GitHub issue alone (004 closes; #14 already closed on GitHub)
 
 ## Review
-- Coder: Apple AI Chat `.chat-messages` resting hairline mixes against opaque `#ffffff` (was `var(--hairline)` glass on the already-opaque panel fill). Icon-strip / section dividers opaque in v0.1.1712.
-- Tester next: expand AI Chat on macOS, warm ≥30s; confirm message-list border solid; Activity Monitor Graphics and Media / `tauri://localhost` toward <1%.
-- Next fuel after bounce: remaining theme glass (`var(--hairline)` on popover headers / markdown table / monitor form).
+- Coder: `.monitors-settings-popover .popover-header` and `.ollama-settings-popover .popover-header` mix `border-bottom` against opaque `#ffffff` (was `var(--hairline)` glass). Message-list border opaque in v0.1.1713.
+- Tester next: expand Monitors or AI Chat → open settings popover; confirm title-row hairline solid; Activity Monitor Graphics and Media / `tauri://localhost` toward <1%.
+- Next fuel after bounce: remaining `var(--hairline)` (add-monitor form, monitor-history, markdown table/hr).

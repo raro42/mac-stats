@@ -2087,7 +2087,8 @@ border-radius: 24px;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--hairline);
+  /* Opaque mix — glass alpha stays in Graphics and Media (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #0c0c10 5%, #ffffff);
   flex-shrink: 0;
 }
 
@@ -2560,7 +2561,8 @@ border-radius: 24px;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--hairline);
+  /* Opaque mix — glass alpha stays in Graphics and Media (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #0c0c10 5%, #ffffff);
 }
 
 .ollama-settings-popover .popover-header h3 {
