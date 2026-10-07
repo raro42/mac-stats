@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1627** — Perplexity result rows (`.perplexity-result-item` resting · hover · focus · selected · Top): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1626** — Top Processes empty shell (`.process-empty`): opaque wash (no glass alpha).
 - **v0.1.1625** — Top Processes filter-miss (`.processes-filter-miss` · Hot · Pinned · Clear filter): opaque wash (no glass alpha).
 - **v0.1.1624** — Ring filter-miss (`.rings-filter-miss` · CTA): opaque wash (no glass alpha).
@@ -50,7 +51,6 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Ratchet
 - Discard — local AI Chat filter-miss wash duplicated origin v0.1.1623.
-- Keep — v0.1.1626 Top Processes empty shell opaque wash (#14).
 - Keep — v0.1.1625 Top Processes filter-miss opaque wash (#14).
 - Keep — v0.1.1624 Ring filter-miss · CTA opaque wash (#14).
 - Keep — v0.1.1623 AI Chat filter-miss · Clear opaque wash (#14).
