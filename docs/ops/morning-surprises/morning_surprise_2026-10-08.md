@@ -4,9 +4,13 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
-- **v0.1.1719** — Apple primary / muted type tokens (`--text` · `--muted`) and leftover panel tokens mix against an opaque shell fill. No glass alpha on always-on labels.
+- **v0.1.1723** — Apple battery strip glyph (`.battery-icon` resting · charging) mixes type color against an opaque strip fill. No glass alpha on the always-visible Bat icon.
+- **v0.1.1722** — Apple window title (`.apple-title h1`) mixes type color against an opaque shell fill. No glass alpha on the always-visible product title.
+- **v0.1.1721** — Apple section icon strip glyphs (`.icon-btn` resting · hover) mix type color against an opaque chip fill.
+- **v0.1.1720** — Apple icon-line strip glyphs (`.icon-line-item` resting · hover) mix type color against an opaque chip fill.
+- **v0.1.1719** — Apple primary / muted type tokens (`--text` · `--muted`) and leftover panel tokens mix against an opaque shell fill.
 - **v0.1.1718** — Apple Settings / Monitors / AI Chat modal dimmers (`--modal-backdrop`) mix against an opaque fill.
-- **v0.1.1717** — Apple ring gauge tracks (`.ring-track` / `--ring-track`) mix against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp ring tracks.
+- **v0.1.1717** — Apple ring gauge tracks (`.ring-track` / `--ring-track`) mix against an opaque fill.
 - **v0.1.1716** — Apple AI Chat markdown table cells and horizontal rules mix hairline borders against an opaque fill.
 - **v0.1.1715** — Apple Monitors settings Add form and row history hairlines opaque.
 - **v0.1.1714** — Apple Monitors / AI Chat settings popover headers opaque hairline borders.
@@ -18,7 +22,7 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - **v0.1.1708** — Apple Details / Top Processes shells opaque hairline borders.
 - **v0.1.1707** — Apple Changelog scrollbar track / thumbs opaque.
 - **v0.1.1706** — Apple Details / Top Processes scrollbar thumbs opaque.
-- **v0.1.1705** — Apple battery / power strip opaque hairline borders (sibling race content under a mislabeled commit message; still a real #14 cut).
+- **v0.1.1705** — Apple battery / power strip opaque hairline borders.
 - **v0.1.1704** — Apple History controls opaque hairline borders.
 - **v0.1.1703** — Apple AI Chat model-text hover + connection focus opaque.
 - **v0.1.1702** — Apple settings popover Close hover opaque.
@@ -32,9 +36,9 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - Design review: due=false (feature-agent-ops still recommended when screenshot TCC allows).
 - Debug.log: quiet in the 180m window.
 - Sibling harnesses: OpenClaw / Hermes paths missing on this host.
-- 23:00 backstop: git flush clean; CI and release scripts already ran today (skip).
+- 00:09 tick: raced sibling on apple-title (kept v0.1.1722), then shipped battery-icon as v0.1.1723.
 
 ## Next
 
-- More #14 glass: icon-line resting/hover `color: rgba(12, 12, 16, …)` on the always-visible Monitors · AI Chat strip.
+- More #14 glass: Details · Top Processes body `rgba(60, 60, 67, 0.72)`; icon-line status-good/warning/bad type rgba.
 - Screenshot refresh for feature-agent-ops when due and TCC allows.
