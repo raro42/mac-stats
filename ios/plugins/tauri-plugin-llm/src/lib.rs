@@ -1,7 +1,7 @@
-//! Plugin de iOS Stats: modelo de lenguaje local en el iPhone con llama.cpp.
+//! iOS Stats plugin: on-device language model on the iPhone with llama.cpp.
 //!
-//! La parte nativa está en `ios/tauri-plugin-llm/` (Swift). Este crate solo expone
-//! una API asíncrona para el Rust de la app; la web no tiene acceso directo.
+//! The native side lives in `ios/tauri-plugin-llm/` (Swift). This crate only exposes
+//! an async API to the app's Rust code; the web layer has no direct access.
 
 use tauri::{
     plugin::{Builder, TauriPlugin},
@@ -25,7 +25,7 @@ pub use desktop::Llm;
 #[cfg(mobile)]
 pub use mobile::Llm;
 
-/// Acceso al plugin desde `App`, `AppHandle` o `Window`.
+/// Access to the plugin from `App`, `AppHandle` or `Window`.
 pub trait LlmExt<R: Runtime> {
     fn llm(&self) -> &Llm<R>;
 }

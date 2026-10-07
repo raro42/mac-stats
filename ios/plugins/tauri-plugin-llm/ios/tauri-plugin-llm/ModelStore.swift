@@ -1,8 +1,8 @@
-// Descarga de modelos GGUF: progreso, reanudación, verificación SHA-256 y espacio libre.
+// GGUF model downloads: progress, resume, SHA-256 verification and free space checks.
 //
-// Una sola descarga a la vez. El archivo se baja a una carpeta temporal, se verifica y
-// solo entonces se mueve (de forma atómica) a `Application Support/models/`, excluido
-// de la copia de seguridad de iCloud.
+// One download at a time. The file is downloaded to a temporary folder, verified, and
+// only then moved (atomically) to `Application Support/models/`, excluded from the
+// iCloud backup.
 
 import CryptoKit
 import Foundation
@@ -54,7 +54,7 @@ final class ModelStore: NSObject, URLSessionDownloadDelegate {
     Self.modelsDirectory().appendingPathComponent(".\(file).resume")
   }
 
-  /// Espacio disponible para «uso importante» (incluye lo que iOS puede purgar).
+  /// Space available for "important usage" (includes what iOS can purge).
   private func availableSpace() -> Int64 {
     let values = try? Self.modelsDirectory()
       .resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
@@ -103,7 +103,7 @@ final class ModelStore: NSObject, URLSessionDownloadDelegate {
     task.resume()
   }
 
-  /// Cancela guardando los datos para reanudar después.
+  /// Cancels, saving the resume data to continue later.
   func cancel() {
     lock.lock()
     let task = self.task
@@ -150,7 +150,7 @@ final class ModelStore: NSObject, URLSessionDownloadDelegate {
       return
     }
 
-    // `location` desaparece al volver de este método: se mueve antes de verificar.
+    // `location` is gone once this method returns: move it before verifying.
     let directory = Self.modelsDirectory()
     let staging = directory.appendingPathComponent(".\(request.file).partial")
     let destination = directory.appendingPathComponent(request.file)
@@ -182,12 +182,12 @@ final class ModelStore: NSObject, URLSessionDownloadDelegate {
   }
 
   func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-    guard let error else { return }  // el éxito ya se trató en didFinishDownloadingTo
+    guard let error else { return }  // success was already handled in didFinishDownloadingTo
     let cancelled = (error as NSError).code == NSURLErrorCancelled
     finish(.failure(cancelled ? ModelStoreError.cancelled : error))
   }
 
-  // MARK: - Utilidades
+  // MARK: - Utilities
 
   private func sha256(of url: URL) throws -> String {
     let handle = try FileHandle(forReadingFrom: url)

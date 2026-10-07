@@ -11,7 +11,7 @@ use crate::models::*;
 tauri::ios_plugin_binding!(init_plugin_llm);
 
 #[cfg(not(target_os = "ios"))]
-compile_error!("tauri-plugin-llm solo tiene implementación para iOS");
+compile_error!("tauri-plugin-llm is only implemented for iOS");
 
 pub fn init<R: Runtime, C: DeserializeOwned>(
     _app: &AppHandle<R>,
@@ -21,7 +21,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     Ok(Llm(handle))
 }
 
-/// Acceso al motor de llama.cpp (código Swift en `ios/`).
+/// Access to the llama.cpp engine (Swift code in `ios/`).
 pub struct Llm<R: Runtime>(PluginHandle<R>);
 
 impl<R: Runtime> Llm<R> {
@@ -51,7 +51,7 @@ impl<R: Runtime> Llm<R> {
         Ok(())
     }
 
-    /// Devuelve la ruta final del modelo ya verificado.
+    /// Returns the final path of the verified model.
     pub async fn download(&self, request: DownloadRequest) -> crate::Result<String> {
         let reply: Value = self.0.run_mobile_plugin_async("download", request).await?;
         Ok(reply.get("path").and_then(Value::as_str).unwrap_or_default().to_string())
@@ -70,7 +70,7 @@ impl<R: Runtime> Llm<R> {
         Ok(())
     }
 
-    /// Solo depuración: `memoryWarning` o `resignActive`.
+    /// Debug only: `memoryWarning` or `resignActive`.
     pub async fn debug_simulate(&self, event: &str) -> crate::Result<()> {
         let _: Value = self
             .0

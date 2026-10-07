@@ -1,5 +1,5 @@
-// Tarjeta del modelo: elegir uno del catálogo, descargarlo (con progreso y verificación
-// SHA-256 en Swift), cancelar la descarga o borrarlo.
+// Model card: pick a model from the catalog, download it (with progress and SHA-256
+// verification in Swift), cancel the download, or delete it.
 import { bytes } from "../format";
 import {
   chatCancelDownload,
@@ -11,7 +11,7 @@ import {
 } from "../ipc";
 
 export interface ModelCard {
-  /** Modelo elegido, o `null` si aún no se ha leído el catálogo. */
+  /** Selected model, or `null` if the catalog has not been read yet. */
   selected(): ChatModel | null;
   refresh(): Promise<void>;
 }
@@ -118,7 +118,7 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     }
   });
 
-  // `confirm()` no siempre se muestra en la WebView de iOS: se confirma con un segundo toque.
+  // `confirm()` is not always shown in the iOS WebView, so deletion is confirmed with a second tap.
   let armed: number | null = null;
   remove.addEventListener("click", async () => {
     const model = selected();

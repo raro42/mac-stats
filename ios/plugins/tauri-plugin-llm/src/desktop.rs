@@ -13,7 +13,7 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
     Ok(Llm(PhantomData))
 }
 
-/// En escritorio no hay motor: todo devuelve `Unsupported` (sirve para `cargo test`).
+/// There is no engine on desktop: everything returns `Unsupported` (enough for `cargo test`).
 pub struct Llm<R: Runtime>(PhantomData<fn() -> R>);
 
 impl<R: Runtime> Llm<R> {

@@ -1,8 +1,8 @@
-// Plugin de Tauri que expone LlamaEngine a Rust (la web nunca lo llama directamente).
+// Tauri plugin that exposes LlamaEngine to Rust (the web layer never calls it directly).
 //
-// Tauri ejecuta todos los comandos de los plugins en una única cola en serie, así que
-// cada handler solo valida los argumentos y encola el trabajo en `queue`; `cancel` y
-// `status` responden al momento.
+// Tauri runs every plugin command on a single serial queue, so each handler only
+// validates its arguments and enqueues the work on `queue`; `cancel` and `status`
+// reply immediately.
 
 import SwiftRs
 import Tauri
@@ -66,7 +66,7 @@ class LlmPlugin: Plugin {
   override init() {
     super.init()
     let center = NotificationCenter.default
-    // Con poca memoria, iOS cierra la app: mejor soltar el modelo antes.
+    // When memory runs low, iOS kills the app: better to release the model first.
     center.addObserver(
       forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil
     ) { [weak self] _ in
@@ -74,7 +74,7 @@ class LlmPlugin: Plugin {
       self.engine.requestCancel()
       self.queue.async { self.engine.unload() }
     }
-    // Metal no puede trabajar en segundo plano: se corta la generación al salir.
+    // Metal cannot work in the background: generation stops when the app leaves the foreground.
     center.addObserver(
       forName: UIApplication.willResignActiveNotification, object: nil, queue: nil
     ) { [weak self] _ in
@@ -92,8 +92,8 @@ class LlmPlugin: Plugin {
     }
   }
 
-  /// Metal solo puede usar la GPU con la app en primer plano. Si se lanza desde el Mac
-  /// con el iPhone en la pantalla de bloqueo, la app arranca en segundo plano.
+  /// Metal can only use the GPU while the app is in the foreground. When launched from the
+  /// Mac with the iPhone on the lock screen, the app starts in the background.
   private func isActive() -> Bool {
     if Thread.isMainThread { return UIApplication.shared.applicationState == .active }
     return DispatchQueue.main.sync { UIApplication.shared.applicationState == .active }
@@ -158,7 +158,7 @@ class LlmPlugin: Plugin {
     invoke.resolve(["ok": true])
   }
 
-  /// Evita que la pantalla se bloquee (pruebas largas o generación en curso).
+  /// Keeps the screen from locking (long tests or a generation in progress).
   @objc public func keepAwake(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(KeepAwakeArgs.self)
     DispatchQueue.main.async {
@@ -193,7 +193,7 @@ extension LlmPlugin {
 
   @objc public func deleteModel(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(DeleteArgs.self)
-    // No se puede borrar el archivo que llama.cpp tiene mapeado en memoria.
+    // The file that llama.cpp has memory-mapped cannot be deleted.
     run(invoke) {
       if (self.engine.snapshot()["path"] as? String)?.hasSuffix("/\(args.file)") == true {
         self.engine.unload()
@@ -205,7 +205,7 @@ extension LlmPlugin {
 }
 
 extension LlmPlugin {
-  /// Solo depuración: simula eventos del sistema para el autodiagnóstico.
+  /// Debug only: simulates system events for the self-test.
   @objc public func debugSimulate(_ invoke: Invoke) throws {
     #if DEBUG
       let args = try invoke.parseArgs(SimulateArgs.self)
@@ -214,13 +214,13 @@ extension LlmPlugin {
       case "memoryWarning": name = UIApplication.didReceiveMemoryWarningNotification
       case "resignActive": name = UIApplication.willResignActiveNotification
       default:
-        invoke.reject("Evento desconocido: \(args.event)")
+        invoke.reject("Unknown event: \(args.event)")
         return
       }
       DispatchQueue.main.async { NotificationCenter.default.post(name: name, object: nil) }
       invoke.resolve(["ok": true])
     #else
-      invoke.reject("Solo disponible en builds de depuración.")
+      invoke.reject("Only available in debug builds.")
     #endif
   }
 }

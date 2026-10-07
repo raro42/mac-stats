@@ -34,19 +34,19 @@ const WINDOWS: Record<Range, { windowMs: number; stepMs: number }> = {
 const LIVE_POINTS = 300;
 const HOUR_REFRESH_MS = 15_000;
 
-/** Más alto es peor (CPU, RAM, disco). */
+/** Higher is worse (CPU, RAM, disk). */
 function levelUp(value: number, warn: number, crit: number): Level {
   return value >= crit ? "crit" : value >= warn ? "warn" : "ok";
 }
 
-/** Más bajo es peor (batería). */
+/** Lower is worse (battery). */
 function levelDown(value: number, warn: number, crit: number): Level {
   return value <= crit ? "crit" : value <= warn ? "warn" : "ok";
 }
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Falta el elemento #${id}`);
+  if (!el) throw new Error(`Missing element #${id}`);
   return el as T;
 }
 

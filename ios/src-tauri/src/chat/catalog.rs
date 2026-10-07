@@ -1,5 +1,5 @@
-//! Catálogo de modelos (ios/models/catalog.json): URL fijadas a un commit de Hugging
-//! Face, tamaño exacto y SHA-256 para verificar la descarga.
+//! Model catalog (ios/models/catalog.json): URLs pinned to a Hugging Face commit,
+//! exact size and SHA-256 to verify the download.
 
 use std::path::PathBuf;
 
@@ -28,7 +28,7 @@ impl CatalogEntry {
         models_dir().join(&self.file)
     }
 
-    /// Está en el iPhone con el tamaño exacto (la verificación SHA-256 se hizo al bajarlo).
+    /// It is on the iPhone with the exact size (the SHA-256 check ran when it was downloaded).
     pub fn installed(&self) -> bool {
         std::fs::metadata(self.path()).map(|m| m.len() == self.size).unwrap_or(false)
     }
@@ -36,15 +36,15 @@ impl CatalogEntry {
 
 pub fn catalog() -> Vec<CatalogEntry> {
     serde_json::from_str(include_str!("../../../models/catalog.json"))
-        .expect("models/catalog.json no es válido")
+        .expect("models/catalog.json is not valid")
 }
 
 pub fn find(id: &str) -> Option<CatalogEntry> {
     catalog().into_iter().find(|m| m.id == id)
 }
 
-/// `Library/Application Support/models/` del contenedor de la app (la misma carpeta
-/// que usa el `ModelStore` de Swift).
+/// `Library/Application Support/models/` in the app container (the same folder
+/// that Swift's `ModelStore` uses).
 pub fn models_dir() -> PathBuf {
     PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Library/Application Support/models")
 }

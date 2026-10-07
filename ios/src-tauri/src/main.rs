@@ -1,4 +1,4 @@
-// Evita la consola extra en Windows en release; en iOS no se usa este binario.
+// Prevents an extra console window on Windows in release; iOS does not use this binary.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {

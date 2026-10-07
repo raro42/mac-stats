@@ -59,7 +59,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Franja bajo la barra de estado: el contenido no se monta sobre la hora al desplazarse. */
+/* Band under the status bar so scrolled content does not run over the clock. */
 body::before {
   content: "";
   position: fixed;
@@ -86,7 +86,7 @@ body::before {
   display: none !important;
 }
 
-/* Cabecera */
+/* Header */
 .title-row {
   display: flex;
   align-items: center;
@@ -144,7 +144,7 @@ body::before {
   color: #111;
 }
 
-/* Anillos */
+/* Rings */
 .rings {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -250,7 +250,7 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-/* Tarjetas */
+/* Cards */
 .card {
   padding: 14px 16px;
   border: 1px solid var(--card-border);
@@ -361,7 +361,7 @@ body::before {
   text-align: center;
 }
 
-/* Barra de pestañas */
+/* Tab bar */
 .tabbar {
   position: fixed;
   right: 0;
@@ -405,7 +405,7 @@ body::before {
   color: var(--accent);
 }
 
-/* Laboratorio (fase A) */
+/* Lab (phase A) */
 .lab-select,
 .lab-prompt {
   width: 100%;
@@ -465,7 +465,7 @@ body::before {
   user-select: text;
 }
 
-/* Chat (fase B) */
+/* Chat (phase B) */
 .chat-view {
   padding-bottom: calc(env(safe-area-inset-bottom) + 150px);
 }
@@ -708,7 +708,7 @@ body::before {
   opacity: 0.4;
 }
 
-/* Progreso de la medición automática (depuración) */
+/* Automatic benchmark progress (debug only) */
 .bench-banner {
   position: fixed;
   top: calc(env(safe-area-inset-top) + 4px);

@@ -1,11 +1,11 @@
-//! Lecturas de Mach vía `libc`: CPU total, memoria del sistema y memoria de la app.
+//! Mach readings via `libc`: total CPU, system memory and app memory.
 //!
-//! Son APIs públicas de Darwin que funcionan igual en iOS y macOS (en macOS solo
-//! se usan para `cargo test`).
+//! These are public Darwin APIs that work the same on iOS and macOS (on macOS they
+//! are only used for `cargo test`).
 
 use std::mem::{offset_of, size_of, MaybeUninit};
 
-/// Ticks acumulados de todos los núcleos.
+/// Accumulated ticks of all cores.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CpuTicks {
     pub busy: u64,
@@ -13,8 +13,8 @@ pub struct CpuTicks {
 }
 
 impl CpuTicks {
-    /// Porcentaje de uso entre `prev` y `self`; `None` si los contadores no avanzaron
-    /// o retrocedieron (desbordamiento o reinicio).
+    /// Usage percentage between `prev` and `self`; `None` if the counters did not advance
+    /// or went backwards (overflow or reset).
     pub fn usage_since(&self, prev: &CpuTicks) -> Option<f32> {
         let total = self.total.checked_sub(prev.total)?;
         let busy = self.busy.checked_sub(prev.busy)?;
@@ -25,7 +25,7 @@ impl CpuTicks {
     }
 }
 
-#[allow(deprecated)] // libc recomienda `mach2`, pero no compensa otra dependencia por esto.
+#[allow(deprecated)] // libc recommends `mach2`, but another dependency is not worth it for this.
 fn task_self() -> libc::mach_port_t {
     unsafe { libc::mach_task_self() }
 }
@@ -35,7 +35,7 @@ fn host_self() -> libc::mach_port_t {
     unsafe { libc::mach_host_self() }
 }
 
-/// Suma de ticks (user, system, nice, idle) de todos los núcleos.
+/// Sum of ticks (user, system, nice, idle) across all cores.
 pub fn cpu_ticks() -> Option<CpuTicks> {
     let mut cpu_count: libc::natural_t = 0;
     let mut info: libc::processor_info_array_t = std::ptr::null_mut();
@@ -69,7 +69,7 @@ pub fn cpu_ticks() -> Option<CpuTicks> {
         ticks.total += user + system + nice + idle;
     }
 
-    // El kernel reserva el array en nuestro espacio de direcciones: hay que liberarlo.
+    // The kernel allocates the array in our address space: it must be freed.
     unsafe {
         libc::vm_deallocate(
             task_self(),
@@ -89,8 +89,8 @@ fn page_size() -> u64 {
     }
 }
 
-/// Memoria usada por el sistema, con el mismo criterio que Monitor de Actividad:
-/// memoria de apps (internal - purgeable) + cableada + comprimida.
+/// Memory used by the system, with the same criteria as Activity Monitor:
+/// app memory (internal - purgeable) + wired + compressed.
 pub fn system_memory_used() -> Option<u64> {
     let mut stats = MaybeUninit::<libc::vm_statistics64>::zeroed();
     let mut count = libc::HOST_VM_INFO64_COUNT;
@@ -111,7 +111,7 @@ pub fn system_memory_used() -> Option<u64> {
     Some(pages * page_size())
 }
 
-/// `struct task_vm_info` de `<mach/task_info.h>` hasta la revisión 2.
+/// `struct task_vm_info` from `<mach/task_info.h>` up to revision 2.
 #[repr(C)]
 #[derive(Default)]
 struct TaskVmInfo {
@@ -134,17 +134,17 @@ struct TaskVmInfo {
     compressed: u64,
     compressed_peak: u64,
     compressed_lifetime: u64,
-    // Revisión 1
+    // Revision 1
     phys_footprint: u64,
-    // Revisión 2
+    // Revision 2
     min_address: u64,
     max_address: u64,
 }
 
 const TASK_VM_INFO: libc::task_flavor_t = 22;
 
-/// Memoria que iOS le atribuye a esta app (`phys_footprint`, la que usa para
-/// decidir si la cierra). Si el kernel no rellena la revisión 1, usa la residente.
+/// Memory that iOS attributes to this app (`phys_footprint`, the value it uses to
+/// decide whether to kill it). If the kernel does not fill revision 1, uses the resident size.
 pub fn app_footprint() -> Option<u64> {
     let mut info = TaskVmInfo::default();
     let mut count = (size_of::<TaskVmInfo>() / size_of::<libc::natural_t>())
@@ -171,11 +171,11 @@ pub fn app_footprint() -> Option<u64> {
 
 #[cfg(target_os = "ios")]
 extern "C" {
-    /// `<os/proc.h>`: memoria que la app aún puede usar antes de que iOS la cierre.
+    /// `<os/proc.h>`: memory the app can still use before iOS kills it.
     fn os_proc_available_memory() -> libc::size_t;
 }
 
-/// Margen de memoria de la app. `None` fuera de iOS o en el simulador (devuelve 0).
+/// App memory headroom. `None` outside iOS or on the simulator (where it returns 0).
 pub fn app_available_memory() -> Option<u64> {
     #[cfg(target_os = "ios")]
     {
@@ -208,7 +208,7 @@ mod tests {
 
     #[test]
     fn task_vm_info_layout_matches_kernel_revision_2() {
-        // 42 natural_t = TASK_VM_INFO_REV2_COUNT en el SDK.
+        // 42 natural_t = TASK_VM_INFO_REV2_COUNT in the SDK.
         assert_eq!(size_of::<TaskVmInfo>() / size_of::<libc::natural_t>(), 42);
         assert_eq!(offset_of!(TaskVmInfo, phys_footprint), 144);
     }

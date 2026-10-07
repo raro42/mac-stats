@@ -295,10 +295,10 @@
       "type": "string",
       "oneOf": [
         {
-          "description": "El plugin no expone comandos a la web; solo lo usa el Rust de la app.",
+          "description": "The plugin exposes no commands to the web layer; only the app's Rust code uses it.",
           "type": "string",
           "const": "default",
-          "markdownDescription": "El plugin no expone comandos a la web; solo lo usa el Rust de la app."
+          "markdownDescription": "The plugin exposes no commands to the web layer; only the app's Rust code uses it."
         }
       ]
     }

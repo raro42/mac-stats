@@ -1,5 +1,5 @@
-// Rust admite una sola suscripción a las métricas (hay una sola ventana): este módulo
-// la comparte entre el monitor y el chat.
+// Rust supports a single metrics subscription (there is only one window): this module
+// shares it between the monitor and the chat.
 import { subscribeMetrics, type Snapshot } from "./ipc";
 
 type Listener = (snapshot: Snapshot) => void;
@@ -8,7 +8,7 @@ const listeners = new Set<Listener>();
 let latest: Snapshot | null = null;
 let subscription: Promise<void> | null = null;
 
-/** Registra `listener` y devuelve la última lectura disponible. */
+/** Registers `listener` and returns the latest available reading. */
 export async function onMetrics(listener: Listener): Promise<Snapshot | null> {
   listeners.add(listener);
   subscription ??= subscribeMetrics((snapshot) => {

@@ -1,6 +1,6 @@
-// Anillo de progreso. Adaptado de los `.ring-gauge` de los temas de la app de Mac
-// (src-tauri/dist/themes/*/cpu.html): mismo círculo de radio 42 en un viewBox de
-// 100, aquí como arco de 270° y sin estilos en línea (la CSP los bloquea).
+// Progress ring. Adapted from the `.ring-gauge` in the Mac app themes
+// (src-tauri/dist/themes/*/cpu.html): same radius-42 circle in a 100-unit viewBox,
+// drawn here as a 270° arc and without inline styles (the CSP blocks them).
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const RADIUS = 42;
@@ -65,12 +65,12 @@ export class RingGauge {
     this.root.setAttribute("aria-label", `${label}: sin datos`);
   }
 
-  /** `fraction` entre 0 y 1, o `null` si no hay dato. */
+  /** `fraction` between 0 and 1, or `null` when there is no data. */
   set(fraction: number | null, value: string, sub: string, level: Level = "ok"): void {
     const f = fraction == null ? 0 : Math.min(1, Math.max(0, fraction));
     this.progress.setAttribute("stroke-dasharray", `${ARC * f} ${CIRCUMFERENCE}`);
     this.root.dataset.level = fraction == null ? "none" : level;
-    this.root.dataset.empty = String(f === 0); // con 0 el extremo redondeado dibujaría un punto
+    this.root.dataset.empty = String(f === 0); // at 0 the round line cap would draw a dot
     this.valueEl.textContent = value;
     this.subEl.textContent = sub;
     this.root.setAttribute("aria-label", `${this.label}: ${value}${sub ? `, ${sub}` : ""}`);

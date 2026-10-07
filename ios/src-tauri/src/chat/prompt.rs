@@ -1,14 +1,14 @@
-//! Cómo se arma el prompt: persona, historial recortado, datos del iPhone y pregunta.
+//! How the prompt is built: persona, trimmed history, iPhone data and question.
 //!
-//! Los datos del iPhone van en un mensaje de sistema aparte, justo antes de la pregunta:
-//! en la prueba de la fase A, cuando iban dentro del mensaje del usuario, los modelos
-//! pequeños los copiaban en la respuesta. La idea de darle al modelo las métricas en
-//! vivo viene de `src-tauri/src/prompts/mod.rs` de la app de Mac.
+//! The iPhone data goes in a separate system message right before the question:
+//! in the phase A test, when it was inside the user message, the small models
+//! copied it into the reply. The idea of giving the model live metrics comes
+//! from `src-tauri/src/prompts/mod.rs` in the Mac app.
 //!
-//! El prompt de cada turno continúa exactamente el del anterior (los datos de cada
-//! pregunta se guardan con ella y el historial se recorta a saltos). Así el motor
-//! reutiliza lo ya procesado: Qwen3.5 y LFM2.5 son híbridos y solo pueden reutilizar
-//! un prefijo exacto; si cambia algo del principio, procesan todo otra vez.
+//! Each turn's prompt continues the previous one exactly (each question's data is
+//! saved with it and the history is trimmed in jumps). That way the engine reuses
+//! what it already processed: Qwen3.5 and LFM2.5 are hybrids and can only reuse
+//! an exact prefix; if anything at the start changes, they process everything again.
 
 use tauri_plugin_llm::ChatMessage;
 
@@ -16,7 +16,7 @@ use super::store::StoredMessage;
 use crate::metrics::apple::{BatteryState, Thermal};
 use crate::metrics::Snapshot;
 
-/// Persona reescrita a partir de `src-tauri/agent/soul.md` de la app de Mac, en es-MX.
+/// Persona rewritten from `src-tauri/agent/soul.md` in the Mac app, in es-MX.
 pub const PERSONA: &str = "Eres el asistente de iOS Stats, una app que vigila el estado de este iPhone. \
 Respondes en español de México, de forma breve, clara y amable. \
 Antes de cada pregunta recibes un mensaje de sistema con los datos actuales del iPhone: \
@@ -25,8 +25,8 @@ y nunca copies esa lista en tu respuesta. \
 Estados térmicos de iOS: normal (sin problema), templado (algo caliente), \
 caliente o «serio» (iOS baja el rendimiento para enfriarse) y crítico (muy caliente, conviene dejar de usarlo).";
 
-/// Caracteres de historial que caben con holgura en 4096 tokens junto a la persona,
-/// los datos del iPhone, la pregunta y hasta 512 tokens de respuesta.
+/// History characters that fit comfortably in 4096 tokens alongside the persona,
+/// the iPhone data, the question and up to 512 reply tokens.
 pub const HISTORY_BUDGET_CHARS: usize = 8_000;
 
 fn gb(bytes: u64) -> String {
@@ -43,7 +43,7 @@ fn thermal_es(t: Thermal) -> &'static str {
     }
 }
 
-/// Datos del iPhone en una línea.
+/// iPhone data on one line.
 pub fn device_note(s: &Snapshot) -> String {
     let mut parts = Vec::new();
     if let Some(cpu) = s.cpu {
@@ -77,8 +77,8 @@ pub fn device_note(s: &Snapshot) -> String {
     format!("Datos actuales de este iPhone: {}.", parts.join(", "))
 }
 
-/// Historial para el modelo: cada pregunta va precedida de los datos del iPhone que se
-/// le dieron en su momento, igual que cuando se generó la respuesta.
+/// History for the model: each question is preceded by the iPhone data it was given
+/// at the time, just as when the reply was generated.
 pub fn history(messages: &[StoredMessage]) -> Vec<ChatMessage> {
     let mut out = Vec::new();
     for m in messages {
@@ -90,9 +90,9 @@ pub fn history(messages: &[StoredMessage]) -> Vec<ChatMessage> {
     out
 }
 
-/// Persona + historial + datos del iPhone + pregunta. Si el historial pasa de
-/// `budget_chars`, se recorta por el principio a saltos de medio presupuesto, para que
-/// el inicio no cambie en cada turno. Nunca empieza con una respuesta.
+/// Persona + history + iPhone data + question. If the history exceeds
+/// `budget_chars`, it is trimmed from the start in jumps of half the budget, so that
+/// the start does not change on every turn. It never starts with a reply.
 pub fn build(history: &[ChatMessage], device: Option<&str>, question: &str, budget_chars: usize) -> Vec<ChatMessage> {
     let total: usize = history.iter().map(|m| m.content.len()).sum();
     let step = (budget_chars / 2).max(1);
@@ -167,12 +167,12 @@ mod tests {
             msg("user", &"c".repeat(50)),
             msg("assistant", &"d".repeat(50)),
         ];
-        // Sobran 40 caracteres: se quita medio presupuesto (80), es decir «a» y «b».
+        // 40 characters too many: half the budget (80) is dropped, i.e. `a` and `b`.
         let out = build(&history, None, "?", 160);
         let contents: Vec<_> = out[1..out.len() - 1].iter().map(|m| &m.content[..1]).collect();
         assert_eq!(contents, ["c", "d"]);
 
-        // Si el corte cae en una respuesta, también se salta.
+        // If the cut lands on a reply, that reply is skipped too.
         let history = vec![
             msg("user", &"a".repeat(100)),
             msg("assistant", &"b".repeat(10)),
@@ -190,11 +190,11 @@ mod tests {
             .map(|i| msg(if i % 2 == 0 { "user" } else { "assistant" }, &format!("{i:03}").repeat(33)))
             .collect();
         let first = |n: usize| build(&turns[..n], None, "?", 1_000)[1].content.clone();
-        // 10 mensajes de 99 caracteres caben enteros.
+        // 10 messages of 99 characters fit entirely.
         assert_eq!(first(10), turns[0].content);
-        // Del 11 al 15 sobra menos de medio presupuesto: se quitan 6 y el inicio no cambia.
+        // From 11 to 15 the overflow is under half the budget: 6 are dropped and the start stays the same.
         for n in 11..=15 {
-            assert_eq!(first(n), turns[6].content, "con {n} mensajes");
+            assert_eq!(first(n), turns[6].content, "with {n} messages");
         }
         assert_eq!(first(16), turns[12].content);
     }

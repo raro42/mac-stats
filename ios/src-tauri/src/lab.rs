@@ -1,9 +1,9 @@
-//! Laboratorio de modelos (fase A): cargar, medir y probar modelos locales en el iPhone.
+//! Model lab (phase A): load, benchmark and try local models on the iPhone.
 //!
-//! Además de los comandos para la tarjeta «Laboratorio», incluye un modo automático
-//! para builds de depuración: si la app arranca con `IOS_STATS_BENCH=<ids>|all`, mide
-//! cada modelo (carga, velocidad, memoria, temperatura y calidad en es-MX), imprime una
-//! línea `BENCH {json}` por evento y guarda el resultado en `Documents/`.
+//! Besides the commands for the «Laboratorio» card, it includes an automatic mode
+//! for debug builds: if the app starts with `IOS_STATS_BENCH=<ids>|all`, it measures
+//! each model (load, speed, memory, temperature and es-MX quality), prints one
+//! `BENCH {json}` line per event and saves the result in `Documents/`.
 
 use std::path::PathBuf;
 use std::sync::{
@@ -28,7 +28,7 @@ use crate::chat::prompt::{self, PERSONA};
 use crate::metrics::apple::Thermal;
 use crate::metrics::MetricsState;
 
-/// Persona, datos del iPhone y pregunta: el mismo prompt que usa el chat.
+/// Persona, iPhone data and question: the same prompt the chat uses.
 fn build_messages(metrics: &MetricsState, question: &str) -> Vec<ChatMessage> {
     let device = metrics.latest().map(|s| prompt::device_note(&s));
     prompt::build(&[], device.as_deref(), question, prompt::HISTORY_BUDGET_CHARS)
@@ -49,7 +49,7 @@ fn load_request(entry: &CatalogEntry, threads: u32) -> LoadRequest {
 }
 
 // ---------------------------------------------------------------------------
-// Comandos de la tarjeta «Laboratorio»
+// Commands for the «Laboratorio» card
 // ---------------------------------------------------------------------------
 
 #[derive(Serialize)]
@@ -118,7 +118,7 @@ pub async fn lab_cancel(app: AppHandle) -> Result<(), String> {
 }
 
 // ---------------------------------------------------------------------------
-// Medición automática (IOS_STATS_BENCH)
+// Automatic benchmark (IOS_STATS_BENCH)
 // ---------------------------------------------------------------------------
 
 const QUALITY_PROMPTS: [&str; 10] = [
@@ -136,8 +136,8 @@ const QUALITY_PROMPTS: [&str; 10] = [
 
 const SOAK_PROMPT: &str = "Cuéntame una historia larga sobre un viaje en tren por la sierra de México, con muchos detalles.";
 
-/// Cada evento va a la consola, a `Documents/llm-bench-progress.jsonl` (para leerlo
-/// desde el Mac con devicectl aunque la consola no llegue) y a la web como aviso.
+/// Each event goes to the console, to `Documents/llm-bench-progress.jsonl` (so the Mac
+/// can read it with devicectl even when console output is lost) and to the web UI as a banner.
 fn bench_log(value: Value) {
     println!("BENCH {value}");
     let path = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents/llm-bench-progress.jsonl");
@@ -158,7 +158,7 @@ fn env_u64(name: &str, default: u64) -> u64 {
     std::env::var(name).ok().and_then(|v| v.parse().ok()).unwrap_or(default)
 }
 
-/// Pico de memoria y estados térmicos mientras el modelo está cargado (lectura cada 0.5 s).
+/// Peak memory and thermal states while the model is loaded (sampled every 0.5 s).
 #[derive(Default, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 struct Peaks {
@@ -201,7 +201,7 @@ fn watch_peaks(metrics: MetricsState, stop: Arc<AtomicBool>) -> Arc<Mutex<Peaks>
     out
 }
 
-/// Genera y devuelve el texto completo, el tiempo hasta el primer fragmento y el resultado.
+/// Generates and returns the full text, the time to the first chunk and the result.
 async fn generate_collect(
     app: &AppHandle,
     messages: Vec<ChatMessage>,
@@ -266,7 +266,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
         report["model"] = json!({ "description": cold.description, "params": cold.n_params, "bytes": cold.size_bytes, "gpu": cold.gpu });
         bench_log(json!({ "event": "loaded", "id": entry.id, "info": cold }));
 
-        // Primera generación: incluye compilar los shaders de Metal.
+        // First generation: includes compiling the Metal shaders.
         let warmup = vec![
             ChatMessage { role: "system".into(), content: PERSONA.into() },
             ChatMessage { role: "user".into(), content: "Hola".into() },
@@ -283,7 +283,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
         bench_log(json!({ "event": "bench", "id": entry.id, "bench": bench }));
         report["bench"] = json!(bench);
 
-        // Calidad: respuestas deterministas (temperatura 0) a 10 preguntas en es-MX.
+        // Quality: deterministic answers (temperature 0) to 10 questions in es-MX.
         let mut quality = Vec::new();
         for (i, prompt) in QUALITY_PROMPTS.iter().enumerate() {
             let messages = build_messages(metrics, prompt);
@@ -294,7 +294,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
         }
         report["quality"] = json!(quality);
 
-        // Prueba sostenida: generar sin parar durante `soak_secs`.
+        // Soak test: generate nonstop for `soak_secs`.
         let soak_start = Instant::now();
         let mut soak = Vec::new();
         let mut seed = 100;
@@ -323,7 +323,7 @@ async fn bench_model(app: &AppHandle, metrics: &MetricsState, entry: &CatalogEnt
         report["soak"] = json!(soak);
         llm.unload().await.map_err(|e| e.to_string())?;
 
-        // Estabilidad: tres ciclos de carga y descarga.
+        // Stability: three load/unload cycles.
         let mut cycles = 0;
         for _ in 0..3 {
             llm.load(request.clone()).await.map_err(|e| e.to_string())?;
@@ -355,7 +355,7 @@ pub async fn auto_bench(app: AppHandle, spec: String) {
         .collect();
     let metrics = app.state::<MetricsState>().inner().clone();
 
-    // Espera a que el monitor tenga lecturas (la CPU necesita dos ticks).
+    // Wait until the monitor has readings (CPU usage needs two ticks).
     for _ in 0..20 {
         if metrics.latest().is_some_and(|s| s.cpu.is_some()) {
             break;
@@ -365,7 +365,7 @@ pub async fn auto_bench(app: AppHandle, spec: String) {
     bench_log(json!({ "event": "start", "models": models.iter().map(|m| &m.id).collect::<Vec<_>>(), "soakSecs": soak_secs, "threads": threads }));
     let _ = app.llm().keep_awake(true).await;
 
-    // Se guarda después de cada modelo para no perder resultados si la prueba se corta.
+    // Saved after each model so no results are lost if the run is cut short.
     let path = PathBuf::from(std::env::var("HOME").unwrap_or_default()).join("Documents/llm-bench.json");
     let mut reports = Vec::new();
     for entry in &models {

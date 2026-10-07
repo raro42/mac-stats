@@ -35,7 +35,7 @@ window.addEventListener("DOMContentLoaded", () => {
         banner.hidden = false;
       }
     });
-  // El laboratorio de modelos solo aparece en builds de depuración.
+  // The model lab only shows up in debug builds.
   void debugBuild().then((debug) => {
     if (!debug) return;
     const lab = document.getElementById("lab-details");

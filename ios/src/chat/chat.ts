@@ -1,4 +1,4 @@
-// Pestaña Chat: conversación con el modelo que corre dentro del iPhone.
+// Chat tab: conversation with the model running on the iPhone itself.
 import {
   chatCancel,
   chatDelete,
@@ -14,7 +14,7 @@ import { createModelCard } from "./model-card";
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Falta el elemento #${id}`);
+  if (!el) throw new Error(`Missing element #${id}`);
   return el as T;
 }
 

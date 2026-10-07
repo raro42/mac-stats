@@ -1,6 +1,6 @@
-// Gráfica de línea sobre <canvas>. Adaptada de src/chart-line.js de la app de Mac,
-// que dependía de IDs fijos y de globales de `window`; aquí es una clase
-// reutilizable que ubica los puntos por tiempo y corta la línea en los huecos.
+// Line chart on a <canvas>. Adapted from src/chart-line.js in the Mac app, which
+// relied on fixed IDs and `window` globals; here it is a reusable class that places
+// points by time and breaks the line at gaps.
 
 export interface Sample {
   ts: number;
@@ -23,7 +23,7 @@ export class LineChart {
     new ResizeObserver(() => this.draw()).observe(canvas);
   }
 
-  /** Ventana visible y separación esperada entre puntos (para detectar huecos). */
+  /** Visible window and expected spacing between points (used to detect gaps). */
   setWindow(windowMs: number, stepMs: number): void {
     this.windowMs = windowMs;
     this.stepMs = stepMs;

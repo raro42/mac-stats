@@ -1,4 +1,4 @@
-// Tarjeta «Laboratorio»: prueba manual de los modelos locales (fase A).
+// "Lab" card: manual testing of the local models (phase A).
 import { bytes } from "../format";
 import {
   labBench,
@@ -12,7 +12,7 @@ import {
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Falta el elemento #${id}`);
+  if (!el) throw new Error(`Missing element #${id}`);
   return el as T;
 }
 

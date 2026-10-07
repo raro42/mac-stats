@@ -1,4 +1,4 @@
-// Formatos en es-MX (punto decimal, como en México).
+// es-MX number formats (decimal point, as used in Mexico).
 const oneDecimal = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 1 });
 const noDecimals = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 });
 

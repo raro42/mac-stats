@@ -2,7 +2,7 @@
 name = "tauri-plugin-llm"
 version = "0.1.0"
 authors = ["gilberto"]
-description = "LLM local en el iPhone con llama.cpp para iOS Stats"
+description = "On-device LLM on the iPhone with llama.cpp for iOS Stats"
 license = "MIT"
 edition = "2021"
 rust-version = "1.90"

@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# iOS Stats: binarios grandes que se descargan con scripts (no van al repo)
+# iOS Stats: large binaries fetched by scripts (not committed)
 vendor/llama.xcframework/
 vendor/llama.cpp/
 vendor/*.zip

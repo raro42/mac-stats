@@ -48,7 +48,7 @@ pub struct ChatMessage {
     pub content: String,
 }
 
-/// Petición de generación. Swift envía `{type: "delta", text}` por `on_event`.
+/// Generation request. Swift sends `{type: "delta", text}` through `on_event`.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GenerateRequest {
@@ -81,12 +81,12 @@ pub struct EngineStatus {
     pub path: Option<String>,
     pub busy: bool,
     pub available_memory: u64,
-    /// La app está en primer plano (sin eso Metal no puede usar la GPU).
+    /// The app is in the foreground (otherwise Metal cannot use the GPU).
     pub active: bool,
 }
 
-/// Descarga verificada de un modelo. Swift envía por `on_event`
-/// `{type: "progress", received, total}` y `{type: "verifying"}`.
+/// Verified model download. Swift sends `{type: "progress", received, total}`
+/// and `{type: "verifying"}` through `on_event`.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadRequest {

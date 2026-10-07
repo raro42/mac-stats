@@ -1,10 +1,10 @@
-//! Bucle de muestreo: CPU, RAM, red y estado térmico cada segundo; batería cada
-//! 30 s y almacenamiento cada 60 s.
+//! Sampling loop: CPU, RAM, network and thermal state every second; battery every
+//! 30 s and storage every 60 s.
 //!
-//! iOS congela la app en segundo plano, así que el bucle solo corre en primer
-//! plano. Al volver, si pasaron más de `GAP` desde el último tick, se marca un
-//! hueco y se rehace la línea base de CPU y red; si no, la primera lectura
-//! promediaría todo el tiempo que la app estuvo congelada.
+//! iOS freezes the app in the background, so the loop only runs in the
+//! foreground. On return, if more than `GAP` has passed since the last tick, a gap
+//! is marked and the CPU and network baselines are reset; otherwise the first
+//! reading would average over all the time the app was frozen.
 
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -33,7 +33,7 @@ fn due(last: Option<Instant>, every: Duration, now: Instant) -> bool {
     last.is_none_or(|t| now.duration_since(t) >= every)
 }
 
-/// `UIDevice` solo se puede usar en el hilo principal.
+/// `UIDevice` can only be used on the main thread.
 #[cfg(target_os = "ios")]
 async fn read_battery(app: &AppHandle) -> Option<Battery> {
     let (tx, rx) = tokio::sync::oneshot::channel();
@@ -52,8 +52,8 @@ async fn read_battery(_app: &AppHandle) -> Option<Battery> {
     None
 }
 
-/// En depuración, `IOS_STATS_FAKE_THERMAL=serious|critical` fuerza el estado térmico
-/// para probar los avisos del chat sin calentar el iPhone.
+/// In debug builds, `IOS_STATS_FAKE_THERMAL=serious|critical` forces the thermal state
+/// to test the chat warnings without heating up the iPhone.
 fn thermal() -> apple::Thermal {
     if cfg!(debug_assertions) {
         match std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() {

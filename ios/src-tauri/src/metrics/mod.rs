@@ -1,5 +1,5 @@
-//! Monitor del iPhone: un muestreador en Rust que envía cada lectura al frontend
-//! por un `Channel` de Tauri y guarda el historial para las gráficas.
+//! iPhone monitor: a Rust sampler that sends each reading to the frontend
+//! through a Tauri `Channel` and keeps the history for the charts.
 
 pub mod apple;
 pub mod history;
@@ -15,21 +15,21 @@ use tauri::{ipc::Channel, AppHandle, Manager, State};
 use apple::{Battery, Storage, Thermal};
 use history::{History, Point};
 
-/// Una lectura completa del dispositivo.
+/// A complete device reading.
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Snapshot {
-    /// Milisegundos desde la época Unix.
+    /// Milliseconds since the Unix epoch.
     pub ts: i64,
-    /// Uso total de CPU en %; `None` en el primer tick o justo después de un hueco.
+    /// Total CPU usage in %; `None` on the first tick or right after a gap.
     pub cpu: Option<f32>,
     pub ram_used: Option<u64>,
     pub ram_total: u64,
-    /// Memoria que iOS atribuye a esta app.
+    /// Memory that iOS attributes to this app.
     pub app_footprint: Option<u64>,
-    /// Margen antes de que iOS cierre la app (solo en un iPhone real).
+    /// Headroom before iOS kills the app (only on a real iPhone).
     pub app_available: Option<u64>,
-    /// Bytes por segundo.
+    /// Bytes per second.
     pub net_down: Option<f64>,
     pub net_up: Option<f64>,
     pub battery: Option<Battery>,
@@ -64,21 +64,21 @@ impl MetricsState {
         self.0.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
-    /// Última lectura completa (la usa el chat para darle contexto al modelo).
+    /// Latest complete reading (the chat uses it to give the model context).
     pub fn latest(&self) -> Option<Snapshot> {
         self.lock().latest.clone()
     }
 }
 
-/// Registra el estado compartido y arranca el muestreo.
+/// Registers the shared state and starts sampling.
 pub fn init(app: &AppHandle) {
     let state = MetricsState::default();
     app.manage(state.clone());
     tauri::async_runtime::spawn(sampler::run(app.clone(), state));
 }
 
-/// Suscribe la vista a las lecturas y devuelve la última, si existe.
-/// Hay una sola ventana, así que la suscripción nueva sustituye a la anterior.
+/// Subscribes the view to readings and returns the latest one, if any.
+/// There is a single window, so a new subscription replaces the previous one.
 #[tauri::command]
 pub fn metrics_subscribe(
     state: State<'_, MetricsState>,
@@ -89,7 +89,7 @@ pub fn metrics_subscribe(
     inner.latest.clone()
 }
 
-/// Historial para las gráficas: `"5m"` (segundos) o `"1h"` (minutos).
+/// History for the charts: `"5m"` (seconds) or `"1h"` (minutes).
 #[tauri::command]
 pub fn metrics_history(state: State<'_, MetricsState>, range: String) -> Vec<Point> {
     let inner = state.lock();

@@ -1,6 +1,6 @@
 ## Default Permission
 
-El plugin no expone comandos a la web; solo lo usa el Rust de la app.
+The plugin exposes no commands to the web layer; only the app's Rust code uses it.
 
 ## Permission Table
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Compila llama.xcframework (iPhone + simulador) desde una etiqueta fijada de llama.cpp.
-# El XCFramework de las releases oficiales solo incluye ios-device y macos, así que
-# el simulador no podría enlazarlo.
+# Builds llama.xcframework (iPhone + simulator) from a pinned llama.cpp tag.
+# The XCFramework in the official releases only includes ios-device and macos, so
+# the simulator could not link against it.
 set -euo pipefail
 
 TAG="b11321"
@@ -10,14 +10,14 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/vendor/llama.cpp"
 OUT="$ROOT/vendor/llama.xcframework"
 
-command -v cmake >/dev/null || { echo "Falta cmake: brew install cmake" >&2; exit 1; }
+command -v cmake >/dev/null || { echo "cmake is missing: brew install cmake" >&2; exit 1; }
 
 if [ ! -d "$SRC/.git" ]; then
   git clone --quiet --depth 1 --branch "$TAG" https://github.com/ggml-org/llama.cpp.git "$SRC"
 fi
 actual="$(git -C "$SRC" rev-parse HEAD)"
 if [ "$actual" != "$COMMIT" ]; then
-  echo "El commit de $TAG no coincide: $actual (esperado $COMMIT)" >&2
+  echo "Commit mismatch for $TAG: $actual (expected $COMMIT)" >&2
   exit 1
 fi
 
@@ -26,12 +26,12 @@ fi
 rm -rf "$OUT"
 cp -R "$SRC/build-apple/llama.xcframework" "$OUT"
 
-# llama.framework es dinámico y no trae manifiesto de privacidad; App Store Connect
-# exige uno dentro de cada framework que use APIs con motivo declarado (fstat).
+# llama.framework is dynamic and ships without a privacy manifest; App Store Connect
+# requires one inside every framework that uses required-reason APIs (fstat).
 for fw in "$OUT"/*/llama.framework; do
   cp "$ROOT/vendor/PrivacyInfo.llama.xcprivacy" "$fw/PrivacyInfo.xcprivacy"
 done
 
 printf 'tag=%s\ncommit=%s\n' "$TAG" "$COMMIT" > "$ROOT/vendor/llama.lock"
-echo "Listo: $OUT"
+echo "Done: $OUT"
 ls "$OUT"

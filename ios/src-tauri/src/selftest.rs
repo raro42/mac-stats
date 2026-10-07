@@ -1,21 +1,21 @@
-//! Autodiagnóstico del chat (fase B), solo en builds de depuración.
+//! Chat self-test (phase B), debug builds only.
 //!
-//! Con `IOS_STATS_SELFTEST=1` la app comprueba en el propio iPhone los criterios de la
-//! fase B y guarda el resultado en `Documents/selftest.json` (y `selftest.done` al
-//! terminar):
-//! - carga del modelo elegido y chat de varios turnos guardado en disco, en el que cada
-//!   turno reutiliza lo que el motor ya procesó en el anterior;
-//! - «Detener» corta la respuesta en menos de 300 ms;
-//! - salir a segundo plano cancela la generación;
-//! - tras un aviso de memoria el modelo se suelta y se vuelve a cargar al preguntar;
-//! - con `IOS_STATS_FAKE_THERMAL=critical`, el chat se niega a generar (en ese modo es la
-//!   única prueba, porque nada más puede generar);
-//! - deja una conversación con HTML malicioso para comprobar a ojo que no se ejecuta;
-//! - una descarga con SHA-256 incorrecto se rechaza y no deja el archivo;
-//! - con `IOS_STATS_SELFTEST_DOWNLOAD=<id>`, descarga ese modelo de verdad (con progreso).
+//! With `IOS_STATS_SELFTEST=1` the app checks the phase B criteria on the iPhone itself
+//! and saves the result in `Documents/selftest.json` (and `selftest.done` when it
+//! finishes):
+//! - loading the selected model and a multi-turn chat saved to disk, where each
+//!   turn reuses what the engine already processed in the previous one;
+//! - «Detener» stops the reply in under 300 ms;
+//! - going to the background cancels generation;
+//! - after a memory warning the model is released and reloaded on the next question;
+//! - with `IOS_STATS_FAKE_THERMAL=critical`, the chat refuses to generate (in that mode it
+//!   is the only test, because nothing else can generate);
+//! - leaves a conversation with malicious HTML to check by eye that it does not run;
+//! - a download with a wrong SHA-256 is rejected and leaves no file behind;
+//! - with `IOS_STATS_SELFTEST_DOWNLOAD=<id>`, really downloads that model (with progress).
 //!
-//! Mantiene la pantalla encendida mientras corre y al final borra las conversaciones de
-//! prueba, salvo la del HTML malicioso.
+//! Keeps the screen on while it runs and at the end deletes the test conversations,
+//! except the malicious HTML one.
 
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
@@ -42,8 +42,8 @@ fn log(value: &Value) {
     println!("SELFTEST {value}");
 }
 
-/// Lanza una respuesta larga en segundo plano y la interrumpe con `interrupt` a los 3 s.
-/// Devuelve el resultado y cuánto tardó en cortar desde la interrupción.
+/// Starts a long reply in the background and interrupts it with `interrupt` after 3 s.
+/// Returns the result and how long it took to stop after the interruption.
 async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<SendResult, String>, Duration) {
     let handle = app.clone();
     let task = tauri::async_runtime::spawn(async move {
@@ -92,28 +92,28 @@ pub async fn run(app: AppHandle) {
         results.push(item);
     };
 
-    // Estado térmico crítico forzado: el chat debe negarse a generar.
+    // Forced critical thermal state: the chat must refuse to generate.
     if std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() == Ok("critical") {
         let refused = chat::send(&app, &state, &metrics, None, "Hola", quiet()).await;
         record(
-            "termico_critico",
+            "thermal_critical",
             refused.as_ref().is_err_and(|e| e.contains("caliente")),
-            json!({ "resultado": refused.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
+            json!({ "result": refused.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
         );
         finish(&app, results).await;
         return;
     }
 
-    // Conversaciones que se borran al terminar.
+    // Conversations deleted at the end.
     let mut created = Vec::new();
 
-    // 1. Carga del modelo elegido.
+    // 1. Load the selected model.
     let entry = state.selected();
     let start = Instant::now();
     let loaded = chat::ensure_loaded(&app, &state, &entry).await;
-    record("carga", loaded.is_ok(), json!({ "modelo": entry.id, "ms": start.elapsed().as_millis(), "error": loaded.err() }));
+    record("load", loaded.is_ok(), json!({ "model": entry.id, "ms": start.elapsed().as_millis(), "error": loaded.err() }));
 
-    // 2. Chat de varios turnos guardado en disco.
+    // 2. Multi-turn chat saved to disk.
     let questions = ["Hola, ¿qué puedes hacer?", "¿Y cómo va mi batería?", "Resume en una frase lo que me dijiste."];
     let mut conversation_id = None;
     let mut answers = Vec::new();
@@ -124,12 +124,12 @@ pub async fn run(app: AppHandle) {
             Ok(r) => {
                 reused.push(r.n_cached);
                 answers.push(json!({
-                    "pregunta": q,
+                    "question": q,
                     "tokensPrompt": r.n_prompt,
-                    "reutilizados": r.n_cached,
+                    "reused": r.n_cached,
                     "promptMs": r.prompt_ms.round(),
                     "tgTps": r.tg_tps,
-                    "fin": r.stop_reason,
+                    "stop": r.stop_reason,
                 }));
                 conversation_id = Some(r.conversation_id);
             }
@@ -144,46 +144,46 @@ pub async fn run(app: AppHandle) {
         .flat_map(|c| c.messages.iter().filter(|m| m.role == "assistant").map(|m| m.content.clone()))
         .collect();
     record(
-        "chat_multiturno",
+        "multi_turn_chat",
         errors.is_empty() && messages == 6 && replies.iter().all(|r| !r.trim().is_empty()),
-        json!({ "mensajesGuardados": messages, "respuestas": replies, "turnos": answers, "errores": errors }),
+        json!({ "savedMessages": messages, "replies": replies, "turns": answers, "errors": errors }),
     );
-    // Los turnos 2 y 3 continúan el prompt anterior: el motor no debe procesarlo entero.
+    // Turns 2 and 3 continue the previous prompt: the engine must not reprocess all of it.
     record(
-        "reutiliza_memoria",
+        "reuses_cache",
         reused.len() == 3 && reused[1..].iter().all(|&n| n > 0),
-        json!({ "reutilizadosPorTurno": reused }),
+        json!({ "reusedPerTurn": reused }),
     );
 
-    // 3. «Detener».
+    // 3. «Detener» (stop button).
     let (reply, latency) = interrupted(&app, "cancel").await;
     created.extend(reply.as_ref().ok().map(|r| r.conversation_id.clone()));
     let stop = reply.map(|r| r.stop_reason);
     record(
-        "detener",
+        "stop",
         stop.as_deref() == Ok("cancelled") && latency < Duration::from_millis(300),
-        json!({ "fin": stop, "ms": latency.as_millis() }),
+        json!({ "stop": stop, "ms": latency.as_millis() }),
     );
 
-    // 4. Salir a segundo plano.
+    // 4. Going to the background.
     let (reply, latency) = interrupted(&app, "resignActive").await;
     created.extend(reply.as_ref().ok().map(|r| r.conversation_id.clone()));
     let stop = reply.map(|r| r.stop_reason);
-    record("segundo_plano", stop.as_deref() == Ok("cancelled"), json!({ "fin": stop, "ms": latency.as_millis() }));
+    record("background", stop.as_deref() == Ok("cancelled"), json!({ "stop": stop, "ms": latency.as_millis() }));
 
-    // 5. Aviso de memoria: se suelta el modelo y la siguiente pregunta lo recarga.
+    // 5. Memory warning: the model is released and the next question reloads it.
     let _ = app.llm().debug_simulate("memoryWarning").await;
     tokio::time::sleep(Duration::from_millis(1500)).await;
     let released = app.llm().status().await.map(|s| !s.loaded).unwrap_or(false);
     let again = chat::send(&app, &state, &metrics, None, "¿Sigues ahí?", quiet()).await;
     created.extend(again.as_ref().ok().map(|r| r.conversation_id.clone()));
     record(
-        "aviso_memoria",
+        "memory_warning",
         released && again.is_ok(),
-        json!({ "modeloSoltado": released, "respondeDespues": again.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
+        json!({ "modelReleased": released, "repliesAfter": again.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
     );
 
-    // 6. Descarga con SHA-256 incorrecto: se rechaza y no queda el archivo.
+    // 6. Download with a wrong SHA-256: rejected and no file is left behind.
     let bad_file = "selftest-bad-sha.bin";
     let bad = app
         .llm()
@@ -198,12 +198,12 @@ pub async fn run(app: AppHandle) {
         .await;
     let leftover = catalog::models_dir().join(bad_file).exists();
     record(
-        "descarga_sha_incorrecto",
+        "download_wrong_sha",
         bad.as_ref().is_err_and(|e| e.to_string().contains("SHA-256")) && !leftover,
-        json!({ "resultado": bad.as_ref().map_err(|e| e.to_string()), "archivoQueda": leftover }),
+        json!({ "result": bad.as_ref().map_err(|e| e.to_string()), "fileLeftBehind": leftover }),
     );
 
-    // 7. Descarga real de un modelo del catálogo (opcional).
+    // 7. Real download of a catalog model (optional).
     if let Ok(id) = std::env::var("IOS_STATS_SELFTEST_DOWNLOAD") {
         if let Some(entry) = catalog::find(&id) {
             let events = std::sync::Arc::new(std::sync::atomic::AtomicU32::new(0));
@@ -226,20 +226,20 @@ pub async fn run(app: AppHandle) {
                 .await;
             let secs = start.elapsed().as_secs_f64();
             record(
-                "descarga_real",
+                "real_download",
                 result.is_ok() && entry.installed(),
                 json!({
-                    "modelo": id,
-                    "segundos": secs.round(),
+                    "model": id,
+                    "seconds": secs.round(),
                     "MBps": (entry.size as f64 / 1_048_576.0 / secs * 10.0).round() / 10.0,
-                    "eventosProgreso": events.load(std::sync::atomic::Ordering::Relaxed),
+                    "progressEvents": events.load(std::sync::atomic::Ordering::Relaxed),
                     "error": result.err().map(|e| e.to_string()),
                 }),
             );
         }
     }
 
-    // 8. Conversación con HTML malicioso, para revisar a ojo que se muestra como texto.
+    // 8. Conversation with malicious HTML, to check by eye that it is shown as text.
     let now = chat::now_ms();
     let mut xss = Conversation::new(chat::new_id(), now);
     xss.title = "Prueba de HTML malicioso".into();
@@ -261,7 +261,7 @@ pub async fn run(app: AppHandle) {
         stats: None,
     });
     let saved = state.store.save(&xss);
-    record("xss_guardada", saved.is_ok(), json!({ "id": xss.id }));
+    record("xss_saved", saved.is_ok(), json!({ "id": xss.id }));
 
     for id in &created {
         let _ = state.store.delete(id);

@@ -1,92 +1,92 @@
 # iOS Stats
 
-App de iPhone derivada de [mac-stats](../README.md), con dos partes:
+iPhone app derived from [mac-stats](../README.md), with two parts:
 
-- **Monitor:** CPU, RAM, memoria de la app, espacio, batería, estado térmico, modo de bajo consumo, red e historial de 5 min / 1 h.
-- **Chat con IA local:** un modelo de lenguaje pequeño que corre **dentro del iPhone** con [llama.cpp](https://github.com/ggml-org/llama.cpp), sin servidor ni conexión. Ollama no funciona en iOS; llama.cpp es el motor en el que se basa y usa los mismos modelos GGUF.
+- **Monitor:** CPU, RAM, app memory, storage, battery, thermal state, Low Power Mode, network, and 5 min / 1 h history.
+- **Local AI chat:** a small language model that runs **on the iPhone itself** with [llama.cpp](https://github.com/ggml-org/llama.cpp), with no server and no network connection. Ollama does not run on iOS; llama.cpp is the engine Ollama is built on, and it uses the same GGUF models.
 
-Es un proyecto Tauri 2 independiente dentro del repo: no toca la app de Mac.
+It is a standalone Tauri 2 project inside the repo: it does not touch the Mac app.
 
-## Estructura
+## Layout
 
-| Ruta | Qué hay |
+| Path | Contents |
 |---|---|
-| `src/` | Interfaz (Vite + TypeScript, sin framework): monitor, chat y laboratorio |
-| `src-tauri/src/metrics/` | Lecturas del iPhone en Rust (Mach, Foundation, UIKit, `getifaddrs`) |
-| `src-tauri/src/chat/` | Catálogo de modelos, prompt, conversaciones y comandos del chat |
-| `src-tauri/src/lab.rs`, `selftest.rs` | Laboratorio, medición automática y autodiagnóstico (depuración) |
-| `plugins/tauri-plugin-llm/` | Plugin de Tauri: `LlamaEngine.swift` (llama.cpp), `ModelStore.swift` (descargas) |
-| `models/catalog.json` | Modelos disponibles, fijados a un commit de Hugging Face con su SHA-256 |
-| `scripts/` | `build-llama.sh` (compila llama.cpp) y `fetch-models.sh` (descarga modelos en el Mac) |
-| `vendor/` | `llama.xcframework` compilado y su manifiesto de privacidad (el framework no va a git) |
+| `src/` | UI (Vite + TypeScript, no framework): monitor, chat and lab |
+| `src-tauri/src/metrics/` | iPhone readings in Rust (Mach, Foundation, UIKit, `getifaddrs`) |
+| `src-tauri/src/chat/` | Model catalog, prompt, conversations and chat commands |
+| `src-tauri/src/lab.rs`, `selftest.rs` | Lab, automatic benchmark and self-test (debug) |
+| `plugins/tauri-plugin-llm/` | Tauri plugin: `LlamaEngine.swift` (llama.cpp), `ModelStore.swift` (downloads) |
+| `models/catalog.json` | Available models, pinned to a Hugging Face commit with their SHA-256 |
+| `scripts/` | `build-llama.sh` (builds llama.cpp) and `fetch-models.sh` (downloads models on the Mac) |
+| `vendor/` | Built `llama.xcframework` and its privacy manifest (the framework is not committed to git) |
 
-## Requisitos
+## Requirements
 
-- macOS con Xcode 26 y una cuenta de desarrollador iniciada en Xcode (*Ajustes → Cuentas*).
-- Rust con los targets de iOS: `rustup target add aarch64-apple-ios aarch64-apple-ios-sim`.
-- `brew install xcodegen cmake` y pnpm.
+- macOS with Xcode 26 and a developer account signed in to Xcode (*Settings → Accounts*).
+- Rust with the iOS targets: `rustup target add aarch64-apple-ios aarch64-apple-ios-sim`.
+- `brew install xcodegen cmake` and pnpm.
 
-## Preparación
+## Setup
 
 ```bash
 pnpm install
-./scripts/build-llama.sh          # llama.cpp b11321 para iPhone y simulador (~15 min la primera vez)
-pnpm tauri ios init               # solo si falta src-tauri/gen/apple
+./scripts/build-llama.sh          # llama.cpp b11321 for iPhone and simulator (~15 min the first time)
+pnpm tauri ios init               # only if src-tauri/gen/apple is missing
 ```
 
-`tauri ios init` reescribe el archivo de entitlements; el `build.rs` del plugin vuelve a añadir `increased-memory-limit` en cada build.
+`tauri ios init` rewrites the entitlements file; the plugin's `build.rs` adds `increased-memory-limit` back on every build.
 
-## Ejecutar
+## Run
 
 ```bash
-# Simulador (el modelo corre en CPU)
+# Simulator (the model runs on the CPU)
 pnpm tauri ios build --debug --target aarch64-sim
 xcrun simctl install booted "src-tauri/gen/apple/build/arm64-sim/iOS Stats.app"
 xcrun simctl launch booted com.gilberto.iosstats
 
-# iPhone conectado por cable (GPU con Metal)
+# iPhone connected by cable (GPU with Metal)
 pnpm tauri ios build --debug --export-method debugging
 xcrun devicectl device install app --device <id> "src-tauri/gen/apple/build/arm64/iOS Stats.ipa"
 xcrun devicectl device process launch --device <id> --terminate-existing com.gilberto.iosstats
 ```
 
-Compila siempre desde la Terminal: las builds lanzadas desde la interfaz de Xcode no encuentran Node ni pnpm.
+Always build from Terminal: builds started from the Xcode UI cannot find Node or pnpm.
 
-## Modelos
+## Models
 
-La forma normal es descargarlos desde la app (pestaña Chat): solo por Wi‑Fi por defecto, con reanudación y verificación SHA-256. Para pruebas también se pueden bajar en el Mac (`./scripts/fetch-models.sh`) y copiarlos al iPhone, aunque `devicectl` copia a ~1 MB/s:
+The normal way is to download them from the app (Chat tab): Wi‑Fi only by default, with resume and SHA-256 verification. For testing you can also download them on the Mac (`./scripts/fetch-models.sh`) and copy them to the iPhone, although `devicectl` copies at ~1 MB/s:
 
 ```bash
 xcrun devicectl device copy to --device <id> --domain-type appDataContainer \
-  --domain-identifier com.gilberto.iosstats --source models/<archivo>.gguf \
-  --destination "Library/Application Support/models/<archivo>.gguf"
+  --domain-identifier com.gilberto.iosstats --source models/<file>.gguf \
+  --destination "Library/Application Support/models/<file>.gguf"
 ```
 
-Los resultados de la prueba de modelos están en [docs/llm-spike.md](docs/llm-spike.md).
+The model test results are in [docs/llm-spike.md](docs/llm-spike.md).
 
-## Herramientas de depuración
+## Debug tools
 
-Solo existen en builds de depuración. Se pasan como variables de entorno al lanzar la app: en el iPhone con `devicectl ... process launch --environment-variables '{"VAR":"valor"}'` y en el simulador con el prefijo `SIMCTL_CHILD_`.
+These only exist in debug builds. They are passed as environment variables when launching the app: on the iPhone with `devicectl ... process launch --environment-variables '{"VAR":"value"}'` and in the simulator with the `SIMCTL_CHILD_` prefix.
 
-| Variable | Qué hace |
+| Variable | What it does |
 |---|---|
-| `IOS_STATS_BENCH=all` o `<id>,<id>` | Mide los modelos (carga, velocidad, memoria, temperatura, 10 preguntas en es-MX) y guarda `Documents/llm-bench.json`; el avance sale en pantalla y en `Documents/llm-bench-progress.jsonl` |
-| `IOS_STATS_SOAK_SECS`, `IOS_STATS_THREADS` | Duración de la prueba sostenida (600 s) e hilos (2) para la medición |
-| `IOS_STATS_SELFTEST=1` | Autodiagnóstico del chat; guarda `Documents/selftest.json`. Con `IOS_STATS_SELFTEST_DOWNLOAD=<id>` también descarga ese modelo |
-| `IOS_STATS_FAKE_THERMAL=serious\|critical` | Simula el estado térmico en el monitor y en el motor |
-| `IOS_STATS_DEMO_PROMPT="…"` | Abre el chat y envía esa pregunta al arrancar |
+| `IOS_STATS_BENCH=all` or `<id>,<id>` | Benchmarks the models (load, speed, memory, temperature, 10 questions in es-MX) and saves `Documents/llm-bench.json`; progress is shown on screen and in `Documents/llm-bench-progress.jsonl` |
+| `IOS_STATS_SOAK_SECS`, `IOS_STATS_THREADS` | Duration of the sustained test (600 s) and number of threads (2) for the benchmark |
+| `IOS_STATS_SELFTEST=1` | Chat self-test; saves `Documents/selftest.json`. With `IOS_STATS_SELFTEST_DOWNLOAD=<id>` it also downloads that model |
+| `IOS_STATS_FAKE_THERMAL=serious\|critical` | Simulates the thermal state in the monitor and in the engine |
+| `IOS_STATS_DEMO_PROMPT="…"` | Opens the chat and sends that question on launch |
 
-La pestaña Chat incluye además una tarjeta «Laboratorio» para cargar, medir y probar modelos a mano.
+The Chat tab also includes a "Lab" card («Laboratorio» in the current UI) for loading, benchmarking and trying models by hand.
 
-## Pruebas
+## Tests
 
 ```bash
-(cd src-tauri && cargo test)   # métricas, historial, red, catálogo, prompt y conversaciones
-pnpm build                     # tipos de TypeScript y empaquetado
+(cd src-tauri && cargo test)   # metrics, history, network, catalog, prompt and conversations
+pnpm build                     # TypeScript type check and bundling
 ```
 
-## Límites de iOS
+## iOS limits
 
-- No hay temperaturas en °C, uso de GPU, frecuencia ni lista de procesos: iOS solo expone el estado térmico (4 niveles).
-- La app se congela en segundo plano: el monitor deja un hueco en el historial y la generación se cancela.
-- La app solo carga un modelo si su margen de memoria supera el tamaño del modelo más 512 MB. En un iPhone 12 Pro el margen es de ~3.8 GB con el entitlement `increased-memory-limit` y de ~3 GB sin él. Los pesos se leen con mmap y apenas cuentan en la memoria de la app.
+- No temperatures in °C, GPU usage, frequency or process list: iOS only exposes the thermal state (4 levels).
+- The app is suspended in the background: the monitor leaves a gap in the history and generation is cancelled.
+- The app only loads a model if its memory headroom exceeds the model size plus 512 MB. On an iPhone 12 Pro the headroom is ~3.8 GB with the `increased-memory-limit` entitlement and ~3 GB without it. The weights are read with mmap and barely count toward the app's memory.

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Manifiesto de privacidad de iOS Stats: no rastrea ni recoge datos. Declara las APIs
-     con «motivo requerido» que usa la app:
-     - FileTimestamp C617.1: tamaño y fechas de los modelos dentro del contenedor.
-     - DiskSpace 85F4.1: mostrar al usuario el espacio libre (monitor).
-     - DiskSpace E174.1: comprobar el espacio antes de descargar un modelo.
-     - SystemBootTime 35F9.1: medir tiempos transcurridos dentro de la app. -->
+<!-- iOS Stats privacy manifest: no tracking and no data collection. Declares the
+     "required reason" APIs the app uses:
+     - FileTimestamp C617.1: size and dates of the models inside the container.
+     - DiskSpace 85F4.1: show the user the free space (monitor).
+     - DiskSpace E174.1: check the space before downloading a model.
+     - SystemBootTime 35F9.1: measure elapsed time within the app. -->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>

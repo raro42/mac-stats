@@ -4,7 +4,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("el modelo local solo funciona en iOS")]
+    #[error("the local model only works on iOS")]
     Unsupported,
     #[cfg(mobile)]
     #[error(transparent)]

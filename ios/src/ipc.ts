@@ -1,4 +1,4 @@
-// Contrato con Rust (src-tauri/src/metrics/mod.rs). Los nombres llegan en camelCase.
+// Contract with Rust (src-tauri/src/metrics/mod.rs). Field names arrive in camelCase.
 import { Channel, invoke } from "@tauri-apps/api/core";
 
 export type Thermal = "nominal" | "fair" | "serious" | "critical" | "unknown";
@@ -37,7 +37,7 @@ export interface DeviceInfo {
   simulator: boolean;
 }
 
-/** Recibe una lectura por segundo; devuelve la última que ya tenga Rust. */
+/** Receives one reading per second; returns the latest one Rust already has. */
 export async function subscribeMetrics(
   onSample: (snapshot: Snapshot) => void,
 ): Promise<Snapshot | null> {
@@ -54,7 +54,7 @@ export function deviceInfo(): Promise<DeviceInfo> {
   return invoke<DeviceInfo>("device_info");
 }
 
-// --- Laboratorio de modelos (fase A, solo depuración) ---
+// --- Model lab (phase A, debug only) ---
 
 export interface LabModel {
   id: string;
@@ -110,7 +110,7 @@ export function labGenerate(
   return invoke<GenerateResult>("lab_generate", { prompt, thinkPrefill, onEvent: channel });
 }
 
-// --- Chat (fase B) ---
+// --- Chat (phase B) ---
 
 export interface ChatModel {
   id: string;

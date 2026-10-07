@@ -1,5 +1,5 @@
-//! Conversaciones guardadas en el contenedor de la app: un JSON por conversación y un
-//! índice, escritos siempre en un archivo temporal y renombrados (escritura atómica).
+//! Conversations saved in the app container: one JSON file per conversation plus an
+//! index, always written to a temporary file and renamed (atomic write).
 
 use std::fs;
 use std::io;
@@ -19,11 +19,11 @@ pub struct ReplyStats {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct StoredMessage {
-    /// "user" o "assistant".
+    /// "user" or "assistant".
     pub role: String,
     pub content: String,
     pub ts: i64,
-    /// Datos del iPhone que se le dieron al modelo con esta pregunta.
+    /// iPhone data given to the model with this question.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub device_note: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -64,7 +64,7 @@ impl Conversation {
     }
 }
 
-/// Título a partir de la primera pregunta (una línea, máx. 48 caracteres).
+/// Title from the first question (one line, max. 48 characters).
 pub fn title_from(question: &str) -> String {
     let line = question.lines().next().unwrap_or("").trim();
     let mut title: String = line.chars().take(48).collect();
@@ -78,8 +78,8 @@ pub fn title_from(question: &str) -> String {
     }
 }
 
-/// Los IDs llegan desde la web: solo se aceptan hexadecimales, para que nunca puedan
-/// apuntar fuera de la carpeta de conversaciones.
+/// IDs come from the web UI: only hexadecimal ones are accepted, so they can never
+/// point outside the conversations folder.
 pub fn valid_id(id: &str) -> bool {
     !id.is_empty() && id.len() <= 32 && id.chars().all(|c| c.is_ascii_hexdigit())
 }
@@ -108,7 +108,7 @@ impl ChatStore {
         self.dir.join("index.json")
     }
 
-    /// Conversaciones de la más reciente a la más antigua.
+    /// Conversations from newest to oldest.
     pub fn list(&self) -> Vec<ConversationSummary> {
         let mut list: Vec<ConversationSummary> = fs::read(self.index_path())
             .ok()

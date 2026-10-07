@@ -1,8 +1,8 @@
-// Motor de inferencia sobre la API en C de llama.cpp (b11321).
-// Sigue el patrón del ejemplo oficial examples/llama.swiftui/llama.cpp.swift/LibLlama.swift.
+// Inference engine on top of the llama.cpp C API (b11321).
+// Follows the pattern of the official example examples/llama.swiftui/llama.cpp.swift/LibLlama.swift.
 //
-// Todas las llamadas a llama.cpp ocurren en la cola del plugin («llm.engine»); solo
-// `requestCancel()` y `snapshot()` se llaman desde otros hilos y van protegidos por un lock.
+// Every llama.cpp call happens on the plugin queue ("llm.engine"); only
+// `requestCancel()` and `snapshot()` are called from other threads, guarded by a lock.
 
 import Foundation
 import Tauri
@@ -55,17 +55,17 @@ struct GenerateOptions {
   var maxTokens: Int
   var temperature: Float
   var seed: UInt32
-  /// Qwen3.5 razona por defecto; un bloque `<think>` vacío tras la cabecera del
-  /// asistente lo desactiva (es lo que hace su plantilla oficial sin `enable_thinking`).
+  /// Qwen3.5 reasons by default; an empty `<think>` block after the assistant header
+  /// turns that off (it is what its official template does without `enable_thinking`).
   var thinkPrefill: Bool
 }
 
-/// Margen de memoria antes de que iOS cierre la app (0 en el simulador).
+/// Memory headroom before iOS kills the app (0 in the simulator).
 func availableMemory() -> UInt64 {
   UInt64(os_proc_available_memory())
 }
 
-/// Estado térmico; en depuración se puede forzar con `IOS_STATS_FAKE_THERMAL`.
+/// Thermal state; debug builds can force it with `IOS_STATS_FAKE_THERMAL`.
 private func thermalState() -> ProcessInfo.ThermalState {
   #if DEBUG
     switch ProcessInfo.processInfo.environment["IOS_STATS_FAKE_THERMAL"] {
@@ -89,7 +89,7 @@ final class LlamaEngine {
   private var vocab: OpaquePointer?
   private var nCtx: UInt32 = 0
   private var nBatch: UInt32 = 512
-  /// Tokens que hay ahora en la memoria del contexto (secuencia 0).
+  /// Tokens currently in the context memory (sequence 0).
   private var cached: [llama_token] = []
 
   private let lock = NSLock()
@@ -97,7 +97,7 @@ final class LlamaEngine {
   private var loadedPath: String?
   private var busy = false
 
-  // MARK: - Estado compartido entre hilos
+  // MARK: - State shared across threads
 
   func requestCancel() {
     lock.lock()
@@ -135,7 +135,7 @@ final class LlamaEngine {
     ]
   }
 
-  // MARK: - Carga
+  // MARK: - Loading
 
   func load(_ options: LoadOptions) throws -> JsonObject {
     _ = LlamaEngine.backend
@@ -216,7 +216,7 @@ final class LlamaEngine {
     lock.unlock()
   }
 
-  // MARK: - Texto ↔ tokens
+  // MARK: - Text ↔ tokens
 
   private func applyTemplate(_ turns: [ChatTurn]) throws -> String {
     guard let model else { throw LlmError.notLoaded }
@@ -298,10 +298,10 @@ final class LlamaEngine {
     if rc != 0 { throw LlmError.decodeFailed(rc) }
   }
 
-  // MARK: - Generación
+  // MARK: - Generation
 
-  /// Genera la respuesta del asistente. `emit` recibe eventos `{type: "delta", text}`
-  /// agrupados cada ~40 ms.
+  /// Generates the assistant reply. `emit` receives `{type: "delta", text}` events
+  /// batched every ~40 ms.
   func generate(
     turns: [ChatTurn], options: GenerateOptions, emit: (JsonObject) -> Void
   ) throws -> JsonObject {
@@ -309,8 +309,8 @@ final class LlamaEngine {
     begin()
     defer { end() }
 
-    // Las respuestas anteriores se generaron tras el bloque <think> vacío; se repite en el
-    // historial para que el prompt continúe exactamente lo que ya está en memoria.
+    // Earlier replies were generated after the empty <think> block; it is repeated in the
+    // history so the prompt continues exactly what is already in memory.
     let think = "<think>\n\n</think>\n\n"
     let rendered = options.thinkPrefill
       ? turns.map { $0.role == "assistant" ? ChatTurn(role: $0.role, content: think + $0.content) : $0 }
@@ -321,10 +321,10 @@ final class LlamaEngine {
     let limit = Int(nCtx) - options.maxTokens
     if tokens.count > limit { throw LlmError.promptTooLong(tokens: tokens.count, limit: limit) }
 
-    // Reutiliza el prefijo común con lo que ya hay en memoria. Los modelos híbridos
-    // (Qwen3.5, LFM2.5) no pueden borrar solo una parte: entonces se procesa todo.
+    // Reuses the prefix shared with what is already in memory. Hybrid models
+    // (Qwen3.5, LFM2.5) cannot remove just part of it: then everything is processed.
     var reused = zip(cached, tokens).prefix { $0 == $1 }.count
-    if reused == tokens.count { reused -= 1 }  // hace falta decodificar el último para tener logits
+    if reused == tokens.count { reused -= 1 }  // the last one must be decoded to get logits
     let memory = llama_get_memory(ctx)
     if reused > 0 && !llama_memory_seq_rm(memory, 0, llama_pos(reused), -1) {
       reused = 0
@@ -332,8 +332,8 @@ final class LlamaEngine {
     if reused == 0 { llama_memory_clear(memory, true) }
     cached = Array(tokens[0..<reused])
 
-    // Bloques pequeños: la cancelación solo se puede atender entre llamadas a
-    // llama_decode, y con Metal el aborto de llama.cpp no funciona.
+    // Small chunks: cancellation can only be handled between llama_decode calls,
+    // and llama.cpp's abort does not work with Metal.
     let promptChunk = min(Int(nBatch), 64)
     let promptStart = DispatchTime.now().uptimeNanoseconds
     var position = reused
@@ -416,7 +416,7 @@ final class LlamaEngine {
     ]
   }
 
-  // MARK: - Benchmark (pp = procesar prompt, tg = generar)
+  // MARK: - Benchmark (pp = prompt processing, tg = generation)
 
   func bench(pp: Int, tg: Int, reps: Int) throws -> JsonObject {
     guard let ctx else { throw LlmError.notLoaded }

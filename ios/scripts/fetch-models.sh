@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Descarga en el Mac los modelos de models/catalog.json (URL fijadas a un commit de
-# Hugging Face) y verifica su SHA-256. Uso: scripts/fetch-models.sh [id ...]
+# Downloads the models in models/catalog.json to the Mac (URLs pinned to a Hugging Face
+# commit) and verifies their SHA-256. Usage: scripts/fetch-models.sh [id ...]
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -23,14 +23,14 @@ sha_of() { shasum -a 256 "$1" | cut -d' ' -f1; }
 while IFS=$'\t' read -r url file sha; do
   dest="$DIR/$file"
   if [ -f "$dest" ] && [ "$(sha_of "$dest")" = "$sha" ]; then
-    echo "OK (ya estaba) $file"
+    echo "OK (already present) $file"
     continue
   fi
-  echo "Descargando ${file}…"
+  echo "Downloading ${file}…"
   curl -L --fail --retry 3 -C - -o "$dest.part" "$url"
   got="$(sha_of "$dest.part")"
   if [ "$got" != "$sha" ]; then
-    echo "SHA-256 incorrecto para $file: $got" >&2
+    echo "SHA-256 mismatch for $file: $got" >&2
     rm -f "$dest.part"
     exit 1
   fi

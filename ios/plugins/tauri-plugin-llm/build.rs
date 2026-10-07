@@ -1,13 +1,13 @@
-// La web no llama al plugin: solo lo usa el Rust de la app, así que no hay comandos
-// ni permisos que exponer.
+// The web layer does not call the plugin: only the app's Rust code uses it, so there are
+// no commands or permissions to expose.
 const COMMANDS: &[&str] = &[];
 
 fn main() {
     tauri_plugin::Builder::new(COMMANDS).ios_path("ios").build();
 
-    // Los modelos necesitan más memoria de la que iOS concede por defecto a una app.
-    // `tauri ios init` reescribe el archivo de entitlements, así que se reinserta en cada
-    // build. Fuera de una build de iOS lanzada por la CLI de Tauri no hace nada.
+    // Models need more memory than iOS grants an app by default.
+    // `tauri ios init` rewrites the entitlements file, so the key is re-inserted on every
+    // build. Outside an iOS build started by the Tauri CLI this does nothing.
     #[cfg(target_os = "macos")]
     {
         println!("cargo:rerun-if-env-changed=TAURI_IOS_PROJECT_PATH");
@@ -24,6 +24,6 @@ fn main() {
                 true.into(),
             );
         })
-        .expect("no se pudo actualizar el archivo de entitlements");
+        .expect("failed to update the entitlements file");
     }
 }

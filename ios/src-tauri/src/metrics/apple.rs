@@ -1,8 +1,8 @@
-//! APIs de Foundation y UIKit: estado térmico, modo de bajo consumo, almacenamiento,
-//! batería y datos del dispositivo.
+//! Foundation and UIKit APIs: thermal state, Low Power Mode, storage,
+//! battery and device info.
 //!
-//! El estado térmico y el modo de bajo consumo están adaptados de la app de Mac
-//! (`src-tauri/src/ffi/objc.rs` en la raíz del repo).
+//! Thermal state and Low Power Mode are adapted from the Mac app
+//! (`src-tauri/src/ffi/objc.rs` at the repo root).
 
 use objc2_foundation::{
     NSArray, NSNumber, NSProcessInfo, NSString, NSURLVolumeAvailableCapacityForImportantUsageKey,
@@ -10,7 +10,7 @@ use objc2_foundation::{
 };
 use serde::Serialize;
 
-/// `NSProcessInfo.thermalState`. iOS no expone temperaturas en °C.
+/// `NSProcessInfo.thermalState`. iOS does not expose temperatures in °C.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Thermal {
@@ -22,7 +22,7 @@ pub enum Thermal {
 }
 
 pub fn thermal_state() -> Thermal {
-    // NSProcessInfoThermalState es un newtype sobre NSInteger, no un enum de Rust.
+    // NSProcessInfoThermalState is a newtype over NSInteger, not a Rust enum.
     match NSProcessInfo::processInfo().thermalState().0 {
         0 => Thermal::Nominal,
         1 => Thermal::Fair,
@@ -57,12 +57,12 @@ pub fn os_version() -> String {
 #[serde(rename_all = "camelCase")]
 pub struct Storage {
     pub total: u64,
-    /// Espacio para "uso importante": incluye lo purgable que iOS puede liberar,
-    /// que es lo que muestra Ajustes.
+    /// Space for "important usage": includes purgeable data iOS can free,
+    /// which is what Settings shows.
     pub available: u64,
 }
 
-/// Capacidad del volumen que contiene `path` (el contenedor de la app en iOS).
+/// Capacity of the volume that contains `path` (the app container on iOS).
 pub fn storage(path: &str) -> Option<Storage> {
     let url = NSURL::fileURLWithPath(&NSString::from_str(path));
     let (total_key, available_key) = unsafe {
@@ -91,7 +91,7 @@ pub fn storage(path: &str) -> Option<Storage> {
     })
 }
 
-#[cfg_attr(not(target_os = "ios"), allow(dead_code))] // solo se construye en iOS
+#[cfg_attr(not(target_os = "ios"), allow(dead_code))] // only constructed on iOS
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum BatteryState {
@@ -109,8 +109,8 @@ pub struct Battery {
     pub state: BatteryState,
 }
 
-/// Lee la batería con `UIDevice`. Solo funciona en el hilo principal; devuelve
-/// `None` en el simulador (nivel −1) o si se llama desde otro hilo.
+/// Reads the battery with `UIDevice`. Only works on the main thread; returns
+/// `None` on the simulator (level −1) or when called from another thread.
 #[cfg(target_os = "ios")]
 pub fn battery_on_main_thread() -> Option<Battery> {
     use objc2_ui_kit::{UIDevice, UIDeviceBatteryState};
@@ -160,7 +160,7 @@ fn sysctl_string(name: &str) -> Option<String> {
     Some(text.trim_end_matches('\0').to_string())
 }
 
-/// Identificador del modelo (p. ej. `iPhone13,3`) y si es el simulador.
+/// Model identifier (e.g. `iPhone13,3`) and whether it is the simulator.
 pub fn model_identifier() -> (String, bool) {
     if let Ok(sim) = std::env::var("SIMULATOR_MODEL_IDENTIFIER") {
         return (sim, true);
@@ -169,7 +169,7 @@ pub fn model_identifier() -> (String, bool) {
     (id, false)
 }
 
-/// Nombre comercial de los iPhone conocidos; si no está en la tabla, el identificador.
+/// Marketing name of known iPhones; the identifier if it is not in the table.
 pub fn marketing_name(identifier: &str) -> String {
     let name = match identifier {
         "iPhone13,1" => "iPhone 12 mini",

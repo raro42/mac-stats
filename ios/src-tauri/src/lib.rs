@@ -5,14 +5,14 @@ mod lab;
 mod metrics;
 mod selftest;
 
-/// La web muestra el laboratorio de modelos solo en builds de depuración.
+/// The web UI shows the model lab only in debug builds.
 #[tauri::command]
 fn debug_build() -> bool {
     cfg!(debug_assertions)
 }
 
-/// Pruebas automáticas (solo depuración): con `IOS_STATS_DEMO_PROMPT` la web abre el
-/// chat y envía esa pregunta al arrancar.
+/// Automated tests (debug only): with `IOS_STATS_DEMO_PROMPT` the web UI opens the
+/// chat and sends that question at startup.
 #[tauri::command]
 fn debug_demo_prompt() -> Option<String> {
     if cfg!(debug_assertions) {
@@ -28,10 +28,10 @@ pub fn run() {
         .plugin(tauri_plugin_llm::init())
         .setup(|app| {
             metrics::init(app.handle());
-            // Destino de los modelos (se copian con devicectl o se descargan en la fase B).
+            // Model destination (copied with devicectl or downloaded in phase B).
             let _ = std::fs::create_dir_all(chat::catalog::models_dir());
             app.manage(chat::ChatState::new(app.handle()));
-            // Medición automática de modelos (fase A), solo en builds de depuración.
+            // Automatic model benchmark (phase A), debug builds only.
             if cfg!(debug_assertions) {
                 if let Ok(spec) = std::env::var("IOS_STATS_BENCH") {
                     tauri::async_runtime::spawn(lab::auto_bench(app.handle().clone(), spec));
@@ -69,5 +69,5 @@ pub fn run() {
             chat::chat_send,
         ])
         .run(tauri::generate_context!())
-        .expect("error al iniciar iOS Stats");
+        .expect("error while starting iOS Stats");
 }

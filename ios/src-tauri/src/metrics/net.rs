@@ -1,16 +1,16 @@
-//! Tráfico de red (Wi‑Fi `en*` y datos móviles `pdp_ip*`) a partir de `getifaddrs`.
+//! Network traffic (Wi‑Fi `en*` and cellular `pdp_ip*`) from `getifaddrs`.
 //!
-//! Los contadores de `struct if_data` son de 32 bits y se desbordan a los 4 GB,
-//! así que las diferencias se calculan por interfaz con aritmética modular.
+//! The `struct if_data` counters are 32-bit and wrap around at 4 GB,
+//! so deltas are computed per interface with modular arithmetic.
 
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::time::Instant;
 
-/// Prefijo de `struct if_data` (`<net/if_var.h>`) hasta los contadores de bytes.
-/// `libc` solo expone `if_data64`, que no es lo que devuelve `getifaddrs`.
+/// Prefix of `struct if_data` (`<net/if_var.h>`) up to the byte counters.
+/// `libc` only exposes `if_data64`, which is not what `getifaddrs` returns.
 #[repr(C)]
-#[allow(dead_code)] // los campos fijan el desplazamiento; solo se leen los bytes
+#[allow(dead_code)] // the fields fix the offsets; only the byte counters are read
 struct IfDataPrefix {
     ifi_type: u8,
     ifi_typelen: u8,
@@ -36,7 +36,7 @@ fn is_tracked(name: &str) -> bool {
     name.starts_with("en") || name.starts_with("pdp_ip")
 }
 
-/// Bytes recibidos y enviados por interfaz.
+/// Bytes received and sent per interface.
 fn read_counters() -> HashMap<String, (u32, u32)> {
     let mut out = HashMap::new();
     let mut ifap: *mut libc::ifaddrs = std::ptr::null_mut();
@@ -64,8 +64,8 @@ fn read_counters() -> HashMap<String, (u32, u32)> {
     out
 }
 
-/// Suma de las diferencias por interfaz; las interfaces nuevas no aportan hasta
-/// la siguiente lectura.
+/// Sum of the per-interface deltas; new interfaces do not count until
+/// the next reading.
 fn delta_bytes(
     prev: &HashMap<String, (u32, u32)>,
     now: &HashMap<String, (u32, u32)>,
@@ -81,7 +81,7 @@ fn delta_bytes(
     (rx, tx)
 }
 
-/// Velocidad de bajada y subida en bytes por segundo.
+/// Download and upload speed in bytes per second.
 #[derive(Default)]
 pub struct NetMeter {
     last: Option<(Instant, HashMap<String, (u32, u32)>)>,
@@ -103,7 +103,7 @@ impl NetMeter {
         rates
     }
 
-    /// Olvida la línea base (p. ej. al volver de segundo plano).
+    /// Forgets the baseline (e.g. when returning from the background).
     pub fn reset(&mut self) {
         self.last = None;
     }

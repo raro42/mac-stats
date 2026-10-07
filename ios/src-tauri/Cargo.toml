@@ -1,16 +1,16 @@
 [package]
 name = "ios-stats"
 version = "0.1.0"
-description = "iOS Stats: monitor del iPhone y chat con IA local (derivado de mac-stats)"
+description = "iOS Stats: iPhone monitor and local AI chat (derived from mac-stats)"
 authors = ["gilberto"]
 license = "MIT"
 edition = "2021"
 
 [lib]
-# El sufijo `_lib` evita el choque de nombres con el binario de escritorio.
+# The `_lib` suffix avoids a name clash with the desktop binary.
 name = "ios_stats_lib"
-# Sin cdylib: en iOS solo se usa la staticlib, y la dylib exigiría resolver al enlazar
-# los símbolos de llama.framework (que solo enlaza Xcode).
+# No cdylib: iOS only uses the staticlib, and the dylib would have to resolve the
+# llama.framework symbols at link time (only Xcode links that framework).
 crate-type = ["staticlib", "rlib"]
 
 [build-dependencies]

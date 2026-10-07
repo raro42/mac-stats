@@ -1,5 +1,5 @@
-//! Chat con el modelo local: descargas, carga en memoria, conversaciones y envío con
-//! respuesta en streaming.
+//! Chat with the local model: downloads, loading into memory, conversations and sending
+//! with a streamed reply.
 
 pub mod catalog;
 pub mod prompt;
@@ -20,7 +20,7 @@ use crate::metrics::{apple::Thermal, MetricsState};
 use catalog::CatalogEntry;
 use store::{ChatStore, Conversation, ConversationSummary, ReplyStats, StoredMessage};
 
-/// Modelo recomendado (resultado de la prueba de la fase A: ios/docs/llm-spike.md).
+/// Recommended model (outcome of the phase A test: ios/docs/llm-spike.md).
 pub const DEFAULT_MODEL: &str = "qwen3.5-2b";
 
 const MAX_TOKENS: u32 = 512;
@@ -44,8 +44,8 @@ struct Settings {
 pub struct ChatState {
     pub(crate) store: ChatStore,
     settings_path: PathBuf,
-    /// Modelo cargado ahora en llama.cpp. Es un mutex asíncrono para que dos cargas no
-    /// se pisen.
+    /// Model currently loaded in llama.cpp. It is an async mutex so two loads do not
+    /// step on each other.
     loaded: tokio::sync::Mutex<Option<String>>,
 }
 
@@ -73,14 +73,14 @@ impl ChatState {
             .model_id
             .and_then(|id| catalog::find(&id))
             .or_else(|| catalog::find(DEFAULT_MODEL))
-            .expect("el modelo por defecto está en el catálogo")
+            .expect("the default model is in the catalog")
     }
 }
 
 pub(crate) async fn ensure_loaded(app: &AppHandle, state: &ChatState, entry: &CatalogEntry) -> Result<Option<LoadInfo>, String> {
     let mut loaded = state.loaded.lock().await;
-    // Swift puede haber soltado el modelo por su cuenta (aviso de memoria), así que se
-    // comprueba el estado real del motor y no solo lo que recuerda Rust.
+    // Swift may have released the model on its own (memory warning), so check the
+    // engine's real state and not just what Rust remembers.
     let path = entry.path().to_string_lossy().into_owned();
     let engine = app.llm().status().await.map_err(|e| e.to_string())?;
     if loaded.as_deref() == Some(entry.id.as_str()) && engine.loaded && engine.path.as_deref() == Some(path.as_str()) {
@@ -105,7 +105,7 @@ pub(crate) async fn ensure_loaded(app: &AppHandle, state: &ChatState, entry: &Ca
 }
 
 // ---------------------------------------------------------------------------
-// Modelos
+// Models
 // ---------------------------------------------------------------------------
 
 #[derive(Serialize)]
@@ -159,7 +159,7 @@ pub async fn chat_status(app: AppHandle, state: State<'_, ChatState>) -> Result<
     })
 }
 
-/// Descarga verificada. Reenvía a la web `{type: "progress"|"verifying", …}`.
+/// Verified download. Forwards `{type: "progress"|"verifying", …}` to the web UI.
 #[tauri::command]
 pub async fn chat_download(app: AppHandle, id: String, allow_cellular: bool, on_event: Channel<Value>) -> Result<(), String> {
     let entry = catalog::find(&id).ok_or_else(|| format!("No existe el modelo «{id}»"))?;
@@ -205,7 +205,7 @@ pub async fn chat_unload(app: AppHandle, state: State<'_, ChatState>) -> Result<
 }
 
 // ---------------------------------------------------------------------------
-// Conversaciones
+// Conversations
 // ---------------------------------------------------------------------------
 
 #[tauri::command]
@@ -235,15 +235,15 @@ pub struct SendResult {
     pub stop_reason: String,
     pub n_gen: u32,
     pub tg_tps: f64,
-    /// Tokens del prompt y cuántos se reutilizaron de la memoria del turno anterior.
+    /// Prompt tokens and how many were reused from the previous turn's cache.
     pub n_prompt: u32,
     pub n_cached: u32,
     pub prompt_ms: f64,
 }
 
-/// Envía una pregunta. La web recibe `{type: "status", text}` mientras se carga el
-/// modelo y `{type: "delta", text}` con cada fragmento de la respuesta. La pregunta se
-/// guarda antes de generar y la respuesta al terminar, aunque se cancele a mitad.
+/// Sends a question. The web UI receives `{type: "status", text}` while the model
+/// loads and `{type: "delta", text}` with each chunk of the reply. The question is
+/// saved before generating and the reply when it finishes, even if cancelled midway.
 #[tauri::command]
 pub async fn chat_send(
     app: AppHandle,
@@ -301,7 +301,7 @@ pub(crate) async fn send(
     conversation.updated_at = now;
     state.store.save(&conversation).map_err(|e| e.to_string())?;
 
-    // Canal propio: acumula la respuesta para guardarla y reenvía cada fragmento a la web.
+    // Own channel: accumulates the reply to save it and forwards each chunk to the web UI.
     let reply = Arc::new(Mutex::new(String::new()));
     let (acc, web) = (reply.clone(), on_event.clone());
     let channel = Channel::<Value>::new(move |body| {
@@ -328,8 +328,8 @@ pub(crate) async fn send(
         })
         .await;
 
-    // Se guarda tal cual, sin recortar espacios: el siguiente turno la vuelve a enviar y
-    // tiene que coincidir con lo que el modelo generó para reutilizar la memoria.
+    // Saved as is, without trimming whitespace: the next turn sends it again and it
+    // must match what the model generated so the cache can be reused.
     let text = reply.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let (stop_reason, n_gen, tg_tps) = match &result {
         Ok(r) => (r.stop_reason.clone(), r.n_gen, r.tg_tps),

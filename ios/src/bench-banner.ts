@@ -1,4 +1,4 @@
-// Aviso fijo con el progreso de la medición automática de modelos (solo depuración).
+// Fixed banner showing the progress of the automatic model benchmark (debug only).
 import { listen } from "@tauri-apps/api/event";
 
 type BenchEvent = {

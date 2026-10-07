@@ -1,10 +1,10 @@
-//! Historial en memoria para las gráficas: 300 muestras de 1 s (vista «5 min»)
-//! y 60 cubos de 1 min (vista «1 h»).
+//! In-memory history for the charts: 300 one-second samples («5 min» view)
+//! and 60 one-minute buckets («1 h» view).
 //!
-//! Reescritura de `src-tauri/src/metrics/history.rs` de la app de Mac, que asumía
-//! una muestra por segundo y devolvía puntos duplicados donde se solapaban sus
-//! niveles. Aquí los niveles son independientes y los huecos (la app estuvo en
-//! segundo plano) se marcan con un punto `gap` para que la gráfica corte la línea.
+//! Rewrite of `src-tauri/src/metrics/history.rs` from the Mac app, which assumed
+//! one sample per second and returned duplicate points where its tiers
+//! overlapped. Here the tiers are independent and gaps (the app was in the
+//! background) are marked with a `gap` point so the chart breaks the line.
 
 use serde::Serialize;
 use std::collections::VecDeque;
@@ -16,14 +16,14 @@ const MINUTE_MS: i64 = 60_000;
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Point {
-    /// Milisegundos desde la época Unix.
+    /// Milliseconds since the Unix epoch.
     pub ts: i64,
     pub cpu: Option<f32>,
-    /// RAM del sistema usada, en %.
+    /// System RAM used, in %.
     pub ram: Option<f32>,
-    /// Memoria de la app, en MB.
+    /// App memory, in MB.
     pub app_mb: Option<f32>,
-    /// `true` marca un corte: no hay datos entre el punto anterior y el siguiente.
+    /// `true` marks a break: there is no data between the previous point and the next.
     pub gap: bool,
 }
 
@@ -52,7 +52,7 @@ impl Mean {
     }
 }
 
-/// Minuto en curso, todavía sin cerrar.
+/// Current minute, not closed yet.
 struct MinuteAccum {
     minute: i64,
     cpu: Mean,
@@ -97,7 +97,7 @@ impl History {
         let minute = p.ts.div_euclid(MINUTE_MS);
         match self.current.as_ref().map(|acc| acc.minute) {
             Some(current) if current == minute => {}
-            Some(current) if minute < current => return, // reloj hacia atrás: se ignora
+            Some(current) if minute < current => return, // clock went backwards: ignored
             _ => self.close_minute(minute),
         }
         let acc = self.current.get_or_insert_with(|| MinuteAccum::new(minute));
@@ -106,16 +106,16 @@ impl History {
         acc.app_mb.add(p.app_mb);
     }
 
-    /// Marca un corte en la vista de segundos. La de minutos detecta sola los
-    /// minutos que faltan al cerrar el siguiente.
+    /// Marks a break in the seconds view. The minutes view detects missing
+    /// minutes on its own when it closes the next one.
     pub fn push_gap(&mut self, ts: i64) {
         if self.seconds.back().is_some_and(|p| !p.gap) {
             push_capped(&mut self.seconds, Point::gap(ts), SECONDS_CAP);
         }
     }
 
-    /// Cierra el minuto en curso y abre `next`; si entre ambos faltan minutos,
-    /// deja un punto de corte.
+    /// Closes the current minute and opens `next`; if minutes are missing in between,
+    /// it leaves a gap point.
     fn close_minute(&mut self, next: i64) {
         if let Some(acc) = self.current.take() {
             push_capped(&mut self.minutes, acc.point(), MINUTES_CAP);
@@ -130,7 +130,7 @@ impl History {
         self.seconds.iter().copied().collect()
     }
 
-    /// Minutos cerrados más el minuto en curso (para que la vista «1 h» esté viva).
+    /// Closed minutes plus the current one (so the «1 h» view stays live).
     pub fn minutes(&self) -> Vec<Point> {
         let mut out: Vec<Point> = self.minutes.iter().copied().collect();
         if let Some(acc) = &self.current {
@@ -164,7 +164,7 @@ mod tests {
         let mut h = History::default();
         h.push(sample(0, 10.0));
         h.push(sample(30_000, 30.0));
-        assert_eq!(h.minutes().len(), 1, "solo el minuto en curso");
+        assert_eq!(h.minutes().len(), 1, "only the current minute");
         assert_eq!(h.minutes()[0].cpu, Some(20.0));
 
         h.push(sample(60_000, 50.0));
@@ -213,7 +213,7 @@ mod tests {
         for m in 0..(MINUTES_CAP as i64 + 5) {
             h.push(sample(m * MINUTE_MS, 1.0));
         }
-        // 60 cerrados + el minuto en curso
+        // 60 closed + the current minute
         assert_eq!(h.minutes().len(), MINUTES_CAP + 1);
     }
 

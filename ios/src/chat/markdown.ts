@@ -1,6 +1,6 @@
-// Markdown de las respuestas del modelo. La salida del modelo no es de fiar: se
-// sanitiza con DOMPurify y una lista blanca corta (sin imágenes, estilos ni scripts)
-// antes de insertarla, y nunca se ejecuta nada de lo que devuelve.
+// Markdown for the model's replies. Model output is untrusted: it is sanitized with
+// DOMPurify and a short allowlist (no images, styles or scripts) before it is inserted,
+// and nothing it returns is ever executed.
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 
@@ -15,7 +15,7 @@ export function renderMarkdown(text: string): string {
   return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR: ["href"], ALLOW_DATA_ATTR: false });
 }
 
-/** Los enlaces de las respuestas no navegan: la app no tiene navegador. */
+/** Links in replies do not navigate: the app has no browser. */
 export function disableLinks(container: HTMLElement): void {
   container.addEventListener("click", (event) => {
     if ((event.target as HTMLElement).closest("a")) event.preventDefault();

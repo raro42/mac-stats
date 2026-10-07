@@ -1,108 +1,108 @@
-# Prueba de modelos en el iPhone (fase A)
+# Model test on the iPhone (phase A)
 
-**Resumen:** Qwen3.5-2B se queda como modelo por defecto. LFM2.5-1.2B queda como opción ligera y rápida.
+**Summary:** Qwen3.5-2B stays as the default model. LFM2.5-1.2B stays as the lightweight, fast option.
 
-Medido el 1 de octubre de 2026 en las siguientes condiciones:
+Measured on October 1, 2026 under the following conditions:
 
-- **Equipo:** iPhone 12 Pro (A14, 6 GB, iOS 26.6.1).
-- **Motor:** llama.cpp b11321 con Metal, contexto de 4096 tokens y 2 hilos.
-- **Memoria:** con el entitlement `increased-memory-limit`.
-- **Conexión:** el iPhone estuvo conectado por cable y cargando durante toda la prueba.
+- **Device:** iPhone 12 Pro (A14, 6 GB, iOS 26.6.1).
+- **Engine:** llama.cpp b11321 with Metal, 4096-token context and 2 threads.
+- **Memory:** with the `increased-memory-limit` entitlement.
+- **Connection:** the iPhone was connected by cable and charging for the whole test.
 
-Los modelos se midieron uno tras otro: primero Qwen3.5-2B y después LFM2.5-1.2B, que empezó con el iPhone ya caliente. Qwen2.5-1.5B no se midió porque no estaba en el iPhone.
+The models were measured one after the other: first Qwen3.5-2B and then LFM2.5-1.2B, which started with the iPhone already warm. Qwen2.5-1.5B was not measured because it was not on the iPhone.
 
-Los datos completos están en [llm-bench-iphone12pro.json](llm-bench-iphone12pro.json). «GB» son 2³⁰ bytes, como en el monitor de la app.
+The full data is in [llm-bench-iphone12pro.json](llm-bench-iphone12pro.json). "GB" means 2³⁰ bytes, as in the app's monitor.
 
-## Resultados
+## Results
 
 | | Qwen3.5-2B Q4_K_M | LFM2.5-1.2B Q4_K_M |
 |---|---|---|
-| Archivo | 1.19 GB | 0.68 GB |
-| Parámetros | 1.9 B | 1.2 B |
-| Carga en frío / en caliente | 2.0 s / 0.48 s | 1.1 s / 0.15 s |
-| Primera palabra en una conversación nueva | 1.3–2.0 s | 0.8–1.4 s |
-| Procesar prompt (pp512) | 162 tok/s | 214 tok/s ¹ |
-| Generar (tg128) | 18.5 tok/s | 32.3 tok/s ¹ |
-| Generando sin parar 3 min | 13 tok/s al empezar, 8.6 tok/s desde el minuto 1 ² | 9.1 tok/s ² |
-| Memoria de la app (pico) | 0.20 GB | 0.17 GB |
-| Margen de memoria mínimo | 3.80 GB | 3.83 GB |
-| 3 ciclos de carga y descarga | sin fallos | sin fallos |
-| Calidad (10 preguntas, de 1 a 5) | 3.7 | 3.3 |
+| File | 1.19 GB | 0.68 GB |
+| Parameters | 1.9 B | 1.2 B |
+| Cold / warm load | 2.0 s / 0.48 s | 1.1 s / 0.15 s |
+| First word in a new conversation | 1.3–2.0 s | 0.8–1.4 s |
+| Prompt processing (pp512) | 162 tok/s | 214 tok/s ¹ |
+| Generation (tg128) | 18.5 tok/s | 32.3 tok/s ¹ |
+| Generating non-stop for 3 min | 13 tok/s at the start, 8.6 tok/s from minute 1 on ² | 9.1 tok/s ² |
+| App memory (peak) | 0.20 GB | 0.17 GB |
+| Minimum memory headroom | 3.80 GB | 3.83 GB |
+| 3 load/unload cycles | no failures | no failures |
+| Quality (10 questions, scored 1 to 5) | 3.7 | 3.3 |
 
-¹ Medido con el iPhone ya caliente; en frío debería ser algo más.
-² Limitado por la pausa térmica de la app (ver «Calor»).
+¹ Measured with the iPhone already warm; cold, it should be somewhat higher.
+² Capped by the app's thermal pause (see "Heat").
 
-### Memoria
+### Memory
 
-Los pesos se leen del archivo con mmap y no cuentan en la memoria de la app. Con cualquiera de los dos modelos la app no pasó de 0.2 GB y el margen se quedó por encima de 3.8 GB. Sin el entitlement, el margen era de unos 3 GB.
+The weights are read from the file with mmap and do not count toward the app's memory. With either model the app never went above 0.2 GB and the headroom stayed above 3.8 GB. Without the entitlement, the headroom was about 3 GB.
 
-### Calor
+### Heat
 
-Generando sin parar con el cable conectado, el iPhone pasa a «serio» en menos de un minuto. En ese estado el motor hace una pausa de 100 ms por token. Como la GPU calcula el siguiente token durante la pausa, la velocidad se queda en unos 9 tok/s con cualquier modelo. Las cifras de la prueba sostenida miden esa pausa, no el límite del chip. En 3 minutos nunca llegó a «crítico».
+Generating non-stop with the cable connected, the iPhone goes to "serious" in under a minute. In that state the engine pauses for 100 ms per token. Since the GPU computes the next token during the pause, the speed settles at about 9 tok/s with either model. The sustained-test figures measure that pause, not the chip's limit. In 3 minutes it never reached "critical".
 
-### Calidad
+### Quality
 
-Una respuesta por pregunta, con temperatura 0.7, puntuada a mano:
+One answer per question, at temperature 0.7, scored by hand. The questions were asked in Spanish (es-MX); the exact prompts are in the JSON file. Quoted prompts and model output are kept in the original Spanish, with an English gloss.
 
-| # | Pregunta | Qwen3.5-2B | LFM2.5-1.2B |
+| # | Question | Qwen3.5-2B | LFM2.5-1.2B |
 |---|---|---|---|
-| 1 | ¿Cómo van mi batería y mi memoria? | 5 | 2: mezcla cifras («3.9 GB disponibles en un total de 0.1 GB») |
-| 2 | La RAM en dos frases | 4: una sola frase | 5: usa los datos del iPhone |
-| 3 | 3 consejos para que no se caliente | 4 | 3: «mantén la batería al 50 %» |
-| 4 | Resumir una frase | 4: añade algo que no estaba | 5 |
+| 1 | ¿Cómo van mi batería y mi memoria? ("How are my battery and memory doing?") | 5 | 2: mixes up figures («3.9 GB disponibles en un total de 0.1 GB», "3.9 GB available out of a total of 0.1 GB") |
+| 2 | RAM in two sentences | 4: only one sentence | 5: uses the iPhone's data |
+| 3 | 3 tips to keep it from overheating | 4 | 3: «mantén la batería al 50 %» ("keep the battery at 50 %") |
+| 4 | Summarize a sentence | 4: adds something that was not there | 5 |
 | 5 | 17 × 23 | 1: 351 | 1: 486 |
 | 6 | Haiku | 4 | 4 |
-| 7 | Traducir al inglés | 5 | 3: «Your phone» en vez de «My phone» |
+| 7 | Translate into English | 5 | 3: "Your phone" instead of "My phone" |
 | 8 | 45 GB ÷ 1.5 GB | 5 | 5 |
-| 9 | 3 pasos para liberar espacio | 2: inventa menús y dice que reiniciar borra la caché | 4: genérico pero correcto |
-| 10 | ¿Qué es el estado térmico «serio»? | 3: bien al principio, luego exagera y dice que la app ve el consumo de otras apps | 1: dice que se está enfriando para rendir más |
+| 9 | 3 steps to free up space | 2: makes up menus and says that restarting clears the cache | 4: generic but correct |
+| 10 | ¿Qué es el estado térmico «serio»? ("What is the 'serious' thermal state?") | 3: good at first, then exaggerates and says the app can see other apps' usage | 1: says the phone is cooling down to perform better |
 
-Los dos fallan la multiplicación: no conviene fiarse de sus cuentas.
+Both get the multiplication wrong: their arithmetic should not be trusted.
 
-## Decisión
+## Decision
 
-**Qwen3.5-2B sigue como modelo por defecto.** Cumple los tres requisitos de la fase A:
+**Qwen3.5-2B stays as the default model.** It meets the three phase A requirements:
 
-- **Velocidad:** 8.6 tok/s sostenidos (mínimo: 8).
-- **Memoria:** 0.20 GB de pico (máximo: 2 GB).
-- **Estabilidad:** 3 ciclos de carga y descarga sin fallos.
+- **Speed:** 8.6 tok/s sustained (minimum: 8).
+- **Memory:** 0.20 GB peak (maximum: 2 GB).
+- **Stability:** 3 load/unload cycles with no failures.
 
-Además, contesta mejor que LFM2.5 sobre el propio iPhone (preguntas 1 y 10) y escribe mejor en español.
+It also answers questions about the iPhone itself better than LFM2.5 (questions 1 and 10) and writes better Spanish.
 
-**LFM2.5-1.2B queda como opción ligera.** Pesa la mitad, carga en la mitad de tiempo y en frío genera 1.75 veces más rápido. A cambio, se equivoca más con los datos del iPhone.
+**LFM2.5-1.2B stays as the lightweight option.** It is half the size, loads in half the time and, cold, generates 1.75 times faster. On the other hand, it makes more mistakes with the iPhone's data.
 
-**Qwen2.5-1.5B** sigue en el catálogo para descargarlo desde la app.
+**Qwen2.5-1.5B** stays in the catalog so it can be downloaded from the app.
 
-## Límites de la prueba
+## Test limitations
 
-- La prueba sostenida duró 3 minutos en lugar de 10.
-- La batería no se pudo medir: el iPhone estaba conectado y se quedó en 100 %.
-- LFM2.5 no se midió con el iPhone frío.
-- Hay una sola respuesta por pregunta y la puntuación es manual.
+- The sustained test lasted 3 minutes instead of 10.
+- Battery drain could not be measured: the iPhone was plugged in and stayed at 100 %.
+- LFM2.5 was not measured with a cold iPhone.
+- There is a single answer per question and the scoring is manual.
 
-## Cambios que salieron de la prueba
+## Changes that came out of the test
 
-- **Datos del iPhone en un mensaje de sistema aparte.** Cuando iban dentro de la pregunta, los modelos los copiaban en la respuesta.
-- **Prompt en bloques de 64 tokens.** Con bloques de 512, «Detener» tardaba segundos.
-- **Cada turno continúa exactamente el prompt del anterior.** Qwen3.5 y LFM2.5 son modelos híbridos: solo reutilizan lo ya procesado si el prompt nuevo empieza igual que el anterior. Para conseguirlo:
-  - el historial incluye los datos del iPhone que se dieron con cada pregunta;
-  - las respuestas se guardan sin recortar;
-  - el bloque `<think>` vacío se repite en las respuestas anteriores;
-  - el historial se recorta a saltos de medio presupuesto, no en cada turno.
+- **iPhone data in a separate system message.** When it was included in the question, the models copied it into the answer.
+- **Prompt processed in 64-token batches.** With 512-token batches, the Stop button («Detener») took seconds to react.
+- **Each turn continues the previous turn's prompt exactly.** Qwen3.5 and LFM2.5 are hybrid models: they only reuse what has already been processed if the new prompt starts exactly like the previous one. To achieve that:
+  - the history includes the iPhone data that was sent with each question;
+  - replies are stored untrimmed;
+  - the empty `<think>` block is repeated in previous replies;
+  - the history is trimmed in jumps of half the budget, not on every turn.
 
-## Cómo repetirla
+## How to repeat it
 
-Con el iPhone desbloqueado y la app en primer plano (la app mantiene la pantalla encendida):
+With the iPhone unlocked and the app in the foreground (the app keeps the screen on):
 
 ```bash
 xcrun devicectl device process launch --device <id> --terminate-existing \
   --environment-variables '{"IOS_STATS_BENCH":"all","IOS_STATS_SOAK_SECS":"180"}' com.gilberto.iosstats
 ```
 
-- **Avance:** aparece en un aviso en pantalla y en `Documents/llm-bench-progress.jsonl`.
-- **Final:** al terminar se crea `Documents/llm-bench.done`.
+- **Progress:** shown in an on-screen banner and in `Documents/llm-bench-progress.jsonl`.
+- **Finish:** when it is done, `Documents/llm-bench.done` is created.
 
-Para traer los resultados al Mac:
+To copy the results to the Mac:
 
 ```bash
 xcrun devicectl device copy from --device <id> --domain-type appDataContainer \
