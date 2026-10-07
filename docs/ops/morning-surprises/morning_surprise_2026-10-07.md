@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1636** — Top Processes row Copied badge (`.process-row.is-just-copied` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1635** — Collapsible section headers (`.section-header-collapsible` hover · focus-visible): opaque wash (no glass alpha on hover, focus ring, or Apple theme border). Always-visible on the default collapsed layout.
 - **v0.1.1634** — Debug Log lines (`.logs-line` hover · selected): opaque wash (no glass alpha on hover or selected inset ring).
 - **v0.1.1633** — Perplexity result Copied badge (`.perplexity-result-item` `::after`): opaque green wash (no glass alpha on the badge).
@@ -54,10 +55,11 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Tried / context
 - Digester open stayed empty; design review in grace (feature-agent-ops still the stale screenshot).
-- Sibling harnesses unavailable on this host (missing git checkouts).
+- Sibling scan this tick: OpenClaw and Hermes checkouts are present. No port this tick. Fuel stayed on GitHub #14.
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `c664f2e9` — v0.1.1636 Top Processes row Copied badge opaque wash (#14). Rebased past origin v0.1.1635.
 - Keep @ `cf28617b` — v0.1.1633 Perplexity result Copied badge opaque wash (#14). Rebased past origin v0.1.1632.
 - Keep @ `5cbc29b4` — v0.1.1629 Perplexity weather card opaque wash (#14). Rebased past origin v0.1.1628.
 - Discard — local AI Chat filter-miss wash duplicated origin v0.1.1623.
