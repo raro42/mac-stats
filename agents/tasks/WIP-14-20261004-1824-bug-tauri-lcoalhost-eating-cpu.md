@@ -12821,3 +12821,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Changelog via footer version; confirm loading / empty / error shells stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1696)
+
+**Date:** 2026-10-07 17:50 UTC (2026-10-07 19:50 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1696**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1696)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Changelog inline code skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1696**
+- `CHANGELOG.md` **[0.1.1696]** documents Apple Changelog inline code (`.changelog-code`) mixing wash against an opaque fill; no glass alpha on the code pill; Loading / error shells opaque in v0.1.1695
+- `src-tauri/dist/themes/apple/cpu.css` — `.changelog-code` mixes wash against opaque `#ffffff` (`color-mix(in srgb, currentColor 6%, #ffffff)`). Claimed wash fill has no `transparent` / `hsla(` / `backdrop-filter` / `var(--panel)` (text color may still use `rgba` for soft tint)
+- Prior cuts still present: `.changelog-loading` / `.changelog-error` opaque mixes (v0.1.1695); `.chat-message.thinking` opaque mixes (v0.1.1694); `.chat-exec-code` opaque wash (parallel); `.process-empty` / `.monitors-empty` opaque empty shells
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css` / dist copy)
+- Note (not a CSS-cut regression): wash paint is the Changelog inline-code path (open Changelog via footer version; confirm inline code pills stay solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.changelog-code` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / cursor-agent / `rustc`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Changelog via footer version; confirm inline code pills stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
