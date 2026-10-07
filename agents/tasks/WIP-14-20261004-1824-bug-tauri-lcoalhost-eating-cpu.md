@@ -9450,3 +9450,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops → Agents; select an agent so the editor shows; focus the textarea; edit until dirty; confirm focus ring and dirty border washes; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1617)
+
+**Date:** 2026-10-07 05:50 UTC (2026-10-07 07:50 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1617**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1617)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops refresh row skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1617**
+- `CHANGELOG.md` **[0.1.1617]** documents Agent Ops refresh row (Refresh · Refresh digest · Updated stamp · top hairline) mixing washes against an opaque fill; no glass alpha on secondary refresh buttons, the Updated control, or the refresh-row divider
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-refresh-row.ops-refresh-row-top` hairline, `.ops-updated-ago` hover / focus-visible, and `.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` resting / `:hover` / `:focus-visible` mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: `textarea.ops-agent-editor:focus` / `.is-dirty` mix against opaque `#ffffff` (v0.1.1616)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops refresh-row path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops refresh-row wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Refresh · Refresh digest · Updated in the refresh row; hover Refresh and Updated; Tab-focus them; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
