@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1689** (follow-up after v0.1.1688).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Monitors settings Remove skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.monitor-remove-btn` resting · hover · focus-visible, mix fills / borders / focus ring against opaque `#ffffff` (Apple had `rgba(255,59,48,0.1)` / `0.2` glass). Shared `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` focus ring mixes against `#ffffff` (was `transparent`). Monitors settings list rows opaque in v0.1.1685. Add-form URL input opaque in v0.1.1686.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Monitors settings with at least one saved monitor; confirm Remove stays solid on rest / hover, focus ring solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1688)
+
 Version **v0.1.1688** (follow-up after v0.1.1687).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

@@ -2183,21 +2183,28 @@ border-radius: 24px;
   margin-left: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-remove-btn {
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
+  border: 1px solid color-mix(in srgb, #ff3b30 20%, #ffffff);
   color: #ff3b30;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .monitor-remove-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
-  border-color: rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 20%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+}
+
+.monitor-remove-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, #ffffff);
+  outline-offset: 2px;
 }
 
 .add-monitor-form {
