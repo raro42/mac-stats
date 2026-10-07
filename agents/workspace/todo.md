@@ -6,8 +6,8 @@
 - [x] Bump to v0.1.1721 + CHANGELOG + standing_backlog
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit + push `origin/main`
-- [ ] Leave GitHub issue alone (do not close)
+- [x] Commit + push `origin/main`
+- [x] Leave GitHub issue alone (do not close)
 
 ## Review
 - Coder: `.icon-btn` resting/hover were `rgba(30, 30, 34, …)` glass under the always-visible Monitors · AI Chat · … strip icons (over opaque `#ececf1` chip). Now `color-mix` against opaque chip `#ececf1` / hover `#ffffff`.
