@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1660** (follow-up after v0.1.1659).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple Settings toggle skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.setting-toggle input[type="checkbox"]` resting · checked · knob, mix track against opaque `#ffffff` (no `rgba` glass alpha). Soft knob drop shadow dropped. Help sheet opaque in v0.1.1659.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings; confirm product / Downloads / Ori / Having fun / Voice toggles stay solid on / off. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1659)
+
 Version **v0.1.1659** (follow-up after v0.1.1658).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -10999,3 +11013,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; confirm Clean now / primary toolbar button stays solid on rest and hover; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1659)
+
+**Date:** 2026-10-07 12:23 UTC (2026-10-07 14:23 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1659**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1659)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Settings help sheet skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1659**
+- `CHANGELOG.md` **[0.1.1659]** documents Apple Settings help sheet (`.settings-help-sheet` resting · focus · Copied) mixing wash against an opaque fill; no glass alpha on cheat-sheet panel / focus ring / Copied flash; Theme list opaque in v0.1.1658
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-help-sheet` resting uses `color-mix(... #ffffff)` for border and background; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- `src/cpu-ui.js` / `src-tauri/dist/cpu-ui.js` — identical for this block. `#settings-help-sheet:focus-visible` and `#settings-help-sheet.is-just-copied` mix against opaque `#ffffff`; no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: Apple theme list `.theme-item` rest · hover · focus · current opaque mix in `src-tauri/dist/themes/apple/cpu.css` (v0.1.1658; text color still uses `rgba` for ink, not wash glass alpha)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings → Help cheat-sheet path (open Settings → Help; rest / Tab-focus / Copied). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings help sheet wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / shell).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Help; confirm the cheat-sheet panel stays solid on rest / Tab-focus / Copied; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.

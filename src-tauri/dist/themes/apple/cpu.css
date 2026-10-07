@@ -788,22 +788,23 @@ padding: 18px 18px 16px;
   cursor: pointer;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .setting-toggle input[type="checkbox"] {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
+  background: color-mix(in srgb, #0c0c10 8%, #ffffff);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
+  background: color-mix(in srgb, #3b82f6 80%, #ffffff);
+  border-color: color-mix(in srgb, #3b82f6 60%, #ffffff);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -812,11 +813,11 @@ padding: 18px 18px 16px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: white;
+  background: #ffffff;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
