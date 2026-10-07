@@ -8752,3 +8752,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops (Agents / Schedules / Sessions / Memory as available); type in the filter input; confirm match chip (all · partial · zero) washes; Tab-focus Clear; use Clear when a filter is active (just-cleared flash); confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1600)
+
+**Date:** 2026-10-07 03:45 UTC (2026-10-07 05:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1600**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1600)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops tab strip + count pills skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1600**
+- `CHANGELOG.md` **[0.1.1600]** documents Agent Ops tab strip (tabs, file tabs, count pills) mixing washes against an opaque fill; no glass alpha on resting, hover, focus-visible, or active states
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-tab-count` resting / active, and `.agent-ops-tab` / `.ops-file-tab` resting / `:hover` / `:focus-visible` / `.active` / `.active:hover`, mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed tab / count-pill wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops tab-strip path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops tab-strip / count-pill wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm Overview / Agents / Schedules / Sessions / Memory (and file tabs if shown); hover tabs; Tab-focus a tab; activate another tab; confirm count pills on tabs with inventory; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
