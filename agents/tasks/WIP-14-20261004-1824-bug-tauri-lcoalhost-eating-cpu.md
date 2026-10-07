@@ -10888,3 +10888,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; set a scope filter that misses (On / Off) and confirm the scope filter-miss shell stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1656)
+
+**Date:** 2026-10-07 12:09 UTC (2026-10-07 14:09 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1656**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1656)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Settings button rest · hover skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1656**
+- `CHANGELOG.md` **[0.1.1656]** documents Apple Settings buttons (`.settings-btn` · `.settings-btn-primary` resting · hover) mixing fill against an opaque fill; no glass alpha on the button wash; Disk Cleanup scope filter-miss opaque in v0.1.1655
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-btn` / `.settings-btn:hover` / `.settings-btn-primary` / `.settings-btn-primary:hover` use `color-mix(... #ffffff)`; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: Disk Cleanup `.disk-cleanup-scope-filter-miss` opaque mix in `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` (v0.1.1655)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings Save / primary / secondary button path (open Settings). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings button wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / shell).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; confirm Save / primary / secondary settings buttons stay solid on rest and hover; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
