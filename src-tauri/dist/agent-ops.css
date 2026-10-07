@@ -1274,6 +1274,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   gap: 4px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-row {
   position: relative;
   display: grid;
@@ -1282,7 +1283,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   align-items: baseline;
   padding: 8px 10px;
   border-radius: 8px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   border: 1px solid transparent;
   cursor: pointer;
   text-align: left;
@@ -1293,27 +1294,26 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-row:hover {
-  border-color: color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 9%, transparent);
-  box-shadow: 0 2px 8px color-mix(in srgb, #000 8%, transparent);
+  border-color: color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 9%, #ffffff);
 }
 
 .ops-row:focus-visible {
-  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, #ffffff);
   outline-offset: 2px;
 }
 
 /* Keyboard/click selection — accent wash (parity with overview .is-active). */
 .ops-row.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
 }
 
 .ops-row.is-selected:hover {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 15%, transparent);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 15%, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
 }
 
 /* c / chip copy — green Copied wash + badge (Top Processes / Monitors parity). */
