@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1633** — Perplexity result Copied badge (`.perplexity-result-item` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1632** — Debug Log collapsed Error/Warn glance (`.logs-error-glance` · Quiet · hover): opaque wash (no glass alpha); soft glass hover shadow dropped.
 - **v0.1.1631** — Debug Log filter-miss (`.logs-viewer-empty.logs-filter-miss` · Error · Warn · Clear filter): opaque wash (no glass alpha).
 - **v0.1.1630** — Debug Log chrome (`.logs-toolbar` · buttons · `.logs-viewer` · path focus): opaque wash (no glass alpha).
@@ -55,6 +56,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `cf28617b` — v0.1.1633 Perplexity result Copied badge opaque wash (#14). Rebased past origin v0.1.1632.
 - Keep @ `5cbc29b4` — v0.1.1629 Perplexity weather card opaque wash (#14). Rebased past origin v0.1.1628.
 - Discard — local AI Chat filter-miss wash duplicated origin v0.1.1623.
 - Keep — v0.1.1625 Top Processes filter-miss opaque wash (#14).
