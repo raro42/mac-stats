@@ -8,8 +8,8 @@
 - [x] CHANGELOG `[0.1.1694]` entry
 - [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`
-- [ ] GitHub comment via `gh-safe.sh` (issue not closed)
+- [x] Commit + push `origin/main` (`cfffa04e`)
+- [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
 - Cut: Apple `.chat-message.thinking` mix against opaque `#ffffff` (was `transparent` glass on dashed border + wash).
