@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1700
+
+- Apple section collapse control (`.collapse-btn` hover · focus-visible) mixes fills against an opaque fill. No glass alpha on the chevron hover wash or focus ring. Section headers already opaque. History tooltip already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1699
 
 - Apple History sparkline tooltip (`.history-tooltip`) uses an opaque fill. No glass alpha on the tip panel, border, or soft drop shadow. Match monitor tick tips opaque in v0.1.1594. Markdown shells already opaque. P2 reliability / GitHub #14.

@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1700** (follow-up after v0.1.1699).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple section collapse control skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.collapse-btn` hover · focus-visible mix wash / focus ring against opaque `#ffffff` (Apple had `var(--hairline)` glass hover + `transparent` focus mix). Section headers opaque in v0.1.1635. History tooltip opaque in v0.1.1699.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover / keyboard-focus a Details or Top Processes collapse chevron (`.collapse-btn`); confirm hover wash and focus ring stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1699)
+
+
 Version **v0.1.1699** (follow-up after v0.1.1698).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
