@@ -22,6 +22,35 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1613** (follow-up after v0.1.1612).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops close button resting · hover skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-close-btn` resting / `:hover`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Resting fill is a light opaque wash instead of `background: transparent`.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops. Confirm the close (×) control in the Agent Ops header. Hover it; confirm the wash still shows, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1612)
+
+Version **v0.1.1612** (follow-up after v0.1.1611).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops loading shell skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-loading` resting wash, mix against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops while inventory loads. Confirm the loading shell wash. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1611)
+
+
 Version **v0.1.1611** (follow-up after v0.1.1610).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -32,7 +61,6 @@ Changes (Agent Ops Overview Open link resting · hover · focus-visible skip gla
 
 Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops → Overview. Confirm Open links on cards when present. Hover an Open link; Tab-focus it; confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
 
----
 
 ## Prior implementation (v0.1.1610)
 

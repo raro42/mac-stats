@@ -630,10 +630,11 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   overflow: visible;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-close-btn {
   margin-left: auto;
-  background: transparent;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
   color: inherit;
   border-radius: 8px;
   width: 28px;
@@ -646,7 +647,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 .ops-close-btn:hover {
   opacity: 1;
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
 
 .agent-ops-section .section-header-collapsible,
