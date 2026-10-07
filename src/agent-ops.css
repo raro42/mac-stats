@@ -4980,6 +4980,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.42;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-filter-miss {
   display: flex;
   flex-direction: column;
@@ -4987,20 +4988,20 @@ textarea.ops-agent-editor.is-dirty {
   justify-content: center;
   padding: 18px 14px 16px;
   border-style: solid;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
 }
 
 .chat-filter-miss.is-errors {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: inherit;
 }
 
 .chat-filter-miss.is-you,
 .chat-filter-miss.is-assistant {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 .chat-filter-miss-title {
@@ -5020,10 +5021,11 @@ textarea.ops-agent-editor.is-dirty {
   text-align: center;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-filter-miss-cta {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
   color: var(--text);
   font: inherit;
   font-size: 12px;
@@ -5038,12 +5040,12 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .chat-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
 }
 
 .chat-filter-miss-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
 }
 
 /* Debug Log — Error/Warn attention glance (Monitors Down/Slow / Hot parity; expanded) */
@@ -10367,9 +10369,10 @@ button.is-just-saved,
 }
 
 /* AI Chat Clear — secondary control next to Send */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-clear-btn {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
   border-radius: 8px;
   padding: 8px 12px;
   color: inherit;
@@ -10382,12 +10385,12 @@ button.is-just-saved,
 }
 
 #chat-clear-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, currentColor 12%, transparent);
-  border-color: color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 28%, #ffffff);
 }
 
 #chat-clear-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 

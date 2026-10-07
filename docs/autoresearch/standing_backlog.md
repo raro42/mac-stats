@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1623
+
+- AI Chat filter-miss / Clear (`.chat-filter-miss` · CTA · `#chat-clear-btn`) mix washes against an opaque fill. No glass alpha on the empty-filter shell or Clear control. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1622
 
 - AI Chat error bubbles (`.chat-message.assistant.is-error`) mix their wash against an opaque fill. No glass alpha on the error row background or border. P2 reliability / GitHub #14.
