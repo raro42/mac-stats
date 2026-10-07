@@ -951,7 +951,8 @@ border-radius: 24px;
   background: color-mix(in srgb, #ff3b30 10%, #ffffff);
   border: 1px solid color-mix(in srgb, #ff3b30 30%, #ffffff);
   border-radius: 8px;
-  color: rgba(255, 59, 48, 0.9);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #ff3b30 90%, #ffffff);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
