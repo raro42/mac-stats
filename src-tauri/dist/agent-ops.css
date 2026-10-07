@@ -9218,6 +9218,7 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.55;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-soft-delete {
   display: flex;
   align-items: center;
@@ -9226,21 +9227,21 @@ button.monitor-detail-url.is-just-saved {
   margin: 4px 0 6px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3%, #ffffff);
   cursor: pointer;
   user-select: none;
   transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .disk-cleanup-soft-delete:hover {
-  background: color-mix(in srgb, currentColor 5.5%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, currentColor 5.5%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
 }
 
 .disk-cleanup-soft-delete:focus-within {
-  border-color: color-mix(in srgb, #0a84ff 34%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 34%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ffffff);
 }
 
 .disk-cleanup-soft-delete input {

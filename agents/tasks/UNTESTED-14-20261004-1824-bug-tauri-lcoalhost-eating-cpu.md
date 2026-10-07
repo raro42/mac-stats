@@ -22,6 +22,30 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1663** (follow-up after v0.1.1662).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup soft-delete skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-soft-delete` resting / `:hover` / `:focus-within`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Top Processes empty shell opaque in v0.1.1662.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; confirm the Move to Trash / soft-delete row stays solid on rest, hover, and Tab-focus. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1662)
+
+Version **v0.1.1662** (follow-up after v0.1.1661; landed on origin while this cut was in flight).
+
+Changes (Apple Top Processes empty-shell skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.process-empty` resting · hover, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Settings card opaque in v0.1.1661.
+
+---
+
+## Prior implementation (v0.1.1661)
+
 Version **v0.1.1661** (follow-up after v0.1.1660).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
