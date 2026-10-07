@@ -4,6 +4,8 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
+- **v0.1.1719** — Apple primary / muted type tokens (`--text` · `--muted`) and leftover panel tokens mix against an opaque shell fill. No glass alpha on always-on labels.
+- **v0.1.1718** — Apple Settings / Monitors / AI Chat modal dimmers (`--modal-backdrop`) mix against an opaque fill.
 - **v0.1.1717** — Apple ring gauge tracks (`.ring-track` / `--ring-track`) mix against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp ring tracks.
 - **v0.1.1716** — Apple AI Chat markdown table cells and horizontal rules mix hairline borders against an opaque fill.
 - **v0.1.1715** — Apple Monitors settings Add form and row history hairlines opaque.
@@ -34,5 +36,5 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Next
 
-- More #14 glass: `--modal-backdrop` on Settings / Monitors / Ollama popovers (open-only).
+- More #14 glass: icon-line resting/hover `color: rgba(12, 12, 16, …)` on the always-visible Monitors · AI Chat strip.
 - Screenshot refresh for feature-agent-ops when due and TCC allows.
