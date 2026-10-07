@@ -1,11 +1,13 @@
-# WIP-14 — next WebView idle cut
+# Coder todo — WIP-14 (tauri://localhost CPU)
 
-- [x] Pick lowest GitHub WIP/FEAT: WIP-14
-- [x] Opaque Disk Cleanup scope filter chips + Clear (All · On · Off; parallel to category chips v0.1.1596)
-- [x] Bump Cargo.toml → 0.1.1597, CHANGELOG, sync dist
-- [x] `cargo check` in src-tauri/
-- [x] Update task notes, rename WIP → UNTESTED, commit + push
-- [x] GitHub comment via gh-safe (do not close #14)
+## Plan
+- [x] Pick lowest GitHub FEAT/WIP: WIP-14
+- [x] Convert Agent Ops filter row (`.ops-filter-input` / `.ops-filter-match` / `.ops-filter-clear`) glass blends to opaque `#ffffff`
+- [x] Sync `src-tauri/dist/agent-ops.css`
+- [x] Bump `src-tauri/Cargo.toml` → `0.1.1598`
+- [x] Update WIP Implementation notes; `cargo check` in `src-tauri/`
+- [ ] Commit + push `origin/main`; rename `WIP-` → `UNTESTED-`
 
 ## Review
-v0.1.1597: Disk Cleanup scope filter chips + Clear opaque washes (#14). `cargo check` pass (existing warnings only). Pushed to origin/main. Issue #14 left open.
+- v0.1.1598: Agent Ops filter input / match / Clear / just-cleared opaque washes (#14).
+- `cargo check` in `src-tauri/` succeeded (pre-existing unused import warning in `feature_health.rs` only).

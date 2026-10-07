@@ -760,6 +760,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   opacity: 0.72;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-filter-input {
   flex: 1;
   min-width: 0;
@@ -767,13 +768,14 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   box-sizing: border-box;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
   color: inherit;
   font-size: 13px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-filter-match {
   flex: 0 0 auto;
   font-size: 11px;
@@ -782,8 +784,8 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   padding: 5px 8px;
   border-radius: 6px;
   opacity: 0.85;
-  background: color-mix(in srgb, currentColor 8%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, currentColor 8%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 16%, #ffffff);
   white-space: nowrap;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
@@ -793,28 +795,29 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-filter-match.is-all {
-  background: color-mix(in srgb, #30d158 18%, transparent);
-  border-color: color-mix(in srgb, #30d158 32%, transparent);
+  background: color-mix(in srgb, #30d158 18%, #ffffff);
+  border-color: color-mix(in srgb, #30d158 32%, #ffffff);
   opacity: 0.95;
 }
 
 .ops-filter-match.is-partial {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
   opacity: 0.95;
 }
 
 .ops-filter-match.is-zero {
-  background: color-mix(in srgb, #ff9f0a 16%, transparent);
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  background: color-mix(in srgb, #ff9f0a 16%, #ffffff);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
   opacity: 0.95;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-filter-clear {
   flex: 0 0 auto;
   appearance: none;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 7%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
   color: inherit;
   font: inherit;
   font-size: 11px;
@@ -834,26 +837,26 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-filter-clear:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ffffff);
   opacity: 1;
 }
 
 .ops-filter-clear:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
 }
 
 .ops-filter-input:hover {
-  background: color-mix(in srgb, currentColor 7%, transparent);
-  border-color: color-mix(in srgb, currentColor 24%, transparent);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 24%, #ffffff);
 }
 
 .ops-filter-input:focus {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
 .ops-filter-caption {
@@ -1731,10 +1734,11 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-filter-input.ops-filter-just-cleared {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
 }
 
 .ops-overview-body > .ops-empty {
