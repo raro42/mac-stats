@@ -731,12 +731,13 @@ padding: 18px 18px 16px;
   margin-top: 2px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .settings-btn {
   height: 30px;
   padding: 0 11px;
   border-radius: 8px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.10));
-  background: color-mix(in srgb, var(--text, #0c0c10) 6%, transparent);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
   color: var(--text);
   font-size: 12px;
   font-weight: 550;
@@ -746,17 +747,17 @@ padding: 18px 18px 16px;
 }
 
 .settings-btn:hover {
-  background: color-mix(in srgb, var(--text, #0c0c10) 11%, transparent);
-  border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, transparent);
+  background: color-mix(in srgb, var(--text, #0c0c10) 11%, #ffffff);
+  border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, #ffffff);
 }
 
 .settings-btn-primary {
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 28%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 40%, transparent);
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 28%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 40%, #ffffff);
 }
 
 .settings-btn-primary:hover {
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 38%, transparent);
+  background: color-mix(in srgb, var(--accent, #8bb4e8) 38%, #ffffff);
 }
 
 .settings-help-sheet {

@@ -1,14 +1,14 @@
-# Feature coder — WIP-14 (#14) v0.1.1655
+# WIP-14 coder pass (v0.1.1656)
 
-## Plan
-- [x] Pick lowest GitHub FEAT/WIP: `WIP-14` (tauri localhost CPU)
-- [x] Opaque wash for `.disk-cleanup-scope-filter-miss` (+ On/Off empty)
-- [x] Sync `src/agent-ops.css` + `src-tauri/dist/agent-ops.css`
-- [x] Bump to `0.1.1655` (remote already took 1654 for Settings rest/hover)
-- [x] CHANGELOG + standing_backlog overnight merge note
-- [x] Prepend Implementation on task; rename WIP- → UNTESTED-
+- [x] Opaque-wash Apple Settings buttons (`.settings-btn` / `.settings-btn-primary` rest · hover) in `src-tauri/dist/themes/apple/cpu.css`
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1656
+- [x] CHANGELOG `[0.1.1656]` entry
+- [x] Prepend Implementation note on WIP-14 task file
 - [x] `cargo check` in `src-tauri/`
-- [x] Commit + push `origin/main` (do not close #14)
+- [x] Rename WIP-14 → UNTESTED-14
+- [ ] Commit + push `origin/main`
+- [x] Do **not** close GitHub #14
 
 ## Review
-Shipped **v0.1.1655**: Disk Cleanup scope filter-miss shell mixes washes against opaque `#ffffff`. GitHub #14 left for tester/004 (do not close).
+
+v0.1.1656: Apple Settings `.settings-btn` / `.settings-btn-primary` resting · hover mix against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Issue #14 left open.
