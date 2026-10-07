@@ -4,6 +4,7 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
+- **v0.1.1714** — Apple Monitors / AI Chat settings popover headers mix hairline borders against an opaque fill.
 - **v0.1.1713** — Apple AI Chat message list (`.chat-messages`) mixes the hairline border against an opaque fill. Panel fill was already opaque in v0.1.1676; the border still used glass `--hairline`.
 - **v0.1.1712** — Apple icon-strip dividers (`.icon-btn:not(:last-child)::after`) and section hairlines (`.apple-divider`) opaque mixes on the shell fill.
 - **v0.1.1711** — Apple outer window shell (`.apple-shell`) opaque hairline border.
@@ -30,5 +31,5 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Next
 
-- More #14 glass: popover header hairlines; markdown table/hr hairlines; add-monitor / monitor-history hairlines.
+- More #14 glass: markdown table/hr hairlines; add-monitor / monitor-history hairlines; add-monitor / monitor-history hairlines.
 - Screenshot refresh for feature-agent-ops when due and TCC allows.
