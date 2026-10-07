@@ -5445,6 +5445,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.42;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-scope-filter-miss {
   display: flex;
   flex-direction: column;
@@ -5457,21 +5458,21 @@ textarea.ops-agent-editor.is-dirty {
   font-style: normal;
   text-align: center;
   /* Filter-miss calm — soft accent wash (Ready calm 7%). */
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 /* Off empty = all scopes on (Ready soft green — nothing disabled is calm). */
 .disk-cleanup-scope-filter-miss.is-off-empty {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   color: inherit;
 }
 
 .disk-cleanup-scope-filter-miss.is-on-empty {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

@@ -22,6 +22,30 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1655** (follow-up after v0.1.1654).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup scope filter-miss skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-scope-filter-miss` resting / `.is-off-empty` / `.is-on-empty`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Settings input rest/hover opaque in v0.1.1654; category filter-miss opaque in v0.1.1653.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; set a scope filter that misses (On / Off) and confirm the scope filter-miss shell stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1654)
+
+Version **v0.1.1654** (follow-up after v0.1.1653; landed on origin while this cut was in flight).
+
+Changes (Apple Settings input rest · hover skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-input` / `.discord-token-input` resting · hover, mix fills against opaque fill.
+
+---
+
+## Prior implementation (v0.1.1653)
+
 Version **v0.1.1653** (follow-up after v0.1.1652).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -10776,3 +10800,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; if a category or scope list is empty, confirm the empty shell stays solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1653)
+
+**Date:** 2026-10-07 11:45 UTC (2026-10-07 13:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1653**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1653)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Disk Cleanup filter-miss + empty CTA skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1653**
+- `CHANGELOG.md` **[0.1.1653]** documents Disk Cleanup filter-miss shell and empty CTA (`.disk-cleanup-filter-miss` · Reclaim · Big · Clean · `.disk-cleanup-empty-cta` resting · hover · focus) mixing the wash against an opaque fill; no glass alpha on the filter-miss shell or Clear/Review CTA; empty shell opaque in v0.1.1652
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — identical for this block. `.disk-cleanup-filter-miss` resting / `.is-reclaim-empty` / `.is-big-empty` / `.is-clean-empty`, and `.disk-cleanup-empty-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Apple `cpu.html` ships `.disk-cleanup-empty-cta` on empty scope/list shells. `src/cpu.js` injects `.disk-cleanup-filter-miss` (+ `is-reclaim-empty` / `is-big-empty` / `is-clean-empty`) and Clear-filter CTAs when category/scope filters miss (expand Disk Cleanup to exercise)
+- Prior cut still present: `.disk-cleanup-empty` opaque wash (v0.1.1652)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Disk Cleanup filter-miss / empty-CTA path (expand Disk Cleanup; set a missing category filter or open an empty-shell CTA). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Disk Cleanup filter-miss / empty-CTA wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Disk Cleanup; set a category filter that misses (Reclaim / Big / Clean) or open an empty-shell CTA; confirm filter-miss shell and Clear/Review CTA stay solid on rest / hover / Tab-focus; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
