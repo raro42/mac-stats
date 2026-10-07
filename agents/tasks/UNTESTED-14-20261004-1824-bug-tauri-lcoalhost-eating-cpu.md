@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1587** (follow-up after v0.1.1586).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Top Processes filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.processes-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / pinned·hot `.has-hits` / `.is-active`, and `.processes-filter-clear` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes. Hover All · Pinned · Hot; Tab-focus a chip; activate Pinned or Hot; use Clear when a filter is active. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1586)
+
 Version **v0.1.1586** (follow-up after v0.1.1585).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -8188,3 +8202,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover a ring value (CPU · GPU · Freq · Temp) or Bat / Power; Tab-focus one of those copy targets; confirm the hover wash and focus ring still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1585)
+
+**Date:** 2026-10-07 02:01 UTC (2026-10-07 04:01 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1585**; tree advanced to **v0.1.1586**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1586)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Top Processes row pinned + hover + focus-visible + active + selected skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1586** (task Implementation section claims **0.1.1585**)
+- `CHANGELOG.md` **[0.1.1585]** documents Top Processes row pinned, hover, focus-visible, active, and selected mixing the accent wash against an opaque fill; no glass alpha or hover drop shadow on process rows
+- `CHANGELOG.md` **[0.1.1586]** (tree tip) documents Top Processes pin hover and focus-visible opaque wash (also present in CSS; not the claimed 1585 slice alone)
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.process-row.is-pinned` / `:hover` / `:focus-visible` / `:active` / `.is-selected` mix washes against opaque `#ffffff`. Hover / active `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those row wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Top Processes row interaction path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes row wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Top Processes; hover a row; Tab-focus one; Arrow to select; pin one; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
