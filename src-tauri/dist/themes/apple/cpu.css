@@ -515,10 +515,15 @@ border-radius: 24px;
   overflow: hidden;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-bar-fill {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, rgba(110, 170, 230, 0.90), rgba(140, 190, 240, 0.90));
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #6eaadf 90%, #ffffff),
+    color-mix(in srgb, #8cbef0 90%, #ffffff)
+  );
   border-radius: 99px;
 }
 
