@@ -22,6 +22,35 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1597** (follow-up after v0.1.1596).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup scope filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-scope-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / on·off `.has-hits` / `.is-active`, and `.disk-cleanup-scope-filter-clear` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup. Confirm scope filter chips (All · On · Off) when present. Hover All · On · Off; Tab-focus a chip; activate On or Off when they have hits; use Clear when a filter is active. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1596)
+
+Version **v0.1.1596** (follow-up after v0.1.1595).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup category filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / reclaim·big·clean `.has-hits` / `.is-active`, and `.disk-cleanup-filter-clear` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup. Confirm category filter chips (All · Reclaim · Big · Clean) when present. Hover All · Reclaim · Big · Clean; Tab-focus a chip; activate Reclaim, Big, or Clean when they have hits; use Clear when a filter is active. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1595)
+
+
 Version **v0.1.1595** (follow-up after v0.1.1594).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

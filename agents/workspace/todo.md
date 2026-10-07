@@ -1,12 +1,11 @@
 # WIP-14 — next WebView idle cut
 
 - [x] Pick lowest GitHub WIP/FEAT: WIP-14
-- [x] Survey remaining glass blends after v0.1.1593 / remote v0.1.1594
-- [x] Opaque Debug Log filter chips + Clear (parallel to Perplexity / AI Chat chips)
-- [x] Bump Cargo.toml → 0.1.1595 (1594 taken by monitor tick tips), CHANGELOG, sync dist
+- [x] Opaque Disk Cleanup scope filter chips + Clear (All · On · Off; parallel to category chips v0.1.1596)
+- [x] Bump Cargo.toml → 0.1.1597, CHANGELOG, sync dist
 - [x] `cargo check` in src-tauri/
-- [x] Update task notes, rename WIP → UNTESTED, commit + push
-- [x] GitHub comment via gh-safe (do not close #14)
+- [ ] Update task notes, rename WIP → UNTESTED, commit + push
+- [ ] GitHub comment via gh-safe (do not close #14)
 
 ## Review
-v0.1.1595: Debug Log filter chips + Clear opaque washes (#14). `cargo check` pass. Pushed to origin/main. Issue #14 left open.
+v0.1.1597: Disk Cleanup scope filter chips + Clear opaque washes (#14). `cargo check` pass (existing warnings only). Issue #14 left open.
