@@ -4,8 +4,10 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
-- **v0.1.1723** — Apple battery strip glyph (`.battery-icon` resting · charging) mixes type color against an opaque strip fill. No glass alpha on the always-visible Bat icon.
-- **v0.1.1722** — Apple window title (`.apple-title h1`) mixes type color against an opaque shell fill. No glass alpha on the always-visible product title.
+- **v0.1.1725** — Apple icon-line status washes (`.icon-line-item.status-good` · `.status-warning` · `.status-bad` resting · hover) mix type color against an opaque chip fill. No glass alpha on Ready / Slow / Down strip status type.
+- **v0.1.1724** — Apple Details / Top Processes body type (`.details-grid` · `.process-table`) mixes against an opaque panel fill.
+- **v0.1.1723** — Apple battery strip glyph (`.battery-icon` resting · charging) mixes type color against an opaque strip fill.
+- **v0.1.1722** — Apple window title (`.apple-title h1`) mixes type color against an opaque shell fill.
 - **v0.1.1721** — Apple section icon strip glyphs (`.icon-btn` resting · hover) mix type color against an opaque chip fill.
 - **v0.1.1720** — Apple icon-line strip glyphs (`.icon-line-item` resting · hover) mix type color against an opaque chip fill.
 - **v0.1.1719** — Apple primary / muted type tokens (`--text` · `--muted`) and leftover panel tokens mix against an opaque shell fill.
@@ -36,9 +38,9 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - Design review: due=false (feature-agent-ops still recommended when screenshot TCC allows).
 - Debug.log: quiet in the 180m window.
 - Sibling harnesses: OpenClaw / Hermes paths missing on this host.
-- 00:09 tick: raced sibling on apple-title (kept v0.1.1722), then shipped battery-icon as v0.1.1723.
+- 00:45 tick: shipped icon-line status type as v0.1.1725; logged missing keep for v0.1.1724.
 
 ## Next
 
-- More #14 glass: Details · Top Processes body `rgba(60, 60, 67, 0.72)`; icon-line status-good/warning/bad type rgba.
+- More #14 glass: remaining apple theme type rgba (error accents / popover copy around lines 954–1385).
 - Screenshot refresh for feature-agent-ops when due and TCC allows.
