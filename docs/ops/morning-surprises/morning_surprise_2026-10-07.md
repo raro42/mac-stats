@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1659** — Apple Settings help sheet (`.settings-help-sheet` resting · focus · copied): opaque wash (no glass alpha on the sheet).
 - **v0.1.1658** — Apple theme list (`.theme-item` resting · hover · focus · current): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1657** — Disk Cleanup primary toolbar (`.disk-cleanup-toolbar .disk-cleanup-primary` resting · hover): opaque wash (no glass alpha on Clean now).
 - **v0.1.1656** — Apple Settings buttons (`.settings-btn` · `.settings-btn-primary` resting · hover): opaque fill (no glass alpha on the button wash).
@@ -72,11 +73,12 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 
 ## Tried / context
 - Digester open stayed empty; design review in grace (feature-agent-ops still the stale screenshot).
-- This tick discarded a local Settings button wash that duplicated origin v0.1.1656, then shipped the theme list as v0.1.1658. Origin also shipped Disk Cleanup scope filter-miss (v0.1.1655) and the primary toolbar (v0.1.1657).
+- This tick shipped the Settings help sheet as v0.1.1659. Focus and the copied flash mix against an opaque fill. The earlier tick discarded a local Settings button wash that duplicated origin v0.1.1656, then shipped the theme list as v0.1.1658.
 - Sibling scan this tick: OpenClaw and Hermes checkouts are present. No port this tick. Fuel stayed on GitHub #14.
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep @ `39cfc86` — v0.1.1659 Apple Settings help sheet opaque wash (#14).
 - Keep @ `bbf627ab` — v0.1.1658 Apple theme list opaque wash (#14).
 - Discard — local Settings button wash duplicated origin v0.1.1656.
 - Keep @ `6310600a` — v0.1.1654 Apple Settings input rest and hover opaque wash (#14). Rebased past origin v0.1.1653.
