@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1632** (follow-up after v0.1.1631).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Debug Log collapsed Error/Warn glance skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.logs-error-glance` resting / `:hover` / `:focus-visible` / `.has-errors` / `.has-warns-only` / `.is-quiet`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Soft glass hover shadow dropped (`box-shadow: none`, attention-glance parity). Attention glance already opaque.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm Debug Log keep-header Error/Warn/Quiet glance washes stay solid; hover and Tab-focus the glance. Expand Debug Log when useful. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1631)
+
 Version **v0.1.1631** (follow-up after v0.1.1630).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -9935,3 +9949,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Debug Log; confirm the toolbar shell, Refresh / Open buttons, and viewer panel washes stay solid; Tab-focus path hint and a toolbar button; confirm focus rings; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1631)
+
+**Date:** 2026-10-07 08:13 UTC (2026-10-07 10:13 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1631**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1631)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Debug Log filter-miss · Error · Warn · Clear skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1631**
+- `CHANGELOG.md` **[0.1.1631]** documents Debug Log filter-miss (`.logs-viewer-empty.logs-filter-miss` · Error · Warn · Clear filter) mixing washes against an opaque fill; no glass alpha on the empty-filter shell or Clear filter control; toolbar / viewer already opaque in v0.1.1630
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.logs-viewer-empty.logs-filter-miss` (+ `.is-error-empty` / `.is-warn-empty`) and `.logs-filter-miss-cta` resting / `:hover` / `:focus-visible` mix washes against opaque `#ffffff`. Comments: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: `.logs-toolbar` / `.logs-viewer` / path focus mix against opaque `#ffffff` (v0.1.1630)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Debug Log filter-miss / Clear path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Debug Log filter-miss wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` during cargo).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Debug Log; apply Error or Warn filter so the filter-miss shell shows; hover Clear filter; Tab-focus Clear; confirm solid washes; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
