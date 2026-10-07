@@ -8,10 +8,11 @@
 - [x] CHANGELOG `[0.1.1684]` entry
 - [x] Refresh Implementation section → rename `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/` (green; unused-import warning pre-existing)
-- [ ] Commit + push `origin/main`
-- [ ] GitHub comment via `gh-safe.sh` (do not close issue)
+- [x] Commit + push `origin/main` (`4e137f81`)
+- [x] GitHub comment via `gh-safe.sh` (issue not closed)
 
 ## Review
 - Cut: Apple `.ollama-settings-popover .popover-content` opaque `#ffffff`, hairline via `color-mix`, `box-shadow: none`; close focus ring mixes against `#ffffff`.
 - Parallel to Monitors settings popover in v0.1.1683.
 - Linux webkit2gtk blank-page floor still applies; macOS Graphics and Media gate remains tester check.
+- Task file: `agents/tasks/UNTESTED-14-20261004-1824-bug-tauri-lcoalhost-eating-cpu.md`
