@@ -2902,17 +2902,19 @@ border-radius: 24px;
   margin: 4px 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  border-left: 3px solid rgba(12, 12, 16, 0.2);
-  background: rgba(12, 12, 16, 0.03);
+  border-left: 3px solid color-mix(in srgb, #0c0c10 20%, #ffffff);
+  background: color-mix(in srgb, #0c0c10 3%, #ffffff);
   border-radius: 4px;
   font-style: italic;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown code {
-  background: rgba(12, 12, 16, 0.08);
+  background: color-mix(in srgb, #0c0c10 8%, #ffffff);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
@@ -2920,9 +2922,10 @@ border-radius: 24px;
   color: #d73a49;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown pre {
-  background: rgba(12, 12, 16, 0.05);
-  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, #0c0c10 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   border-radius: 8px;
   padding: 12px;
   margin: 12px 0;
@@ -2953,8 +2956,9 @@ border-radius: 24px;
   text-align: left;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message .markdown table th {
-  background: rgba(12, 12, 16, 0.05);
+  background: color-mix(in srgb, #0c0c10 5%, #ffffff);
   font-weight: 600;
 }
 

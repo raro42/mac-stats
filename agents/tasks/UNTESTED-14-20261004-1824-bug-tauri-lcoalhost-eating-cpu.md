@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1698** (follow-up after v0.1.1697).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat markdown code / quote / pre skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-message .markdown blockquote` · `code` · `pre` · `table th` mix washes / borders against opaque `#ffffff` (Apple had `rgba(12,12,16,0.03/0.05/0.08)` glass + hairline glass on pre). Monitors Add opaque in v0.1.1697. Changelog inline code opaque in v0.1.1696. Exec code opaque in v0.1.1693.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat with a markdown reply that includes inline code, a fenced block, a quote, and/or a table; confirm those shells stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1697)
+
+
 Version **v0.1.1697** (follow-up after v0.1.1696).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
