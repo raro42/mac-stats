@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1653** (follow-up after v0.1.1652).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup filter-miss + empty CTA skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-filter-miss` resting / `.is-reclaim-empty` / `.is-big-empty` / `.is-clean-empty`, and `.disk-cleanup-empty-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Empty shell opaque in v0.1.1652.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; set a category filter that misses (Reclaim / Big / Clean) or open an empty-shell CTA; confirm filter-miss shell and Clear/Review CTA stay solid on rest / hover / Tab-focus. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1652)
+
 Version **v0.1.1652** (follow-up after v0.1.1651).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
