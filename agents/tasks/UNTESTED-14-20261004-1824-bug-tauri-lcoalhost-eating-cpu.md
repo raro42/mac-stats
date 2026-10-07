@@ -22,6 +22,31 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1659** (follow-up after v0.1.1658).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple Settings help sheet skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-help-sheet` resting, mix fill against opaque `#ffffff` (no `transparent` glass alpha).
+- `src/cpu-ui.js` / `src-tauri/dist/cpu-ui.js` — `#settings-help-sheet:focus-visible` · `.is-just-copied`, mix against opaque `#ffffff`. Theme list opaque in v0.1.1658.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings → Help; confirm the cheat-sheet panel stays solid on rest / Tab-focus / Copied. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1658)
+
+Version **v0.1.1658** (follow-up after v0.1.1657; landed on origin while this cut was in flight).
+
+Changes (Apple theme list skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.theme-item` resting · hover · focus · current, mix washes against opaque `#ffffff` (no `transparent` glass alpha). Hover drops the soft glass shadow. Disk Cleanup primary toolbar opaque in v0.1.1657.
+
+---
+
+## Prior implementation (v0.1.1657)
+
 Version **v0.1.1657** (follow-up after v0.1.1656).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

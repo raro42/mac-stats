@@ -761,14 +761,15 @@ padding: 18px 18px 16px;
   background: color-mix(in srgb, var(--accent, #8bb4e8) 38%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .settings-help-sheet {
   margin: 4px 0 0;
   padding: 10px 11px;
   max-height: 160px;
   overflow: auto;
   border-radius: 10px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.08));
-  background: color-mix(in srgb, var(--text, #0c0c10) 5%, transparent);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
+  background: color-mix(in srgb, var(--text, #0c0c10) 5%, #ffffff);
   font-size: 11px;
   line-height: 1.45;
   white-space: pre-wrap;

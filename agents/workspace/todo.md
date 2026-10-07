@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1657)
+# WIP-14 coder pass (v0.1.1659)
 
-- [x] Opaque-wash Disk Cleanup primary toolbar (`.disk-cleanup-toolbar .disk-cleanup-primary` rest · hover) in `src/agent-ops.css` + dist sync
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1657
-- [x] CHANGELOG `[0.1.1657]` entry
+- [x] Opaque-wash Apple Settings help sheet (`.settings-help-sheet` rest · focus · Copied) in apple `cpu.css` + `cpu-ui.js` / dist sync
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1659
+- [x] CHANGELOG `[0.1.1659]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1657: Disk Cleanup `.disk-cleanup-toolbar .disk-cleanup-primary` resting · hover mix against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1659: Apple `.settings-help-sheet` resting + injected focus/Copied washes mix against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.

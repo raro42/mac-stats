@@ -1179,13 +1179,14 @@
       .product-setting-kb-hint[hidden] {
         display: none !important;
       }
+      /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
       #settings-help-sheet:focus-visible {
-        outline: 2px solid color-mix(in srgb, var(--accent, #8bb4e8) 70%, transparent);
+        outline: 2px solid color-mix(in srgb, var(--accent, #8bb4e8) 70%, #ffffff);
         outline-offset: 2px;
       }
       #settings-help-sheet.is-just-copied {
-        border-color: color-mix(in srgb, #34c759 55%, transparent);
-        background: color-mix(in srgb, #34c759 12%, transparent);
+        border-color: color-mix(in srgb, #34c759 55%, #ffffff);
+        background: color-mix(in srgb, #34c759 12%, #ffffff);
       }
     `;
     document.head.appendChild(style);
