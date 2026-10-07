@@ -2979,10 +2979,11 @@ border-radius: 24px;
 }
 
 /* Thinking animation */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message.thinking {
   opacity: 0.85;
-  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 18%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
 }
 
 .chat-status {
