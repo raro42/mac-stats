@@ -13595,3 +13595,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm header icon-strip separators and section hairlines stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1714)
+
+**Date:** 2026-10-07 20:55 UTC (2026-10-07 22:55 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1714**)
+- No stale sibling `agents/tasks/WIP-14-…` or `UNTESTED-14-…` at start of this pass
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1714)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Monitors / AI Chat settings popover header hairlines skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1714**
+- `CHANGELOG.md` **[0.1.1714]** documents Apple Monitors / AI Chat settings popover headers mixing the hairline border against an opaque fill; no glass alpha on the popover title-row divider; Message-list border opaque in v0.1.1713
+- `src-tauri/dist/themes/apple/cpu.css` — `.monitors-settings-popover .popover-header` and `.ollama-settings-popover .popover-header` use `border-bottom: 1px solid color-mix(in srgb, #0c0c10 5%, #ffffff)` with opaque `#ffffff` mix comment. No glass `--hairline` / alpha border on the claimed paths.
+- Prior cuts still present: `.chat-messages` resting mix hairline against opaque `#ffffff` (v0.1.1713); history park still present (`html:not(.is-history-gpu-unparked)` in `src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the settings popover title-row hairline (open Monitors or AI Chat settings). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque popover-header hairline cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open, expand Monitors or AI Chat, open the settings popover, warm ≥30s; confirm the popover title-row hairline stays solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
