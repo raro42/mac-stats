@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1661** (follow-up after v0.1.1660).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Apple Settings card skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-card` resting + `.settings-header` hairline, opaque `#ffffff` fill / mix border against opaque fill (no `--panel` / `rgba` glass alpha). Soft panel drop shadow dropped. Settings toggles opaque in v0.1.1660.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open Settings; confirm the Settings card shell stays solid (no translucent glass panel). Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1660)
+
 Version **v0.1.1660** (follow-up after v0.1.1659).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -11050,3 +11064,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings → Help; confirm the cheat-sheet panel stays solid on rest / Tab-focus / Copied; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1660)
+
+**Date:** 2026-10-07 12:32 UTC (2026-10-07 14:32 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1660**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1660)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Settings toggle skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1660**
+- `CHANGELOG.md` **[0.1.1660]** documents Apple Settings toggles (`.setting-toggle input[type="checkbox"]` resting · checked · knob) mixing the track against an opaque fill; no glass alpha on the switch; soft knob drop shadow dropped; Help sheet opaque in v0.1.1659
+- `src-tauri/dist/themes/apple/cpu.css` — `.setting-toggle input[type="checkbox"]` resting · checked · `::before` / `:checked::before` mix fills against opaque `#ffffff`; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`; knob uses `box-shadow: none` and `transform: none` (left-positioned)
+- Prior cut still present: `.settings-help-sheet` resting mixes border/background against opaque `#ffffff` (v0.1.1659)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings toggle path (open Settings; product / Downloads / Ori / Having fun / Voice toggles). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings toggle wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / shell).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; confirm product / Downloads / Ori / Having fun / Voice toggles stay solid on / off; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
