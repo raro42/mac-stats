@@ -9883,3 +9883,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity; confirm the empty shell wash stays solid; apply Top/Snippet filter for filter-miss; hover Clear filter; trigger or find an error empty shell when useful; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1630)
+
+**Date:** 2026-10-07 08:08 UTC (2026-10-07 10:08 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1630**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1630)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Debug Log toolbar · viewer · path focus skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1630**
+- `CHANGELOG.md` **[0.1.1630]** documents Debug Log chrome (`.logs-toolbar` · buttons · `.logs-viewer` · path focus) mixing washes against an opaque fill; no glass alpha on the toolbar shell, Refresh / Open controls, viewer panel, or path focus ring
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.logs-toolbar`, `.logs-toolbar button` resting / `:hover` / `:focus-visible`, `.logs-viewer` resting / `:focus-visible`, and `.logs-path-hint:focus-visible` mix washes against opaque `#ffffff`. Comments: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- `src-tauri/dist/themes/apple/cpu.css` — `.logs-toolbar` / buttons / `.logs-viewer` same opaque `#ffffff` wash (theme-local rules)
+- Prior cut still present: `.perplexity-weather-card` mixes against opaque `#ffffff` (v0.1.1629)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Debug Log toolbar / viewer / path-focus path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Debug Log toolbar / viewer wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` during cargo).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Debug Log; confirm the toolbar shell, Refresh / Open buttons, and viewer panel washes stay solid; Tab-focus path hint and a toolbar button; confirm focus rings; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
