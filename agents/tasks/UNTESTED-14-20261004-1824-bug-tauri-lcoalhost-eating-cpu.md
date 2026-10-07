@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1699** (follow-up after v0.1.1698).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple History sparkline tooltip skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.history-tooltip` uses opaque `#1c1c1e` / `#f5f5f7`, border `color-mix` against the tip fill, `box-shadow: none` (Apple had `rgba(28,28,30,0.92)` glass + soft drop shadow). Match `.monitor-tick-tip` opaque in v0.1.1594. Markdown shells opaque in v0.1.1698.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover a History sparkline point; confirm the tip stays solid (no glass alpha / soft shadow). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1698)
+
 Version **v0.1.1698** (follow-up after v0.1.1697).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -12920,3 +12933,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Monitors; confirm the small Add control stays solid on rest / hover / active and focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1698)
+
+**Date:** 2026-10-07 18:27 UTC (2026-10-07 20:27 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1698**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1698)
+- First `cd src-tauri && cargo test` — **interrupted** (overnight `overnight_rust_target_clean.py` raced `target/debug/deps` mid-compile: `failed to write …rmeta: No such file or directory`)
+- Retry `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple AI Chat markdown code / quote / pre skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1698**
+- `CHANGELOG.md` **[0.1.1698]** documents Apple AI Chat markdown code / quote / pre / table header (`.chat-message .markdown` `blockquote` · `code` · `pre` · `table th`) mixing washes against an opaque fill; no glass alpha on those markdown shells; Monitors Add opaque in v0.1.1697; Changelog inline code opaque in v0.1.1696; Exec code opaque in v0.1.1693
+- `src-tauri/dist/themes/apple/cpu.css` — `.chat-message .markdown blockquote` · `code` · `pre` · `table th` mix washes / borders against opaque `#ffffff` (`color-mix(in srgb, #0c0c10 …%, #ffffff)`). Claimed wash fills / borders have no `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)` / glass `transparent` (`.markdown pre code` still uses `background: transparent` so nested code does not double-wash; link color may still use `rgba` for tint)
+- Prior cuts still present: `.add-btn-small` opaque mixes (v0.1.1697); `.changelog-code` opaque wash (v0.1.1696); `.chat-message.thinking` opaque mixes (v0.1.1694); `.chat-exec-card` opaque mixes (v0.1.1693)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css` / dist copy)
+- Note (not a CSS-cut regression): wash paint is the AI Chat markdown path (expand AI Chat with a markdown reply that includes inline code, a fenced block, a quote, and/or a table; confirm those shells stay solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.chat-message .markdown` markdown-shell cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / `cursor-agent` / overnight harness scripts).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat with a markdown reply that includes inline code, a fenced block, a quote, and/or a table; confirm those shells stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.

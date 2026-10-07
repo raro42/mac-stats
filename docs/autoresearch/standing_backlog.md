@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1699
+
+- Apple History sparkline tooltip (`.history-tooltip`) uses an opaque fill. No glass alpha on the tip panel, border, or soft drop shadow. Match monitor tick tips opaque in v0.1.1594. Markdown shells already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1683
 
 - Apple Monitors settings popover shell (`.monitors-settings-popover .popover-content`) uses an opaque fill. No glass alpha on the popover panel or soft drop shadow. Close focus ring mixes against opaque. Perplexity search box already opaque. Model select already opaque. P2 reliability / GitHub #14.
