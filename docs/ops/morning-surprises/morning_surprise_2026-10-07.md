@@ -3,6 +3,11 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1609** — Agent Ops empty panels and the Clear filter button: opaque wash (no glass alpha).
+- **v0.1.1608** — Agent Ops On · Off badges: opaque wash (no glass alpha).
+- **v0.1.1607** — Agent Ops list rows (resting · hover · focus · selected): opaque wash.
+- **v0.1.1606** — Agent Ops Runs list rows (Lite · Slow · Fail): opaque wash.
+- **v0.1.1605** — Agent Ops Runs filter chips (All · Instant · Lite · Direct · Slow · Fail) and Clear: opaque wash (no glass alpha).
 - **v0.1.1604** — Agent Ops Knowledge filter chips (All · Discord · Core) and Clear: opaque wash (no glass alpha).
 - **v0.1.1603** — Agent Ops Schedules filter chips (All · Jobs · Deliveries) and Clear: opaque wash (no glass alpha).
 - **v0.1.1602** — Agent Ops Agents filter chips (All · On · Off) and Clear: opaque wash (no glass alpha).
@@ -27,7 +32,9 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Discard — local Runs chip wash duplicated origin v0.1.1605.
 - Discard — local tab wash duplicated origin v0.1.1600. Local Schedules wash duplicated origin v0.1.1603.
+- Keep — v0.1.1609 Agent Ops empty panel + Clear filter opaque wash (#14).
 - Keep — v0.1.1604 Agent Ops Knowledge All · Discord · Core filter chip opaque wash (#14).
 - Keep @ `27f9dd35` — v0.1.1601 Agent Ops Sessions All · Live · Files filter chip opaque wash (#14).
 - Keep — v0.1.1600 Agent Ops tab strip / count pills opaque wash (#14).

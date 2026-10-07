@@ -1624,6 +1624,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-empty {
   margin: 2px 0;
   padding: 16px 14px;
@@ -1631,16 +1632,16 @@ textarea.ops-agent-editor.is-dirty {
   line-height: 1.45;
   opacity: 0.78;
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   text-align: center;
   transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .ops-empty:hover {
   opacity: 0.92;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
 }
 
 .ops-empty-filter-miss {
@@ -1653,8 +1654,8 @@ textarea.ops-agent-editor.is-dirty {
 /* Filter-miss calm (AI Chat filter-miss parity) — solid accent wash, not dashed muted. */
 .ops-empty-filter-miss.is-calm {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   opacity: 1;
   color: inherit;
 }
@@ -1662,8 +1663,8 @@ textarea.ops-agent-editor.is-dirty {
 /* Fail lane empty = good news (Ready calm / Monitors all-up soft green parity). */
 .ops-empty-filter-miss.is-fail-empty {
   border-style: solid;
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
   opacity: 1;
   color: inherit;
 }
@@ -1690,8 +1691,8 @@ textarea.ops-agent-editor.is-dirty {
 /* True-empty tab calm — same solid wash as filter-miss / overview Ready. */
 .ops-empty-tab.ops-empty-filter-miss.is-calm {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   opacity: 1;
   color: inherit;
 }
@@ -1712,10 +1713,11 @@ textarea.ops-agent-editor.is-dirty {
   max-width: 28em;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-clear-filter {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 36%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
   color: inherit;
   font: inherit;
   font-size: 12px;
@@ -1728,13 +1730,13 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .ops-clear-filter:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, #ffffff);
 }
 
 .ops-clear-filter:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -1762,8 +1764,8 @@ textarea.ops-agent-editor.is-dirty {
 /* Overview empty CTA calm — solid wash + warm title (filter-miss parity). */
 .ops-overview-body > .ops-empty-overview-cta.is-calm {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   opacity: 1;
 }
 
