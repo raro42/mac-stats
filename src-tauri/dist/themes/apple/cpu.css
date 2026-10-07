@@ -2051,14 +2051,15 @@ border-radius: 24px;
   z-index: 2000;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-settings-popover .popover-content {
   width: min(600px, 90vw);
   max-height: 80vh;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.20);
-padding: 0;
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
+  box-shadow: none;
+  padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2103,7 +2104,7 @@ padding: 0;
 }
 
 .monitors-settings-popover .popover-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text);
 }
