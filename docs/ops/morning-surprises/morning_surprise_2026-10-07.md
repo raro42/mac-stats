@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1621** — AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final): opaque wash (no glass alpha).
 - **v0.1.1620** — AI Chat composer (`#chat-input:focus` · `#chat-send-btn` resting · hover): opaque focus wash; soft glass Send shadows dropped.
 - **v0.1.1619** — AI Chat message rows (hover · focus · selected · Copied badge): opaque wash (no glass alpha).
 - **v0.1.1618** — AI Chat empty starter chips (`.chat-empty-chip` resting · hover · focus-visible): opaque wash (no glass alpha).

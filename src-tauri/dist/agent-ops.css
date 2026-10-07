@@ -2947,13 +2947,14 @@ textarea.ops-agent-editor.is-dirty {
   font-variant-numeric: tabular-nums;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-exec-card {
   margin: 2px 0;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #34c759 28%, transparent);
-  border-left: 3px solid color-mix(in srgb, #34c759 75%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, #34c759 28%, #ffffff);
+  border-left: 3px solid color-mix(in srgb, #34c759 75%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
 }
 
 .chat-exec-label {
@@ -2972,8 +2973,8 @@ textarea.ops-agent-editor.is-dirty {
   overflow-x: auto;
   font-size: 12px;
   line-height: 1.4;
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .chat-exec-result {
@@ -2997,13 +2998,13 @@ textarea.ops-agent-editor.is-dirty {
 .chat-answer-part {
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 
 .chat-answer-part.chat-answer-final {
-  border-color: color-mix(in srgb, #0a84ff 28%, transparent);
-  background: color-mix(in srgb, #0a84ff 6%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 28%, #ffffff);
+  background: color-mix(in srgb, #0a84ff 6%, #ffffff);
 }
 
 .section-header-collapsible {
