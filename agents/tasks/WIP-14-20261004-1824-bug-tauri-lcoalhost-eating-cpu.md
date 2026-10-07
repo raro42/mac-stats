@@ -11100,3 +11100,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; confirm product / Downloads / Ori / Having fun / Voice toggles stay solid on / off; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1661)
+
+**Date:** 2026-10-07 12:39 UTC (2026-10-07 14:39 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1661**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1661)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Settings card skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1661**
+- `CHANGELOG.md` **[0.1.1661]** documents Apple Settings card (`.settings-card` + `.settings-header` hairline) using an opaque fill; no glass `--panel` alpha on the modal shell; soft panel drop shadow dropped; Settings toggles opaque in v0.1.1660
+- `src-tauri/dist/themes/apple/cpu.css` — `.settings-card` uses `background: #ffffff`, border via `color-mix(... #ffffff)`, `box-shadow: none`, `animation: none`; claimed wash block has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- `.settings-header` hairline mixes against opaque `#ffffff` (no glass alpha)
+- Prior cut still present: `.setting-toggle input[type="checkbox"]` mixes track against opaque `#ffffff` (v0.1.1660)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Settings card shell path (open Settings; confirm solid modal shell). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Settings card wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / shell).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Settings; confirm the Settings card shell stays solid (no translucent glass panel); gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
