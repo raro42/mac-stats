@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1668** (follow-up after v0.1.1667).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Monitors Down · Slow row skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.monitor-item.is-down` · `.is-slow` resting · hover, mix washes against opaque `#ffffff` (no `transparent` / hairline glass alpha). Apple Monitors base row opaque in v0.1.1667.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors with at least one Down and/or Slow row; confirm status rows stay solid on rest / hover. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1667)
+
 Version **v0.1.1667** (follow-up after v0.1.1666).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

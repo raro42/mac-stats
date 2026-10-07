@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1667)
+# WIP-14 coder pass (v0.1.1668)
 
-- [x] Opaque-wash Apple Monitors rows (`.monitor-item` resting · hover) in `src-tauri/dist/themes/apple/cpu.css`
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1667
-- [x] CHANGELOG `[0.1.1667]` entry
+- [x] Opaque-wash Monitors Down · Slow rows (`.monitor-item.is-down` · `.is-slow` resting · hover) in `src/agent-ops.css` + dist
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1668
+- [x] CHANGELOG `[0.1.1668]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1667: Apple `.monitor-item` resting · hover mix washes against opaque `#ffffff`. Soft glass hover shadow dropped. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1668: Monitors `.monitor-item.is-down` · `.is-slow` resting · hover mix washes against opaque `#ffffff`. `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.

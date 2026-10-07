@@ -7303,14 +7303,15 @@ textarea.ops-agent-editor.is-dirty {
   color: var(--accent, #007aff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item.is-down {
-  border-color: color-mix(in srgb, #ff3b30 28%, var(--hairline, currentColor));
-  background: color-mix(in srgb, #ff3b30 6%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 6%, #ffffff);
 }
 
 .monitor-item.is-down:hover {
-  border-color: color-mix(in srgb, #ff3b30 40%, transparent);
-  background: color-mix(in srgb, #ff3b30 10%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
 }
 
 .monitor-item.is-pending {
@@ -7318,14 +7319,15 @@ textarea.ops-agent-editor.is-dirty {
   border-style: dashed;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item.is-slow:not(.is-down):not(.is-pending) {
-  border-color: color-mix(in srgb, #ff9500 28%, var(--hairline, currentColor));
-  background: color-mix(in srgb, #ff9500 6%, transparent);
+  border-color: color-mix(in srgb, #ff9500 28%, #ffffff);
+  background: color-mix(in srgb, #ff9500 6%, #ffffff);
 }
 
 .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
-  border-color: color-mix(in srgb, #ff9500 40%, transparent);
-  background: color-mix(in srgb, #ff9500 10%, transparent);
+  border-color: color-mix(in srgb, #ff9500 40%, #ffffff);
+  background: color-mix(in srgb, #ff9500 10%, #ffffff);
 }
 
 .monitor-item.is-slow:not(.is-down) .monitor-latency {
