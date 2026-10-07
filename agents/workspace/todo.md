@@ -5,7 +5,7 @@
 - [x] Opaque `#f2f2f6` mix for modal / popover backdrops (`--modal-backdrop`) (v0.1.1718)
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Leave GitHub issue alone (do not close)
 
 ## Review
