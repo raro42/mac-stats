@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1722
+
+- Apple window title (`.apple-title h1`) mixes type color against an opaque shell fill. No glass alpha on the always-visible product title. Icon-btn type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1721
 
 - Apple section icon strip glyphs (`.icon-btn` resting · hover) mix type color against an opaque chip fill. No glass alpha on the always-visible Monitors · AI Chat · … strip icons. Icon-line type already opaque. P2 reliability / GitHub #14.
