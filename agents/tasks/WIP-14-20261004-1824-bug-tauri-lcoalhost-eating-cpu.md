@@ -13085,3 +13085,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); hover / keyboard-focus a Details or Top Processes collapse chevron (`.collapse-btn`); confirm hover wash and focus ring stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1702)
+
+**Date:** 2026-10-07 19:08 UTC (2026-10-07 21:08 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1702**; tree also includes prior **v0.1.1701** overflow menu-btn cut)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1702)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple settings popover Close hover skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1702**
+- `CHANGELOG.md` **[0.1.1702]** documents Apple Monitors / AI Chat settings popover Close controls (`.monitors-settings-popover .popover-close` · `.ollama-settings-popover .popover-close` hover) mix fills against an opaque fill; no glass alpha on the Close hover wash; Overflow menu triggers opaque in v0.1.1701; Popover shells opaque in v0.1.1683
+- `src-tauri/dist/themes/apple/cpu.css` — both `.popover-close:hover` rules use `color-mix(..., #ffffff)`. No `var(--hairline)` / `hsla(` / `backdrop-filter` / glass `rgba(` on the claimed hover wash path. Resting `.popover-close` background remains `transparent` (control chrome only; not a glass panel wash).
+- Prior cuts still present: `.monitors-menu-btn:hover` · `.ollama-menu-btn:hover` opaque mixes (v0.1.1701); `.collapse-btn:hover` opaque mix (v0.1.1700)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the settings popover Close hover path (expand Monitors or AI Chat; open settings popover; hover Close; confirm hover wash stays solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.popover-close` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / `cursor-agent` / overnight harness scripts).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Monitors or AI Chat; open the settings popover; hover Close; confirm hover wash stays solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
