@@ -12129,3 +12129,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; confirm the model select stays solid (no glass alpha) on rest / hover, focus ring solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1682)
+
+**Date:** 2026-10-07 15:30 UTC (2026-10-07 17:30 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1682**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1682)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Perplexity search box skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1682**
+- `CHANGELOG.md` **[0.1.1682]** documents Apple Perplexity search box (`.perplexity-search-box input` · `button` resting · hover · focus-visible) mixing the wash against an opaque fill; no glass alpha on the query field, Search control, or focus rings; model select opaque in v0.1.1681; Send control opaque in v0.1.1680
+- `src-tauri/dist/themes/apple/cpu.css` — `.perplexity-search-box input` / `button` backgrounds and borders `color-mix(..., #ffffff)`; `input:focus-visible` outline/border mix against `#ffffff` with opaque `#ffffff` focus fill; `button:hover` mixes against `#ffffff`; `button:focus-visible` outline mix against `#ffffff`. Claimed blocks have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `.model-select` opaque mixes (v0.1.1681); `#chat-send-btn` opaque mixes (v0.1.1680)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Perplexity search box path (expand Perplexity; confirm the search field and Search control stay solid on rest / hover, focus rings solid when focused). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.perplexity-search-box` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Perplexity; confirm the search field and Search control stay solid (no glass alpha) on rest / hover, focus rings solid when focused; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
