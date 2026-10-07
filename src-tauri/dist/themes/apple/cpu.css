@@ -165,15 +165,16 @@ border-radius: 24px;
   background: transparent;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .apple-details::-webkit-scrollbar-thumb,
 .apple-processes::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: color-mix(in srgb, #000000 15%, #ffffff);
   border-radius: 3px;
 }
 
 .apple-details::-webkit-scrollbar-thumb:hover,
 .apple-processes::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: color-mix(in srgb, #000000 25%, #ffffff);
 }
 
 /* No ::before gradient mask — masked edge layers keep WebKit compositing (#14). */
