@@ -1,16 +1,14 @@
-# UNTESTED-14 — tauri://localhost CPU (coder)
+# Feature coder — WIP-14 (#14) v0.1.1649
 
 ## Plan
-- [x] Read FEATURE-CODER.md + agents.md + lessons.md
-- [x] Pick lowest GitHub WIP/FEAT (`WIP-14`)
-- [x] Opaque wash: Disk Cleanup Copied badge `::after` (category + scope rows)
-- [x] Bump to v0.1.1647 + CHANGELOG + standing_backlog
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename WIP → UNTESTED; commit + push origin/main
-- [x] Do not close GitHub #14
+- [x] Pick lowest GitHub FEAT/WIP: `WIP-14` (tauri localhost CPU)
+- [ ] Opaque wash for `.disk-cleanup-meta-card` family (resting · hover · focus · status)
+- [ ] Sync `src/agent-ops.css` + `src-tauri/dist/agent-ops.css`
+- [ ] Bump `0.1.1648` → `0.1.1649` (Cargo.toml + lock)
+- [ ] CHANGELOG + standing_backlog overnight merge note
+- [ ] Prepend Implementation on WIP task; rename → UNTESTED-
+- [ ] `cargo check` in `src-tauri/`
+- [ ] Commit + push `origin/main` (do not close #14)
 
 ## Review
-- **v0.1.1647**: Disk Cleanup `.disk-cleanup-item` / `.disk-cleanup-scope-row` `is-just-copied::after` mixes green wash against opaque `#ffffff`.
-- Row wash was already opaque (v0.1.1577); badge still used `rgba(0,0,0,0.4)`.
-- Linux cannot prove `<1%` Graphics and Media; macOS Activity Monitor remains the gate.
-- Task file: `agents/tasks/UNTESTED-14-20261004-1824-bug-tauri-lcoalhost-eating-cpu.md`.
+(pending)

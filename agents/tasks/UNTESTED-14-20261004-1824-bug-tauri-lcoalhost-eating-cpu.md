@@ -22,6 +22,34 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1649** (follow-up after v0.1.1648).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup meta-card skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-meta-card` resting / `:hover` / `:focus-within` / `.has-reclaim` / `.is-clean` / `.has-scopes-off` / `.is-all-on` / `.has-due` / `.is-ok` / `.has-periodic-off` (+ action `:focus-visible` variants), mix washes against opaque `#ffffff` (no `transparent` glass alpha). Hover drops the soft glass shadow. Category/scope rows already opaque in v0.1.1648.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; confirm Reclaimable now · Next automatic run · Runs when · Enabled scopes meta cards stay solid on rest / hover / Tab-focus. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1648)
+
+Version **v0.1.1648** (follow-up after v0.1.1647).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup category/scope row skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-item` / `.disk-cleanup-scope-row` resting · hover · focus · selected · Reclaim · Big, mix washes against opaque `#ffffff`. Hover drops the soft glass shadow. Copied badge already opaque in v0.1.1647.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; confirm category and scope row washes stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1647)
+
 Version **v0.1.1647** (follow-up after v0.1.1646).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

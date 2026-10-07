@@ -7806,6 +7806,7 @@ button.monitor-detail-url.is-just-saved {
   align-items: stretch;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-meta-card {
   display: flex;
   flex-direction: column;
@@ -7813,8 +7814,8 @@ button.monitor-detail-url.is-just-saved {
   min-height: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -7822,21 +7823,21 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .disk-cleanup-meta-card:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 16%, transparent);
-  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 16%, #ffffff);
+  box-shadow: none;
 }
 
 .disk-cleanup-meta-card:focus-within {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 36%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
 }
 
 /* Reclaimable now — soft alert (Monitors Slow / Big attention soft 7%/30% parity). */
 .disk-cleanup-meta-card.has-reclaim {
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.has-reclaim .disk-cleanup-meta-value {
@@ -7846,8 +7847,8 @@ button.monitor-detail-url.is-just-saved {
 
 /* Calm wash when nothing reclaimable (collapsed is-clean / Details is-ok parity). */
 .disk-cleanup-meta-card.is-clean:not(.has-reclaim) {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 /* Reclaimable now — click/keyboard glance (Monitors summary parity) */
@@ -7857,73 +7858,73 @@ button.monitor-detail-url.is-just-saved {
 
 .disk-cleanup-meta-card.is-action:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 36%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
-  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.is-clean:not(.has-reclaim):focus-visible {
-  border-color: color-mix(in srgb, #34c759 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
+  border-color: color-mix(in srgb, #34c759 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ffffff);
 }
 
 /* Enabled scopes — soft wash when some scopes are off */
 .disk-cleanup-meta-card.has-scopes-off {
-  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.has-scopes-off:focus-visible {
-  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ffffff);
 }
 
 /* Calm wash when every scope is on (Reclaimable is-clean / Details is-ok parity). */
 .disk-cleanup-meta-card.is-all-on:not(.has-scopes-off) {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.is-all-on:not(.has-scopes-off):focus-visible {
-  border-color: color-mix(in srgb, #34c759 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
+  border-color: color-mix(in srgb, #34c759 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ffffff);
 }
 
 /* Next automatic run — amber when due (Reclaimable has-reclaim soft 7%/30% parity). */
 .disk-cleanup-meta-card.has-due {
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.has-due:focus-visible {
-  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, #ffffff);
 }
 
 /* Calm wash when next run is still ahead (Reclaimable is-clean / Details is-ok parity). */
 .disk-cleanup-meta-card.is-ok:not(.has-due):not(.has-periodic-off) {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.is-ok:not(.has-due):not(.has-periodic-off):focus-visible {
-  border-color: color-mix(in srgb, #34c759 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, transparent);
+  border-color: color-mix(in srgb, #34c759 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #34c759 22%, #ffffff);
 }
 
 /* Runs when — soft accent when periodic cleanup is off (Ops accent soft 7%/28% parity). */
 .disk-cleanup-meta-card.has-periodic-off {
-  border-color: color-mix(in srgb, #64d2ff 28%, transparent);
-  background: color-mix(in srgb, #64d2ff 7%, transparent);
+  border-color: color-mix(in srgb, #64d2ff 28%, #ffffff);
+  background: color-mix(in srgb, #64d2ff 7%, #ffffff);
 }
 
 .disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {
-  border-color: color-mix(in srgb, #64d2ff 48%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, transparent);
+  border-color: color-mix(in srgb, #64d2ff 48%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, #ffffff);
 }
 
 .disk-cleanup-meta-label {
