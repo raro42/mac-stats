@@ -1426,6 +1426,7 @@ button.ops-badge:disabled {
 }
 
 /* Sessions / Knowledge / Agents / Schedules / Runs: click-to-copy id, slug, path, or request id */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-session-copy-chip {
   display: inline-flex;
   align-items: center;
@@ -1433,8 +1434,8 @@ button.ops-badge:disabled {
   margin: 8px 4px 0;
   padding: 4px 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
   color: inherit;
   font: inherit;
   font-size: 11px;
@@ -1449,13 +1450,13 @@ button.ops-badge:disabled {
 }
 
 .ops-session-copy-chip:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, #ffffff);
 }
 
 .ops-session-copy-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
