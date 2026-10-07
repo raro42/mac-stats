@@ -1,15 +1,13 @@
-# WIP-14 coder pass (v0.1.1681)
+# Tester pass — TESTING-14 → WIP-14 (v0.1.1681)
 
-- [x] Opaque-wash Apple AI Chat `.model-select` resting · hover · focus · focus-visible
-- [x] Bump `src-tauri/Cargo.toml` (+ lock) to 0.1.1681
-- [x] CHANGELOG `[0.1.1681]` entry
-- [x] Prepend Implementation note on WIP-14 task file
-- [x] Update `docs/autoresearch/standing_backlog.md` #14 line
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename WIP-14 → UNTESTED-14
-- [x] Commit + push `origin/main`
+- [x] Read `agents/testing/TESTER.md` + `agents/workspace/lessons.md`
+- [x] Verify claimed v0.1.1681 (`.model-select` opaque wash)
+- [x] `cargo check` / `cargo test` in `src-tauri/`
+- [x] Static CSS + CHANGELOG + history park checks
+- [x] `scan_debug_log_errors.py --minutes 180`
+- [x] Append Test report; rename TESTING-14 → WIP-14
 - [x] Do **not** close GitHub #14
 
 ## Review
 
-v0.1.1681: Apple AI Chat `.model-select` resting · hover · focus · focus-visible mix against opaque `#ffffff` (no glass alpha). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main (`50fd9b5f`). Issue #14 was already CLOSED on GitHub; left untouched.
+v0.1.1681 static cut verified (`.model-select` mixes against `#ffffff`; no glass tokens in claimed block). `cargo check` / `cargo test` pass (1359 lib). Linux host cannot prove macOS Activity Monitor / `tauri://localhost` &lt;1%, so FAIL → WIP. GitHub #14 left untouched.
