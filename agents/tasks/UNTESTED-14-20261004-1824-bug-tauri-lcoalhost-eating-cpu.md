@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1647** (follow-up after v0.1.1646).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Disk Cleanup Copied badge skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.disk-cleanup-item.is-just-copied::after` / `.disk-cleanup-scope-row.is-just-copied::after`, mix green wash against opaque `#ffffff` (no `rgba` glass alpha). Row wash already opaque in v0.1.1577.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Disk Cleanup; copy a category or scope row when useful. Confirm Copied badge wash stays solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1646)
+
+
 Version **v0.1.1646** (follow-up after v0.1.1645).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -10497,3 +10512,41 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus Bat · LPM · Power on the strip; confirm the strip focus ring stays solid; trigger Bat/LPM attention flash when useful; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1646)
+
+**Date:** 2026-10-07 10:32 UTC (2026-10-07 12:32 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1646**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1646)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple history time-range focus skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1646**
+- `CHANGELOG.md` **[0.1.1646]** documents Apple history time-range (`.time-range-dropdown:focus`) mixing the focus wash against an opaque fill; no glass alpha on the History dropdown focus ring or border; always-visible on the default collapsed layout; Monitors Copied badge opaque in v0.1.1645
+- `src-tauri/dist/themes/apple/cpu.css` — `.time-range-dropdown:focus` mixes outline and border against opaque `#ffffff`; `background: #ffffff`; `box-shadow: none`. Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Claimed wash rule has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Apple `cpu.html` has `#time-range-select.time-range-dropdown` (always-visible on the default collapsed layout: History time-range control)
+- Prior cut still present: `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` identical — `.monitor-item.is-just-copied::after` mixes green wash against opaque `#ffffff` (v0.1.1645). Same opaque-wash comment. Claimed wash rule has no `transparent` / `rgba(` / `hsla(` / `backdrop-filter`
+- Prior cut still present: `.battery-power-strip:focus-within` and Bat/LPM attention flash opaque (v0.1.1644)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the always-visible History time-range focus path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque History time-range focus wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); Tab-focus the History time-range dropdown; confirm the focus ring and border stay solid; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
