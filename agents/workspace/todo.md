@@ -2,13 +2,13 @@
 
 ## Plan
 - [x] Pick lowest GitHub FEAT/WIP: `WIP-14` (tauri localhost CPU)
-- [ ] Opaque wash for `.disk-cleanup-meta-card` family (resting · hover · focus · status)
-- [ ] Sync `src/agent-ops.css` + `src-tauri/dist/agent-ops.css`
-- [ ] Bump `0.1.1648` → `0.1.1649` (Cargo.toml + lock)
-- [ ] CHANGELOG + standing_backlog overnight merge note
-- [ ] Prepend Implementation on WIP task; rename → UNTESTED-
-- [ ] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main` (do not close #14)
+- [x] Opaque wash for `.disk-cleanup-meta-card` family (resting · hover · focus · status)
+- [x] Sync `src/agent-ops.css` + `src-tauri/dist/agent-ops.css`
+- [x] Bump `0.1.1648` → `0.1.1649` (Cargo.toml + lock)
+- [x] CHANGELOG + standing_backlog overnight merge note
+- [x] Prepend Implementation on WIP task; rename → UNTESTED-
+- [x] `cargo check` in `src-tauri/`
+- [x] Commit + push `origin/main` (do not close #14)
 
 ## Review
-(pending)
+Shipped **v0.1.1649**: Disk Cleanup meta cards mix washes against opaque `#ffffff`; hover soft glass shadow dropped. Task file: `agents/tasks/UNTESTED-14-…`. GitHub #14 left open for tester/004.
