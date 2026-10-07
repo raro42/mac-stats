@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1702
+
+- Apple Monitors / AI Chat settings popover Close controls (`.monitors-settings-popover .popover-close` · `.ollama-settings-popover .popover-close` hover) mix fills against an opaque fill. No glass alpha on the Close hover wash. Overflow menu triggers already opaque. Popover shells already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1701
 
 - Apple Monitors / AI Chat overflow menu triggers (`.monitors-menu-btn` · `.ollama-menu-btn` hover) mix fills against an opaque fill. No glass alpha on the ⋯ hover wash. Menu shells already opaque. Collapse control already opaque. P2 reliability / GitHub #14.

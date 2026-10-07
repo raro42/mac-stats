@@ -2104,8 +2104,9 @@ border-radius: 24px;
   transition: all 0.2s;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-settings-popover .popover-close:hover {
-  background: var(--hairline);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
   color: var(--text);
 }
 
@@ -2575,8 +2576,9 @@ border-radius: 24px;
   transition: all 0.2s;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-close:hover {
-  background: var(--hairline);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
   color: var(--text);
 }
 
