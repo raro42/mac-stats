@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1635** (follow-up after v0.1.1634).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (collapsible section headers skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.section-header-collapsible:hover` and `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha on hover fill or focus ring).
+- `src-tauri/dist/themes/apple/cpu.css` — `.section-header-collapsible:hover` / `:focus-visible` same opaque wash (theme-local border + background + focus ring).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Hover a section header (Details, Top Processes, …); Tab-focus one. Confirm hover and focus washes stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1634)
+
 Version **v0.1.1634** (follow-up after v0.1.1633).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

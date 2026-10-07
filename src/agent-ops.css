@@ -3017,14 +3017,15 @@ textarea.ops-agent-editor.is-dirty {
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .section-header-collapsible:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
 .section-header-collapsible:focus-visible {
   outline: none;
-  background: color-mix(in srgb, #0a84ff 8%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
+  background: color-mix(in srgb, #0a84ff 8%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1635** — Collapsible section headers (`.section-header-collapsible` hover · focus-visible): opaque wash (no glass alpha on hover, focus ring, or Apple theme border). Always-visible on the default collapsed layout.
 - **v0.1.1634** — Debug Log lines (`.logs-line` hover · selected): opaque wash (no glass alpha on hover or selected inset ring).
 - **v0.1.1633** — Perplexity result Copied badge (`.perplexity-result-item` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1632** — Debug Log collapsed Error/Warn glance (`.logs-error-glance` · Quiet · hover): opaque wash (no glass alpha); soft glass hover shadow dropped.

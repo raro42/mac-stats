@@ -1641,16 +1641,17 @@ padding: 18px 18px 16px;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .section-header-collapsible:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-color: color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border-color: color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .section-header-collapsible:focus-visible {
   outline: none;
-  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
 }
 
 .section-header-collapsible .section-title {
