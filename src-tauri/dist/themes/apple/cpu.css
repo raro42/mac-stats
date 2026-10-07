@@ -13,13 +13,19 @@
     "Segoe UI",
     sans-serif;
 
-  --text: rgba(12, 12, 16, 0.88);
-  --muted: rgba(12, 12, 16, 0.50);
-  --hairline: rgba(12, 12, 16, 0.05);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --text: color-mix(in srgb, #0c0c10 88%, #f7f7fa);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --muted: color-mix(in srgb, #0c0c10 50%, #f7f7fa);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --hairline: color-mix(in srgb, #0c0c10 5%, #f7f7fa);
 
-  --panel: rgba(255, 255, 255, 0.55);
-  --panel-border: rgba(255, 255, 255, 0.80);
-  --panel-shadow: 0 20px 80px rgba(0, 0, 0, 0.10);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --panel: #ffffff;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  --panel-border: color-mix(in srgb, #ffffff 80%, #f7f7fa);
+  /* Flat — soft glass drop shadow stays in Graphics and Media (#14). */
+  --panel-shadow: none;
 
   --accent: #8bb4e8; /* Pastel blue for temperature */
   --accent-usage: #9db5c4; /* Pastel blue-grey for usage */
