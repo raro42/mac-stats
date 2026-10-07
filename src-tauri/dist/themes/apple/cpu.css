@@ -2612,6 +2612,7 @@ border-radius: 24px;
   margin-top: 16px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary,
 .ollama-settings-popover .popover-btn-secondary {
   padding: 8px 16px;
@@ -2619,34 +2620,38 @@ border-radius: 24px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   border: 1px solid transparent;
+  box-shadow: none;
 }
 
 .ollama-settings-popover .popover-btn-primary {
-  background: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, var(--accent, #007aff) 90%, #ffffff);
   color: white;
-  border-color: rgba(0, 122, 255, 0.9);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 90%, #ffffff);
 }
 
 .ollama-settings-popover .popover-btn-primary:hover {
-  background: rgba(0, 122, 255, 1);
+  background: var(--accent, #007aff);
+  border-color: var(--accent, #007aff);
+  box-shadow: none;
 }
 
 .ollama-settings-popover .popover-btn-primary:focus-visible,
 .ollama-settings-popover .popover-btn-secondary:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
 }
 
 .ollama-settings-popover .popover-btn-secondary {
-  background: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
   color: var(--text);
-  border-color: var(--hairline);
+  border-color: color-mix(in srgb, #0c0c10 10%, #ffffff);
 }
 
 .ollama-settings-popover .popover-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: color-mix(in srgb, var(--text, #0c0c10) 10%, #ffffff);
+  border-color: color-mix(in srgb, #0c0c10 14%, #ffffff);
 }
 
 .connection-indicator {

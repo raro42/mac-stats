@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1688** (follow-up after v0.1.1687).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Ollama settings Save/Cancel skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.ollama-settings-popover .popover-btn-primary` · `.popover-btn-secondary` resting · hover · focus-visible, mix fills / borders / focus ring against opaque `#ffffff` (Apple had `rgba(0,122,255,0.9)` / `rgba(255,255,255,0.5)` / `0.7` glass + transparent focus mixes). System-prompt textarea opaque in v0.1.1687. Ollama settings popover shell opaque in v0.1.1684.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open AI Chat settings (gear / Ollama settings); confirm Save and Cancel stay solid on rest / hover, focus rings solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1687)
+
+
 Version **v0.1.1687** (follow-up after v0.1.1686).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
