@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1592** (follow-up after v0.1.1591).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (AI Chat filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.chat-filter-chip` resting / `:hover` / `:focus-visible` / `.is-active` / you·assistant·errors `.has-hits` / `.is-active`, and `.chat-filter-clear` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat. Confirm filter chips (All · You · Assistant · Errors) when present. Hover All · You · Assistant · Errors; Tab-focus a chip; activate You, Assistant, or Errors when they have hits; use Clear when a filter is active. Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1591)
 Version **v0.1.1591** (follow-up after v0.1.1590).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
@@ -8431,3 +8444,38 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm Rings filter chips (All · Hot) when present; hover All · Hot; Tab-focus a chip; activate Hot when it has hits; confirm washes still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1591)
+
+**Date:** 2026-10-07 02:53 UTC (2026-10-07 04:53 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1591**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1591)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Agent Ops overview cards skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1591**
+- `CHANGELOG.md` **[0.1.1591]** documents Agent Ops overview cards (Agents · Schedules · Sessions · Memory) mixing washes against an opaque fill; no glass alpha on resting, hover, focus-within, focus-visible, ok/warn/bad, or active states; soft hover drop shadows removed
+- `src/agent-ops.css` and `src-tauri/dist/agent-ops.css` are identical. `.ops-overview-card` resting / `:hover` / `:focus-within` / clickable `:focus-visible` / `.is-active` / `.ops-health-ok` / `.ops-health-warn` / `.ops-health-bad` / active hover, plus `.ops-overview-head-count` resting / active and active `.ops-overview-link`, mix washes against opaque `#ffffff`. Hover has no soft drop shadow (background/border only). Comment: Opaque wash — glass alpha stays in Graphics and Media (#14). Those claimed overview-card / head-count / active-link wash rules have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` (resting `.ops-overview-link` still uses transparent; out of this claimed cut)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Agent Ops overview-card path. macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Agent Ops overview-card wash cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling.
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand Agent Ops; confirm overview cards (Agents · Schedules · Sessions · Memory) washes still show (ok/warn/bad when applicable); hover a card; Tab-focus a clickable card; activate a linked card; confirm washes and focus ring still show, then leave; gauges/sparklines stay filled; watch Graphics and Media / `tauri://localhost`) before CLOSED. Do **not** close GitHub #14.
