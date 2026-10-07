@@ -9782,7 +9782,7 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 
 **debug.log**
 
-- `python3 scripts/scan_debug_log_errors.py --minutes 180` , no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes empty-shell wash cut.
+- `python3 scripts/scan_debug_log_errors.py --minutes 180`: no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque Top Processes empty-shell wash cut.
 
 **Runtime**
 
