@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1697** (follow-up after v0.1.1696).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Monitors Add control skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.add-btn-small` resting · hover · focus-visible · active mix fills / border / focus ring against opaque `#ffffff` (Apple had `rgba(255,255,255,0.3/0.4/0.5)` glass + transparent focus mix). Changelog inline code opaque in v0.1.1696. Monitors Add-form URL input opaque in v0.1.1686.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors; confirm the small Add control stays solid on rest / hover / active and focus ring solid when focused. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1696)
+
 Version **v0.1.1696** (follow-up after v0.1.1695).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

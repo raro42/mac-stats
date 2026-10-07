@@ -2252,34 +2252,35 @@ border-radius: 24px;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .add-btn-small {
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid var(--hairline);
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   border-radius: 6px;
   color: var(--muted);
   padding: 4px 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   position: relative;
   z-index: 10;
 }
 
 .add-btn-small:hover {
-  background: rgba(255, 255, 255, 0.4);
-  border-color: rgba(12, 12, 16, 0.1);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
+  border-color: color-mix(in srgb, #0c0c10 10%, #ffffff);
   color: var(--text);
 }
 
 .add-btn-small:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text);
 }
 
 .add-btn-small:active {
-  background: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, var(--text, #0c0c10) 10%, #ffffff);
 }
 
 .monitors-list {
