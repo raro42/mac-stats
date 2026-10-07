@@ -22,18 +22,18 @@
 
 ## Implementation (coder)
 
-Version **v0.1.1706** (follow-up after v0.1.1705).
+Version **v0.1.1707** (follow-up after v0.1.1706).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
 
-Changes (Apple Details / Top Processes scrollbar thumbs skip glass blend):
+Changes (Apple Changelog scrollbar track / thumbs skip glass blend):
 
-- `src-tauri/dist/themes/apple/cpu.css` — `.apple-details` · `.apple-processes` `::-webkit-scrollbar-thumb` resting · hover mix against opaque `#ffffff` (Apple had `rgba(0,0,0,0.15/0.25)` glass thumbs). Battery strip hairline opaque in v0.1.1705.
+- `src-tauri/dist/themes/apple/cpu.css` — `.changelog-body` `::-webkit-scrollbar-track` · thumb resting · hover mix against opaque `#ffffff` (Apple had `rgba(0,0,0,0.05/0.2/0.3)` glass). Details / Top Processes thumbs opaque in v0.1.1706.
 
-Tester: open CPU window on macOS (already focused), warm ≥30s. Expand Details or Top Processes until the thin scrollbar shows; confirm thumb resting / hover stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+Tester: open CPU window on macOS (already focused), warm ≥30s. Open Changelog until the body scrolls; confirm track / thumb resting / hover stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
 
 
-## Prior implementation (v0.1.1705)
+## Prior implementation (v0.1.1706)
 
 ## Implementation (prior header)
 
@@ -13275,3 +13275,40 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm History controls and the time-range dropdown borders stay solid (no glass alpha) on rest / hover; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1706)
+
+**Date:** 2026-10-07 19:45 UTC (2026-10-07 21:45 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1706**)
+- Stale sibling `agents/tasks/WIP-14-…` (claimed **v0.1.1705**) was present; this run tested the TESTING file (1706) and replaced WIP with the report outcome.
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1706)
+- `cd src-tauri && cargo test` — first full lib run **1358 passed; 1 failed**: `agents::cli::tests::prompt_timeout_allows_fast_completion` (50ms timeout flake under suite load: `timed out after 0s`). Isolated retry of that test — **pass**. Unrelated to the Apple CSS scrollbar-thumb cut.
+
+**Static verification (claimed #14 Apple Details / Top Processes scrollbar thumbs skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1706**
+- `CHANGELOG.md` **[0.1.1706]** documents Apple Details / Top Processes scrollbar thumbs (`.apple-details` · `.apple-processes` `::-webkit-scrollbar-thumb` resting · hover) mix against an opaque fill; no glass alpha on the thin scroll thumbs; Battery strip hairline opaque in v0.1.1705
+- `src-tauri/dist/themes/apple/cpu.css` — `.apple-details` / `.apple-processes` `::-webkit-scrollbar-thumb` / `:hover` use `color-mix(in srgb, #000000 15%/25%, #ffffff)`. No `rgba(0, 0, 0, 0.15/0.25)` glass thumbs on the claimed path.
+- Prior cuts still present: `.battery-power-strip` resting · hover mix borders against opaque `#ececf1` / `#e4e4ea` (v0.1.1705)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Details / Top Processes thin scrollbar thumb path (expand until the thumb shows; confirm resting / hover stay solid). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque scrollbar-thumb cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash` / `rustc`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s; expand Details or Top Processes until the thin scrollbar shows; confirm thumb resting / hover stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.

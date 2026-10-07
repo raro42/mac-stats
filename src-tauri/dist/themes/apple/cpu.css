@@ -1232,18 +1232,19 @@ border-radius: 24px;
   width: 6px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .changelog-body::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: color-mix(in srgb, #000000 5%, #ffffff);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: color-mix(in srgb, #000000 20%, #ffffff);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, #000000 30%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
