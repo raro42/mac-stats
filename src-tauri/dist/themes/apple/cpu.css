@@ -1243,6 +1243,7 @@ border-radius: 24px;
   background: rgba(0, 0, 0, 0.3);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .changelog-loading,
 .changelog-error {
   text-align: center;
@@ -1251,16 +1252,16 @@ border-radius: 24px;
   font-size: 13px;
   line-height: 1.45;
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 20%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 20%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   margin: 8px 0;
 }
 
 /* Soft alert (Monitors Down / Perplexity empty-error soft 7%/30% parity). */
 .changelog-error {
   color: rgba(255, 59, 48, 0.85);
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 .changelog-h2 {
