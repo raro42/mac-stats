@@ -8,7 +8,7 @@
 - [x] CHANGELOG `[0.1.1696]` entry
 - [x] Refresh Implementation section → rename `WIP-` → `UNTESTED-14-…`
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main` (`57f92d58`; HTTPS after SSH key deny)
 - [x] Issue left open (004 closes)
 
 ## Review
