@@ -3027,6 +3027,7 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-empty {
   margin: 4px 0;
   padding: 14px 12px;
@@ -3035,18 +3036,20 @@ textarea.ops-agent-editor.is-dirty {
   line-height: 1.45;
   color: var(--muted);
   border-radius: 10px;
-  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
 }
 
 /* Soft alert (Monitors Down / Perplexity has-error soft 7%/30% parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-empty-error {
   color: #ff3b30;
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 /* Filter-miss calm (Monitors / Disk Cleanup / Top Processes / AI Chat / Agent Ops parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-filter-miss {
   display: flex;
   flex-direction: column;
@@ -3057,16 +3060,16 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 1;
   font-style: normal;
   text-align: center;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   color: inherit;
 }
 
 .perplexity-filter-miss.is-top-empty,
 .perplexity-filter-miss.is-snippet-empty {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 34%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 .perplexity-filter-miss-title {
@@ -3088,10 +3091,11 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .perplexity-empty-cta {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, #ffffff);
   color: var(--text);
   font: inherit;
   font-size: 12px;
@@ -3106,13 +3110,13 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .perplexity-empty-cta:hover {
-  background: color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, #ffffff);
 }
 
 .perplexity-empty-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
 }
 
 /* Perplexity results — keyboard hint + selected wash (Monitors / AI Chat parity) */

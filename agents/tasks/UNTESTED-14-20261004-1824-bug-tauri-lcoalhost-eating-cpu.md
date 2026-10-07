@@ -22,6 +22,27 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1628** (follow-up after v0.1.1627).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Perplexity empty · filter-miss · Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.perplexity-empty`, `.perplexity-empty-error`, `.perplexity-filter-miss` (+ Top / Snippet empty), and `.perplexity-empty-cta` resting / `:hover` / `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — `.perplexity-empty` / `.perplexity-empty-error` same opaque wash (theme-local rules).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Perplexity. Confirm the empty shell wash stays solid; apply Top/Snippet filter for filter-miss; hover Clear filter; trigger or find an error empty shell when useful. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1627)
+
+Version **v0.1.1627** (follow-up after v0.1.1626). Result-row opaque wash shipped on main; task file still pointed at v0.1.1626 until this follow-up.
+
+---
+
+## Prior implementation (v0.1.1626)
+
 Version **v0.1.1626** (follow-up after v0.1.1625).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

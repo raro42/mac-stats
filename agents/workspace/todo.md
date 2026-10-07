@@ -1,14 +1,12 @@
-# WIP-14 — tauri://localhost CPU (#14)
+# Todo — WIP-14 WebView CPU cut (v0.1.1628)
 
-## Plan
-- [x] Read FEATURE-CODER / agents.md / lessons; pick lowest GitHub FEAT/WIP (WIP-14)
-- [x] Convert Top Processes empty shell → opaque `#ffffff` (v0.1.1626)
-- [x] Convert Top Processes filter-miss / CTA → opaque `#ffffff` (v0.1.1625; already on origin)
-- [x] Convert ring filter-miss / CTA → opaque `#ffffff` (v0.1.1624)
-- [x] Sync dist; CHANGELOG; cargo check
-- [x] Rename WIP- → UNTESTED-
+- [x] Pick lowest GitHub task: WIP-14 (`raro42/mac-stats` #14)
+- [x] Survey next glass-alpha surface after v0.1.1627 Perplexity result rows
+- [x] Opaque wash: `.perplexity-empty` · `.perplexity-empty-error` · `.perplexity-filter-miss` · CTA
+- [x] Sync `src-tauri/dist/agent-ops.css`, bump to 0.1.1628, CHANGELOG, standing_backlog
+- [x] `cargo check` in `src-tauri/`
+- [x] Prepend Implementation on task file; rename WIP- → UNTESTED-
+- [ ] Commit + push `origin/main` (do not close GitHub issue)
 
 ## Review
-- **v0.1.1626** — Top Processes `.process-empty` mix wash against opaque `#ffffff`. Continues #14 WebView compositor cuts on the process list surface after v0.1.1625 filter-miss.
-- Tester needs macOS Activity Monitor for Graphics and Media / `tauri://localhost`.
-- Do not close GitHub #14.
+v0.1.1628: Perplexity empty / filter-miss / Clear filter opaque washes in `agent-ops.css` (+ apple theme empty/error). `cargo check` pass. Task renamed to UNTESTED-14. GitHub #14 left for closing reviewer / macOS Activity Monitor gate.
