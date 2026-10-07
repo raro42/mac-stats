@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1720
+
+- Apple icon-line strip glyphs (`.icon-line-item` resting · hover) mix type color against an opaque chip fill. No glass alpha on the always-visible Monitors · AI Chat · … strip icons. Primary / muted type tokens already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1719
 
 - Apple primary / muted type tokens (`--text` · `--muted`) and leftover panel tokens (`--hairline` · `--panel` · `--panel-border` · `--panel-shadow`) mix against an opaque shell fill. No glass alpha on always-on labels. Modal dimmers already opaque. P2 reliability / GitHub #14.
