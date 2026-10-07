@@ -7,9 +7,9 @@
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14
-- [ ] Commit + push `origin/main`
-- [ ] Do **not** close GitHub #14
+- [x] Commit + push `origin/main`
+- [x] Do **not** close GitHub #14
 
 ## Review
 
-v0.1.1672: Force Quit `.force-quit-btn` resting · hover · focus · active · `.is-confirming` (+ section hairline) mix washes against opaque `#ffffff` (shared confirming + Apple). `cargo check` pass. Task renamed to UNTESTED-14. Issue #14 not closed by coder.
+v0.1.1672: Force Quit `.force-quit-btn` resting · hover · focus · active · `.is-confirming` (+ section hairline) mix washes against opaque `#ffffff` (shared confirming + Apple). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
