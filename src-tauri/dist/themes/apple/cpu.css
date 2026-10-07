@@ -308,7 +308,8 @@ border-radius: 24px;
   border-radius: 20px;
   /* Opaque cards — no soft shadows (Graphics and Media idle cost, #14). */
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  border: 1px solid color-mix(in srgb, #0c0c10 6%, #ffffff);
   box-shadow: none;
   padding: 16px 12px;
   min-height: 160px;

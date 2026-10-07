@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1709
+
+- Apple ring metric cards (`.metric-card`) mix hairline borders against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp card borders. Details / Top Processes shells already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1708
 
 - Apple Details / Top Processes shells (`.apple-details` · `.apple-processes` resting · hover) mix hairline borders against an opaque fill. No glass alpha on the section panel borders. Changelog scrollbar already opaque. P2 reliability / GitHub #14.
