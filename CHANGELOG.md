@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1672] - 2026-10-07
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Force Quit control (`.force-quit-btn` resting · hover · focus · active · `.is-confirming` + section hairline) mix the wash against an opaque fill. No glass alpha on the Force Quit control. Shared confirming wash and Apple theme both updated. Process Details panel opaque in v0.1.1671.
+
 ## [0.1.1671] - 2026-10-07
 
 ### Changed

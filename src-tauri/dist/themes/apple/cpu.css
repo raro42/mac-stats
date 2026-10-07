@@ -909,17 +909,19 @@ border-radius: 24px;
   padding: 7px 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .force-quit-section {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px dashed color-mix(in srgb, #ff3b30 28%, transparent);
+  border-top: 1px dashed color-mix(in srgb, #ff3b30 28%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 10%, #ffffff);
+  border: 1px solid color-mix(in srgb, #ff3b30 30%, #ffffff);
   border-radius: 8px;
   color: rgba(255, 59, 48, 0.9);
   font-size: 14px;
@@ -930,17 +932,17 @@ border-radius: 24px;
 }
 
 .force-quit-btn:hover {
-  background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.4);
+  background: color-mix(in srgb, #ff3b30 15%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 40%, #ffffff);
 }
 
 .force-quit-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, rgba(255, 59, 48, 0.9) 70%, transparent);
+  outline: 2px solid color-mix(in srgb, #ff3b30 70%, #ffffff);
   outline-offset: 2px;
 }
 
 .force-quit-btn:active {
-  background: rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, #ff3b30 20%, #ffffff);
 }
 
 .force-quit-btn:disabled {
@@ -951,10 +953,10 @@ border-radius: 24px;
 
 
 .force-quit-btn.is-confirming {
-  background: rgba(255, 59, 48, 0.22);
-  border-color: rgba(255, 59, 48, 0.55);
+  background: color-mix(in srgb, #ff3b30 22%, #ffffff);
+  border-color: color-mix(in srgb, #ff3b30 55%, #ffffff);
   color: #ff3b30;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #ff3b30 18%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff3b30 18%, #ffffff);
   animation: none;
 }
 
