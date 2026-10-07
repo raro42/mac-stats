@@ -4961,9 +4961,10 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Error bubble — soft alert (Errors glance / Monitors Down soft 7%/30% parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message.assistant.is-error {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 .chat-filter-count {

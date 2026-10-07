@@ -3,6 +3,7 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
+- **v0.1.1622** — AI Chat error bubbles (`.chat-message.assistant.is-error`): opaque wash (no glass alpha).
 - **v0.1.1621** — AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final): opaque wash (no glass alpha).
 - **v0.1.1620** — AI Chat composer (`#chat-input:focus` · `#chat-send-btn` resting · hover): opaque focus wash; soft glass Send shadows dropped.
 - **v0.1.1619** — AI Chat message rows (hover · focus · selected · Copied badge): opaque wash (no glass alpha).
@@ -44,6 +45,9 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
+- Keep — v0.1.1622 AI Chat error bubble opaque wash (#14).
+- Keep — v0.1.1621 AI Chat exec / answer card opaque wash (#14).
+- Keep — v0.1.1620 AI Chat composer focus wash; Send shadows dropped (#14).
 - Discard — local starter-chip wash duplicated origin v0.1.1618.
 - Keep — v0.1.1619 AI Chat message row hover · focus · selected · Copied badge opaque wash (#14).
 - Discard — local close-button wash duplicated origin v0.1.1613.
