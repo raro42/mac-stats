@@ -671,9 +671,10 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   grid-column: 1 / -1;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-health-card {
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
   border-radius: 10px;
   padding: 10px 12px;
   min-height: 58px;
@@ -682,51 +683,50 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 .ops-health-card.ops-health-clickable {
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ops-health-card.ops-health-clickable:hover {
-  border-color: color-mix(in srgb, currentColor 28%, transparent);
-  background: color-mix(in srgb, currentColor 10%, transparent);
+  border-color: color-mix(in srgb, currentColor 28%, #ffffff);
+  background: color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 .ops-health-card.ops-health-clickable:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #ffffff);
 }
 
 /* Soft ok (Ready calm / Monitors all-up 7%/28% parity). */
 .ops-health-card.ops-health-ok {
-  border-color: color-mix(in srgb, #34c759 28%, transparent);
-  background: color-mix(in srgb, #34c759 7%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, #ffffff);
+  background: color-mix(in srgb, #34c759 7%, #ffffff);
 }
 
 /* Soft alert (Runs has-slow / Monitors Slow 7%/30% parity). */
 .ops-health-card.ops-health-warn {
-  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
-  background: color-mix(in srgb, #ff9f0a 7%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #ffffff);
+  background: color-mix(in srgb, #ff9f0a 7%, #ffffff);
 }
 
 /* Soft alert (Runs has-fail / Monitors Down 7%/30% parity). */
 .ops-health-card.ops-health-bad {
-  border-color: color-mix(in srgb, #ff3b30 30%, transparent);
-  background: color-mix(in srgb, #ff3b30 7%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 30%, #ffffff);
+  background: color-mix(in srgb, #ff3b30 7%, #ffffff);
 }
 
 /* Linked detail tab is active — accent ring keeps ok/warn/bad wash visible. */
 .ops-health-card.is-active {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, #ffffff);
 }
 
 .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
 
 .ops-health-card.is-active.ops-health-clickable:hover {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, transparent),
-    0 2px 8px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, #ffffff);
 }
 
 .ops-health-label {
