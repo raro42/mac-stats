@@ -1414,6 +1414,7 @@ button.ops-badge:disabled {
   min-width: 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-preview {
   margin: 10px 0 0;
   padding: 12px;
@@ -1423,9 +1424,9 @@ button.ops-badge:disabled {
   word-break: break-word;
   font-size: 11px;
   line-height: 1.45;
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
 /* Sessions / Knowledge / Agents / Schedules / Runs: click-to-copy id, slug, path, or request id */
