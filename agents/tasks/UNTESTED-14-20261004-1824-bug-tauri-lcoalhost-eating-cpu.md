@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1705** (follow-up after v0.1.1704).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple battery / power strip hairline border skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.battery-power-strip` resting · hover mix hairline borders against opaque `#ececf1` / `#e4e4ea` (Apple had `var(--hairline)` glass borders). Focus-within opaque in v0.1.1644. History controls opaque in v0.1.1704.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Confirm the battery / power strip border stays solid (no glass alpha) on rest / hover. Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1704)
+
+## Implementation (prior header)
+
+
 Version **v0.1.1704** (follow-up after v0.1.1703).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -13189,3 +13205,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); expand AI Chat; hover the model label (`.model-text`); keyboard-focus the red connection indicator when offline; confirm hover wash and focus ring stay solid (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1704)
+
+**Date:** 2026-10-07 19:27 UTC (2026-10-07 21:27 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1704**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1704)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple History controls / time-range border skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1704**
+- `CHANGELOG.md` **[0.1.1704]** documents Apple History controls (`.history-controls` · `.time-range-dropdown` resting · hover) mix hairline borders against an opaque fill; no glass alpha on the History chrome or time-range border; Focus ring opaque in v0.1.1646; Model-text hover opaque in v0.1.1703
+- `src-tauri/dist/themes/apple/cpu.css` — `.history-controls` uses opaque `#ffffff` fill + `color-mix(..., #ffffff)` border, `box-shadow: none`; `.time-range-dropdown` / `:hover` / `:focus` mix borders / focus ring against `#ffffff`. No `var(--hairline)` / `hsla(` / `backdrop-filter` / glass `rgba(` on the claimed History chrome path.
+- Prior cuts still present: `.model-text:hover` · `.connection-indicator:focus-visible:not(.connected)` opaque mixes (v0.1.1703)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src-tauri/dist/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the History controls / time-range border path (CPU window focused, warm ≥30s, sections collapsed; confirm History controls and time-range dropdown borders stay solid on rest / hover). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.history-controls` / `.time-range-dropdown` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); confirm History controls and the time-range dropdown borders stay solid (no glass alpha) on rest / hover; gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.

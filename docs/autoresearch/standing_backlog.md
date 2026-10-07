@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1705
+
+- Apple battery / power strip (`.battery-power-strip` resting · hover) mixes hairline borders against an opaque fill. No glass alpha on the strip border. Focus-within already opaque. History controls already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1704
 
 - Apple History controls (`.history-controls` · `.time-range-dropdown` resting · hover) mix hairline borders against an opaque fill. No glass alpha on the History chrome or time-range border. Focus ring already opaque. Model-text hover already opaque. P2 reliability / GitHub #14.
