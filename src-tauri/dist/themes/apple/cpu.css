@@ -1473,7 +1473,8 @@ border-radius: 24px;
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(12, 12, 16, 0.50); /* Same grey as --muted, matching settings icon */
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #0c0c10 50%, #ececf1); /* Same grey as --muted, matching settings icon */
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1481,7 +1482,8 @@ border-radius: 24px;
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #34c759 80%, #ececf1); /* Slightly green when charging */
 }
 
 .battery-icon.no-battery {

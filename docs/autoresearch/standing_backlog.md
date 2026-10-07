@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1723
+
+- Apple battery strip glyph (`.battery-icon` resting · charging) mixes type color against an opaque strip fill. No glass alpha on the always-visible Bat icon. Window title already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1722
 
 - Apple window title (`.apple-title h1`) mixes type color against an opaque shell fill. No glass alpha on the always-visible product title. Icon-btn type already opaque. P2 reliability / GitHub #14.
