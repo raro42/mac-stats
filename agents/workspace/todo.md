@@ -1,13 +1,17 @@
-# Coder — WIP-14 → UNTESTED-14 (v0.1.1683)
+# WIP-14 / #14 — tauri://localhost CPU (v0.1.1684)
 
-- [x] Read FEATURE-CODER.md + agents.md + lessons.md
-- [x] Pick lowest GitHub WIP/FEAT (WIP-14)
-- [x] Opaque Apple Monitors settings popover shell (`.popover-content`)
-- [x] Bump v0.1.1683 + CHANGELOG + standing backlog
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename WIP-14 → UNTESTED-14; commit + push
-- [x] Comment on #14 via gh-safe (do not close)
+## Plan
+- [x] Pick lowest GitHub FEAT/WIP: `WIP-14-…` (issue #14)
+- [x] Next glass cut: Apple Ollama settings popover shell (mirror Monitors popover v0.1.1683)
+- [x] Bump `Cargo.toml` → `0.1.1684`
+- [x] Opaque `.ollama-settings-popover .popover-content` + close focus ring mix
+- [x] CHANGELOG `[0.1.1684]` entry
+- [x] Refresh Implementation section → rename `UNTESTED-14-…`
+- [x] `cargo check` in `src-tauri/` (green; unused-import warning pre-existing)
+- [ ] Commit + push `origin/main`
+- [ ] GitHub comment via `gh-safe.sh` (do not close issue)
 
 ## Review
-
-v0.1.1683: Apple `.monitors-settings-popover .popover-content` opaque `#ffffff` (no glass rgba / soft shadow); close focus ring mixes against `#ffffff`. Continues #14 WebView idle cuts after Perplexity search box. Issue left open for tester / 004.
+- Cut: Apple `.ollama-settings-popover .popover-content` opaque `#ffffff`, hairline via `color-mix`, `box-shadow: none`; close focus ring mixes against `#ffffff`.
+- Parallel to Monitors settings popover in v0.1.1683.
+- Linux webkit2gtk blank-page floor still applies; macOS Graphics and Media gate remains tester check.
