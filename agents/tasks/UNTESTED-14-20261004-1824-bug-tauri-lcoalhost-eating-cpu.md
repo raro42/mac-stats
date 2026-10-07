@@ -22,6 +22,19 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1687** (follow-up after v0.1.1686).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple Ollama settings system-prompt textarea skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.ollama-settings-popover .popover-body textarea` resting · focus, mix washes / borders / focus ring against opaque `#ffffff` (Apple had `rgba(255,255,255,0.7)` / `0.9` glass). Monitors Add-form URL input opaque in v0.1.1686. Ollama settings popover shell opaque in v0.1.1684.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Open AI Chat settings (gear / Ollama settings); confirm the system-prompt textarea stays solid on rest / focus (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1686)
+
 Version **v0.1.1686** (follow-up after v0.1.1685).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
@@ -12326,3 +12339,39 @@ Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30
 2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
 
 Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Monitors settings with at least one saved monitor; confirm settings list rows stay solid on rest / hover (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
+
+## Test report (v0.1.1686)
+
+**Date:** 2026-10-07 16:00 UTC (2026-10-07 18:00 CEST)
+**Result: FAIL** → move to WIP
+**Host:** Linux (webkit2gtk). Cannot run macOS Activity Monitor / `tauri://localhost` Graphics and Media check from this box.
+
+**Commands run**
+
+- Started from `agents/testing/active/TESTING-14-…` (GitHub #14, coder claimed **v0.1.1686**)
+- `cd src-tauri && cargo check` — **pass** (warnings only; v0.1.1686)
+- `cd src-tauri && cargo test` — **pass** (1359 passed in lib suite; 0 failed; 1 doc-test ignored)
+
+**Static verification (claimed #14 Apple Monitors settings Add form URL input skip glass blend)**
+
+- `src-tauri/Cargo.toml` — version **0.1.1686**
+- `CHANGELOG.md` **[0.1.1686]** documents Apple Monitors settings Add form URL input (`.add-monitor-form input` resting · focus) mixing washes against an opaque fill; no glass alpha on the field or focus ring; Monitors settings list rows opaque in v0.1.1685; Ollama settings popover shell opaque in v0.1.1684
+- `src-tauri/dist/themes/apple/cpu.css` — `.add-monitor-form input` / `:focus` backgrounds, borders, and focus ring `color-mix(..., #ffffff)` or solid `#ffffff`. Claimed blocks have no `transparent` / `rgba(` / `hsla(` / `backdrop-filter` / `var(--panel)`
+- Prior cuts still present: `.monitor-settings-item` opaque mixes (v0.1.1685); `.ollama-settings-popover .popover-content` opaque (v0.1.1684); `.monitors-settings-popover .popover-content` opaque (v0.1.1683)
+- History park still present: `html:not(.is-history-gpu-unparked)` hides canvases until hover / Refresh (`src/agent-ops.css`)
+- Note (not a CSS-cut regression): wash paint is the Monitors settings Add form URL input path (open Monitors settings → Add Monitor; confirm the URL field stays solid on rest / focus). macOS wash paint still needs a live window pass.
+
+**debug.log**
+
+- `python3 scripts/scan_debug_log_errors.py --minutes 180` — no ERROR/WARN/panic clusters. No new errors tied to the #14 opaque `.add-monitor-form input` cut.
+
+**Runtime**
+
+- No `mac_stats` / `WebKitWebProcess` running on this host during the pass (could not sample WebView CPU). `pgrep` only matched harness / agent tooling (`rustc` / `bash`).
+
+**Why not CLOSED**
+
+1. Issue acceptance is **<1%** `tauri://localhost` / Graphics and Media on **macOS**. This host cannot measure that.
+2. Linux WebKit floor (blank `cpu.html` near a full core, per prior notes) still blocks proving the product cut meets the issue bar here.
+
+Needs a macOS Activity Monitor pass (CPU window open already focused, warm ≥30s with sections collapsed (default); open Monitors settings → Add Monitor; confirm the URL field stays solid on rest / focus (no glass alpha); gauges/sparklines still update; watch Graphics and Media / `tauri://localhost` toward <1%) before CLOSED. Do **not** close GitHub #14.
