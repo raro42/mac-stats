@@ -4,12 +4,15 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
-- **v0.1.1714** — Apple Monitors / AI Chat settings popover headers mix hairline borders against an opaque fill.
-- **v0.1.1713** — Apple AI Chat message list (`.chat-messages`) mixes the hairline border against an opaque fill. Panel fill was already opaque in v0.1.1676; the border still used glass `--hairline`.
-- **v0.1.1712** — Apple icon-strip dividers (`.icon-btn:not(:last-child)::after`) and section hairlines (`.apple-divider`) opaque mixes on the shell fill.
-- **v0.1.1711** — Apple outer window shell (`.apple-shell`) opaque hairline border.
-- **v0.1.1710** — Apple History sparkline shells (`.history-chart-container`) opaque hairline borders.
-- **v0.1.1709** — Apple ring metric cards (`.metric-card`) opaque hairline borders.
+- **v0.1.1717** — Apple ring gauge tracks (`.ring-track` / `--ring-track`) mix against an opaque fill. No glass alpha on the always-visible CPU · GPU · Freq · Temp ring tracks.
+- **v0.1.1716** — Apple AI Chat markdown table cells and horizontal rules mix hairline borders against an opaque fill.
+- **v0.1.1715** — Apple Monitors settings Add form and row history hairlines opaque.
+- **v0.1.1714** — Apple Monitors / AI Chat settings popover headers opaque hairline borders.
+- **v0.1.1713** — Apple AI Chat message list (`.chat-messages`) hairline border opaque.
+- **v0.1.1712** — Apple icon-strip dividers and section hairlines opaque.
+- **v0.1.1711** — Apple outer window shell opaque hairline border.
+- **v0.1.1710** — Apple History sparkline shells opaque hairline borders.
+- **v0.1.1709** — Apple ring metric cards opaque hairline borders.
 - **v0.1.1708** — Apple Details / Top Processes shells opaque hairline borders.
 - **v0.1.1707** — Apple Changelog scrollbar track / thumbs opaque.
 - **v0.1.1706** — Apple Details / Top Processes scrollbar thumbs opaque.
@@ -27,9 +30,9 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - Design review: due=false (feature-agent-ops still recommended when screenshot TCC allows).
 - Debug.log: quiet in the 180m window.
 - Sibling harnesses: OpenClaw / Hermes paths missing on this host.
-- Race note: divider cut intended this tick was already on main as v0.1.1712; pivoted to `.chat-messages` border for v0.1.1713.
+- 23:00 backstop: git flush clean; CI and release scripts already ran today (skip).
 
 ## Next
 
-- More #14 glass: markdown table/hr hairlines; add-monitor / monitor-history hairlines; add-monitor / monitor-history hairlines.
+- More #14 glass: `--modal-backdrop` on Settings / Monitors / Ollama popovers (open-only).
 - Screenshot refresh for feature-agent-ops when due and TCC allows.
