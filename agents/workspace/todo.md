@@ -6,7 +6,7 @@
 - [x] Bump v0.1.1683 + CHANGELOG + standing backlog
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename WIP-14 → UNTESTED-14; commit + push
-- [ ] Comment on #14 via gh-safe (do not close)
+- [x] Comment on #14 via gh-safe (do not close)
 
 ## Review
 
