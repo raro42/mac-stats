@@ -28,3 +28,23 @@ Tester: open CPU window on macOS, warm ≥30s. Confirm Monitors/Ops icon-line Re
 ## Prior cuts (summary)
 
 Opaque hairline / wash series through **v0.1.1723** (battery-icon · apple-title · icon-btn type · icon-line type · text/muted · panel tokens · modal-backdrop · ring-track · markdown table/hr · Add form · monitor-history · popover headers · chat-messages border · icon-strip / section dividers · shell · history charts · metric cards · Details/Top Processes · scrollbars · battery strip · History controls · menus · popovers · and earlier #14 opaque washes). Full prior Implementation + Linux tester FAIL reports lived in the previous 1MB WIP dump and were trimmed here so the queue stays readable.
+
+## Test report
+
+**Date:** 2026-10-08 00:47 CEST (local); 2026-10-07 22:47 UTC.
+
+**Host:** Linux (Arch). macOS Activity Monitor / `tauri://localhost` Graphics and Media idle not runnable here. Per task note, Linux webkit2gtk WebKitWebProcess floor is not the macOS gate for this cut.
+
+**Commands run**
+- `cd src-tauri && cargo check` → **PASS** (`mac_stats v0.1.1725`; pre-existing unused warnings only)
+- `cd src-tauri && cargo test` → **PASS** (1359 lib tests passed; 0 failed)
+
+**Static checks (this cut)**
+- `src-tauri/dist/themes/apple/cpu.css`: `.icon-line-item.status-good` / `.status-warning` / `.status-bad` (and `:hover`) use opaque `color-mix(in srgb, … % , #ffffff)` for `color` / `background` / `border-color`; `box-shadow: none`.
+- Grep for prior glass `rgba(36,160,90|200,130,20|200,55,50` on those rules → **no matches**.
+- `Cargo.toml` version **0.1.1725** matches Implementation.
+
+**Logs**
+- `~/.mac-stats/debug.log` tail: no errors tied to this CSS cut / #14 WebView idle (stale Ollama connection-refused noise only).
+
+**Verdict:** **PASS** for v0.1.1725 icon-line status opaque wash cut. Move → `CLOSED-`. GitHub #14 left open (operator / 004). macOS warm-window Activity Monitor `<1%` remains the ongoing product gate on Apple Silicon, not blocked by this cut’s coded change.
