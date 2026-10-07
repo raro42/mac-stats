@@ -2795,13 +2795,14 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-detail-section .process-detail-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 7px 0;
   gap: 16px;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, #ffffff);
 }
 
 .process-detail-section .process-detail-row:last-child,

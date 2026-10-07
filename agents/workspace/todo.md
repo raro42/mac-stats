@@ -1,8 +1,8 @@
-# WIP-14 coder pass (v0.1.1672)
+# WIP-14 coder pass (v0.1.1673)
 
-- [x] Opaque-wash Force Quit control (`.force-quit-btn` resting · hover · focus · active · `.is-confirming` + section hairline) in `src/agent-ops.css` + dist + Apple theme
-- [x] Bump `src-tauri/Cargo.toml` to 0.1.1672
-- [x] CHANGELOG `[0.1.1672]` entry
+- [x] Opaque-wash Process Details metric row hairlines (`.process-detail-row` border-bottom) in `src/agent-ops.css` + dist + Apple theme
+- [x] Bump `src-tauri/Cargo.toml` to 0.1.1673
+- [x] CHANGELOG `[0.1.1673]` entry
 - [x] Prepend Implementation note on WIP-14 task file
 - [x] Update `docs/autoresearch/standing_backlog.md` #14 line
 - [x] `cargo check` in `src-tauri/`
@@ -12,4 +12,4 @@
 
 ## Review
 
-v0.1.1672: Force Quit `.force-quit-btn` resting · hover · focus · active · `.is-confirming` (+ section hairline) mix washes against opaque `#ffffff` (shared confirming + Apple). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
+v0.1.1673: Process Details `.process-detail-row` border-bottom mixes against opaque `#ffffff` (shared sheet + Apple). `cargo check` pass. Task renamed to UNTESTED-14. Pushed to origin/main. Issue #14 not closed by coder.
