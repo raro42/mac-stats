@@ -8,7 +8,7 @@
 - [x] CHANGELOG + standing_backlog overnight merge note
 - [x] Prepend Implementation on task; rename WIP- → UNTESTED-
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main` (do not close #14)
+- [x] Commit + push `origin/main` (do not close #14)
 
 ## Review
 Shipped **v0.1.1655**: Disk Cleanup scope filter-miss shell mixes washes against opaque `#ffffff`. GitHub #14 left for tester/004 (do not close).
