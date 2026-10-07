@@ -2001,18 +2001,19 @@ border-radius: 24px;
 }
 
 .monitors-menu-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 2px;
   color: var(--text);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitors-menu {
   position: fixed;
-  background: var(--panel);
-  border: 1px solid var(--hairline);
+  background: #ffffff;
+  border: 1px solid color-mix(in srgb, #0c0c10 8%, #ffffff);
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
   z-index: 1000;
   min-width: 140px;
 }
@@ -2027,17 +2028,17 @@ border-radius: 24px;
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.15s ease;
 }
 
 .monitors-menu-item:hover {
-  background: var(--hairline);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
 }
 
 .monitors-menu-item:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: -2px;
-  background: var(--hairline);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
 }
 
 .monitors-settings-popover {
