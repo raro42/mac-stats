@@ -22,6 +22,21 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1671** (follow-up after v0.1.1670).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Process Details panel skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.process-detail-hero` · `.process-detail-section`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+- `src-tauri/dist/themes/apple/cpu.css` — same selectors (Apple had put glass back). Monitors detail opaque in v0.1.1670.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Top Processes with at least one row; open Process Details; confirm hero and metric sections stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1670)
+
 Version **v0.1.1670** (follow-up after v0.1.1669).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

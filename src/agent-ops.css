@@ -2621,6 +2621,7 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Shared process details modal (all themes) */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-detail-hero {
   display: flex;
   flex-wrap: wrap;
@@ -2628,8 +2629,8 @@ textarea.ops-agent-editor.is-dirty {
   margin: 0 0 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
 }
 
 .process-detail-hero-toolbar-kb-hint {
@@ -2785,12 +2786,13 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-detail-section {
   margin: 0 0 10px;
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
+  background: color-mix(in srgb, currentColor 3.5%, #ffffff);
 }
 
 .process-detail-section .process-detail-row {
