@@ -1038,10 +1038,11 @@ padding: 18px 18px 16px;
   border-color: var(--hairline);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .time-range-dropdown:focus {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 40%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 40%, #ffffff);
   outline-offset: 1px;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   box-shadow: none;
   background: #ffffff;
 }
