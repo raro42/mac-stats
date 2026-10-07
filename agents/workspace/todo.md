@@ -8,7 +8,7 @@
 - [x] Bump `Cargo.toml` → `0.1.1591`; CHANGELOG entry; standing_backlog note
 - [x] Prepend Implementation notes; rename WIP → UNTESTED
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`; do not close #14
+- [x] Commit + push `origin/main`; do not close #14
 
 ## Review
 Opaque wash on Agent Ops overview cards (Agents · Schedules · Sessions · Memory). Soft hover shadows removed. Same #14 glass-alpha pattern. Issue left open for tester / 004.
