@@ -1909,24 +1909,27 @@ textarea.ops-agent-editor.is-dirty {
   pointer-events: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-input:focus {
   outline: none;
-  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
+  background: #ffffff;
 }
 
 /* Shared AI chat send affordance (all themes) */
+/* Opaque wash — soft glass shadows stay in Graphics and Media (#14). */
 #chat-send-btn {
   border-radius: 10px !important;
   padding: 8px 18px !important;
   font-weight: 600 !important;
   letter-spacing: 0.01em;
-  transition: background 0.2s ease, box-shadow 0.2s ease !important;
-  box-shadow: 0 1px 2px color-mix(in srgb, #000 12%, transparent);
+  transition: background 0.2s ease !important;
+  box-shadow: none;
 }
 
 #chat-send-btn:hover {
-  box-shadow: 0 4px 10px color-mix(in srgb, #0a84ff 28%, transparent);
+  box-shadow: none;
 }
 
 .chat-input-container {
