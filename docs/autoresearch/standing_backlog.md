@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1715
+
+- Apple Monitors settings Add form and row history (`.add-monitor-form` · `.monitor-history`) mix hairline borders against an opaque fill. No glass alpha on the Add form divider or per-row history tick divider. Popover headers already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1714
 
 - Apple Monitors / AI Chat settings popover headers (`.monitors-settings-popover .popover-header` · `.ollama-settings-popover .popover-header`) mix the hairline border against an opaque fill. No glass alpha on the popover title-row divider. Message-list border already opaque. P2 reliability / GitHub #14.
