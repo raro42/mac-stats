@@ -7255,15 +7255,17 @@ textarea.ops-agent-editor.is-dirty {
     transform 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, #ffffff);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item.is-selected {
-  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, var(--hairline, currentColor));
-  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, #ffffff);
 }
 
 /* Click / c copy URL — green Copied wash (Top Processes / Disk Cleanup parity). */

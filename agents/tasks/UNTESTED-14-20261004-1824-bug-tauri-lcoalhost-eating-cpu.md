@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1669** (follow-up after v0.1.1668).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Monitors row selected · focus skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.monitor-item.is-selected` · `:focus-visible`, mix washes against opaque `#ffffff` (no `transparent` / hairline glass alpha). Down · Slow status washes opaque in v0.1.1668.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Monitors with at least one row; Tab-focus a row and select one; confirm selection wash and focus ring stay solid. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1668)
+
 Version **v0.1.1668** (follow-up after v0.1.1667).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
