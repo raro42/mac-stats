@@ -3,7 +3,8 @@
 Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque washes instead of glass alpha).
 
 ## Shipped tonight
-- **v0.1.1649** — Apple Settings inputs (`.settings-input:focus` · `.discord-token-input:focus`): opaque focus wash (no glass alpha on the focus ring or the focused field).
+- **v0.1.1650** — Apple Settings inputs (`.settings-input:focus` · `.discord-token-input:focus`): opaque focus wash (no glass alpha on the focus ring or the focused field). Rebased past origin v0.1.1649.
+- **v0.1.1649** — Disk Cleanup meta cards (`.disk-cleanup-meta-card` resting · hover · focus · Reclaim · Clean · scopes · due · periodic): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1648** — Disk Cleanup category and scope rows (resting · hover · focus · selected · Reclaim · Big): opaque wash (no glass alpha). Hover drops the soft glass shadow.
 - **v0.1.1647** — Disk Cleanup Copied badge (`.disk-cleanup-item` / `.disk-cleanup-scope-row` `is-just-copied` `::after`): opaque green wash (no glass alpha on the badge).
 - **v0.1.1646** — Apple history time-range (`.time-range-dropdown:focus`): opaque focus wash (no glass alpha). Always-visible on the default collapsed layout.
@@ -70,7 +71,7 @@ Overnight Track B kept shipping GitHub **#14** WebView compositor cuts (opaque w
 - Linux webkit floor still not the macOS Graphics and Media gate. Each cut still needs macOS proof for #14 close.
 
 ## Ratchet
-- Keep @ `955371b0` — v0.1.1649 Apple Settings input focus opaque wash (#14).
+- Keep @ `af16957c` — v0.1.1650 Apple Settings input focus opaque wash (#14). Rebased past origin v0.1.1649.
 - Keep @ `1557072d` — v0.1.1648 Disk Cleanup category and scope row opaque wash (#14).
 - Discard — local Disk Cleanup Copied-badge wash duplicated origin v0.1.1647.
 - Keep @ `1e86faf6` — v0.1.1645 Monitors row Copied badge opaque wash (#14). Rebased past origin v0.1.1644.
