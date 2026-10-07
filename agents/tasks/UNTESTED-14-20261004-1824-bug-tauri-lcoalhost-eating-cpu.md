@@ -22,6 +22,20 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1601** (follow-up after v0.1.1600).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.
+
+Changes (Agent Ops Sessions filter chips + Clear skip glass blend):
+
+- `src/agent-ops.css` / `src-tauri/dist/agent-ops.css` — `.ops-session-kind-chip` resting / `:hover` / `:focus-visible` / `.is-active` / live·files `.has-hits` / live `.is-active`, and `.ops-session-kind-filter-clear` resting / `:hover` / `:focus-visible` / `.is-just-saved`, mix washes against opaque `#ffffff` (no `transparent` glass alpha).
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand Agent Ops → Sessions. Confirm filter chips (All · Live · Files) when present. Hover All · Live · Files; Tab-focus a chip; activate Live or Files when they have hits; use Clear when a filter is active (just-saved flash). Confirm washes still show, then leave. Gauges/sparklines stay filled. Watch Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+---
+
+## Prior implementation (v0.1.1600)
+
 Version **v0.1.1600** (follow-up after v0.1.1599).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on Apple Silicon.

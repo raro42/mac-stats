@@ -5512,12 +5512,13 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Clear beside All·Live·Files when a kind filter is active (Processes / Disk Clear parity). */
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-session-kind-filter-clear {
   flex: 0 0 auto;
   margin-left: auto;
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
-  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, #ffffff);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #ffffff);
   color: inherit;
   font: inherit;
   font-size: 11px;
@@ -5541,13 +5542,13 @@ textarea.ops-agent-editor.is-dirty {
 
 .ops-session-kind-filter-clear:hover {
   opacity: 1;
-  background: color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ffffff);
 }
 
 .ops-session-kind-filter-clear:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, #ffffff);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -5559,6 +5560,7 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-session-kind-chip {
   appearance: none;
   display: inline-flex;
@@ -5571,8 +5573,8 @@ textarea.ops-agent-editor.is-dirty {
   line-height: 1;
   padding: 5px 9px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
+  background: color-mix(in srgb, currentColor 4%, #ffffff);
   color: var(--text);
   cursor: pointer;
   opacity: 0.88;
@@ -5585,33 +5587,33 @@ textarea.ops-agent-editor.is-dirty {
 
 .ops-session-kind-chip:hover {
   opacity: 1;
-  background: color-mix(in srgb, currentColor 7%, transparent);
+  background: color-mix(in srgb, currentColor 7%, #ffffff);
 }
 
 .ops-session-kind-chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, #ffffff);
 }
 
 .ops-session-kind-chip.is-active {
   opacity: 1;
-  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ffffff);
 }
 
 .ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
-  background: color-mix(in srgb, #30d158 12%, transparent);
-  border-color: color-mix(in srgb, #30d158 28%, transparent);
+  background: color-mix(in srgb, #30d158 12%, #ffffff);
+  border-color: color-mix(in srgb, #30d158 28%, #ffffff);
 }
 
 .ops-session-kind-chip[data-ops-session-kind='live'].is-active {
-  background: color-mix(in srgb, #30d158 18%, transparent);
-  border-color: color-mix(in srgb, #30d158 36%, transparent);
+  background: color-mix(in srgb, #30d158 18%, #ffffff);
+  border-color: color-mix(in srgb, #30d158 36%, #ffffff);
 }
 
 .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
-  background: color-mix(in srgb, #0a84ff 12%, transparent);
-  border-color: color-mix(in srgb, #0a84ff 28%, transparent);
+  background: color-mix(in srgb, #0a84ff 12%, #ffffff);
+  border-color: color-mix(in srgb, #0a84ff 28%, #ffffff);
 }
 
 .ops-session-kind-count {
