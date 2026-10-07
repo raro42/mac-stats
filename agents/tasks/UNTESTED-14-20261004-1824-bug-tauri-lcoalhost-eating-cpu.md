@@ -22,6 +22,22 @@
 
 ## Implementation (coder)
 
+Version **v0.1.1703** (follow-up after v0.1.1702).
+
+Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.
+
+Changes (Apple AI Chat model-text hover + connection indicator focus skip glass blend):
+
+- `src-tauri/dist/themes/apple/cpu.css` — `.model-text:hover` mix wash against opaque `#ffffff` (Apple had `var(--hairline)` glass hover); `.connection-indicator:focus-visible:not(.connected)` focus ring mixes against opaque `#ffffff` (Apple had `transparent` glass mix). Model-text focus-visible opaque in v0.1.1692. Popover Close hover opaque in v0.1.1702.
+
+Tester: open CPU window on macOS (already focused), warm ≥30s with sections collapsed (default). Expand AI Chat; hover the model label (`.model-text`); keyboard-focus the red connection indicator when offline; confirm hover wash and focus ring stay solid (no glass alpha). Gauges/sparklines still update. Check Activity Monitor Graphics and Media / `tauri://localhost` toward <1%. Do not close GitHub #14.
+
+
+## Prior implementation (v0.1.1702)
+
+## Implementation (prior header)
+
+
 Version **v0.1.1702** (follow-up after v0.1.1701).
 
 Profiler note (Linux webkit2gtk): a blank `cpu.html` still pegs WebKitWebProcess near a full core. That host floor is not the macOS `tauri://localhost` / Graphics and Media gate. Product cuts below still matter on macOS.

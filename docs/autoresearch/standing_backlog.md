@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1703
+
+- Apple AI Chat model label (`.model-text` hover) and connection indicator (`.connection-indicator:focus-visible`) mix fills / focus ring against an opaque fill. No glass alpha on the model-name hover wash or connection focus ring. Model-text focus-visible already opaque. Popover Close hover already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1702
 
 - Apple Monitors / AI Chat settings popover Close controls (`.monitors-settings-popover .popover-close` · `.ollama-settings-popover .popover-close` hover) mix fills against an opaque fill. No glass alpha on the Close hover wash. Overflow menu triggers already opaque. Popover shells already opaque. P2 reliability / GitHub #14.

@@ -2691,8 +2691,9 @@ border-radius: 24px;
   opacity: 0.8;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .connection-indicator:focus-visible:not(.connected) {
-  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
   outline-offset: 3px;
 }
 
@@ -2710,9 +2711,10 @@ border-radius: 24px;
   white-space: nowrap;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .model-text:hover {
   color: var(--text);
-  background: var(--hairline);
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
 .model-text:focus-visible {
