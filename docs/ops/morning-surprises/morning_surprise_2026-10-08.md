@@ -23,4 +23,4 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 - Apple `cpu.css` has no remaining `rgb(`/`rgba(` type. History range label shipped in v0.1.1737. Next always-visible `opacity:` candidates: `.battery-status`, `.time-remaining`.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1737** (History range label).
+Latest keep: **v0.1.1737** @ `5fa00c8f`.
