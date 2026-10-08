@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1750** | `.apple-shell .logs-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Debug Log filter-miss hint; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1749** | `.apple-shell .processes-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Top Processes filter-miss hint; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1748** | `.apple-shell .perplexity-empty-hint` · `.perplexity-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Perplexity empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1747** | `.apple-shell .chat-exec-label` opaque `color-mix` 33% `#0c0c10` on `#ffffff` (AI Chat Code executed / Result captions; was shared `opacity: 0.65` on `--muted`) |
@@ -32,7 +33,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Perplexity empty hints shipped in v0.1.1748. Top Processes filter-miss hints shipped in v0.1.1749 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Next opacity candidate: `.logs-filter-miss-hint` (shared `opacity: 0.9` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
+- Top Processes filter-miss hints shipped in v0.1.1749. Debug Log filter-miss hints shipped in v0.1.1750 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Next opacity candidate: `.monitors-empty-hint` / `.monitors-filter-miss-hint` (shared `opacity: 0.9` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1749** @ `4cdebe2f`.
+Latest keep: **v0.1.1750** @ `e2151e91`.
