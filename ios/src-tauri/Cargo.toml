@@ -33,13 +33,24 @@ objc2-foundation = { version = "0.3", default-features = false, features = [
   "NSLocale",
   "NSObject",
   "NSProcessInfo",
+  "NSSet",
   "NSString",
   "NSURL",
   "NSValue",
 ] }
 
 [target.'cfg(target_os = "ios")'.dependencies]
-objc2-ui-kit = { version = "0.3", default-features = false, features = ["std", "UIDevice"] }
+objc2-ui-kit = { version = "0.3", default-features = false, features = [
+  "std",
+  "UIApplication",
+  "UIDevice",
+  "UIInterface",
+  "UIResponder",
+  "UIScene",
+  "UIView",
+  "UIWindow",
+  "UIWindowScene",
+] }
 
 [profile.release]
 codegen-units = 1

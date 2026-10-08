@@ -9,8 +9,11 @@ import {
   type Thermal,
 } from "../ipc";
 import { onMetrics } from "../metrics-bus";
+import { activeTheme } from "../themes";
 import { LineChart } from "./line-chart";
+import { PosterChart } from "./poster-chart";
 import { RingGauge, type Level } from "./ring-gauge";
+import { ThermalStrip } from "./thermal-strip";
 
 const THERMAL_LABEL: Record<Thermal, TextKey> = {
   nominal: "thermal.nominal",
@@ -19,6 +22,17 @@ const THERMAL_LABEL: Record<Thermal, TextKey> = {
   critical: "thermal.critical",
   unknown: "thermal.unknown",
 };
+
+/** What each thermal state means, shown under the thermal scale. */
+const THERMAL_MEANING: Record<Thermal, TextKey | null> = {
+  nominal: "thermal.meaning.nominal",
+  fair: "thermal.meaning.fair",
+  serious: "thermal.meaning.serious",
+  critical: "thermal.meaning.critical",
+  unknown: null,
+};
+
+const THERMAL_ORDER: Thermal[] = ["nominal", "fair", "serious", "critical"];
 
 const BATTERY_LABEL: Record<BatteryState, TextKey | null> = {
   charging: "battery.charging",
@@ -60,6 +74,10 @@ export async function startMonitor(): Promise<void> {
     battery: new RingGauge(ringsEl, t("metric.battery"), "accent-battery"),
   };
   const thermalEl = byId("thermal");
+  const thermalCard = byId("thermal-card");
+  const thermalLevel = byId("thermal-level");
+  const thermalMeaning = byId("thermal-meaning");
+  const thermalSteps = Array.from(thermalCard.querySelectorAll<HTMLElement>(".thermal-step"));
   const lowPowerEl = byId("low-power");
   const appMemBar = byId("appmem-bar");
   const appMemFill = byId("appmem-fill");
@@ -69,7 +87,12 @@ export async function startMonitor(): Promise<void> {
   const charts = {
     cpu: new LineChart(byId<HTMLCanvasElement>("chart-cpu"), "--cpu"),
     ram: new LineChart(byId<HTMLCanvasElement>("chart-ram"), "--ram"),
+    thermal: new ThermalStrip(byId<HTMLCanvasElement>("chart-thermal")),
   };
+  // Data Poster shows mini bar/line charts in the CPU and RAM tiles instead of rings.
+  const posters = activeTheme()?.poster
+    ? { cpu: new PosterChart(rings.cpu.element, "--cpu"), ram: new PosterChart(rings.ram.element, "--ram") }
+    : null;
 
   let range: Range = "5m";
   let simulator = false;
@@ -79,8 +102,29 @@ export async function startMonitor(): Promise<void> {
     const { windowMs, stepMs } = WINDOWS[range];
     charts.cpu.setWindow(windowMs, stepMs);
     charts.ram.setWindow(windowMs, stepMs);
+    charts.thermal.setWindow(windowMs, stepMs);
     charts.cpu.setData(points.map((p) => ({ ts: p.ts, v: p.cpu, gap: p.gap })));
     charts.ram.setData(points.map((p) => ({ ts: p.ts, v: p.ram, gap: p.gap })));
+    charts.thermal.setData(points.map((p) => ({ ts: p.ts, thermal: p.thermal, gap: p.gap })));
+  }
+
+  function renderThermal(state: Thermal): void {
+    const label = t(THERMAL_LABEL[state]);
+    const meaningKey = THERMAL_MEANING[state];
+    const meaning = meaningKey ? t(meaningKey) : "";
+    const spoken = t("thermal.label", { level: label });
+    thermalEl.textContent = label;
+    thermalEl.dataset.state = state;
+    thermalEl.setAttribute("aria-label", spoken);
+    thermalCard.dataset.state = state;
+    thermalCard.setAttribute("aria-label", meaning ? `${spoken}. ${meaning}` : spoken);
+    thermalLevel.textContent = label;
+    thermalMeaning.textContent = meaning;
+    const current = THERMAL_ORDER.indexOf(state);
+    thermalSteps.forEach((step, i) => {
+      step.classList.toggle("is-current", i === current);
+      step.classList.toggle("is-passed", current >= 0 && i < current);
+    });
   }
 
   function render(s: Snapshot): void {
@@ -122,8 +166,7 @@ export async function startMonitor(): Promise<void> {
       rings.battery.set(null, "—", t(simulator ? "monitor.noBatterySimulator" : "monitor.unavailable"));
     }
 
-    thermalEl.textContent = t(THERMAL_LABEL[s.thermal]);
-    thermalEl.dataset.state = s.thermal;
+    renderThermal(s.thermal);
     lowPowerEl.hidden = !s.lowPower;
 
     if (s.appFootprint != null) {
@@ -148,7 +191,10 @@ export async function startMonitor(): Promise<void> {
     if (range === "5m") {
       charts.cpu.push({ ts: s.ts, v: s.cpu }, LIVE_POINTS);
       charts.ram.push({ ts: s.ts, v: ramPct }, LIVE_POINTS);
+      charts.thermal.push({ ts: s.ts, thermal: s.thermal }, LIVE_POINTS);
     }
+    posters?.cpu.push(s.cpu);
+    posters?.ram.push(ramPct);
   }
 
   const rangeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-range]"));
@@ -171,6 +217,11 @@ export async function startMonitor(): Promise<void> {
     t("monitor.ramTotal", { size: bytes(info.ramTotal) }),
   ]);
 
+  if (posters) {
+    const recent = await metricsHistory("5m");
+    posters.cpu.seed(recent.map((p) => p.cpu));
+    posters.ram.seed(recent.map((p) => p.ram));
+  }
   const latest = await onMetrics(render);
   await loadHistory();
   if (latest) render(latest);

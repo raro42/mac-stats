@@ -249,16 +249,6 @@ struct Peaks {
     worst_thermal: Option<Thermal>,
 }
 
-fn thermal_rank(t: Thermal) -> u8 {
-    match t {
-        Thermal::Nominal => 0,
-        Thermal::Fair => 1,
-        Thermal::Serious => 2,
-        Thermal::Critical => 3,
-        Thermal::Unknown => 0,
-    }
-}
-
 fn watch_peaks(metrics: MetricsState, stop: Arc<AtomicBool>) -> Arc<Mutex<Peaks>> {
     let peaks = Arc::new(Mutex::new(Peaks::default()));
     let out = peaks.clone();
@@ -272,10 +262,7 @@ fn watch_peaks(metrics: MetricsState, stop: Arc<AtomicBool>) -> Arc<Mutex<Peaks>
                 if let Some(a) = s.app_available {
                     p.min_available = Some(p.min_available.map_or(a, |m| m.min(a)));
                 }
-                let worse = p.worst_thermal.is_none_or(|w| thermal_rank(s.thermal) > thermal_rank(w));
-                if worse {
-                    p.worst_thermal = Some(s.thermal);
-                }
+                p.worst_thermal = Thermal::worst(p.worst_thermal, Some(s.thermal));
             }
             tokio::time::sleep(Duration::from_millis(500)).await;
         }

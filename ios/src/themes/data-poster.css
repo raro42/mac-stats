@@ -1,0 +1,250 @@
+/* "Data Poster": port of the desktop theme (src-tauri/dist/themes/data-poster/cpu.css and
+   poster-charts.js). Fixed dark #0b0b10: no rings; each gauge is a poster tile with a big
+   number, a tinted radial glow over 10px scanlines, and (CPU, RAM) a mini bar chart and a
+   line chart drawn by the app in --cpu / --ram. */
+
+:root[data-theme="data-poster"] {
+  color-scheme: dark;
+
+  /* Page: body (cpu.css:28-36) under the fixed .poster-bg layer (cpu.css:38-47: blue glow
+     and 24px grid at opacity 0.25, folded into the alphas, so the grid stays as faint as on
+     the desktop). The 900/1200px sizes are for the 820px-wide desktop window; vw keeps the
+     proportion on a phone. */
+  --bg: #0b0b10;
+  --page-bg:
+    radial-gradient(110vw 110vw at 70% 70%, rgba(85, 199, 255, 0.025), rgba(0, 0, 0, 0) 58%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.01) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0075) 0 1px, transparent 1px 24px),
+    radial-gradient(146vw 110vw at 30% 30%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(135deg, #07070b, #0b0b10 55%, #07070b);
+
+  /* Surfaces: cards = .poster-panel (cpu.css:49-66), tiles below use .poster-tile.
+     Tab bar = the sticky credit strip .theme-footer (cpu.css:407-428). */
+  --card: rgba(0, 0, 0, 0.46);
+  --card-border: rgba(255, 255, 255, 0.14);
+  --card-shadow: none;
+  --card-blur: none;
+  --radius-card: 22px;
+  --tabbar: linear-gradient(180deg, rgba(8, 8, 12, 0.55), rgba(8, 8, 12, 0.92) 35%, rgba(8, 8, 12, 0.96));
+  --tabbar-blur: blur(16px) saturate(140%);
+
+  /* Text: :root (cpu.css:7-26). */
+  --fg: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.6);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+
+  /* Controls: track = .process-bar (cpu.css:379-385), grid = --rule. */
+  --track: rgba(255, 255, 255, 0.14);
+  --grid: rgba(255, 255, 255, 0.12);
+  --accent: #55c7ff;
+  --on-accent: #0b0b10; /* 10:1 on the blue */
+
+  /* Metrics = the desktop chart colors (poster-charts.js:13-34): CPU = usage,
+     RAM = GPU, Storage = frequency; battery = the desktop charging green. */
+  --cpu: rgb(85, 199, 255);
+  --ram: rgb(196, 168, 216);
+  --disk: rgb(93, 255, 176);
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* Type: h1 (cpu.css:111-115), .metric-value (235-246), .metric-label (227-233),
+     .section-title (310-317). The 48px value fits: no ring around it. */
+  --title-size: 30px;
+  --title-weight: 800;
+  --title-tracking: -0.6px;
+  --value-size: 48px;
+  --value-weight: 800;
+  --value-tracking: -0.8px;
+  --label-size: 12px;
+  --label-weight: 400;
+  --label-tracking: normal;
+  --label-transform: none;
+  --h2-size: 14px;
+  --h2-weight: 800;
+  --h2-tracking: 0.1em;
+  --h2-transform: uppercase;
+}
+
+/* Section spacing: .poster-panel gap (cpu.css:65). */
+:root[data-theme="data-poster"] .view {
+  gap: 18px;
+}
+
+/* Rule under the header: .poster-rule (cpu.css:157-161). */
+:root[data-theme="data-poster"] .top {
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Poster tiles: .poster-metrics / .poster-tile (cpu.css:163-178). */
+:root[data-theme="data-poster"] .rings {
+  gap: 18px;
+}
+
+:root[data-theme="data-poster"] .ring {
+  min-height: 190px;
+  padding: 14px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.26);
+  isolation: isolate; /* keeps the layers' z-index inside the tile, under the tab bar */
+}
+
+/* Tinted glow + scanlines per tile: .poster-tile::before (cpu.css:180-204), tinted with
+   the tile's color (it turns orange/red with the warn/crit level). */
+:root[data-theme="data-poster"] .ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* CPU = .usage; RAM (the desktop GPU tile has no glow) uses the same recipe. */
+:root[data-theme="data-poster"] .ring.accent-cpu::before,
+:root[data-theme="data-poster"] .ring.accent-ram::before {
+  background:
+    radial-gradient(circle at 50% 20%, color-mix(in srgb, var(--ring-color) 55%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ring-color) 16%, transparent) 0 1px, transparent 1px 10px);
+}
+
+/* Storage = .freq. */
+:root[data-theme="data-poster"] .ring.accent-disk::before {
+  background:
+    radial-gradient(circle at 70% 35%, color-mix(in srgb, var(--ring-color) 45%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 10px);
+}
+
+/* Battery = .heat. */
+:root[data-theme="data-poster"] .ring.accent-battery::before {
+  background:
+    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ring-color) 70%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 10px);
+}
+
+/* No ring: the value layer spans the whole tile, number centered (.metric-value),
+   label top-left (.metric-label), sub-text bottom-left (.metric-subtext, cpu.css:265-272). */
+:root[data-theme="data-poster"] .ring-dial {
+  position: static;
+  max-width: none;
+}
+
+:root[data-theme="data-poster"] .ring-dial svg {
+  display: none;
+}
+
+:root[data-theme="data-poster"] .ring-center {
+  z-index: 3;
+}
+
+:root[data-theme="data-poster"] .ring-label {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:root[data-theme="data-poster"] .ring-sub {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 3;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.62);
+  text-align: start;
+}
+
+/* Mini charts: .chart-container / .bar-chart / .line-chart (cpu.css:283-308). */
+:root[data-theme="data-poster"] .poster-charts {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:root[data-theme="data-poster"] .poster-bars {
+  display: block;
+  position: absolute;
+  /* Desktop: 80×60 at top 32 in a ~250px tile. Scaled to the phone tile (~170px) and
+     moved up beside the label, so the big number never runs into the bars. */
+  top: 12px;
+  right: 12px;
+  width: 54px;
+  height: 38px;
+  opacity: 0.85;
+}
+
+:root[data-theme="data-poster"] .poster-line {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  opacity: 0.9;
+}
+
+:root[data-theme="data-poster"] .card h2,
+:root[data-theme="data-poster"] .card summary {
+  color: rgba(255, 255, 255, 0.76); /* .section-title */
+}
+
+/* Bars: .process-bar / .process-bar-fill (cpu.css:379-391). */
+:root[data-theme="data-poster"] .bar {
+  height: 3px;
+}
+
+:root[data-theme="data-poster"] .bar-fill {
+  background: linear-gradient(90deg, #55c7ff, rgba(255, 184, 74, 0.85));
+}
+
+/* Period switch styled like .time-range-dropdown (cpu.css:2338-2360). */
+:root[data-theme="data-poster"] .segmented {
+  padding: 0;
+  border: 1px solid rgba(85, 199, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(85, 199, 255, 0.05);
+}
+
+:root[data-theme="data-poster"] .segmented button {
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+}
+
+:root[data-theme="data-poster"] .segmented button[aria-pressed="true"] {
+  background: rgba(85, 199, 255, 0.15);
+  color: #55c7ff;
+  box-shadow: none;
+}
+
+/* History charts: .history-chart-container (cpu.css:2308-2315). */
+:root[data-theme="data-poster"] .chart-canvas {
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="data-poster"] .chart-label {
+  top: 4px;
+  left: 6px;
+}
+
+/* Tab labels in the .theme-footer type (cpu.css:407-428). */
+:root[data-theme="data-poster"] .tab {
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.swatch[data-swatch="data-poster"] {
+  background:
+    radial-gradient(circle at 50% 25%, rgba(85, 199, 255, 0.75), rgba(0, 0, 0, 0) 60%),
+    repeating-linear-gradient(0deg, rgba(85, 199, 255, 0.35) 0 1px, transparent 1px 4px),
+    #0b0b10;
+}

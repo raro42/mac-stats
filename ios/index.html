@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
-    <link rel="stylesheet" href="/src/styles.css" />
     <title>iOS Stats</title>
     <script type="module" src="/src/main.ts"></script>
   </head>
@@ -17,13 +16,27 @@
           <h1>iOS Stats</h1>
           <div class="badges">
             <span id="low-power" class="pill pill-lowpower" data-i18n="monitor.lowPower" hidden></span>
-            <span id="thermal" class="pill pill-thermal" data-state="unknown">—</span>
+            <span id="thermal" class="pill pill-thermal" data-state="unknown" role="img">—</span>
           </div>
         </div>
         <p id="device" class="device" data-i18n="monitor.readingDevice"></p>
       </header>
 
       <section id="rings" class="rings" data-i18n-aria-label="monitor.gauges"></section>
+
+      <section id="thermal-card" class="card thermal-card" data-state="unknown" role="img">
+        <div class="card-head">
+          <h2 data-i18n="thermal.title"></h2>
+          <span id="thermal-level" class="thermal-level" aria-hidden="true">—</span>
+        </div>
+        <div class="thermal-scale" aria-hidden="true">
+          <span class="thermal-step" data-step="nominal" data-i18n="thermal.nominal"></span>
+          <span class="thermal-step" data-step="fair" data-i18n="thermal.fair"></span>
+          <span class="thermal-step" data-step="serious" data-i18n="thermal.serious"></span>
+          <span class="thermal-step" data-step="critical" data-i18n="thermal.critical"></span>
+        </div>
+        <p id="thermal-meaning" class="card-text" aria-hidden="true"></p>
+      </section>
 
       <section class="card">
         <h2 data-i18n="monitor.appMemory"></h2>
@@ -55,6 +68,10 @@
         <div class="chart">
           <span class="chart-label" aria-hidden="true" data-i18n="metric.ram"></span>
           <canvas id="chart-ram" class="chart-canvas chart-ram" role="img" data-i18n-aria-label="monitor.chartRam"></canvas>
+        </div>
+        <div class="chart-thermal">
+          <span class="chart-caption" aria-hidden="true" data-i18n="thermal.title"></span>
+          <canvas id="chart-thermal" class="thermal-canvas" role="img"></canvas>
         </div>
       </section>
 
@@ -107,6 +124,12 @@
           <h1 data-i18n="settings.title"></h1>
         </div>
       </header>
+
+      <section class="card">
+        <h2 id="theme-heading" data-i18n="settings.appearance"></h2>
+        <div id="theme-list" class="choice-list" role="radiogroup" aria-labelledby="theme-heading"></div>
+        <p id="theme-note" class="card-text" hidden></p>
+      </section>
 
       <section class="card">
         <h2 id="language-heading" data-i18n="settings.language"></h2>

@@ -1,55 +1,31 @@
-:root {
-  color-scheme: dark light;
-  --bg: #07090c;
-  --card: #11151b;
-  --card-border: #1c222b;
-  --fg: #e9edf2;
-  --muted: #8b95a3;
-  --track: #222934;
-  --grid: rgba(139, 149, 163, 0.25);
-  --accent: #0a84ff;
-  --ok: #30d158;
-  --warn: #ff9f0a;
-  --crit: #ff453a;
-  --cpu: #5ac8fa;
-  --ram: #bf5af2;
-  --disk: #64d2ff;
-  --battery: #30d158;
-  --tabbar: rgba(17, 21, 27, 0.82);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-  -webkit-text-size-adjust: 100%;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f2f2f7;
-    --card: #ffffff;
-    --card-border: #e5e5ea;
-    --fg: #1c1c1e;
-    --muted: #6e6e73;
-    --track: #e9e9ee;
-    --grid: rgba(110, 110, 115, 0.22);
-    --accent: #007aff;
-    --ok: #248a3d;
-    --warn: #ff9500;
-    --crit: #d70015;
-    --cpu: #0a84ff;
-    --ram: #8944ab;
-    --disk: #0071a4;
-    --battery: #248a3d;
-    --tabbar: rgba(249, 249, 249, 0.86);
-  }
-}
+/* Layout and components. Every color, font and shape comes from the theme tokens in
+   system.css (defaults) and <theme>.css (desktop themes); see the list there. */
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  background: var(--bg);
+  font-family: var(--font);
+  -webkit-text-size-adjust: 100%;
+}
+
 html,
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--fg);
+}
+
+/* Page background on a fixed layer: iOS ignores background-attachment: fixed, and
+   theme backgrounds (gradients, grids) must not scroll with the content. */
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-bg);
+  pointer-events: none;
 }
 
 body {
@@ -112,9 +88,9 @@ body.i18n-pending {
 
 .top h1 {
   margin: 0;
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: var(--title-size);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
 }
 
 /* Negative tracking crowds CJK glyphs. */
@@ -144,26 +120,26 @@ body.i18n-pending {
 }
 
 .pill-thermal[data-state="nominal"] {
-  color: var(--ok);
+  color: var(--thermal-nominal);
 }
 
 .pill-thermal[data-state="fair"] {
-  color: var(--fg);
+  color: var(--thermal-fair);
 }
 
 .pill-thermal[data-state="serious"] {
-  background: var(--warn);
-  color: #111;
+  background: var(--thermal-serious);
+  color: var(--on-thermal);
 }
 
 .pill-thermal[data-state="critical"] {
-  background: var(--crit);
-  color: #fff;
+  background: var(--thermal-critical);
+  color: var(--on-crit);
 }
 
 .pill-lowpower {
-  background: #ffd60a;
-  color: #111;
+  background: var(--lowpower);
+  color: var(--on-lowpower);
 }
 
 /* Rings */
@@ -174,13 +150,17 @@ body.i18n-pending {
 }
 
 .ring {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 12px 10px 12px;
   border: 1px solid var(--card-border);
-  border-radius: 18px;
+  border-radius: var(--radius-card);
   background: var(--card);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
   --ring-color: var(--accent);
 }
 
@@ -223,18 +203,19 @@ body.i18n-pending {
 .ring-track,
 .ring-progress {
   fill: none;
-  stroke-width: 7;
-  stroke-linecap: round;
-  transform: rotate(135deg);
+  stroke-width: var(--ring-stroke);
+  stroke-linecap: var(--ring-cap);
+  transform: rotate(var(--ring-start));
   transform-origin: 50% 50%;
 }
 
 .ring-track {
-  stroke: var(--track);
+  stroke: var(--ring-track);
 }
 
 .ring-progress {
   stroke: var(--ring-color);
+  filter: var(--ring-filter);
   transition: stroke-dasharray 0.6s ease, stroke 0.3s ease;
 }
 
@@ -252,15 +233,19 @@ body.i18n-pending {
 }
 
 .ring-value {
-  font-size: 24px;
-  font-weight: 650;
+  font-size: var(--value-size);
+  font-weight: var(--value-weight);
+  letter-spacing: var(--value-tracking);
   font-variant-numeric: tabular-nums;
 }
 
 .ring-label {
   margin-top: 2px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: var(--label-transform);
 }
 
 .ring-sub {
@@ -278,14 +263,21 @@ body.i18n-pending {
 .card {
   padding: 14px 16px;
   border: 1px solid var(--card-border);
-  border-radius: 18px;
+  border-radius: var(--radius-card);
   background: var(--card);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
 }
 
-.card h2 {
+.card h2,
+.conversations summary,
+.lab summary {
   margin: 0 0 10px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--h2-size);
+  font-weight: var(--h2-weight);
+  letter-spacing: var(--h2-tracking);
+  text-transform: var(--h2-transform);
 }
 
 .card-head {
@@ -356,7 +348,7 @@ body.i18n-pending {
 .segmented button[aria-pressed="true"] {
   background: var(--card);
   color: var(--fg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
 }
 
 .chart {
@@ -396,8 +388,8 @@ body.i18n-pending {
   padding: 6px 0 calc(env(safe-area-inset-bottom) + 2px);
   border-top: 1px solid var(--card-border);
   background: var(--tabbar);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: var(--tabbar-blur);
+  backdrop-filter: var(--tabbar-blur);
 }
 
 .tab {
@@ -477,7 +469,7 @@ body.i18n-pending {
   width: 100%;
   margin-top: 8px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .lab-output {
@@ -530,7 +522,7 @@ body.i18n-pending {
 
 .model-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .model-cellular {
@@ -546,7 +538,7 @@ body.i18n-pending {
   padding: 10px 14px;
   border-radius: 12px;
   background: var(--warn);
-  color: #111;
+  color: var(--on-warn);
   font-size: 14px;
   font-weight: 600;
 }
@@ -579,7 +571,7 @@ body.i18n-pending {
   align-self: flex-end;
   border-bottom-right-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   white-space: pre-wrap;
 }
 
@@ -643,12 +635,6 @@ body.i18n-pending {
 .bubble-assistant pre code {
   padding: 0;
   background: transparent;
-}
-
-.conversations summary,
-.lab summary {
-  font-size: 15px;
-  font-weight: 600;
 }
 
 .conv-list {
@@ -732,7 +718,7 @@ body.i18n-pending {
   border: 0;
   border-radius: 20px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -752,13 +738,13 @@ body.i18n-pending {
   padding: 8px 12px;
   border-radius: 12px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 13px;
   font-weight: 600;
   text-align: center;
 }
 
-/* Settings: language list */
+/* Settings: language and theme lists */
 .choice-list {
   display: flex;
   flex-direction: column;
@@ -782,4 +768,143 @@ body.i18n-pending {
   height: 20px;
   margin: 0;
   accent-color: var(--accent);
+}
+
+/* Thermal card: the four iOS thermal states with the current one highlighted. Colors and
+   the pulse for serious/critical match the desktop's thermal card. */
+.thermal-card {
+  --level-color: var(--muted);
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--level-color) 7%, transparent),
+    color-mix(in srgb, var(--level-color) 7%, transparent)
+  );
+}
+
+.thermal-card[data-state="nominal"] {
+  --level-color: var(--thermal-nominal);
+}
+
+.thermal-card[data-state="fair"] {
+  --level-color: var(--thermal-fair);
+}
+
+.thermal-card[data-state="serious"] {
+  --level-color: var(--thermal-serious);
+}
+
+.thermal-card[data-state="critical"] {
+  --level-color: var(--thermal-critical);
+}
+
+.thermal-level {
+  color: var(--level-color);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.thermal-scale {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.thermal-step {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.thermal-step::before {
+  content: "";
+  height: 6px;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.thermal-step[data-step="nominal"] {
+  --step-color: var(--thermal-nominal);
+}
+
+.thermal-step[data-step="fair"] {
+  --step-color: var(--thermal-fair);
+}
+
+.thermal-step[data-step="serious"] {
+  --step-color: var(--thermal-serious);
+}
+
+.thermal-step[data-step="critical"] {
+  --step-color: var(--thermal-critical);
+}
+
+.thermal-step.is-passed::before {
+  background: var(--step-color);
+  opacity: 0.35;
+}
+
+.thermal-step.is-current {
+  color: var(--fg);
+  font-weight: 650;
+}
+
+.thermal-step.is-current::before {
+  background: var(--step-color);
+}
+
+.thermal-card[data-state="serious"] .is-current::before,
+.thermal-card[data-state="critical"] .is-current::before {
+  animation: thermal-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes thermal-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thermal-card .is-current::before {
+    animation: none;
+  }
+}
+
+/* Thermal history strip under the CPU/RAM charts. */
+.chart-thermal {
+  margin-top: 10px;
+}
+
+.chart-caption {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.thermal-canvas {
+  display: block;
+  width: 100%;
+  height: 10px;
+  margin-top: 4px;
+}
+
+/* Data Poster mini charts: hidden unless the theme shows them. */
+.poster-charts {
+  display: none;
+}
+
+/* Theme picker swatch; each theme file paints its own. */
+.swatch {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+}
+
+.swatch[data-swatch="system"] {
+  background: linear-gradient(135deg, #f2f2f7 50%, #07090c 50%);
 }

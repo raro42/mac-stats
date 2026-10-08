@@ -27,8 +27,8 @@ Answer briefly, clearly and kindly. \
 Before each question you receive a system message with the iPhone's current data and the language to answer in. \
 Use the data only if the question is about the phone, never invent data that is not there, \
 and never copy that list into your answer. Always answer in the language that message asks for. \
-iOS thermal states: normal (no problem), warm (a bit hot), \
-hot (iOS lowers performance to cool down) and critical (very hot, better to stop using it).";
+iOS thermal states: nominal (normal), fair (slightly elevated), \
+serious (high: iOS lowers performance to cool down) and critical (very high: better to stop using it).";
 
 /// History bytes (UTF-8) that fit comfortably in 4096 tokens alongside the persona,
 /// the per-turn note, the question and up to 512 reply tokens. CJK text uses about three
@@ -39,12 +39,12 @@ fn gb(bytes: u64) -> String {
     format!("{:.1} GB", bytes as f64 / 1_073_741_824.0)
 }
 
-/// Same words as the UI labels in English (`src/i18n/en.ts`, `thermal.*`).
+/// Same words as the UI in English and the desktop app (`src/i18n/en.ts`, `thermal.*`).
 fn thermal_name(t: Thermal) -> &'static str {
     match t {
-        Thermal::Nominal => "normal",
-        Thermal::Fair => "warm",
-        Thermal::Serious => "hot",
+        Thermal::Nominal => "nominal",
+        Thermal::Fair => "fair",
+        Thermal::Serious => "serious",
         Thermal::Critical => "critical",
         Thermal::Unknown => "unknown",
     }
@@ -163,7 +163,7 @@ mod tests {
         assert_eq!(
             device_note(&snapshot()),
             "Current data for this iPhone: CPU 23%, RAM 3.0 GB of 6.0 GB, app memory 1.5 GB \
-(headroom 1.0 GB), battery 78% (charging), thermal state warm, 41.0 GB free."
+(headroom 1.0 GB), battery 78% (charging), thermal state fair, 41.0 GB free."
         );
     }
 

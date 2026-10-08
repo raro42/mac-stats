@@ -52,11 +52,12 @@ async fn read_battery(_app: &AppHandle) -> Option<Battery> {
     None
 }
 
-/// In debug builds, `IOS_STATS_FAKE_THERMAL=serious|critical` forces the thermal state
-/// to test the chat warnings without heating up the iPhone.
+/// In debug builds, `IOS_STATS_FAKE_THERMAL=fair|serious|critical` forces the thermal
+/// state to test the indicator and the chat warnings without heating up the iPhone.
 fn thermal() -> apple::Thermal {
     if cfg!(debug_assertions) {
         match std::env::var("IOS_STATS_FAKE_THERMAL").as_deref() {
+            Ok("fair") => return apple::Thermal::Fair,
             Ok("serious") => return apple::Thermal::Serious,
             Ok("critical") => return apple::Thermal::Critical,
             _ => {}
@@ -119,6 +120,7 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
             None => (None, None),
         };
 
+        let thermal = thermal();
         let snapshot = Snapshot {
             ts,
             cpu,
@@ -130,7 +132,7 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
             net_up,
             battery,
             storage,
-            thermal: thermal(),
+            thermal,
             low_power: apple::low_power_mode(),
         };
         let point = Point {
@@ -140,6 +142,7 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
                 .filter(|_| ram_total > 0)
                 .map(|used| (used as f64 / ram_total as f64 * 100.0) as f32),
             app_mb: app_footprint.map(|bytes| (bytes as f64 / 1_048_576.0) as f32),
+            thermal: Some(thermal),
             gap: false,
         };
 

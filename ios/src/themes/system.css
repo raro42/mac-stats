@@ -1,0 +1,99 @@
+/* "System" theme (default): the iOS look, following iPhone light/dark.
+   It also defines every token the components use; the desktop themes in <theme>.css
+   override them under :root[data-theme="<id>"].
+
+   Tokens
+   - Page:     --bg (solid: status band, composer), --page-bg (body background, may be a gradient)
+   - Surfaces: --card, --card-border, --card-shadow, --card-blur (backdrop-filter), --radius-card
+   - Text:     --fg, --muted, --font
+   - Controls: --track, --grid, --accent, --on-accent, --shadow, --tabbar, --tabbar-blur
+   - States:   --ok, --warn, --on-warn, --crit, --on-crit, --lowpower, --on-lowpower
+   - Thermal:  --thermal-nominal, --thermal-fair, --thermal-serious, --thermal-critical, --on-thermal
+   - Metrics:  --cpu, --ram, --disk, --battery (rings and charts)
+   - Type:     --title-*, --value-*, --label-*, --h2-* (size, weight, tracking, transform)
+   - Rings:    --ring-stroke, --ring-cap, --ring-track, --ring-filter, --ring-start (rotation of
+               the arc's start), --ring-arc (share of the circle the arc covers; read by
+               ring-gauge.ts once at start) */
+
+:root {
+  color-scheme: dark light;
+  --bg: #07090c;
+  --page-bg: var(--bg);
+  --card: #11151b;
+  --card-border: #1c222b;
+  --card-shadow: none;
+  --card-blur: none;
+  --radius-card: 18px;
+  --fg: #e9edf2;
+  --muted: #8b95a3;
+  --track: #222934;
+  --grid: rgba(139, 149, 163, 0.25);
+  --accent: #0a84ff;
+  --on-accent: #fff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --tabbar: rgba(17, 21, 27, 0.82);
+  --tabbar-blur: blur(20px) saturate(180%);
+  --ok: #30d158;
+  --warn: #ff9f0a;
+  --on-warn: #111;
+  --crit: #ff453a;
+  --on-crit: #fff;
+  --lowpower: #ffd60a;
+  --on-lowpower: #111;
+
+  /* Same colors as the desktop thermal states (mac-stats agent-ops.css). */
+  --thermal-nominal: #34c759;
+  --thermal-fair: #ff9500;
+  --thermal-serious: #ff9500;
+  --thermal-critical: var(--crit);
+  --on-thermal: #111;
+
+  --cpu: #5ac8fa;
+  --ram: #bf5af2;
+  --disk: #64d2ff;
+  --battery: #30d158;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --title-size: 34px;
+  --title-weight: 700;
+  --title-tracking: -0.02em;
+  --value-size: 24px;
+  --value-weight: 650;
+  --value-tracking: normal;
+  --label-size: 12px;
+  --label-weight: 400;
+  --label-tracking: normal;
+  --label-transform: none;
+  --h2-size: 15px;
+  --h2-weight: 600;
+  --h2-tracking: normal;
+  --h2-transform: none;
+
+  --ring-stroke: 7;
+  --ring-cap: round;
+  --ring-track: var(--track);
+  --ring-filter: none;
+  --ring-start: 135deg;
+  --ring-arc: 0.75;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #f2f2f7;
+    --card: #ffffff;
+    --card-border: #e5e5ea;
+    --fg: #1c1c1e;
+    --muted: #6e6e73;
+    --track: #e9e9ee;
+    --grid: rgba(110, 110, 115, 0.22);
+    --accent: #007aff;
+    --ok: #248a3d;
+    --warn: #ff9500;
+    --crit: #d70015;
+    --cpu: #0a84ff;
+    --ram: #8944ab;
+    --disk: #0071a4;
+    --battery: #248a3d;
+    --tabbar: rgba(249, 249, 249, 0.86);
+  }
+}

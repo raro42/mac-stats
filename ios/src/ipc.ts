@@ -25,6 +25,8 @@ export interface HistoryPoint {
   cpu: number | null;
   ram: number | null;
   appMb: number | null;
+  /** In the 1 h view, the worst state of the minute. */
+  thermal: Thermal | null;
   gap: boolean;
 }
 
@@ -207,9 +209,17 @@ export interface AppLanguage {
 }
 
 export const appLanguage = () => invoke<AppLanguage>("app_language");
+
+// --- Theme ---
+
+/** `theme` is a desktop theme id, or null for System. */
+export const appTheme = () => invoke<{ theme: string | null }>("app_theme");
+export const setAppTheme = (theme: string | null) =>
+  invoke<{ theme: string | null }>("set_app_theme", { theme });
 export const setAppLanguage = (language: string | null) =>
   invoke<AppLanguage>("set_app_language", { language });
 export const debugDemoPrompt = () => invoke<string | null>("debug_demo_prompt");
+export const debugDemoView = () => invoke<string | null>("debug_demo_view");
 
 export function chatDownload(
   id: string,

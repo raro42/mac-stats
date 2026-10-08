@@ -6,6 +6,7 @@ mod lab;
 mod language;
 mod metrics;
 mod selftest;
+mod theme;
 
 /// The web UI shows the model lab only in debug builds.
 #[tauri::command]
@@ -19,6 +20,18 @@ fn debug_build() -> bool {
 fn debug_demo_prompt() -> Option<String> {
     if cfg!(debug_assertions) {
         std::env::var("IOS_STATS_DEMO_PROMPT").ok()
+    } else {
+        None
+    }
+}
+
+/// Screenshots and manual tests (debug only): with `IOS_STATS_DEMO_VIEW=<tab>[-bottom]`
+/// (`monitor`, `chat`, `settings`) the web opens that tab and, with `-bottom`, scrolls to
+/// the end.
+#[tauri::command]
+fn debug_demo_view() -> Option<String> {
+    if cfg!(debug_assertions) {
+        std::env::var("IOS_STATS_DEMO_VIEW").ok()
     } else {
         None
     }
@@ -47,8 +60,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             debug_build,
             debug_demo_prompt,
+            debug_demo_view,
             language::app_language,
             language::set_app_language,
+            theme::app_theme,
+            theme::set_app_theme,
             metrics::metrics_subscribe,
             metrics::metrics_history,
             metrics::device_info,

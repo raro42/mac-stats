@@ -8,10 +8,11 @@ use objc2_foundation::{
     NSArray, NSNumber, NSProcessInfo, NSString, NSURLVolumeAvailableCapacityForImportantUsageKey,
     NSURLVolumeTotalCapacityKey, NSURL,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-/// `NSProcessInfo.thermalState`. iOS does not expose temperatures in °C.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+/// `NSProcessInfo.thermalState`. iOS does not expose temperatures in °C. The desktop app
+/// shows the same four states ("Thermal: Nominal" … "Critical").
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Thermal {
     Nominal,
@@ -19,6 +20,28 @@ pub enum Thermal {
     Serious,
     Critical,
     Unknown,
+}
+
+impl Thermal {
+    /// Severity for "worst state" comparisons; `Unknown` ranks lowest.
+    pub fn rank(self) -> u8 {
+        match self {
+            Thermal::Unknown => 0,
+            Thermal::Nominal => 1,
+            Thermal::Fair => 2,
+            Thermal::Serious => 3,
+            Thermal::Critical => 4,
+        }
+    }
+
+    /// The worse of two optional states.
+    pub fn worst(a: Option<Thermal>, b: Option<Thermal>) -> Option<Thermal> {
+        match (a, b) {
+            (Some(x), Some(y)) => Some(if y.rank() > x.rank() { y } else { x }),
+            (x, None) => x,
+            (None, y) => y,
+        }
+    }
 }
 
 pub fn thermal_state() -> Thermal {

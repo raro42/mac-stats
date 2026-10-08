@@ -51,6 +51,8 @@ pub(crate) struct Settings {
     pub model_id: Option<String>,
     /// UI language chosen in Settings; `None` = Automatic (follow iOS).
     pub language: Option<String>,
+    /// UI theme id (same ids as the desktop app); `None` = System.
+    pub theme: Option<String>,
 }
 
 pub struct ChatState {

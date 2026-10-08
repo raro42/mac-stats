@@ -1,0 +1,155 @@
+/* "Architect" theme, ported from src-tauri/dist/themes/architect/cpu.css (fixed light).
+   Blueprint grid paper, slate ink, boxes with a solid border plus an inner dashed frame,
+   rings drawn in ink as an open arc (GPU lavender). */
+
+:root[data-theme="architect"] {
+  color-scheme: light;
+
+  /* Page: architect/cpu.css:38-44 body background (22px blueprint grid + blue glow). */
+  --page-bg:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)),
+    repeating-linear-gradient(0deg, rgba(35, 45, 65, 0.06), rgba(35, 45, 65, 0.06) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(35, 45, 65, 0.06), rgba(35, 45, 65, 0.06) 1px, transparent 1px, transparent 22px),
+    radial-gradient(1200px 900px at 25% 15%, rgba(185, 205, 255, 0.35), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #fbfbfb, #f1f1f1);
+  /* Solid color of the top of that page (white + blue glow + 4% black). */
+  --bg: #e3e7f2;
+
+  /* Surfaces: :216-228 .metric-box (white 20%) on the :46-57 sheet (white 50%) = white 60%,
+     so the grid still shows through faintly. Border is --line-strong. */
+  --card: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(35, 45, 65, 0.35);
+  --card-shadow: none;
+  --card-blur: none;
+  --radius-card: 14px;
+
+  /* Text: :10-11 ink. Desktop --ink-muted is 0.55; raised to 0.70 (the desktop --accent)
+     so muted text reaches 4.5:1 on the grey grid. */
+  --fg: rgba(35, 45, 65, 0.88);
+  --muted: rgba(35, 45, 65, 0.7);
+  --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+
+  /* Controls: :24 accent is the ink itself; :418 process-bar track is 0.12, lightened to
+     0.08 so muted text on segmented/pill controls stays at 4.5:1. */
+  --track: rgba(35, 45, 65, 0.08);
+  --grid: rgba(35, 45, 65, 0.2);
+  --accent: rgba(35, 45, 65, 0.7);
+  --on-accent: #fff;
+  /* :19 panel and the settings card blur (:461-462). */
+  --tabbar: rgba(250, 250, 248, 0.94);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* States: darker shades of the iOS colors so text passes 4.5:1 on paper. */
+  --ok: #1b6e30;
+  --warn: #ff9500;
+  --on-warn: #111;
+  --crit: #c80013;
+  --on-crit: #fff;
+
+  /* Thermal: same hues as the desktop #34c759 / #ff9500, darkened for 4.5:1 text on
+     light paper; white text on the serious pill. */
+  --thermal-nominal: #1b6e30;
+  --thermal-fair: #945300;
+  --thermal-serious: #945300;
+  --thermal-critical: var(--crit);
+  --on-thermal: #fff;
+
+  /* Metrics: usage and frequency rings use the ink accent (:331-339), GPU lavender (:2411),
+     battery green (:1091). */
+  --cpu: rgba(35, 45, 65, 0.7);
+  --ram: #c4a8d8;
+  --disk: rgba(35, 45, 65, 0.7);
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* Type: :107-119 title 30/400; :260-266 label 14/500 capitalized; :268-279 value
+     38/500; :341-348 section title 16/400 uppercase. Value scaled 38 -> 28px because
+     the desktop shrinks "%" to 6px while here "100 %" is one string inside the 128px
+     ring; label 14 -> 13px so "Armazenamento" fits inside the arc. */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  --value-size: 28px;
+  --value-weight: 500;
+  --value-tracking: -0.01em;
+  --label-size: 13px;
+  --label-weight: 500;
+  --label-tracking: normal;
+  --label-transform: capitalize;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* Rings: cpu.html draws "M 15.2 72.4 A 38 38 0 1 1 84.8 72.4", a 245.5° arc that starts
+     at 147.2° (bottom left) and leaves the gap at the bottom; :324-339 stroke 5, round. */
+  --ring-stroke: 5;
+  --ring-cap: round;
+  --ring-track: rgba(35, 45, 65, 0.2);
+  --ring-filter: none;
+  --ring-start: 147.2deg;
+  --ring-arc: 0.682;
+}
+
+/* :107-119 title in neutral near-black, :121-126 light subtitle. */
+:root[data-theme="architect"] .top h1 {
+  color: rgba(28, 28, 30, 0.92);
+}
+
+:root[data-theme="architect"] .device {
+  font-size: 12px;
+  font-weight: 300;
+}
+
+/* :173-177 hairline rule under the header. */
+:root[data-theme="architect"] .top {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--grid);
+}
+
+/* :128-135 header chips styled like the .arch-actions group: light paper + ink border.
+   Only the token changes, so the colored low-power/serious/critical pills keep theirs. */
+:root[data-theme="architect"] .pill {
+  --track: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(35, 45, 65, 0.35);
+}
+
+/* :251-258 inner dashed frame of every box. Inset 14px -> 6px: the phone cards have
+   12-16px padding, so the frame stays clear of the ring and the text. */
+:root[data-theme="architect"] .card {
+  position: relative;
+}
+
+:root[data-theme="architect"] .ring::after,
+:root[data-theme="architect"] .card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed rgba(35, 45, 65, 0.18);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* :260-266 label in ink; :290-300 subtext 500. */
+:root[data-theme="architect"] .ring-label {
+  color: var(--fg);
+}
+
+:root[data-theme="architect"] .ring-sub {
+  font-weight: 500;
+}
+
+/* Desktop chat (:2046 .chat-message, :2261 #chat-input, :2282 #chat-send-btn): 8px corners. */
+:root[data-theme="architect"] .bubble,
+:root[data-theme="architect"] .composer textarea,
+:root[data-theme="architect"] .composer-send {
+  border-radius: 8px;
+}
+
+/* Theme picker: grid paper with the ink accent. */
+.swatch[data-swatch="architect"] {
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(35, 45, 65, 0.7) 50%),
+    repeating-linear-gradient(0deg, rgba(35, 45, 65, 0.16) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, rgba(35, 45, 65, 0.16) 0 1px, transparent 1px 5px),
+    #f4f5f8;
+}

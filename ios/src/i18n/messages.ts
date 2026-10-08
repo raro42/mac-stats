@@ -29,7 +29,15 @@ export interface Messages extends ErrorMessages {
   "metric.storage": string;
   "metric.battery": string;
 
-  // iOS thermal states
+  // iOS thermal states. English uses the desktop app's words (Nominal / Fair / Serious /
+  // Critical) so both apps say the same thing.
+  "thermal.title": string;
+  /** Spoken and pill label: "Thermal: {level}", like the desktop's thermal card. */
+  "thermal.label": string;
+  "thermal.meaning.nominal": string;
+  "thermal.meaning.fair": string;
+  "thermal.meaning.serious": string;
+  "thermal.meaning.critical": string;
   "thermal.nominal": string;
   "thermal.fair": string;
   "thermal.serious": string;
@@ -60,6 +68,9 @@ export interface Messages extends ErrorMessages {
   "monitor.period": string;
   "monitor.chartCpu": string;
   "monitor.chartRam": string;
+  /** Accessible name of the thermal history strip; `{level}` is the worst state shown. */
+  "monitor.thermalHistory": string;
+  "monitor.thermalHistoryEmpty": string;
   "monitor.footnote": string;
   "monitor.cpuDetail": string;
   "monitor.usedOfTotal": string;
@@ -121,6 +132,9 @@ export interface Messages extends ErrorMessages {
 
   // Settings tab
   "settings.title": string;
+  "settings.appearance": string;
+  /** Default theme that follows iPhone light/dark. Theme names themselves are not translated. */
+  "settings.themeSystem": string;
   "settings.language": string;
   /** "Automatic" option; `{language}` is the language it resolves to. */
   "settings.automatic": string;

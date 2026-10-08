@@ -2,6 +2,8 @@
 // relied on fixed IDs and `window` globals; here it is a reusable class that places
 // points by time and breaks the line at gaps.
 
+import { prepareCanvas, runs, windowStart } from "./time-axis";
+
 export interface Sample {
   ts: number;
   v: number | null;
@@ -41,18 +43,9 @@ export class LineChart {
   }
 
   draw(): void {
-    const ctx = this.ctx;
-    const width = this.canvas.clientWidth;
-    const height = this.canvas.clientHeight;
-    if (!ctx || width === 0 || height === 0) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    if (this.canvas.width !== Math.round(width * dpr) || this.canvas.height !== Math.round(height * dpr)) {
-      this.canvas.width = Math.round(width * dpr);
-      this.canvas.height = Math.round(height * dpr);
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+    const canvas = prepareCanvas(this.canvas, this.ctx);
+    if (!canvas) return;
+    const { ctx, width, height } = canvas;
 
     const style = getComputedStyle(this.canvas);
     const color = style.getPropertyValue(this.colorVar).trim() || "#5ac8fa";
@@ -67,31 +60,14 @@ export class LineChart {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const end = this.data.length ? this.data[this.data.length - 1].ts : Date.now();
-    const start = end - this.windowMs;
+    const start = windowStart(this.data, this.windowMs);
     const pad = 2;
     const x = (ts: number) => ((ts - start) / this.windowMs) * width;
     const y = (v: number) => pad + (1 - Math.min(this.max, Math.max(0, v)) / this.max) * (height - 2 * pad);
 
-    const segments: Array<Array<[number, number]>> = [];
-    let current: Array<[number, number]> = [];
-    let prevTs: number | null = null;
-    for (const p of this.data) {
-      if (p.ts < start) continue;
-      const valid = !p.gap && p.v != null;
-      const tooFar = prevTs != null && p.ts - prevTs > this.stepMs * 2.5;
-      if ((!valid || tooFar) && current.length) {
-        segments.push(current);
-        current = [];
-      }
-      if (valid) {
-        current.push([x(p.ts), y(p.v as number)]);
-        prevTs = p.ts;
-      } else {
-        prevTs = null;
-      }
-    }
-    if (current.length) segments.push(current);
+    const segments = runs(this.data, start, this.stepMs, (p) => p.v != null).map((run) =>
+      run.map((p): [number, number] => [x(p.ts), y(p.v as number)]),
+    );
 
     for (const seg of segments) {
       if (seg.length === 1) {

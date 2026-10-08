@@ -74,10 +74,16 @@ These only exist in debug builds. They are passed as environment variables when 
 | `IOS_STATS_BENCH_LANGS=es,en,de,fr,pt-BR,zh-Hans` | Languages of the quality questions (default `es`); each answer records the language it was written in |
 | `IOS_STATS_SOAK_SECS`, `IOS_STATS_THREADS` | Duration of the sustained test (600 s) and number of threads (2) for the benchmark |
 | `IOS_STATS_SELFTEST=1` | Chat self-test, including a language switch (es, en, "ok", de); saves `Documents/selftest.json`. With `IOS_STATS_SELFTEST_DOWNLOAD=<id>` it also downloads that model |
-| `IOS_STATS_FAKE_THERMAL=serious\|critical` | Simulates the thermal state in the monitor and in the engine |
+| `IOS_STATS_FAKE_THERMAL=fair\|serious\|critical` | Simulates the thermal state in the monitor (`fair` only there) and, for serious/critical, in the engine |
 | `IOS_STATS_DEMO_PROMPT="…"` | Opens the chat and sends that question on launch |
+| `IOS_STATS_DEMO_VIEW=monitor\|chat\|settings[-bottom]` | Opens that tab on launch and, with `-bottom`, scrolls to the end (for screenshots) |
 
 The Chat tab also includes a "Lab" card for loading, benchmarking and trying models by hand. Debug builds also offer a "Pseudo" language in Settings: every string shows as `[!! … ~~~ !!]`, about 40% longer, so hard-coded text and clipped layouts stand out.
+
+## Themes and thermal indicator
+
+- **Themes:** the nine desktop mac-stats themes with the same names and look (the desktop "Apple" theme is called "Glass" here, without the logo, because of App Store rules), plus the default "System" theme that follows iPhone light/dark. Pick one in Settings → Appearance. Details and the desktop-to-iPhone mapping: [docs/themes.md](docs/themes.md).
+- **Thermal indicator:** iOS exposes only the thermal state (Nominal, Fair, Serious, Critical), not °C. The Monitor shows it as a card with the four levels and what the current one means, plus a strip under the history charts (in the 1 h view, the worst state of each minute). Labels and colors match the desktop's thermal card.
 
 ## Languages
 

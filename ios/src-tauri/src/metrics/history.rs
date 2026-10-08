@@ -9,6 +9,8 @@
 use serde::Serialize;
 use std::collections::VecDeque;
 
+use super::apple::Thermal;
+
 pub const SECONDS_CAP: usize = 300;
 pub const MINUTES_CAP: usize = 60;
 const MINUTE_MS: i64 = 60_000;
@@ -23,6 +25,8 @@ pub struct Point {
     pub ram: Option<f32>,
     /// App memory, in MB.
     pub app_mb: Option<f32>,
+    /// iOS thermal state; in the «1 h» view, the worst state of the minute.
+    pub thermal: Option<Thermal>,
     /// `true` marks a break: there is no data between the previous point and the next.
     pub gap: bool,
 }
@@ -58,11 +62,12 @@ struct MinuteAccum {
     cpu: Mean,
     ram: Mean,
     app_mb: Mean,
+    thermal: Option<Thermal>,
 }
 
 impl MinuteAccum {
     fn new(minute: i64) -> Self {
-        MinuteAccum { minute, cpu: Mean::default(), ram: Mean::default(), app_mb: Mean::default() }
+        MinuteAccum { minute, cpu: Mean::default(), ram: Mean::default(), app_mb: Mean::default(), thermal: None }
     }
 
     fn point(&self) -> Point {
@@ -71,6 +76,7 @@ impl MinuteAccum {
             cpu: self.cpu.value(),
             ram: self.ram.value(),
             app_mb: self.app_mb.value(),
+            thermal: self.thermal,
             gap: false,
         }
     }
@@ -104,6 +110,7 @@ impl History {
         acc.cpu.add(p.cpu);
         acc.ram.add(p.ram);
         acc.app_mb.add(p.app_mb);
+        acc.thermal = Thermal::worst(acc.thermal, p.thermal);
     }
 
     /// Marks a break in the seconds view. The minutes view detects missing
@@ -145,7 +152,7 @@ mod tests {
     use super::*;
 
     fn sample(ts: i64, cpu: f32) -> Point {
-        Point { ts, cpu: Some(cpu), ram: Some(50.0), app_mb: Some(80.0), gap: false }
+        Point { ts, cpu: Some(cpu), ram: Some(50.0), app_mb: Some(80.0), thermal: Some(Thermal::Nominal), gap: false }
     }
 
     #[test]
@@ -170,7 +177,10 @@ mod tests {
         h.push(sample(60_000, 50.0));
         let m = h.minutes();
         assert_eq!(m.len(), 2);
-        assert_eq!(m[0], Point { ts: 0, cpu: Some(20.0), ram: Some(50.0), app_mb: Some(80.0), gap: false });
+        assert_eq!(
+            m[0],
+            Point { ts: 0, cpu: Some(20.0), ram: Some(50.0), app_mb: Some(80.0), thermal: Some(Thermal::Nominal), gap: false }
+        );
         assert_eq!(m[1].ts, 60_000);
         assert_eq!(m[1].cpu, Some(50.0));
     }
@@ -215,6 +225,22 @@ mod tests {
         }
         // 60 closed + the current minute
         assert_eq!(h.minutes().len(), MINUTES_CAP + 1);
+    }
+
+    #[test]
+    fn minute_buckets_keep_the_worst_thermal_state() {
+        let mut h = History::default();
+        let at = |ts: i64, t: Thermal| Point { thermal: Some(t), ..sample(ts, 1.0) };
+        h.push(at(0, Thermal::Nominal));
+        h.push(at(10_000, Thermal::Serious));
+        h.push(at(20_000, Thermal::Fair));
+        h.push(Point { thermal: None, ..sample(30_000, 1.0) });
+        assert_eq!(h.minutes()[0].thermal, Some(Thermal::Serious));
+        // Unknown never hides a known state.
+        h.push(at(40_000, Thermal::Unknown));
+        assert_eq!(h.minutes()[0].thermal, Some(Thermal::Serious));
+        // The seconds view keeps each sample as is.
+        assert_eq!(h.seconds()[2].thermal, Some(Thermal::Fair));
     }
 
     #[test]

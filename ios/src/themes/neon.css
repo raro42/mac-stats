@@ -1,0 +1,255 @@
+/* "Neon": port of the desktop theme (src-tauri/dist/themes/neon/cpu.css and the
+   `.neon-frame` in neon/cpu.html:13). Fixed dark: green #6dff7b glow, a fixed glowing
+   rounded frame, the four gauges joined in one block, top-arc rings with a glow. */
+
+:root[data-theme="neon"] {
+  color-scheme: dark;
+
+  /* Page: body + body::before (cpu.css:34-48); the highlight's opacity 0.8 is folded into
+     its alpha. The 900px blobs are sized for the 820px-wide desktop window; 110vw keeps
+     that proportion on a phone. --bg = the gradient's mid green, which is what the top of
+     the page shows. */
+  --bg: #06110a;
+  --page-bg:
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.048), rgba(0, 0, 0, 0) 45%),
+    radial-gradient(110vw 110vw at 10% 20%, rgba(70, 255, 120, 0.12), rgba(0, 0, 0, 0) 55%),
+    radial-gradient(110vw 110vw at 85% 20%, rgba(70, 255, 120, 0.1), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(110vw 110vw at 60% 95%, rgba(70, 255, 120, 0.08), rgba(0, 0, 0, 0) 55%),
+    linear-gradient(135deg, #020302, #06110a 60%, #020302);
+
+  /* Surfaces: cards = .neon-panel (cpu.css:63-82) with the --hairline as border, since
+     the phone splits the one desktop panel into cards. Its 24px blur would be invisible
+     over a smooth gradient, so cards skip it; the tab bar keeps it (content scrolls under). */
+  --card: rgba(8, 18, 12, 0.72);
+  --card-border: rgba(70, 255, 120, 0.18);
+  --card-shadow: none;
+  --card-blur: none;
+  --radius-card: 18px;
+  --tabbar: rgba(8, 18, 12, 0.92);
+  --tabbar-blur: blur(24px) saturate(140%);
+
+  /* Text: :root (cpu.css:7-25). */
+  --fg: rgba(230, 255, 230, 0.92);
+  --muted: rgba(180, 230, 180, 0.6);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+
+  /* Controls: track = .process-bar (cpu.css:461-467), grid = --hairline. */
+  --track: rgba(120, 255, 160, 0.12);
+  --grid: rgba(70, 255, 120, 0.18);
+  --accent: #6dff7b;
+  --on-accent: #020302; /* 16:1 on the green */
+
+  /* Metrics: CPU and Storage use the ring green, RAM the desktop GPU ring
+     (cpu.css:2394-2396), battery the desktop charging green (cpu.css:1076-1078). */
+  --cpu: #6dff7b;
+  --ram: #c4a8d8;
+  --disk: #6dff7b;
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* Type: h1 (cpu.css:126-138), .metric-value (255-272), .metric-label (244-253),
+     .section-title (341-348). */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  /* Desktop 38px with a separate 8px unit; here "%" is part of the string, so 36px keeps
+     "100 %" (de/fr) under the arc. */
+  --value-size: 36px;
+  --value-weight: 400;
+  --value-tracking: -0.01em;
+  --label-size: 11px;
+  --label-weight: 700;
+  --label-tracking: 0.8px;
+  --label-transform: uppercase;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* Rings: .ring-gauge / .ring-track / .ring-progress (cpu.css:304-339). The desktop clips
+     the circle so only its top shows; here the arc is the top half, 9 to 3 o'clock.
+     Track = 0.18 green at opacity 0.9. */
+  --ring-stroke: 4;
+  --ring-cap: round;
+  --ring-track: rgba(120, 255, 160, 0.162);
+  --ring-filter: drop-shadow(0 0 7px rgba(110, 255, 155, 0.3));
+  --ring-start: 180deg;
+  --ring-arc: 0.5;
+}
+
+/* Glowing frame: .neon-frame (cpu.css:50-61, --glow at :24). Inset 22px at the sides like
+   the desktop; top and bottom sit on the status band and the tab bar. Drawn over the
+   content (it is only a border), under the status band and the tab bar. */
+:root[data-theme="neon"] body::after {
+  content: "";
+  position: fixed;
+  top: env(safe-area-inset-top);
+  right: calc(env(safe-area-inset-right) + 22px);
+  bottom: calc(env(safe-area-inset-bottom) + 58px);
+  left: calc(env(safe-area-inset-left) + 22px);
+  z-index: 1;
+  border: 1px solid rgba(110, 255, 160, 0.22);
+  border-radius: 42px;
+  box-shadow:
+    0 0 22px rgba(90, 255, 140, 0.35),
+    0 0 60px rgba(90, 255, 140, 0.22);
+  pointer-events: none;
+}
+
+:root[data-theme="neon"] .tabbar {
+  z-index: 2;
+}
+
+/* Content stays inside the frame: 32px at the sides like the desktop body padding,
+   and clear of the frame's rounded top corners. */
+:root[data-theme="neon"] .view {
+  padding-top: calc(env(safe-area-inset-top) + 24px);
+  padding-right: calc(env(safe-area-inset-right) + 32px);
+  padding-left: calc(env(safe-area-inset-left) + 32px);
+}
+
+:root[data-theme="neon"] .composer {
+  padding-right: calc(env(safe-area-inset-right) + 32px);
+  padding-left: calc(env(safe-area-inset-left) + 32px);
+}
+
+/* Header divider: .divider (cpu.css:174-178), opacity 0.9 folded in. */
+:root[data-theme="neon"] .top {
+  padding-bottom: 14px;
+  background: linear-gradient(90deg, rgba(120, 255, 160, 0), rgba(120, 255, 160, 0.2), rgba(120, 255, 160, 0))
+    bottom / 100% 1px no-repeat;
+}
+
+/* Gauges joined in one block, only the outer corners rounded (.metrics-grid /
+   .metric-tile, cpu.css:180-221). The tile shadow goes on the block so neighbours do not
+   shade each other in the 2x2 grid. */
+:root[data-theme="neon"] .rings {
+  gap: 0;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="neon"] .ring {
+  padding: 35px 14px 12px;
+  border-color: transparent;
+  border-radius: 0;
+  background: rgba(8, 18, 12, 0.45);
+  /* Same glow as cpu.css:338, tinted with each ring's color (RAM, warn, crit). */
+  --ring-filter: drop-shadow(0 0 7px color-mix(in srgb, var(--ring-color) 30%, transparent));
+}
+
+:root[data-theme="neon"] .ring:first-child {
+  border-top-left-radius: 18px;
+}
+
+:root[data-theme="neon"] .ring:nth-child(2) {
+  border-top-right-radius: 18px;
+}
+
+:root[data-theme="neon"] .ring:nth-last-child(2) {
+  border-bottom-left-radius: 18px;
+}
+
+:root[data-theme="neon"] .ring:last-child {
+  border-bottom-right-radius: 18px;
+}
+
+/* Tile glow: .metric-tile::before (cpu.css:214-221), opacity 0.9 folded in. */
+:root[data-theme="neon"] .ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 18%, rgba(120, 255, 160, 0.108), rgba(0, 0, 0, 0) 55%);
+  pointer-events: none;
+}
+
+/* Top arc: drop most of the empty lower half of the dial and keep the value centered on
+   the arc, a little above its ends like the desktop (.metric-value top 50%, ring 54%). */
+:root[data-theme="neon"] .ring-dial svg {
+  margin-bottom: -30%;
+}
+
+:root[data-theme="neon"] .ring-center {
+  inset: 0 0 auto;
+  aspect-ratio: 1;
+  padding-bottom: 8px;
+}
+
+/* Label on top of the tile like .metric-label; desktop opacity 0.5 dropped for contrast. */
+:root[data-theme="neon"] .ring-label {
+  position: absolute;
+  top: -21px;
+  right: 0;
+  left: 0;
+  margin: 0;
+  color: rgba(190, 255, 205, 0.75);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* .metric-subtext (cpu.css:284-295); positioned to stay above the tile glow. */
+:root[data-theme="neon"] .ring-sub {
+  position: relative;
+  color: rgba(180, 235, 190, 0.7);
+  font-weight: 600;
+}
+
+:root[data-theme="neon"] .card h2,
+:root[data-theme="neon"] .card summary {
+  color: rgba(210, 255, 220, 0.75); /* .section-title */
+}
+
+/* Bars: .process-bar / .process-bar-fill (cpu.css:461-474); the glow needs overflow. */
+:root[data-theme="neon"] .bar {
+  height: 4px;
+  overflow: visible;
+}
+
+:root[data-theme="neon"] .bar-fill {
+  background: linear-gradient(90deg, #6dff7b, #2bff9f);
+  box-shadow: 0 0 10px rgba(110, 255, 155, 0.3);
+}
+
+/* Period switch styled like .time-range-dropdown (cpu.css:2328-2350). */
+:root[data-theme="neon"] .segmented {
+  padding: 0;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  background: rgba(0, 255, 0, 0.05);
+}
+
+:root[data-theme="neon"] .segmented button {
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+}
+
+:root[data-theme="neon"] .segmented button[aria-pressed="true"] {
+  background: rgba(0, 255, 0, 0.15);
+  color: #00ff00;
+  box-shadow: none;
+}
+
+/* History charts: .history-chart-container (cpu.css:387-401); no backdrop blur. */
+:root[data-theme="neon"] .chart-canvas {
+  border-radius: 12px;
+  background: rgba(8, 18, 12, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(120, 255, 160, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="neon"] .chart-label {
+  top: 4px;
+  left: 8px;
+}
+
+.swatch[data-swatch="neon"] {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(109, 255, 123, 0.35), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(135deg, #020302, #06110a 60%, #020302);
+  box-shadow:
+    inset 0 0 0 1px rgba(109, 255, 123, 0.9),
+    inset 0 0 6px rgba(90, 255, 140, 0.6);
+}

@@ -1,13 +1,24 @@
 // Progress ring. Adapted from the `.ring-gauge` in the Mac app themes
 // (src-tauri/dist/themes/*/cpu.html): same radius-42 circle in a 100-unit viewBox,
-// drawn here as a 270° arc and without inline styles (the CSP blocks them).
+// without inline styles (the CSP blocks them). The theme decides how much of the circle
+// the arc covers (`--ring-arc`: 240° on Glass, full circle on Dark, top half on Neon…)
+// and CSS rotates it (`--ring-start`).
 
 import { t } from "../i18n";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const RADIUS = 42;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const ARC = CIRCUMFERENCE * 0.75;
+
+/** Arc length for the active theme. Read once: a theme change reloads the page. */
+let arcLength: number | null = null;
+function arc(): number {
+  if (arcLength == null) {
+    const share = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ring-arc"));
+    arcLength = CIRCUMFERENCE * (share > 0 && share <= 1 ? share : 0.75);
+  }
+  return arcLength;
+}
 
 export type Level = "ok" | "warn" | "crit";
 
@@ -39,7 +50,7 @@ export class RingGauge {
     svg.setAttribute("viewBox", "0 0 100 100");
     svg.setAttribute("aria-hidden", "true");
     const track = circle("ring-track");
-    track.setAttribute("stroke-dasharray", `${ARC} ${CIRCUMFERENCE}`);
+    track.setAttribute("stroke-dasharray", `${arc()} ${CIRCUMFERENCE}`);
     this.progress = circle("ring-progress");
     this.progress.setAttribute("stroke-dasharray", `0 ${CIRCUMFERENCE}`);
     svg.append(track, this.progress);
@@ -67,10 +78,15 @@ export class RingGauge {
     this.root.setAttribute("aria-label", t("monitor.gaugeEmpty", { label }));
   }
 
+  /** The ring's card, for extras such as the Data Poster mini charts. */
+  get element(): HTMLDivElement {
+    return this.root;
+  }
+
   /** `fraction` between 0 and 1, or `null` when there is no data. */
   set(fraction: number | null, value: string, sub: string, level: Level = "ok"): void {
     const f = fraction == null ? 0 : Math.min(1, Math.max(0, fraction));
-    this.progress.setAttribute("stroke-dasharray", `${ARC * f} ${CIRCUMFERENCE}`);
+    this.progress.setAttribute("stroke-dasharray", `${arc() * f} ${CIRCUMFERENCE}`);
     this.root.dataset.level = fraction == null ? "none" : level;
     this.root.dataset.empty = String(f === 0); // at 0 the round line cap would draw a dot
     this.valueEl.textContent = value;

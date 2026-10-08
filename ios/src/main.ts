@@ -3,9 +3,10 @@ import { startChat, type ChatView } from "./chat/chat";
 import { startLab } from "./chat/lab";
 import { applyTranslations, isUiLanguage, setLanguage, t } from "./i18n";
 import { errorText } from "./i18n/errors";
-import { appLanguage, debugBuild, debugDemoPrompt } from "./ipc";
+import { appLanguage, appTheme, debugBuild, debugDemoPrompt, debugDemoView } from "./ipc";
 import { startMonitor } from "./monitor/monitor";
 import { startSettings } from "./settings/settings";
+import { applyTheme } from "./themes";
 
 function setupTabs(): void {
   const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>(".tab"));
@@ -18,8 +19,11 @@ function setupTabs(): void {
   }
 }
 
-/** Rust decides the language (in-app setting or iOS preferences) so the UI and the chat agree. */
-async function loadLanguage(): Promise<void> {
+/**
+ * Language and theme, before the page is shown. Rust decides the language (in-app
+ * setting or iOS preferences) so the UI and the chat agree, and stores the theme.
+ */
+async function loadAppearance(): Promise<void> {
   try {
     const lang = await appLanguage();
     setLanguage(isUiLanguage(lang.resolved) ? lang.resolved : "en", lang.locale ?? undefined);
@@ -27,12 +31,29 @@ async function loadLanguage(): Promise<void> {
     console.error("could not read the app language", error);
     setLanguage("en");
   }
+  try {
+    applyTheme((await appTheme()).theme);
+  } catch (error) {
+    console.error("could not read the app theme", error);
+    applyTheme(null);
+  }
   applyTranslations();
   document.body.classList.remove("i18n-pending");
 }
 
+/** Debug builds: `IOS_STATS_DEMO_VIEW=settings` (or `monitor-bottom`…) for screenshots. */
+async function showDemoView(): Promise<void> {
+  const view = await debugDemoView();
+  if (!view) return;
+  const [tab, where] = view.split("-");
+  document.querySelector<HTMLButtonElement>(`.tab[data-view="${tab}"]`)?.click();
+  if (where === "bottom") window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight }), 1500);
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
-  await loadLanguage();
+  // iOS only applies :active (tap feedback in some themes) when a touch listener exists.
+  document.addEventListener("touchstart", () => {}, { passive: true });
+  await loadAppearance();
   setupTabs();
   const debug = await debugBuild().catch(() => false);
 
@@ -64,6 +85,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // The model lab only shows up in debug builds.
   if (debug) {
+    void showDemoView();
     const lab = document.getElementById("lab-details");
     if (lab) lab.hidden = false;
     void startBenchBanner();
