@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1755
+
+- Apple monitor detail labels (`.monitor-detail-k`) mix type color against an opaque detail panel (`color-mix` 39% `#0c0c10` on `#ffffff`). No glass `opacity` on those URL · status captions. `.apple-shell` beats the later shared `opacity: 0.78`. Monitor last-check age already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1754
 
 - Apple monitor last-check age (`.monitor-checked-ago`) mixes type color against an opaque row fill (`color-mix` 36% `#0c0c10` on `#ffffff`; Down rows 43%). No glass `opacity` on that age line. `.apple-shell` beats the later shared `opacity: 0.72`. The Down selector beats shared `opacity: 0.85`. Monitor latency already opaque. P2 reliability / GitHub #14.
