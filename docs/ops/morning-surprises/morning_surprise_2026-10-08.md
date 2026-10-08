@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1759** | `.apple-shell .perplexity-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Perplexity key · Save · Clear keyboard hint; was shared `opacity: 0.72` on inherited `--text`) |
 | **v0.1.1758** | `.apple-shell .discord-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Discord token · Save · Clear · View logs keyboard hint; was shared `opacity: 0.72` on inherited `--text`) |
 | **v0.1.1757** | `.apple-shell .monitor-detail-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Check now · Remove keyboard hint; was shared `opacity: 0.72` on inherited `--text`) |
 | **v0.1.1756** | `.apple-shell .monitor-detail-note` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (no local check history line; was shared `opacity: 0.72` on inherited `--text`) |
@@ -41,7 +42,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- The Check now · Remove hint shipped in v0.1.1757. The Discord settings toolbar hint shipped in v0.1.1758 (`opacity: 1` plus 63% ink; `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`). Next opacity candidate: `.perplexity-settings-toolbar-kb-hint` (shared `opacity: 0.72`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state. `.monitor-item.is-checking` and `.is-pending` stay whole-row transient opacity.
+- The Discord settings toolbar hint shipped in v0.1.1758. The Perplexity settings toolbar hint shipped in v0.1.1759 (`opacity: 1` plus 63% ink; `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`). Next opacity candidate: `.brave-settings-toolbar-kb-hint` (shared `opacity: 0.72`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state. `.monitor-item.is-checking` and `.is-pending` stay whole-row transient opacity.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1758** @ `27064d55`.
+Latest keep: **v0.1.1759** @ `11965917`.
