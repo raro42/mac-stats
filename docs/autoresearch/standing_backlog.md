@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1740
+
+- Apple footer (`.apple-footer`) mixes type color against an opaque shell fill (`color-mix` 28% `#0c0c10` on `#f7f7fa`; hover 44%). No glass `opacity` on the always-visible version · GitHub line. Time-left caption already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1739
 
 - Apple time-left caption (`.time-remaining`) mixes type color against an opaque strip fill (`color-mix` 45% `#0c0c10` on `#ececf1`). No glass `opacity` on that always-visible line. Battery status already opaque. P2 reliability / GitHub #14.
