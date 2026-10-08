@@ -1813,6 +1813,14 @@ border-radius: 24px;
   content-visibility: hidden;
   contain: strict;
 }
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .disk-cleanup-empty-hint opacity: 0.9. */
+.apple-shell .disk-cleanup-empty-hint,
+.apple-shell .disk-cleanup-filter-miss-hint {
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the white empty shell. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+  opacity: 1;
+}
 .perplexity-config-status {
   font-size: 12px;
   color: var(--muted);
