@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1739
+
+- Apple time-left caption (`.time-remaining`) mixes type color against an opaque strip fill (`color-mix` 45% `#0c0c10` on `#ececf1`). No glass `opacity` on that always-visible line. Battery status already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1738
 
 - Apple battery status (`.battery-status`) mixes type color against an opaque strip fill (`color-mix` 45% `#0c0c10` on `#ececf1`). No glass `opacity` on the always-visible Bat charging / AC caption. History range label already opaque. P2 reliability / GitHub #14.

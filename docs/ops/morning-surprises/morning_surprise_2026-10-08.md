@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1739** | `.time-remaining` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (time-left caption; was `opacity: 0.9` on `--muted`) |
 | **v0.1.1738** | `.battery-status` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (Bat charging / AC caption; was `opacity: 0.9` on `--muted`) |
 | **v0.1.1737** | `.history-controls label` opaque `color-mix` 46% `#0c0c10` on `#ffffff` (History range caption; was `opacity: 0.9` on `--muted`) |
 | **v0.1.1736** | `.section-title` opaque `color-mix` 75% `#010101` on `#ffffff` (Details · Top Processes headings; was `rgb(1,1,1,0.75)`) |
@@ -21,7 +22,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Apple `cpu.css` has no remaining `rgb(`/`rgba(` type. Battery status shipped in v0.1.1738. Next always-visible `opacity:` candidate: `.time-remaining`.
+- Apple `cpu.css` has no remaining `rgb(`/`rgba(` type. Time-left caption shipped in v0.1.1739. Next always-visible `opacity:` candidate: `.apple-footer` (0.55).
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1738** @ `8bab247a`.
+Latest keep: **v0.1.1739**.
