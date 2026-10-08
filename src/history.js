@@ -18,9 +18,9 @@
   }
 
   // Chart configuration
-  const HISTORY_POINTS = 2; // Fewer points = less canvas work (#14)
-  // Match HISTORY_POLL_MS — legacy 3s gate was leftover from faster polls (#14).
-  const TEMPERATURE_REDRAW_INTERVAL_MS = 3600000;
+  const HISTORY_POINTS = 60; // Points in the history graph (#15 restores readable sparklines)
+  // Match HISTORY_POLL_MS while focused; blur parks canvases (#14 / #15).
+  const TEMPERATURE_REDRAW_INTERVAL_MS = 3000;
   let lastTemperatureDrawMs = 0;
 
   // Time range options (in seconds)
@@ -135,14 +135,11 @@
 
   function windowOccluded() {
     if (typeof document === 'undefined') return false;
-    if (document.hidden) return true;
-    try {
-      if (typeof document.hasFocus === 'function' && !document.hasFocus()) return true;
-    } catch (_) { /* ignore */ }
-    return false;
+    // Do not use document.hasFocus() — it starved sparklines while frontmost (#15).
+    return !!document.hidden;
   }
 
-  /** Prefer shared park gate — macOS keeps visibilityState=visible when occluded (#14). */
+  /** Prefer shared park gate — blur / Focused(false) set windowPollsPaused (#14 / #15). */
   function historyWorkPaused() {
     try {
       if (typeof window.__macStatsWindowWorkPaused === 'function') {
@@ -491,7 +488,7 @@
   }
 
   let historyPollInterval = null;
-  const HISTORY_POLL_MS = 3600000;
+  const HISTORY_POLL_MS = 8000;
 
   function pauseHistoryPoll() {
     if (historyPollInterval) {

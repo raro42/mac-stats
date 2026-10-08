@@ -546,6 +546,68 @@ body:hover {
 }
 
 
+/*
+ * Data Poster / dark shells: shared opaque washes mix against #ffffff for Apple.
+ * Remap the always-visible monitors summary (and kin) onto dark panel ink (#15).
+ */
+body.theme-data-poster .monitors-summary,
+body.theme-dark .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+}
+body.theme-data-poster .monitors-summary:hover,
+body.theme-dark .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+}
+body.theme-data-poster .monitors-summary:focus-visible,
+body.theme-dark .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+}
+body.theme-data-poster .monitors-summary.has-down,
+body.theme-dark .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
+  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+}
+body.theme-data-poster .monitors-summary.is-all-up,
+body.theme-dark .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
+  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+}
+body.theme-data-poster .monitors-summary.has-slowest-hint,
+body.theme-dark .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+}
+body.theme-data-poster .ollama-collapsed-glance,
+body.theme-data-poster .chat-collapsed-glance,
+body.theme-dark .ollama-collapsed-glance,
+body.theme-dark .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .ollama-collapsed-glance:hover,
+body.theme-dark .ollama-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+}
+body.theme-data-poster .ollama-collapsed-glance.is-offline,
+body.theme-dark .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+}
+body.theme-data-poster .ollama-collapsed-glance.is-online,
+body.theme-dark .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
+  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+}
+body.theme-data-poster .ollama-collapsed-glance.has-errors,
+body.theme-dark .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
+  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+}
+
 /* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
 body.theme-data-poster #icon-monitors,
 body.theme-data-poster #icon-ollama,

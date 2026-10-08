@@ -76,7 +76,7 @@
     frequency: NaN,
   };
 
-  /** macOS often keeps visibilityState=visible when another app is frontmost (#14). */
+  /** Prefer shared park gate; fallback is document.hidden only (#14 / #15). */
   function windowOccluded() {
     if (typeof document === "undefined") return false;
     try {
@@ -86,15 +86,8 @@
     } catch (_) {
       /* ignore */
     }
-    if (document.hidden) return true;
-    try {
-      if (typeof document.hasFocus === "function" && !document.hasFocus()) {
-        return true;
-      }
-    } catch (_) {
-      /* ignore */
-    }
-    return false;
+    // Do not use document.hasFocus() — it starved charts while frontmost (#15).
+    return !!document.hidden;
   }
 
   /** Drop GPU backing stores while occluded — keeps last buffer for unpark redraw (#14). */

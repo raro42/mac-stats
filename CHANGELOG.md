@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1762] - 2026-10-08
+
+### Fixed
+- **CPU window stuck on "None yet" (#15)** — Overnight #14 idle ratchets had deferred first metrics up to minutes, polled once per hour, skipped ring paints under 99% change, and treated `document.hasFocus() === false` as occluded (WKWebView often lies while the window is frontmost). Focused window again polls about every 2s, arms within ~0.5s, unparks sparklines after first paint, and parks only on blur / `Focused(false)` / `document.hidden`. Backend `get_cpu_details` rate floor is ~1.5s again (was 600s); process-cache TTL is 30s. Data Poster / dark themes no longer paint Apple `#ffffff` opaque washes on Monitors summary and AI Chat collapsed glances.
+
 ## [0.1.1761] - 2026-10-08
 
 ### Changed

@@ -1072,6 +1072,12 @@ body {
   box-shadow: none;
 }
 
+.lpm-info .lpm-toggle {
+  /* Opaque dark track — shared Apple #ececf1 wash reads as a white chip here (#15). */
+  background: color-mix(in srgb, var(--muted, #888) 28%, #0e0e14);
+  border-color: color-mix(in srgb, var(--muted, #888) 36%, #0e0e14);
+}
+
 .lpm-toggle::after {
   content: "";
   position: absolute;
@@ -2262,19 +2268,20 @@ body {
 
 #chat-input {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Dark panel only — never fall back to light glass on this theme (#15). */
+  background: rgba(14, 14, 20, 0.94);
+  border: 1px solid var(--hairline, rgba(255, 255, 255, 0.16));
   border-radius: 8px;
   padding: 8px 12px;
-  color: var(--text, var(--ink, inherit));
+  color: var(--text, rgba(255, 255, 255, 0.92));
   font-size: 13px;
   font-family: inherit;
 }
 
 #chat-input:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: var(--accent, #55c7ff);
+  background: rgba(18, 18, 26, 0.96);
 }
 
 #chat-input::placeholder {

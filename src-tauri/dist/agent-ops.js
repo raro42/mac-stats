@@ -449,8 +449,8 @@
     return true;
   }
 
-  const OPS_REFRESH_INTERVAL = 3600000;
-  const OPS_GLANCE_POLL_INTERVAL = 3600000;
+  const OPS_REFRESH_INTERVAL = 30000;
+  const OPS_GLANCE_POLL_INTERVAL = 60000;
   let agentOpsInterval = null;
   let agentOpsGlanceInterval = null;
   let agentOpsCollapsed = true;

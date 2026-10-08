@@ -1641,10 +1641,11 @@ pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
 }
 
 /// How long a Top Processes snapshot stays fresh while the CPU window is open.
-/// Must stay ≥ the CPU-window process-list poll (3600s). A 5–10s TTL forced
+/// Must stay ≥ the CPU-window process-list poll (30s). A 5–10s TTL forced
 /// `refresh_processes(All)` on almost every `get_cpu_details` while the window
-/// was visible and kept Graphics and Media / host CPU hot (#14).
-const PROCESS_CACHE_TTL_SECS: u64 = 3600;
+/// was visible and kept Graphics and Media / host CPU hot (#14). #15 restores
+/// a live 30s process list so the window is not stuck on "None yet".
+const PROCESS_CACHE_TTL_SECS: u64 = 30;
 
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
@@ -1653,11 +1654,10 @@ pub fn get_cpu_details() -> CpuDetails {
     let should_allow_full_call = match crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
         Ok(mut last_call) => {
             let now = std::time::Instant::now();
-            // Align with CPU-window poll (~3600s). A 2s floor still allowed burst
-            // IPC + process-cache checks while Graphics and Media was hot (#14).
+            // Align with CPU-window poll (~2s). A 600s floor left gauges at "None yet" (#15).
             let should = last_call
                 .as_ref()
-                .map(|lc| now.duration_since(*lc).as_secs_f64() >= 600.0)
+                .map(|lc| now.duration_since(*lc).as_secs_f64() >= 1.5)
                 .unwrap_or(true);
             if should {
                 *last_call = Some(now);

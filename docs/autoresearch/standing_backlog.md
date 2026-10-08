@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1762
+
+- Restore live CPU-window metrics after #14 idle ratchet broke gauges at "None yet" (GitHub #15). Focused polls ~2s; park only on blur / Focused(false) / hidden; drop hasFocus occlusion; process-cache TTL 30s; Data Poster dark washes for monitors summary + AI Chat glance.
+
 ## Overnight merge — v0.1.1761
 
 - Apple Redmine settings toolbar keyboard hint (`.redmine-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the URL · key · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Brave settings toolbar hint already opaque. P2 reliability / GitHub #14.
