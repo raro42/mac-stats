@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1744
+
+- Apple AI Chat status (`.chat-status`) mixes type color against an opaque message-list fill (`color-mix` 45% `#0c0c10` on `#ffffff`). No glass `opacity` on that status line. AI Chat empty shell already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1743
 
 - Apple AI Chat empty shell (`.chat-empty`) mixes type color against an opaque message-list fill (`color-mix` 45% `#0c0c10` on `#ffffff`). No glass `opacity` on that empty state. Hover drops the `opacity: 1` restore. Perplexity result meta already opaque. P2 reliability / GitHub #14.
