@@ -6,10 +6,11 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
-| **v0.1.1739** | `.time-remaining` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (time-left caption; was `opacity: 0.9` on `--muted`) |
-| **v0.1.1738** | `.battery-status` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (Bat charging / AC caption; was `opacity: 0.9` on `--muted`) |
-| **v0.1.1737** | `.history-controls label` opaque `color-mix` 46% `#0c0c10` on `#ffffff` (History range caption; was `opacity: 0.9` on `--muted`) |
-| **v0.1.1736** | `.section-title` opaque `color-mix` 75% `#010101` on `#ffffff` (Details · Top Processes headings; was `rgb(1,1,1,0.75)`) |
+| **v0.1.1740** | `.apple-footer` opaque `color-mix` 28% `#0c0c10` on `#f7f7fa` (hover 44%; version · GitHub line; was `opacity: 0.55` / `0.88` on `--muted`) |
+| **v0.1.1739** | `.time-remaining` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (time-left caption) |
+| **v0.1.1738** | `.battery-status` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (Bat charging / AC caption) |
+| **v0.1.1737** | `.history-controls label` opaque `color-mix` 46% `#0c0c10` on `#ffffff` (History range caption) |
+| **v0.1.1736** | `.section-title` opaque `color-mix` 75% `#010101` on `#ffffff` (Details · Top Processes headings) |
 | **v0.1.1735** | `.detail-label` opaque `color-mix` 63% `#3c3c43` on `#ffffff` (Details Load · RAM · Up captions) |
 | **v0.1.1734** | `#chip-info::before` opaque `color-mix` 32% `#0c0c10` on `#f7f7fa` ( glyph) |
 | **v0.1.1733** | `.apple-subtitle` / `#chip-info` opaque `color-mix` 46% `#0c0c10` on `#f7f7fa` |
@@ -22,7 +23,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Apple `cpu.css` has no remaining `rgb(`/`rgba(` type. Time-left caption shipped in v0.1.1739. Next always-visible `opacity:` candidate: `.apple-footer` (0.55).
+- Always-visible Apple footer glass type cleared in v0.1.1740. Next opacity candidates: `.logs-path-hint`, `.perplexity-result-meta`, `.chat-empty` / `.chat-status` / `.response-time` (panel type), interactive press opacities left alone.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1739** @ `9ed5ce60`.
+Latest keep: **v0.1.1740** @ `3208e4c0`.
