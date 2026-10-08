@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1754** | `.apple-shell .monitor-checked-ago` opaque `color-mix` 36% `#0c0c10` on `#ffffff` (Down rows 43%; last-check age; was shared `opacity: 0.72` / Down `0.85` on `--muted`) |
 | **v0.1.1753** | `.apple-shell .monitor-latency` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (monitor timing line; was shared `opacity: 0.9` on `--muted`; Slow and Down keep status color) |
 | **v0.1.1752** | `.apple-shell .disk-cleanup-empty-hint` · `.disk-cleanup-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Disk Cleanup empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1751** | `.apple-shell .monitors-empty-hint` · `.monitors-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Monitors empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
@@ -36,7 +37,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Disk Cleanup empty hints shipped in v0.1.1752. Monitor latency shipped in v0.1.1753 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Skipped `.rings-filter-miss-hint`: that node is removed and never paints. Next opacity candidate: `.monitor-checked-ago` (shared `opacity: 0.72` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
+- Monitor latency shipped in v0.1.1753. Last-check age shipped in v0.1.1754 (`opacity: 1` plus 36% ink; Down rows 43%; `.apple-shell` beats the later shared sheet, and the Down selector beats `opacity: 0.85`). Next opacity candidate: `.monitor-detail-k` (shared `opacity: 0.78` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state. `.monitor-item.is-checking` and `.is-pending` stay whole-row transient opacity.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1753** @ `76da1097`.
+Latest keep: **v0.1.1754** @ `24ca4199`.
