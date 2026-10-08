@@ -4,6 +4,7 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
+- **v0.1.1730** — Apple ring metric labels (`.metric-label`) mix type color against an opaque card fill. No glass `opacity` on the always-visible CPU · GPU · Freq · Temp captions.
 - **v0.1.1729** — Apple Settings theme-list type (`.theme-item`) mixes against an opaque panel fill. No glass alpha on the theme button label fallback (`var(--text, #0c0c10)`). Clears the last `rgba(` in Apple `cpu.css`.
 - **v0.1.1728** — Apple AI Chat markdown link type (`.chat-message .markdown a`) mixes against an opaque panel fill. No glass alpha on markdown link color.
 - **v0.1.1727** — Apple Force Quit control type (`.force-quit-btn` resting) mixes against an opaque panel fill. No glass alpha on Force Quit label type.
@@ -42,6 +43,7 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - Design review: due=false (feature-agent-ops still recommended when screenshot TCC allows).
 - Debug.log: quiet in the 180m window.
 - Sibling harnesses: OpenClaw / Hermes paths missing on this host.
+- 02:41 tick: shipped ring `.metric-label` opacity → opaque color-mix as v0.1.1730 (first always-visible opacity cut after rgba cleared).
 - 02:17 tick: shipped Settings theme-item type fallback as v0.1.1729 (last `rgba(` in Apple `cpu.css`).
 - 01:55 tick: shipped AI Chat markdown link type as v0.1.1728.
 - 01:35 tick: shipped Force Quit type as v0.1.1727.
@@ -50,4 +52,4 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Next
 
-- Apple `cpu.css` has no `rgba(` left. Scan other themes / shared CSS for #14 glass leftovers, or screenshot feature-agent-ops when due and TCC allows.
+- More Apple always-visible `opacity` on chrome (`.metric-subtext`, `.history-chart-caption`, `#chip-info::before`, footer). Then other themes / shared CSS for #14 glass leftovers, or screenshot feature-agent-ops when due and TCC allows.
