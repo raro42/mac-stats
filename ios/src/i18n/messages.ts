@@ -34,6 +34,8 @@ export interface Messages extends ErrorMessages {
   "thermal.title": string;
   /** Spoken and pill label: "Thermal: {level}", like the desktop's thermal card. */
   "thermal.label": string;
+  /** What each level means for the iPhone. The chat also sends it to the model, so keep
+   *  it about the device (chat effects are in the chat banners). */
   "thermal.meaning.nominal": string;
   "thermal.meaning.fair": string;
   "thermal.meaning.serious": string;
@@ -110,6 +112,10 @@ export interface Messages extends ErrorMessages {
   "chat.bannerSerious": string;
   "chat.bannerLowPower": string;
   "chat.startFailed": string;
+
+  /** Apple's path to free up space, in the iPhone's own words. Used by the chat prompt
+   *  (Rust reads it from here), not shown in the UI. */
+  "prompt.storagePath": string;
 
   // Why a reply stopped
   "stop.eos": string;

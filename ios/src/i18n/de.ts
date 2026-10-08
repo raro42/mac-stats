@@ -21,8 +21,8 @@ export const de: Messages = {
   "thermal.label": "Thermisch: {level}",
   "thermal.meaning.nominal": "Im normalen Bereich.",
   "thermal.meaning.fair": "Leicht erhöht. iOS reduziert eventuell Hintergrundaktivität.",
-  "thermal.meaning.serious": "Hoch. iOS drosselt die Leistung zum Abkühlen; Antworten dauern länger.",
-  "thermal.meaning.critical": "Sehr hoch. Lass das iPhone abkühlen; der Chat pausiert.",
+  "thermal.meaning.serious": "Hoch. iOS drosselt die Leistung zum Abkühlen.",
+  "thermal.meaning.critical": "Sehr hoch. Nutze das iPhone besser nicht, bis es abgekühlt ist.",
   "thermal.nominal": "Normal",
   "thermal.fair": "Erhöht",
   "thermal.serious": "Ernst",
@@ -87,6 +87,7 @@ export const de: Messages = {
   "chat.bannerSerious": "Das iPhone ist heiß: Antworten dauern länger.",
   "chat.bannerLowPower": "Der Stromsparmodus ist an: Antworten können länger dauern.",
   "chat.startFailed": "Der Chat konnte nicht starten: {error}",
+  "prompt.storagePath": "Einstellungen > Allgemein > iPhone-Speicher",
 
   "stop.eos": "Vollständig",
   "stop.cancelled": "Gestoppt",

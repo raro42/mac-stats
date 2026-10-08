@@ -36,7 +36,7 @@ async fn build_messages(app: &AppHandle, metrics: &MetricsState, question: &str)
     let state = app.state::<ChatState>();
     let empty = Conversation::new(String::new(), 0);
     let (reply, _) = chat_mod::pick_reply_language(app, &state, &empty, question).await;
-    let note = prompt::turn_note(metrics.latest().as_ref(), &reply);
+    let note = prompt::turn_note(metrics.latest().as_ref(), &reply, question);
     prompt::build(&[], Some(&note), question, prompt::HISTORY_BUDGET_BYTES)
 }
 
@@ -366,7 +366,7 @@ async fn bench_model(
         for (lang, prompts) in QUALITY_PROMPTS.iter().filter(|(l, _)| langs.iter().any(|x| x == l)) {
             for (i, prompt) in prompts.iter().enumerate() {
                 let messages = build_messages(app, metrics, prompt).await;
-                let (text, ttft, r) = generate_collect(app, messages, 220, 0.0, 7, entry.think_prefill).await?;
+                let (text, ttft, r) = generate_collect(app, messages.clone(), 220, 0.0, 7, entry.think_prefill).await?;
                 let detected = app.llm().detect_language(&text).await.ok().flatten();
                 let base = |code: &str| code.split('-').next().unwrap_or(code).to_string();
                 // Q5 is only a number (no language to detect) and Q7 asks for a translation
@@ -377,8 +377,10 @@ async fn bench_model(
                     _ => Some(*lang),
                 };
                 let language_ok = expected.map(|e| detected.as_ref().map(|d| base(&d.code)) == Some(base(e)));
+                // The note sent with the question, so reviewers can check answers against it.
+                let note = messages.iter().rev().find(|m| m.role == "system").map(|m| m.content.clone());
                 let item = json!({
-                    "lang": lang, "n": i + 1, "prompt": prompt, "answer": text, "ttftMs": ttft,
+                    "lang": lang, "n": i + 1, "prompt": prompt, "note": note, "answer": text, "ttftMs": ttft,
                     "tgTps": r.tg_tps, "nGen": r.n_gen, "stop": r.stop_reason,
                     "answerLanguage": detected.map(|d| d.code), "languageOk": language_ok,
                 });

@@ -11,6 +11,83 @@ How to run each check is in [README.md](../README.md) (Tests, Debug tools).
 
 ---
 
+## 2026-10-08: third prompt on a real iPhone
+
+**Environment:** iPhone 12 Pro, iOS 26.6.1, wired, kept unlocked. Debug build with the third prompt. Full benchmark (3 models × 10 questions × 6 languages) in 25 min, then the self-test. Raw data with the note sent for every answer: [llm-bench-multilang-v3-iphone12pro.json](llm-bench-multilang-v3-iphone12pro.json).
+
+- **Self-test: 10/10.**
+  - Cache reuse worked this time (0 → 303 → 525 tokens), which confirms the earlier failure was intermittent.
+  - `language_switch`: es, en, en, de as expected.
+- **Reply language:** LFM2.5 54/54. Qwen3.5 and Qwen2.5 53/54 and 52/54; every flag is the Q8 one-line calculation ("30 videos"), which the detector reads as Portuguese or Turkish.
+- **Answer quality** (LLM reviewer, 1–5; ±0.3 noise per cell):
+
+  | Model | es | en | de | fr | pt-BR | zh-Hans | v3 | v2 | v1 |
+  |---|---|---|---|---|---|---|---|---|---|
+  | Qwen3.5-2B | 4.0 | 4.3 | 3.5 | 3.8 | 3.2 | 3.6 | **3.7** | 3.4 | 3.7 |
+  | LFM2.5-1.2B | 3.3 | 4.3 | 2.9 | 3.3 | 3.2 | 2.3 | **3.2** | 3.2 | 3.0 |
+  | Qwen2.5-1.5B | 3.3 | 4.2 | 2.3 | 3.8 | 3.3 | 3.4 | **3.4** | 3.3 | 3.3 |
+
+  - **Same overall as the first prompt, and much better on the questions that use device data.** The reviewer re-scored Qwen3.5's first-prompt answers with the same rubric:
+    - Q1 (battery and memory now): 2.3 → 3.8.
+    - Q9 (free up space): 1.5 → 2.8.
+    - Unrelated questions: 4.1 → 3.9.
+  - **Problems fixed:**
+    - app memory reported as the phone's RAM;
+    - English "serious" leaking into other languages;
+    - the storage tip leaking into unrelated answers (≈6 → 0);
+    - "level 3 of 4" read as moderate.
+  - **Settings path in Q9:** now correct in 14 of 18 answers (v2: 1 of 6 for Qwen3.5). Models still invent extra steps such as "Clear cache".
+  - **Still open:**
+    1. German "Speicher" is read as storage when the question means memory. Labels in the reply language ("Arbeitsspeicher (RAM)" vs "Speicherplatz") would remove the ambiguity.
+    2. The tip's English "(offload or delete apps there)" is copied word for word into Spanish and Portuguese answers. It needs the real button names per language, plus "iOS has no clear-cache button".
+    3. The German thermal word "Ernst" is an unnatural calque; rename it (for example "Hoch").
+    4. The note goes with every question and slightly hurts unrelated ones: "Your phone" in translations, a few arithmetic slips. Option: send it only when the question is about the device.
+- **Decision:** keep the third prompt; Qwen3.5-2B stays the default (best or tied in every language, most accurate on Q1).
+
+---
+
+## 2026-10-08: prompt fixes and background refresh on a real iPhone
+
+**Environment:** iPhone 12 Pro, iOS 26.6.1, wired. Debug builds of commits `a8069294` (prompt fixes) and `c86139b3` (saved history).
+
+- **Background App Refresh on the device:** the console shows `background refresh registered: yes`, and scheduling raised no error (the app logs only failures). Real wake-ups still need a night with the app in the background.
+- **Multilingual benchmark with the fixed prompt, Qwen3.5-2B:** 54/54 answers in the expected language (6 languages × 9 checked questions). Q5 is only a number and is not checked; Q7 must be in the translation's target language. Generation 18.7 tok/s when cool.
+- **LFM2.5-1.2B and Qwen2.5-1.5B failed in that run** with `generation_failed` (`llama_decode` code -3). The iPhone lost its connection to the Mac during the run and, most likely, the screen locked. Metal cannot use the GPU while the app is not in the foreground, so every later decode failed. Re-run in progress.
+- Lesson for future runs: keep the iPhone unlocked and the app in front for the whole benchmark. A failure with code -3 right after a disconnect points to this, not to the model.
+- **Self-test with the fixed prompt: 9/10.**
+  - `language_switch` passed (es, en, en, de).
+  - `stop` passed in 73 ms; `background` cancelled in 20 ms. `memory_warning`, `download_wrong_sha` and `xss_saved` passed.
+  - **`reuses_cache` failed:** tokens reused per turn were 0, 373, 0. On the third turn the whole 684-token prompt was processed again (5.2 s instead of about 0.5 s).
+  - Cause: Qwen3.5 is a hybrid model, and the engine can only reuse its memory when the saved text of the previous reply tokenizes back to exactly the tokens the model generated. When the model picks an unusual token split, the prefix stops matching inside that reply and the memory cannot be trimmed, so everything is processed again.
+  - The same test passed with 355 and 563 tokens reused the day before, so this is intermittent and not caused by the prompt change. Possible fix: keep the generated token ids with the reply instead of re-tokenizing the text.
+- Note for scripted runs: wait for a result file from the current run (check which models it lists), not just for any file. A stale `llm-bench.json` made one wait end early, and launching the self-test then stopped the benchmark.
+- **Re-run of LFM2.5-1.2B and Qwen2.5-1.5B (iPhone kept unlocked):** reply language 54/54 and 52/54. Qwen2.5 left the French translation question in French; the other flag is a numeric reply misread by the detector. Bench speed when cool: LFM2.5 33.2 tok/s, Qwen2.5 20.1 tok/s.
+  Raw data: [llm-bench-multilang-v2-iphone12pro.json](llm-bench-multilang-v2-iphone12pro.json).
+- **Answer quality, old prompt → second prompt** (LLM reviewer, 1–5; the reviewer re-scored old answers within 0.03 of the first review):
+
+  | Model | es | en | de | fr | pt-BR | zh-Hans | Overall |
+  |---|---|---|---|---|---|---|---|
+  | Qwen3.5-2B | 3.9 → 3.8 | 4.1 → 3.8 | 3.7 → 3.5 | 3.6 → 3.0 | 3.6 → 3.4 | 3.5 → 3.0 | 3.7 → **3.4** |
+  | LFM2.5-1.2B | 2.9 → 3.1 | 4.2 → 4.1 | 2.8 → 3.1 | 3.0 → 3.5 | 2.8 → 2.6 | 2.0 → 2.8 | 3.0 → **3.2** |
+  | Qwen2.5-1.5B | 3.7 → 3.2 | 4.2 → 4.0 | 2.7 → 2.8 | 2.8 → 3.2 | 3.0 → 3.0 | 3.1 → 3.7 | 3.3 → **3.3** |
+
+  - **The labeled device note worked:**
+    - storage is no longer read as memory (all 18 Q8 answers use the question's 45 GB);
+    - app memory is no longer reported as the phone's RAM;
+    - "serious" no longer leaks into other languages (9 leaks → 0).
+  - **The facts added to the persona caused new problems:**
+    - The "free up space" tip leaked into 7 unrelated answers.
+    - "Thermal level 3 of 4" was read as "moderate"; two models stopped saying that iOS slows down.
+    - The Settings path was only in English, so models invented translations of it.
+  - **Third prompt** (this commit), from that review:
+    - Nothing in the persona but the rules.
+    - The note lists one labeled value per line: RAM and storage as "X used, Y free of Z", "battery charge".
+    - The thermal state is the app's word plus its meaning in the reply language (`thermal.meaning.*`, now device-only).
+    - Apple's path to free space (`prompt.storagePath`, in the reply language) is added only when the question is about space.
+    - Every benchmark item now stores the note that was sent with it.
+
+---
+
 ## 2026-10-08: saved history and background samples (simulator)
 
 **Environment:** iOS Simulator (iPhone 17 Pro, iOS 26.5 runtime), debug build.

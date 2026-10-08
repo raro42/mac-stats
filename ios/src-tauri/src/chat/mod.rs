@@ -343,7 +343,7 @@ pub(crate) async fn send(
     }
 
     let (reply_language, detected) = pick_reply_language(app, state, &conversation, &question).await;
-    let note = prompt::turn_note(snapshot.as_ref(), &reply_language);
+    let note = prompt::turn_note(snapshot.as_ref(), &reply_language, &question);
     let history = prompt::history(&conversation.messages);
     let messages = prompt::build(&history, Some(&note), &question, prompt::HISTORY_BUDGET_BYTES);
 

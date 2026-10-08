@@ -21,8 +21,8 @@ export const zhHans: Messages = {
   "thermal.label": "热状态：{level}",
   "thermal.meaning.nominal": "处于正常范围。",
   "thermal.meaning.fair": "略有升高。iOS 可能会减少后台活动。",
-  "thermal.meaning.serious": "较高。iOS 会降低性能以降温，回复会变慢。",
-  "thermal.meaning.critical": "非常高。请让 iPhone 冷却，聊天已暂停。",
+  "thermal.meaning.serious": "较高。iOS 会降低性能以降温。",
+  "thermal.meaning.critical": "非常高。最好先停止使用 iPhone，等它冷却。",
   "thermal.nominal": "正常",
   "thermal.fair": "一般",
   "thermal.serious": "严重",
@@ -87,6 +87,7 @@ export const zhHans: Messages = {
   "chat.bannerSerious": "iPhone 很热：回复会变慢。",
   "chat.bannerLowPower": "低电量模式已开启：回复可能变慢。",
   "chat.startFailed": "聊天无法启动：{error}",
+  "prompt.storagePath": "设置 > 通用 > iPhone 储存空间",
 
   "stop.eos": "已完成",
   "stop.cancelled": "已停止",

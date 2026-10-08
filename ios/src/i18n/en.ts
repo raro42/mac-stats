@@ -21,8 +21,8 @@ export const en: Messages = {
   "thermal.label": "Thermal: {level}",
   "thermal.meaning.nominal": "Within normal limits.",
   "thermal.meaning.fair": "Slightly elevated. iOS may reduce background work.",
-  "thermal.meaning.serious": "High. iOS lowers performance to cool down; replies are slower.",
-  "thermal.meaning.critical": "Very high. Let the iPhone cool down; the chat is paused.",
+  "thermal.meaning.serious": "High. iOS lowers performance to cool down.",
+  "thermal.meaning.critical": "Very high. Better to stop using the iPhone until it cools down.",
   "thermal.nominal": "Nominal",
   "thermal.fair": "Fair",
   "thermal.serious": "Serious",
@@ -87,6 +87,7 @@ export const en: Messages = {
   "chat.bannerSerious": "The iPhone is hot: replies will be slower.",
   "chat.bannerLowPower": "Low Power Mode is on: replies may be slower.",
   "chat.startFailed": "The chat could not start: {error}",
+  "prompt.storagePath": "Settings > General > iPhone Storage",
 
   "stop.eos": "Complete",
   "stop.cancelled": "Stopped",
