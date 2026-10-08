@@ -867,3 +867,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #13.
 - [x] `cargo test --offline` — **1346** passed, **7** failed, all `commands::harness_ops` matchers/digest/timing. Same class as the tester report. Not caused by the Data Poster CSS change.
 - [x] `cargo build --release` succeeds (**v0.1.1355**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-10-08 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #15 CPU "None yet" + Data Poster dark)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.1762** (`93e1c96e`): focused CPU-window cadences restored; park only on blur / `Focused(false)` / `document.hidden` (not `document.hasFocus()`); `get_cpu_details` floor ~1.5s; process-cache TTL 30s; Data Poster / dark Monitors summary and AI Chat glances mix against `#0e0e14`. `src/*.js` / `src/agent-ops.css` match `src-tauri/dist/`. Changelog **[0.1.1762] Fixed** names GitHub #15. **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #15 fix.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `io_other_error`, `manual_is_multiple_of`, `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #15.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.1762**). Did not start a second process.

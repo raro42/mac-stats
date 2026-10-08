@@ -33,3 +33,47 @@ Changes:
 
 Tester: open CPU window on macOS, warm ≥30s. Confirm rings, strip, Details, and sparklines leave "None yet". Switch to Data Poster: Monitors summary and AI Chat glance stay dark (not white cream bars). Do **not** close GitHub #15.
 
+
+## Test report
+
+- **Date:** 2026-10-08 17:06 UTC (19:06 CEST)
+- **Result:** PASS
+- **Ship:** v0.1.1762 (`93e1c96e`)
+
+### Commands
+
+| Command | Result |
+|---|---|
+| `cd src-tauri && cargo check` | PASS (warnings only; unrelated dead_code / unused imports) |
+| `cd src-tauri && cargo test` | PASS — 1359 passed, 0 failed |
+
+### Static checks (acceptance)
+
+- `get_cpu_details` rate floor is **1.5s** (comment cites prior 600s floor starving "None yet" for #15).
+- `PROCESS_CACHE_TTL_SECS` is **30**.
+- Park gates in `cpu.js` / `history.js` / `chart-line.js` use `document.hidden` + `windowPollsPaused`; **not** `document.hasFocus()` (explicit #15 comments).
+- Data Poster / dark: `.monitors-summary` and Ollama/AI Chat collapsed glances mix against `#0e0e14`; LPM toggle track + `#chat-input` use dark opaque fills (no Apple `#ffffff` cream wash).
+
+### Logs
+
+- Checked debug log tail: no #15 / metrics-starvation errors. Only stale Ollama endpoint-unreachable noise (unrelated).
+
+### Notes
+
+- Host is Linux; full macOS warm ≥30s CPU-window visual pass was not run here. Build + unit tests + code review of the listed #15 fixes are green.
+- GitHub issue **#15 left open** (004 closes).
+
+## Closing review (004)
+
+- Date: 2026-10-08 (19:15 CEST / 17:15 UTC)
+- Ship: **v0.1.1762** (`93e1c96e`) already on `main`.
+- `cargo check` pass. `cargo build --release` **v0.1.1762** pass.
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1359** passed, **0** failed.
+- `CHANGELOG.md` **[0.1.1762] Fixed** already names GitHub #15; no Unreleased drift for this bug.
+- Static re-check: `get_cpu_details` floor 1.5s; `PROCESS_CACHE_TTL_SECS` 30; park gates use `document.hidden` + `windowPollsPaused` (not `hasFocus`); Data Poster / dark Monitors + Ollama glances mix against `#0e0e14`. `src/` ↔ `src-tauri/dist/` in sync for touched assets.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#15** closed by 004.
+
+Handoff: complete
+
