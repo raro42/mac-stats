@@ -2880,17 +2880,17 @@ border-radius: 24px;
   padding: 16px 14px;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--muted);
-  opacity: 0.9;
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the white message list. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
   border-radius: 10px;
   border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
   background: color-mix(in srgb, currentColor 4%, #ffffff);
   text-align: center;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .chat-empty:hover {
-  opacity: 1;
   color: var(--text);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
   background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
