@@ -7,7 +7,16 @@
 // is writing a reply.
 import { AUTONYMS, LANGUAGES, PSEUDO, t, type UiLanguage } from "../i18n";
 import { errorText } from "../i18n/errors";
-import { appLanguage, appTheme, setAppLanguage, setAppTheme } from "../ipc";
+import {
+  appLanguage,
+  appTheme,
+  historySettings,
+  metricsClearHistory,
+  setAppLanguage,
+  setAppTheme,
+  setBackgroundHistory,
+  type HistorySettings,
+} from "../ipc";
 import { THEMES } from "../themes";
 
 export interface SettingsOptions {
@@ -81,7 +90,55 @@ function radioList<V>(
   list.replaceChildren(...radios.map((r) => r.label));
 }
 
+/** History card: background samples switch, iOS status note and "Delete history". */
+async function startHistory(): Promise<void> {
+  const toggle = byId<HTMLInputElement>("background-history");
+  const iosOff = byId("background-off");
+  const remove = byId<HTMLButtonElement>("delete-history");
+  const status = byId("history-status");
+
+  const show = (s: HistorySettings) => {
+    toggle.checked = s.background;
+    // iOS lets the user turn Background App Refresh off per app; then only the time
+    // with the app open is saved.
+    iosOff.hidden = !(s.background && (s.iosStatus === "denied" || s.iosStatus === "restricted"));
+  };
+  show(await historySettings());
+
+  toggle.addEventListener("change", async () => {
+    try {
+      show(await setBackgroundHistory(toggle.checked));
+    } catch (error) {
+      toggle.checked = !toggle.checked;
+      status.textContent = errorText(error);
+    }
+  });
+
+  // Deleting cannot be undone, so it takes a second tap (same pattern as the model card).
+  let armed: number | null = null;
+  remove.addEventListener("click", async () => {
+    if (armed === null) {
+      remove.textContent = t("settings.confirmDeleteHistory");
+      armed = window.setTimeout(() => {
+        armed = null;
+        remove.textContent = t("settings.deleteHistory");
+      }, 4000);
+      return;
+    }
+    window.clearTimeout(armed);
+    armed = null;
+    remove.textContent = t("settings.deleteHistory");
+    try {
+      await metricsClearHistory();
+      status.textContent = t("settings.historyDeleted");
+    } catch (error) {
+      status.textContent = errorText(error);
+    }
+  });
+}
+
 export async function startSettings({ debug, busy }: SettingsOptions): Promise<void> {
+  void startHistory().catch((error: unknown) => console.error("history settings", error));
   const [language, theme] = await Promise.all([appLanguage(), appTheme()]);
 
   radioList<string | null>(

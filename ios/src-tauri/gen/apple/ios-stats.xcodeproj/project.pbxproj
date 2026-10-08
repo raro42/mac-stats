@@ -20,6 +20,7 @@
 		9E56D61E95E645497920870F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CECB2F34FAD21F827B7C179A /* Assets.xcassets */; };
 		9F21780E461ACD4AA00438B6 /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C096C3D27813DA1F9D724E9 /* libapp.a */; };
 		BD9AD13811877D287BE00B15 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3D6EDD20FBD7212A2AA3095 /* Security.framework */; };
+		BE15B68C35B5B30ED8377608 /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4A124064AC05BAC7A05CF24 /* BackgroundTasks.framework */; };
 		CB65455C4CF71A938473B7BF /* llama.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6C2E3E207B05890576C6C7 /* llama.xcframework */; };
 		E57BFD989A0B16620AE84F18 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D3319B37391DEDDCB7715A57 /* LaunchScreen.storyboard */; };
 		F78C8F6135CAD7FAA471FF86 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2401ED0BA4AD0D85E4FF250B /* QuartzCore.framework */; };
@@ -54,11 +55,14 @@
 		3EE5C1DDFCD6534B45FAB97E /* mach.rs */ = {isa = PBXFileReference; path = mach.rs; sourceTree = "<group>"; };
 		4A2C1C1E15F5F33BF1ABBE72 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4BBA42E3642C41F4F57193B5 /* store.rs */ = {isa = PBXFileReference; path = store.rs; sourceTree = "<group>"; };
+		4C8E66E24D15F852BB547593 /* store.rs */ = {isa = PBXFileReference; path = store.rs; sourceTree = "<group>"; };
 		502AE85298185E88506AAC62 /* ios-stats_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ios-stats_iOS.entitlements"; sourceTree = "<group>"; };
 		5291DBD4F673B9B0EADE2B9E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		563BEC325753C808896D7417 /* catalog.rs */ = {isa = PBXFileReference; path = catalog.rs; sourceTree = "<group>"; };
 		5953AA18C14851CC80EABC24 /* sampler.rs */ = {isa = PBXFileReference; path = sampler.rs; sourceTree = "<group>"; };
+		806F49BD96F58B5B76CA28B5 /* background.rs */ = {isa = PBXFileReference; path = background.rs; sourceTree = "<group>"; };
 		81B06D3CDE968CFD99CF00F9 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
+		8A26AAE1B4E78C0E714FE184 /* theme.rs */ = {isa = PBXFileReference; path = theme.rs; sourceTree = "<group>"; };
 		8C692EC1FB21E6FADEFF6E89 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		957750031BF5A515D2DDBF63 /* mod.rs */ = {isa = PBXFileReference; path = mod.rs; sourceTree = "<group>"; };
 		9A623AD50284B3409E81CB4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -77,8 +81,10 @@
 		DEE913AEAF646B789CC13D35 /* NaturalLanguage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NaturalLanguage.framework; path = System/Library/Frameworks/NaturalLanguage.framework; sourceTree = SDKROOT; };
 		DFA098316A24E2548759B838 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		E286580C8A01DCD527E963B6 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
+		E4A124064AC05BAC7A05CF24 /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
 		EB62AFEBC745D5231E3578CC /* history.rs */ = {isa = PBXFileReference; path = history.rs; sourceTree = "<group>"; };
 		EBB96752F7F787EC75535064 /* language.rs */ = {isa = PBXFileReference; path = language.rs; sourceTree = "<group>"; };
+		EC01EB025535D34DB90D8EAA /* cpu_probe.rs */ = {isa = PBXFileReference; path = cpu_probe.rs; sourceTree = "<group>"; };
 		F1D50C13E60E72ADCBAEB9AF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F83EF0773405B1C1E31F19AE /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FB975E5B5DF6371AFD1A915B /* prompt.rs */ = {isa = PBXFileReference; path = prompt.rs; sourceTree = "<group>"; };
@@ -92,6 +98,7 @@
 				9F21780E461ACD4AA00438B6 /* libapp.a in Frameworks */,
 				CB65455C4CF71A938473B7BF /* llama.xcframework in Frameworks */,
 				6C3CE79DA5B9E77FE6AF4452 /* CoreGraphics.framework in Frameworks */,
+				BE15B68C35B5B30ED8377608 /* BackgroundTasks.framework in Frameworks */,
 				7266443D6DC35DB82D711150 /* Metal.framework in Frameworks */,
 				7C5B0797E707E4FDE571009A /* NaturalLanguage.framework in Frameworks */,
 				FCD400AE3FB622A35515AD54 /* MetalKit.framework in Frameworks */,
@@ -119,6 +126,7 @@
 		1CDA4BA1DAF6C192E861F8F7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E4A124064AC05BAC7A05CF24 /* BackgroundTasks.framework */,
 				DD53192A96A108465454B763 /* CoreGraphics.framework */,
 				3C096C3D27813DA1F9D724E9 /* libapp.a */,
 				DD6C2E3E207B05890576C6C7 /* llama.xcframework */,
@@ -142,6 +150,7 @@
 				A9A77E91138A104E5C82C973 /* mod.rs */,
 				1B8740D96C33D7EB8BC6F8FC /* net.rs */,
 				5953AA18C14851CC80EABC24 /* sampler.rs */,
+				4C8E66E24D15F852BB547593 /* store.rs */,
 			);
 			path = metrics;
 			sourceTree = "<group>";
@@ -204,12 +213,15 @@
 		C59AF99E477A692480096B66 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				806F49BD96F58B5B76CA28B5 /* background.rs */,
+				EC01EB025535D34DB90D8EAA /* cpu_probe.rs */,
 				B98F80AA52F92FF39F4E9943 /* error.rs */,
 				1C4D4B8E65E764539279B9A9 /* lab.rs */,
 				EBB96752F7F787EC75535064 /* language.rs */,
 				E286580C8A01DCD527E963B6 /* lib.rs */,
 				26D11060E6AC9ADE1D809004 /* main.rs */,
 				3377173C0A2240652DE0BFEE /* selftest.rs */,
+				8A26AAE1B4E78C0E714FE184 /* theme.rs */,
 				11D44361D2ABCA84E3D46C98 /* chat */,
 				39BE0382B23E2B15AE56E032 /* metrics */,
 			);
@@ -228,14 +240,14 @@
 			path = "ios-stats_iOS";
 			sourceTree = "<group>";
 		};
-		"TEMP_7931CB75-73F8-4A21-8883-61E86D68C6BB" /* arm64 */ = {
+		"TEMP_8D37D719-9FE1-4912-8EC2-A41230F89E4A" /* arm64 */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = arm64;
 			sourceTree = "<group>";
 		};
-		"TEMP_C3FB36B2-E7FF-4F36-9E29-57E8E4491D42" /* x86_64 */ = {
+		"TEMP_9E253D47-6B4E-41B9-8D9E-8D7ABDA9F7D1" /* x86_64 */ = {
 			isa = PBXGroup;
 			children = (
 			);

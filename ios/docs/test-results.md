@@ -11,6 +11,24 @@ How to run each check is in [README.md](../README.md) (Tests, Debug tools).
 
 ---
 
+## 2026-10-08: saved history and background samples (simulator)
+
+**Environment:** iOS Simulator (iPhone 17 Pro, iOS 26.5 runtime), debug build.
+
+- `cargo test`: 57 passed. New tests cover saved minutes (partial then final record of a minute, day files, 30-day retention, compaction of past days), bucket downsampling (weighted means, worst thermal state, background flag) and loading the last hour at startup.
+- `pnpm build` and `check_i18n.py`: pass.
+- **Early task registration works:** the log shows `background refresh registered: yes` (registered from `main.mm` before the app starts).
+- **Scheduling fails in the simulator** with `BGTaskSchedulerErrorDomain` code 1 (unavailable). This is expected: the simulator does not run background tasks. To be verified on an iPhone.
+- **Minutes are saved** to `history/YYYY-MM-DD.jsonl`, for example `{"ts":…,"cpu":27.1,"ram":80.9,"thermal":"nominal","bg":false,"n":19}`. After a relaunch, the 1 h view still shows the earlier minutes and the 24 h view shows them.
+- Some minutes held fewer than 60 samples and there were long gaps: macOS seems to slow the simulator down (App Nap) when its window is not in front. This is not an app issue, but simulator numbers should not be used to judge sample counts.
+- Found and fixed: with five ranges, the history switcher wrapped onto two lines in Spanish. It now has its own full-width row under the title.
+
+**Pending (iPhone disconnected during this session):**
+- the multilingual benchmark and self-test with the prompt fixes;
+- real Background App Refresh wake-ups (needs a night with the app in the background).
+
+---
+
 ## 2026-10-08: Monitor CPU after the ring optimization (real iPhone)
 
 **Change measured:** the ring gauges now move in whole-percent steps, only animate jumps of 3 points or more, use a 0.3 s transition (was 0.6 s), and skip DOM writes when a value did not change (`ring-gauge.ts`, `monitor.ts`).

@@ -1,11 +1,13 @@
 //! iPhone monitor: a Rust sampler that sends each reading to the frontend
-//! through a Tauri `Channel` and keeps the history for the charts.
+//! through a Tauri `Channel` and keeps the history for the charts: in memory for the
+//! 5 min / 1 h views, and on disk (`store`) for 24 h / 7 d / 30 d.
 
 pub mod apple;
 pub mod history;
 pub mod mach;
 pub mod net;
 mod sampler;
+pub mod store;
 
 use std::sync::{Arc, Mutex, MutexGuard};
 
@@ -14,6 +16,10 @@ use tauri::{ipc::Channel, AppHandle, Manager, State};
 
 use apple::{Battery, Storage, Thermal};
 use history::{History, Point};
+use store::{HistoryStore, Record};
+
+const MINUTE_MS: i64 = 60_000;
+const DAY_MS: i64 = 86_400_000;
 
 /// A complete device reading.
 #[derive(Clone, Debug, Serialize)]
@@ -61,11 +67,25 @@ struct Inner {
 }
 
 #[derive(Clone, Default)]
-pub struct MetricsState(Arc<Mutex<Inner>>);
+pub struct MetricsState {
+    inner: Arc<Mutex<Inner>>,
+    /// `None` when the app data folder is not available (then nothing is saved).
+    store: Option<Arc<HistoryStore>>,
+}
 
 impl MetricsState {
     fn lock(&self) -> MutexGuard<'_, Inner> {
-        self.0.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+        self.inner.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    /// Saves a minute (closed, or partial during a background wake-up). Called outside
+    /// the lock: it writes a file.
+    fn save(&self, minute: &Point) {
+        if let Some(store) = &self.store {
+            if let Err(e) = store.append(&Record::from_point(minute)) {
+                eprintln!("history: could not save a minute: {e}");
+            }
+        }
     }
 
     /// Latest complete reading (the chat uses it to give the model context).
@@ -74,9 +94,17 @@ impl MetricsState {
     }
 }
 
-/// Registers the shared state and starts sampling.
+/// Registers the shared state, loads the last hour from disk and starts sampling.
 pub fn init(app: &AppHandle) {
-    let state = MetricsState::default();
+    let store = app.path().app_data_dir().ok().map(|dir| Arc::new(HistoryStore::new(dir.join("history"))));
+    let state = MetricsState { inner: Default::default(), store: store.clone() };
+    if let Some(store) = store {
+        let now = sampler::now_ms();
+        store.maintain(now);
+        let this_minute = now - now.rem_euclid(MINUTE_MS);
+        let recent = store.range(this_minute - 60 * MINUTE_MS, this_minute);
+        state.lock().history.seed_minutes(recent.into_iter().map(Record::to_point));
+    }
     app.manage(state.clone());
     tauri::async_runtime::spawn(sampler::run(app.clone(), state));
 }
@@ -93,14 +121,37 @@ pub fn metrics_subscribe(
     inner.latest.clone()
 }
 
-/// History for the charts: `"5m"` (seconds) or `"1h"` (minutes).
+/// History for the charts: `"5m"` (seconds) and `"1h"` (minutes) from memory;
+/// `"24h"`, `"7d"` and `"30d"` from disk, in 5 min, 30 min and 2 h buckets.
 #[tauri::command]
 pub fn metrics_history(state: State<'_, MetricsState>, range: String) -> Vec<Point> {
-    let inner = state.lock();
-    match range.as_str() {
-        "1h" => inner.history.minutes(),
-        _ => inner.history.seconds(),
+    let (window, bucket) = match range.as_str() {
+        "24h" => (DAY_MS, 5 * MINUTE_MS),
+        "7d" => (7 * DAY_MS, 30 * MINUTE_MS),
+        "30d" => (store::KEEP_DAYS * DAY_MS, 120 * MINUTE_MS),
+        "1h" => return state.lock().history.minutes(),
+        _ => return state.lock().history.seconds(),
+    };
+    let Some(store) = &state.store else { return Vec::new() };
+    let current = state.lock().history.current_minute();
+    let now = sampler::now_ms();
+    let mut records = store.range(now - window, now + MINUTE_MS);
+    // The minute being filled is only on disk during background wake-ups.
+    if let Some(current) = current.filter(|p| p.n > 0) {
+        records.retain(|r| r.ts != current.ts);
+        records.push(Record::from_point(&current));
     }
+    store::downsample(&records, bucket)
+}
+
+/// Deletes the saved history and the charts' in-memory history.
+#[tauri::command]
+pub fn metrics_clear_history(state: State<'_, MetricsState>) -> Result<(), crate::error::AppError> {
+    if let Some(store) = &state.store {
+        store.clear()?;
+    }
+    state.lock().history.clear();
+    Ok(())
 }
 
 #[tauri::command]

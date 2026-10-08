@@ -10,6 +10,7 @@
 		A0E2115A2BF552D2003BCF4D /* LlmPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E211592BF552D2003BCF4D /* LlmPlugin.swift */; };
 		C0FFEE000000000000000002 /* LlamaEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE000000000000000001 /* LlamaEngine.swift */; };
 		C0FFEE000000000000000004 /* ModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE000000000000000003 /* ModelStore.swift */; };
+		C0FFEE000000000000000006 /* BackgroundRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE000000000000000005 /* BackgroundRefresh.swift */; };
 		A0E211622BF55305003BCF4D /* Tauri in Frameworks */ = {isa = PBXBuildFile; productRef = A0E211612BF55305003BCF4D /* Tauri */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		A0E211592BF552D2003BCF4D /* LlmPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LlmPlugin.swift; sourceTree = "<group>"; };
 		C0FFEE000000000000000001 /* LlamaEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LlamaEngine.swift; sourceTree = "<group>"; };
 		C0FFEE000000000000000003 /* ModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelStore.swift; sourceTree = "<group>"; };
+		C0FFEE000000000000000005 /* BackgroundRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefresh.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				A0E211592BF552D2003BCF4D /* LlmPlugin.swift */,
 				C0FFEE000000000000000001 /* LlamaEngine.swift */,
 				C0FFEE000000000000000003 /* ModelStore.swift */,
+				C0FFEE000000000000000005 /* BackgroundRefresh.swift */,
 			);
 			path = "tauri-plugin-llm";
 			sourceTree = "<group>";
@@ -137,6 +140,7 @@
 				A0E2115A2BF552D2003BCF4D /* LlmPlugin.swift in Sources */,
 				C0FFEE000000000000000002 /* LlamaEngine.swift in Sources */,
 				C0FFEE000000000000000004 /* ModelStore.swift in Sources */,
+				C0FFEE000000000000000006 /* BackgroundRefresh.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

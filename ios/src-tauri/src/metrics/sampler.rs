@@ -22,7 +22,7 @@ const GAP: Duration = Duration::from_millis(2_500);
 const BATTERY_EVERY: Duration = Duration::from_secs(30);
 const STORAGE_EVERY: Duration = Duration::from_secs(60);
 
-fn now_ms() -> i64 {
+pub(super) fn now_ms() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis() as i64)
@@ -51,6 +51,31 @@ async fn read_battery(app: &AppHandle) -> Option<Battery> {
 async fn read_battery(_app: &AppHandle) -> Option<Battery> {
     None
 }
+
+/// Whether the app is on screen. During a Background App Refresh wake-up it is not, and
+/// those samples are marked as background ones. `UIApplication` needs the main thread.
+#[cfg(target_os = "ios")]
+async fn in_foreground(app: &AppHandle) -> bool {
+    use objc2_ui_kit::{UIApplication, UIApplicationState};
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    let sent = app.run_on_main_thread(move || {
+        let state = objc2::MainThreadMarker::new().map(|mtm| UIApplication::sharedApplication(mtm).applicationState());
+        let _ = tx.send(state.is_none_or(|s| s != UIApplicationState::Background));
+    });
+    if sent.is_err() {
+        return true;
+    }
+    tokio::time::timeout(Duration::from_millis(500), rx).await.ok().and_then(Result::ok).unwrap_or(true)
+}
+
+#[cfg(not(target_os = "ios"))]
+async fn in_foreground(_app: &AppHandle) -> bool {
+    true
+}
+
+/// During a background wake-up, the minute being filled is also saved every this many
+/// samples, so it survives if iOS terminates the app before the minute closes.
+const BACKGROUND_SAVE_EVERY: u32 = 5;
 
 /// In debug builds, `IOS_STATS_FAKE_THERMAL=fair|serious|critical` forces the thermal
 /// state to test the indicator and the chat warnings without heating up the iPhone.
@@ -121,6 +146,7 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
         };
 
         let thermal = thermal();
+        let foreground = in_foreground(&app).await;
         let snapshot = Snapshot {
             ts,
             cpu,
@@ -143,16 +169,28 @@ pub(super) async fn run(app: AppHandle, state: MetricsState) {
                 .map(|used| (used as f64 / ram_total as f64 * 100.0) as f32),
             app_mb: app_footprint.map(|bytes| (bytes as f64 / 1_048_576.0) as f32),
             thermal: Some(thermal),
+            bg: !foreground,
+            n: 1,
             gap: false,
         };
 
-        let mut inner = state.lock();
-        inner.history.push(point);
-        inner.latest = Some(snapshot.clone());
-        if let Some(channel) = &inner.subscriber {
-            if channel.send(snapshot).is_err() {
-                inner.subscriber = None;
+        let (closed, partial) = {
+            let mut inner = state.lock();
+            let closed = inner.history.push(point);
+            let partial = inner
+                .history
+                .current_minute()
+                .filter(|m| !foreground && m.n % BACKGROUND_SAVE_EVERY == 0);
+            inner.latest = Some(snapshot.clone());
+            if let Some(channel) = &inner.subscriber {
+                if channel.send(snapshot).is_err() {
+                    inner.subscriber = None;
+                }
             }
+            (closed, partial)
+        };
+        for minute in closed.iter().chain(partial.iter()) {
+            state.save(minute);
         }
     }
 }

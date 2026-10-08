@@ -115,3 +115,9 @@ pub struct DetectedLanguage {
     /// 0.0–1.0
     pub confidence: f64,
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BackgroundRefreshRequest {
+    pub enabled: bool,
+}

@@ -3,7 +3,7 @@ import { Channel, invoke } from "@tauri-apps/api/core";
 
 export type Thermal = "nominal" | "fair" | "serious" | "critical" | "unknown";
 export type BatteryState = "unknown" | "unplugged" | "charging" | "full";
-export type Range = "5m" | "1h";
+export type Range = "5m" | "1h" | "24h" | "7d" | "30d";
 
 export interface Snapshot {
   ts: number;
@@ -25,8 +25,10 @@ export interface HistoryPoint {
   cpu: number | null;
   ram: number | null;
   appMb: number | null;
-  /** In the 1 h view, the worst state of the minute. */
+  /** In the 1 h view, the worst state of the minute; longer views, of the bucket. */
   thermal: Thermal | null;
+  /** Measured during a Background App Refresh wake-up (app not on screen). */
+  bg: boolean;
   gap: boolean;
 }
 
@@ -54,6 +56,19 @@ export async function subscribeMetrics(
 export function metricsHistory(range: Range): Promise<HistoryPoint[]> {
   return invoke<HistoryPoint[]>("metrics_history", { range });
 }
+
+export const metricsClearHistory = () => invoke<void>("metrics_clear_history");
+
+export interface HistorySettings {
+  /** The app's background samples switch. */
+  background: boolean;
+  /** iOS Background App Refresh for the app: available, denied, restricted… */
+  iosStatus: string;
+}
+
+export const historySettings = () => invoke<HistorySettings>("history_settings");
+export const setBackgroundHistory = (enabled: boolean) =>
+  invoke<HistorySettings>("set_background_history", { enabled });
 
 export function deviceInfo(): Promise<DeviceInfo> {
   return invoke<DeviceInfo>("device_info");

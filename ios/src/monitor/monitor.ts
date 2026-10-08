@@ -41,9 +41,24 @@ const BATTERY_LABEL: Record<BatteryState, TextKey | null> = {
   unknown: null,
 };
 
+const MINUTE = 60_000;
+const DAY = 24 * 60 * MINUTE;
+
+/** Visible window and point spacing per range; Rust buckets the long ranges the same way. */
 const WINDOWS: Record<Range, { windowMs: number; stepMs: number }> = {
-  "5m": { windowMs: 5 * 60_000, stepMs: 1_000 },
-  "1h": { windowMs: 60 * 60_000, stepMs: 60_000 },
+  "5m": { windowMs: 5 * MINUTE, stepMs: 1_000 },
+  "1h": { windowMs: 60 * MINUTE, stepMs: MINUTE },
+  "24h": { windowMs: DAY, stepMs: 5 * MINUTE },
+  "7d": { windowMs: 7 * DAY, stepMs: 30 * MINUTE },
+  "30d": { windowMs: 30 * DAY, stepMs: 120 * MINUTE },
+};
+
+const RANGE_LABEL: Record<Range, () => string> = {
+  "5m": () => duration(5, "minute"),
+  "1h": () => duration(1, "hour"),
+  "24h": () => duration(24, "hour"),
+  "7d": () => duration(7, "day"),
+  "30d": () => duration(30, "day"),
 };
 
 const LIVE_POINTS = 300;
@@ -102,7 +117,11 @@ export async function startMonitor(): Promise<void> {
   let range: Range = "5m";
   let simulator = false;
 
+  const historyNote = byId("history-note");
+
   async function loadHistory(): Promise<void> {
+    // Long views mix lines (app open) with dots (background wake-ups); say so.
+    historyNote.hidden = range === "5m" || range === "1h";
     const points = await metricsHistory(range);
     const { windowMs, stepMs } = WINDOWS[range];
     charts.cpu.setWindow(windowMs, stepMs);
@@ -208,7 +227,7 @@ export async function startMonitor(): Promise<void> {
 
   const rangeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-range]"));
   for (const button of rangeButtons) {
-    button.textContent = button.dataset.range === "1h" ? duration(1, "hour") : duration(5, "minute");
+    button.textContent = RANGE_LABEL[button.dataset.range as Range]();
     button.addEventListener("click", () => {
       range = button.dataset.range as Range;
       for (const b of rangeButtons) b.setAttribute("aria-pressed", String(b === button));
@@ -236,6 +255,6 @@ export async function startMonitor(): Promise<void> {
   if (latest) render(latest);
 
   window.setInterval(() => {
-    if (range === "1h" && !document.hidden) void loadHistory();
+    if (range !== "5m" && !document.hidden) void loadHistory();
   }, HOUR_REFRESH_MS);
 }

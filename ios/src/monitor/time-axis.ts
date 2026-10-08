@@ -24,10 +24,13 @@ export function prepareCanvas(
   return { ctx, width, height };
 }
 
-/** Start of the visible window: it ends at the newest point (or now). */
+/**
+ * Start of the visible window. It ends now, so time without data (the app closed) shows
+ * as an empty stretch at the end instead of stretching the last points to the edge.
+ */
 export function windowStart(data: Timed[], windowMs: number): number {
-  const end = data.length ? data[data.length - 1].ts : Date.now();
-  return end - windowMs;
+  const newest = data.length ? data[data.length - 1].ts : 0;
+  return Math.max(Date.now(), newest) - windowMs;
 }
 
 /**

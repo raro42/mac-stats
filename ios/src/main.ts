@@ -41,13 +41,20 @@ async function loadAppearance(): Promise<void> {
   document.body.classList.remove("i18n-pending");
 }
 
-/** Debug builds: `IOS_STATS_DEMO_VIEW=settings` (or `monitor-bottom`…) for screenshots. */
+/**
+ * Debug builds, for screenshots: `IOS_STATS_DEMO_VIEW=<tab>[-bottom][-<range>]`, e.g.
+ * `settings`, `monitor-bottom` or `monitor-bottom-24h` (opens that history range).
+ */
 async function showDemoView(): Promise<void> {
   const view = await debugDemoView();
   if (!view) return;
-  const [tab, where] = view.split("-");
+  const [tab, ...options] = view.split("-");
   document.querySelector<HTMLButtonElement>(`.tab[data-view="${tab}"]`)?.click();
-  if (where === "bottom") window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight }), 1500);
+  const range = options.find((o) => o !== "bottom");
+  window.setTimeout(() => {
+    if (range) document.querySelector<HTMLButtonElement>(`[data-range="${range}"]`)?.click();
+    if (options.includes("bottom")) window.scrollTo({ top: document.body.scrollHeight });
+  }, 1500);
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

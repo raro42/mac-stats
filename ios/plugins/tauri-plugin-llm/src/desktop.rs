@@ -61,6 +61,14 @@ impl<R: Runtime> Llm<R> {
         Ok(None)
     }
 
+    pub async fn set_background_refresh(&self, _enabled: bool) -> crate::Result<()> {
+        Ok(())
+    }
+
+    pub async fn background_refresh_status(&self) -> crate::Result<String> {
+        Ok("unavailable".into())
+    }
+
     pub async fn keep_awake(&self, _enabled: bool) -> crate::Result<()> {
         Ok(())
     }

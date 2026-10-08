@@ -919,3 +919,77 @@ body.i18n-pending {
 .swatch[data-swatch="system"] {
   background: linear-gradient(135deg, #f2f2f7 50%, #07090c 50%);
 }
+
+/* Settings: switch row (label left, iOS-style switch right). */
+.switch-row {
+  justify-content: space-between;
+  border-top: 0;
+}
+
+.switch-row input[role="switch"] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--track);
+  transition: background 0.2s ease;
+}
+
+.switch-row input[role="switch"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.switch-row input[role="switch"]:checked {
+  background: var(--ok);
+}
+
+.switch-row input[role="switch"]:checked::after {
+  transform: translateX(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-row input[role="switch"],
+  .switch-row input[role="switch"]::after {
+    transition: none;
+  }
+}
+
+.history-delete {
+  width: 100%;
+  margin-top: 12px;
+  color: var(--crit);
+}
+
+.history-note {
+  margin: 8px 0 0;
+}
+
+/* Five history ranges: the switcher gets its own full-width row under the title, so
+   it fits on a phone in every language. */
+.history-card .card-head {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.history-card .segmented {
+  display: flex;
+}
+
+.history-card .segmented button {
+  flex: 1;
+  padding-inline: 4px;
+  white-space: nowrap;
+}

@@ -90,6 +90,10 @@ class DetectLanguageArgs: Decodable {
   let text: String
 }
 
+class BackgroundRefreshArgs: Decodable {
+  let enabled: Bool
+}
+
 class LlmPlugin: Plugin {
   private let queue = DispatchQueue(label: "llm.engine", qos: .userInitiated)
   private let engine = LlamaEngine()
@@ -257,6 +261,19 @@ extension LlmPlugin {
     invoke.resolve([
       "language": ["code": code, "englishName": name, "confidence": confidence] as JsonObject
     ])
+  }
+
+  /// Turns the history's Background App Refresh wake-ups on or off (BackgroundRefresh.swift).
+  @objc public func setBackgroundRefresh(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(BackgroundRefreshArgs.self)
+    BackgroundRefresh.enabled = args.enabled
+    if args.enabled { BackgroundRefresh.schedule() } else { BackgroundRefresh.cancel() }
+    invoke.resolve(["ok": true])
+  }
+
+  /// Whether iOS allows Background App Refresh for the app (the user can turn it off).
+  @objc public func backgroundRefreshStatus(_ invoke: Invoke) {
+    invoke.resolve(["status": BackgroundRefresh.status()])
   }
 
   /// Debug only: simulates system events for the self-test.

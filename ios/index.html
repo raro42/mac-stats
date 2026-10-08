@@ -53,12 +53,15 @@
         </div>
       </section>
 
-      <section class="card">
+      <section class="card history-card">
         <div class="card-head">
           <h2 data-i18n="monitor.history"></h2>
           <div class="segmented" role="group" data-i18n-aria-label="monitor.period">
             <button type="button" data-range="5m" aria-pressed="true"></button>
             <button type="button" data-range="1h" aria-pressed="false"></button>
+            <button type="button" data-range="24h" aria-pressed="false"></button>
+            <button type="button" data-range="7d" aria-pressed="false"></button>
+            <button type="button" data-range="30d" aria-pressed="false"></button>
           </div>
         </div>
         <div class="chart">
@@ -73,6 +76,7 @@
           <span class="chart-caption" aria-hidden="true" data-i18n="thermal.title"></span>
           <canvas id="chart-thermal" class="thermal-canvas" role="img"></canvas>
         </div>
+        <p id="history-note" class="chart-caption history-note" data-i18n="monitor.historyDots" hidden></p>
       </section>
 
       <p class="footnote" data-i18n="monitor.footnote"></p>
@@ -129,6 +133,19 @@
         <h2 id="theme-heading" data-i18n="settings.appearance"></h2>
         <div id="theme-list" class="choice-list" role="radiogroup" aria-labelledby="theme-heading"></div>
         <p id="theme-note" class="card-text" hidden></p>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="settings.history"></h2>
+        <label class="choice switch-row">
+          <span data-i18n="settings.backgroundSamples"></span>
+          <input type="checkbox" id="background-history" role="switch" />
+        </label>
+        <p class="card-text" data-i18n="settings.backgroundNote"></p>
+        <p id="background-off" class="card-text" data-i18n="settings.backgroundOff" hidden></p>
+        <p class="card-text" data-i18n="settings.historyRetention"></p>
+        <button type="button" id="delete-history" class="lab-btn history-delete" data-i18n="settings.deleteHistory"></button>
+        <p id="history-status" class="card-text" role="status"></p>
       </section>
 
       <section class="card">

@@ -57,7 +57,7 @@ export function seconds(value: number): string {
   return formatter({ style: "unit", unit: "second", unitDisplay: "short", maximumFractionDigits: 1 }).format(value);
 }
 
-export function duration(value: number, unit: "minute" | "hour"): string {
+export function duration(value: number, unit: "minute" | "hour" | "day"): string {
   return formatter({ style: "unit", unit, unitDisplay: "short" }).format(value);
 }
 

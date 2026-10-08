@@ -62,6 +62,10 @@ targets:
         # the <lang>.lproj folders, iOS offers a per-app language and localizes system UI
         # inside the WebView.
         CFBundleLocalizations: [en, es, de, fr, pt-BR, zh-Hans]
+        # Background App Refresh for the saved history (BackgroundRefresh.swift). The
+        # task id is registered from Sources/ios-stats/main.mm before the app starts.
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: [com.gilberto.iosstats.refresh]
         CFBundleShortVersionString: 0.1.0
         CFBundleVersion: "0.1.0"
     entitlements:
@@ -85,6 +89,7 @@ targets:
         embed: false
       - framework: ../../../vendor/llama.xcframework
       - sdk: CoreGraphics.framework
+      - sdk: BackgroundTasks.framework
       - sdk: Metal.framework
       - sdk: NaturalLanguage.framework
       - sdk: MetalKit.framework

@@ -78,7 +78,7 @@ These only exist in debug builds. They are passed as environment variables when 
 | `IOS_STATS_DEMO_PROMPT="…"` | Opens the chat and sends that question on launch |
 | `IOS_STATS_CPU_PROBE=<seconds>` | After 15 s, averages the iPhone's total CPU (including WebKit) and writes `Documents/cpu-probe.json`; used to compare themes |
 | `IOS_STATS_KEEP_AWAKE=1` | Keeps the screen on, for measurements with the iPhone untouched |
-| `IOS_STATS_DEMO_VIEW=monitor\|chat\|settings[-bottom]` | Opens that tab on launch and, with `-bottom`, scrolls to the end (for screenshots) |
+| `IOS_STATS_DEMO_VIEW=monitor\|chat\|settings[-bottom][-<range>]` | Opens that tab on launch; `-bottom` scrolls to the end and a range (`1h`, `24h`, `7d`, `30d`) opens that history view (for screenshots) |
 
 The Chat tab also includes a "Lab" card for loading, benchmarking and trying models by hand. Debug builds also offer a "Pseudo" language in Settings: every string shows as `[!! … ~~~ !!]`, about 40% longer, so hard-coded text and clipped layouts stand out.
 

@@ -88,6 +88,21 @@ impl<R: Runtime> Llm<R> {
         Ok(reply.get("language").and_then(|l| serde_json::from_value(l.clone()).ok()))
     }
 
+    /// Turns the history's Background App Refresh wake-ups on or off.
+    pub async fn set_background_refresh(&self, enabled: bool) -> crate::Result<()> {
+        let _: Value = self
+            .0
+            .run_mobile_plugin_async("setBackgroundRefresh", BackgroundRefreshRequest { enabled })
+            .await?;
+        Ok(())
+    }
+
+    /// `available`, `denied` (turned off by the user in iOS Settings) or `restricted`.
+    pub async fn background_refresh_status(&self) -> crate::Result<String> {
+        let reply: Value = self.0.run_mobile_plugin_async("backgroundRefreshStatus", json!({})).await?;
+        Ok(reply.get("status").and_then(Value::as_str).unwrap_or("unknown").to_string())
+    }
+
     pub async fn keep_awake(&self, enabled: bool) -> crate::Result<()> {
         let _: Value = self
             .0

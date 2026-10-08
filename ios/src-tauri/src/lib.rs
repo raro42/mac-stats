@@ -1,6 +1,7 @@
 use tauri::Manager;
 use tauri_plugin_llm::LlmExt;
 
+mod background;
 mod chat;
 mod cpu_probe;
 mod error;
@@ -48,6 +49,7 @@ pub fn run() {
             // Model destination (copied with devicectl or downloaded in phase B).
             let _ = std::fs::create_dir_all(chat::catalog::models_dir());
             app.manage(chat::ChatState::new(app.handle()));
+            background::sync(app.handle().clone());
             // Automatic model benchmark (phase A), debug builds only.
             if cfg!(debug_assertions) {
                 if let Ok(spec) = std::env::var("IOS_STATS_BENCH") {
@@ -79,6 +81,9 @@ pub fn run() {
             theme::set_app_theme,
             metrics::metrics_subscribe,
             metrics::metrics_history,
+            metrics::metrics_clear_history,
+            background::history_settings,
+            background::set_background_history,
             metrics::device_info,
             lab::lab_models,
             lab::lab_load,
