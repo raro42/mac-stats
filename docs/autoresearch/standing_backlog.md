@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1763
+
+- Apple power strip captions (`.power-label` · `.lpm-label`) mix type color against the opaque strip fill (`color-mix` 45% `#0c0c10` on `#ececf1`). No shell `--muted` on Power · LPM labels. Bat status / time-left already opaque. Design-review CPU metrics polish; screenshot deferred (Mac unreachable). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1762
 
 - Restore live CPU-window metrics after #14 idle ratchet broke gauges at "None yet" (GitHub #15). Focused polls ~2s; park only on blur / Focused(false) / hidden; drop hasFocus occlusion; process-cache TTL 30s; Data Poster dark washes for monitors summary + AI Chat glance.
