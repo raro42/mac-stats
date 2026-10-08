@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1774] - 2026-10-08
+
+### Fixed
+- **Footer version blank until click** — Paint the app version from localStorage / `?v=` on open, then confirm with `get_app_version`. No more "None yet" beside the GitHub link while waiting for a footer click (#14 leftover).
+
 ## [0.1.1773] - 2026-10-08
 
 ### Changed

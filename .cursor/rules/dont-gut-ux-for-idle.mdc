@@ -22,6 +22,7 @@ WebView idle work (#14) is real. Empty or broken UI is not an acceptable trade.
 - “Optimize” by removing seed calls from the open path.
 - Sleep the **menu-bar metrics loop** for minutes (e.g. 600s). Menu bar and glass UI need ~2s when the window is focused, ~5s when idle.
 - Make `get_cpu_details` read `SYSTEM` without `refresh_cpu_usage` — that freezes percentages at 0%.
+- Leave the footer version on **None yet** until a click. Version is already in the binary / localStorage — paint it on open.
 
 ## Examples
 

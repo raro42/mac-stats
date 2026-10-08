@@ -4835,15 +4835,38 @@
   }
 
   async function injectAppVersion() {
-    // OPTIMIZATION Phase 2: Cache app version in localStorage
-    // Fetch app version from Rust backend and inject into all version elements
-    // Parked: skip version IPC + footer DOM (#14).
-    if (uiWorkPaused()) return;
+    // Version is compile-time + localStorage — paint cache first, then confirm via IPC.
+    // Do not leave the footer on "None yet" until a click (#14 leftover).
     try {
-      let version = localStorage.getItem('appVersion');
+      let version =
+        localStorage.getItem("macStatsAssetVersion") ||
+        localStorage.getItem("appVersion");
+      try {
+        const fromUrl = new URLSearchParams(window.location.search).get("v");
+        if (fromUrl && /^\d+\.\d+/.test(fromUrl)) {
+          version = fromUrl.replace(/^v/i, "");
+        }
+      } catch (_) {
+        /* ignore */
+      }
+
+      // Paint cached version even while parked so the footer is not blank.
+      if (version && !uiWorkPaused()) {
+        const versionElements = document.querySelectorAll(
+          ".app-version, .theme-version, .arch-version"
+        );
+        versionElements.forEach((el) => {
+          const themeName =
+            typeof footerThemeLabel === "function"
+              ? footerThemeLabel(el)
+              : (el.getAttribute("data-theme-label") || "").trim();
+          el.textContent = themeName ? `${themeName} v${version}` : `v${version}`;
+        });
+      }
 
       // If not cached, fetch from backend
       if (!version) {
+        if (uiWorkPaused()) return;
         const invoke = getInvoke();
         if (!invoke) {
           console.warn("Tauri invoke not available, skipping version injection");
@@ -4854,7 +4877,10 @@
         if (uiWorkPaused()) {
           // Keep cache even when parked so resume can paint without IPC.
           try {
-            if (version) localStorage.setItem('appVersion', version);
+            if (version) {
+              localStorage.setItem("appVersion", version);
+              localStorage.setItem("macStatsAssetVersion", version);
+            }
           } catch (_) {
             /* ignore */
           }
@@ -4863,7 +4889,8 @@
 
         // Cache for future loads
         try {
-          localStorage.setItem('appVersion', version);
+          localStorage.setItem("appVersion", version);
+          localStorage.setItem("macStatsAssetVersion", version);
         } catch (e) {
           console.warn("Failed to cache version:", e);
         }
@@ -5376,8 +5403,10 @@
     initRefresh();
     initExternalLinks();
     wireChangelogVersionClicksOnce();
+    // Footer version is already in localStorage / binary — show it on open.
+    void injectAppVersion();
     // Theme picker, Product toggles, decorations, Settings keyboard, and
-    // changelog modal wait for Settings / footer click (#14).
+    // changelog modal wait for Settings click (#14).
   }
 
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;

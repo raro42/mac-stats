@@ -3088,7 +3088,8 @@ function startCpuWindowMetricsOnce() {
   // Reuse ~/.mac-stats/history.json immediately so Freq / Temp / sparklines
   // are not empty while the first live sample arrives.
   void seedThemeHistoryFromBackend();
-  // Version/GitHub update waits for footer click (not first poll, #14).
+  // Footer version is compile-time / localStorage — show it on open, not on click.
+  startCpuWindowVersionOnce();
   const afterFirst = () => {
     // Parked after IPC: clear so focus can re-arm (#15).
     if (windowWorkPaused()) {
@@ -5692,17 +5693,60 @@ function footerThemeLabel(el) {
 }
 window.footerThemeLabel = footerThemeLabel;
 
-// App version cache — fetched once on focus / metrics arm (#14).
+// App version cache — compile-time string; also kept in localStorage / ?v=.
 let appVersionCache = null;
+
+/** Sync hint already on disk / in the theme URL — paint before any IPC. */
+function cachedAppVersionHint() {
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get("v");
+    if (fromUrl && /^\d+\.\d+/.test(fromUrl)) return fromUrl.replace(/^v/i, "");
+  } catch (_) {
+    /* ignore */
+  }
+  try {
+    const fromAsset = localStorage.getItem("macStatsAssetVersion");
+    if (fromAsset && fromAsset !== "unknown") return fromAsset.replace(/^v/i, "");
+    const fromApp = localStorage.getItem("appVersion");
+    if (fromApp && fromApp !== "unknown") return fromApp.replace(/^v/i, "");
+  } catch (_) {
+    /* ignore */
+  }
+  return null;
+}
+
+function paintFooterAppVersion(version) {
+  if (!version || version === "unknown") return;
+  const versionElements = document.querySelectorAll(
+    ".app-version, .theme-version, .arch-version"
+  );
+  versionElements.forEach((el) => {
+    const themeName = footerThemeLabel(el);
+    const next = themeName ? `${themeName} v${version}` : `v${version}`;
+    if (el.textContent !== next) el.textContent = next;
+  });
+}
+
+/** First paint: show cached version so the footer is not "None yet". */
+function paintFooterAppVersionFromCache() {
+  const hint = cachedAppVersionHint();
+  if (!hint) return;
+  if (appVersionCache === null) appVersionCache = hint;
+  paintFooterAppVersion(hint);
+}
 
 async function fetchAppVersion() {
   if (appVersionCache !== null) {
+    paintFooterAppVersion(appVersionCache);
     return appVersionCache;
   }
 
+  // Instant paint from memory / disk before the (cheap) IPC round-trip.
+  paintFooterAppVersionFromCache();
+
   const inv = getInvoke();
   if (!inv) {
-    appVersionCache = "unknown";
+    appVersionCache = appVersionCache || "unknown";
     return appVersionCache;
   }
 
@@ -5719,6 +5763,11 @@ async function fetchAppVersion() {
       const prev = localStorage.getItem("macStatsAssetVersion");
       if (prev !== appVersionCache) {
         localStorage.setItem("macStatsAssetVersion", appVersionCache);
+        try {
+          localStorage.setItem("appVersion", appVersionCache);
+        } catch (_) {
+          /* ignore */
+        }
         // Hard reload theme shell once per version so gauge/layout HTML updates stick.
         if (prev) {
           window.location.replace(`../../cpu.html?v=${encodeURIComponent(appVersionCache)}`);
@@ -5726,21 +5775,11 @@ async function fetchAppVersion() {
         }
       }
     } catch (_) {}
-    const versionElements = document.querySelectorAll(
-      ".app-version, .theme-version, .arch-version"
-    );
-    versionElements.forEach((el) => {
-      const themeName = footerThemeLabel(el);
-      if (themeName) {
-        el.textContent = `${themeName} v${appVersionCache}`;
-      } else {
-        el.textContent = `v${appVersionCache}`;
-      }
-    });
+    paintFooterAppVersion(appVersionCache);
     return appVersionCache;
   } catch (error) {
     console.error("Error fetching app version:", error);
-    appVersionCache = "unknown";
+    appVersionCache = appVersionCache || "unknown";
     return appVersionCache;
   }
 }
@@ -5748,10 +5787,13 @@ async function fetchAppVersion() {
 // Try multiple initialization strategies
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
+    // Footer version from localStorage / ?v= before any IPC.
+    paintFooterAppVersionFromCache();
     // Version / ring / monitoring arm on focus or late fallback (#14).
     init();
   });
 } else {
+  paintFooterAppVersionFromCache();
   init();
 }
 
@@ -6381,7 +6423,8 @@ function resumeVisibleWindowWork() {
       scheduleCpuWindowMetricsOnce(500);
     }
     scheduleDeferredFocusRefresh();
-    // Version/GitHub IPC waits for footer click — not alt-tab resume (#14).
+    // Version is cheap (cached / get_app_version) — paint on resume if still blank.
+    startCpuWindowVersionOnce();
     resumeIdleWindowPolls();
   } else {
     init();
