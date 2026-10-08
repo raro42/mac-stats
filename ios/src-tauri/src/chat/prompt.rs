@@ -40,20 +40,37 @@ fn gb(bytes: u64) -> String {
     format!("{:.1} GB", bytes as f64 / 1_073_741_824.0)
 }
 
-/// A UI string in `language`, read from the app's dictionaries (`src/i18n/<lang>.ts`), so
-/// the model gets the same words the app shows. English for languages the UI lacks.
-fn ui_text(key: &str, language: &str) -> Option<String> {
-    let dictionary = match language {
-        "es" => include_str!("../../../src/i18n/es.ts"),
-        "de" => include_str!("../../../src/i18n/de.ts"),
-        "fr" => include_str!("../../../src/i18n/fr.ts"),
-        "pt" | "pt-BR" => include_str!("../../../src/i18n/pt-BR.ts"),
-        "zh-Hans" => include_str!("../../../src/i18n/zh-Hans.ts"),
-        _ => include_str!("../../../src/i18n/en.ts"),
-    };
+/// The app's dictionaries (`src/i18n/<lang>.ts`), by language code.
+const DICTIONARIES: [(&str, &str); 6] = [
+    ("es", include_str!("../../../src/i18n/es.ts")),
+    ("en", include_str!("../../../src/i18n/en.ts")),
+    ("de", include_str!("../../../src/i18n/de.ts")),
+    ("fr", include_str!("../../../src/i18n/fr.ts")),
+    ("pt-BR", include_str!("../../../src/i18n/pt-BR.ts")),
+    ("zh-Hans", include_str!("../../../src/i18n/zh-Hans.ts")),
+];
+
+fn dictionary_value(dictionary: &str, key: &str) -> Option<String> {
     let (_, rest) = dictionary.split_once(&format!("\"{key}\": \""))?;
     let (text, _) = rest.split_once('"')?;
     Some(text.replace("\\u00a0", "\u{a0}"))
+}
+
+/// A UI string in `language`, read from the app's dictionaries, so the model gets the same
+/// words the app shows. English for languages the UI lacks.
+fn ui_text(key: &str, language: &str) -> Option<String> {
+    let language = if language == "pt" { "pt-BR" } else { language };
+    let dictionary = DICTIONARIES.iter().find(|(code, _)| *code == language).unwrap_or(&DICTIONARIES[1]).1;
+    dictionary_value(dictionary, key)
+}
+
+/// Whether `question` contains any of the comma-separated words stored under `key`, in any
+/// of the app's languages (the user may write in a language other than the app's).
+fn mentions_any(question: &str, key: &str) -> bool {
+    let q = question.to_lowercase();
+    DICTIONARIES.iter().filter_map(|(_, d)| dictionary_value(d, key)).any(|words| {
+        words.split(',').map(str::trim).filter(|w| !w.is_empty()).any(|w| q.contains(w))
+    })
 }
 
 /// Thermal state as the app shows it, with what it means: "Serio (Alto. iOS baja el
@@ -73,33 +90,34 @@ fn thermal_text(t: Thermal, language: &str) -> Option<String> {
     })
 }
 
-/// Apple's path to free up space, in the reply language (from the app's dictionaries).
-fn storage_path(language: &str) -> String {
-    ui_text("prompt.storagePath", language).unwrap_or_else(|| "Settings > General > iPhone Storage".into())
+/// Whether a question is about storage space (`prompt.spaceWords`).
+fn asks_about_space(question: &str) -> bool {
+    mentions_any(question, "prompt.spaceWords")
 }
 
-/// Whether a question is about storage space, in any of the app's languages. Bare German
-/// "Speicher" is left out: it also means memory.
-fn asks_about_space(question: &str) -> bool {
-    const WORDS: [&str; 14] = [
-        "space", "storage", "espacio", "almacenamiento", "speicherplatz", "platz", "iphone-speicher",
-        "espace", "stockage", "espaço", "armazenamento", "空间", "存储", "储存",
-    ];
-    let q = question.to_lowercase();
-    WORDS.iter().any(|w| q.contains(w))
+/// Whether a question is about this iPhone: battery, memory, storage, heat, speed…
+/// (`prompt.deviceWords`). The device data goes only with those: sent with every question,
+/// it leaked into unrelated answers ("Your phone…" in translations, arithmetic slips). A
+/// follow-up such as "and the battery?" still matches.
+fn asks_about_device(question: &str) -> bool {
+    mentions_any(question, "prompt.deviceWords")
 }
 
 /// iPhone data, one labeled value per line: in the benchmark, models read an unlabeled
-/// "55.8 GB free" as free memory, the app's own memory as the phone's RAM, and subtracted
-/// storage figures wrongly. `language` picks the words for the thermal state.
+/// "55.8 GB free" as free memory, the app's own memory as the phone's RAM, subtracted
+/// storage figures wrongly, and German "Speicher" as storage. RAM and storage are named
+/// in the reply language (`prompt.ram`, `prompt.storage`), the thermal state uses the
+/// app's words.
 pub fn device_note(s: &Snapshot, language: &str) -> String {
+    let label = |key: &str, english: &str| ui_text(key, language).unwrap_or_else(|| english.to_string());
     let mut lines = vec!["This iPhone now (use only if the question is about it):".to_string()];
     if let Some(cpu) = s.cpu {
         lines.push(format!("- CPU: {cpu:.0}%"));
     }
     if let Some(used) = s.ram_used {
         let free = s.ram_total.saturating_sub(used);
-        lines.push(format!("- RAM: {} used, {} free of {}", gb(used), gb(free), gb(s.ram_total)));
+        let ram = label("prompt.ram", "RAM (memory)");
+        lines.push(format!("- {ram}: {} used, {} free of {}", gb(used), gb(free), gb(s.ram_total)));
     }
     if let Some(b) = s.battery {
         let state = match b.state {
@@ -118,21 +136,26 @@ pub fn device_note(s: &Snapshot, language: &str) -> String {
     }
     if let Some(st) = s.storage {
         let used = st.total.saturating_sub(st.available);
-        lines.push(format!("- Storage: {} used, {} free of {}", gb(used), gb(st.available), gb(st.total)));
+        let storage = label("prompt.storage", "Storage");
+        lines.push(format!("- {storage}: {} used, {} free of {}", gb(used), gb(st.available), gb(st.total)));
     }
     lines.join("\n")
 }
 
-/// System message sent before a question: iPhone data (if any), a fact the question needs
-/// (where to free space), then the reply language last, where small models follow it best.
+/// System message sent before a question: the iPhone data and, for questions about space,
+/// how to free it (both only when the question is about the device), then the reply
+/// language last, where small models follow it best.
 pub fn turn_note(device: Option<&Snapshot>, reply: &ReplyLanguage, question: &str) -> String {
     let mut parts = Vec::new();
-    if let Some(s) = device {
-        parts.push(device_note(s, &reply.code));
+    if asks_about_device(question) {
+        if let Some(s) = device {
+            parts.push(device_note(s, &reply.code));
+        }
     }
     if asks_about_space(question) {
-        let path = storage_path(&reply.code);
-        parts.push(format!("To free up space on an iPhone: {path} (offload or delete apps there)."));
+        if let Some(tip) = ui_text("prompt.storageTip", &reply.code) {
+            parts.push(tip);
+        }
     }
     parts.push(format!("Reply in {}.", reply.english_name));
     parts.join("\n")
@@ -209,7 +232,7 @@ mod tests {
             device_note(&snapshot(), "en"),
             "This iPhone now (use only if the question is about it):\n\
 - CPU: 23%\n\
-- RAM: 3.0 GB used, 3.0 GB free of 6.0 GB\n\
+- RAM (memory): 3.0 GB used, 3.0 GB free of 6.0 GB\n\
 - Battery charge: 78% (charging)\n\
 - Thermal state: Fair (Slightly elevated. iOS may reduce background work.)\n\
 - Storage: 87.0 GB used, 41.0 GB free of 128.0 GB"
@@ -221,6 +244,10 @@ mod tests {
         assert!(device_note(&snapshot(), "es").contains("- Thermal state: Moderado (Algo elevado."));
         assert!(device_note(&snapshot(), "zh-Hans").contains("- Thermal state: 一般 ("));
         assert!(device_note(&snapshot(), "it").contains("- Thermal state: Fair ("));
+        let german = device_note(&snapshot(), "de");
+        assert!(german.contains("- Arbeitsspeicher (RAM): 3.0 GB used"));
+        assert!(german.contains("- Speicherplatz: 87.0 GB used"));
+        assert!(german.contains("- Thermal state: Erhöht ("));
         assert_eq!(
             thermal_text(Thermal::Serious, "fr").as_deref(),
             Some("Sérieux (Élevé. iOS réduit les performances pour refroidir.)")
@@ -233,6 +260,7 @@ mod tests {
         let spanish = ReplyLanguage { code: "es".into(), english_name: "Spanish".into() };
         let note = turn_note(None, &spanish, "¿Cómo libero espacio en mi iPhone?");
         assert!(note.contains("Ajustes > General > Almacenamiento del iPhone"));
+        assert!(note.contains("«Desinstalar app»"));
         assert!(note.ends_with("\nReply in Spanish."));
         assert!(!turn_note(None, &spanish, "¿Qué es la memoria RAM?").contains("Ajustes"));
         // German "Speicher" alone also means memory: no tip.
@@ -244,12 +272,25 @@ mod tests {
     #[test]
     fn turn_note_ends_with_the_reply_language() {
         let german = ReplyLanguage { code: "de".into(), english_name: "German".into() };
-        let note = turn_note(Some(&snapshot()), &german, "Hallo");
+        let note = turn_note(Some(&snapshot()), &german, "Wie heiß ist mein Handy gerade?");
         assert!(note.starts_with("This iPhone now"));
         assert!(note.contains("Erhöht"));
         assert!(note.ends_with("\nReply in German."));
         let chinese = ReplyLanguage { code: "zh-Hans".into(), english_name: "Simplified Chinese".into() };
         assert_eq!(turn_note(None, &chinese, "你好"), "Reply in Simplified Chinese.");
+    }
+
+    #[test]
+    fn device_data_only_goes_with_questions_about_the_device() {
+        let spanish = ReplyLanguage { code: "es".into(), english_name: "Spanish".into() };
+        let with = |q: &str| turn_note(Some(&snapshot()), &spanish, q).contains("This iPhone now");
+        assert!(with("¿Cómo va mi batería?"));
+        assert!(with("¿Y la memoria RAM?"));
+        assert!(with("Mi teléfono está muy caliente"));
+        assert!(!with("¿Cuánto es 17 × 23?"));
+        assert!(!with("Escribe un haiku sobre el otoño."));
+        let chinese = ReplyLanguage { code: "zh-Hans".into(), english_name: "Simplified Chinese".into() };
+        assert!(turn_note(Some(&snapshot()), &chinese, "我的电池怎么样？").contains("This iPhone now"));
     }
 
     #[test]

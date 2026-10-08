@@ -87,7 +87,11 @@ export const en: Messages = {
   "chat.bannerSerious": "The iPhone is hot: replies will be slower.",
   "chat.bannerLowPower": "Low Power Mode is on: replies may be slower.",
   "chat.startFailed": "The chat could not start: {error}",
-  "prompt.storagePath": "Settings > General > iPhone Storage",
+  "prompt.ram": "RAM (memory)",
+  "prompt.storage": "Storage",
+  "prompt.storageTip": "To free up space: Settings > General > iPhone Storage; each app there has “Offload App” (keeps its data) and “Delete App”. iOS has no button to clear the cache.",
+  "prompt.deviceWords": "iphone, phone, battery, charg, memory, ram, storage, space, cpu, processor, hot, heat, temperature, thermal, slow, performance, low power",
+  "prompt.spaceWords": "space, storage",
 
   "stop.eos": "Complete",
   "stop.cancelled": "Stopped",

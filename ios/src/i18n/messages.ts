@@ -113,9 +113,17 @@ export interface Messages extends ErrorMessages {
   "chat.bannerLowPower": string;
   "chat.startFailed": string;
 
-  /** Apple's path to free up space, in the iPhone's own words. Used by the chat prompt
-   *  (Rust reads it from here), not shown in the UI. */
-  "prompt.storagePath": string;
+  // Used by the chat prompt (Rust reads them from here), not shown in the UI. Labels name
+  // RAM and storage unambiguously in each language; the tip uses iOS's real button names.
+  "prompt.ram": string;
+  "prompt.storage": string;
+  "prompt.storageTip": string;
+  /** Comma-separated lowercase words that mark a question about this iPhone (battery,
+   *  memory, storage, heat…). The chat sends the device data only for those. */
+  "prompt.deviceWords": string;
+  /** Words that mark a question about storage space (adds the storage tip). Avoid words
+   *  that also mean memory, such as German "Speicher". */
+  "prompt.spaceWords": string;
 
   // Why a reply stopped
   "stop.eos": string;

@@ -87,7 +87,11 @@ export const es: Messages = {
   "chat.bannerSerious": "El iPhone está caliente: las respuestas irán más lentas.",
   "chat.bannerLowPower": "Modo de bajo consumo activado: las respuestas pueden ir más lentas.",
   "chat.startFailed": "No se pudo iniciar el chat: {error}",
-  "prompt.storagePath": "Ajustes > General > Almacenamiento del iPhone",
+  "prompt.ram": "Memoria RAM",
+  "prompt.storage": "Almacenamiento",
+  "prompt.storageTip": "Para liberar espacio: Ajustes > General > Almacenamiento del iPhone; ahí cada app tiene «Desinstalar app» (conserva sus datos) y «Eliminar app». iOS no tiene un botón para borrar la caché.",
+  "prompt.deviceWords": "iphone, teléfono, telefono, celular, batería, bateria, carga, memoria, ram, almacenamiento, espacio, procesador, caliente, calor, térmico, lento, rendimiento, bajo consumo",
+  "prompt.spaceWords": "espacio, almacenamiento",
 
   "stop.eos": "Completa",
   "stop.cancelled": "Detenida",

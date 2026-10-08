@@ -87,7 +87,11 @@ export const fr: Messages = {
   "chat.bannerSerious": "L'iPhone est chaud : les réponses seront plus lentes.",
   "chat.bannerLowPower": "Le mode Économie d'énergie est activé : les réponses peuvent être plus lentes.",
   "chat.startFailed": "Le chat n'a pas pu démarrer : {error}",
-  "prompt.storagePath": "Réglages > Général > Stockage iPhone",
+  "prompt.ram": "Mémoire vive (RAM)",
+  "prompt.storage": "Stockage",
+  "prompt.storageTip": "Pour libérer de l'espace\u00a0: Réglages > Général > Stockage iPhone\u00a0; chaque app y propose «\u00a0Décharger l'app\u00a0» (garde ses données) et «\u00a0Supprimer l'app\u00a0». iOS n'a pas de bouton pour vider le cache.",
+  "prompt.deviceWords": "iphone, téléphone, batterie, charge, mémoire, ram, stockage, espace, chaud, chaleur, thermique, lent, performances, économie d'énergie",
+  "prompt.spaceWords": "espace, stockage",
 
   "stop.eos": "Complète",
   "stop.cancelled": "Arrêtée",

@@ -87,7 +87,11 @@ export const zhHans: Messages = {
   "chat.bannerSerious": "iPhone 很热：回复会变慢。",
   "chat.bannerLowPower": "低电量模式已开启：回复可能变慢。",
   "chat.startFailed": "聊天无法启动：{error}",
-  "prompt.storagePath": "设置 > 通用 > iPhone 储存空间",
+  "prompt.ram": "运行内存 (RAM)",
+  "prompt.storage": "存储空间",
+  "prompt.storageTip": "释放空间：设置 > 通用 > iPhone 储存空间；每个 App 都有“卸载 App”（保留数据）和“删除 App”。iOS 没有清除缓存的按钮。",
+  "prompt.deviceWords": "iphone, 手机, 电池, 充电, 内存, 存储, 空间, 发热, 温度, 性能, 低电量",
+  "prompt.spaceWords": "空间, 存储, 储存",
 
   "stop.eos": "已完成",
   "stop.cancelled": "已停止",

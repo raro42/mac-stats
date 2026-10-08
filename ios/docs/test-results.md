@@ -11,6 +11,51 @@ How to run each check is in [README.md](../README.md) (Tests, Debug tools).
 
 ---
 
+## 2026-10-08: fourth prompt on a real iPhone
+
+**Environment:** iPhone 12 Pro, iOS 26.6.1, wired. Debug build with the fourth prompt. Raw data (Qwen3.5-2B and LFM2.5-1.2B): [llm-bench-multilang-v4-iphone12pro.json](llm-bench-multilang-v4-iphone12pro.json).
+
+**Changes:**
+- The device data goes only with questions about the device (keyword lists `prompt.deviceWords`, per language, in the dictionaries).
+- RAM and storage labels are in the reply language ("Arbeitsspeicher (RAM)" / "Speicherplatz").
+- The storage tip is a full sentence in the reply language with iOS's button names and "no clear-cache button".
+- German "Ernst" was renamed "Hoch".
+
+**Runs:**
+- Three of four runs stopped after 6–9 minutes with `app_in_background` or `llama_decode` code -3. The app left the foreground while the benchmark ran (the run at 08:02 with the same app lasted 25 min). Cause not identified yet: screen turned off, the iPhone was used, or a system alert. Qwen2.5-1.5B could not be measured.
+- Self-test (app in front): **10/10**, cache reuse 0 → 137 → 304.
+- Reply language: Qwen3.5 53/54 (only the "30 videos" formula flagged), LFM2.5 54/54.
+
+**Quality** (LLM reviewer, 1–5, v3 re-scored with the same rubric):
+
+| Model | es | en | de | fr | pt-BR | zh-Hans | v4 | v3 |
+|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B | 3.2 | 4.3 | 3.0 | 3.4 | 3.2 | 3.5 | **3.4** | 3.6 |
+| LFM2.5-1.2B | 3.3 | 4.1 | 2.9 | 3.5 | 3.7 | 2.4 | **3.3** | 3.3 |
+
+- **Without Q5 (17 × 23), the content is flat:** Qwen3.5 193 → 192 points, LFM2.5 184 → 185. The drop comes from Q5 (both models fail it whatever the prompt) and from the thermal state, which was not the same in every language this time (see below).
+- **Fixed:**
+  - English tip text copied into answers;
+  - the "Ernst" calque;
+  - most Q8 arithmetic.
+- **Unchanged:**
+  - German "Speicher" read as storage (iOS itself calls storage "iPhone-Speicher", so the question is ambiguous);
+  - invented "clear cache" steps from Qwen3.5;
+  - "Your phone" in translations (the quoted sentence contains "phone", so the data is still attached);
+  - pt-BR answers say "Configurações" instead of "Ajustes".
+- **Benchmark confound:** the iPhone was at nominal during the Spanish questions and at serious later, and Q10 answers describe the current state. Comparisons between prompt versions need a fixed device snapshot.
+- **Decision:** keep the fourth prompt (its targeted fixes worked and nothing got worse because of it). Qwen3.5-2B stays the default; LFM2.5 is not usable in Chinese (2.4).
+
+**Next ideas (not done):**
+- Gate on whole words and ignore quoted text.
+- Give all four thermal states with the current one marked when the question is about heat.
+- Put two more real steps in the storage tip.
+- Compute simple arithmetic in code.
+- Run the quality benchmark on a fixed snapshot.
+- Make the benchmark wait and retry when the app leaves the foreground.
+
+---
+
 ## 2026-10-08: third prompt on a real iPhone
 
 **Environment:** iPhone 12 Pro, iOS 26.6.1, wired, kept unlocked. Debug build with the third prompt. Full benchmark (3 models × 10 questions × 6 languages) in 25 min, then the self-test. Raw data with the note sent for every answer: [llm-bench-multilang-v3-iphone12pro.json](llm-bench-multilang-v3-iphone12pro.json).
