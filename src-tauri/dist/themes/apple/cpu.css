@@ -3085,13 +3085,17 @@ border-radius: 24px;
   background: color-mix(in srgb, currentColor 4%, #ffffff);
 }
 
-.chat-exec-label {
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .chat-exec-label opacity: 0.65. */
+.apple-shell .chat-exec-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--muted);
+  /* Was opacity 0.65 on --muted (50% ink) → ~33% ink on the white message list. */
+  color: color-mix(in srgb, #0c0c10 33%, #ffffff);
   margin: 0 0 4px;
+  opacity: 1;
 }
 
 .chat-exec-label + .chat-exec-label,
