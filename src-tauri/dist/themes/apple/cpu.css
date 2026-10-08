@@ -1954,10 +1954,11 @@ border-radius: 24px;
 
 .logs-path-hint {
   font-size: 11px;
-  color: var(--muted);
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.85 on --muted (50% ink) → ~43% ink on the white toolbar. */
+  color: color-mix(in srgb, #0c0c10 43%, #ffffff);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   margin-left: 8px;
-  opacity: 0.85;
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
