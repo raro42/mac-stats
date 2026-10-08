@@ -41,8 +41,12 @@ pub struct Snapshot {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceInfo {
-    pub model: String,
-    pub identifier: String,
+    /// Marketing name, or the raw identifier for models not in the table; `None` when
+    /// the identifier cannot be read.
+    pub model: Option<String>,
+    /// Translation key for names that differ by language (see `apple::model_key`).
+    pub model_key: Option<&'static str>,
+    pub identifier: Option<String>,
     pub os_version: String,
     pub cores: usize,
     pub ram_total: u64,
@@ -103,7 +107,8 @@ pub fn metrics_history(state: State<'_, MetricsState>, range: String) -> Vec<Poi
 pub fn device_info() -> DeviceInfo {
     let (identifier, simulator) = apple::model_identifier();
     DeviceInfo {
-        model: apple::marketing_name(&identifier),
+        model: identifier.as_deref().map(apple::marketing_name),
+        model_key: identifier.as_deref().and_then(apple::model_key),
         identifier,
         os_version: apple::os_version(),
         cores: apple::active_cores(),

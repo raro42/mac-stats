@@ -1,8 +1,11 @@
 import { startBenchBanner } from "./bench-banner";
-import { startChat } from "./chat/chat";
+import { startChat, type ChatView } from "./chat/chat";
 import { startLab } from "./chat/lab";
-import { debugBuild, debugDemoPrompt } from "./ipc";
+import { applyTranslations, isUiLanguage, setLanguage, t } from "./i18n";
+import { errorText } from "./i18n/errors";
+import { appLanguage, debugBuild, debugDemoPrompt } from "./ipc";
 import { startMonitor } from "./monitor/monitor";
+import { startSettings } from "./settings/settings";
 
 function setupTabs(): void {
   const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>(".tab"));
@@ -15,35 +18,58 @@ function setupTabs(): void {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+/** Rust decides the language (in-app setting or iOS preferences) so the UI and the chat agree. */
+async function loadLanguage(): Promise<void> {
+  try {
+    const lang = await appLanguage();
+    setLanguage(isUiLanguage(lang.resolved) ? lang.resolved : "en", lang.locale ?? undefined);
+  } catch (error) {
+    console.error("could not read the app language", error);
+    setLanguage("en");
+  }
+  applyTranslations();
+  document.body.classList.remove("i18n-pending");
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  await loadLanguage();
   setupTabs();
+  const debug = await debugBuild().catch(() => false);
+
   startMonitor().catch((error: unknown) => {
     const device = document.getElementById("device");
-    if (device) device.textContent = `No se pudo iniciar el monitor: ${String(error)}`;
+    if (device) device.textContent = t("monitor.startFailed", { error: errorText(error) });
   });
+
+  let chat: ChatView | null = null;
+  startSettings({ debug, busy: () => chat?.generating() ?? false }).catch((error: unknown) => {
+    console.error("could not start settings", error);
+  });
+
   startChat()
-    .then(async (chat) => {
+    .then(async (view) => {
+      chat = view;
       const demo = await debugDemoPrompt();
       if (!demo) return;
       document.querySelector<HTMLButtonElement>('.tab[data-view="chat"]')?.click();
-      await chat.ask(demo);
+      await view.ask(demo);
     })
     .catch((error: unknown) => {
       const banner = document.getElementById("chat-banner");
       if (banner) {
-        banner.textContent = `No se pudo iniciar el chat: ${String(error)}`;
+        banner.textContent = t("chat.startFailed", { error: errorText(error) });
         banner.hidden = false;
       }
     });
+
   // The model lab only shows up in debug builds.
-  void debugBuild().then((debug) => {
-    if (!debug) return;
+  if (debug) {
     const lab = document.getElementById("lab-details");
     if (lab) lab.hidden = false;
     void startBenchBanner();
     startLab().catch((error: unknown) => {
       const status = document.getElementById("lab-status");
-      if (status) status.textContent = `No se pudo iniciar el laboratorio: ${String(error)}`;
+      if (status) status.textContent = t("lab.startFailed", { error: errorText(error) });
     });
-  });
+  }
 });

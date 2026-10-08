@@ -1,6 +1,8 @@
 // Model card: pick a model from the catalog, download it (with progress and SHA-256
 // verification in Swift), cancel the download, or delete it.
-import { bytes } from "../format";
+import { bytes, percent } from "../format";
+import { t } from "../i18n";
+import { errorText } from "../i18n/errors";
 import {
   chatCancelDownload,
   chatDeleteModel,
@@ -28,9 +30,13 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
   let downloading = false;
 
   const select = el("select", "model-select");
-  select.setAttribute("aria-label", "Modelo");
+  select.setAttribute("aria-label", t("model.title"));
   const meta = el("p", "card-text");
   const progress = el("div", "bar");
+  progress.setAttribute("role", "progressbar");
+  progress.setAttribute("aria-valuemin", "0");
+  progress.setAttribute("aria-valuemax", "100");
+  progress.setAttribute("aria-label", t("model.downloadProgress"));
   const fill = el("div", "bar-fill");
   progress.append(fill);
   progress.hidden = true;
@@ -38,14 +44,14 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
   const cellular = el("label", "model-cellular");
   const cellularBox = el("input");
   cellularBox.type = "checkbox";
-  cellular.append(cellularBox, " Usar datos móviles");
+  cellular.append(cellularBox, el("span", "", t("model.cellular")));
   const primary = el("button", "lab-btn model-primary");
   primary.type = "button";
   const remove = el("button", "lab-btn");
   remove.type = "button";
-  remove.textContent = "Borrar";
+  remove.textContent = t("common.delete");
   actions.append(primary, remove);
-  root.replaceChildren(el("h2", "", "Modelo"), select, meta, progress, cellular, actions);
+  root.replaceChildren(el("h2", "", t("model.title")), select, meta, progress, cellular, actions);
 
   const selected = () => models.find((m) => m.selected) ?? null;
 
@@ -53,7 +59,11 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     const model = selected();
     select.replaceChildren(
       ...models.map((m) => {
-        const option = el("option", "", `${m.name} · ${bytes(m.size)}${m.recommended ? " · recomendado" : ""}`);
+        const option = el(
+          "option",
+          "",
+          t(m.recommended ? "model.optionRecommended" : "model.option", { name: m.name, size: bytes(m.size) }),
+        );
         option.value = m.id;
         option.selected = m.selected;
         return option;
@@ -66,12 +76,12 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     if (!downloading) {
       progress.hidden = true;
       meta.textContent = installed
-        ? `Listo en el iPhone · ${model.license}. Funciona sin conexión.`
-        : `Se descarga una vez (${bytes(model.size)}) y luego funciona sin conexión · ${model.license}.`;
+        ? t("model.ready", { license: model.license })
+        : t("model.notInstalled", { size: bytes(model.size), license: model.license });
     }
     cellular.hidden = installed || downloading;
     primary.hidden = installed && !downloading;
-    primary.textContent = downloading ? "Cancelar" : "Descargar";
+    primary.textContent = t(downloading ? "common.cancel" : "model.download");
     remove.hidden = !installed || downloading;
   }
 
@@ -96,16 +106,22 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     downloading = true;
     progress.hidden = false;
     fill.style.width = "0%";
-    meta.textContent = "Preparando la descarga…";
+    meta.textContent = t("model.preparing");
     render();
     try {
       await chatDownload(model.id, cellularBox.checked, (event) => {
         if (event.type === "progress" && event.total > 0) {
           const share = event.received / event.total;
           fill.style.width = `${(share * 100).toFixed(1)}%`;
-          meta.textContent = `Descargando ${(share * 100).toFixed(0)}% · ${bytes(event.received)} de ${bytes(event.total)}`;
+          progress.setAttribute("aria-valuenow", (share * 100).toFixed(0));
+          progress.setAttribute("aria-valuetext", percent(share * 100));
+          meta.textContent = t("model.downloading", {
+            percent: percent(share * 100),
+            received: bytes(event.received),
+            total: bytes(event.total),
+          });
         } else if (event.type === "verifying") {
-          meta.textContent = "Verificando el archivo (SHA-256)…";
+          meta.textContent = t("model.verifying");
         }
       });
       downloading = false;
@@ -114,7 +130,7 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     } catch (error) {
       downloading = false;
       render();
-      meta.textContent = String(error);
+      meta.textContent = errorText(error);
     }
   });
 
@@ -124,20 +140,20 @@ export function createModelCard(root: HTMLElement, onChange: () => void): ModelC
     const model = selected();
     if (!model) return;
     if (armed === null) {
-      remove.textContent = `¿Borrar ${bytes(model.size)}? Toca otra vez`;
+      remove.textContent = t("model.confirmDelete", { size: bytes(model.size) });
       armed = window.setTimeout(() => {
         armed = null;
-        remove.textContent = "Borrar";
+        remove.textContent = t("common.delete");
       }, 4000);
       return;
     }
     window.clearTimeout(armed);
     armed = null;
-    remove.textContent = "Borrar";
+    remove.textContent = t("common.delete");
     try {
       await chatDeleteModel(model.id);
     } catch (error) {
-      meta.textContent = String(error);
+      meta.textContent = errorText(error);
     }
     await refresh();
     onChange();

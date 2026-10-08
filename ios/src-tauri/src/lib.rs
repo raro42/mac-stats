@@ -1,7 +1,9 @@
 use tauri::Manager;
 
 mod chat;
+mod error;
 mod lab;
+mod language;
 mod metrics;
 mod selftest;
 
@@ -45,6 +47,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             debug_build,
             debug_demo_prompt,
+            language::app_language,
+            language::set_app_language,
             metrics::metrics_subscribe,
             metrics::metrics_history,
             metrics::device_info,

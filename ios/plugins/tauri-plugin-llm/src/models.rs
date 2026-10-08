@@ -97,3 +97,21 @@ pub struct DownloadRequest {
     pub allow_cellular: bool,
     pub on_event: Channel<serde_json::Value>,
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DetectLanguageRequest {
+    pub text: String,
+}
+
+/// Language of a text as detected on the device by Apple's NaturalLanguage framework.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct DetectedLanguage {
+    /// BCP-47 code, e.g. `es`, `en`, `pt`, `zh-Hans`.
+    pub code: String,
+    /// English name of the language, e.g. "Spanish".
+    pub english_name: String,
+    /// 0.0–1.0
+    pub confidence: f64,
+}

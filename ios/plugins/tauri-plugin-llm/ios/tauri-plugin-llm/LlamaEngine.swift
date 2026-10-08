@@ -9,7 +9,9 @@ import Tauri
 import llama
 import os
 
-enum LlmError: LocalizedError {
+/// Errors carry a stable `code` that Rust and the web layer translate (see
+/// `src/i18n/error-codes.ts`); `errorDescription` is English text for logs only.
+enum LlmError: CodedError {
   case notLoaded
   case modelMissing(String)
   case insufficientMemory(needed: UInt64, available: UInt64)
@@ -20,20 +22,33 @@ enum LlmError: LocalizedError {
   case promptTooLong(tokens: Int, limit: Int)
   case decodeFailed(Int32)
 
-  var errorDescription: String? {
-    let gb = { (bytes: UInt64) in String(format: "%.1f GB", Double(bytes) / 1_073_741_824) }
+  var code: String {
     switch self {
-    case .notLoaded: return "No hay ningún modelo cargado."
-    case .modelMissing(let path): return "No se encontró el modelo en \(path)."
+    case .notLoaded: return "model_not_loaded"
+    case .modelMissing: return "model_file_missing"
+    case .insufficientMemory: return "not_enough_memory"
+    case .loadFailed: return "model_load_failed"
+    case .contextFailed: return "context_failed"
+    case .templateFailed: return "chat_template_failed"
+    case .tokenizeFailed: return "tokenize_failed"
+    case .promptTooLong: return "conversation_too_long"
+    case .decodeFailed: return "generation_failed"
+    }
+  }
+
+  var errorDescription: String? {
+    switch self {
+    case .notLoaded: return "No model is loaded."
+    case .modelMissing(let path): return "Model not found at \(path)."
     case .insufficientMemory(let needed, let available):
-      return "No hay memoria suficiente: hacen falta \(gb(needed)) y quedan \(gb(available))."
-    case .loadFailed(let path): return "llama.cpp no pudo cargar \(path)."
-    case .contextFailed: return "llama.cpp no pudo crear el contexto."
-    case .templateFailed: return "No se pudo aplicar la plantilla de chat del modelo."
-    case .tokenizeFailed: return "No se pudo tokenizar el texto."
+      return "Not enough memory: \(needed) bytes needed, \(available) available."
+    case .loadFailed(let path): return "llama.cpp could not load \(path)."
+    case .contextFailed: return "llama.cpp could not create the context."
+    case .templateFailed: return "The model's chat template could not be applied."
+    case .tokenizeFailed: return "The text could not be tokenized."
     case .promptTooLong(let tokens, let limit):
-      return "La conversación ocupa \(tokens) tokens y el límite es \(limit)."
-    case .decodeFailed(let code): return "llama_decode falló (código \(code))."
+      return "The conversation takes \(tokens) tokens and the limit is \(limit)."
+    case .decodeFailed(let code): return "llama_decode failed (code \(code))."
     }
   }
 }
@@ -189,7 +204,7 @@ final class LlamaEngine {
 
     var desc = [CChar](repeating: 0, count: 256)
     let descLen = llama_model_desc(model, &desc, desc.count)
-    let description = descLen > 0 ? String(cString: desc) : "desconocido"
+    let description = descLen > 0 ? String(cString: desc) : ""
     let template = llama_model_chat_template(model, nil).map { String(cString: $0) }
 
     return [

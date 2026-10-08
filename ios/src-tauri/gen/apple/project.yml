@@ -1,6 +1,7 @@
 name: ios-stats
 options:
   bundleIdPrefix: com.gilberto.iosstats
+  developmentLanguage: en
   deploymentTarget:
     iOS: 17.0
 fileGroups: [../../src]
@@ -57,6 +58,10 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        # Languages the app ships in (same list as src/i18n/languages.ts). With these and
+        # the <lang>.lproj folders, iOS offers a per-app language and localizes system UI
+        # inside the WebView.
+        CFBundleLocalizations: [en, es, de, fr, pt-BR, zh-Hans]
         CFBundleShortVersionString: 0.1.0
         CFBundleVersion: "0.1.0"
     entitlements:
@@ -81,6 +86,7 @@ targets:
       - framework: ../../../vendor/llama.xcframework
       - sdk: CoreGraphics.framework
       - sdk: Metal.framework
+      - sdk: NaturalLanguage.framework
       - sdk: MetalKit.framework
       - sdk: QuartzCore.framework
       - sdk: Security.framework

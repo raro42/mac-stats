@@ -4,10 +4,38 @@
 // validates its arguments and enqueues the work on `queue`; `cancel` and `status`
 // reply immediately.
 
+import NaturalLanguage
 import SwiftRs
 import Tauri
 import UIKit
 import WebKit
+
+/// An error with a stable code from `src/i18n/error-codes.ts`. The web layer shows a
+/// translated message for the code; the English description only goes to logs.
+protocol CodedError: LocalizedError {
+  var code: String { get }
+}
+
+/// Code for any error thrown by the engine, the model store, URLSession or FileManager.
+func errorCode(_ error: Error) -> String {
+  if let coded = error as? CodedError { return coded.code }
+  if let url = error as? URLError {
+    if url.networkUnavailableReason == .cellular { return "cellular_not_allowed" }
+    switch url.code {
+    case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed: return "network_offline"
+    case .timedOut: return "network_timeout"
+    default: return "network"
+    }
+  }
+  if error is CocoaError || (error as NSError).domain == NSPOSIXErrorDomain { return "storage" }
+  return "internal"
+}
+
+extension Invoke {
+  func reject(_ error: Error) {
+    reject(error.localizedDescription, code: errorCode(error))
+  }
+}
 
 class LoadArgs: Decodable {
   let path: String
@@ -58,6 +86,10 @@ class SimulateArgs: Decodable {
   let event: String
 }
 
+class DetectLanguageArgs: Decodable {
+  let text: String
+}
+
 class LlmPlugin: Plugin {
   private let queue = DispatchQueue(label: "llm.engine", qos: .userInitiated)
   private let engine = LlamaEngine()
@@ -87,7 +119,7 @@ class LlmPlugin: Plugin {
       do {
         invoke.resolve(try work())
       } catch {
-        invoke.reject(error.localizedDescription)
+        invoke.reject(error)
       }
     }
   }
@@ -135,7 +167,7 @@ class LlmPlugin: Plugin {
   @objc public func generate(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(GenerateArgs.self)
     guard isActive() else {
-      invoke.reject("La app tiene que estar en pantalla para responder.")
+      invoke.reject("The app must be in the foreground to generate.", code: "app_in_background")
       return
     }
     let turns = args.messages.map { ChatTurn(role: $0.role, content: $0.content) }
@@ -172,7 +204,7 @@ extension LlmPlugin {
   @objc public func download(_ invoke: Invoke) throws {
     let args = try invoke.parseArgs(DownloadArgs.self)
     guard let url = URL(string: args.url), url.scheme == "https" else {
-      invoke.reject("La URL del modelo debe ser https.")
+      invoke.reject("The model URL must use https.", code: "insecure_url")
       return
     }
     let request = DownloadRequest(
@@ -181,7 +213,7 @@ extension LlmPlugin {
     store.start(request, onEvent: args.onEvent) { result in
       switch result {
       case .success(let file): invoke.resolve(["path": file.path])
-      case .failure(let error): invoke.reject(error.localizedDescription)
+      case .failure(let error): invoke.reject(error)
       }
     }
   }
@@ -205,6 +237,28 @@ extension LlmPlugin {
 }
 
 extension LlmPlugin {
+  /// Language of a piece of text, detected on the device with NaturalLanguage (no network).
+  /// Replies `{language: {code, englishName, confidence}}`, or `{language: null}` when
+  /// nothing is recognized. `code` is BCP-47 (`es`, `en`, `zh-Hans`, …).
+  @objc public func detectLanguage(_ invoke: Invoke) throws {
+    let args = try invoke.parseArgs(DetectLanguageArgs.self)
+    let recognizer = NLLanguageRecognizer()
+    recognizer.processString(args.text)
+    guard
+      let (language, confidence) = recognizer.languageHypotheses(withMaximum: 1)
+        .max(by: { $0.value < $1.value }),
+      language != .undetermined
+    else {
+      invoke.resolve(["language": NSNull()])
+      return
+    }
+    let code = language.rawValue
+    let name = Locale(identifier: "en").localizedString(forIdentifier: code) ?? code
+    invoke.resolve([
+      "language": ["code": code, "englishName": name, "confidence": confidence] as JsonObject
+    ])
+  }
+
   /// Debug only: simulates system events for the self-test.
   @objc public func debugSimulate(_ invoke: Invoke) throws {
     #if DEBUG

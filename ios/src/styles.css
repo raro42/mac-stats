@@ -86,9 +86,25 @@ body::before {
   display: none !important;
 }
 
+/* Hidden until main.ts applies the active language, so no text flashes in the wrong one. */
+body.i18n-pending {
+  visibility: hidden;
+}
+
+/* Read by VoiceOver, not shown. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Header */
 .title-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -101,6 +117,11 @@ body::before {
   letter-spacing: -0.02em;
 }
 
+/* Negative tracking crowds CJK glyphs. */
+:lang(zh) .top h1 {
+  letter-spacing: 0;
+}
+
 .device {
   margin: 4px 0 0;
   color: var(--muted);
@@ -109,6 +130,7 @@ body::before {
 
 .badges {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -244,6 +266,8 @@ body::before {
 .ring-sub {
   min-height: 1.3em;
   margin-top: -4px;
+  padding: 0 2px;
+  overflow-wrap: anywhere;
   color: var(--muted);
   font-size: 12px;
   text-align: center;
@@ -382,7 +406,8 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 4px 28px;
+  min-width: 72px;
+  padding: 4px 12px;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -649,7 +674,7 @@ body::before {
   color: var(--fg);
   font: inherit;
   font-size: 15px;
-  text-align: left;
+  text-align: start;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -692,7 +717,16 @@ body::before {
   user-select: text;
 }
 
+/* Long placeholders (German, French) stay on one line instead of being cut in half. */
+.composer textarea::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .composer-send {
+  flex: none;
+  white-space: nowrap;
   appearance: none;
   padding: 10px 16px;
   border: 0;
@@ -722,4 +756,30 @@ body::before {
   font-size: 13px;
   font-weight: 600;
   text-align: center;
+}
+
+/* Settings: language list */
+.choice-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--card-border);
+  font-size: 16px;
+}
+
+.choice:first-child {
+  border-top: 0;
+}
+
+.choice input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
 }

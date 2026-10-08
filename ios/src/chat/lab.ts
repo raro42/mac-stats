@@ -1,5 +1,7 @@
 // "Lab" card: manual testing of the local models (phase A).
-import { bytes } from "../format";
+import { bytes, seconds, tokensPerSecond } from "../format";
+import { t, tp, type TextKey } from "../i18n";
+import { errorText } from "../i18n/errors";
 import {
   labBench,
   labCancel,
@@ -16,7 +18,12 @@ function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   return el as T;
 }
 
-const tps = (v: number) => `${v.toFixed(1)} tok/s`;
+const STOP_LABEL: Record<string, TextKey> = {
+  eos: "stop.eos",
+  cancelled: "stop.cancelled",
+  thermal: "stop.thermal",
+  length: "stop.length",
+};
 
 export async function startLab(): Promise<void> {
   const select = byId<HTMLSelectElement>("lab-model");
@@ -36,7 +43,7 @@ export async function startLab(): Promise<void> {
     for (const b of [loadBtn, unloadBtn, benchBtn]) b.disabled = busy;
   };
   const fail = (e: unknown) => {
-    status.textContent = `Error: ${String(e)}`;
+    status.textContent = t("lab.error", { error: errorText(e) });
     setBusy(false);
   };
 
@@ -45,25 +52,26 @@ export async function startLab(): Promise<void> {
     ...models.map((m) => {
       const option = document.createElement("option");
       option.value = m.id;
-      option.textContent = `${m.name} · ${bytes(m.size)}${m.installed ? "" : " (no está en el iPhone)"}`;
+      option.textContent = t(m.installed ? "model.option" : "lab.notInstalled", { name: m.name, size: bytes(m.size) });
       option.disabled = !m.installed;
       return option;
     }),
   );
   const firstInstalled = models.find((m) => m.installed);
   if (firstInstalled) select.value = firstInstalled.id;
-  status.textContent = firstInstalled
-    ? "Elige un modelo y pulsa Cargar."
-    : "No hay modelos en el iPhone todavía.";
+  status.textContent = t(firstInstalled ? "lab.pickModel" : "lab.noModels");
 
   loadBtn.addEventListener("click", async () => {
     setBusy(true);
-    status.textContent = "Cargando… (la primera vez compila los shaders de Metal)";
+    status.textContent = t("lab.loading");
     try {
       const info = await labLoad(select.value);
-      status.textContent = `${info.description} · ${(info.loadMs / 1000).toFixed(1)} s · ${
-        info.gpu ? "GPU" : "CPU"
-      } · margen ${bytes(info.availableMemory)}`;
+      status.textContent = t("lab.loaded", {
+        description: info.description || "—",
+        seconds: seconds(info.loadMs / 1000),
+        backend: info.gpu ? "GPU" : "CPU",
+        headroom: bytes(info.availableMemory),
+      });
     } catch (e) {
       fail(e);
     }
@@ -73,7 +81,7 @@ export async function startLab(): Promise<void> {
   unloadBtn.addEventListener("click", async () => {
     try {
       await labUnload();
-      status.textContent = "Modelo descargado de la memoria.";
+      status.textContent = t("lab.unloaded");
     } catch (e) {
       fail(e);
     }
@@ -81,10 +89,14 @@ export async function startLab(): Promise<void> {
 
   benchBtn.addEventListener("click", async () => {
     setBusy(true);
-    status.textContent = "Midiendo (pp512 / tg128 × 3)…";
+    status.textContent = t("lab.benching");
     try {
       const r = await labBench();
-      status.textContent = `Prompt ${tps(r.ppTps)} · generación ${tps(r.tgTps)} · margen ${bytes(r.availableMemory)}`;
+      status.textContent = t("lab.benchResult", {
+        pp: tokensPerSecond(r.ppTps),
+        tg: tokensPerSecond(r.tgTps),
+        headroom: bytes(r.availableMemory),
+      });
     } catch (e) {
       fail(e);
     }
@@ -99,17 +111,24 @@ export async function startLab(): Promise<void> {
     const text = prompt.value.trim();
     if (!text) return;
     generating = true;
-    sendBtn.textContent = "Detener";
+    sendBtn.textContent = t("chat.stop");
     output.textContent = "";
     try {
       const r = await labGenerate(text, selected()?.thinkPrefill ?? false, (delta) => {
         output.textContent += delta;
       });
-      status.textContent = `${r.nGen} tokens · ${tps(r.tgTps)} · prompt ${tps(r.ppTps)} (${r.nCached} reutilizados) · fin: ${r.stopReason}`;
+      const reason = STOP_LABEL[r.stopReason];
+      status.textContent = t("lab.generateResult", {
+        tokens: tp("lab.tokens", r.nGen),
+        tg: tokensPerSecond(r.tgTps),
+        pp: tokensPerSecond(r.ppTps),
+        reused: tp("lab.reused", r.nCached),
+        reason: reason ? t(reason) : r.stopReason,
+      });
     } catch (e) {
       fail(e);
     }
     generating = false;
-    sendBtn.textContent = "Generar";
+    sendBtn.textContent = t("lab.generate");
   });
 }

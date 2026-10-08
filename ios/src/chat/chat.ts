@@ -8,6 +8,9 @@ import {
   type Snapshot,
   type StoredMessage,
 } from "../ipc";
+import { joined, tokensPerSecond } from "../format";
+import { t, type TextKey } from "../i18n";
+import { errorText } from "../i18n/errors";
 import { onMetrics } from "../metrics-bus";
 import { disableLinks, renderMarkdown } from "./markdown";
 import { createModelCard } from "./model-card";
@@ -18,16 +21,23 @@ function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   return el as T;
 }
 
-const STOP_LABEL: Record<string, string> = {
-  cancelled: "Detenida",
-  thermal: "Detenida: el iPhone está muy caliente",
-  length: "Cortada: llegó al límite de longitud",
-  context: "Cortada: la conversación ya no cabe",
-  error: "Interrumpida por un error",
+/** Why a reply stopped; `eos` (finished normally) shows no label in the chat. */
+const STOP_LABEL: Record<string, TextKey> = {
+  cancelled: "stop.cancelled",
+  thermal: "stop.thermal",
+  length: "stop.length",
+  error: "stop.error",
 };
+
+function stats(tgTps: number, stopReason: string): string {
+  const reason = STOP_LABEL[stopReason];
+  return joined([tokensPerSecond(tgTps), reason && t(reason)]);
+}
 
 export interface ChatView {
   ask(question: string): Promise<void>;
+  /** True while a reply is being written. */
+  generating(): boolean;
 }
 
 export async function startChat(): Promise<ChatView> {
@@ -48,8 +58,8 @@ export async function startChat(): Promise<ChatView> {
   function updateComposer(): void {
     const ready = card.selected()?.installed ?? false;
     input.disabled = !ready && !generating;
-    input.placeholder = ready ? "Pregunta algo…" : "Descarga un modelo para empezar";
-    send.textContent = generating ? "Detener" : "Enviar";
+    input.placeholder = t(ready ? "chat.placeholder" : "chat.placeholderNoModel");
+    send.textContent = t(generating ? "chat.stop" : "chat.send");
     send.disabled = !generating && (!ready || input.value.trim() === "");
   }
 
@@ -61,6 +71,17 @@ export async function startChat(): Promise<ChatView> {
     history.append(node);
     empty.hidden = true;
     return node;
+  }
+
+  /** Placeholder in the reply bubble; VoiceOver hears "writing the reply" instead of "…". */
+  function showPending(node: HTMLElement, visible: string): void {
+    const shown = document.createElement("span");
+    shown.setAttribute("aria-hidden", "true");
+    shown.textContent = visible;
+    const spoken = document.createElement("span");
+    spoken.className = "sr-only";
+    spoken.textContent = visible === "…" ? t("chat.pending") : visible;
+    node.replaceChildren(shown, spoken);
   }
 
   function footnote(node: HTMLElement, text: string): void {
@@ -79,10 +100,7 @@ export async function startChat(): Promise<ChatView> {
     empty.hidden = messages.length > 0;
     for (const m of messages) {
       const node = bubble(m.role, m.content);
-      if (m.stats) {
-        const reason = STOP_LABEL[m.stats.stopReason];
-        footnote(node, [`${m.stats.tgTps.toFixed(1)} tok/s`, reason].filter(Boolean).join(" · "));
-      }
+      if (m.stats) footnote(node, stats(m.stats.tgTps, m.stats.stopReason));
     }
   }
 
@@ -94,13 +112,14 @@ export async function startChat(): Promise<ChatView> {
         const open = document.createElement("button");
         open.type = "button";
         open.className = "conv-open";
-        open.textContent = c.title;
+        const title = c.title || t("chat.untitled");
+        open.textContent = title;
         open.addEventListener("click", () => void openConversation(c.id));
         const del = document.createElement("button");
         del.type = "button";
         del.className = "conv-delete";
-        del.textContent = "Borrar";
-        del.setAttribute("aria-label", `Borrar «${c.title}»`);
+        del.textContent = t("common.delete");
+        del.setAttribute("aria-label", t("chat.deleteConversation", { title }));
         del.addEventListener("click", async () => {
           await chatDelete(c.id);
           if (c.id === conversationId) newConversation();
@@ -127,9 +146,9 @@ export async function startChat(): Promise<ChatView> {
 
   function showBanner(snapshot: Snapshot): void {
     let text = "";
-    if (snapshot.thermal === "critical") text = "El iPhone está muy caliente: el chat se pausa hasta que se enfríe.";
-    else if (snapshot.thermal === "serious") text = "El iPhone está caliente: las respuestas irán más lentas.";
-    else if (snapshot.lowPower) text = "Modo de bajo consumo activado: las respuestas pueden ir más lentas.";
+    if (snapshot.thermal === "critical") text = t("chat.bannerCritical");
+    else if (snapshot.thermal === "serious") text = t("chat.bannerSerious");
+    else if (snapshot.lowPower) text = t("chat.bannerLowPower");
     banner.textContent = text;
     banner.hidden = text === "";
   }
@@ -140,7 +159,7 @@ export async function startChat(): Promise<ChatView> {
     bubble("user", question);
     const answer = bubble("assistant");
     answer.classList.add("bubble-pending");
-    answer.textContent = "…";
+    showPending(answer, "…");
     scrollToEnd();
 
     let text = "";
@@ -154,7 +173,7 @@ export async function startChat(): Promise<ChatView> {
     try {
       const result = await chatSend(conversationId, question, (event) => {
         if (event.type === "status") {
-          answer.textContent = event.text;
+          showPending(answer, t("chat.loadingModel"));
         } else if (event.type === "delta") {
           text += event.text;
           answer.classList.remove("bubble-pending");
@@ -167,11 +186,10 @@ export async function startChat(): Promise<ChatView> {
       conversationId = result.conversationId;
       paint();
       answer.classList.remove("bubble-pending");
-      const reason = STOP_LABEL[result.stopReason];
-      footnote(answer, [`${result.tgTps.toFixed(1)} tok/s`, reason].filter(Boolean).join(" · "));
+      footnote(answer, stats(result.tgTps, result.stopReason));
     } catch (error) {
       answer.remove();
-      bubble("error", String(error));
+      bubble("error", errorText(error));
     }
     generating = false;
     updateComposer();
@@ -208,5 +226,5 @@ export async function startChat(): Promise<ChatView> {
 
   const snapshot = await onMetrics(showBanner);
   if (snapshot) showBanner(snapshot);
-  return { ask };
+  return { ask, generating: () => generating };
 }

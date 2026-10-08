@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es-MX">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -8,106 +8,128 @@
     <title>iOS Stats</title>
     <script type="module" src="/src/main.ts"></script>
   </head>
-  <body>
-    <main id="view-monitor" class="view">
+  <!-- All visible text comes from src/i18n through data-i18n* attributes; the body stays
+       hidden until the active language is applied. -->
+  <body class="i18n-pending">
+    <main id="view-monitor" class="view" role="tabpanel">
       <header class="top">
         <div class="title-row">
           <h1>iOS Stats</h1>
           <div class="badges">
-            <span id="low-power" class="pill pill-lowpower" hidden>Bajo consumo</span>
+            <span id="low-power" class="pill pill-lowpower" data-i18n="monitor.lowPower" hidden></span>
             <span id="thermal" class="pill pill-thermal" data-state="unknown">—</span>
           </div>
         </div>
-        <p id="device" class="device">Leyendo el dispositivo…</p>
+        <p id="device" class="device" data-i18n="monitor.readingDevice"></p>
       </header>
 
-      <section id="rings" class="rings" aria-label="Indicadores"></section>
+      <section id="rings" class="rings" data-i18n-aria-label="monitor.gauges"></section>
 
       <section class="card">
-        <h2>Memoria de la app</h2>
-        <div class="bar" aria-hidden="true"><div id="appmem-fill" class="bar-fill"></div></div>
-        <p id="appmem-text" class="card-text">Midiendo…</p>
+        <h2 data-i18n="monitor.appMemory"></h2>
+        <div id="appmem-bar" class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+          data-i18n-aria-label="monitor.appMemoryProgress"><div id="appmem-fill" class="bar-fill"></div></div>
+        <p id="appmem-text" class="card-text" data-i18n="monitor.measuring"></p>
       </section>
 
       <section class="card net">
-        <h2>Red</h2>
+        <h2 data-i18n="monitor.network"></h2>
         <div class="net-row">
-          <span class="net-item"><span class="net-arrow" aria-hidden="true">↓</span><span id="net-down">—</span></span>
-          <span class="net-item"><span class="net-arrow" aria-hidden="true">↑</span><span id="net-up">—</span></span>
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↓</span><span class="sr-only" data-i18n="monitor.download"></span> <span id="net-down">—</span></span>
+          <span class="net-item"><span class="net-arrow" aria-hidden="true">↑</span><span class="sr-only" data-i18n="monitor.upload"></span> <span id="net-up">—</span></span>
         </div>
       </section>
 
       <section class="card">
         <div class="card-head">
-          <h2>Historial</h2>
-          <div class="segmented" role="group" aria-label="Periodo">
-            <button type="button" data-range="5m" aria-pressed="true">5 min</button>
-            <button type="button" data-range="1h" aria-pressed="false">1 h</button>
+          <h2 data-i18n="monitor.history"></h2>
+          <div class="segmented" role="group" data-i18n-aria-label="monitor.period">
+            <button type="button" data-range="5m" aria-pressed="true"></button>
+            <button type="button" data-range="1h" aria-pressed="false"></button>
           </div>
         </div>
         <div class="chart">
-          <span class="chart-label">CPU</span>
-          <canvas id="chart-cpu" class="chart-canvas chart-cpu"></canvas>
+          <span class="chart-label" aria-hidden="true" data-i18n="metric.cpu"></span>
+          <canvas id="chart-cpu" class="chart-canvas chart-cpu" role="img" data-i18n-aria-label="monitor.chartCpu"></canvas>
         </div>
         <div class="chart">
-          <span class="chart-label">RAM</span>
-          <canvas id="chart-ram" class="chart-canvas chart-ram"></canvas>
+          <span class="chart-label" aria-hidden="true" data-i18n="metric.ram"></span>
+          <canvas id="chart-ram" class="chart-canvas chart-ram" role="img" data-i18n-aria-label="monitor.chartRam"></canvas>
         </div>
       </section>
 
-      <p class="footnote">iOS no deja leer temperaturas en °C, la GPU ni los procesos de otras apps.</p>
+      <p class="footnote" data-i18n="monitor.footnote"></p>
     </main>
 
-    <main id="view-chat" class="view chat-view" hidden>
+    <main id="view-chat" class="view chat-view" role="tabpanel" hidden>
       <header class="top">
         <div class="title-row">
-          <h1>Chat</h1>
-          <button type="button" id="chat-new" class="pill-btn">Nueva</button>
+          <h1 data-i18n="chat.title"></h1>
+          <button type="button" id="chat-new" class="pill-btn" data-i18n="chat.new"></button>
         </div>
-        <p class="device">IA que corre dentro de tu iPhone, sin servidor ni conexión.</p>
+        <p class="device" data-i18n="chat.tagline"></p>
       </header>
 
-      <section id="model-card" class="card model-card" aria-label="Modelo"></section>
+      <section id="model-card" class="card model-card" data-i18n-aria-label="model.title"></section>
       <div id="chat-banner" class="banner" role="status" hidden></div>
 
-      <p id="chat-empty" class="chat-empty">
-        Pregúntale por tu iPhone («¿cómo va mi batería?») o por cualquier otra cosa.
-      </p>
+      <p id="chat-empty" class="chat-empty" data-i18n="chat.empty"></p>
       <section id="chat-history" class="chat-history" aria-live="polite"></section>
 
       <details class="card conversations">
-        <summary>Conversaciones</summary>
+        <summary data-i18n="chat.conversations"></summary>
         <ul id="conv-list" class="conv-list"></ul>
       </details>
 
       <details id="lab-details" class="card lab" hidden>
-        <summary>Laboratorio (depuración)</summary>
-        <select id="lab-model" class="lab-select" aria-label="Modelo del laboratorio"></select>
+        <summary data-i18n="lab.title"></summary>
+        <select id="lab-model" class="lab-select" data-i18n-aria-label="lab.model"></select>
         <div class="lab-buttons">
-          <button type="button" id="lab-load" class="lab-btn">Cargar</button>
-          <button type="button" id="lab-bench" class="lab-btn">Medir</button>
-          <button type="button" id="lab-unload" class="lab-btn">Descargar</button>
+          <button type="button" id="lab-load" class="lab-btn" data-i18n="lab.load"></button>
+          <button type="button" id="lab-bench" class="lab-btn" data-i18n="lab.bench"></button>
+          <button type="button" id="lab-unload" class="lab-btn" data-i18n="lab.unload"></button>
         </div>
-        <p id="lab-status" class="card-text">Preparando…</p>
-        <textarea id="lab-prompt" class="lab-prompt" rows="3">¿Cómo van mi batería y mi memoria ahora mismo?</textarea>
-        <button type="button" id="lab-send" class="lab-btn lab-send">Generar</button>
+        <p id="lab-status" class="card-text" data-i18n="lab.preparing"></p>
+        <textarea id="lab-prompt" class="lab-prompt" rows="3" data-i18n="lab.defaultPrompt"></textarea>
+        <button type="button" id="lab-send" class="lab-btn lab-send" data-i18n="lab.generate"></button>
         <div id="lab-output" class="lab-output" aria-live="polite"></div>
       </details>
 
       <form id="chat-form" class="composer">
-        <textarea id="chat-input" rows="1" placeholder="Pregunta algo…" aria-label="Mensaje"></textarea>
-        <button type="submit" id="chat-send" class="composer-send">Enviar</button>
+        <textarea id="chat-input" rows="1" data-i18n-placeholder="chat.placeholder" data-i18n-aria-label="chat.message"></textarea>
+        <button type="submit" id="chat-send" class="composer-send" data-i18n="chat.send"></button>
       </form>
     </main>
 
-    <nav class="tabbar" aria-label="Secciones">
-      <button type="button" class="tab" data-view="monitor" aria-selected="true">
+    <main id="view-settings" class="view" role="tabpanel" hidden>
+      <header class="top">
+        <div class="title-row">
+          <h1 data-i18n="settings.title"></h1>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2 id="language-heading" data-i18n="settings.language"></h2>
+        <div id="language-list" class="choice-list" role="radiogroup" aria-labelledby="language-heading"></div>
+        <p id="language-note" class="card-text" data-i18n="settings.languageNote"></p>
+      </section>
+    </main>
+
+    <nav class="tabbar" role="tablist" data-i18n-aria-label="tabs.label">
+      <button type="button" class="tab" role="tab" data-view="monitor" aria-selected="true">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" /></svg>
-        <span>Monitor</span>
+        <span data-i18n="tabs.monitor"></span>
       </button>
-      <button type="button" class="tab" data-view="chat" aria-selected="false">
+      <button type="button" class="tab" role="tab" data-view="chat" aria-selected="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" /></svg>
-        <span>Chat</span>
+        <span data-i18n="tabs.chat"></span>
+      </button>
+      <button type="button" class="tab" role="tab" data-view="settings" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+        </svg>
+        <span data-i18n="tabs.settings"></span>
       </button>
     </nav>
   </body>

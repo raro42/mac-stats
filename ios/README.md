@@ -70,19 +70,31 @@ These only exist in debug builds. They are passed as environment variables when 
 
 | Variable | What it does |
 |---|---|
-| `IOS_STATS_BENCH=all` or `<id>,<id>` | Benchmarks the models (load, speed, memory, temperature, 10 questions in es-MX) and saves `Documents/llm-bench.json`; progress is shown on screen and in `Documents/llm-bench-progress.jsonl` |
+| `IOS_STATS_BENCH=all` or `<id>,<id>` | Benchmarks the models (load, speed, memory, temperature, 10 quality questions per language) and saves `Documents/llm-bench.json`; progress is shown on screen and in `Documents/llm-bench-progress.jsonl` |
+| `IOS_STATS_BENCH_LANGS=es,en,de,fr,pt-BR,zh-Hans` | Languages of the quality questions (default `es`); each answer records the language it was written in |
 | `IOS_STATS_SOAK_SECS`, `IOS_STATS_THREADS` | Duration of the sustained test (600 s) and number of threads (2) for the benchmark |
-| `IOS_STATS_SELFTEST=1` | Chat self-test; saves `Documents/selftest.json`. With `IOS_STATS_SELFTEST_DOWNLOAD=<id>` it also downloads that model |
+| `IOS_STATS_SELFTEST=1` | Chat self-test, including a language switch (es, en, "ok", de); saves `Documents/selftest.json`. With `IOS_STATS_SELFTEST_DOWNLOAD=<id>` it also downloads that model |
 | `IOS_STATS_FAKE_THERMAL=serious\|critical` | Simulates the thermal state in the monitor and in the engine |
 | `IOS_STATS_DEMO_PROMPT="…"` | Opens the chat and sends that question on launch |
 
-The Chat tab also includes a "Lab" card («Laboratorio» in the current UI) for loading, benchmarking and trying models by hand.
+The Chat tab also includes a "Lab" card for loading, benchmarking and trying models by hand. Debug builds also offer a "Pseudo" language in Settings: every string shows as `[!! … ~~~ !!]`, about 40% longer, so hard-coded text and clipped layouts stand out.
+
+## Languages
+
+The app ships in Spanish, English, German, French, Brazilian Portuguese and Simplified Chinese. It follows the iPhone's language (including the per-app language in iOS Settings) and can be changed in the app's Settings tab. Unsupported languages fall back to English.
+
+- **UI text** lives in `src/i18n/`: one dictionary per language, all typed against `messages.ts`, so a missing key fails `pnpm build`. Static HTML uses `data-i18n*` attributes; code uses `t()` / `tp()` (plurals). Numbers and units use `Intl` with the iPhone's region (for example `es-MX` keeps the decimal point).
+- **Errors** never carry text: Rust and Swift return a code from `src/i18n/error-codes.ts` plus parameters, and the web layer translates it.
+- **Rust decides the language** (`src-tauri/src/language.rs`), so the UI and the chat always agree.
+- **The chat** prompt is English. Each turn ends with "Reply in <Language>.": a clear message in another language (detected on the device with Apple's NaturalLanguage) switches the reply language, short messages keep the current one, and otherwise the app language is used.
+- To add a language: add it to `src/i18n/languages.ts`, create its dictionary, add it to `SUPPORTED` and `match_tag` in `language.rs`, and to `CFBundleLocalizations` plus a `<lang>.lproj/InfoPlist.strings` in `src-tauri/gen/apple/` (then run `xcodegen generate` there).
 
 ## Tests
 
 ```bash
-(cd src-tauri && cargo test)   # metrics, history, network, catalog, prompt and conversations
-pnpm build                     # TypeScript type check and bundling
+(cd src-tauri && cargo test)   # metrics, history, network, catalog, prompt, conversations, languages, error codes
+pnpm build                     # TypeScript type check (every key in every language) and bundling
+python3 scripts/check_i18n.py  # no hard-coded UI text, Spanish leftovers or unknown error codes outside src/i18n
 ```
 
 ## iOS limits

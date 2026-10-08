@@ -79,6 +79,15 @@ impl<R: Runtime> Llm<R> {
         Ok(())
     }
 
+    /// `None` when the text has no recognizable language.
+    pub async fn detect_language(&self, text: &str) -> crate::Result<Option<DetectedLanguage>> {
+        let reply: Value = self
+            .0
+            .run_mobile_plugin_async("detectLanguage", DetectLanguageRequest { text: text.into() })
+            .await?;
+        Ok(reply.get("language").and_then(|l| serde_json::from_value(l.clone()).ok()))
+    }
+
     pub async fn keep_awake(&self, enabled: bool) -> crate::Result<()> {
         let _: Value = self
             .0

@@ -57,6 +57,10 @@ impl<R: Runtime> Llm<R> {
         Err(Error::Unsupported)
     }
 
+    pub async fn detect_language(&self, _text: &str) -> crate::Result<Option<DetectedLanguage>> {
+        Ok(None)
+    }
+
     pub async fn keep_awake(&self, _enabled: bool) -> crate::Result<()> {
         Ok(())
     }

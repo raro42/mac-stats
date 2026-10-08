@@ -5,11 +5,12 @@
 //! finishes):
 //! - loading the selected model and a multi-turn chat saved to disk, where each
 //!   turn reuses what the engine already processed in the previous one;
-//! - «Detener» stops the reply in under 300 ms;
+//! - the Stop button stops the reply in under 300 ms;
 //! - going to the background cancels generation;
 //! - after a memory warning the model is released and reloaded on the next question;
 //! - with `IOS_STATS_FAKE_THERMAL=critical`, the chat refuses to generate (in that mode it
 //!   is the only test, because nothing else can generate);
+//! - the reply language follows the user's language changes (es, en, "ok", de);
 //! - leaves a conversation with malicious HTML to check by eye that it does not run;
 //! - a download with a wrong SHA-256 is rejected and leaves no file behind;
 //! - with `IOS_STATS_SELFTEST_DOWNLOAD=<id>`, really downloads that model (with progress).
@@ -30,6 +31,7 @@ use crate::chat::{
     store::{Conversation, StoredMessage},
     ChatState, SendResult,
 };
+use crate::error::{AppError, ErrorCode};
 use crate::metrics::MetricsState;
 
 const LONG_PROMPT: &str = "Escribe un cuento muy largo, con muchos capítulos, sobre un robot que aprende a cocinar.";
@@ -44,7 +46,7 @@ fn log(value: &Value) {
 
 /// Starts a long reply in the background and interrupts it with `interrupt` after 3 s.
 /// Returns the result and how long it took to stop after the interruption.
-async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<SendResult, String>, Duration) {
+async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<SendResult, AppError>, Duration) {
     let handle = app.clone();
     let task = tauri::async_runtime::spawn(async move {
         let state = handle.state::<ChatState>();
@@ -59,7 +61,7 @@ async fn interrupted(app: &AppHandle, interrupt: &str) -> (Result<SendResult, St
     };
     let result = match task.await {
         Ok(r) => r,
-        Err(e) => Err(e.to_string()),
+        Err(_) => Err(ErrorCode::Internal.into()),
     };
     (result, start.elapsed())
 }
@@ -97,7 +99,7 @@ pub async fn run(app: AppHandle) {
         let refused = chat::send(&app, &state, &metrics, None, "Hola", quiet()).await;
         record(
             "thermal_critical",
-            refused.as_ref().is_err_and(|e| e.contains("caliente")),
+            refused.as_ref().is_err_and(|e| e.is(ErrorCode::TooHot)),
             json!({ "result": refused.as_ref().map(|r| &r.stop_reason).map_err(|e| e) }),
         );
         finish(&app, results).await;
@@ -133,7 +135,7 @@ pub async fn run(app: AppHandle) {
                 }));
                 conversation_id = Some(r.conversation_id);
             }
-            Err(e) => errors.push(e),
+            Err(e) => errors.push(e.to_string()),
         }
     }
     created.extend(conversation_id.clone());
@@ -155,7 +157,50 @@ pub async fn run(app: AppHandle) {
         json!({ "reusedPerTurn": reused }),
     );
 
-    // 3. «Detener» (stop button).
+    // 2b. The reply language follows the user: a clear message in another language
+    // switches it, a short "ok" keeps it. Each reply's language is checked with the same
+    // on-device detector.
+    let turns = [
+        ("Hola, ¿me explicas en dos frases qué es la memoria RAM?", "es"),
+        ("Thanks! Now explain in two sentences what the CPU does.", "en"),
+        ("ok", "en"),
+        ("Danke! Erkläre mir bitte in zwei Sätzen, was der Akku macht.", "de"),
+    ];
+    let mut switch_id = None;
+    let mut switch_ok = true;
+    let mut switch_turns = Vec::new();
+    for (question, expected) in turns {
+        let result = chat::send(&app, &state, &metrics, switch_id.clone(), question, quiet()).await;
+        let (asked, detected) = match &result {
+            Ok(r) => {
+                switch_id = Some(r.conversation_id.clone());
+                let reply = state
+                    .store
+                    .get(&r.conversation_id)
+                    .and_then(|c| c.messages.last().filter(|m| m.role == "assistant").map(|m| m.content.clone()))
+                    .unwrap_or_default();
+                let detected = app.llm().detect_language(&reply).await.ok().flatten().map(|d| d.code);
+                (Some(r.reply_language.clone()), detected)
+            }
+            Err(_) => (None, None),
+        };
+        let base = |code: &str| code.split('-').next().unwrap_or(code).to_string();
+        let ok = asked.as_deref().map(base).as_deref() == Some(expected)
+            && detected.as_deref().map(base).as_deref() == Some(expected);
+        switch_ok &= ok;
+        switch_turns.push(json!({
+            "question": question,
+            "expected": expected,
+            "asked": asked,
+            "replyDetected": detected,
+            "ok": ok,
+            "error": result.err().map(|e| e.to_string()),
+        }));
+    }
+    created.extend(switch_id);
+    record("language_switch", switch_ok, json!({ "turns": switch_turns }));
+
+    // 3. Stop button.
     let (reply, latency) = interrupted(&app, "cancel").await;
     created.extend(reply.as_ref().ok().map(|r| r.conversation_id.clone()));
     let stop = reply.map(|r| r.stop_reason);
@@ -199,7 +244,7 @@ pub async fn run(app: AppHandle) {
     let leftover = catalog::models_dir().join(bad_file).exists();
     record(
         "download_wrong_sha",
-        bad.as_ref().is_err_and(|e| e.to_string().contains("SHA-256")) && !leftover,
+        bad.as_ref().is_err_and(|e| e.code() == Some("checksum_mismatch")) && !leftover,
         json!({ "result": bad.as_ref().map_err(|e| e.to_string()), "fileLeftBehind": leftover }),
     );
 
@@ -242,22 +287,24 @@ pub async fn run(app: AppHandle) {
     // 8. Conversation with malicious HTML, to check by eye that it is shown as text.
     let now = chat::now_ms();
     let mut xss = Conversation::new(chat::new_id(), now);
-    xss.title = "Prueba de HTML malicioso".into();
+    xss.title = "Malicious HTML test".into();
     xss.messages.push(StoredMessage {
         role: "user".into(),
-        content: "Muestra este HTML".into(),
+        content: "Show this HTML".into(),
         ts: now,
-        device_note: None,
+        turn_note: None,
+        language: None,
         stats: None,
     });
     xss.messages.push(StoredMessage {
         role: "assistant".into(),
-        content: "Texto **normal**. <img src=x onerror=\"document.body.style.background='red'\"> \
-<script>document.body.innerHTML='HACKEADO'</script> <a href=\"javascript:alert(1)\">enlace</a> \
-<iframe src=\"https://example.com\"></iframe> <b style=\"color:red\">fin</b>"
+        content: "**Normal** text. <img src=x onerror=\"document.body.style.background='red'\"> \
+<script>document.body.innerHTML='HACKED'</script> <a href=\"javascript:alert(1)\">link</a> \
+<iframe src=\"https://example.com\"></iframe> <b style=\"color:red\">end</b>"
             .into(),
         ts: now + 1,
-        device_note: None,
+        turn_note: None,
+        language: None,
         stats: None,
     });
     let saved = state.store.save(&xss);

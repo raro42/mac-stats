@@ -1,4 +1,5 @@
-import { bytes, percent, rate } from "../format";
+import { bytes, duration, joined, percent, rate } from "../format";
+import { t, tp, type TextKey } from "../i18n";
 import {
   deviceInfo,
   metricsHistory,
@@ -11,19 +12,19 @@ import { onMetrics } from "../metrics-bus";
 import { LineChart } from "./line-chart";
 import { RingGauge, type Level } from "./ring-gauge";
 
-const THERMAL_LABEL: Record<Thermal, string> = {
-  nominal: "Normal",
-  fair: "Templado",
-  serious: "Caliente",
-  critical: "Crítico",
-  unknown: "Desconocido",
+const THERMAL_LABEL: Record<Thermal, TextKey> = {
+  nominal: "thermal.nominal",
+  fair: "thermal.fair",
+  serious: "thermal.serious",
+  critical: "thermal.critical",
+  unknown: "thermal.unknown",
 };
 
-const BATTERY_LABEL: Record<BatteryState, string> = {
-  charging: "Cargando",
-  full: "Llena",
-  unplugged: "Desconectado",
-  unknown: "",
+const BATTERY_LABEL: Record<BatteryState, TextKey | null> = {
+  charging: "battery.charging",
+  full: "battery.full",
+  unplugged: "battery.unplugged",
+  unknown: null,
 };
 
 const WINDOWS: Record<Range, { windowMs: number; stepMs: number }> = {
@@ -53,13 +54,14 @@ function byId<T extends HTMLElement = HTMLElement>(id: string): T {
 export async function startMonitor(): Promise<void> {
   const ringsEl = byId("rings");
   const rings = {
-    cpu: new RingGauge(ringsEl, "CPU", "accent-cpu"),
-    ram: new RingGauge(ringsEl, "RAM", "accent-ram"),
-    disk: new RingGauge(ringsEl, "Espacio", "accent-disk"),
-    battery: new RingGauge(ringsEl, "Batería", "accent-battery"),
+    cpu: new RingGauge(ringsEl, t("metric.cpu"), "accent-cpu"),
+    ram: new RingGauge(ringsEl, t("metric.ram"), "accent-ram"),
+    disk: new RingGauge(ringsEl, t("metric.storage"), "accent-disk"),
+    battery: new RingGauge(ringsEl, t("metric.battery"), "accent-battery"),
   };
   const thermalEl = byId("thermal");
   const lowPowerEl = byId("low-power");
+  const appMemBar = byId("appmem-bar");
   const appMemFill = byId("appmem-fill");
   const appMemText = byId("appmem-text");
   const netDownEl = byId("net-down");
@@ -83,7 +85,7 @@ export async function startMonitor(): Promise<void> {
 
   function render(s: Snapshot): void {
     if (s.cpu != null) {
-      rings.cpu.set(s.cpu / 100, percent(s.cpu), "uso total", levelUp(s.cpu, 50, 85));
+      rings.cpu.set(s.cpu / 100, percent(s.cpu), t("monitor.cpuDetail"), levelUp(s.cpu, 50, 85));
     }
 
     const ramPct = s.ramUsed != null && s.ramTotal > 0 ? (s.ramUsed / s.ramTotal) * 100 : null;
@@ -91,7 +93,7 @@ export async function startMonitor(): Promise<void> {
       rings.ram.set(
         ramPct / 100,
         percent(ramPct),
-        `${bytes(s.ramUsed)} de ${bytes(s.ramTotal)}`,
+        t("monitor.usedOfTotal", { used: bytes(s.ramUsed), total: bytes(s.ramTotal) }),
         levelUp(ramPct, 85, 95),
       );
     }
@@ -101,7 +103,7 @@ export async function startMonitor(): Promise<void> {
       rings.disk.set(
         usedPct / 100,
         percent(usedPct),
-        `${bytes(s.storage.available)} libres`,
+        t("monitor.free", { free: bytes(s.storage.available) }),
         levelUp(usedPct, 85, 95),
       );
     }
@@ -109,17 +111,18 @@ export async function startMonitor(): Promise<void> {
     if (s.battery) {
       const pct = s.battery.level * 100;
       const pluggedIn = s.battery.state === "charging" || s.battery.state === "full";
+      const stateKey = BATTERY_LABEL[s.battery.state];
       rings.battery.set(
         s.battery.level,
         percent(pct),
-        BATTERY_LABEL[s.battery.state],
+        stateKey ? t(stateKey) : "",
         pluggedIn ? "ok" : levelDown(pct, 20, 10),
       );
     } else {
-      rings.battery.set(null, "—", simulator ? "No hay batería en el simulador" : "No disponible");
+      rings.battery.set(null, "—", t(simulator ? "monitor.noBatterySimulator" : "monitor.unavailable"));
     }
 
-    thermalEl.textContent = THERMAL_LABEL[s.thermal];
+    thermalEl.textContent = t(THERMAL_LABEL[s.thermal]);
     thermalEl.dataset.state = s.thermal;
     lowPowerEl.hidden = !s.lowPower;
 
@@ -127,10 +130,15 @@ export async function startMonitor(): Promise<void> {
       if (s.appAvailable != null) {
         const share = s.appFootprint / (s.appFootprint + s.appAvailable);
         appMemFill.style.width = `${(share * 100).toFixed(1)}%`;
-        appMemText.textContent = `${bytes(s.appFootprint)} usados · margen ${bytes(s.appAvailable)}`;
+        appMemBar.setAttribute("aria-valuenow", (share * 100).toFixed(0));
+        appMemBar.setAttribute("aria-valuetext", percent(share * 100));
+        appMemText.textContent = t("monitor.appMemoryUsed", {
+          used: bytes(s.appFootprint),
+          headroom: bytes(s.appAvailable),
+        });
       } else {
         appMemFill.style.width = "0%";
-        appMemText.textContent = `${bytes(s.appFootprint)} usados · el margen solo se ve en un iPhone`;
+        appMemText.textContent = t("monitor.appMemorySimulator", { used: bytes(s.appFootprint) });
       }
     }
 
@@ -145,6 +153,7 @@ export async function startMonitor(): Promise<void> {
 
   const rangeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-range]"));
   for (const button of rangeButtons) {
+    button.textContent = button.dataset.range === "1h" ? duration(1, "hour") : duration(5, "minute");
     button.addEventListener("click", () => {
       range = button.dataset.range as Range;
       for (const b of rangeButtons) b.setAttribute("aria-pressed", String(b === button));
@@ -154,12 +163,13 @@ export async function startMonitor(): Promise<void> {
 
   const info = await deviceInfo();
   simulator = info.simulator;
-  byId("device").textContent = [
-    info.simulator ? `Simulador (${info.model})` : info.model,
-    `iOS ${info.osVersion}`,
-    `${info.cores} núcleos`,
-    `${bytes(info.ramTotal)} de RAM`,
-  ].join(" · ");
+  const model = info.modelKey ? t(`device.${info.modelKey}`) : (info.model ?? t("device.unknown"));
+  byId("device").textContent = joined([
+    info.simulator ? t("monitor.simulator", { model }) : model,
+    t("monitor.osVersion", { version: info.osVersion }),
+    tp("monitor.cores", info.cores),
+    t("monitor.ramTotal", { size: bytes(info.ramTotal) }),
+  ]);
 
   const latest = await onMetrics(render);
   await loadHistory();

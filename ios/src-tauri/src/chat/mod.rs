@@ -16,6 +16,8 @@ use tauri::ipc::{Channel, InvokeResponseBody};
 use tauri::{AppHandle, Manager, State};
 use tauri_plugin_llm::{DownloadRequest, EngineStatus, GenerateRequest, LlmExt, LoadInfo, LoadRequest};
 
+use crate::error::{AppError, ErrorCode};
+use crate::language;
 use crate::metrics::{apple::Thermal, MetricsState};
 use catalog::CatalogEntry;
 use store::{ChatStore, Conversation, ConversationSummary, ReplyStats, StoredMessage};
@@ -26,6 +28,14 @@ pub const DEFAULT_MODEL: &str = "qwen3.5-2b";
 const MAX_TOKENS: u32 = 512;
 const TEMPERATURE: f32 = 0.7;
 
+/// Extra memory Swift requires on top of the model size before loading it
+/// (`LlamaEngine.load`); used to explain a `not_enough_memory` error.
+const LOAD_MEMORY_MARGIN: u64 = 512 * 1_048_576;
+
+/// Extra free space Swift requires on top of the model size before downloading it
+/// (`ModelStore.start`); used to explain a `not_enough_storage` error.
+const DOWNLOAD_SPACE_MARGIN: u64 = 1_073_741_824;
+
 pub(crate) fn now_ms() -> i64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0)
 }
@@ -35,10 +45,12 @@ pub(crate) fn new_id() -> String {
     format!("{:x}{:04x}", now_ms(), COUNTER.fetch_add(1, Ordering::Relaxed) & 0xffff)
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
-struct Settings {
-    model_id: Option<String>,
+pub(crate) struct Settings {
+    pub model_id: Option<String>,
+    /// UI language chosen in Settings; `None` = Automatic (follow iOS).
+    pub language: Option<String>,
 }
 
 pub struct ChatState {
@@ -61,11 +73,22 @@ impl ChatState {
         }
     }
 
-    fn settings(&self) -> Settings {
+    pub(crate) fn settings(&self) -> Settings {
         std::fs::read(&self.settings_path)
             .ok()
             .and_then(|b| serde_json::from_slice(&b).ok())
             .unwrap_or_default()
+    }
+
+    /// Read-modify-write, so changing one setting keeps the others.
+    pub(crate) fn update_settings(&self, change: impl FnOnce(&mut Settings)) -> Result<(), AppError> {
+        let mut settings = self.settings();
+        change(&mut settings);
+        if let Some(dir) = self.settings_path.parent() {
+            std::fs::create_dir_all(dir)?;
+        }
+        std::fs::write(&self.settings_path, serde_json::to_vec_pretty(&settings)?)?;
+        Ok(())
     }
 
     pub(crate) fn selected(&self) -> CatalogEntry {
@@ -77,29 +100,30 @@ impl ChatState {
     }
 }
 
-pub(crate) async fn ensure_loaded(app: &AppHandle, state: &ChatState, entry: &CatalogEntry) -> Result<Option<LoadInfo>, String> {
+fn find_model(id: &str) -> Result<CatalogEntry, AppError> {
+    catalog::find(id).ok_or_else(|| AppError::new(ErrorCode::ModelUnknown).with("id", id))
+}
+
+pub(crate) async fn ensure_loaded(app: &AppHandle, state: &ChatState, entry: &CatalogEntry) -> Result<Option<LoadInfo>, AppError> {
     let mut loaded = state.loaded.lock().await;
     // Swift may have released the model on its own (memory warning), so check the
     // engine's real state and not just what Rust remembers.
     let path = entry.path().to_string_lossy().into_owned();
-    let engine = app.llm().status().await.map_err(|e| e.to_string())?;
+    let engine = app.llm().status().await?;
     if loaded.as_deref() == Some(entry.id.as_str()) && engine.loaded && engine.path.as_deref() == Some(path.as_str()) {
         return Ok(None);
     }
     if !entry.installed() {
-        return Err(format!("Primero descarga «{}».", entry.name));
+        return Err(AppError::new(ErrorCode::ModelNotInstalled).with("name", entry.name.as_str()));
     }
-    let info = app
-        .llm()
-        .load(LoadRequest {
-            path,
-            n_ctx: 4096,
-            n_batch: 512,
-            n_threads: 2,
-            gpu: true,
-        })
-        .await
-        .map_err(|e| e.to_string())?;
+    let request = LoadRequest { path, n_ctx: 4096, n_batch: 512, n_threads: 2, gpu: true };
+    let info = match app.llm().load(request).await.map_err(AppError::from) {
+        Err(e) if e.is(ErrorCode::NotEnoughMemory) => {
+            let available = app.llm().status().await.map(|s| s.available_memory).unwrap_or(0);
+            return Err(e.with("needed", entry.size + LOAD_MEMORY_MARGIN).with("available", available));
+        }
+        other => other?,
+    };
     *loaded = Some(entry.id.clone());
     Ok(Some(info))
 }
@@ -133,13 +157,9 @@ pub fn chat_models(state: State<'_, ChatState>) -> Vec<ChatModel> {
 }
 
 #[tauri::command]
-pub fn chat_select_model(state: State<'_, ChatState>, id: String) -> Result<(), String> {
-    catalog::find(&id).ok_or_else(|| format!("No existe el modelo «{id}»"))?;
-    let bytes = serde_json::to_vec_pretty(&Settings { model_id: Some(id) }).map_err(|e| e.to_string())?;
-    if let Some(dir) = state.settings_path.parent() {
-        let _ = std::fs::create_dir_all(dir);
-    }
-    std::fs::write(&state.settings_path, bytes).map_err(|e| e.to_string())
+pub fn chat_select_model(state: State<'_, ChatState>, id: String) -> Result<(), AppError> {
+    find_model(&id)?;
+    state.update_settings(|s| s.model_id = Some(id))
 }
 
 #[derive(Serialize)]
@@ -151,57 +171,67 @@ pub struct ChatStatus {
 }
 
 #[tauri::command]
-pub async fn chat_status(app: AppHandle, state: State<'_, ChatState>) -> Result<ChatStatus, String> {
+pub async fn chat_status(app: AppHandle, state: State<'_, ChatState>) -> Result<ChatStatus, AppError> {
     Ok(ChatStatus {
         loaded_model: state.loaded.lock().await.clone(),
         selected_model: state.selected().id,
-        engine: app.llm().status().await.map_err(|e| e.to_string())?,
+        engine: app.llm().status().await?,
     })
 }
 
-/// Verified download. Forwards `{type: "progress"|"verifying", …}` to the web UI.
+/// Verified download. Forwards `{type: "progress"|"verifying", …}` to the web layer.
 #[tauri::command]
-pub async fn chat_download(app: AppHandle, id: String, allow_cellular: bool, on_event: Channel<Value>) -> Result<(), String> {
-    let entry = catalog::find(&id).ok_or_else(|| format!("No existe el modelo «{id}»"))?;
-    app.llm()
-        .download(DownloadRequest {
-            url: entry.url(),
-            sha256: entry.sha256.clone(),
-            size: entry.size,
-            file: entry.file.clone(),
-            allow_cellular,
-            on_event,
-        })
-        .await
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+pub async fn chat_download(
+    app: AppHandle,
+    metrics: State<'_, MetricsState>,
+    id: String,
+    allow_cellular: bool,
+    on_event: Channel<Value>,
+) -> Result<(), AppError> {
+    let entry = find_model(&id)?;
+    let request = DownloadRequest {
+        url: entry.url(),
+        sha256: entry.sha256.clone(),
+        size: entry.size,
+        file: entry.file.clone(),
+        allow_cellular,
+        on_event,
+    };
+    match app.llm().download(request).await.map_err(AppError::from) {
+        Ok(_) => Ok(()),
+        Err(e) if e.is(ErrorCode::NotEnoughStorage) => {
+            let available = metrics.latest().and_then(|s| s.storage).map(|s| s.available).unwrap_or(0);
+            Err(e.with("needed", entry.size + DOWNLOAD_SPACE_MARGIN).with("available", available))
+        }
+        Err(e) => Err(e),
+    }
 }
 
 #[tauri::command]
-pub async fn chat_cancel_download(app: AppHandle) -> Result<(), String> {
-    app.llm().cancel_download().await.map_err(|e| e.to_string())
+pub async fn chat_cancel_download(app: AppHandle) -> Result<(), AppError> {
+    Ok(app.llm().cancel_download().await?)
 }
 
 #[tauri::command]
-pub async fn chat_delete_model(app: AppHandle, state: State<'_, ChatState>, id: String) -> Result<(), String> {
-    let entry = catalog::find(&id).ok_or_else(|| format!("No existe el modelo «{id}»"))?;
+pub async fn chat_delete_model(app: AppHandle, state: State<'_, ChatState>, id: String) -> Result<(), AppError> {
+    let entry = find_model(&id)?;
     let mut loaded = state.loaded.lock().await;
     if loaded.as_deref() == Some(id.as_str()) {
         *loaded = None;
     }
-    app.llm().delete_model(&entry.file).await.map_err(|e| e.to_string())
+    Ok(app.llm().delete_model(&entry.file).await?)
 }
 
 #[tauri::command]
-pub async fn chat_load(app: AppHandle, state: State<'_, ChatState>) -> Result<Option<LoadInfo>, String> {
+pub async fn chat_load(app: AppHandle, state: State<'_, ChatState>) -> Result<Option<LoadInfo>, AppError> {
     let entry = state.selected();
     ensure_loaded(&app, &state, &entry).await
 }
 
 #[tauri::command]
-pub async fn chat_unload(app: AppHandle, state: State<'_, ChatState>) -> Result<(), String> {
+pub async fn chat_unload(app: AppHandle, state: State<'_, ChatState>) -> Result<(), AppError> {
     *state.loaded.lock().await = None;
-    app.llm().unload().await.map_err(|e| e.to_string())
+    Ok(app.llm().unload().await?)
 }
 
 // ---------------------------------------------------------------------------
@@ -219,13 +249,13 @@ pub fn chat_get(state: State<'_, ChatState>, id: String) -> Option<Conversation>
 }
 
 #[tauri::command]
-pub fn chat_delete(state: State<'_, ChatState>, id: String) -> Result<(), String> {
-    state.store.delete(&id).map_err(|e| e.to_string())
+pub fn chat_delete(state: State<'_, ChatState>, id: String) -> Result<(), AppError> {
+    Ok(state.store.delete(&id)?)
 }
 
 #[tauri::command]
-pub async fn chat_cancel(app: AppHandle) -> Result<(), String> {
-    app.llm().cancel().await.map_err(|e| e.to_string())
+pub async fn chat_cancel(app: AppHandle) -> Result<(), AppError> {
+    Ok(app.llm().cancel().await?)
 }
 
 #[derive(Serialize)]
@@ -235,15 +265,36 @@ pub struct SendResult {
     pub stop_reason: String,
     pub n_gen: u32,
     pub tg_tps: f64,
-    /// Prompt tokens and how many were reused from the previous turn's cache.
+    /// Prompt tokens and how many were reused from the previous turn's memory.
     pub n_prompt: u32,
     pub n_cached: u32,
     pub prompt_ms: f64,
+    /// Language the reply was asked for (BCP-47 code).
+    pub reply_language: String,
 }
 
-/// Sends a question. The web UI receives `{type: "status", text}` while the model
-/// loads and `{type: "delta", text}` with each chunk of the reply. The question is
-/// saved before generating and the reply when it finishes, even if cancelled midway.
+/// Reply language for `question` in `conversation` (see `language::reply_language`).
+/// Returns the language and the detection to store with the question, if it was clear.
+pub(crate) async fn pick_reply_language(
+    app: &AppHandle,
+    state: &ChatState,
+    conversation: &Conversation,
+    question: &str,
+) -> (language::ReplyLanguage, Option<tauri_plugin_llm::DetectedLanguage>) {
+    let detected = app.llm().detect_language(question).await.unwrap_or_else(|e| {
+        eprintln!("language detection failed: {e}");
+        None
+    });
+    let sticky = conversation.messages.iter().rev().find_map(|m| m.language.as_ref());
+    let reply = language::reply_language(detected.as_ref(), question, sticky, &language::current(state));
+    let clear = detected.filter(|d| language::is_clear(d, question));
+    (reply, clear)
+}
+
+/// Sends a question. The web layer receives `{type: "status", code: "loading_model"}`
+/// while the model loads and `{type: "delta", text}` with each chunk of the reply. The
+/// question is saved before generating and the reply when it finishes, even if it is
+/// cancelled midway.
 #[tauri::command]
 pub async fn chat_send(
     app: AppHandle,
@@ -252,7 +303,7 @@ pub async fn chat_send(
     conversation_id: Option<String>,
     text: String,
     on_event: Channel<Value>,
-) -> Result<SendResult, String> {
+) -> Result<SendResult, AppError> {
     send(&app, &state, &metrics, conversation_id, &text, on_event).await
 }
 
@@ -263,19 +314,19 @@ pub(crate) async fn send(
     conversation_id: Option<String>,
     text: &str,
     on_event: Channel<Value>,
-) -> Result<SendResult, String> {
+) -> Result<SendResult, AppError> {
     let question = text.trim().to_string();
     if question.is_empty() {
-        return Err("Escribe una pregunta.".into());
+        return Err(ErrorCode::EmptyQuestion.into());
     }
     let snapshot = metrics.latest();
     if snapshot.as_ref().is_some_and(|s| s.thermal == Thermal::Critical) {
-        return Err("El iPhone está muy caliente. Deja que se enfríe antes de seguir.".into());
+        return Err(ErrorCode::TooHot.into());
     }
 
     let entry = state.selected();
     if state.loaded.lock().await.as_deref() != Some(entry.id.as_str()) {
-        let _ = on_event.send(json!({ "type": "status", "text": "Cargando el modelo…" }));
+        let _ = on_event.send(json!({ "type": "status", "code": "loading_model" }));
     }
     ensure_loaded(app, state, &entry).await?;
 
@@ -287,21 +338,23 @@ pub(crate) async fn send(
         conversation.title = store::title_from(&question);
     }
 
-    let device = snapshot.as_ref().map(prompt::device_note);
+    let (reply_language, detected) = pick_reply_language(app, state, &conversation, &question).await;
+    let note = prompt::turn_note(snapshot.as_ref(), &reply_language.english_name);
     let history = prompt::history(&conversation.messages);
-    let messages = prompt::build(&history, device.as_deref(), &question, prompt::HISTORY_BUDGET_CHARS);
+    let messages = prompt::build(&history, Some(&note), &question, prompt::HISTORY_BUDGET_BYTES);
 
     conversation.messages.push(StoredMessage {
         role: "user".into(),
         content: question,
         ts: now,
-        device_note: device,
+        turn_note: Some(note),
+        language: detected,
         stats: None,
     });
     conversation.updated_at = now;
-    state.store.save(&conversation).map_err(|e| e.to_string())?;
+    state.store.save(&conversation)?;
 
-    // Own channel: accumulates the reply to save it and forwards each chunk to the web UI.
+    // Own channel: accumulates the reply to save it and forwards each chunk to the web layer.
     let reply = Arc::new(Mutex::new(String::new()));
     let (acc, web) = (reply.clone(), on_event.clone());
     let channel = Channel::<Value>::new(move |body| {
@@ -328,8 +381,8 @@ pub(crate) async fn send(
         })
         .await;
 
-    // Saved as is, without trimming whitespace: the next turn sends it again and it
-    // must match what the model generated so the cache can be reused.
+    // Saved as is, without trimming whitespace: the next turn sends it again and it has
+    // to match what the model generated for the memory to be reused.
     let text = reply.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let (stop_reason, n_gen, tg_tps) = match &result {
         Ok(r) => (r.stop_reason.clone(), r.n_gen, r.tg_tps),
@@ -340,14 +393,15 @@ pub(crate) async fn send(
             role: "assistant".into(),
             content: text,
             ts: now_ms(),
-            device_note: None,
+            turn_note: None,
+            language: None,
             stats: Some(ReplyStats { model_id: entry.id.clone(), n_gen, tg_tps, stop_reason: stop_reason.clone() }),
         });
         conversation.updated_at = now_ms();
-        state.store.save(&conversation).map_err(|e| e.to_string())?;
+        state.store.save(&conversation)?;
     }
 
-    let r = result.map_err(|e| e.to_string())?;
+    let r = result?;
     Ok(SendResult {
         conversation_id: conversation.id,
         stop_reason,
@@ -356,5 +410,6 @@ pub(crate) async fn send(
         n_prompt: r.n_prompt,
         n_cached: r.n_cached,
         prompt_ms: r.prompt_ms,
+        reply_language: reply_language.code,
     })
 }

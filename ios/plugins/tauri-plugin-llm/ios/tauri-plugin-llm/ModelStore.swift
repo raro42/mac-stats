@@ -8,22 +8,31 @@ import CryptoKit
 import Foundation
 import Tauri
 
-enum ModelStoreError: LocalizedError {
+enum ModelStoreError: CodedError {
   case busy
   case notEnoughSpace(needed: Int64, available: Int64)
   case checksumMismatch
   case badResponse(Int)
   case cancelled
 
-  var errorDescription: String? {
-    let gb = { (bytes: Int64) in String(format: "%.1f GB", Double(bytes) / 1_073_741_824) }
+  var code: String {
     switch self {
-    case .busy: return "Ya hay una descarga en curso."
+    case .busy: return "download_busy"
+    case .notEnoughSpace: return "not_enough_storage"
+    case .checksumMismatch: return "checksum_mismatch"
+    case .badResponse: return "download_failed"
+    case .cancelled: return "download_cancelled"
+    }
+  }
+
+  var errorDescription: String? {
+    switch self {
+    case .busy: return "A download is already in progress."
     case .notEnoughSpace(let needed, let available):
-      return "Falta espacio: hacen falta \(gb(needed)) y quedan \(gb(available))."
-    case .checksumMismatch: return "El archivo descargado no coincide con su SHA-256 y se ha borrado."
-    case .badResponse(let code): return "El servidor respondió con el código \(code)."
-    case .cancelled: return "Descarga cancelada."
+      return "Not enough space: \(needed) bytes needed, \(available) available."
+    case .checksumMismatch: return "The downloaded file did not match its SHA-256 and was deleted."
+    case .badResponse(let code): return "The server answered with status \(code)."
+    case .cancelled: return "Download cancelled."
     }
   }
 }

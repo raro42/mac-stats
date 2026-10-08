@@ -160,16 +160,23 @@ fn sysctl_string(name: &str) -> Option<String> {
     Some(text.trim_end_matches('\0').to_string())
 }
 
-/// Model identifier (e.g. `iPhone13,3`) and whether it is the simulator.
-pub fn model_identifier() -> (String, bool) {
+/// Model identifier (e.g. `iPhone13,3`), `None` if it cannot be read, and whether it is
+/// the simulator.
+pub fn model_identifier() -> (Option<String>, bool) {
     if let Ok(sim) = std::env::var("SIMULATOR_MODEL_IDENTIFIER") {
-        return (sim, true);
+        return (Some(sim), true);
     }
-    let id = sysctl_string("hw.machine").unwrap_or_else(|| "desconocido".into());
-    (id, false)
+    (sysctl_string("hw.machine").filter(|id| !id.is_empty()), false)
 }
 
-/// Marketing name of known iPhones; the identifier if it is not in the table.
+/// Translation key for models whose name changes by language. Apple translates the
+/// generation in "iPhone SE (3rd generation)"; other names are the same everywhere.
+pub fn model_key(identifier: &str) -> Option<&'static str> {
+    (identifier == "iPhone14,6").then_some("iphoneSe3")
+}
+
+/// Marketing name of known iPhones (Apple's English name); the identifier if it is not in
+/// the table.
 pub fn marketing_name(identifier: &str) -> String {
     let name = match identifier {
         "iPhone13,1" => "iPhone 12 mini",
@@ -180,7 +187,7 @@ pub fn marketing_name(identifier: &str) -> String {
         "iPhone14,5" => "iPhone 13",
         "iPhone14,2" => "iPhone 13 Pro",
         "iPhone14,3" => "iPhone 13 Pro Max",
-        "iPhone14,6" => "iPhone SE (3.ª gen.)",
+        "iPhone14,6" => "iPhone SE (3rd generation)",
         "iPhone14,7" => "iPhone 14",
         "iPhone14,8" => "iPhone 14 Plus",
         "iPhone15,2" => "iPhone 14 Pro",
@@ -207,6 +214,8 @@ mod tests {
     fn known_and_unknown_models() {
         assert_eq!(marketing_name("iPhone13,3"), "iPhone 12 Pro");
         assert_eq!(marketing_name("iPhone99,9"), "iPhone99,9");
+        assert_eq!(model_key("iPhone14,6"), Some("iphoneSe3"));
+        assert_eq!(model_key("iPhone13,3"), None);
     }
 
     #[test]

@@ -1,5 +1,7 @@
 // Fixed banner showing the progress of the automatic model benchmark (debug only).
 import { listen } from "@tauri-apps/api/event";
+import { number, seconds, tokensPerSecond } from "./format";
+import { t } from "./i18n";
 
 type BenchEvent = {
   event: string;
@@ -10,24 +12,29 @@ type BenchEvent = {
   sample?: { t: number; tgTps: number };
 };
 
-function describe(e: BenchEvent): string {
+function describe(e: BenchEvent): string | null {
+  const id = e.id ?? "";
   switch (e.event) {
     case "start":
-      return `Medición de modelos: empezando (${e.models?.length ?? 0})`;
+      return t("bench.start", { count: number(e.models?.length ?? 0) });
     case "loaded":
-      return `Midiendo ${e.id}: modelo cargado`;
+      return t("bench.loaded", { id });
     case "bench":
-      return `Midiendo ${e.id}: ${e.bench?.tgTps.toFixed(1)} tok/s`;
+      return t("bench.speed", { id, speed: tokensPerSecond(e.bench?.tgTps ?? 0) });
     case "quality":
-      return `Midiendo ${e.id}: pregunta ${e.item?.n}/10`;
+      return t("bench.question", { id, n: number(e.item?.n ?? 0), total: number(10) });
     case "soak":
-      return `Midiendo ${e.id}: prueba sostenida ${e.sample?.t} s · ${e.sample?.tgTps.toFixed(1)} tok/s`;
+      return t("bench.soak", {
+        id,
+        seconds: seconds(e.sample?.t ?? 0),
+        speed: tokensPerSecond(e.sample?.tgTps ?? 0),
+      });
     case "model_done":
-      return "Modelo terminado";
+      return t("bench.modelDone");
     case "done":
-      return "Medición terminada ✓";
+      return t("bench.done");
     default:
-      return e.event;
+      return null;
   }
 }
 
@@ -37,8 +44,9 @@ export async function startBenchBanner(): Promise<void> {
   banner.hidden = true;
   document.body.append(banner);
   await listen<BenchEvent>("bench-progress", (msg) => {
-    banner.textContent = `${describe(msg.payload)} · no cierres la app`;
-    if (msg.payload.event === "done") banner.textContent = describe(msg.payload);
+    const status = describe(msg.payload);
+    if (!status) return;
+    banner.textContent = msg.payload.event === "done" ? status : t("bench.keepOpen", { status });
     banner.hidden = false;
   });
 }

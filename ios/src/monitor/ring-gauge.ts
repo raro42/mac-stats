@@ -2,6 +2,8 @@
 // (src-tauri/dist/themes/*/cpu.html): same radius-42 circle in a 100-unit viewBox,
 // drawn here as a 270° arc and without inline styles (the CSP blocks them).
 
+import { t } from "../i18n";
+
 const SVG_NS = "http://www.w3.org/2000/svg";
 const RADIUS = 42;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -54,7 +56,7 @@ export class RingGauge {
 
     this.subEl = document.createElement("div");
     this.subEl.className = "ring-sub";
-    this.subEl.textContent = "Midiendo…";
+    this.subEl.textContent = t("monitor.measuring");
 
     const dial = document.createElement("div");
     dial.className = "ring-dial";
@@ -62,7 +64,7 @@ export class RingGauge {
     this.root.append(dial, this.subEl);
     this.root.dataset.empty = "true";
     container.append(this.root);
-    this.root.setAttribute("aria-label", `${label}: sin datos`);
+    this.root.setAttribute("aria-label", t("monitor.gaugeEmpty", { label }));
   }
 
   /** `fraction` between 0 and 1, or `null` when there is no data. */
@@ -73,6 +75,11 @@ export class RingGauge {
     this.root.dataset.empty = String(f === 0); // at 0 the round line cap would draw a dot
     this.valueEl.textContent = value;
     this.subEl.textContent = sub;
-    this.root.setAttribute("aria-label", `${this.label}: ${value}${sub ? `, ${sub}` : ""}`);
+    this.root.setAttribute(
+      "aria-label",
+      sub
+        ? t("monitor.gaugeValueDetail", { label: this.label, value, detail: sub })
+        : t("monitor.gaugeValue", { label: this.label, value }),
+    );
   }
 }

@@ -6,6 +6,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+use tauri_plugin_llm::DetectedLanguage;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -23,9 +24,14 @@ pub struct StoredMessage {
     pub role: String,
     pub content: String,
     pub ts: i64,
-    /// iPhone data given to the model with this question.
+    /// System note given to the model with this question: iPhone data and reply
+    /// language. Saved so later turns replay the exact same prompt.
+    #[serde(default, alias = "deviceNote", skip_serializing_if = "Option::is_none")]
+    pub turn_note: Option<String>,
+    /// Language of this user message, only when the on-device detection was clear.
+    /// The last one is the conversation's current reply language.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub device_note: Option<String>,
+    pub language: Option<DetectedLanguage>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stats: Option<ReplyStats>,
 }
@@ -51,7 +57,7 @@ pub struct ConversationSummary {
 
 impl Conversation {
     pub fn new(id: String, now: i64) -> Self {
-        Conversation { id, title: "Nueva conversación".into(), created_at: now, updated_at: now, messages: Vec::new() }
+        Conversation { id, title: String::new(), created_at: now, updated_at: now, messages: Vec::new() }
     }
 
     pub fn summary(&self) -> ConversationSummary {
@@ -64,18 +70,15 @@ impl Conversation {
     }
 }
 
-/// Title from the first question (one line, max. 48 characters).
+/// Title from the first question (one line, max. 48 characters). Empty when there is
+/// no text: the web layer then shows a translated "New conversation".
 pub fn title_from(question: &str) -> String {
     let line = question.lines().next().unwrap_or("").trim();
     let mut title: String = line.chars().take(48).collect();
     if line.chars().count() > 48 {
         title.push('…');
     }
-    if title.is_empty() {
-        "Nueva conversación".into()
-    } else {
-        title
-    }
+    title
 }
 
 /// IDs come from the web UI: only hexadecimal ones are accepted, so they can never
@@ -126,7 +129,7 @@ impl ChatStore {
     pub fn save(&self, conversation: &Conversation) -> io::Result<()> {
         let path = self
             .path(&conversation.id)
-            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "id de conversación no válido"))?;
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "invalid conversation id"))?;
         write_atomic(&path, &serde_json::to_vec_pretty(conversation)?)?;
         let mut index = self.list();
         index.retain(|c| c.id != conversation.id);
@@ -155,7 +158,7 @@ mod tests {
     }
 
     fn message(role: &str, content: &str) -> StoredMessage {
-        StoredMessage { role: role.into(), content: content.into(), ts: 1, device_note: None, stats: None }
+        StoredMessage { role: role.into(), content: content.into(), ts: 1, turn_note: None, language: None, stats: None }
     }
 
     #[test]
@@ -201,9 +204,18 @@ mod tests {
     }
 
     #[test]
+    fn old_files_with_device_note_still_load() {
+        let old = r#"{"role":"user","content":"hola","ts":1,"deviceNote":"Datos"}"#;
+        let m: StoredMessage = serde_json::from_str(old).unwrap();
+        assert_eq!(m.turn_note.as_deref(), Some("Datos"));
+        assert_eq!(m.language, None);
+    }
+
+    #[test]
     fn titles_are_one_short_line() {
-        assert_eq!(title_from("¿Cómo va mi batería?\nmás texto"), "¿Cómo va mi batería?");
-        assert_eq!(title_from("   "), "Nueva conversación");
+        assert_eq!(title_from("How is my battery?\nmore text"), "How is my battery?");
+        assert_eq!(title_from("   "), "");
+        assert_eq!(Conversation::new("a1".into(), 0).title, "");
         let long = "a".repeat(60);
         assert_eq!(title_from(&long).chars().count(), 49);
     }

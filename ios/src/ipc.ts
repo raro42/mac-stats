@@ -29,8 +29,11 @@ export interface HistoryPoint {
 }
 
 export interface DeviceInfo {
-  model: string;
-  identifier: string;
+  /** Marketing name, or the raw identifier for unknown models; null if unreadable. */
+  model: string | null;
+  /** Translation key for names that change by language (`device.<modelKey>`). */
+  modelKey: "iphoneSe3" | null;
+  identifier: string | null;
   osVersion: string;
   cores: number;
   ramTotal: number;
@@ -163,10 +166,12 @@ export interface SendResult {
   stopReason: string;
   nGen: number;
   tgTps: number;
+  /** Language the reply was asked for (BCP-47). */
+  replyLanguage: string;
 }
 
 export type ChatEvent =
-  | { type: "status"; text: string }
+  | { type: "status"; code: "loading_model" }
   | { type: "delta"; text: string }
   | { type: "progress"; received: number; total: number }
   | { type: "verifying" };
@@ -187,6 +192,23 @@ export const chatGet = (id: string) => invoke<Conversation | null>("chat_get", {
 export const chatDelete = (id: string) => invoke<void>("chat_delete", { id });
 export const chatCancel = () => invoke<void>("chat_cancel");
 export const debugBuild = () => invoke<boolean>("debug_build");
+
+// --- Language ---
+
+export interface AppLanguage {
+  /** null = Automatic (follow iOS). */
+  setting: string | null;
+  /** Language the UI uses now. */
+  resolved: string;
+  /** What Automatic resolves to on this iPhone. */
+  automatic: string;
+  /** Full tag for number formats, e.g. `es-MX`. */
+  locale: string | null;
+}
+
+export const appLanguage = () => invoke<AppLanguage>("app_language");
+export const setAppLanguage = (language: string | null) =>
+  invoke<AppLanguage>("set_app_language", { language });
 export const debugDemoPrompt = () => invoke<string | null>("debug_demo_prompt");
 
 export function chatDownload(
