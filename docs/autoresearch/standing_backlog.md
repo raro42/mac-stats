@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1773
+
+- Apple theme-list keyboard hint (`.theme-list-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Appearance theme-list hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Slack settings toolbar hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1771
 
 - Apple Slack settings toolbar keyboard hint (`.slack-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the webhook · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Telegram settings toolbar hint already opaque. P2 reliability / GitHub #14.
