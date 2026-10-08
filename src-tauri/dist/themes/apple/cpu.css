@@ -697,7 +697,7 @@ border-radius: 24px;
   border-radius: 9px;
   border: 1px solid color-mix(in srgb, #0c0c10 10%, #ffffff);
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, #ffffff);
-  color: var(--text, rgba(10, 10, 12, 0.78));
+  color: var(--text, #0c0c10);
   font-size: 12px;
   font-weight: 550;
   cursor: pointer;
