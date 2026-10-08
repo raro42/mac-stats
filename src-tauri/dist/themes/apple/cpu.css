@@ -2592,6 +2592,14 @@ border-radius: 24px;
   opacity: 1;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .ollama-settings-header-kb-hint opacity: 0.72. */
+.apple-shell .ollama-settings-header-kb-hint {
+  /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the white settings card. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
   background: color-mix(in srgb, currentColor 4%, #ffffff);
