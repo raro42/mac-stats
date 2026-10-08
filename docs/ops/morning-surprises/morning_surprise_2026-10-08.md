@@ -1,16 +1,23 @@
 # Morning surprise — 2026-10-08
 
-Overnight Track B kept shipping Apple theme WebView idle cuts (GitHub #14).
+Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14** (opaque type / no glass `opacity` on always-visible chrome).
 
-## Shipped tonight
-- **v0.1.1734** — Chip glyph (`#chip-info::before`) opaque color-mix (no glass opacity on the Apple mark beside the chip line).
-- Prior keeps same night: **v0.1.1722–1733** (title, Bat glyph, Details/Top Processes body, icon-line status, Changelog, Force Quit, markdown links, theme-item, metric-label, metric-subtext, history-chart-caption, apple-subtitle).
+## Shipped tonight (keeps)
 
-## Tried / context
-- Digester open stayed empty; design review still in grace (feature-agent-ops ~22d).
-- Debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing P2 reliability / #14 always-visible type opacity.
+| Version | What |
+|---------|------|
+| **v0.1.1735** | `.detail-label` opaque `color-mix` 63% `#3c3c43` on `#ffffff` (Details Load · RAM · Up captions) |
+| **v0.1.1734** | `#chip-info::before` opaque `color-mix` 32% `#0c0c10` on `#f7f7fa` ( glyph) |
+| **v0.1.1733** | `.apple-subtitle` / `#chip-info` opaque `color-mix` 46% `#0c0c10` on `#f7f7fa` |
+| **v0.1.1732** | `.history-chart-caption` opaque `color-mix` 36% `#0c0c10` on `#ffffff` |
+| **v0.1.1731** | `.metric-subtext` opaque `color-mix` 40% `#0c0c10` on `#ffffff` |
+| **v0.1.1730** | `.metric-label` opaque `color-mix` 62% `#0c0c10` on `#ffffff` |
+| **v0.1.1729** | Settings `.theme-item` opaque type fallback (Apple `cpu.css` zero `rgba(` left) |
 
-## Next
-- `.detail-label` opacity.
-- Screenshot feature-agent-ops when TCC allows.
+## Fuel notes
+
+- Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
+- Debug.log quiet (no ERROR/WARN clusters in scan windows).
+- Next: `.section-title` `rgb(1,1,1,0.75)` → opaque mix; feature-agent-ops screenshot when allowed.
+
+Latest keep: **v0.1.1735** @ `b30e6e89`.
