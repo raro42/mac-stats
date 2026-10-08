@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1746
+
+- Apple AI Chat thinking bubble (`.chat-message.thinking`) mixes type color against an opaque message-list fill (`color-mix` 75% `#0c0c10` on `#ffffff`). No glass `opacity` on that waiting bubble. AI Chat response time already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1745
 
 - Apple AI Chat response time (`.response-time`) mixes type color against an opaque message-list fill (`color-mix` 36% `#0c0c10` on `#ffffff`). No glass `opacity` on that latency line. AI Chat status already opaque. P2 reliability / GitHub #14.
