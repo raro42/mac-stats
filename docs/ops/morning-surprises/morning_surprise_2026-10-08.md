@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1753** | `.apple-shell .monitor-latency` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (monitor timing line; was shared `opacity: 0.9` on `--muted`; Slow and Down keep status color) |
 | **v0.1.1752** | `.apple-shell .disk-cleanup-empty-hint` · `.disk-cleanup-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Disk Cleanup empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1751** | `.apple-shell .monitors-empty-hint` · `.monitors-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Monitors empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1750** | `.apple-shell .logs-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Debug Log filter-miss hint; was shared `opacity: 0.9` on `--muted`) |
@@ -35,7 +36,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Monitors empty hints shipped in v0.1.1751. Disk Cleanup empty and filter-miss hints shipped in v0.1.1752 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Next opacity candidate: `.rings-filter-miss-hint` (shared `opacity: 0.78`). Then `.monitor-latency` (shared `opacity: 0.9` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
+- Disk Cleanup empty hints shipped in v0.1.1752. Monitor latency shipped in v0.1.1753 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Skipped `.rings-filter-miss-hint`: that node is removed and never paints. Next opacity candidate: `.monitor-checked-ago` (shared `opacity: 0.72` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1752** @ `29b59ec5`.
+Latest keep: **v0.1.1753** @ `76da1097`.
