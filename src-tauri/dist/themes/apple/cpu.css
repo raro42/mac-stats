@@ -1063,10 +1063,11 @@ border-radius: 24px;
 }
 
 .history-controls label {
-  color: var(--muted);
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.9 on --muted (50% ink) → ~46% ink on the white control. */
+  color: color-mix(in srgb, #0c0c10 46%, #ffffff);
   font-weight: 600;
   letter-spacing: 0.02em;
-  opacity: 0.9;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

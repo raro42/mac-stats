@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1737
+
+- Apple History range label (`.history-controls label`) mixes type color against an opaque fill (`color-mix` 46% `#0c0c10` on `#ffffff`). No glass `opacity` on the always-visible range caption. Section titles already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1736
 
 - Apple section titles (`.section-title`) mix type color against an opaque panel fill (`color-mix` 75% `#010101` on `#ffffff`). No glass `rgb(1,1,1,0.75)` on the always-visible Details · Top Processes headings. Details label type already opaque. P2 reliability / GitHub #14.
