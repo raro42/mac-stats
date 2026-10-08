@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1757** | `.apple-shell .monitor-detail-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Check now · Remove keyboard hint; was shared `opacity: 0.72` on inherited `--text`) |
 | **v0.1.1756** | `.apple-shell .monitor-detail-note` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (no local check history line; was shared `opacity: 0.72` on inherited `--text`) |
 | **v0.1.1755** | `.apple-shell .monitor-detail-k` opaque `color-mix` 39% `#0c0c10` on `#ffffff` (monitor detail URL · status captions; was shared `opacity: 0.78` on `--muted`) |
 | **v0.1.1754** | `.apple-shell .monitor-checked-ago` opaque `color-mix` 36% `#0c0c10` on `#ffffff` (Down rows 43%; last-check age; was shared `opacity: 0.72` / Down `0.85` on `--muted`) |
@@ -39,7 +40,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- Detail labels shipped in v0.1.1755. The no-history note shipped in v0.1.1756 (`opacity: 1` plus 63% ink; `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`). Next opacity candidate: `.monitor-detail-toolbar-kb-hint` (shared `opacity: 0.72`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state. `.monitor-item.is-checking` and `.is-pending` stay whole-row transient opacity.
+- The no-history note shipped in v0.1.1756. The Check now · Remove hint shipped in v0.1.1757 (`opacity: 1` plus 63% ink; `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`). Next opacity candidate: `.discord-toolbar-kb-hint` (shared `opacity: 0.72`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state. `.monitor-item.is-checking` and `.is-pending` stay whole-row transient opacity.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1756** @ `6d915696`.
+Latest keep: **v0.1.1757** @ `aa3e4576`.
