@@ -1515,9 +1515,10 @@ border-radius: 24px;
 }
 
 .battery-status {
-  color: var(--muted);
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the strip fill. */
+  color: color-mix(in srgb, #0c0c10 45%, #ececf1);
   font-size: 12px;
-  opacity: 0.9;
 }
 
 .power-label {
