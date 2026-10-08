@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1730
+
+- Apple ring metric labels (`.metric-label`) mix type color against an opaque card fill (`color-mix` 62% `#0c0c10` on `#ffffff`). No glass `opacity` on the always-visible CPU · GPU · Freq · Temp captions. Theme-item type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1729
 
 - Apple Settings theme-list type (`.theme-item`) mixes against an opaque panel fill. No glass alpha on the theme button label fallback (`var(--text, #0c0c10)`). Markdown link type already opaque. P2 reliability / GitHub #14.

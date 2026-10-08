@@ -353,8 +353,8 @@ border-radius: 24px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: var(--text);
-  opacity: 0.62;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
   margin-top: 4px;
   z-index: 2;
 }
