@@ -228,7 +228,9 @@ border-radius: 24px;
   display: inline-block;
   margin-right: 10px;
   font-size: 18px;
-  opacity: 0.7;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.7 on subtitle mix (~46% ink) → ~32% ink on shell. */
+  color: color-mix(in srgb, #0c0c10 32%, #f7f7fa);
 }
 
 .apple-actions {
