@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1735
+
+- Apple Details labels (`.detail-label`) mix type color against an opaque panel fill (`color-mix` 63% `#3c3c43` on `#ffffff`). No glass `opacity` on the always-visible Load · RAM · Up captions. Chip glyph type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1734
 
 - Apple chip glyph (`#chip-info::before`) mixes type color against an opaque shell fill (`color-mix` 32% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the always-visible  mark beside the chip line. Chip subtitle type already opaque. P2 reliability / GitHub #14.

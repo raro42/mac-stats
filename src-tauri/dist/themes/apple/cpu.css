@@ -474,7 +474,9 @@ border-radius: 24px;
 }
 
 .detail-label {
-  opacity: 0.88;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.88 on grid mix (~72% ink) → ~63% ink on panel. */
+  color: color-mix(in srgb, #3c3c43 63%, #ffffff);
 }
 
 .detail-value {
