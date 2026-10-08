@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme opaque keyboard-hint type for GitHub
 
 | Version | What |
 |--------|------|
+| **v0.1.1779** | Ollama settings header kb-hint (`.ollama-settings-header-kb-hint`) opaque `color-mix` on the white settings card |
 | **v0.1.1778** | Settings header kb-hint (`.settings-header-kb-hint`) opaque `color-mix` on the white settings card |
 | **v0.1.1777** | Credentials section kb-hint opaque |
 | **v0.1.1776** | Product setting kb-hint opaque |
@@ -19,7 +20,7 @@ Glass `opacity` on keyboard hints still forced compositor blending on Settings c
 
 ## Next
 
-- `.ollama-settings-header-kb-hint` (same pattern)
+- `.ollama-settings-toolbar-kb-hint` (same pattern)
 - Refresh `feature-cpu-metrics` / `feature-agent-ops` screenshots when a Mac is reachable (design-review grace)
 
 ## Digester
