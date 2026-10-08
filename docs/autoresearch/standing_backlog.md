@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1760
+
+- Apple Brave settings toolbar keyboard hint (`.brave-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the key · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Perplexity settings toolbar hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1759
 
 - Apple Perplexity settings toolbar keyboard hint (`.perplexity-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the key · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Discord settings toolbar hint already opaque. P2 reliability / GitHub #14.
