@@ -1,6 +1,8 @@
 use tauri::Manager;
+use tauri_plugin_llm::LlmExt;
 
 mod chat;
+mod cpu_probe;
 mod error;
 mod lab;
 mod language;
@@ -50,6 +52,16 @@ pub fn run() {
             if cfg!(debug_assertions) {
                 if let Ok(spec) = std::env::var("IOS_STATS_BENCH") {
                     tauri::async_runtime::spawn(lab::auto_bench(app.handle().clone(), spec));
+                }
+                // Keeps the screen on (measurements with the iPhone untouched).
+                if std::env::var("IOS_STATS_KEEP_AWAKE").is_ok() {
+                    let handle = app.handle().clone();
+                    tauri::async_runtime::spawn(async move {
+                        let _ = handle.llm().keep_awake(true).await;
+                    });
+                }
+                if let Some(secs) = std::env::var("IOS_STATS_CPU_PROBE").ok().and_then(|v| v.parse().ok()) {
+                    tauri::async_runtime::spawn(cpu_probe::run(app.handle().clone(), secs));
                 }
                 if std::env::var("IOS_STATS_SELFTEST").is_ok() {
                     tauri::async_runtime::spawn(selftest::run(app.handle().clone()));

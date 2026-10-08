@@ -76,6 +76,8 @@ These only exist in debug builds. They are passed as environment variables when 
 | `IOS_STATS_SELFTEST=1` | Chat self-test, including a language switch (es, en, "ok", de); saves `Documents/selftest.json`. With `IOS_STATS_SELFTEST_DOWNLOAD=<id>` it also downloads that model |
 | `IOS_STATS_FAKE_THERMAL=fair\|serious\|critical` | Simulates the thermal state in the monitor (`fair` only there) and, for serious/critical, in the engine |
 | `IOS_STATS_DEMO_PROMPT="…"` | Opens the chat and sends that question on launch |
+| `IOS_STATS_CPU_PROBE=<seconds>` | After 15 s, averages the iPhone's total CPU (including WebKit) and writes `Documents/cpu-probe.json`; used to compare themes |
+| `IOS_STATS_KEEP_AWAKE=1` | Keeps the screen on, for measurements with the iPhone untouched |
 | `IOS_STATS_DEMO_VIEW=monitor\|chat\|settings[-bottom]` | Opens that tab on launch and, with `-bottom`, scrolls to the end (for screenshots) |
 
 The Chat tab also includes a "Lab" card for loading, benchmarking and trying models by hand. Debug builds also offer a "Pseudo" language in Settings: every string shows as `[!! … ~~~ !!]`, about 40% longer, so hard-coded text and clipped layouts stand out.
@@ -96,6 +98,8 @@ The app ships in Spanish, English, German, French, Brazilian Portuguese and Simp
 - To add a language: add it to `src/i18n/languages.ts`, create its dictionary, add it to `SUPPORTED` and `match_tag` in `language.rs`, and to `CFBundleLocalizations` plus a `<lang>.lproj/InfoPlist.strings` in `src-tauri/gen/apple/` (then run `xcodegen generate` there).
 
 ## Tests
+
+Every run is logged in [docs/test-results.md](docs/test-results.md) (no personal data). Add an entry after each run.
 
 ```bash
 (cd src-tauri && cargo test)   # metrics, history, network, catalog, prompt, conversations, languages, error codes
