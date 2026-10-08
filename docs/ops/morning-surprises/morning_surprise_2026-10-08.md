@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1748** | `.apple-shell .perplexity-empty-hint` · `.perplexity-filter-miss-hint` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (Perplexity empty / filter-miss hints; was shared `opacity: 0.9` on `--muted`) |
 | **v0.1.1747** | `.apple-shell .chat-exec-label` opaque `color-mix` 33% `#0c0c10` on `#ffffff` (AI Chat Code executed / Result captions; was shared `opacity: 0.65` on `--muted`) |
 | **v0.1.1746** | `.chat-message.thinking` opaque `color-mix` 75% `#0c0c10` on `#ffffff` (AI Chat waiting bubble; was `opacity: 0.85`) |
 | **v0.1.1745** | `.apple-shell .response-time` opaque `color-mix` 36% `#0c0c10` on `#ffffff` (AI Chat latency line; was `opacity: 0.72` on `--muted`) |
@@ -30,7 +31,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- AI Chat thinking bubble shipped in v0.1.1746. AI Chat exec labels shipped in v0.1.1747 (`opacity: 1` plus 33% ink; `.apple-shell` beats the later shared sheet). Next opacity candidate: `.perplexity-empty-hint` / `.perplexity-filter-miss-hint` (shared `opacity: 0.9` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
+- AI Chat exec labels shipped in v0.1.1747. Perplexity empty hints shipped in v0.1.1748 (`opacity: 1` plus 45% ink; `.apple-shell` beats the later shared sheet). Next opacity candidate: `.processes-filter-miss-hint` (shared `opacity: 0.9` on `--muted`). Icon-strip images stay on opacity (a CSS filter is heavier). `#chat-send-btn:disabled` (0.55) is a disabled state.
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1747** @ `6baf1403`.
+Latest keep: **v0.1.1748** @ `bf2f31d4`.
