@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1742** | `.perplexity-result-meta` opaque `color-mix` 38% `#0c0c10` on `#ffffff` (Perplexity source line; was `opacity: 0.75` on `--muted`) |
 | **v0.1.1741** | `.logs-path-hint` opaque `color-mix` 43% `#0c0c10` on `#ffffff` (Debug Log path; was `opacity: 0.85` on `--muted`) |
 | **v0.1.1740** | `.apple-footer` opaque `color-mix` 28% `#0c0c10` on `#f7f7fa` (hover 44%; version · GitHub line; was `opacity: 0.55` / `0.88` on `--muted`) |
 | **v0.1.1739** | `.time-remaining` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (time-left caption; was `opacity: 0.9` on `--muted`) |
@@ -24,7 +25,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- A local footer cut duplicated origin v0.1.1740 and was discarded. Debug Log path hint shipped in v0.1.1741. Next opacity candidates: `.perplexity-result-meta` (0.75), `.chat-empty` (0.9), `.chat-status` (0.9), `.response-time` (0.72). Icon-strip images stay on opacity (a CSS filter is heavier).
+- Debug Log path hint shipped in v0.1.1741. Perplexity result meta shipped in v0.1.1742. Next opacity candidates: `.chat-empty` (0.9), `.chat-status` (0.9), `.response-time` (0.72). Icon-strip images stay on opacity (a CSS filter is heavier).
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1741** @ `42692276`.
+Latest keep: **v0.1.1742** @ `2ed48d9a`.
