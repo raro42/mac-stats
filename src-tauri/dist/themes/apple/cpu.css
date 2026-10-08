@@ -452,7 +452,9 @@ border-radius: 24px;
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  color: rgb(1, 1, 1, 0.75);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  /* Was rgb(1,1,1,0.75) glass type → 75% ink on panel. */
+  color: color-mix(in srgb, #010101 75%, #ffffff);
 }
 
 .details-grid {

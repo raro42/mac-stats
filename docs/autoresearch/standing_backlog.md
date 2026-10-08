@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1736
+
+- Apple section titles (`.section-title`) mix type color against an opaque panel fill (`color-mix` 75% `#010101` on `#ffffff`). No glass `rgb(1,1,1,0.75)` on the always-visible Details · Top Processes headings. Details label type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1735
 
 - Apple Details labels (`.detail-label`) mix type color against an opaque panel fill (`color-mix` 63% `#3c3c43` on `#ffffff`). No glass `opacity` on the always-visible Load · RAM · Up captions. Chip glyph type already opaque. P2 reliability / GitHub #14.
