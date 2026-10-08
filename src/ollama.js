@@ -3649,6 +3649,36 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+
+const TOOLBAR_VIM_NAV_KEYS = new Set(['h', 'l', 'j', 'k']);
+
+function isToolbarTextField(el) {
+  if (!el) return false;
+  if (el.isContentEditable) return true;
+  const tag = el.tagName;
+  if (tag === 'TEXTAREA') return true;
+  if (tag !== 'INPUT') return false;
+  const type = (el.type || 'text').toLowerCase();
+  return (
+    type === 'text' ||
+    type === 'search' ||
+    type === 'url' ||
+    type === 'email' ||
+    type === 'password' ||
+    type === 'tel' ||
+    type === 'number' ||
+    type === ''
+  );
+}
+
+/** Vim letters / Home / End never leave a text field mid-typing. */
+function blockToolbarNavInTextField(e, active) {
+  if (!isToolbarTextField(active)) return false;
+  if (TOOLBAR_VIM_NAV_KEYS.has(e.key)) return true;
+  if (e.key === 'Home' || e.key === 'End') return true;
+  return false;
+}
+
 /** Focusable composer items in DOM order (input · Clear when enabled · Send). */
 function getChatComposerItems(container) {
   const row = container || document.querySelector('.chat-input-container');
@@ -3760,8 +3790,8 @@ function ensureChatComposerKbHint(container) {
 
 /**
  * AI Chat composer toolbar keyboard — focus input · Clear · Send, then ←→ / h l /
- * Home/End (filter-row parity). Input keeps normal typing; arrows move only at
- * text start/end. One Tab stop via roving tabindex.
+ * Home/End (filter-row parity). Input keeps normal typing; h/l/j/k and Home/End
+ * never leave the field; arrows move only at text start/end. One Tab stop via roving tabindex.
  */
 function ensureChatComposerToolbarKeyboard() {
   const row = document.querySelector('.chat-input-container');
@@ -3786,6 +3816,7 @@ function ensureChatComposerToolbarKeyboard() {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (active === document.getElementById('chat-input')) return;
       if (active?.id === 'chat-clear-btn' || active?.id === 'chat-send-btn') return;

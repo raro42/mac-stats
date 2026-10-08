@@ -4731,6 +4731,44 @@ const TOOLBAR_NAV_KEYS = new Set([
   'k',
 ]);
 
+const TOOLBAR_VIM_NAV_KEYS = new Set(['h', 'l', 'j', 'k']);
+
+/** True for text fields that must keep typing (not steal h/l/j/k for toolbar nav). */
+function isToolbarTextField(el) {
+  if (!el) return false;
+  if (el.isContentEditable) return true;
+  const tag = el.tagName;
+  if (tag === 'TEXTAREA') return true;
+  if (tag !== 'INPUT') return false;
+  const type = (el.type || 'text').toLowerCase();
+  return (
+    type === 'text' ||
+    type === 'search' ||
+    type === 'url' ||
+    type === 'email' ||
+    type === 'password' ||
+    type === 'tel' ||
+    type === 'number' ||
+    type === ''
+  );
+}
+
+/**
+ * Vim letters and Home/End must never leave a text field mid-typing.
+ * Arrow keys still use AtMoveBoundary checks in each toolbar handler.
+ */
+function blockToolbarNavInTextField(e, active) {
+  if (!isToolbarTextField(active)) return false;
+  if (TOOLBAR_VIM_NAV_KEYS.has(e.key)) return true;
+  if (e.key === 'Home' || e.key === 'End') return true;
+  return false;
+}
+
+if (typeof window !== 'undefined') {
+  window.isToolbarTextField = isToolbarTextField;
+  window.blockToolbarNavInTextField = blockToolbarNavInTextField;
+}
+
 /** Pick a sensible default item when the toolbar has focus but no item is focused yet. */
 function seedToolbarFocusItem(items) {
   if (!items.length) return null;
@@ -4768,6 +4806,9 @@ function handleToolbarArrowKeydown(e, container, getItems, refreshRoving) {
     if (idx < 0) idx = items.indexOf(seed);
     if (idx < 0) return false;
   }
+
+  // Never steal h/l/j/k / Home/End from a text field in the toolbar.
+  if (blockToolbarNavInTextField(e, items[idx])) return false;
 
   let next = -1;
   if (
@@ -9819,6 +9860,7 @@ function ensureMonitorAddFormToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'monitor-url-input' ||
@@ -12376,6 +12418,7 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'ollama-system-prompt' ||
@@ -13962,6 +14005,7 @@ function wireBraveSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'brave-api-key-input' ||
@@ -14318,6 +14362,7 @@ function wireRedmineSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isRedmineSettingsInput(active) ||
@@ -14658,6 +14703,7 @@ function wireMastodonSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isMastodonSettingsInput(active) ||
@@ -15026,6 +15072,7 @@ function wireMcpSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isMcpSettingsInput(active) ||
@@ -15402,6 +15449,7 @@ function wireBrowserSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isBrowserSettingsInput(active) ||
@@ -15855,6 +15903,7 @@ function wireCursorAgentSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isCursorAgentSettingsInput(active) ||
@@ -16332,6 +16381,7 @@ function wireTelegramSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isTelegramSettingsInput(active) ||
@@ -16687,6 +16737,7 @@ function wireSlackSettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         isSlackSettingsInput(active) ||
@@ -17662,6 +17713,7 @@ function wirePerplexitySearchToolbarKeyboard(row) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (active?.id === 'perplexity-query' || active?.id === 'perplexity-search-btn') return;
     }
@@ -17812,6 +17864,7 @@ function wirePerplexitySetupToolbarKeyboard(row) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (active?.id === 'perplexity-inline-key' || active?.id === 'perplexity-inline-save') {
         return;
@@ -18016,6 +18069,7 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'perplexity-api-key-input' ||
@@ -19692,6 +19746,7 @@ function ensureLogsToolbarKeyboard() {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'logs-refresh-btn' ||
@@ -21286,6 +21341,7 @@ function ensureDiskCleanupAddScopeToolbarKeyboard(wrap) {
     const idx = items.indexOf(document.activeElement);
     if (idx < 0) return;
     const active = items[idx];
+    if (blockToolbarNavInTextField(e, active)) return;
     if (e.key === 'Enter' || e.key === ' ') {
       if (
         active?.id === 'disk-cleanup-add-label' ||
