@@ -216,7 +216,18 @@ body.i18n-pending {
 .ring-progress {
   stroke: var(--ring-color);
   filter: var(--ring-filter);
-  transition: stroke-dasharray 0.6s ease, stroke 0.3s ease;
+  transition: stroke-dasharray 0.3s ease, stroke 0.3s ease;
+}
+
+/* Small changes jump without animating (see ring-gauge.ts). */
+.ring-progress.ring-instant {
+  transition: stroke 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress {
+    transition: none;
+  }
 }
 
 .ring[data-empty="true"] .ring-progress {

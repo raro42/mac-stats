@@ -11,6 +11,72 @@ How to run each check is in [README.md](../README.md) (Tests, Debug tools).
 
 ---
 
+## 2026-10-08: Monitor CPU after the ring optimization (real iPhone)
+
+**Change measured:** the ring gauges now move in whole-percent steps, only animate jumps of 3 points or more, use a 0.3 s transition (was 0.6 s), and skip DOM writes when a value did not change (`ring-gauge.ts`, `monitor.ts`).
+
+**Environment and method:** iPhone 12 Pro, iOS 26.6.1, wired. Same probe as the earlier run (`IOS_STATS_CPU_PROBE=30`), Monitor tab, two passes in opposite order. The iPhone cooled for 8 minutes after the benchmark first.
+
+| Theme | Before (lower pass) | After pass 1 | After pass 2 | After (lower pass) |
+|---|---|---|---|---|
+| System | 9.4 | 17.8 ¹ | 3.8 | **3.8** |
+| Glass (`apple`) | 8.9 | 16.5 ¹ | 4.3 | **4.3** |
+| Light | 12.3 | 4.9 | 6.0 | **4.9** |
+| Neon | 10.3 | 4.9 | 4.2 | **4.2** |
+| Futuristic | 8.7 | 3.9 | 4.1 | **3.9** |
+| Data Poster | 2.9 | 3.2 | 3.5 | **3.2** |
+| Dark (TUI) | 9.9 | 6.5 | 4.5 | **4.5** |
+| Material | 8.6 | 4.3 | 4.4 | **4.3** |
+| Architect | 9.2 | 4.4 | 3.4 | **3.4** |
+| Swiss Minimalistic | 7.7 | 5.6 | 4.0 | **4.0** |
+
+¹ The first two runs after the benchmark; the iPhone was still busy in the background (pass 2 measured 3.8 and 4.3).
+
+**Result:** the Monitor's iPhone-wide CPU dropped by about half on every theme with rings (System 9.4 → 3.8 %), and all themes now sit within 3–5 %. Data Poster, which has no rings, did not change, which confirms the ring animation was the main cost. Light is still the highest theme, but only by about 1 point.
+
+---
+
+## 2026-10-08: multilingual model benchmark on a real iPhone
+
+**Environment:** iPhone 12 Pro (A14, 6 GB), iOS 26.6.1, wired and charging (one 30 s unplug during the third model), Metal, debug build of commit `9334f40c`. Command: `IOS_STATS_BENCH=all IOS_STATS_BENCH_LANGS=es,en,de,fr,pt-BR,zh-Hans IOS_STATS_SOAK_SECS=60`. Each model answered the same 10 questions in 6 languages (60 answers, temperature 0). Raw data: [llm-bench-multilang-iphone12pro.json](llm-bench-multilang-iphone12pro.json). Run time: 24 min.
+
+**Reply language:** all three models answered in the language they were asked in, in all six languages. The detector flagged 2 answers per language, both expected:
+- Q5 ("answer only with the number"): "391" has no detectable language.
+- Q7 asks for a translation into another language, so the answer is in that language.
+- Two extra flags were numeric one-liners misread as Portuguese ("45 GB / 1,5 GB = 30 Videos.").
+
+| Model | Load cold / warm | Generation (bench, cool) | Generation during the 60 questions | Peak app memory | Lowest headroom |
+|---|---|---|---|---|---|
+| Qwen3.5-2B | 1.9 s / 0.5 s | 18.5 tok/s | 11.5 tok/s first, then ~7.3 tok/s | 0.22 GB | 4.08 GB |
+| LFM2.5-1.2B | 1.3 s / 0.1 s | 17.3 tok/s | ~8.3 tok/s | 0.21 GB | 4.09 GB |
+| Qwen2.5-1.5B | 1.5 s / 0.3 s | 11.1 tok/s | ~7.8 tok/s | 0.26 GB | 4.04 GB |
+
+- The iPhone reached the **serious** thermal state early in the first model and stayed there. In that state the engine pauses 100 ms per token on purpose (`LlamaEngine.swift`), which caps generation at about 8–9 tok/s. The quality-phase speeds above measure that cap, not the models.
+- No errors, no reply cut by the length limit (every answer ended with `eos`). This is the first measurement of Qwen2.5-1.5B.
+
+**Answer quality** (1–5 per answer, scored by an LLM reviewer reading all 180 answers; same scale as [llm-spike.md](llm-spike.md); a human native-speaker check is still pending):
+
+| Model | es | en | de | fr | pt-BR | zh-Hans | Overall |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-2B | 3.9 | 4.1 | 3.7 | 3.6 | 3.6 | 3.5 | **3.7** |
+| LFM2.5-1.2B | 2.9 | 4.2 | 2.8 | 3.0 | 2.8 | 2.0 | **3.0** |
+| Qwen2.5-1.5B | 3.7 | 4.2 | 2.7 | 2.8 | 3.0 | 3.1 | **3.3** |
+
+- **Qwen3.5-2B stays the default for every language.** It has the best grammar outside English and the most reliable arithmetic (Q8 right in all six languages), and it usually explains the "serious" state correctly. In English the three models are within noise.
+- **LFM2.5-1.2B:** the multiplication is wrong in 5 of 6 languages. It pulls the device data into unrelated answers (it used the free-storage number instead of the question's 45 GB) and gives weak Chinese.
+- **Qwen2.5-1.5B:** switches language mid-answer (German answer ending in Japanese, French "Mon phone is very slow"). It also has factual slips ("RAM = Read-Only Memory") and once suggested erasing all data.
+- **All models** invent iOS Settings paths when asked how to free space.
+
+**Prompt problems found (app side, not model side), not fixed yet:**
+1. The device note says "55.8 GB free" without saying it is storage, so models read it as free memory. Label it "storage 55.8 GB free".
+2. "app memory X (headroom Y)" confuses every model: they report the app's 0.2 GB or the 3.8 GB headroom as the phone's RAM. Drop it or rephrase it as "RAM X of Y used (Z free)".
+3. The thermal state goes to the model in English only ("serious"), which leaks into other languages ("seriös", "serieux"). Send the state name and meaning in the reply language; the UI already has them (`thermal.*` in `src/i18n`).
+4. The note goes with every question, and small models leak it into unrelated answers.
+5. The language check in the benchmark should skip Q5 (only a number) and expect the target language for Q7 (translation). It also misses answers that mix languages.
+6. The whole run was at thermal state serious; a run at nominal would show the normal case.
+
+---
+
 ## 2026-10-07: themes, thermal card, i18n on a real iPhone
 
 **Environment:** iPhone 12 Pro (A14, 6 GB), iOS 26.6.1, wired. Debug build (`pnpm tauri ios build --debug --export-method debugging`). Commit `589f5dea` plus the debug-only CPU probe and keep-awake options added in the same session.
@@ -56,7 +122,7 @@ iPhone total CPU (% of all cores) while the Monitor tab is open, mean over 30 s.
 
 Findings:
 - Blur and glow themes cost about the same as System, within the noise. The exception is **Light**, consistently higher (+3 to +10 points), probably because of its drop-shadow filter on the rings plus a 30 px blur on every card.
-- **Data Poster is far cheaper** than every other theme, and it is the only one without SVG rings. That suggests the main cost of the Monitor is the four ring arcs animating (`stroke-dasharray` transition of 0.6 s on every 1 s update), not the themes. Worth optimizing for every theme; not changed yet.
+- **Data Poster is far cheaper** than every other theme, and it is the only one without SVG rings. That suggests the main cost of the Monitor is the four ring arcs animating (`stroke-dasharray` transition of 0.6 s on every 1 s update), not the themes. Optimized on 2026-10-08 (see that entry).
 - Limits of the method: total-device CPU includes background iOS work, and 30 s samples are short. Instruments would separate WebKit from the rest; it could not connect to the device (see above).
 
 ---

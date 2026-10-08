@@ -59,6 +59,11 @@ function levelDown(value: number, warn: number, crit: number): Level {
   return value <= crit ? "crit" : value <= warn ? "warn" : "ok";
 }
 
+/** Skips DOM writes when the text did not change (the monitor updates every second). */
+function setText(el: HTMLElement, text: string): void {
+  if (el.textContent !== text) el.textContent = text;
+}
+
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing element #${id}`);
@@ -108,7 +113,11 @@ export async function startMonitor(): Promise<void> {
     charts.thermal.setData(points.map((p) => ({ ts: p.ts, thermal: p.thermal, gap: p.gap })));
   }
 
+  let shownThermal: Thermal | null = null;
+
   function renderThermal(state: Thermal): void {
+    if (state === shownThermal) return; // updated every second; changes are rare
+    shownThermal = state;
     const label = t(THERMAL_LABEL[state]);
     const meaningKey = THERMAL_MEANING[state];
     const meaning = meaningKey ? t(meaningKey) : "";
@@ -175,18 +184,18 @@ export async function startMonitor(): Promise<void> {
         appMemFill.style.width = `${(share * 100).toFixed(1)}%`;
         appMemBar.setAttribute("aria-valuenow", (share * 100).toFixed(0));
         appMemBar.setAttribute("aria-valuetext", percent(share * 100));
-        appMemText.textContent = t("monitor.appMemoryUsed", {
-          used: bytes(s.appFootprint),
-          headroom: bytes(s.appAvailable),
-        });
+        setText(
+          appMemText,
+          t("monitor.appMemoryUsed", { used: bytes(s.appFootprint), headroom: bytes(s.appAvailable) }),
+        );
       } else {
         appMemFill.style.width = "0%";
         appMemText.textContent = t("monitor.appMemorySimulator", { used: bytes(s.appFootprint) });
       }
     }
 
-    netDownEl.textContent = s.netDown != null ? rate(s.netDown) : "—";
-    netUpEl.textContent = s.netUp != null ? rate(s.netUp) : "—";
+    setText(netDownEl, s.netDown != null ? rate(s.netDown) : "—");
+    setText(netUpEl, s.netUp != null ? rate(s.netUp) : "—");
 
     if (range === "5m") {
       charts.cpu.push({ ts: s.ts, v: s.cpu }, LIVE_POINTS);

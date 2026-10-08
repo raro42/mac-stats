@@ -31,8 +31,14 @@ function circle(cls: string): SVGCircleElement {
   return c;
 }
 
+/** Changes smaller than this jump without animating (saves repaints every second). */
+const ANIMATE_FROM = 0.03;
+
 export class RingGauge {
   private readonly root: HTMLDivElement;
+  /** Last drawn fraction, rounded to whole percent; -1 before the first value. */
+  private drawn = -1;
+  private spoken = "";
   private readonly progress: SVGCircleElement;
   private readonly valueEl: HTMLSpanElement;
   private readonly subEl: HTMLDivElement;
@@ -84,18 +90,31 @@ export class RingGauge {
   }
 
   /** `fraction` between 0 and 1, or `null` when there is no data. */
+  /**
+   * Called every second, so it only touches the DOM when something visible changed: the
+   * arc moves in whole-percent steps and only animates jumps of 3 points or more. Most of
+   * the Monitor's CPU went into these SVG repaints (ios/docs/test-results.md).
+   */
   set(fraction: number | null, value: string, sub: string, level: Level = "ok"): void {
-    const f = fraction == null ? 0 : Math.min(1, Math.max(0, fraction));
-    this.progress.setAttribute("stroke-dasharray", `${arc() * f} ${CIRCUMFERENCE}`);
-    this.root.dataset.level = fraction == null ? "none" : level;
-    this.root.dataset.empty = String(f === 0); // at 0 the round line cap would draw a dot
-    this.valueEl.textContent = value;
-    this.subEl.textContent = sub;
-    this.root.setAttribute(
-      "aria-label",
-      sub
-        ? t("monitor.gaugeValueDetail", { label: this.label, value, detail: sub })
-        : t("monitor.gaugeValue", { label: this.label, value }),
-    );
+    const f = fraction == null ? 0 : Math.round(Math.min(1, Math.max(0, fraction)) * 100) / 100;
+    if (f !== this.drawn) {
+      const jump = this.drawn < 0 || Math.abs(f - this.drawn) >= ANIMATE_FROM;
+      this.progress.classList.toggle("ring-instant", !jump);
+      this.progress.setAttribute("stroke-dasharray", `${arc() * f} ${CIRCUMFERENCE}`);
+      this.drawn = f;
+    }
+    const levelState = fraction == null ? "none" : level;
+    if (this.root.dataset.level !== levelState) this.root.dataset.level = levelState;
+    const empty = String(f === 0); // at 0 the round line cap would draw a dot
+    if (this.root.dataset.empty !== empty) this.root.dataset.empty = empty;
+    if (this.valueEl.textContent !== value) this.valueEl.textContent = value;
+    if (this.subEl.textContent !== sub) this.subEl.textContent = sub;
+    const spoken = sub
+      ? t("monitor.gaugeValueDetail", { label: this.label, value, detail: sub })
+      : t("monitor.gaugeValue", { label: this.label, value });
+    if (spoken !== this.spoken) {
+      this.root.setAttribute("aria-label", spoken);
+      this.spoken = spoken;
+    }
   }
 }
