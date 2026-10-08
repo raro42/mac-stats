@@ -2404,6 +2404,15 @@ border-radius: 24px;
   background: color-mix(in srgb, #ff3b30 10%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .monitors-empty-hint opacity: 0.9. */
+.apple-shell .monitors-empty-hint,
+.apple-shell .monitors-filter-miss-hint {
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the white empty shell. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
   background: color-mix(in srgb, currentColor 4%, #ffffff);
