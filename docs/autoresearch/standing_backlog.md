@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1765
+
+- Apple MCP settings toolbar keyboard hint (`.mcp-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the URL · stdio · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Mastodon settings toolbar hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1764
 
 - Apple Mastodon settings toolbar keyboard hint (`.mastodon-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the URL · token · Save · Clear hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Redmine settings toolbar hint already opaque. P2 reliability / GitHub #14.
