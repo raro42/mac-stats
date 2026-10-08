@@ -580,6 +580,14 @@ border-radius: 24px;
   color: var(--text);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .processes-filter-miss-hint opacity: 0.9. */
+.apple-shell .processes-filter-miss-hint {
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the white filter-miss shell. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+  opacity: 1;
+}
+
 .settings-modal {
   position: fixed;
   inset: 0;

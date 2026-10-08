@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1749
+
+- Apple Top Processes filter-miss hints (`.processes-filter-miss-hint`) mix type color against an opaque filter-miss fill (`color-mix` 45% `#0c0c10` on `#ffffff`). No glass `opacity` on that hint line. `.apple-shell` beats the later shared `opacity: 0.9`. Perplexity empty hints already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1748
 
 - Apple Perplexity empty hints (`.perplexity-empty-hint` · `.perplexity-filter-miss-hint`) mix type color against an opaque empty-shell fill (`color-mix` 45% `#0c0c10` on `#ffffff`). No glass `opacity` on those hint lines. `.apple-shell` beats the later shared `opacity: 0.9`. AI Chat exec labels already opaque. P2 reliability / GitHub #14.
