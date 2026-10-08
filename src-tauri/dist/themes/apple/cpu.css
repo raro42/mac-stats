@@ -2421,6 +2421,14 @@ border-radius: 24px;
   opacity: 1;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .monitor-latency opacity: 0.9. */
+.apple-shell .monitor-latency {
+  /* Was opacity 0.9 on --muted (50% ink) → ~45% ink on the white monitor row. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
   background: color-mix(in srgb, currentColor 4%, #ffffff);
