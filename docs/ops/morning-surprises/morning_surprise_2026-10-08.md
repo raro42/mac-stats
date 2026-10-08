@@ -4,7 +4,8 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 
 ## Shipped
 
-- **v0.1.1728** — Apple AI Chat markdown link type (`.chat-message .markdown a`) mixes against an opaque panel fill. No glass alpha on markdown link color. Last direct `color: rgba` type rule in Apple theme cleared.
+- **v0.1.1729** — Apple Settings theme-list type (`.theme-item`) mixes against an opaque panel fill. No glass alpha on the theme button label fallback (`var(--text, #0c0c10)`). Clears the last `rgba(` in Apple `cpu.css`.
+- **v0.1.1728** — Apple AI Chat markdown link type (`.chat-message .markdown a`) mixes against an opaque panel fill. No glass alpha on markdown link color.
 - **v0.1.1727** — Apple Force Quit control type (`.force-quit-btn` resting) mixes against an opaque panel fill. No glass alpha on Force Quit label type.
 - **v0.1.1726** — Apple Changelog body type (`.changelog-error` · `.changelog-h2` · `.changelog-version` · `.changelog-h3` · `.changelog-paragraph` · `.changelog-item` · bullet · `.changelog-code` · `strong`) mixes against an opaque panel fill. No glass alpha on Changelog copy or the error accent.
 - **v0.1.1725** — Apple icon-line status washes (`.icon-line-item.status-good` · `.status-warning` · `.status-bad` resting · hover) mix type color against an opaque chip fill. No glass alpha on Ready / Slow / Down strip status type.
@@ -41,11 +42,12 @@ Overnight autoresearch (Track B) kept real ships. Digester open was empty; desig
 - Design review: due=false (feature-agent-ops still recommended when screenshot TCC allows).
 - Debug.log: quiet in the 180m window.
 - Sibling harnesses: OpenClaw / Hermes paths missing on this host.
-- 01:55 tick: shipped AI Chat markdown link type as v0.1.1728 (last direct `color: rgba` type).
+- 02:17 tick: shipped Settings theme-item type fallback as v0.1.1729 (last `rgba(` in Apple `cpu.css`).
+- 01:55 tick: shipped AI Chat markdown link type as v0.1.1728.
 - 01:35 tick: shipped Force Quit type as v0.1.1727.
 - 01:10 tick: shipped Changelog body type as v0.1.1726.
 - 00:45 tick: shipped icon-line status type as v0.1.1725; logged missing keep for v0.1.1724.
 
 ## Next
 
-- More #14 glass: `.theme-item` type fallback still `var(--text, rgba(10, 10, 12, 0.78))` (opaque `#0c0c10` fallback); then scan other non-type glass leftovers; screenshot feature-agent-ops when due and TCC allows.
+- Apple `cpu.css` has no `rgba(` left. Scan other themes / shared CSS for #14 glass leftovers, or screenshot feature-agent-ops when due and TCC allows.
