@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1742
+
+- Apple Perplexity result meta (`.perplexity-result-meta`) mixes type color against an opaque row fill (`color-mix` 38% `#0c0c10` on `#ffffff`). No glass `opacity` on that source line. Debug Log path hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1741
 
 - Apple Debug Log path hint (`.logs-path-hint`) mixes type color against an opaque toolbar fill (`color-mix` 43% `#0c0c10` on `#ffffff`). No glass `opacity` on that path line. Footer type already opaque. P2 reliability / GitHub #14.

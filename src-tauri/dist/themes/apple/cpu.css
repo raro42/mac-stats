@@ -1914,9 +1914,10 @@ border-radius: 24px;
   line-height: 1.45;
 }
 .perplexity-result-meta {
-  color: var(--muted);
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.75 on --muted (50% ink) → ~38% ink on the white result row. */
+  color: color-mix(in srgb, #0c0c10 38%, #ffffff);
   font-size: 11px;
-  opacity: 0.75;
   margin-top: 2px;
 }
 .perplexity-result-list {
