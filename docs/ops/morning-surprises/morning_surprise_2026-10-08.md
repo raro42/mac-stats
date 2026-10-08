@@ -25,4 +25,4 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 - Apple `cpu.css` has no remaining `rgb(`/`rgba(` type. Time-left caption shipped in v0.1.1739. Next always-visible `opacity:` candidate: `.apple-footer` (0.55).
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1739**.
+Latest keep: **v0.1.1739** @ `9ed5ce60`.
