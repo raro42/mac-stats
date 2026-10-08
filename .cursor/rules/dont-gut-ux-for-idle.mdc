@@ -1,0 +1,32 @@
+---
+description: Idle / #14 cuts must not empty charts, gauges, or other obvious UX
+alwaysApply: true
+---
+
+# Do not gut UX for idle cuts
+
+WebView idle work (#14) is real. Empty or broken UI is not an acceptable trade.
+
+## Do
+
+- Keep sparkline history readable (`LINE_CHART_POINTS` / `HISTORY_POINTS` around **60**, not 2–4).
+- On CPU window open, **reuse** `~/.mac-stats/history.json` via `get_metrics_history` + `seedFromPoints` and warm Freq / Temp rings from the newest point.
+- Park GPU canvases if needed — but keep the **data buffers** filled so unpark shows a real chart.
+- Prefer deferring *paint* over deleting *history*.
+
+## Do not
+
+- Drop chart buffers to 2 points to save compositor work.
+- Ship an open path that shows flat / empty Freq · Temp graphs when disk history exists.
+- Leave gauges on **None yet** when the last sample is already on disk.
+- “Optimize” by removing seed calls from the open path.
+
+## Examples
+
+```text
+❌ LINE_CHART_POINTS = 2 (sparklines look empty on every open)
+❌ Seed with maxDisplayPoints: 2
+❌ Skip history seed until long idle while rings say None yet
+✅ Seed ~60 points from history.json on open; paint last Freq / Temp on rings
+✅ Park canvases; unpark redraws a full buffer
+```

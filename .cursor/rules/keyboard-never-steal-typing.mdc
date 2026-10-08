@@ -1,0 +1,30 @@
+---
+description: Toolbar vim keys must never steal characters from text fields
+alwaysApply: true
+---
+
+# Keyboard never steals typing
+
+Toolbar navigation (`h` `l` `j` `k`, and Home/End as toolbar jumps) is for **buttons and chips**. It is not for text fields.
+
+## Do
+
+- When focus is in `input`, `textarea`, or `contentEditable`, letter keys must type.
+- Use `blockToolbarNavInTextField(e, active)` (or the same rule) before any toolbar move.
+- Arrow keys may leave a field only at the caret edge (`AtMoveBoundary`).
+- Prefer Tab to leave a field when in doubt.
+
+## Do not
+
+- Treat `h`/`l`/`j`/`k` like arrows while the caret is in a composer, search box, URL field, API key, or filter input.
+- Jump to Clear / Send / next chip when the user types `l` or `h` in AI Chat.
+- Assume “caret at end” means “ready to leave the field” for letter keys — that is the normal typing position.
+
+## Examples
+
+```text
+❌ Pressing l in #chat-input focuses Clear
+❌ Pressing h in an empty URL field leaves the field
+✅ Typing hello in AI Chat stays in the input
+✅ ArrowRight at end of input may move to Clear / Send
+```

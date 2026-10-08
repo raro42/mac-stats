@@ -6,8 +6,9 @@
 (function () {
   "use strict";
 
-  // Fewer points = less canvas work per sample (#14).
-  const LINE_CHART_POINTS = 2;
+  // Match history.js / ~10 minutes of ~10s samples. Never leave this at 2 —
+  // that made open look empty even with ~/.mac-stats/history.json (#15 / UX).
+  const LINE_CHART_POINTS = 60;
   const EMPTY_POINT = NaN;
   let cachedSparklineBackdrop = null;
 

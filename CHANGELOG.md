@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1770] - 2026-10-08
+
+### Fixed
+- **CPU window open looks empty** — Sparklines again use 60 history points (not 2). On open, seed charts and warm Freq · Temp · CPU · GPU rings from `~/.mac-stats/history.json` instead of starting at “None yet” / flat graphs while the first live sample arrives.
+- **Keyboard vs typing** — Project rules: never steal `h`/`l`/`j`/`k` from text fields; do not gut charts for idle cuts.
+
 ## [0.1.1769] - 2026-10-08
 
 ### Fixed

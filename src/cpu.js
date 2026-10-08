@@ -1733,16 +1733,28 @@ async function refresh() {
     if (shouldUpdateTemperature) {
       if (!data.can_read_temperature) {
         failedAttempts.temperature++;
-        const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
-        // Empty Temp ring: match Power / Heat "None yet" (bare em dash reads like missing data).
-        if (currentDisplay !== "None yet") {
+        // Keep history-seeded / last-known °C — do not wipe to "None yet" on
+        // the first open polls before SMC is ready.
+        if (heldTemp > 0) {
+          const numberText = `${Math.round(heldTemp)}`;
           scheduleDOMUpdate(() => {
-            tempEl.innerHTML = "None yet";
-            if (tempSubtext) tempSubtext.textContent = "None yet";
+            tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+            if (tempSubtext) tempSubtext.textContent = `${numberText}°C`;
           });
+        } else {
+          const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
+          // Empty Temp ring: match Power / Heat "None yet" (bare em dash reads like missing data).
+          if (currentDisplay !== "None yet") {
+            scheduleDOMUpdate(() => {
+              tempEl.innerHTML = "None yet";
+              if (tempSubtext) tempSubtext.textContent = "None yet";
+            });
+          }
         }
         // Only show hint after multiple failed attempts
-        const shouldShowHint = failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
+        const shouldShowHint =
+          heldTemp <= 0 &&
+          failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
         if (tempHint && tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
           scheduleDOMUpdate(() => {
             tempHint.style.display = shouldShowHint ? "block" : "none";
@@ -1975,15 +1987,34 @@ async function refresh() {
     
     if (!data.can_read_frequency) {
       failedAttempts.frequency++;
-      // Empty Freq ring: match Temp / Power "None yet" (bare em dash reads like missing data).
-      if (!freqEl.textContent.includes("None yet")) {
+      // Keep history-seeded / last-known GHz until IOReport is ready.
+      if (previousValues.frequency > 0) {
+        const formatted = previousValues.frequency.toFixed(1);
         scheduleDOMUpdate(() => {
-          freqEl.innerHTML = "None yet";
-          freqSubtext.textContent = "None yet";
+          freqEl.innerHTML = `${formatted}<span class="metric-unit">GHz</span>`;
+          if (
+            !freqSubtext.textContent ||
+            freqSubtext.textContent === 'None yet'
+          ) {
+            freqSubtext.textContent = `${formatted} GHz`;
+          }
+        });
+        updateRingGauge(
+          'frequency-ring-progress',
+          Math.min(100, (previousValues.frequency / 5.0) * 100),
+          'frequency'
+        );
+      } else if (!freqEl.textContent.includes('None yet')) {
+        // Empty Freq ring: match Temp / Power "None yet".
+        scheduleDOMUpdate(() => {
+          freqEl.innerHTML = 'None yet';
+          freqSubtext.textContent = 'None yet';
         });
       }
       // Only show hint after multiple failed attempts
-      const shouldShowHint = failedAttempts.frequency >= FAILED_ATTEMPTS_THRESHOLD;
+      const shouldShowHint =
+        previousValues.frequency <= 0 &&
+        failedAttempts.frequency >= FAILED_ATTEMPTS_THRESHOLD;
       if (freqHint.style.display !== (shouldShowHint ? "block" : "none")) {
         scheduleDOMUpdate(() => {
           freqHint.style.display = shouldShowHint ? "block" : "none";
@@ -3054,6 +3085,9 @@ function startCpuWindowMetricsOnce() {
   if (windowWorkPaused()) return;
   // Rings just before first poll — not on open paint (#14).
   wireCpuWindowDomOnce();
+  // Reuse ~/.mac-stats/history.json immediately so Freq / Temp / sparklines
+  // are not empty while the first live sample arrives.
+  void seedThemeHistoryFromBackend();
   // Version/GitHub update waits for footer click (not first poll, #14).
   const afterFirst = () => {
     // Parked after IPC: clear so focus can re-arm (#15).
@@ -6336,10 +6370,10 @@ function resumeVisibleWindowWork() {
       };
       if (typeof window.requestIdleCallback === "function") {
         historySeedIdleHandle = window.requestIdleCallback(seed, {
-          timeout: 2000,
+          timeout: 300,
         });
       } else {
-        historySeedTimeoutId = setTimeout(seed, 2000);
+        historySeedTimeoutId = setTimeout(seed, 300);
       }
     }
     // Idle-defer get_cpu_details / interval arm on focus — not on the focus event (#14 / #15).
@@ -25377,6 +25411,89 @@ let sparklineHistoryReady = false;
 /** Last successful (or exhausted) sparkline seed — skip reseed on rapid focus (#14). */
 let lastSparklineSeedMs = 0;
 
+/** How many sparkline samples to pull from ~/.mac-stats/history.json on open. */
+const SPARKLINE_SEED_POINTS = 60;
+
+/**
+ * Warm ring gauges from the newest history point so Freq / Temp are not
+ * "None yet" while the first live SMC / IOReport sample is still in flight.
+ */
+function applyHistoryPointToGauges(point) {
+  if (!point || typeof point !== 'object') return;
+  const temp =
+    typeof point.temperature === 'number' &&
+    Number.isFinite(point.temperature) &&
+    point.temperature > 0
+      ? point.temperature
+      : 0;
+  const freq =
+    typeof point.frequency === 'number' &&
+    Number.isFinite(point.frequency) &&
+    point.frequency > 0
+      ? point.frequency
+      : 0;
+  const cpu =
+    typeof point.cpu === 'number' && Number.isFinite(point.cpu) ? point.cpu : 0;
+  const gpu =
+    typeof point.gpu === 'number' && Number.isFinite(point.gpu)
+      ? Math.max(0, point.gpu)
+      : 0;
+
+  if (temp > 0) previousValues.temperature = temp;
+  if (freq > 0) previousValues.frequency = freq;
+  if (cpu > 0) previousValues.usage = cpu;
+  if (gpu > 0) previousValues.gpuUsage = gpu;
+
+  scheduleDOMUpdate(() => {
+    const tempEl = document.getElementById('temperature-value');
+    const tempSub = document.getElementById('temperature-subtext');
+    if (temp > 0 && tempEl) {
+      const n = `${Math.round(temp)}`;
+      tempEl.innerHTML = `${n}<span class="metric-unit">°C</span>`;
+      if (tempSub) tempSub.textContent = `${n}°C`;
+      if (typeof updateRingGauge === 'function') {
+        updateRingGauge(
+          'temperature-ring-progress',
+          Math.min(100, temp),
+          'temperature'
+        );
+      }
+    }
+    const freqEl = document.getElementById('frequency-value');
+    const freqSub = document.getElementById('frequency-subtext');
+    if (freq > 0 && freqEl) {
+      const n = freq.toFixed(2);
+      freqEl.innerHTML = `${n}<span class="metric-unit">GHz</span>`;
+      if (freqSub && (!freqSub.textContent || freqSub.textContent === 'None yet')) {
+        freqSub.textContent = `${n} GHz`;
+      }
+      if (typeof updateRingGauge === 'function') {
+        updateRingGauge(
+          'frequency-ring-progress',
+          Math.min(100, (freq / 5.0) * 100),
+          'frequency'
+        );
+      }
+    }
+    const cpuEl = document.getElementById('cpu-usage-value');
+    if (cpu > 0 && cpuEl) {
+      const n = `${Math.round(cpu)}`;
+      cpuEl.innerHTML = `${n}<span class="metric-unit">%</span>`;
+      if (typeof updateRingGauge === 'function') {
+        updateRingGauge('cpu-usage-ring-progress', Math.min(100, cpu), 'usage');
+      }
+    }
+    const gpuEl = document.getElementById('gpu-usage-value');
+    if (gpu > 0 && gpuEl) {
+      const n = `${Math.round(gpu)}`;
+      gpuEl.innerHTML = `${n}<span class="metric-unit">%</span>`;
+      if (typeof updateRingGauge === 'function') {
+        updateRingGauge('gpu-usage-ring-progress', Math.min(100, gpu), 'gpu');
+      }
+    }
+  });
+}
+
 /** Paint sparklines from backend history (menu-bar samples) so charts are not empty on open. */
 async function seedThemeHistoryFromBackend() {
   ensureGpuHistoryChart();
@@ -25395,9 +25512,10 @@ async function seedThemeHistoryFromBackend() {
     try {
       // Tauri 2 command args are camelCase. Snake_case never reached Rust, so
       // the charts stayed empty and grew from the right on every open.
+      // Pull a full sparkline width from disk-backed history (~/.mac-stats/history.json).
       const result = await inv('get_metrics_history', {
         timeRangeSeconds: 600,
-        maxDisplayPoints: 2,
+        maxDisplayPoints: SPARKLINE_SEED_POINTS,
       });
       // Alt-tab during history IPC: do not wake sparkline/poster paint (#14).
       if (windowWorkPaused()) return false;
@@ -25408,6 +25526,8 @@ async function seedThemeHistoryFromBackend() {
         if (typeof window.posterCharts?.seedFromPoints === 'function') {
           window.posterCharts.seedFromPoints(result.points);
         }
+        // Newest sample first for gauges (points are oldest→newest).
+        applyHistoryPointToGauges(result.points[result.points.length - 1]);
         sparklineHistoryReady = true;
         lastSparklineSeedMs = Date.now();
         // Seed implies history IPC is warm — allow deferred 24h probe (#14).
