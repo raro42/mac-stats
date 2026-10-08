@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1772] - 2026-10-08
+
+### Fixed
+- **Menu bar and glass UI percentages stuck at 0%** — Restored the metrics loop to ~2s when the CPU window is focused and ~5s when idle (a leftover #14 cut slept 600s). `get_cpu_details` refreshes CPU/RAM on each full call so the glass UI does not depend on the menu-bar thread alone. Temperature read interval back to ~20s.
+
 ## [0.1.1771] - 2026-10-08
 
 ### Changed

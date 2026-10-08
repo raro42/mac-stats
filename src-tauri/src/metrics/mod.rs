@@ -1928,8 +1928,11 @@ pub fn get_cpu_details() -> CpuDetails {
                 (0.0, load, uptime_secs, processes)
             } else {
                 let sys = sys.as_mut().unwrap();
-                // CRITICAL: Don't refresh here - it's expensive and blocks
-                // Just read existing values without refreshing
+                // Refresh on the full-call path (~1.5s floor). The glass UI must
+                // not depend on the menu-bar loop alone — that left rings at 0%
+                // when the background thread was starved to 600s (#14 leftover).
+                sys.refresh_cpu_usage();
+                sys.refresh_memory();
                 let usage = sys.global_cpu_usage();
                 let load = sysinfo::System::load_average();
                 let uptime_secs = sysinfo::System::uptime();

@@ -762,12 +762,13 @@ fn run_internal(open_cpu_window: bool) {
                     metrics::smc_temperature::SmcTemperatureReader::default();
 
                 loop {
-                    // Same 600s cadence open or idle (#14). Faster open loops only woke
-                    // SMC/IOReport + history while Graphics and Media was already hot.
-                    // Focused + visible: visible-but-unfocused still woke SMC (#14).
+                    // Focused CPU window: ~2s. Menu-bar only: ~5s.
+                    // A leftover #14 ratchet slept 600s here and starved both the
+                    // menu bar and get_cpu_details (which reads SYSTEM without refresh).
                     #[cfg(target_os = "macos")]
                     let cpu_window_visible = crate::state::cpu_window_active_for_metrics();
-                    std::thread::sleep(std::time::Duration::from_secs(600));
+                    #[cfg(not(target_os = "macos"))]
+                    let cpu_window_visible = false;
 
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
@@ -778,7 +779,9 @@ fn run_internal(open_cpu_window: bool) {
                     if !metrics.is_valid() {
                         debug3!("Skipping menu bar update: invalid metrics (CPU={}%, GPU={}%, RAM={}%, DISK={}%)",
                             metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
-                        continue; // Skip this update cycle
+                        let sleep_secs: u64 = if cpu_window_visible { 2 } else { 5 };
+                        std::thread::sleep(std::time::Duration::from_secs(sleep_secs));
+                        continue;
                     }
 
                     let mut text = build_status_text(&metrics);
@@ -1812,12 +1815,10 @@ fn run_internal(open_cpu_window: bool) {
                         debug3!("Could not lock history buffer for update (lock contention)");
                     }
 
-                    // NOTE: Automatic menu bar updates are not implemented because:
-                    // - run_on_main_thread callbacks don't execute (Tauri limitation)
-                    // - performSelector doesn't fire reliably
-                    // Menu bar will update when user clicks on it (click handler works)
-                    // Updates are stored in MENU_BAR_TEXT and processed on click
-                    // Sleep is at the top of this loop (1s with window open, 5s idle).
+                    // MENU_BAR_TEXT is drained by the status-item timer / click handler.
+                    // Sleep at the end so the first sample runs immediately after startup.
+                    let sleep_secs: u64 = if cpu_window_visible { 2 } else { 5 };
+                    std::thread::sleep(std::time::Duration::from_secs(sleep_secs));
                 }
             });
             Ok(())
