@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1746** | `.chat-message.thinking` opaque `color-mix` 75% `#0c0c10` on `#ffffff` (AI Chat waiting bubble; was `opacity: 0.85`) |
 | **v0.1.1745** | `.apple-shell .response-time` opaque `color-mix` 36% `#0c0c10` on `#ffffff` (AI Chat latency line; was `opacity: 0.72` on `--muted`) |
 | **v0.1.1744** | `.chat-status` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (AI Chat status line; was `opacity: 0.9` on `--muted`) |
 | **v0.1.1743** | `.chat-empty` opaque `color-mix` 45% `#0c0c10` on `#ffffff` (AI Chat empty shell; was `opacity: 0.9` on `--muted`) |
@@ -28,7 +29,7 @@ Overnight Track B kept shipping Apple theme WebView idle cuts for GitHub **#14**
 
 - Digester open stayed empty; design review still in grace (stale feature screens need TCC for screenshots).
 - Debug.log quiet (no ERROR/WARN clusters in scan windows).
-- AI Chat status shipped in v0.1.1744. AI Chat response time shipped in v0.1.1745 (`.apple-shell` so it beats the later shared `opacity: 0.72`). Next opacity candidate: `.chat-message.thinking` (0.85). Icon-strip images stay on opacity (a CSS filter is heavier).
+- AI Chat response time shipped in v0.1.1745. AI Chat thinking bubble shipped in v0.1.1746 (`opacity: 1` plus 75% ink). Next opacity candidate: `.chat-exec-label` (shared `opacity: 0.65`; beat it with `.apple-shell`). Icon-strip images stay on opacity (a CSS filter is heavier).
 - feature-agent-ops screenshot when TCC allows.
 
-Latest keep: **v0.1.1745** @ `ce52840`.
+Latest keep: **v0.1.1746** @ `c7f335e7`.
