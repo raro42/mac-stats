@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1758
+
+- Apple Discord settings toolbar keyboard hint (`.discord-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the token · Save · Clear · View logs hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Monitor detail toolbar hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1757
 
 - Apple monitor detail toolbar keyboard hint (`.monitor-detail-toolbar-kb-hint`) mixes type color against an opaque detail panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Check now · Remove hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Monitor detail notes already opaque. P2 reliability / GitHub #14.
