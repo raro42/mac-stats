@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1731
+
+- Apple ring metric subtext (`.metric-subtext`) mixes type color against an opaque card fill (`color-mix` 40% `#0c0c10` on `#ffffff`). No glass `opacity` on the always-visible CPU · GPU · Freq · Temp secondary lines. Metric-label type already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1730
 
 - Apple ring metric labels (`.metric-label`) mix type color against an opaque card fill (`color-mix` 62% `#0c0c10` on `#ffffff`). No glass `opacity` on the always-visible CPU · GPU · Freq · Temp captions. Theme-item type already opaque. P2 reliability / GitHub #14.

@@ -388,8 +388,8 @@ border-radius: 24px;
 .metric-subtext {
   font-size: 10px;
   font-weight: 600;
-  color: var(--muted);
-  opacity: 0.8;
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  color: color-mix(in srgb, #0c0c10 40%, #ffffff);
   white-space: nowrap;
   margin-bottom: 4px;
   z-index: 2;
