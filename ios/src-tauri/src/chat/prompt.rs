@@ -18,17 +18,21 @@
 use tauri_plugin_llm::ChatMessage;
 
 use super::store::StoredMessage;
+use crate::language::ReplyLanguage;
 use crate::metrics::apple::{BatteryState, Thermal};
 use crate::metrics::Snapshot;
 
-/// Persona rewritten from `src-tauri/agent/soul.md` in the Mac app.
+/// Persona rewritten from `src-tauri/agent/soul.md` in the Mac app. The facts at the end
+/// stop small models from inventing them (seen in the multilingual benchmark,
+/// `ios/docs/test-results.md`).
 pub const PERSONA: &str = "You are the assistant of iOS Stats, an app that monitors the state of this iPhone. \
 Answer briefly, clearly and kindly. \
 Before each question you receive a system message with the iPhone's current data and the language to answer in. \
-Use the data only if the question is about the phone, never invent data that is not there, \
-and never copy that list into your answer. Always answer in the language that message asks for. \
-iOS thermal states: nominal (normal), fair (slightly elevated), \
-serious (high: iOS lowers performance to cool down) and critical (very high: better to stop using it).";
+Use the data only when the question is about this iPhone; otherwise ignore it. \
+Never invent data and never copy that list into your answer. Always answer in the language that message asks for. \
+iOS reports one of four thermal levels: 1 normal; 2 slightly elevated; \
+3 high, iOS lowers performance to cool down; 4 very high, better to stop using the phone. \
+To free up space on an iPhone: Settings > General > iPhone Storage, where apps can be offloaded or deleted.";
 
 /// History bytes (UTF-8) that fit comfortably in 4096 tokens alongside the persona,
 /// the per-turn note, the question and up to 512 reply tokens. CJK text uses about three
@@ -39,31 +43,54 @@ fn gb(bytes: u64) -> String {
     format!("{:.1} GB", bytes as f64 / 1_073_741_824.0)
 }
 
-/// Same words as the UI in English and the desktop app (`src/i18n/en.ts`, `thermal.*`).
-fn thermal_name(t: Thermal) -> &'static str {
-    match t {
+/// Thermal level name as the app shows it in `language` (from the UI dictionaries in
+/// `src/i18n`), so the model uses the app's word instead of translating "serious" on its
+/// own. English for languages the UI does not have.
+fn thermal_word(t: Thermal, language: &str) -> String {
+    let key = match t {
         Thermal::Nominal => "nominal",
         Thermal::Fair => "fair",
         Thermal::Serious => "serious",
         Thermal::Critical => "critical",
-        Thermal::Unknown => "unknown",
+        Thermal::Unknown => return "unknown".into(),
+    };
+    let dictionary = match language {
+        "es" => include_str!("../../../src/i18n/es.ts"),
+        "de" => include_str!("../../../src/i18n/de.ts"),
+        "fr" => include_str!("../../../src/i18n/fr.ts"),
+        "pt" | "pt-BR" => include_str!("../../../src/i18n/pt-BR.ts"),
+        "zh-Hans" => include_str!("../../../src/i18n/zh-Hans.ts"),
+        _ => include_str!("../../../src/i18n/en.ts"),
+    };
+    let pattern = format!("\"thermal.{key}\": \"");
+    dictionary
+        .split_once(&pattern)
+        .and_then(|(_, rest)| rest.split_once('"'))
+        .map(|(word, _)| word.to_string())
+        .unwrap_or_else(|| key.to_string())
+}
+
+fn thermal_level(t: Thermal) -> Option<u8> {
+    match t {
+        Thermal::Nominal => Some(1),
+        Thermal::Fair => Some(2),
+        Thermal::Serious => Some(3),
+        Thermal::Critical => Some(4),
+        Thermal::Unknown => None,
     }
 }
 
-/// iPhone data on one line.
-pub fn device_note(s: &Snapshot) -> String {
+/// iPhone data on one line, every value labeled: in the benchmark, models read an
+/// unlabeled "55.8 GB free" as free memory and the app's own memory as the phone's RAM.
+/// `language` picks the word for the thermal level.
+pub fn device_note(s: &Snapshot, language: &str) -> String {
     let mut parts = Vec::new();
     if let Some(cpu) = s.cpu {
         parts.push(format!("CPU {cpu:.0}%"));
     }
     if let Some(used) = s.ram_used {
-        parts.push(format!("RAM {} of {}", gb(used), gb(s.ram_total)));
-    }
-    if let Some(app) = s.app_footprint {
-        match s.app_available {
-            Some(headroom) => parts.push(format!("app memory {} (headroom {})", gb(app), gb(headroom))),
-            None => parts.push(format!("app memory {}", gb(app))),
-        }
+        let free = s.ram_total.saturating_sub(used);
+        parts.push(format!("RAM {} of {} used ({} free)", gb(used), gb(s.ram_total), gb(free)));
     }
     if let Some(b) = s.battery {
         let state = match b.state {
@@ -74,21 +101,24 @@ pub fn device_note(s: &Snapshot) -> String {
         };
         parts.push(format!("battery {:.0}%{state}", b.level * 100.0));
     }
-    parts.push(format!("thermal state {}", thermal_name(s.thermal)));
+    if let Some(level) = thermal_level(s.thermal) {
+        parts.push(format!("thermal level {level} of 4: {}", thermal_word(s.thermal, language)));
+    }
     if s.low_power {
         parts.push("Low Power Mode on".into());
     }
     if let Some(st) = s.storage {
-        parts.push(format!("{} free", gb(st.available)));
+        parts.push(format!("storage {} free of {}", gb(st.available), gb(st.total)));
     }
-    format!("Current data for this iPhone: {}.", parts.join(", "))
+    format!("This iPhone now (use only if the question is about it): {}.", parts.join(", "))
 }
 
-/// System message sent before a question: iPhone data (if any) and the reply language.
-pub fn turn_note(device: Option<&Snapshot>, reply_language: &str) -> String {
-    let language = format!("Reply in {reply_language}.");
+/// System message sent before a question: iPhone data (if any), then the reply language
+/// last, where small models follow it best.
+pub fn turn_note(device: Option<&Snapshot>, reply: &ReplyLanguage) -> String {
+    let language = format!("Reply in {}.", reply.english_name);
     match device {
-        Some(s) => format!("{}\n{language}", device_note(s)),
+        Some(s) => format!("{}\n{language}", device_note(s, &reply.code)),
         None => language,
     }
 }
@@ -159,20 +189,31 @@ mod tests {
     }
 
     #[test]
-    fn device_note_is_compact() {
+    fn device_note_labels_every_value() {
         assert_eq!(
-            device_note(&snapshot()),
-            "Current data for this iPhone: CPU 23%, RAM 3.0 GB of 6.0 GB, app memory 1.5 GB \
-(headroom 1.0 GB), battery 78% (charging), thermal state fair, 41.0 GB free."
+            device_note(&snapshot(), "en"),
+            "This iPhone now (use only if the question is about it): CPU 23%, RAM 3.0 GB of 6.0 GB used \
+(3.0 GB free), battery 78% (charging), thermal level 2 of 4: Fair, storage 41.0 GB free of 128.0 GB."
         );
     }
 
     #[test]
+    fn thermal_level_uses_the_app_word_in_the_reply_language() {
+        assert!(device_note(&snapshot(), "es").contains("thermal level 2 of 4: Moderado"));
+        assert!(device_note(&snapshot(), "zh-Hans").contains("thermal level 2 of 4: 一般"));
+        assert!(device_note(&snapshot(), "it").contains("thermal level 2 of 4: Fair"));
+        assert_eq!(thermal_word(Thermal::Serious, "de"), "Ernst");
+    }
+
+    #[test]
     fn turn_note_ends_with_the_reply_language() {
-        let note = turn_note(Some(&snapshot()), "German");
-        assert!(note.starts_with("Current data for this iPhone: "));
+        let german = ReplyLanguage { code: "de".into(), english_name: "German".into() };
+        let note = turn_note(Some(&snapshot()), &german);
+        assert!(note.starts_with("This iPhone now"));
+        assert!(note.contains("Erhöht"));
         assert!(note.ends_with("\nReply in German."));
-        assert_eq!(turn_note(None, "Simplified Chinese"), "Reply in Simplified Chinese.");
+        let chinese = ReplyLanguage { code: "zh-Hans".into(), english_name: "Simplified Chinese".into() };
+        assert_eq!(turn_note(None, &chinese), "Reply in Simplified Chinese.");
     }
 
     #[test]

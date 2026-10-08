@@ -53,6 +53,8 @@ pub(crate) struct Settings {
     pub language: Option<String>,
     /// UI theme id (same ids as the desktop app); `None` = System.
     pub theme: Option<String>,
+    /// Background samples for the saved history; `None` = on (the default).
+    pub background_history: Option<bool>,
 }
 
 pub struct ChatState {
@@ -341,7 +343,7 @@ pub(crate) async fn send(
     }
 
     let (reply_language, detected) = pick_reply_language(app, state, &conversation, &question).await;
-    let note = prompt::turn_note(snapshot.as_ref(), &reply_language.english_name);
+    let note = prompt::turn_note(snapshot.as_ref(), &reply_language);
     let history = prompt::history(&conversation.messages);
     let messages = prompt::build(&history, Some(&note), &question, prompt::HISTORY_BUDGET_BYTES);
 

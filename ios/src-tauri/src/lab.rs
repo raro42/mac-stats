@@ -36,7 +36,7 @@ async fn build_messages(app: &AppHandle, metrics: &MetricsState, question: &str)
     let state = app.state::<ChatState>();
     let empty = Conversation::new(String::new(), 0);
     let (reply, _) = chat_mod::pick_reply_language(app, &state, &empty, question).await;
-    let note = prompt::turn_note(metrics.latest().as_ref(), &reply.english_name);
+    let note = prompt::turn_note(metrics.latest().as_ref(), &reply);
     prompt::build(&[], Some(&note), question, prompt::HISTORY_BUDGET_BYTES)
 }
 
@@ -369,7 +369,14 @@ async fn bench_model(
                 let (text, ttft, r) = generate_collect(app, messages, 220, 0.0, 7, entry.think_prefill).await?;
                 let detected = app.llm().detect_language(&text).await.ok().flatten();
                 let base = |code: &str| code.split('-').next().unwrap_or(code).to_string();
-                let language_ok = detected.as_ref().map(|d| base(&d.code)) == Some(base(lang));
+                // Q5 is only a number (no language to detect) and Q7 asks for a translation
+                // into another language, so their expected language differs.
+                let expected = match i + 1 {
+                    5 => None,
+                    7 => Some(if *lang == "en" { "es" } else { "en" }),
+                    _ => Some(*lang),
+                };
+                let language_ok = expected.map(|e| detected.as_ref().map(|d| base(&d.code)) == Some(base(e)));
                 let item = json!({
                     "lang": lang, "n": i + 1, "prompt": prompt, "answer": text, "ttftMs": ttft,
                     "tgTps": r.tg_tps, "nGen": r.n_gen, "stop": r.stop_reason,
