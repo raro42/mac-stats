@@ -1,0 +1,173 @@
+/* "Light" theme: port of the desktop "light" theme (src-tauri/dist/themes/light/cpu.css).
+   Big, very round frosted cards on pastel blobs, a soft white highlight in each gauge card,
+   240° rings with a drop shadow and small medium-weight numbers.
+
+   Rings and cards both use the desktop .metric-card. The desktop .cpu-shell has no iPhone
+   counterpart, so its tint and frosted fill are painted onto the page background, and the
+   cards blur/saturate it like the shell does. Where the desktop has a narrow-window value
+   (cpu.css:943-974, max-width 560px) the iPhone uses that one. */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* cpu.css:39-44 body + cpu.css:56-58 shell tint and --panel-bg, top layer first */
+  --page-bg:
+    linear-gradient(135deg, rgba(220, 232, 255, 0.4), rgba(255, 226, 248, 0.32)),
+    linear-gradient(rgba(245, 245, 250, 0.55), rgba(245, 245, 250, 0.55)),
+    radial-gradient(1200px 900px at 20% 15%, rgba(155, 190, 255, 0.8), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(1100px 900px at 85% 18%, rgba(255, 210, 255, 0.75), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(900px 900px at 60% 92%, rgba(220, 220, 240, 0.9), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #ffffff, #f2f2f6);
+  /* Average color of the top 50px of --page-bg on an iPhone (status-bar band). */
+  --bg: #e1e6fd;
+
+  /* cpu.css:200-205 .metric-card; cpu.css:62 shell blur */
+  --card: rgba(255, 255, 255, 0.34);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 26px 70px rgba(0, 0, 0, 0.12);
+  --card-blur: blur(30px) saturate(170%);
+  --radius-card: 28px;
+
+  /* cpu.css:17-18. Desktop --muted is 0.55; raised to 0.64 for 4.5:1 on the iPhone. */
+  --fg: rgba(12, 12, 16, 0.86);
+  --muted: rgba(12, 12, 16, 0.64);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+
+  --track: rgba(0, 0, 0, 0.08); /* cpu.css:814 toggle track */
+  --grid: rgba(12, 12, 16, 0.12);
+  /* Desktop --accent #6aa6df, darkened (same hue) so white text and the selected tab pass AA. */
+  --accent: #2a6fae;
+  --on-accent: #fff;
+  --shadow: 0 10px 24px rgba(0, 0, 0, 0.12); /* cpu.css:168 .icon-btn */
+  /* cpu.css:22 --panel + cpu.css:485-497 settings-card glass */
+  --tabbar: rgba(245, 245, 250, 0.94);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* Desktop state hues, darkened until text on the pale glass reaches 4.5:1. */
+  --ok: #1a6c2d;
+  --warn: #ff9500;
+  --crit: #b31818;
+  --thermal-nominal: #1a6c2d;
+  --thermal-fair: #8f4a00;
+  --thermal-serious: #8f4a00;
+  --on-thermal: #fff;
+
+  /* cpu.css:365-367 every ring uses --accent except GPU (cpu.css:2496); battery cpu.css:1269 */
+  --cpu: #6aa6df;
+  --ram: #c4a8d8;
+  --disk: #6aa6df;
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* cpu.css:115-127 title (44px in the narrow-window rule, cpu.css:953-956) */
+  --title-size: 44px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  /* cpu.css:262-283 value (16px in the narrow-window rule, cpu.css:967-969) */
+  --value-size: 16px;
+  --value-weight: 560;
+  --value-tracking: -0.02em;
+  /* cpu.css:244-260 label */
+  --label-size: 11px;
+  --label-weight: 600;
+  --label-tracking: 0.02em;
+  --label-transform: none;
+  /* cpu.css:375-382 section title */
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* cpu.css:358-373 + cpu.html arc "M 13.6 71 A 42 42 0 1 1 86.4 71": 240°, gap at the bottom */
+  --ring-stroke: 6;
+  --ring-cap: round;
+  --ring-track: rgba(0, 0, 0, 0.1);
+  --ring-filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.1));
+  --ring-start: 150deg;
+  --ring-arc: 0.6667;
+}
+
+/* Let the ring's drop shadow spill past the SVG box instead of being cut into a square. */
+:root[data-theme="light"] .ring-dial svg {
+  overflow: visible;
+}
+
+/* cpu.css:214-221 .metric-card::after: soft white highlight behind the gauge. */
+:root[data-theme="light"] .ring {
+  isolation: isolate;
+}
+
+:root[data-theme="light"] .ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(140px 140px at 50% 20%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 60%);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* cpu.css:153-170 .icon-btn: round white buttons with a floating shadow. Badges in a filled
+   state (serious, critical, low power) keep their own background. */
+:root[data-theme="light"] .pill-thermal:not([data-state="serious"], [data-state="critical"]),
+:root[data-theme="light"] .pill-btn {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* cpu.css:139-151 .cpu-actions: the frosted capsule that holds the round buttons. */
+:root[data-theme="light"] .segmented {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .segmented button {
+  border-radius: 999px;
+}
+
+:root[data-theme="light"] .segmented button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    var(--shadow);
+}
+
+/* cpu.css:446-459 process bar */
+:root[data-theme="light"] .bar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .bar-fill {
+  background: linear-gradient(90deg, rgba(110, 170, 230, 0.95), rgba(140, 190, 240, 0.95));
+}
+
+/* cpu.css:2238-2242 assistant message and cpu.css:2439-2448 chat input use --panel. */
+:root[data-theme="light"] .bubble-assistant,
+:root[data-theme="light"] .composer textarea,
+:root[data-theme="light"] .model-select,
+:root[data-theme="light"] .lab-select,
+:root[data-theme="light"] .lab-prompt {
+  background: rgba(245, 245, 250, 0.94);
+}
+
+/* The page is a gradient, so a solid composer band would show; use the tab bar's glass. */
+:root[data-theme="light"] .composer {
+  background: var(--tabbar);
+  -webkit-backdrop-filter: var(--tabbar-blur);
+  backdrop-filter: var(--tabbar-blur);
+}
+
+/* Theme picker: pastel blobs and the accent. */
+.swatch[data-swatch="light"] {
+  background:
+    linear-gradient(135deg, rgba(42, 111, 174, 0) 64%, #2a6fae 64%),
+    radial-gradient(circle at 20% 15%, rgba(155, 190, 255, 0.95), rgba(255, 255, 255, 0) 75%),
+    radial-gradient(circle at 85% 20%, rgba(255, 210, 255, 0.9), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #ffffff, #f2f2f6);
+}

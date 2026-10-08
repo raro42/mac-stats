@@ -1,0 +1,177 @@
+/* "Glass" theme: port of the desktop "apple" theme (src-tauri/dist/themes/apple/cpu.css).
+   Shown as "Glass" in the picker (App Store rules forbid the Apple trademark), so unlike the
+   desktop it has no Apple logo glyph (#chip-info::before) and never says "Apple".
+   Pastel blobs behind frosted white glass, thin 240° rings with the gap at the bottom.
+
+   Mapping: rings <- .metric-card, cards <- .apple-details. The desktop's .apple-shell has no
+   iPhone counterpart, so its white glass and tints are painted onto the page background (that
+   is what sits behind the cards on the Mac), and the cards blur/saturate it like the shell. */
+
+:root[data-theme="apple"] {
+  color-scheme: light;
+
+  /* cpu.css:40-45 body + cpu.css:56-62 shell glass (0.42 white and tints), top layer first */
+  --page-bg:
+    radial-gradient(1100px 900px at 18% 12%, rgba(165, 190, 255, 0.22), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(1100px 900px at 85% 10%, rgba(255, 190, 245, 0.18), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
+    radial-gradient(900px 900px at 22% 18%, rgba(170, 205, 255, 0.75), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(900px 900px at 82% 16%, rgba(255, 210, 255, 0.7), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(900px 900px at 50% 95%, rgba(235, 235, 245, 0.95), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #ffffff, #f2f2f6);
+  /* Average color of the top 50px of --page-bg on an iPhone (status-bar band). */
+  --bg: #e0dffe;
+
+  /* cpu.css:91-100 .apple-details panel; cpu.css:62 shell blur */
+  --card: rgba(255, 255, 255, 0.22);
+  --card-border: rgba(12, 12, 16, 0.05); /* --hairline */
+  --card-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --card-blur: blur(34px) saturate(1.35);
+  --radius-card: 14px;
+
+  /* cpu.css:16-18. Desktop --muted is 0.50; raised to 0.64 for 4.5:1 on the iPhone, where the
+     blobs sit right behind the text. */
+  --fg: rgba(12, 12, 16, 0.88);
+  --muted: rgba(12, 12, 16, 0.64);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif;
+
+  --track: rgba(0, 0, 0, 0.08); /* cpu.css:832 toggle track */
+  --grid: rgba(12, 12, 16, 0.12);
+  /* Desktop --accent #8bb4e8, darkened (same hue) so white text and the selected tab pass AA. */
+  --accent: #3969a5;
+  --on-accent: #fff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  /* cpu.css:20 --panel + cpu.css:606 settings-card glass */
+  --tabbar: rgba(255, 255, 255, 0.55);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* Desktop state hues, darkened until text on the pale glass reaches 4.5:1. */
+  --ok: #1a6c2d;
+  --warn: #ff9500;
+  --crit: #b31818;
+  --thermal-nominal: #1a6c2d;
+  --thermal-fair: #8f4a00;
+  --thermal-serious: #8f4a00;
+  --on-thermal: #fff;
+
+  /* cpu.css:25-27 usage / GPU / frequency; cpu.css:1482 battery green */
+  --cpu: #9db5c4;
+  --ram: #c4a8d8;
+  --disk: #a8c5e8;
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* cpu.css:226-238 title, cpu.css:465-471 section title */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  /* cpu.css:385-400 value is 38px on a 120px ring with an 8px unit; the iPhone draws "100%"
+     in one size, so it is scaled to 32px to stay inside the 128px dial. */
+  --value-size: 32px;
+  --value-weight: 400;
+  --value-tracking: -0.01em;
+  /* cpu.css:374-383, 10px from the desktop's narrow-window rule (cpu.css:1138-1140) */
+  --label-size: 10px;
+  --label-weight: 700;
+  --label-tracking: 0.8px;
+  --label-transform: uppercase;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: none;
+
+  /* cpu.css:425-451 + cpu.html arc "M 13.6 71 A 42 42 0 1 1 86.4 71": 240°, gap at the bottom */
+  --ring-stroke: 5;
+  --ring-cap: round;
+  --ring-track: rgba(0, 0, 0, 0.06);
+  --ring-filter: none;
+  --ring-start: 150deg;
+  --ring-arc: 0.6667;
+}
+
+/* cpu.css:341-358 .metric-card: brighter glass, no border, inset highlights, soft drop. */
+:root[data-theme="apple"] .ring {
+  border-color: transparent;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 14px 34px rgba(0, 0, 0, 0.1);
+}
+
+/* cpu.css:196-216 .apple-shell::before: the 1px white gradient edge of the glass. */
+:root[data-theme="apple"] .ring::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.3));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* cpu.css:258-277 .apple-actions: header controls are white glass capsules. Badges in a
+   filled state (serious, critical, low power) keep their own background. */
+:root[data-theme="apple"] .pill-thermal:not([data-state="serious"], [data-state="critical"]),
+:root[data-theme="apple"] .pill-btn,
+:root[data-theme="apple"] .segmented {
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="apple"] .segmented {
+  border-radius: 12px;
+}
+
+/* cpu.css:279-310 .icon-btn (10px radius, 0.65 white when active) */
+:root[data-theme="apple"] .segmented button {
+  border-radius: 10px;
+}
+
+:root[data-theme="apple"] .segmented button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* cpu.css:546-559 process bar */
+:root[data-theme="apple"] .bar {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="apple"] .bar-fill {
+  background: linear-gradient(90deg, rgba(110, 170, 230, 0.9), rgba(140, 190, 240, 0.9));
+}
+
+/* cpu.css:2857-2862 assistant message, cpu.css:3144-3154 chat input */
+:root[data-theme="apple"] .bubble-assistant,
+:root[data-theme="apple"] .composer textarea,
+:root[data-theme="apple"] .model-select,
+:root[data-theme="apple"] .lab-select,
+:root[data-theme="apple"] .lab-prompt {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* The page is a gradient, so a solid composer band would show; use the tab bar's glass. */
+:root[data-theme="apple"] .composer {
+  background: var(--tabbar);
+  -webkit-backdrop-filter: var(--tabbar-blur);
+  backdrop-filter: var(--tabbar-blur);
+}
+
+/* Theme picker: pastel blobs, a frosted edge and the accent. */
+.swatch[data-swatch="apple"] {
+  background:
+    linear-gradient(135deg, rgba(57, 105, 165, 0) 64%, #3969a5 64%),
+    radial-gradient(circle at 22% 22%, rgba(170, 205, 255, 0.95), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(circle at 82% 18%, rgba(255, 210, 255, 0.9), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #ffffff, #f2f2f6);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}

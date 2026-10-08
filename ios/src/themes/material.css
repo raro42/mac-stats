@@ -1,0 +1,150 @@
+/* "Material" theme: port of the desktop "material" theme (src-tauri/dist/themes/material/cpu.css).
+   Warm paper, no glass: each gauge is a full-circle ring around an embossed dial face, beige
+   for usage, lilac for GPU/RAM.
+
+   The desktop .mat-card sheet has no iPhone counterpart, so its fill is painted onto the page
+   background. Rings <- the borderless .dial; cards <- the paper of the settings card. */
+
+:root[data-theme="material"] {
+  color-scheme: light;
+
+  /* cpu.css:38-41 body + cpu.css:53 .mat-card fill, top layer first */
+  --page-bg:
+    linear-gradient(rgba(235, 228, 217, 0.86), rgba(235, 228, 217, 0.86)),
+    radial-gradient(1000px 800px at 20% 15%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(1000px 800px at 80% 20%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #eee9e1, #e7e2d9);
+  /* Color of the top of --page-bg on an iPhone (status-bar band, composer). */
+  --bg: #ece6dc;
+
+  /* cpu.css:24-25 --panel / --panel-border, cpu.css:485 settings-card radius,
+     cpu.css:373-376 history-chart-container shadow (the desktop's in-flow card shadow) */
+  --card: rgba(245, 241, 234, 0.96);
+  --card-border: rgba(24, 24, 26, 0.14);
+  --card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  --card-blur: none;
+  --radius-card: 22px;
+
+  /* cpu.css:12-13. Desktop --muted is 0.55; raised to 0.66 for 4.5:1 on the paper. */
+  --fg: rgba(24, 24, 26, 0.85);
+  --muted: rgba(24, 24, 26, 0.66);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+
+  --track: rgba(0, 0, 0, 0.08); /* cpu.css:688 toggle track */
+  --grid: rgba(24, 24, 26, 0.14); /* --rule */
+  /* Desktop --accent #b8a68b, darkened (same hue) so white text and the selected tab pass AA. */
+  --accent: #76654b;
+  --on-accent: #fff;
+  --shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  /* cpu.css:24 --panel + cpu.css:489 settings-card blur */
+  --tabbar: rgba(245, 241, 234, 0.96);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* --warn is the desktop's own (cpu.css:21). Other state hues are darkened until text on
+     the paper reaches 4.5:1. */
+  --ok: #1a6c2d;
+  --warn: #e2b14a;
+  --crit: #b31818;
+  --thermal-nominal: #1a6c2d;
+  --thermal-fair: #8f4a00;
+  --thermal-serious: #8f4a00;
+  --on-thermal: #fff;
+
+  /* cpu.css:293-295 every ring uses --accent except GPU (cpu.css:2376); battery cpu.css:1056 */
+  --cpu: #b8a68b;
+  --ram: #c4a8d8;
+  --disk: #b8a68b;
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* cpu.css:105-118 title, cpu.css:309-316 section title */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  /* cpu.css:228-245 value is 38px inside a ~160px dial face; the iPhone face is ~100px wide
+     and "100%" is drawn in one size, so it is scaled to 30px to stay inside the ring. */
+  --value-size: 30px;
+  --value-weight: 400;
+  --value-tracking: -0.01em;
+  /* cpu.css:217-226 label */
+  --label-size: 11px;
+  --label-weight: 700;
+  --label-tracking: 0.8px;
+  --label-transform: uppercase;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* cpu.css:286-302: full circle starting at 12 o'clock, 8-unit stroke, track at 0.85 opacity */
+  --ring-stroke: 8;
+  --ring-cap: round;
+  --ring-track: rgba(0, 0, 0, 0.102);
+  --ring-filter: none;
+  --ring-start: -90deg;
+  --ring-arc: 1;
+}
+
+/* cpu.css:173-180 .dial: no visible card, the embossed face carries the gauge. */
+:root[data-theme="material"] .ring {
+  border-color: transparent;
+  border-radius: 28px;
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+/* cpu.css:182-193 .dial::before: the raised dial face, sized to sit just under the stroke
+   (radius 39 of 100, like the desktop). Shadows are scaled to the smaller face (x0.6). */
+:root[data-theme="material"] .ring-dial {
+  isolation: isolate;
+}
+
+:root[data-theme="material"] .ring-dial::before {
+  content: "";
+  position: absolute;
+  inset: 11%;
+  z-index: -1;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  background: rgba(245, 241, 234, 0.8);
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.45),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.18),
+    0 11px 24px rgba(0, 0, 0, 0.22);
+}
+
+/* cpu.css:135-151 .icon-btn: translucent white with a dark rim. Badges in a filled state
+   (serious, critical, low power) keep their own background. */
+:root[data-theme="material"] .pill-thermal:not([data-state="serious"], [data-state="critical"]),
+:root[data-theme="material"] .pill-btn {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* The "New chat" button is a desktop .icon-btn, raised. */
+:root[data-theme="material"] .pill-btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 14px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* cpu.css:441-453 process bar: ink, not color */
+:root[data-theme="material"] .bar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="material"] .bar-fill {
+  background: rgba(24, 24, 26, 0.28);
+}
+
+/* Theme picker: paper with a small dial in the ring color. */
+.swatch[data-swatch="material"] {
+  background:
+    radial-gradient(circle at 50% 50%, #f5f1ea 0 4px, #b8a68b 4.5px 6.5px, rgba(184, 166, 139, 0) 7px),
+    linear-gradient(180deg, #eee9e1, #e7e2d9);
+}

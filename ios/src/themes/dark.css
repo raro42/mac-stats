@@ -1,0 +1,132 @@
+/* "Dark (TUI)" theme, ported from src-tauri/dist/themes/dark/cpu.css (fixed dark).
+   Black terminal, green phosphor text, everything monospace, outline tiles, thin
+   full-circle rings and a green border that lights up on touch (desktop: on hover). */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Page: dark/cpu.css:12 + :29-36 body is pure black. */
+  --bg: #000000;
+  --page-bg: #000000;
+
+  /* Surfaces: :13 panel #0a0a0a, :181-188 tile outline #004400 with 14px corners.
+     Static glow: the :47 panel shadow (0 20px 60px, 10% green) scaled to card size. */
+  --card: #0a0a0a;
+  --card-border: #004400;
+  --card-shadow: 0 10px 30px rgba(0, 255, 0, 0.08);
+  --card-blur: none;
+  --radius-card: 14px;
+
+  /* Text: :14-15 green text and secondary. Desktop --text-muted #008800 is 4.3:1 on the
+     panel, so muted uses the secondary #00cc00 (desktop labels/subtitle use it too). */
+  --fg: #00ff00;
+  --muted: #00cc00;
+  --font: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  /* Controls: :18 accent, :24 inactive ring for tracks/bars, :19 hairline for grid. */
+  --track: #003300;
+  --grid: #004400;
+  --accent: #00cc66;
+  --on-accent: #000;
+  --shadow: 0 0 0 1px #004400;
+  --tabbar: rgba(10, 10, 10, 0.94);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* States: iOS dark colors; black text on red reads better than white (6:1). */
+  --warn: #ff9f0a;
+  --on-warn: #111;
+  --crit: #ff453a;
+  --on-crit: #000;
+
+  /* Thermal: desktop state colors unchanged (all above 6:1 on black). */
+  --thermal-nominal: #34c759;
+  --thermal-fair: #ff9500;
+  --thermal-serious: #ff9500;
+  --thermal-critical: var(--crit);
+  --on-thermal: #111;
+
+  /* Metrics: :23 active ring green for usage and frequency, GPU lavender (:2358),
+     battery in the theme accent green. */
+  --cpu: #00ff00;
+  --ram: #c4a8d8;
+  --disk: #00ff00;
+  --battery: #00cc66;
+
+  /* Type: :134-137 title 20/700; :211-216 label 11px; :218-226 value 26/800 (fits the
+     128px ring as is); :317-324 section title 13/800 uppercase 0.08em. */
+  --title-size: 20px;
+  --title-weight: 700;
+  --title-tracking: normal;
+  --value-size: 26px;
+  --value-weight: 800;
+  --value-tracking: normal;
+  --label-size: 11px;
+  --label-weight: 400;
+  --label-tracking: normal;
+  --label-transform: none;
+  --h2-size: 13px;
+  --h2-weight: 800;
+  --h2-tracking: 0.08em;
+  --h2-transform: uppercase;
+
+  /* Rings: :254-280 thin full circle (stroke 3), inactive track #003300 at 0.7,
+     progress starts rotated -120deg. */
+  --ring-stroke: 3;
+  --ring-cap: round;
+  --ring-track: rgba(0, 51, 0, 0.7);
+  --ring-filter: none;
+  --ring-start: -120deg;
+  --ring-arc: 1;
+}
+
+/* :124-132 header separated by a hairline; :139-143 subtitle 12px. */
+:root[data-theme="dark"] .top {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+:root[data-theme="dark"] .device {
+  font-size: 12px;
+}
+
+/* :86-122 the panel gets a 2px rgba(0,255,0,0.8) border on hover. The desktop animation
+   moves a vertical gradient sideways, so it renders as a steady ring: reproduced with a
+   box-shadow on touch. iOS only applies :active when the page has a touchstart listener. */
+:root[data-theme="dark"] .ring:active,
+:root[data-theme="dark"] .card:active {
+  box-shadow: var(--card-shadow), 0 0 0 2px rgba(0, 255, 0, 0.8);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme="dark"] .ring,
+  :root[data-theme="dark"] .card {
+    transition: box-shadow 0.3s ease;
+  }
+}
+
+/* Selected tab: the accent (#00cc66) is too close to the muted green, so use bright
+   green and bold like an active terminal pane. */
+:root[data-theme="dark"] .tab[aria-selected="true"] {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+/* User bubble as a green outline, like the desktop's focused chat input
+   (accent 45% border, accent 10% fill). Desktop chat corners are 8px
+   (:1997 .chat-message, :2212 #chat-input, :2233 #chat-send-btn). */
+:root[data-theme="dark"] .bubble,
+:root[data-theme="dark"] .composer textarea,
+:root[data-theme="dark"] .composer-send {
+  border-radius: 8px;
+}
+
+:root[data-theme="dark"] .bubble-user {
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, #004400);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--fg);
+}
+
+/* Theme picker: black terminal with phosphor green. */
+.swatch[data-swatch="dark"] {
+  background: linear-gradient(135deg, #000000 50%, #00ff00 50%);
+}

@@ -1,0 +1,995 @@
+/* Layout and components. Every color, font and shape comes from the theme tokens in
+   system.css (defaults) and <theme>.css (desktop themes); see the list there. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  font-family: var(--font);
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* Page background on a fixed layer: iOS ignores background-attachment: fixed, and
+   theme backgrounds (gradients, grids) must not scroll with the content. */
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-bg);
+  pointer-events: none;
+}
+
+body {
+  min-height: 100vh;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Band under the status bar so scrolled content does not run over the clock. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  height: env(safe-area-inset-top);
+  background: var(--bg);
+}
+
+.view {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 88px);
+}
+
+.view[hidden],
+[hidden] {
+  display: none !important;
+}
+
+/* Hidden until main.ts applies the active language, so no text flashes in the wrong one. */
+body.i18n-pending {
+  visibility: hidden;
+}
+
+/* Read by VoiceOver, not shown. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Header */
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.top h1 {
+  margin: 0;
+  font-size: var(--title-size);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+}
+
+/* Negative tracking crowds CJK glyphs. */
+:lang(zh) .top h1 {
+  letter-spacing: 0;
+}
+
+.device {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--track);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pill-thermal[data-state="nominal"] {
+  color: var(--thermal-nominal);
+}
+
+.pill-thermal[data-state="fair"] {
+  color: var(--thermal-fair);
+}
+
+.pill-thermal[data-state="serious"] {
+  background: var(--thermal-serious);
+  color: var(--on-thermal);
+}
+
+.pill-thermal[data-state="critical"] {
+  background: var(--thermal-critical);
+  color: var(--on-crit);
+}
+
+.pill-lowpower {
+  background: var(--lowpower);
+  color: var(--on-lowpower);
+}
+
+/* Rings */
+.rings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ring {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
+  --ring-color: var(--accent);
+}
+
+.accent-cpu {
+  --ring-color: var(--cpu);
+}
+
+.accent-ram {
+  --ring-color: var(--ram);
+}
+
+.accent-disk {
+  --ring-color: var(--disk);
+}
+
+.accent-battery {
+  --ring-color: var(--battery);
+}
+
+.ring[data-level="warn"] {
+  --ring-color: var(--warn);
+}
+
+.ring[data-level="crit"] {
+  --ring-color: var(--crit);
+}
+
+.ring-dial {
+  position: relative;
+  width: 100%;
+  max-width: 128px;
+}
+
+.ring-dial svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ring-track,
+.ring-progress {
+  fill: none;
+  stroke-width: var(--ring-stroke);
+  stroke-linecap: var(--ring-cap);
+  transform: rotate(var(--ring-start));
+  transform-origin: 50% 50%;
+}
+
+.ring-track {
+  stroke: var(--ring-track);
+}
+
+.ring-progress {
+  stroke: var(--ring-color);
+  filter: var(--ring-filter);
+  transition: stroke-dasharray 0.3s ease, stroke 0.3s ease;
+}
+
+/* Small changes jump without animating (see ring-gauge.ts). */
+.ring-progress.ring-instant {
+  transition: stroke 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress {
+    transition: none;
+  }
+}
+
+.ring[data-empty="true"] .ring-progress {
+  opacity: 0;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-value {
+  font-size: var(--value-size);
+  font-weight: var(--value-weight);
+  letter-spacing: var(--value-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+.ring-label {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  text-transform: var(--label-transform);
+}
+
+.ring-sub {
+  min-height: 1.3em;
+  margin-top: -4px;
+  padding: 0 2px;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cards */
+.card {
+  padding: 14px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  -webkit-backdrop-filter: var(--card-blur);
+  backdrop-filter: var(--card-blur);
+}
+
+.card h2,
+.conversations summary,
+.lab summary {
+  margin: 0 0 10px;
+  font-size: var(--h2-size);
+  font-weight: var(--h2-weight);
+  letter-spacing: var(--h2-tracking);
+  text-transform: var(--h2-transform);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.card-head h2 {
+  margin: 0;
+}
+
+.card-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.bar-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.6s ease;
+}
+
+.net-row {
+  display: flex;
+  gap: 28px;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.net-arrow {
+  margin-right: 6px;
+  color: var(--muted);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--track);
+}
+
+.segmented button {
+  appearance: none;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: var(--shadow);
+}
+
+.chart {
+  position: relative;
+  margin-top: 8px;
+}
+
+.chart-label {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chart-canvas {
+  display: block;
+  width: 100%;
+  height: 72px;
+}
+
+.footnote {
+  margin: 2px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Tab bar */
+.tabbar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 0 calc(env(safe-area-inset-bottom) + 2px);
+  border-top: 1px solid var(--card-border);
+  background: var(--tabbar);
+  -webkit-backdrop-filter: var(--tabbar-blur);
+  backdrop-filter: var(--tabbar-blur);
+}
+
+.tab {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 72px;
+  padding: 4px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tab svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--accent);
+}
+
+/* Lab (phase A) */
+.lab-select,
+.lab-prompt {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+}
+
+.lab-prompt {
+  margin-top: 10px;
+  resize: vertical;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.lab-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lab-btn {
+  flex: 1;
+  appearance: none;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--track);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lab-btn:disabled {
+  opacity: 0.5;
+}
+
+.lab-send {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.lab-output {
+  min-height: 3em;
+  margin-top: 12px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Chat (phase B) */
+.chat-view {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 150px);
+}
+
+.pill-btn {
+  appearance: none;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--track);
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.model-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+}
+
+.model-card .bar {
+  margin-top: 10px;
+}
+
+.model-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.model-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.model-cellular {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.banner {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn);
+  color: var(--on-warn);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chat-empty {
+  margin: 8px 12px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 16px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.bubble-user {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+  white-space: pre-wrap;
+}
+
+.bubble-assistant {
+  align-self: flex-start;
+  border: 1px solid var(--card-border);
+  border-bottom-left-radius: 6px;
+  background: var(--card);
+}
+
+.bubble-pending {
+  color: var(--muted);
+}
+
+.bubble-error {
+  align-self: stretch;
+  max-width: none;
+  background: transparent;
+  color: var(--crit);
+  font-size: 14px;
+}
+
+.bubble-meta {
+  align-self: flex-start;
+  margin: -4px 0 4px 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bubble-assistant p,
+.bubble-assistant ul,
+.bubble-assistant ol,
+.bubble-assistant pre,
+.bubble-assistant blockquote {
+  margin: 0 0 8px;
+}
+
+.bubble-assistant > :last-child {
+  margin-bottom: 0;
+}
+
+.bubble-assistant ul,
+.bubble-assistant ol {
+  padding-left: 20px;
+}
+
+.bubble-assistant code {
+  padding: 1px 4px;
+  border-radius: 5px;
+  background: var(--track);
+  font-size: 14px;
+}
+
+.bubble-assistant pre {
+  overflow-x: auto;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--track);
+}
+
+.bubble-assistant pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.conv-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conv-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--card-border);
+}
+
+.conv-open {
+  flex: 1;
+  overflow: hidden;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-delete {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--crit);
+  font: inherit;
+  font-size: 13px;
+}
+
+.composer {
+  position: fixed;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 58px);
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  background: var(--bg);
+}
+
+.composer textarea {
+  flex: 1;
+  max-height: 140px;
+  padding: 10px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--fg);
+  font: inherit;
+  font-size: 16px;
+  resize: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Long placeholders (German, French) stay on one line instead of being cut in half. */
+.composer textarea::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.composer-send {
+  flex: none;
+  white-space: nowrap;
+  appearance: none;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.composer-send:disabled {
+  opacity: 0.4;
+}
+
+/* Automatic benchmark progress (debug only) */
+.bench-banner {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 4px);
+  right: 12px;
+  left: 12px;
+  z-index: 20;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Settings: language and theme lists */
+.choice-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--card-border);
+  font-size: 16px;
+}
+
+.choice:first-child {
+  border-top: 0;
+}
+
+.choice input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* Thermal card: the four iOS thermal states with the current one highlighted. Colors and
+   the pulse for serious/critical match the desktop's thermal card. */
+.thermal-card {
+  --level-color: var(--muted);
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--level-color) 7%, transparent),
+    color-mix(in srgb, var(--level-color) 7%, transparent)
+  );
+}
+
+.thermal-card[data-state="nominal"] {
+  --level-color: var(--thermal-nominal);
+}
+
+.thermal-card[data-state="fair"] {
+  --level-color: var(--thermal-fair);
+}
+
+.thermal-card[data-state="serious"] {
+  --level-color: var(--thermal-serious);
+}
+
+.thermal-card[data-state="critical"] {
+  --level-color: var(--thermal-critical);
+}
+
+.thermal-level {
+  color: var(--level-color);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.thermal-scale {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.thermal-step {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.thermal-step::before {
+  content: "";
+  height: 6px;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.thermal-step[data-step="nominal"] {
+  --step-color: var(--thermal-nominal);
+}
+
+.thermal-step[data-step="fair"] {
+  --step-color: var(--thermal-fair);
+}
+
+.thermal-step[data-step="serious"] {
+  --step-color: var(--thermal-serious);
+}
+
+.thermal-step[data-step="critical"] {
+  --step-color: var(--thermal-critical);
+}
+
+.thermal-step.is-passed::before {
+  background: var(--step-color);
+  opacity: 0.35;
+}
+
+.thermal-step.is-current {
+  color: var(--fg);
+  font-weight: 650;
+}
+
+.thermal-step.is-current::before {
+  background: var(--step-color);
+}
+
+.thermal-card[data-state="serious"] .is-current::before,
+.thermal-card[data-state="critical"] .is-current::before {
+  animation: thermal-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes thermal-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thermal-card .is-current::before {
+    animation: none;
+  }
+}
+
+/* Thermal history strip under the CPU/RAM charts. */
+.chart-thermal {
+  margin-top: 10px;
+}
+
+.chart-caption {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.thermal-canvas {
+  display: block;
+  width: 100%;
+  height: 10px;
+  margin-top: 4px;
+}
+
+/* Data Poster mini charts: hidden unless the theme shows them. */
+.poster-charts {
+  display: none;
+}
+
+/* Theme picker swatch; each theme file paints its own. */
+.swatch {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+}
+
+.swatch[data-swatch="system"] {
+  background: linear-gradient(135deg, #f2f2f7 50%, #07090c 50%);
+}
+
+/* Settings: switch row (label left, iOS-style switch right). */
+.switch-row {
+  justify-content: space-between;
+  border-top: 0;
+}
+
+.switch-row input[role="switch"] {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--track);
+  transition: background 0.2s ease;
+}
+
+.switch-row input[role="switch"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.switch-row input[role="switch"]:checked {
+  background: var(--ok);
+}
+
+.switch-row input[role="switch"]:checked::after {
+  transform: translateX(20px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-row input[role="switch"],
+  .switch-row input[role="switch"]::after {
+    transition: none;
+  }
+}
+
+.history-delete {
+  width: 100%;
+  margin-top: 12px;
+  color: var(--crit);
+}
+
+.history-note {
+  margin: 8px 0 0;
+}
+
+/* Five history ranges: the switcher gets its own full-width row under the title, so
+   it fits on a phone in every language. */
+.history-card .card-head {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.history-card .segmented {
+  display: flex;
+}
+
+.history-card .segmented button {
+  flex: 1;
+  padding-inline: 4px;
+  white-space: nowrap;
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Ventana principal: solo el IPC básico de Tauri. Los comandos propios se registran en lib.rs.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

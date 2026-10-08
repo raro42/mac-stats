@@ -1,0 +1,2 @@
+/* App name on the home screen. The brand name is the same in every language. */
+"CFBundleDisplayName" = "iOS Stats";

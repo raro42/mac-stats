@@ -1,0 +1,148 @@
+/* "Swiss Minimalistic" theme, ported from src-tauri/dist/themes/swiss-minimalistic/cpu.css
+   (fixed light). White, flat page; ring tiles with a hairline border and a soft shadow;
+   grey ink rings shown as a top arc; other sections are plain, separated by hairline rules. */
+
+:root[data-theme="swiss-minimalistic"] {
+  color-scheme: light;
+
+  /* Page: swiss-minimalistic/cpu.css:28-35 body and :37-60 shell are plain white. */
+  --bg: #ffffff;
+  --page-bg: #ffffff;
+
+  /* Surfaces: :161-170 .tile (white 24% on white, 1px border, soft shadow, 28px corners). */
+  --card: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 16px 46px rgba(0, 0, 0, 0.08);
+  --card-blur: none;
+  --radius-card: 28px;
+
+  /* Text: :18-19. Desktop --muted is 0.55; raised to 0.60 for 4.5:1 on white and grey. */
+  --fg: rgba(18, 18, 22, 0.9);
+  --muted: rgba(18, 18, 22, 0.6);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+
+  /* Controls: :22 accent is grey ink; :400-406 process-bar track; :13 rule. */
+  --track: rgba(0, 0, 0, 0.1);
+  --grid: rgba(0, 0, 0, 0.1);
+  --accent: rgba(18, 18, 22, 0.68);
+  --on-accent: #fff;
+  /* :11 panel and the shared settings card blur. */
+  --tabbar: rgba(255, 255, 255, 0.94);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* States: darker iOS shades so text passes 4.5:1 on white. */
+  --ok: #1b6e30;
+  --warn: #ff9500;
+  --on-warn: #111;
+  --crit: #d70015;
+  --on-crit: #fff;
+
+  /* Thermal: same hues as the desktop #34c759 / #ff9500, darkened for 4.5:1 text on
+     white; white text on the serious pill. */
+  --thermal-nominal: #1b6e30;
+  --thermal-fair: #945300;
+  --thermal-serious: #945300;
+  --thermal-critical: var(--crit);
+  --on-thermal: #fff;
+
+  /* Metrics: usage and frequency rings use the grey ink (:271-280), GPU lavender (:2447),
+     battery green (:1220). */
+  --cpu: rgba(18, 18, 22, 0.68);
+  --ram: #c4a8d8;
+  --disk: rgba(18, 18, 22, 0.68);
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* Type: :104-116 title 30/400; :193-201 label 11/700 uppercase 0.8px; :203-219 value
+     38/400; :282-289 section title 16/400 uppercase. Value scaled 38 -> 26px with the
+     ring (desktop ring 185px, here 128px). */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  --value-size: 26px;
+  --value-weight: 400;
+  --value-tracking: -0.01em;
+  --label-size: 11px;
+  --label-weight: 700;
+  --label-tracking: 0.07em;
+  --label-transform: uppercase;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* Rings: :248-280 stroke 6, the circle clipped so only the top arc shows; here a
+     semicircle over the top (starts at 9 o'clock, ends at 3 o'clock). */
+  --ring-stroke: 6;
+  --ring-cap: round;
+  --ring-track: rgba(0, 0, 0, 0.12);
+  --ring-filter: none;
+  --ring-start: 180deg;
+  --ring-arc: 0.5;
+}
+
+/* :104-123 title in near-black, subtitle 18/500. */
+:root[data-theme="swiss-minimalistic"] .top h1 {
+  color: rgba(18, 18, 22, 0.92);
+}
+
+:root[data-theme="swiss-minimalistic"] .device {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* :148-152 hairline rule under the header. */
+:root[data-theme="swiss-minimalistic"] .top {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--grid);
+}
+
+/* :161-170 tile padding (24/18/18), narrowed sideways to keep the 128px ring. */
+:root[data-theme="swiss-minimalistic"] .ring {
+  padding: 20px 10px 14px;
+}
+
+/* The arc only uses the top half of the dial: pull the subtext up into the empty half. */
+:root[data-theme="swiss-minimalistic"] .ring-dial {
+  margin-bottom: calc(min(100%, 128px) * -0.22);
+}
+
+/* :265-269 the track has square ends (clipped circle); only the progress is round. */
+:root[data-theme="swiss-minimalistic"] .ring-track {
+  stroke-linecap: butt;
+}
+
+/* :230-240 subtext weight 600. */
+:root[data-theme="swiss-minimalistic"] .ring-sub {
+  font-weight: 600;
+}
+
+/* :353-364 details/processes are not boxed: flat sections under a hairline rule. */
+:root[data-theme="swiss-minimalistic"] .card {
+  padding: 16px 0 4px;
+  border-width: 1px 0 0;
+  border-color: rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Thermal card keeps its state wash, shaped like the desktop ring wash
+   (agent-ops.css .metric-card.is-fair: 12px corners, 1px ring at 18%). */
+:root[data-theme="swiss-minimalistic"] .thermal-card {
+  padding: 14px 16px;
+  border-color: transparent;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--level-color) 18%, transparent);
+}
+
+/* Desktop chat (:2175 .chat-message, :2390 #chat-input, :2411 #chat-send-btn): 8px corners. */
+:root[data-theme="swiss-minimalistic"] .bubble,
+:root[data-theme="swiss-minimalistic"] .composer textarea,
+:root[data-theme="swiss-minimalistic"] .composer-send {
+  border-radius: 8px;
+}
+
+/* Theme picker: white with the grey ink accent. */
+.swatch[data-swatch="swiss-minimalistic"] {
+  background: linear-gradient(135deg, #ffffff 50%, rgba(18, 18, 22, 0.68) 50%);
+}

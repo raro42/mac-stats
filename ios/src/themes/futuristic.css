@@ -1,0 +1,165 @@
+/* "Futuristic": port of the desktop theme (src-tauri/dist/themes/futuristic/cpu.css).
+   Fixed dark: cyan #3bd6ff / violet #a67bff glows on a deep navy gradient, thin full-circle
+   rings with a cyan glow, cyan→violet bars. The desktop also layers `futuristic-bg.svg`,
+   which is missing from the repo, so only its gradients are ported. */
+
+:root[data-theme="futuristic"] {
+  color-scheme: dark;
+
+  /* Page: body background (cpu.css:34-39). The 900px blobs are sized for the 820px-wide
+     desktop window; 110vw keeps that proportion on a phone. --bg is a solid blend of the
+     top of the page (navy + both blobs) so the status band does not show a seam. */
+  --bg: #141d2e;
+  --page-bg:
+    radial-gradient(110vw 110vw at 20% 15%, rgba(59, 214, 255, 0.25), rgba(0, 0, 0, 0) 55%),
+    radial-gradient(110vw 110vw at 80% 20%, rgba(166, 123, 255, 0.22), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(135deg, #07070c 0%, #111123 55%, #090916 100%);
+
+  /* Surfaces: .metric-tile (cpu.css:167-178). The desktop panel blur is 2px (cpu.css:51),
+     invisible over a smooth gradient, so cards skip it. Tab bar = settings glass
+     (cpu.css:448-461, --panel). */
+  --card: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-shadow: none;
+  --card-blur: none;
+  --radius-card: 16px;
+  --tabbar: rgba(14, 14, 24, 0.92);
+  --tabbar-blur: blur(36px) saturate(160%);
+
+  /* Text: :root (cpu.css:9-17). */
+  --fg: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.6);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+
+  /* Controls: track = .process-bar (cpu.css:409-415), grid = --hairline. */
+  --track: rgba(255, 255, 255, 0.12);
+  --grid: rgba(255, 255, 255, 0.12);
+  --accent: #3bd6ff;
+  --on-accent: #07070c; /* 11.7:1 on the cyan */
+
+  /* Metrics: CPU and Storage use the ring cyan, RAM the desktop GPU ring
+     (cpu.css:2404-2406), battery the desktop charging green (cpu.css:1086-1088). */
+  --cpu: #3bd6ff;
+  --ram: #c4a8d8;
+  --disk: #3bd6ff;
+  --battery: rgba(52, 199, 89, 0.8);
+
+  /* Type: h1 (cpu.css:109-121), .metric-value (211-227), .metric-label (201-209),
+     .section-title (291-298). */
+  --title-size: 30px;
+  --title-weight: 400;
+  --title-tracking: -0.01em;
+  /* Desktop 38px with a separate 8px unit; here "%" is part of the string, so 36px keeps
+     "100 %" (de/fr) inside the ring. */
+  --value-size: 36px;
+  --value-weight: 400;
+  --value-tracking: -0.01em;
+  --label-size: 11px;
+  --label-weight: 700;
+  --label-tracking: 0.8px;
+  --label-transform: uppercase;
+  --h2-size: 16px;
+  --h2-weight: 400;
+  --h2-tracking: 0.5px;
+  --h2-transform: uppercase;
+
+  /* Rings: .ring-track / .ring-progress (cpu.css:267-284). Full circle, arc start rotated
+     -120deg, 3-unit stroke; the track is 0.14 white at opacity 0.6. */
+  --ring-stroke: 3;
+  --ring-cap: round;
+  --ring-track: rgba(255, 255, 255, 0.084);
+  --ring-filter: drop-shadow(0 0 8px rgba(59, 214, 255, 0.35));
+  --ring-start: -120deg;
+  --ring-arc: 1;
+}
+
+/* Header rule: .panel-header (cpu.css:99-107). */
+:root[data-theme="futuristic"] .top {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Gauge tile: label on top, value centered in the ring, sub-text below
+   (.metric-tile / .metric-label, cpu.css:167-209). */
+:root[data-theme="futuristic"] .ring {
+  padding: 31px 16px 16px;
+  /* Same glow as cpu.css:283, tinted with each ring's color (RAM, warn, crit). */
+  --ring-filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ring-color) 35%, transparent));
+}
+
+/* Desktop also sets opacity 0.5 on the label; dropped to keep 4.5:1 contrast. */
+:root[data-theme="futuristic"] .ring-label {
+  position: absolute;
+  top: -21px;
+  right: 0;
+  left: 0;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+:root[data-theme="futuristic"] .ring-sub {
+  font-weight: 600; /* .metric-subtext (cpu.css:239-249) */
+}
+
+:root[data-theme="futuristic"] .card h2,
+:root[data-theme="futuristic"] .card summary {
+  color: rgba(255, 255, 255, 0.75); /* .section-title */
+}
+
+/* Bars: .process-bar / .process-bar-fill (cpu.css:409-422); the glow needs overflow. */
+:root[data-theme="futuristic"] .bar {
+  height: 3px;
+  overflow: visible;
+}
+
+:root[data-theme="futuristic"] .bar-fill {
+  background: linear-gradient(90deg, #3bd6ff, #a67bff);
+  box-shadow: 0 0 10px rgba(59, 214, 255, 0.35);
+}
+
+/* Period switch styled like .time-range-dropdown (cpu.css:2338-2360). */
+:root[data-theme="futuristic"] .segmented {
+  padding: 0;
+  border: 1px solid rgba(59, 214, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(59, 214, 255, 0.05);
+}
+
+:root[data-theme="futuristic"] .segmented button {
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+}
+
+:root[data-theme="futuristic"] .segmented button[aria-pressed="true"] {
+  background: rgba(59, 214, 255, 0.15);
+  color: #3bd6ff;
+  box-shadow: none;
+}
+
+/* History charts: .history-chart-container / .history-chart-label (cpu.css:335-363);
+   no backdrop blur (smooth background behind). */
+:root[data-theme="futuristic"] .chart-canvas {
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+:root[data-theme="futuristic"] .chart-label {
+  top: 4px;
+  left: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.swatch[data-swatch="futuristic"] {
+  background:
+    radial-gradient(circle at 25% 25%, rgba(59, 214, 255, 0.85), rgba(0, 0, 0, 0) 55%),
+    radial-gradient(circle at 80% 30%, rgba(166, 123, 255, 0.75), rgba(0, 0, 0, 0) 55%),
+    linear-gradient(135deg, #07070c, #111123 55%, #090916);
+}

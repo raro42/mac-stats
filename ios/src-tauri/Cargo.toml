@@ -1,0 +1,60 @@
+[package]
+name = "ios-stats"
+version = "0.1.0"
+description = "iOS Stats: iPhone monitor and local AI chat (derived from mac-stats)"
+authors = ["gilberto"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+# The `_lib` suffix avoids a name clash with the desktop binary.
+name = "ios_stats_lib"
+# No cdylib: iOS only uses the staticlib, and the dylib would have to resolve the
+# llama.framework symbols at link time (only Xcode links that framework).
+crate-type = ["staticlib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-llm = { path = "../plugins/tauri-plugin-llm" }
+tokio = { version = "1", features = ["time", "sync", "macros"] }
+libc = "0.2"
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSArray",
+  "NSDictionary",
+  "NSEnumerator",
+  "NSError",
+  "NSLocale",
+  "NSObject",
+  "NSProcessInfo",
+  "NSSet",
+  "NSString",
+  "NSURL",
+  "NSValue",
+] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+objc2-ui-kit = { version = "0.3", default-features = false, features = [
+  "std",
+  "UIApplication",
+  "UIDevice",
+  "UIInterface",
+  "UIResponder",
+  "UIScene",
+  "UIView",
+  "UIWindow",
+  "UIWindowScene",
+] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

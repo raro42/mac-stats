@@ -1,0 +1,424 @@
+[
+  {
+    "availableBefore": 4278990720,
+    "batteryAfter": 1.0,
+    "batteryBefore": 1.0,
+    "bench": {
+      "availableMemory": 4093897344,
+      "ppRuns": [
+        174.21467678132038,
+        162.0363945147923,
+        149.77392582460715
+      ],
+      "ppTps": 162.0083323735733,
+      "tgRuns": [
+        18.87101742519157,
+        18.654028076862613,
+        17.94033695750832
+      ],
+      "tgTps": 18.48846081985417
+    },
+    "coldLoadMs": 2017.016666,
+    "file": "Qwen3.5-2B-Q4_K_M.gguf",
+    "firstReply": {
+      "availableMemory": 4075317888,
+      "genMs": 624.059125,
+      "nCached": 0,
+      "nGen": 8,
+      "nPrompt": 148,
+      "ppTps": 139.8011131931905,
+      "promptMs": 1058.646792,
+      "stopReason": "length",
+      "tgTps": 12.819298171467326
+    },
+    "firstReplyTtftMs": 1309.04475,
+    "id": "qwen3.5-2b",
+    "loadUnloadCycles": 3,
+    "model": {
+      "bytes": 1269873920,
+      "description": "qwen35 2B Q4_K - Medium",
+      "gpu": true,
+      "params": 1881825088
+    },
+    "peaks": {
+      "maxFootprint": 216929664,
+      "minAvailable": 4078037632,
+      "worstThermal": "serious"
+    },
+    "quality": [
+      {
+        "answer": "¡Hola! Todo parece estar en orden. Tu batería está al 100 % y tu memoria de la app tiene un margen saludable de 3.8 GB, así que no hay problemas por ahora. ¿Hay algo específico que quieras hacer o necesitas ayuda con alguna función?",
+        "n": 1,
+        "nGen": 57,
+        "prompt": "¿Cómo van mi batería y mi memoria ahora mismo?",
+        "stop": "eos",
+        "tgTps": 14.472909490581833,
+        "ttftMs": 1898.173833
+      },
+      {
+        "answer": "La memoria RAM es el espacio de trabajo temporal que tu iPhone usa para ejecutar aplicaciones y abrir ventanas, permitiendo que funcionen fluidamente mientras guardas tus datos.",
+        "n": 2,
+        "nGen": 33,
+        "prompt": "Explícame en dos frases qué es la memoria RAM.",
+        "stop": "eos",
+        "tgTps": 13.273790327811335,
+        "ttftMs": 1913.4106669999999
+      },
+      {
+        "answer": "¡Claro que sí! Aquí tienes 3 consejos para mantener tu iPhone fresco:\n\n1. **Evita el calor extremo**: No lo dejes al sol directo ni en la nevera, ya que estos extremos pueden dañar los componentes internos.\n2. **Cuida el uso intensivo**: Intenta no cargar aplicaciones pesadas o juegos exigentes durante horas seguidas; si es necesario, ciérralos para ahorrar batería y calor.\n3. **Mantén la ventilación**: Deja que el teléfono respire; evita apretarlo contra tu cuerpo o dejarlo en una caja cerrada donde se acumule el calor.\n\n¡Espero que disfrutes mucho más de tu dispositivo! 🍎✨",
+        "n": 3,
+        "nGen": 150,
+        "prompt": "Dame 3 consejos para que mi iPhone no se caliente.",
+        "stop": "eos",
+        "tgTps": 15.159443234075194,
+        "ttftMs": 1924.178916
+      },
+      {
+        "answer": "El modo de bajo consumo optimiza el rendimiento para ahorrar batería, aunque puede reducir la velocidad y suavidad del sistema.",
+        "n": 4,
+        "nGen": 24,
+        "prompt": "Resume en una frase: «El modo de bajo consumo reduce la actividad en segundo plano, baja el brillo y limita algunas animaciones para que la batería dure más».",
+        "stop": "eos",
+        "tgTps": 12.035843747673525,
+        "ttftMs": 1998.482125
+      },
+      {
+        "answer": "351",
+        "n": 5,
+        "nGen": 3,
+        "prompt": "¿Cuánto es 17 × 23? Responde solo con el número.",
+        "stop": "eos",
+        "tgTps": 4.660734457955611,
+        "ttftMs": 1995.295875
+      },
+      {
+        "answer": "El teléfono se apaga,\nSin energía para seguir.\nUn día más sin cargar.",
+        "n": 6,
+        "nGen": 19,
+        "prompt": "Escribe un haiku sobre un teléfono que se queda sin batería.",
+        "stop": "eos",
+        "tgTps": 11.519537086698874,
+        "ttftMs": 1949.921958
+      },
+      {
+        "answer": "My phone has been very slow since yesterday.",
+        "n": 7,
+        "nGen": 9,
+        "prompt": "Traduce al inglés: «Mi teléfono está muy lento desde ayer».",
+        "stop": "eos",
+        "tgTps": 8.804486834578933,
+        "ttftMs": 1958.2374169999998
+      },
+      {
+        "answer": "Si tienes 45 GB libres y cada video ocupa 1.5 GB, caben exactamente **30 videos** (cálculo: 45 / 1.5 = 30).",
+        "n": 8,
+        "nGen": 43,
+        "prompt": "Si tengo 45 GB libres y cada video ocupa 1.5 GB, ¿cuántos videos caben? Explica el cálculo en una línea.",
+        "stop": "eos",
+        "tgTps": 13.539913046206095,
+        "ttftMs": 1976.307
+      },
+      {
+        "answer": "¡Claro que sí! Aquí tienes 3 pasos sencillos para liberar espacio en tu iPhone:\n\n1. **Borrar archivos de la App Store**: Ve a *Ajustes > Controles de Apps*, selecciona una app y pulsa \"Borrar archivos\".\n2. **Eliminar fotos y videos antiguos**: Abre el *Fotografía* o *Videos*, busca las opciones para borrar imágenes/videos que no uses en los últimos 6 meses.\n3. **Limpiar caché del sistema**: Ve a *Ajustes > General > Reiniciar > Reiniciar el teléfono* (esto limpia archivos temporales sin apagarlo).\n\n¡Espero que te sirvan! ¿Necesitas ayuda con algo más?",
+        "n": 9,
+        "nGen": 153,
+        "prompt": "Haz una lista de 3 pasos para liberar espacio en un iPhone.",
+        "stop": "eos",
+        "tgTps": 14.732084052605671,
+        "ttftMs": 1997.082042
+      },
+      {
+        "answer": "El estado térmico \"serio\" indica que tu iPhone está **muy caliente** y iOS ha bajado su rendimiento para enfriarse.\n\nEsto significa que el teléfono está trabajando intensamente (por ejemplo, jugando a un juego pesado o usando una app con muchas funciones), pero no se puede mantener estable. Si lo usas de nuevo pronto, podría congelar, perder datos o fallar. Para evitar esto, intenta usar la aplicación **iOS Stats** para ver qué apps están consumiendo más recursos y busca opciones como \"Borrar caché\" o cambiar el modo de ahorro de energía en las aplicaciones que no necesitas activadas.",
+        "n": 10,
+        "nGen": 131,
+        "prompt": "¿Qué significa que el estado térmico de mi iPhone sea «serio»?",
+        "stop": "eos",
+        "tgTps": 14.375922875674965,
+        "ttftMs": 2049.343459
+      }
+    ],
+    "soak": [
+      {
+        "battery": 1.0,
+        "footprint": 205149568,
+        "stop": "length",
+        "t": 20,
+        "tgTps": 13.022326711542751,
+        "thermal": "fair"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205231488,
+        "stop": "length",
+        "t": 45,
+        "tgTps": 10.974681800274157,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205231488,
+        "stop": "length",
+        "t": 76,
+        "tgTps": 8.593249623109639,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205313408,
+        "stop": "eos",
+        "t": 86,
+        "tgTps": 8.256295405075928,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205231488,
+        "stop": "length",
+        "t": 117,
+        "tgTps": 8.591922992838319,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205313408,
+        "stop": "length",
+        "t": 147,
+        "tgTps": 8.637645924224914,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205329792,
+        "stop": "length",
+        "t": 178,
+        "tgTps": 8.603886721891667,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 205329792,
+        "stop": "eos",
+        "t": 181,
+        "tgTps": 6.871608152128797,
+        "thermal": "serious"
+      }
+    ],
+    "threads": 2,
+    "warmLoadMs": 482.619542
+  },
+  {
+    "availableBefore": 4124699840,
+    "batteryAfter": 1.0,
+    "batteryBefore": 1.0,
+    "bench": {
+      "availableMemory": 4179324736,
+      "ppRuns": [
+        232.99083481905305,
+        206.82787492387232,
+        200.8557553608283
+      ],
+      "ppTps": 213.5581550345846,
+      "tgRuns": [
+        33.96837723209806,
+        31.760947260326745,
+        31.27450128878225
+      ],
+      "tgTps": 32.33460859373569
+    },
+    "coldLoadMs": 1090.835542,
+    "file": "LFM2.5-1.2B-Instruct-Q4_K_M.gguf",
+    "firstReply": {
+      "availableMemory": 4146589504,
+      "genMs": 983.498875,
+      "nCached": 0,
+      "nGen": 8,
+      "nPrompt": 160,
+      "ppTps": 235.7126952113061,
+      "promptMs": 678.792459,
+      "stopReason": "length",
+      "tgTps": 8.134223844435002
+    },
+    "firstReplyTtftMs": 809.261542,
+    "id": "lfm2.5-1.2b",
+    "loadUnloadCycles": 3,
+    "model": {
+      "bytes": 728509440,
+      "description": "lfm2 1.2B Q4_K - Medium",
+      "gpu": true,
+      "params": 1170340608
+    },
+    "peaks": {
+      "maxFootprint": 181391424,
+      "minAvailable": 4113575872,
+      "worstThermal": "serious"
+    },
+    "quality": [
+      {
+        "answer": "Tu batería está al 100% y la memoria de las aplicaciones tiene 3.9 GB disponibles en un total de 0.1 GB. ¡Todo bien!",
+        "n": 1,
+        "nGen": 36,
+        "prompt": "¿Cómo van mi batería y mi memoria ahora mismo?",
+        "stop": "eos",
+        "tgTps": 8.507960034291644,
+        "ttftMs": 1430.946125
+      },
+      {
+        "answer": "La memoria RAM es la cantidad de espacio en tu iPhone para almacenar temporalmente datos y aplicaciones, permitiendo un funcionamiento más rápido. En este caso, tienes 3.4 GB de RAM de un total de 5.6 GB.",
+        "n": 2,
+        "nGen": 51,
+        "prompt": "Explícame en dos frases qué es la memoria RAM.",
+        "stop": "eos",
+        "tgTps": 8.678589644949325,
+        "ttftMs": 1147.060333
+      },
+      {
+        "answer": "Claro, aquí tienes 3 consejos para evitar que tu iPhone se caliente:\n\n1. **Evita el uso excesivo** de aplicaciones pesadas o multitarea intensa.\n2. **Mantén la batería al 50%** cuando no estés usando mucho el dispositivo.\n3. **Usa el modo de ahorro de energía** en situaciones de calor para reducir el consumo.\n\n¡Espero que te sirvan!",
+        "n": 3,
+        "nGen": 96,
+        "prompt": "Dame 3 consejos para que mi iPhone no se caliente.",
+        "stop": "eos",
+        "tgTps": 8.901583329726725,
+        "ttftMs": 1098.038959
+      },
+      {
+        "answer": "El modo de bajo consumo optimiza el uso de energía, reduciendo la actividad en segundo plano y mejorando la duración de la batería.",
+        "n": 4,
+        "nGen": 31,
+        "prompt": "Resume en una frase: «El modo de bajo consumo reduce la actividad en segundo plano, baja el brillo y limita algunas animaciones para que la batería dure más».",
+        "stop": "eos",
+        "tgTps": 8.79241030633573,
+        "ttftMs": 1207.141042
+      },
+      {
+        "answer": "486",
+        "n": 5,
+        "nGen": 1,
+        "prompt": "¿Cuánto es 17 × 23? Responde solo con el número.",
+        "stop": "eos",
+        "tgTps": 2.650217937094263,
+        "ttftMs": 1052.67225
+      },
+      {
+        "answer": "Batería baja,  \nsolo queda un susurro,  \nesperanza en la pantalla.",
+        "n": 6,
+        "nGen": 21,
+        "prompt": "Escribe un haiku sobre un teléfono que se queda sin batería.",
+        "stop": "eos",
+        "tgTps": 8.136246484100273,
+        "ttftMs": 1094.048458
+      },
+      {
+        "answer": "Your phone has been running slow since yesterday.",
+        "n": 7,
+        "nGen": 9,
+        "prompt": "Traduce al inglés: «Mi teléfono está muy lento desde ayer».",
+        "stop": "eos",
+        "tgTps": 7.147097896082983,
+        "ttftMs": 1070.866291
+      },
+      {
+        "answer": "Con 45 GB libres y cada video ocupando 1.5 GB, puedes guardar 30 videos. El cálculo es sencillo: 45 dividido por 1.5 da el número de videos posibles.",
+        "n": 8,
+        "nGen": 47,
+        "prompt": "Si tengo 45 GB libres y cada video ocupa 1.5 GB, ¿cuántos videos caben? Explica el cálculo en una línea.",
+        "stop": "eos",
+        "tgTps": 8.936396647787939,
+        "ttftMs": 1333.793666
+      },
+      {
+        "answer": "Claro, aquí tienes 3 pasos para liberar espacio en tu iPhone:\n\n1. Elimina aplicaciones innecesarias o temporales.\n2. Desactiva aplicaciones que no uses con frecuencia y guarda su almacenamiento.\n3. Considera eliminar archivos grandes o temporales que ya no necesites.\n\n¡Espero te sea útil!",
+        "n": 9,
+        "nGen": 75,
+        "prompt": "Haz una lista de 3 pasos para liberar espacio en un iPhone.",
+        "stop": "eos",
+        "tgTps": 8.805435536653873,
+        "ttftMs": 1055.552042
+      },
+      {
+        "answer": "El estado térmico «serio» indica que el iPhone está enfriándose para mejorar su rendimiento.",
+        "n": 10,
+        "nGen": 23,
+        "prompt": "¿Qué significa que el estado térmico de mi iPhone sea «serio»?",
+        "stop": "eos",
+        "tgTps": 8.404046331118646,
+        "ttftMs": 1042.9251669999999
+      }
+    ],
+    "soak": [
+      {
+        "battery": 1.0,
+        "footprint": 116216000,
+        "stop": "eos",
+        "t": 18,
+        "tgTps": 9.063856736314335,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116314304,
+        "stop": "length",
+        "t": 47,
+        "tgTps": 9.113700948819927,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116330688,
+        "stop": "eos",
+        "t": 74,
+        "tgTps": 9.06683581789679,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116428992,
+        "stop": "eos",
+        "t": 87,
+        "tgTps": 8.96879316522687,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116347072,
+        "stop": "eos",
+        "t": 102,
+        "tgTps": 8.969684313225118,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116396224,
+        "stop": "length",
+        "t": 131,
+        "tgTps": 9.120785466476333,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116396224,
+        "stop": "length",
+        "t": 159,
+        "tgTps": 9.110510235593747,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116396224,
+        "stop": "eos",
+        "t": 175,
+        "tgTps": 9.01048772697818,
+        "thermal": "serious"
+      },
+      {
+        "battery": 1.0,
+        "footprint": 116396224,
+        "stop": "length",
+        "t": 204,
+        "tgTps": 9.117821788595252,
+        "thermal": "serious"
+      }
+    ],
+    "threads": 2,
+    "warmLoadMs": 152.126292
+  }
+]
