@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1780
+
+- Apple Ollama settings toolbar keyboard hint (`.ollama-settings-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Ollama settings toolbar hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Ollama settings header kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1779
 
 - Apple Ollama settings header keyboard hint (`.ollama-settings-header-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Ollama settings header hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Settings header kb-hint already opaque. P2 reliability / GitHub #14.
