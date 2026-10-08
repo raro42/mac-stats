@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1754
+
+- Apple monitor last-check age (`.monitor-checked-ago`) mixes type color against an opaque row fill (`color-mix` 36% `#0c0c10` on `#ffffff`; Down rows 43%). No glass `opacity` on that age line. `.apple-shell` beats the later shared `opacity: 0.72`. The Down selector beats shared `opacity: 0.85`. Monitor latency already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1753
 
 - Apple monitor latency (`.monitor-latency`) mixes type color against an opaque row fill (`color-mix` 45% `#0c0c10` on `#ffffff`). No glass `opacity` on that timing line. `.apple-shell` beats the later shared `opacity: 0.9`. Slow and Down rows keep their status color. Skipped `.rings-filter-miss-hint`: `removeRingsFilterChips()` drops that node, so the hint never paints. Disk Cleanup empty hints already opaque. P2 reliability / GitHub #14.

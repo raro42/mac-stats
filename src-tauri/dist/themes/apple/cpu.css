@@ -2429,6 +2429,21 @@ border-radius: 24px;
   opacity: 1;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .monitor-checked-ago opacity: 0.72. */
+/* Down rows use a later shared opacity: 0.85; the longer selector beats that. */
+.apple-shell .monitor-checked-ago {
+  /* Was opacity 0.72 on --muted (50% ink) → ~36% ink on the white monitor row. */
+  color: color-mix(in srgb, #0c0c10 36%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .monitor-item.is-down .monitor-checked-ago {
+  /* Was opacity 0.85 on --muted (50% ink) → ~43% ink on the white monitor row. */
+  color: color-mix(in srgb, #0c0c10 43%, #ffffff);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
   background: color-mix(in srgb, currentColor 4%, #ffffff);
