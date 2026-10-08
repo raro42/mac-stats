@@ -1,30 +1,27 @@
 # Morning surprise — 2026-10-09
 
-Overnight Track B opened on design-review fuel (stale `feature-cpu-metrics`) then continued Apple theme WebView idle cuts for GitHub **#14**.
+Overnight Track B kept shipping Apple theme opaque keyboard-hint type for GitHub #14 (WebView idle / glass alpha out of always-visible chrome).
 
-## Shipped tonight (keeps)
+## Shipped tonight
 
 | Version | What |
-|---------|------|
-| **v0.1.1763** | `.power-label` · `.lpm-label` opaque `color-mix` 45% `#0c0c10` on `#ececf1` (Power · LPM captions on the strip; was shell `--muted` mixed on `#f7f7fa`) |
-| **v0.1.1764** | `.mastodon-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (URL · token · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1765** | `.mcp-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (URL · stdio · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1766** | `.browser-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (path · port · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1767** | `.cursor-agent-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (workspace · executable · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1768** | `.telegram-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (token · chat id · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1771** | `.slack-settings-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (webhook · Save · Clear hint; no glass `opacity: 0.72`) |
-| **v0.1.1773** | `.theme-list-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Appearance theme-list hint; no glass `opacity: 0.72`) |
-| **v0.1.1775** | `.appearance-setting-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Appearance section hint; no glass `opacity: 0.72`) |
-| **v0.1.1776** | `.product-setting-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Product section hint; no glass `opacity: 0.72`) |
-| **v0.1.1777** | `.credentials-section-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Credentials section hint; no glass `opacity: 0.72`) |
+|--------|------|
+| **v0.1.1778** | Settings header kb-hint (`.settings-header-kb-hint`) opaque `color-mix` on the white settings card |
+| **v0.1.1777** | Credentials section kb-hint opaque |
+| **v0.1.1776** | Product setting kb-hint opaque |
+| **v0.1.1775** | Appearance setting kb-hint opaque |
+| **v0.1.1773** | Theme-list kb-hint opaque |
+| **v0.1.1771** | Slack settings toolbar kb-hint opaque |
 
-Earlier today (before this overnight window): **v0.1.1762** restored live CPU-window metrics after the #14 idle ratchet stuck gauges on "None yet" (GitHub **#15**). Same window also landed **v0.1.1769** (vim keys no longer steal from text fields), **v0.1.1770** (seed sparklines from history on open), **v0.1.1772** (menu bar / glass UI percentages no longer stuck at 0%), and **v0.1.1774** (footer version paints on open instead of "None yet").
+## Why it matters
 
-## Fuel notes
+Glass `opacity` on keyboard hints still forced compositor blending on Settings chrome. Opaque `color-mix` keeps the same look without that alpha.
 
-- Digester open: empty; design review due=false (grace). Standing P2 / #14 continued.
-- Debug.log quiet (no ERROR/WARN clusters in 180m window).
-- Mac host `192.168.2.20` still unreachable from the Linux rack; `feature-cpu-metrics` screenshot deferred.
-- Next: `.settings-header-kb-hint` glass type (shared `opacity: 0.72`); capture `feature-cpu-metrics` when the Mac is back.
+## Next
 
-Latest keep: **v0.1.1777** @ `115345a1`.
+- `.ollama-settings-header-kb-hint` (same pattern)
+- Refresh `feature-cpu-metrics` / `feature-agent-ops` screenshots when a Mac is reachable (design-review grace)
+
+## Digester
+
+Open candidates: empty. Fuel was standing backlog P2 / #14.
