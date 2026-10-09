@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1796
+
+- Apple footer toolbar keyboard hint (`.footer-toolbar-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the version chip · GitHub link hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Icon-line kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1793
 
 - Apple section icon-line keyboard hint (`.icon-line-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. History sparkline kb-hint already opaque. P2 reliability / GitHub #14.
