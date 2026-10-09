@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1802
+
+- Apple Changelog header keyboard hint (`.changelog-header-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Changelog title · Close hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Force Quit toolbar kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1801
 
 - Apple Force Quit toolbar keyboard hint (`.force-quit-toolbar-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Force Quit hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Process Details hero toolbar kb-hint already opaque. P2 reliability / GitHub #14.
