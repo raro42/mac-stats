@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple theme opaque keyboard-hint type for GitHub
 
 | Version | What |
 |--------|------|
+| **v0.1.1782** | Disk Cleanup action toolbar kb-hint (`.disk-cleanup-toolbar-kb-hint`) opaque `color-mix` on the white panel |
 | **v0.1.1781** | Monitors add-form toolbar kb-hint (`.monitor-add-toolbar-kb-hint`) opaque `color-mix` on the white add-form panel |
 | **v0.1.1780** | Ollama settings toolbar kb-hint (`.ollama-settings-toolbar-kb-hint`) opaque `color-mix` on the white settings card |
 | **v0.1.1779** | Ollama settings header kb-hint (`.ollama-settings-header-kb-hint`) opaque `color-mix` on the white settings card |
@@ -18,11 +19,11 @@ Overnight Track B kept shipping Apple theme opaque keyboard-hint type for GitHub
 
 ## Why it matters
 
-Glass `opacity` on keyboard hints still forced compositor blending on Settings and Monitors chrome. Opaque `color-mix` keeps the same look without that alpha.
+Glass `opacity` on keyboard hints still forced compositor blending on Settings, Monitors, and Disk Cleanup chrome. Opaque `color-mix` keeps the same look without that alpha.
 
 ## Next
 
-- `.disk-cleanup-toolbar-kb-hint` (same pattern)
+- `.disk-cleanup-add-scope-toolbar-kb-hint` (same pattern)
 - Refresh `feature-cpu-metrics` / `feature-agent-ops` screenshots when a Mac is reachable (design-review grace)
 
 ## Digester
