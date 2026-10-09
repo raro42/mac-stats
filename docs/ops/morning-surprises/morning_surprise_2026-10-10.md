@@ -1,6 +1,6 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B mixed GitHub **#14** opaque Apple kb-hint type with the new **layout daily** Data Poster contrast pass.
+Overnight Track B mixed GitHub **#14** opaque Apple kb-hint type with **layout daily** Data Poster contrast (filter-miss last night, exec/answer cards this tick).
 
 ## Shipped this night (selection)
 
@@ -18,12 +18,12 @@ Overnight Track B mixed GitHub **#14** opaque Apple kb-hint type with the new **
 | **v0.1.1800** | `.process-detail-hero-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Process Details name · PID hint) |
 | **v0.1.1801** | `.force-quit-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Force Quit hint) |
 | **v0.1.1802** | `.changelog-header-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Changelog title · Close hint) |
+| **v0.1.1803** | Data Poster / Dark AI Chat exec · answer cards remap onto `#0e0e14` (layout daily) |
 
-## Latest tick (~23:46)
+## Latest tick (~00:15)
 
-- Digester open empty; design review grace; layout daily already done today (data-poster).
+- Digester open empty; design review grace; layout daily due → data-poster.
 - Debug.log: no ERROR/WARN clusters in 180m window.
-- Fuel: standing P2 / #14 → `.changelog-header-kb-hint` glass type.
-- Ratchet **keep** @ `a317ea74`; pushed `main` as **v0.1.1802**.
-- 23:00 backstop: overnight_git_flush clean; maybe_run_ci skip (already today); maybe_cut_github_release skip (already today).
+- Fuel: layout daily → `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final` white-slab remaps.
+- Ratchet **keep** @ `b84f5b8d`; pushed `main` as **v0.1.1803**.
 - Next fuel: `.changelog-body-toolbar-kb-hint` glass type; Dark layout daily tomorrow; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
