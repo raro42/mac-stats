@@ -790,6 +790,32 @@ body.theme-dark .monitors-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
 }
 
+/*
+ * Data Poster / Dark: AI Chat exec + answer cards still mixed Apple #ffffff
+ * washes → white slabs inside assistant turns.
+ */
+body.theme-data-poster .chat-exec-card,
+body.theme-dark .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #0e0e14);
+  border-left-color: color-mix(in srgb, #34c759 75%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+}
+body.theme-data-poster .chat-exec-code,
+body.theme-dark .chat-exec-code {
+  background: color-mix(in srgb, currentColor 10%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
+}
+body.theme-data-poster .chat-answer-part,
+body.theme-dark .chat-answer-part {
+  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+}
+body.theme-data-poster .chat-answer-part.chat-answer-final,
+body.theme-dark .chat-answer-part.chat-answer-final {
+  border-color: color-mix(in srgb, #55c7ff 28%, #0e0e14);
+  background: color-mix(in srgb, #55c7ff 10%, #0e0e14);
+}
+
 /* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
 body.theme-data-poster #icon-monitors,
 body.theme-data-poster #icon-ollama,
