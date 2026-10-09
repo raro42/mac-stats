@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1791
+
+- Apple ring gauge keyboard hint (`.ring-gauge-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the CPU · GPU · Freq · Temp hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Power strip kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1790
 
 - Apple power strip keyboard hint (`.power-strip-kb-hint`) mixes type color against an opaque strip fill (`color-mix` 63% `#0c0c10` on `#ececf1`). No glass `opacity` on the Bat · LPM · Power hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Details kb-hint already opaque. P2 reliability / GitHub #14.
