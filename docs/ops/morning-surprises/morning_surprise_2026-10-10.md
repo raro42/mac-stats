@@ -7,10 +7,11 @@ Overnight Track B kept shipping GitHub **#14** opaque type on Apple theme keyboa
 | Version | What |
 |---------|------|
 | **v0.1.1791** | `.ring-gauge-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (CPU · GPU · Freq · Temp hint) |
+| **v0.1.1792** | `.history-sparkline-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (CPU · GPU · Freq · Temp chart hint) |
 
-## Latest tick (~20:00)
+## Latest tick (~20:30)
 
 - Digester open empty; design review grace; no debug ERROR/WARN clusters.
-- Fuel: standing P2 / #14 → ring gauge kb-hint (next after v0.1.1790 power-strip).
-- Ratchet **keep** @ `057ba30e`; pushed `main`.
-- Next fuel: `.history-sparkline-kb-hint` glass type; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
+- Fuel: standing P2 / #14 → history sparkline kb-hint (next after v0.1.1791 ring-gauge).
+- Ratchet **keep** @ `9e56995e`; pushed `main`.
+- Next fuel: `.icon-line-kb-hint` glass type; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
