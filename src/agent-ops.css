@@ -719,6 +719,77 @@ body.theme-dark #chat-input:focus {
   color: var(--text, rgba(255, 255, 255, 0.92));
 }
 
+/*
+ * Data Poster / Dark: AI Chat · Monitors filter-miss shells + empty CTAs still
+ * mixed Apple #ffffff washes → white slabs when a filter has no rows.
+ */
+body.theme-data-poster .chat-filter-miss,
+body.theme-dark .chat-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-filter-miss.is-errors,
+body.theme-dark .chat-filter-miss.is-errors {
+  border-color: color-mix(in srgb, #34c759 28%, #0e0e14);
+  background: color-mix(in srgb, #34c759 10%, #0e0e14);
+}
+body.theme-data-poster .chat-filter-miss.is-you,
+body.theme-data-poster .chat-filter-miss.is-assistant,
+body.theme-dark .chat-filter-miss.is-you,
+body.theme-dark .chat-filter-miss.is-assistant {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+}
+body.theme-data-poster .chat-filter-miss-cta,
+body.theme-dark .chat-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-filter-miss-cta:hover,
+body.theme-dark .chat-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0e0e14);
+}
+body.theme-data-poster .chat-filter-miss-cta:focus-visible,
+body.theme-dark .chat-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+}
+body.theme-data-poster .monitors-filter-miss,
+body.theme-dark .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .monitors-filter-miss.is-down-empty,
+body.theme-data-poster .monitors-filter-miss.is-slow-empty,
+body.theme-dark .monitors-filter-miss.is-down-empty,
+body.theme-dark .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0e0e14);
+  background: color-mix(in srgb, #34c759 10%, #0e0e14);
+}
+body.theme-data-poster .monitors-filter-miss.is-up-empty,
+body.theme-dark .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+}
+body.theme-data-poster .monitors-empty-cta,
+body.theme-dark .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .monitors-empty-cta:hover,
+body.theme-dark .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0e0e14);
+}
+body.theme-data-poster .monitors-empty-cta:focus-visible,
+body.theme-dark .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+}
+
 /* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
 body.theme-data-poster #icon-monitors,
 body.theme-data-poster #icon-ollama,

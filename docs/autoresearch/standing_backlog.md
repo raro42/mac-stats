@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1797
+
+- Data Poster / Dark: AI Chat · Monitors filter-miss shells (`.chat-filter-miss` · `.monitors-filter-miss`) and empty CTAs (`.chat-filter-miss-cta` · `.monitors-empty-cta`) remap Apple `#ffffff` washes onto `#0e0e14`. Layout daily review (Data Poster). No white slabs when a filter has no rows.
+
 ## Overnight merge — v0.1.1796
 
 - Apple footer toolbar keyboard hint (`.footer-toolbar-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the version chip · GitHub link hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Icon-line kb-hint already opaque. P2 reliability / GitHub #14.
