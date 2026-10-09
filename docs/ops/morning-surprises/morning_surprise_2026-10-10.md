@@ -16,12 +16,12 @@ Overnight Track B mixed GitHub **#14** opaque Apple kb-hint type with the new **
 | **v0.1.1798** | `.header-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Refresh · Settings hint) |
 | **v0.1.1799** | `.process-details-header-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Process Details title · Close hint) |
 | **v0.1.1800** | `.process-detail-hero-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Process Details name · PID hint) |
+| **v0.1.1801** | `.force-quit-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Force Quit hint) |
 
-## Latest tick (~23:02)
+## Latest tick (~23:25)
 
 - Digester open empty; design review grace; layout daily already done today (data-poster).
 - Debug.log: no ERROR/WARN clusters in 180m window.
-- Fuel: standing P2 / #14 → `.process-detail-hero-toolbar-kb-hint` glass type.
-- Ratchet **keep** @ `02be15ea`; pushed `main` as **v0.1.1800**.
-- ~23:00: `maybe_run_ci` dispatched (77 patches since last green); cut GitHub Release **v0.1.1800**.
-- Next fuel: `.force-quit-toolbar-kb-hint` glass type; Dark layout daily tomorrow; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
+- Fuel: standing P2 / #14 → `.force-quit-toolbar-kb-hint` glass type.
+- Ratchet **keep** @ `df0c3702`; pushed `main` as **v0.1.1801**.
+- Next fuel: `.changelog-header-kb-hint` glass type; Dark layout daily tomorrow; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
