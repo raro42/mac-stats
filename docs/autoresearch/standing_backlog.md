@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1806
+
+- Apple Agent Ops health-strip keyboard hint (`.ops-health-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Version · Discord · Redmine · Next schedule · Last delivery · Digest move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Tab-bar kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1805
 
 - Apple Agent Ops tab-bar keyboard hint (`.ops-tab-bar-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Overview · tabs move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Changelog body toolbar kb-hint already opaque. P2 reliability / GitHub #14.
