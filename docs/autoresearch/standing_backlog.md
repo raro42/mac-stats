@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1782
+
+- Apple Disk Cleanup action toolbar keyboard hint (`.disk-cleanup-toolbar-kb-hint`) mixes type color against an opaque panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Clean now · Refresh · Save scopes hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Monitors add-form toolbar kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1781
 
 - Apple Monitors add-form toolbar keyboard hint (`.monitor-add-toolbar-kb-hint`) mixes type color against an opaque add-form panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Monitors add-form toolbar hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Ollama settings toolbar kb-hint already opaque. P2 reliability / GitHub #14.
