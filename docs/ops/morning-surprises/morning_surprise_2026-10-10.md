@@ -13,12 +13,12 @@ Overnight Track B mixed GitHub **#14** opaque Apple kb-hint type with the new **
 | **v0.1.1795** | Data Poster AI Chat / Monitors glance · empty · filter-chip remaps onto `#0e0e14` |
 | **v0.1.1796** | `.footer-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (version · GitHub hint) |
 | **v0.1.1797** | Data Poster / Dark filter-miss shells + empty CTAs remap onto `#0e0e14` (layout daily) |
+| **v0.1.1798** | `.header-toolbar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Refresh · Settings hint) |
 
-## Latest tick (~21:48)
+## Latest tick (~22:13)
 
-- Digester open empty; design review grace; layout daily **due** (Data Poster).
+- Digester open empty; design review grace; layout daily already done today (data-poster).
 - Debug.log: no ERROR/WARN clusters in 180m window.
-- Fuel: layout daily → AI Chat · Monitors filter-miss white slabs.
-- Ratchet **keep** @ `2ed618a7`; pushed `main` as **v0.1.1797**.
-- Marked `layout_daily_review` checked for `data-poster` today.
-- Next fuel: `.header-toolbar-kb-hint` glass type; Dark layout daily tomorrow; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
+- Fuel: standing P2 / #14 → `.header-toolbar-kb-hint` glass type.
+- Ratchet **keep** @ `1b902d7b`; pushed `main` as **v0.1.1798**.
+- Next fuel: `.process-detail-header-kb-hint` glass type; Dark layout daily tomorrow; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
