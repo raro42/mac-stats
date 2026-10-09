@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1799
+
+- Apple Process Details header keyboard hint (`.process-details-header-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the title · Close hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Header toolbar kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1798
 
 - Apple header toolbar keyboard hint (`.header-toolbar-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Refresh · Settings hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Footer toolbar kb-hint already opaque. P2 reliability / GitHub #14.
