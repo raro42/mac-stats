@@ -1,32 +1,26 @@
 # Morning surprise — 2026-10-09
 
-Overnight Track B kept shipping Apple theme opaque keyboard-hint type for GitHub #14 (WebView idle / glass alpha out of always-visible chrome).
+Overnight Track B kept shipping GitHub **#14** opaque type on Apple theme keyboard hints (no glass `opacity` washes on WebView compositor).
 
-## Shipped tonight
+## Shipped this night (selection)
 
 | Version | What |
-|--------|------|
-| **v0.1.1784** | Disk Cleanup category list kb-hint (`.disk-cleanup-list-kb-hint`) opaque `color-mix` on the white panel |
-| **v0.1.1783** | Disk Cleanup add-scope toolbar kb-hint (`.disk-cleanup-add-scope-toolbar-kb-hint`) opaque `color-mix` on the white panel |
-| **v0.1.1782** | Disk Cleanup action toolbar kb-hint (`.disk-cleanup-toolbar-kb-hint`) opaque `color-mix` on the white panel |
-| **v0.1.1781** | Monitors add-form toolbar kb-hint (`.monitor-add-toolbar-kb-hint`) opaque `color-mix` on the white add-form panel |
-| **v0.1.1780** | Ollama settings toolbar kb-hint (`.ollama-settings-toolbar-kb-hint`) opaque `color-mix` on the white settings card |
-| **v0.1.1779** | Ollama settings header kb-hint (`.ollama-settings-header-kb-hint`) opaque `color-mix` on the white settings card |
-| **v0.1.1778** | Settings header kb-hint (`.settings-header-kb-hint`) opaque `color-mix` on the white settings card |
-| **v0.1.1777** | Credentials section kb-hint opaque |
-| **v0.1.1776** | Product setting kb-hint opaque |
-| **v0.1.1775** | Appearance setting kb-hint opaque |
-| **v0.1.1773** | Theme-list kb-hint opaque |
+|---------|------|
+| **v0.1.1785** | `.disk-cleanup-meta-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Reclaimable · Next · Runs when · Enabled scopes) |
+| **v0.1.1784** | `.disk-cleanup-list-kb-hint` opaque (category list) |
+| **v0.1.1783** | `.disk-cleanup-add-scope-toolbar-kb-hint` opaque |
+| **v0.1.1782** | `.disk-cleanup-toolbar-kb-hint` opaque |
+| **v0.1.1781** | `.monitor-add-toolbar-kb-hint` opaque |
+| **v0.1.1780** | `.ollama-settings-toolbar-kb-hint` opaque |
+| **v0.1.1779** | `.ollama-settings-header-kb-hint` opaque |
+| **v0.1.1778** | `.settings-header-kb-hint` opaque |
+| **v0.1.1777** | `.credentials-section-kb-hint` opaque |
+| **v0.1.1776** | `.product-setting-kb-hint` opaque |
+| **v0.1.1775** | `.appearance-setting-kb-hint` opaque |
 
-## Why it matters
+## Latest tick (~03:20)
 
-Glass `opacity` on keyboard hints still forced compositor blending on Settings, Monitors, and Disk Cleanup chrome. Opaque `color-mix` keeps the same look without that alpha.
-
-## Next
-
-- `.disk-cleanup-meta-kb-hint` (same pattern)
-- Refresh `feature-cpu-metrics` / `feature-agent-ops` screenshots when a Mac is reachable (design-review grace)
-
-## Digester
-
-Open candidates: empty. Fuel was standing backlog P2 / #14.
+- Digester open empty; design review grace; no debug ERROR/WARN clusters.
+- Fuel: standing P2 / #14 → Disk Cleanup meta kb-hint.
+- Ratchet **keep** @ `80c8e9be`; pushed `main`.
+- Next fuel: `.disk-cleanup-kb-hint` (scope-list hint) glass type; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
