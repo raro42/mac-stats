@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1805] - 2026-10-10
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Apple Agent Ops tab-bar keyboard hint (`.ops-tab-bar-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Overview · tabs move hint. Changelog body toolbar kb-hint opaque in v0.1.1804.
+
 ## [0.1.1804] - 2026-10-10
 
 ### Changed
