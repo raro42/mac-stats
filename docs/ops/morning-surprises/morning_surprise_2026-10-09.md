@@ -6,6 +6,7 @@ Overnight Track B kept shipping GitHub **#14** opaque type on Apple theme keyboa
 
 | Version | What |
 |---------|------|
+| **v0.1.1789** | `.details-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Details value hint) |
 | **v0.1.1788** | `.processes-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Top Processes list hint) |
 | **v0.1.1787** | `.monitors-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (Monitors list hint) |
 | **v0.1.1786** | `.disk-cleanup-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#ffffff` (scope-list hint) |
@@ -21,9 +22,9 @@ Overnight Track B kept shipping GitHub **#14** opaque type on Apple theme keyboa
 | **v0.1.1776** | `.product-setting-kb-hint` opaque |
 | **v0.1.1775** | `.appearance-setting-kb-hint` opaque |
 
-## Latest tick (~04:45)
+## Latest tick (~05:05)
 
 - Digester open empty; design review grace; no debug ERROR/WARN clusters.
-- Fuel: standing P2 / #14 → Top Processes list kb-hint.
-- Ratchet **keep** @ `3fcbed0c`; pushed `main`.
-- Next fuel: `.details-kb-hint` glass type; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
+- Fuel: standing P2 / #14 → Details value kb-hint.
+- Ratchet **keep** @ `1e4c7526`; pushed `main`.
+- Next fuel: `.power-strip-kb-hint` glass type; capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
