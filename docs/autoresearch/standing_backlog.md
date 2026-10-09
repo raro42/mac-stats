@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1787
+
+- Apple Monitors list keyboard hint (`.monitors-kb-hint`) mixes type color against an opaque panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Monitors list hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Disk Cleanup scope kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1786
 
 - Apple Disk Cleanup scope list keyboard hint (`.disk-cleanup-kb-hint`) mixes type color against an opaque panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the scope-list hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Disk Cleanup meta kb-hint already opaque. P2 reliability / GitHub #14.
