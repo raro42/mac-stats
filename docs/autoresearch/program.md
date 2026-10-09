@@ -71,6 +71,7 @@ Log path (untracked): `~/.mac-stats/improvements/autoresearch/results.tsv`
 1. Read this `program.md`, `docs/autoresearch/standing_backlog.md`, and `~/.mac-stats/improvements/{latest,sibling_harness,loop_backlog,standing_backlog}.md`.
 2. Run `python3 scripts/digest_agent_runs.py` and `python3 scripts/watch_sibling_harnesses.py`.
 3. Run `python3 scripts/overnight_design_review.py` — if **due**, prefer a design-review experiment this tick (screenshot + one visible polish).
+3b. Run `python3 scripts/layout_daily_review.py` — if **due**, prefer one **theme layout/contrast** fix (Data Poster / dark shells; policy `docs/045_layout_daily_review.md`). At most one layout experiment per calendar day.
 4. Pick fuel in order (Idea priority). **Do not default to quiet** when standing backlog or design review has work.
 5. Record `START_SHA=$(git rev-parse HEAD)`. Implement the smallest change that could fix it. Sync frontend with `./scripts/sync-dist.sh` when UI changes.
 6. `python3 scripts/autoresearch_ratchet.py verify` (add `--test-filter <name>` when you know the module).
@@ -82,6 +83,7 @@ Log path (untracked): `~/.mac-stats/improvements/autoresearch/results.tsv`
 
 1. Digester **open** candidates (Slowest / Improve-task thrash / latency / errors — not already filtered noise)
 2. **Overnight design review** when `overnight_design_review.py` says due (screenshot + one nicer view/function)
+2b. **Layout daily review** when `layout_daily_review.py` says due (dark theme contrast / Data Poster — once per day)
 3. Standing backlog top item (`docs/autoresearch/standing_backlog.md` + `~/.mac-stats/improvements/standing_backlog.md`)
 4. User-facing correctness (memory verbatim notes, menu bar metrics, Discord reliability)
 5. Sibling harness ports (OpenClaw / Hermes) that clearly fit mac-stats
@@ -96,6 +98,15 @@ Periodic visual + UX ratchet (complements Wednesday `ui-weekly-review`, does **n
 - Skill: `docs/skills/overnight-design-review.md`
 - Helper: `python3 scripts/overnight_design_review.py` (which surface is stale; suggested screenshot target)
 - One night = **one** surface: capture window-only screenshot → polish CSS/layout/copy → sync-dist → ship
+
+## Layout daily track
+
+Theme contrast / layout ratchet (catches Data Poster white-slab regressions from Apple opaque washes):
+
+- Policy: `docs/045_layout_daily_review.md`
+- Skill: `docs/skills/layout-daily-review.md` (+ Werner `discord-layout-daily` ~10:30)
+- Helper: `python3 scripts/layout_daily_review.py`
+- One day = **one** theme: open AI Chat + Monitors → fix contrast/layout → sync-dist → ship
 
 ## Simplicity criterion
 

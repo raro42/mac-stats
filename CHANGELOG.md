@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1794] - 2026-10-09
+
+### Added
+- **Layout daily review** — Once a day, check dark theme contrast/layout (Data Poster first). Helper `scripts/layout_daily_review.py`, skill `layout-daily-review`, policy `docs/045_layout_daily_review.md`. Wired into the overnight harness loop and Werner schedule `discord-layout-daily` (~10:00). Catches white-slab AI Chat / filter-chip regressions from shared Apple opaque washes.
+
+## [0.1.1775] - 2026-10-09
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Apple Appearance section keyboard hint (`.appearance-setting-kb-hint`) mixes type color against an opaque settings card (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Appearance controls hint. Theme-list hint opaque in v0.1.1773.
 ## [0.1.1793] - 2026-10-09
 
 ### Changed
