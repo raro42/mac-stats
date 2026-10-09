@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1784
+
+- Apple Disk Cleanup category list keyboard hint (`.disk-cleanup-list-kb-hint`) mixes type color against an opaque panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the category-list hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Disk Cleanup add-scope toolbar kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1783
 
 - Apple Disk Cleanup add-scope toolbar keyboard hint (`.disk-cleanup-add-scope-toolbar-kb-hint`) mixes type color against an opaque panel (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the label · path · days · Recursive · Add scope hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Disk Cleanup action toolbar kb-hint already opaque. P2 reliability / GitHub #14.
