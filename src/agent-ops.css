@@ -608,6 +608,117 @@ body.theme-dark .ollama-collapsed-glance.has-errors {
   background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
 }
 
+/*
+ * Data Poster / Dark: AI Chat + Monitors chrome still used Apple #ffffff washes
+ * (model/turn glances, empty state, filter chips) → white slabs + unread text.
+ */
+body.theme-data-poster .chat-model-glance,
+body.theme-data-poster .chat-turn-glance,
+body.theme-data-poster .chat-answer-glance,
+body.theme-data-poster .chat-errors-glance,
+body.theme-data-poster .chat-offline-attention-glance,
+body.theme-dark .chat-model-glance,
+body.theme-dark .chat-turn-glance,
+body.theme-dark .chat-answer-glance,
+body.theme-dark .chat-errors-glance,
+body.theme-dark .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-model-glance:hover,
+body.theme-data-poster .chat-turn-glance:hover,
+body.theme-dark .chat-model-glance:hover,
+body.theme-dark .chat-turn-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+}
+body.theme-data-poster .chat-model-glance.is-online,
+body.theme-data-poster .chat-turn-glance.is-ok:not(.is-active),
+body.theme-dark .chat-model-glance.is-online,
+body.theme-dark .chat-turn-glance.is-ok:not(.is-active) {
+  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
+  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+}
+body.theme-data-poster .chat-model-glance.is-offline,
+body.theme-data-poster .chat-model-glance.is-online.is-no-model,
+body.theme-data-poster .chat-offline-attention-glance.is-offline,
+body.theme-dark .chat-model-glance.is-offline,
+body.theme-dark .chat-model-glance.is-online.is-no-model,
+body.theme-dark .chat-offline-attention-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+}
+body.theme-data-poster .chat-turn-glance.is-active,
+body.theme-dark .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+}
+body.theme-data-poster .chat-empty,
+body.theme-dark .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #0e0e14);
+  background: color-mix(in srgb, currentColor 6%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-empty.is-ready,
+body.theme-dark .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
+  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+}
+body.theme-data-poster .chat-empty.is-no-model,
+body.theme-data-poster .chat-empty.is-offline,
+body.theme-data-poster .chat-empty.is-circuit,
+body.theme-dark .chat-empty.is-no-model,
+body.theme-dark .chat-empty.is-offline,
+body.theme-dark .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+}
+body.theme-data-poster .chat-empty.is-not-set,
+body.theme-dark .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 32%, #0e0e14);
+  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+}
+body.theme-data-poster .chat-empty-chip,
+body.theme-dark .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-empty-chip:hover,
+body.theme-dark .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0e0e14);
+}
+body.theme-data-poster .chat-filter-chip,
+body.theme-data-poster .monitors-filter-chip,
+body.theme-dark .chat-filter-chip,
+body.theme-dark .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0e0e14);
+  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .chat-filter-chip:hover,
+body.theme-data-poster .monitors-filter-chip:hover,
+body.theme-dark .chat-filter-chip:hover,
+body.theme-dark .monitors-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+}
+body.theme-data-poster .chat-filter-chip.is-active,
+body.theme-data-poster .monitors-filter-chip.is-active,
+body.theme-dark .chat-filter-chip.is-active,
+body.theme-dark .monitors-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+}
+body.theme-data-poster #chat-input:focus,
+body.theme-dark #chat-input:focus {
+  border-color: color-mix(in srgb, #55c7ff 55%, #0e0e14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 6%, #0e0e14);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+
 /* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
 body.theme-data-poster #icon-monitors,
 body.theme-data-poster #icon-ollama,
