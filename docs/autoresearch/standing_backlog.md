@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1854
+
+- Apple Agent Ops overview head counts (`.ops-overview-head-count` resting · zero · hover · active-zero) mix type color against an opaque near-white overview card (`color-mix` 69% / 37% / 81% `#0c0c10` on `#ffffff`; active-zero 55% accent). No glass `opacity` on the Overview inventory pills. `.apple-shell` beats the later shared `opacity: 0.78` / zero `0.42` / hover `0.92`. Standing P2 #14; Mac capture deferred. Insights lines already opaque. Next: `.ops-overview-link` glass type/wash. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1853
 
 - Apple Agent Ops Insights lines (`.ops-insight-line` resting · clickable · hover · selected) mix type color against an opaque shell fill (`color-mix` 70% / 79% / 88% `#0c0c10` on `#f7f7fa`). No glass `opacity` on Slowest · Candidates · Lanes body lines. `.apple-shell` beats the later shared `opacity: 0.8` / clickable `0.9` / `1` on inherit. Standing P2 #14; Mac capture deferred. Insight subheads already opaque. Next: `.ops-overview-head-count`. P2 reliability / GitHub #14.
