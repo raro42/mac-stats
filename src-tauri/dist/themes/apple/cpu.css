@@ -2880,6 +2880,15 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .disk-cleanup-item-policy / .disk-cleanup-item-samples opacity: 0.62. */
+.apple-shell .disk-cleanup-item-policy,
+.apple-shell .disk-cleanup-item-samples {
+  /* Was opacity 0.62 on inherit (~88% ink) → ~55% ink on the white category row. */
+  color: color-mix(in srgb, #0c0c10 55%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .disk-cleanup-scope-path opacity: 0.72. */
 .apple-shell .disk-cleanup-scope-path {
   /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white scope row. */
