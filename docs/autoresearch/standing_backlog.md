@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1821
+
+- Apple Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) mixes type color against an opaque white setup row (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the key · Save key move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Logs list kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1820
 
 - Apple Debug Log list keyboard hint (`.logs-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the log-line move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Toolbar kb-hint already opaque. P2 reliability / GitHub #14.

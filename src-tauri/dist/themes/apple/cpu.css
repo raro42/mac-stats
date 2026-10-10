@@ -2881,6 +2881,14 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .perplexity-setup-kb-hint opacity: 0.72. */
+.apple-shell .perplexity-setup-kb-hint {
+  /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the white Perplexity setup row. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .logs-toolbar-kb-hint opacity: 0.72. */
 .apple-shell .logs-toolbar-kb-hint {
   /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the shell fill under Refresh · Open · Auto-refresh. */
