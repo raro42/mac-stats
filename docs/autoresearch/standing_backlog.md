@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1810
+
+- Apple Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Soul · Skill · Mood move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Refresh-row kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1809
 
 - Apple Agent Ops refresh-row keyboard hint (`.ops-refresh-row-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Refresh · Refresh digest · Updated move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Filter-row kb-hint already opaque. P2 reliability / GitHub #14.
