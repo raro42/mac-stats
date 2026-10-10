@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1814
+
+- Apple AI Chat empty starter keyboard hint (`.chat-empty-kb-hint`) mixes type color against an opaque white message-list fill (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the starter-chip move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Insights kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1813
 
 - Apple Agent Ops Insights keyboard hint (`.ops-insights-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Insights move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Preview-row kb-hint already opaque. P2 reliability / GitHub #14.
