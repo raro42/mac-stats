@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1816
+
+- Apple AI Chat message-list keyboard hint (`.chat-kb-hint`) mixes type color against an opaque white message-list fill (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the All · You · Assistant · list move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Composer kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1815
 
 - Apple AI Chat composer keyboard hint (`.chat-composer-kb-hint`) mixes type color against an opaque white composer fill (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the input · Clear · Send move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Starter-chip kb-hint already opaque. P2 reliability / GitHub #14.
