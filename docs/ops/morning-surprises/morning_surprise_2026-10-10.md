@@ -4,10 +4,11 @@ Overnight autoresearch kept shipping Apple theme opaque keyboard-hint type (#14 
 
 ## Latest keep
 
-**v0.1.1814** — Apple AI Chat empty starter keyboard hint (`.chat-empty-kb-hint`) mixes type against opaque white (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the starter-chip move hint.
+**v0.1.1815** — Apple AI Chat composer keyboard hint (`.chat-composer-kb-hint`) mixes type against opaque white (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the input · Clear · Send move hint.
 
 ## Tonight so far (keeps)
 
+- v0.1.1815 chat-composer kb-hint
 - v0.1.1814 chat-empty kb-hint
 - v0.1.1813 ops-insights kb-hint
 - v0.1.1812 ops-preview-row kb-hint
@@ -17,7 +18,7 @@ Overnight autoresearch kept shipping Apple theme opaque keyboard-hint type (#14 
 
 ## Next fuel
 
-`.chat-composer-kb-hint` still glass opacity; then remaining chat / perplexity / logs kb-hints. Dark layout daily next day; capture feature-cpu-metrics when Mac is reachable.
+`.chat-kb-hint` still glass opacity; then perplexity / logs kb-hints. Dark layout daily next day; capture feature-cpu-metrics when Mac is reachable.
 
 ## Context
 
