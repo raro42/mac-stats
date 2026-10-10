@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-10 (~22:05):** Agent Ops tab hints opaque type (v0.1.1847). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-10 (~21:45):** Disk Cleanup scope kind opaque type (v0.1.1846). Recapture of `feature-disk-cleanup.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-10 (~21:20):** Disk Cleanup category policy · samples opaque type (v0.1.1845). Recapture of `feature-disk-cleanup.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-10 (~20:55):** Monitors empty summary · collapsed glance opaque type (v0.1.1844). Recapture of `feature-monitors.png` deferred (Linux rack / no macOS CPU window); prior asset kept; polish grace marked.
