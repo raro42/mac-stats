@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1834
+
+- Apple Process Details metric labels (`.process-detail-section .process-detail-label`) mix type color against an opaque white detail card (`color-mix` 57% `#0c0c10` on `#ffffff`). No glass `opacity` on CPU · Memory · Threads and related rows. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Meta labels already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1833
 
 - Apple Disk Cleanup meta labels (`.disk-cleanup-meta-label`) mix type color against an opaque white meta card (`color-mix` 57% `#0c0c10` on `#ffffff`). No glass `opacity` on Reclaimable now · Next automatic run · Runs when · Enabled scopes. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Soft-delete hint already opaque. P2 reliability / GitHub #14.

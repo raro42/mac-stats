@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1834] - 2026-10-10
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Apple Process Details metric labels (`.process-detail-section .process-detail-label`) mix type color against an opaque white detail card (`color-mix` 57% `#0c0c10` on `#ffffff`). No glass `opacity` on CPU · Memory · Threads and related rows. Meta labels opaque in v0.1.1833.
+
 ## [0.1.1833] - 2026-10-10
 
 ### Changed
