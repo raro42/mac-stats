@@ -2,7 +2,8 @@
 
 ## Shipped overnight
 
-- **v0.1.1822** — Apple Agent Ops Updated stamp (`.ops-updated-ago`) uses opaque `color-mix` (63% / 69% / 81% ink on `#f7f7fa` for resting · visible · hover). No glass `opacity` on the Updated line (WebView idle / GitHub #14).
+- **v0.1.1823** — Apple Agent Ops empty-tab hint (`.ops-empty-tab-hint`) uses opaque `color-mix` (63% ink on `#ffffff`). No glass `opacity` on the empty-tab hint line (WebView idle / GitHub #14).
+- **v0.1.1822** — Apple Agent Ops Updated stamp (`.ops-updated-ago`) uses opaque `color-mix` (63% / 69% / 81% ink on `#f7f7fa` for resting · visible · hover). No glass `opacity` on the Updated line.
 - **v0.1.1821** — Apple Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) uses opaque `color-mix` (63% ink on `#ffffff`). No glass `opacity` on the key · Save key move hint.
 - **v0.1.1820** — Apple Debug Log list keyboard hint (`.logs-kb-hint`) uses opaque `color-mix` (63% ink on `#f7f7fa`). No glass `opacity` on the log-line move hint.
 - **v0.1.1819** — Apple Debug Log toolbar keyboard hint (`.logs-toolbar-kb-hint`) uses opaque `color-mix` (63% ink on `#f7f7fa`). No glass `opacity` on the Refresh · Open in editor · Auto-refresh move hint.
@@ -27,5 +28,5 @@
 
 ## Next fuel
 
-- Next shared `opacity: 0.72` type without `.apple-shell` overrides: `.ops-empty-tab-hint`, `.history-chart-caption`, `.logs-viewer-prefix`, `.disk-cleanup-item-path`, `.disk-cleanup-scope-path`.
+- Next shared `opacity: 0.72` type without `.apple-shell` overrides: `.history-chart-caption`, `.logs-viewer-prefix`, `.disk-cleanup-item-path`, `.disk-cleanup-scope-path`.
 - Layout daily: dark theme still due tomorrow.
