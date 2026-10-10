@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1832
+
+- Apple Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) mixes type color against an opaque shell fill (`color-mix` 57% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the hint line. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Force Quit hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1831
 
 - Apple Process Details Force Quit hint (`.force-quit-hint`) mixes type color against an opaque white card (`color-mix` 62% `#0c0c10` on `#ffffff`). No glass `opacity` on the hint line. `.apple-shell` beats the later shared `opacity: 0.7` on inherited type. Disk Cleanup header summary already opaque. P2 reliability / GitHub #14.
