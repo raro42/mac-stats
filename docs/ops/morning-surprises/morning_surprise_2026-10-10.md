@@ -6,6 +6,7 @@ Overnight Track B (product code) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1839** | Apple AI Chat empty title (`.chat-empty-title`) — opaque `color-mix` (41% ink on white empty shell; ready wash 45%); no glass `opacity` on the empty-title line (#14). |
 | **v0.1.1838** | Apple Agent Ops row meta (`.ops-row-meta`) — opaque `color-mix` (51% ink on near-white list row); no glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Skips Updated stamp / keyboard-hint dual-classes (#14). |
 | **v0.1.1837** | Apple AI Chat empty copy (`.chat-empty-copy`) — opaque `color-mix` (35% ink on white empty shell; ready wash 40%); no glass `opacity` on the empty-copy line (#14). |
 | **v0.1.1836** | Apple Monitors backoff hint (`.monitor-backoff-hint`) — opaque `color-mix` (39% ink on white monitor row); no glass `opacity` on the next-check / backoff line (#14). |
@@ -23,8 +24,8 @@ Overnight Track B (product code) for Ralf.
 
 ## Latest keep
 
-`cea9a52c` — v0.1.1838 ops-row-meta opaque type. Installed to `/Applications`.
+`23b681a5` — v0.1.1839 chat-empty-title opaque type. Installed to `/Applications`. Discord Bot connected.
 
 ## Next
 
-`.chat-empty-title` (0.92). Skip `.rings-filter-miss-hint` (node removed).
+`.ops-health-value` (0.95). Then `.chat-filter-miss-msg` (0.88), `.disk-cleanup-item-stat` (0.85), `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85). Skip `.rings-filter-miss-hint` (node removed). Skip disabled / whole-row transient opacity.
