@@ -1,22 +1,28 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B kept real product polish (not digester-empty quiet).
+Overnight autoresearch (Track B) kept shipping Apple theme opaque-type cuts for GitHub **#14** (WebView idle / Graphics and Media). Digester open stayed empty; design-review screens on grace; layout daily already done (Data Poster).
 
-| Version | What shipped |
-|---------|----------------|
-| **v0.1.1849** | Agent Ops `.ops-agent-save-status` — Agents Save confirmation uses opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1848** | Agent Ops `.ops-detail-meta` — Agents soul/skill/mood path uses opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1847** | Agent Ops `.ops-hint` — Schedules · Runs helper lines use opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1846** | Disk Cleanup `.disk-cleanup-scope-kind` — scope kind label opaque `color-mix`. |
-| **v0.1.1845** | Disk Cleanup `.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` opaque `color-mix`. |
-| **v0.1.1844** | Monitors empty summary · collapsed glance opaque `color-mix` (design-review). |
-| **v0.1.1843** | Disk Cleanup `.disk-cleanup-item-stat` opaque `color-mix` (design-review). |
-| **v0.1.1842** | Agent Ops `.ops-overview-count` opaque `color-mix` (design-review). |
+## Shipped tonight (20:00–… window so far)
 
-## Why it matters
-
-Apple theme text that sat on `opacity` still forced WebView compositing (#14). Opaque `color-mix` against shell/card fills keeps the same look without glass alpha.
+| Version | What |
+|--------|------|
+| **v0.1.1850** | Agent Ops `.ops-subhead` — Live · Recent files · Active schedules · Recent deliveries labels use opaque `color-mix` (44% `#0c0c10` on `#f7f7fa`), not glass `opacity`. |
+| v0.1.1849 | Agent Ops `.ops-agent-save-status` opaque type |
+| v0.1.1848 | Agent Ops `.ops-detail-meta` opaque type |
+| v0.1.1847 | Agent Ops `.ops-hint` opaque type |
+| v0.1.1846 | Disk Cleanup `.disk-cleanup-scope-kind` opaque type |
+| v0.1.1845 | Disk Cleanup policy/samples opaque type |
+| v0.1.1844 | Monitors empty summary opaque type (design-review) |
+| v0.1.1843 | Disk Cleanup category stats opaque type (design-review) |
+| v0.1.1842 | Agent Ops overview count opaque type (design-review) |
 
 ## Next fuel
 
-`.ops-subhead`, `.ops-insight-sub`, `.ops-insight-line`, or `.ops-overview-head-count` (same #14 ratchet). `.ops-keyboard-hint` is `display: none`. `.ops-filter-caption` is unused CSS — skip unless wired into the DOM.
+- `.ops-insight-sub` / `.ops-insight-line` / `.ops-overview-head-count` still use shared glass `opacity` on Apple.
+- Recapture `feature-agent-ops.png` when a Mac CPU window is available.
+
+## Notes
+
+- Sibling harnesses missing on this rack (OpenClaw / Hermes paths absent).
+- `debug.log` scan: no ERROR/WARN clusters in the last 3h.
+- 23:00: git flush clean; CI + release already cut today (skipped).
