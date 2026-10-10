@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1849
+
+- Apple Agent Ops save status (`.ops-agent-save-status`) mixes type color against an opaque shell fill (`color-mix` 62% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Agents Save confirmation line. `.apple-shell` beats the later shared `opacity: 0.7` on inherit. Standing P2 #14; Mac capture deferred. Detail meta already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1848
 
 - Apple Agent Ops detail meta (`.ops-detail-meta`) mixes type color against an opaque shell fill (`color-mix` 66% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Agents soul/skill/mood path line. `.apple-shell` beats the later shared `opacity: 0.75` on inherit. Standing P2 #14; Mac capture deferred. Tab hints already opaque. P2 reliability / GitHub #14.
