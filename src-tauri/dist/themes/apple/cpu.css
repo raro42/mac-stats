@@ -2880,6 +2880,14 @@ border-radius: 24px;
   opacity: 1;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .logs-toolbar-kb-hint opacity: 0.72. */
+.apple-shell .logs-toolbar-kb-hint {
+  /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the shell fill under Refresh · Open · Auto-refresh. */
+  color: color-mix(in srgb, #0c0c10 63%, #f7f7fa);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
   background: color-mix(in srgb, currentColor 4%, #ffffff);
