@@ -2844,6 +2844,14 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .logs-viewer-prefix opacity: 0.72. */
+.apple-shell .logs-viewer-prefix {
+  /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the near-white log viewer. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .ops-refresh-row-kb-hint opacity: 0.72. */
 .apple-shell .ops-refresh-row-kb-hint {
   /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the shell fill. */
