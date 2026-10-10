@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1853
+
+- Apple Agent Ops Insights lines (`.ops-insight-line` resting · clickable · hover · selected) mix type color against an opaque shell fill (`color-mix` 70% / 79% / 88% `#0c0c10` on `#f7f7fa`). No glass `opacity` on Slowest · Candidates · Lanes body lines. `.apple-shell` beats the later shared `opacity: 0.8` / clickable `0.9` / `1` on inherit. Standing P2 #14; Mac capture deferred. Insight subheads already opaque. Next: `.ops-overview-head-count`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1852
 
 - Layout daily (Data Poster / Dark): Monitors collapsed glance (`.monitors-collapsed-glance` resting · hover · focus · Down · All-up · Slowest) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab under the header when Monitors is collapsed. Expanded summary already remapped. Next layout theme: `dark`. Standing P2 #14 next: `.ops-insight-line` / `.ops-overview-head-count`.
