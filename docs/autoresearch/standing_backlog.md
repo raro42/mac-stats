@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1841
+
+- Apple AI Chat filter-miss message (`.chat-filter-miss-msg`) mixes type color against an opaque white filter-miss shell (`color-mix` 77% `#0c0c10` on `#ffffff`). No glass `opacity` on the You · Assistant · Errors empty message line. `.apple-shell` beats the later shared `opacity: 0.88` on inherit. Agent Ops health values already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1840
 
 - Apple Agent Ops health values (`.ops-health-value`) mix type color against an opaque near-white health card (`color-mix` 84% `#0c0c10` on `#ffffff`). No glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest values. `.apple-shell` beats the later shared `opacity: 0.95` on inherit. Health labels already opaque. P2 reliability / GitHub #14.

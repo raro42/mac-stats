@@ -2930,6 +2930,14 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .chat-filter-miss-msg opacity: 0.88. */
+.apple-shell .chat-filter-miss-msg {
+  /* Was opacity 0.88 on inherit (~88% ink) → ~77% ink on the white filter-miss shell. */
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .monitor-backoff-hint opacity: 0.78. */
 .apple-shell .monitor-backoff-hint {
   /* Was opacity 0.78 on --muted (50% ink) → ~39% ink on the white monitor row. */
