@@ -1,17 +1,31 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B (20:00–06:00) kept product CSS for WebView idle cut (#14).
+Overnight autoresearch (Track B) kept shipping Apple WebView idle-cut (#14) keyboard-hint opacity fixes.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
-|---|---|
-| **v0.1.1810** | `.ops-file-tab-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops Soul · Skill · Mood move hint; #14) |
-| **v0.1.1809** | `.ops-refresh-row-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops Refresh · Refresh digest · Updated move hint; #14) |
-| **v0.1.1808** | `.ops-filter-row-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops search · match · Clear move hint; #14) |
+|---------|------|
+| **v0.1.1811** | Agent Ops edit-actions kb-hint (`.ops-agent-edit-actions-kb-hint`) opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` — Save · Load into AI Chat · Back |
+| **v0.1.1810** | Agent Ops file-tab kb-hint (Soul · Skill · Mood) |
+| **v0.1.1809** | Agent Ops refresh-row kb-hint |
+| **v0.1.1808** | Agent Ops filter-row kb-hint |
+| **v0.1.1807** | Agent Ops overview kb-hint |
+| **v0.1.1806** | Agent Ops health-strip kb-hint |
+| **v0.1.1805** | Agent Ops tab-bar kb-hint |
+| **v0.1.1804** | Changelog body toolbar kb-hint |
+| **v0.1.1803** | Data Poster / Dark: AI Chat exec · answer cards remap onto `#0e0e14` (layout daily) |
 
-## Context
+## Also tried / context
 
-- Digester open empty; design-review surfaces in grace; layout daily Data Poster already shipped earlier tonight.
-- Fuel: standing backlog P2 reliability / GitHub #14 (opaque type, no glass `opacity` on keyboard hints).
-- Next Agent Ops kb-hints still on glass opacity: edit-actions · preview-row · insights.
+- Digester open: empty (instant noise filtered).
+- Design review: grace (feature-agent-ops ~24.3d recommended when Mac screenshot reachable).
+- Layout daily: data-poster marked today; Dark/Neon still due next days.
+- Debug.log: no ERROR/WARN clusters.
+- Sibling harness: OpenClaw/Hermes git missing on this host.
+
+## Next fuel
+
+- `.ops-preview-row-kb-hint` glass type (Agent Ops Knowledge/Sessions/Schedules/Runs preview Copy · Load).
+- Then `.ops-insights-kb-hint`.
+- Dark layout daily tomorrow; capture feature-cpu-metrics / feature-agent-ops when Mac is reachable.
