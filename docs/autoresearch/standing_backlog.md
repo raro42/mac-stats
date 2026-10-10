@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1823
+
+- Apple Agent Ops empty-tab hint (`.ops-empty-tab-hint`) mixes type color against an opaque white empty shell (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the empty-tab hint line. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Updated stamp already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1822
 
 - Apple Agent Ops Updated stamp (`.ops-updated-ago`) mixes type color against an opaque shell fill (`color-mix` 63% / 69% / 81% `#0c0c10` on `#f7f7fa` for resting · visible · hover). No glass `opacity` on the Updated line. `.apple-shell` beats the later shared `opacity: 0.72` / `0.78` / `0.92` on inherited `--text`. Perplexity setup kb-hint already opaque. P2 reliability / GitHub #14.
