@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1828
+
+- Apple Disk Cleanup scope path (`.disk-cleanup-scope-path`) mixes type color against an opaque near-white scope row (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the path line. `.apple-shell` beats the later shared `opacity: 0.72` on inherited type. Category path already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1827
 
 - Apple Disk Cleanup category path (`.disk-cleanup-item-path`) mixes type color against an opaque white category row (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the path line. `.apple-shell` beats the later shared `opacity: 0.72` on inherited type. Viewer prefix already opaque. P2 reliability / GitHub #14.
