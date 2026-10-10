@@ -1,22 +1,18 @@
 # Morning surprise — 2026-10-11
 
-Overnight Track B kept real product polish (not digester-empty quiet).
+Overnight Track B kept shipping. Digester open stayed empty; design-review screens on grace; **layout daily** was due for Data Poster.
 
-| Version | What shipped |
-|---------|----------------|
-| **v0.1.1849** | Agent Ops `.ops-agent-save-status` — Agents Save confirmation uses opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1848** | Agent Ops `.ops-detail-meta` — Agents soul/skill/mood path uses opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1847** | Agent Ops `.ops-hint` — Schedules · Runs helper lines use opaque `color-mix` (no glass `opacity`). |
-| **v0.1.1846** | Disk Cleanup `.disk-cleanup-scope-kind` — scope kind label opaque `color-mix`. |
-| **v0.1.1845** | Disk Cleanup `.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` opaque `color-mix`. |
-| **v0.1.1844** | Monitors empty summary · collapsed glance opaque `color-mix` (design-review). |
-| **v0.1.1843** | Disk Cleanup `.disk-cleanup-item-stat` opaque `color-mix` (design-review). |
-| **v0.1.1842** | Agent Ops `.ops-overview-count` opaque `color-mix` (design-review). |
+## Shipped
 
-## Why it matters
+- **v0.1.1852** — Data Poster / Dark Monitors collapsed glance (`.monitors-collapsed-glance`) remaps Apple `#ffffff` opaque washes onto `#0e0e14`. No white slab under the header when Monitors is collapsed. Expanded summary was already remapped earlier.
 
-Apple theme text that sat on `opacity` still forced WebView compositing (#14). Opaque `color-mix` against shell/card fills keeps the same look without glass alpha.
+## Context
 
-## Next fuel
+- Sibling harness: OpenClaw / Hermes paths missing on this host (no port fuel).
+- Debug.log: quiet (no ERROR/WARN clusters in the scan window).
+- Nightly keep row landed in `results.tsv` @ dff4d37.
 
-`.ops-subhead`, `.ops-insight-sub`, `.ops-insight-line`, or `.ops-overview-head-count` (same #14 ratchet). `.ops-keyboard-hint` is `display: none`. `.ops-filter-caption` is unused CSS — skip unless wired into the DOM.
+## Next
+
+- Standing P2 / GitHub #14: `.ops-insight-line` / `.ops-overview-head-count` opaque type on Apple.
+- Layout daily next theme: `dark` (Clear chips / chat bubbles / attention glances still mix `#ffffff` on dark shells).
