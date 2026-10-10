@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1835
+
+- Apple Agent Ops health labels (`.ops-health-label`) mix type color against an opaque near-white health card (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest. `.apple-shell` beats the later shared `opacity: 0.55` on inherited type. Process Details metric labels already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1834
 
 - Apple Process Details metric labels (`.process-detail-section .process-detail-label`) mix type color against an opaque white detail card (`color-mix` 57% `#0c0c10` on `#ffffff`). No glass `opacity` on CPU · Memory · Threads and related rows. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Meta labels already opaque. P2 reliability / GitHub #14.
