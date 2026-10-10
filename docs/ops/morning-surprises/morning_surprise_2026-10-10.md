@@ -6,6 +6,7 @@ Overnight Track B (product code) for Ralf.
 
 | Version | What |
 |---------|------|
+| **v0.1.1837** | Apple AI Chat empty copy (`.chat-empty-copy`) — opaque `color-mix` (35% ink on white empty shell; ready wash 40%); no glass `opacity` on the empty-copy line (#14). |
 | **v0.1.1836** | Apple Monitors backoff hint (`.monitor-backoff-hint`) — opaque `color-mix` (39% ink on white monitor row); no glass `opacity` on the next-check / backoff line (#14). |
 | **v0.1.1835** | Apple Agent Ops health labels (`.ops-health-label`) — opaque `color-mix` (48% ink on near-white health card); no glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest (#14). |
 | **v0.1.1834** | Apple Process Details metric labels (`.process-detail-section .process-detail-label`) — opaque `color-mix` (57% ink on white detail card); no glass `opacity` on CPU · Memory · Threads rows (#14). |
@@ -21,8 +22,8 @@ Overnight Track B (product code) for Ralf.
 
 ## Latest keep
 
-`4f5cb849` — v0.1.1836 monitor-backoff-hint opaque type. Installed to `/Applications`.
+`f0aac242` — v0.1.1837 chat-empty-copy opaque type. Installed to `/Applications`.
 
 ## Next
 
-`.chat-empty-copy` (0.78). Skip `.rings-filter-miss-hint` (node removed). Then `.ops-row-meta` (0.58).
+`.ops-row-meta` (0.58). Then `.chat-empty-title` (0.92). Skip `.rings-filter-miss-hint` (node removed).
