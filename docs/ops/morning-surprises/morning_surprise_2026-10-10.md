@@ -1,38 +1,14 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B kept shipping the Apple theme **opaque type** chain for GitHub **#14** (WebView / Graphics and Media idle cut). Digester open stayed empty; design review was in grace; layout daily already done for the day.
+## Shipped overnight
 
-## Shipped this night (keeps)
+- **v0.1.1843** — Apple Disk Cleanup category reclaim size (`.disk-cleanup-item-stat`) uses opaque `color-mix` type instead of glass `opacity` (GitHub #14 / WebView idle). Design-review surface `feature-disk-cleanup` (Mac window capture deferred on Linux rack; polish grace marked).
 
-Latest keep:
+## Earlier same night / day
 
-- **v0.1.1841** — Apple AI Chat `.chat-filter-miss-msg` mixes type against opaque white filter-miss shell (`color-mix` 77% ink). No glass `opacity` on the You · Assistant · Errors empty message line.
+- **v0.1.1842** — Apple Agent Ops overview inventory lines (`.ops-overview-count`) opaque type; design-review `feature-agent-ops`.
 
-Earlier same-night keeps (sample of the chain):
+## Fuel note
 
-- **v0.1.1840** — Agent Ops `.ops-health-value` opaque type
-- **v0.1.1839** — AI Chat `.chat-empty-title` opaque type
-- **v0.1.1838** — Agent Ops `.ops-row-meta` opaque type
-- **v0.1.1837** — AI Chat `.chat-empty-copy` opaque type
-- **v0.1.1836** — Monitors `.monitor-backoff-hint` opaque type
-- **v0.1.1835** — Agent Ops `.ops-health-label` opaque type
+Digester open was empty. Design review was due on Disk Cleanup. Layout daily already done for data-poster today.
 
-Full keep log: `~/.mac-stats/improvements/autoresearch/results.tsv` (many `#14` keeps after 20:00 local).
-
-## Tried / discarded
-
-- A few race discards when parallel ticks orphaned local commits after rebase abort (footer-toolbar kb-hint / perplexity-kb-hint already on origin).
-
-## Next fuel
-
-- `.disk-cleanup-item-stat` (0.85)
-- `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85)
-- Skip `.rings-filter-miss-hint` (node removed); skip disabled / whole-row transient opacity
-
-## Notes
-
-- Digester: MEMORY / MEMORY_APPEND slow turns already have shipped lanes — open empty.
-- Debug.log: no ERROR/WARN/panic clusters in the scan window at the last tick.
-- Install/kickstart after v0.1.1841; process alive with `-vv`.
-
-Generated: 2026-10-10T05:54:50.311676-07:00
