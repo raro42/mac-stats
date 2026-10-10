@@ -4,6 +4,7 @@ Overnight Track B (20:00–06:00 CEST) kept shipping Apple opaque-type cuts for 
 
 ## Shipped
 
+- **v0.1.1846** — Apple Disk Cleanup scope kind (`.disk-cleanup-scope-kind`) opaque `color-mix` type (no glass opacity on the builtin/kind label).
 - **v0.1.1845** — Apple Disk Cleanup category policy · samples (`.disk-cleanup-item-policy` · `.disk-cleanup-item-samples`) opaque `color-mix` type (no glass opacity on policy/samples lines).
 - **v0.1.1844** — Apple Monitors empty summary · collapsed glance opaque type. Design-review fuel; Mac capture deferred; polish grace marked.
 - **v0.1.1843** — Apple Disk Cleanup category stats opaque type. Design-review fuel; Mac capture deferred; polish grace marked.
@@ -19,5 +20,5 @@ Overnight Track B (20:00–06:00 CEST) kept shipping Apple opaque-type cuts for 
 
 ## Next fuel
 
-- Standing P2 #14: `.disk-cleanup-scope-kind`, `.ops-hint`, `.ops-filter-caption`, `.ops-detail-meta`.
+- Standing P2 #14: `.ops-hint`, `.ops-filter-caption`, `.ops-detail-meta`.
 - Design review when grace expires / Mac capture for stale feature screens.
