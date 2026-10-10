@@ -1,31 +1,26 @@
 # Morning surprise — 2026-10-10
 
-Overnight autoresearch (Track B) kept shipping Apple WebView idle-cut (#14) keyboard-hint opacity fixes.
+Overnight Track B (autoresearch) kept shipping Apple keyboard-hint opacity cuts for GitHub **#14**.
 
-## Shipped tonight
+## Shipped this night (latest first)
 
-| Version | What |
-|---------|------|
-| **v0.1.1812** | Agent Ops preview-row kb-hint (`.ops-preview-row-kb-hint`) opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` — Copy · Load into AI Chat |
-| **v0.1.1811** | Agent Ops edit-actions kb-hint (Save · Load into AI Chat · Back) |
-| **v0.1.1810** | Agent Ops file-tab kb-hint (Soul · Skill · Mood) |
-| **v0.1.1809** | Agent Ops refresh-row kb-hint |
-| **v0.1.1808** | Agent Ops filter-row kb-hint |
-| **v0.1.1807** | Agent Ops overview kb-hint |
-| **v0.1.1806** | Agent Ops health-strip kb-hint |
-| **v0.1.1805** | Agent Ops tab-bar kb-hint |
-| **v0.1.1804** | Changelog body toolbar kb-hint |
-| **v0.1.1803** | Data Poster / Dark: AI Chat exec · answer cards remap onto `#0e0e14` (layout daily) |
+- **v0.1.1813** — Agent Ops Insights keyboard hint (`.ops-insights-kb-hint`) opaque `color-mix` type on the shell fill. No glass `opacity` on the Insights move hint.
+- **v0.1.1812** — Agent Ops preview-row keyboard hint (`.ops-preview-row-kb-hint`) opaque type (Copy · Load into AI Chat).
+- **v0.1.1811** — Agent Ops edit-actions keyboard hint (`.ops-agent-edit-actions-kb-hint`) opaque type (Save · Load · Back).
+- **v0.1.1810** — Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) opaque type (Soul · Skill · Mood).
+- **v0.1.1809** — Agent Ops refresh-row keyboard hint opaque type.
+- **v0.1.1808** — Agent Ops filter-row keyboard hint opaque type.
+- **v0.1.1807** — Agent Ops overview keyboard hint opaque type.
+- **v0.1.1806** — Agent Ops health-strip keyboard hint opaque type.
 
-## Also tried / context
+## Why it matters
 
-- Digester open: empty (instant noise filtered).
-- Design review: grace (feature-agent-ops ~24.3d recommended when Mac screenshot reachable).
-- Layout daily: data-poster marked today; Dark/Neon still due next days.
-- Debug.log: no ERROR/WARN clusters.
-- Sibling harness: OpenClaw/Hermes git missing on this host.
+Glass `opacity` on hint text still pulls the WebView compositor. Opaque `color-mix` keeps the same look without the alpha layer.
 
 ## Next fuel
 
-- `.ops-insights-kb-hint` glass type (Agent Ops Insights move hint).
-- Dark layout daily tomorrow; capture feature-cpu-metrics / feature-agent-ops when Mac is reachable.
+- `.chat-empty-kb-hint` (then chat-composer / chat / perplexity / logs kb-hints) still use shared `opacity: 0.72`.
+- Design-review screens still in grace (feature-agent-ops stale ~24d) — capture when a Mac is reachable.
+- Layout daily: Dark / Neon still due on later calendar days.
+
+_Updated: 2026-10-10 04:11 CEST_
