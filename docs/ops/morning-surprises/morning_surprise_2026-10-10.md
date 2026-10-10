@@ -6,7 +6,8 @@ Overnight autoresearch (Track B) kept shipping Apple WebView idle-cut (#14) keyb
 
 | Version | What |
 |---------|------|
-| **v0.1.1811** | Agent Ops edit-actions kb-hint (`.ops-agent-edit-actions-kb-hint`) opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` — Save · Load into AI Chat · Back |
+| **v0.1.1812** | Agent Ops preview-row kb-hint (`.ops-preview-row-kb-hint`) opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` — Copy · Load into AI Chat |
+| **v0.1.1811** | Agent Ops edit-actions kb-hint (Save · Load into AI Chat · Back) |
 | **v0.1.1810** | Agent Ops file-tab kb-hint (Soul · Skill · Mood) |
 | **v0.1.1809** | Agent Ops refresh-row kb-hint |
 | **v0.1.1808** | Agent Ops filter-row kb-hint |
@@ -26,6 +27,5 @@ Overnight autoresearch (Track B) kept shipping Apple WebView idle-cut (#14) keyb
 
 ## Next fuel
 
-- `.ops-preview-row-kb-hint` glass type (Agent Ops Knowledge/Sessions/Schedules/Runs preview Copy · Load).
-- Then `.ops-insights-kb-hint`.
+- `.ops-insights-kb-hint` glass type (Agent Ops Insights move hint).
 - Dark layout daily tomorrow; capture feature-cpu-metrics / feature-agent-ops when Mac is reachable.
