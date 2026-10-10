@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1851
+
+- Apple Agent Ops Insights section labels (`.ops-insight-sub`) mix type color against an opaque shell fill (`color-mix` 44% `#0c0c10` on `#f7f7fa`). No glass `opacity` on Slowest · Candidates · Lanes and related Insight subheads. `.apple-shell` beats the later shared `opacity: 0.5` on inherit. Standing P2 #14; Mac capture deferred. Section subheads already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1850
 
 - Apple Agent Ops section subheads (`.ops-subhead`) mix type color against an opaque shell fill (`color-mix` 44% `#0c0c10` on `#f7f7fa`). No glass `opacity` on Live · Recent files · Active schedules · Recent deliveries. `.apple-shell` beats the later shared `opacity: 0.5` on inherit. Standing P2 #14; Mac capture deferred. Save status already opaque. P2 reliability / GitHub #14.
