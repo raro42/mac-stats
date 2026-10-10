@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1836
+
+- Apple Monitors backoff hint (`.monitor-backoff-hint`) mixes type color against an opaque white monitor row (`color-mix` 39% `#0c0c10` on `#ffffff`). No glass `opacity` on the next-check / backoff line. `.apple-shell` beats the later shared `opacity: 0.78` on `--muted`. Agent Ops health labels already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1835
 
 - Apple Agent Ops health labels (`.ops-health-label`) mix type color against an opaque near-white health card (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest. `.apple-shell` beats the later shared `opacity: 0.55` on inherited type. Process Details metric labels already opaque. P2 reliability / GitHub #14.
