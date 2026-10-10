@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1812
+
+- Apple Agent Ops preview-row keyboard hint (`.ops-preview-row-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Copy · Load into AI Chat move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Edit-actions kb-hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1811
 
 - Apple Agent Ops edit-actions keyboard hint (`.ops-agent-edit-actions-kb-hint`) mixes type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the Save · Load into AI Chat · Back move hint. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. File-tab kb-hint already opaque. P2 reliability / GitHub #14.
