@@ -1,31 +1,38 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B (product code) for Ralf.
+Overnight Track B kept shipping the Apple theme **opaque type** chain for GitHub **#14** (WebView / Graphics and Media idle cut). Digester open stayed empty; design review was in grace; layout daily already done for the day.
 
-## Shipped tonight
+## Shipped this night (keeps)
 
-| Version | What |
-|---------|------|
-| **v0.1.1839** | Apple AI Chat empty title (`.chat-empty-title`) — opaque `color-mix` (41% ink on white empty shell; ready wash 45%); no glass `opacity` on the empty-title line (#14). |
-| **v0.1.1838** | Apple Agent Ops row meta (`.ops-row-meta`) — opaque `color-mix` (51% ink on near-white list row); no glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Skips Updated stamp / keyboard-hint dual-classes (#14). |
-| **v0.1.1837** | Apple AI Chat empty copy (`.chat-empty-copy`) — opaque `color-mix` (35% ink on white empty shell; ready wash 40%); no glass `opacity` on the empty-copy line (#14). |
-| **v0.1.1836** | Apple Monitors backoff hint (`.monitor-backoff-hint`) — opaque `color-mix` (39% ink on white monitor row); no glass `opacity` on the next-check / backoff line (#14). |
-| **v0.1.1835** | Apple Agent Ops health labels (`.ops-health-label`) — opaque `color-mix` (48% ink on near-white health card); no glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest (#14). |
-| **v0.1.1834** | Apple Process Details metric labels (`.process-detail-section .process-detail-label`) — opaque `color-mix` (57% ink on white detail card); no glass `opacity` on CPU · Memory · Threads rows (#14). |
-| **v0.1.1833** | Apple Disk Cleanup meta labels (`.disk-cleanup-meta-label`) — opaque `color-mix` (57% ink on white meta card); no glass `opacity` on Reclaimable now · Next automatic run · Runs when · Enabled scopes (#14). |
-| **v0.1.1832** | Apple Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) — opaque `color-mix` (57% ink on shell `#f7f7fa`); no glass `opacity` (#14). |
-| **v0.1.1831** | Apple Process Details Force Quit hint (`.force-quit-hint`) — opaque `color-mix` (62% ink on white); no glass `opacity` (#14). |
-| **v0.1.1830** | Apple Disk Cleanup header summary — opaque `color-mix` (63% ink on shell); no glass `opacity` (#14). |
+Latest keep:
 
-## Fuel
+- **v0.1.1840** — Apple Agent Ops `.ops-health-value` mixes type against opaque near-white health cards (`color-mix` 84% ink). No glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest values.
 
-- Digester open empty; design review in grace; layout daily `due=false` (data-poster ok).
-- Standing backlog P2 / GitHub **#14** Apple opaque type chain.
+Earlier same-night keeps (sample of the chain):
 
-## Latest keep
+- **v0.1.1839** — AI Chat `.chat-empty-title` opaque type
+- **v0.1.1838** — Agent Ops `.ops-row-meta` opaque type
+- **v0.1.1837** — AI Chat `.chat-empty-copy` opaque type
+- **v0.1.1836** — Monitors `.monitor-backoff-hint` opaque type
+- **v0.1.1835** — Agent Ops `.ops-health-label` opaque type
 
-`23b681a5` — v0.1.1839 chat-empty-title opaque type. Installed to `/Applications`. Discord Bot connected.
+Full keep log: `~/.mac-stats/improvements/autoresearch/results.tsv` (many `#14` keeps after 20:00 local).
 
-## Next
+## Tried / discarded
 
-`.ops-health-value` (0.95). Then `.chat-filter-miss-msg` (0.88), `.disk-cleanup-item-stat` (0.85), `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85). Skip `.rings-filter-miss-hint` (node removed). Skip disabled / whole-row transient opacity.
+- A few race discards when parallel ticks orphaned local commits after rebase abort (footer-toolbar kb-hint / perplexity-kb-hint already on origin).
+
+## Next fuel
+
+- `.chat-filter-miss-msg` (0.88)
+- `.disk-cleanup-item-stat` (0.85)
+- `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85)
+- Skip `.rings-filter-miss-hint` (node removed); skip disabled / whole-row transient opacity
+
+## Notes
+
+- Digester: MEMORY / MEMORY_APPEND slow turns already have shipped lanes — open empty.
+- Debug.log: no ERROR/WARN/panic clusters in the scan window at the last tick.
+- Install/kickstart after v0.1.1840; process alive with `-vv`.
+
+Generated: 2026-10-10T05:31:02.324274-07:00
