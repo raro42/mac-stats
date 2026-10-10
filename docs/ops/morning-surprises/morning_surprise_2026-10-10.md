@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple WebView idle cut (#14) opaque-type remaps.
 
 | Version | What |
 |---------|------|
+| **v0.1.1830** | Apple `.disk-cleanup-section .disk-cleanup-summary` opaque color-mix (63% ink on `#f7f7fa`); no glass opacity on Disk Cleanup header summary |
 | **v0.1.1829** | Apple `.force-quit-advanced > summary` opaque color-mix (63% ink on `#ffffff`); no glass opacity on Process Details Advanced |
 | **v0.1.1828** | Apple `.disk-cleanup-scope-path` opaque color-mix (63% ink on `#ffffff`); no glass opacity on Disk Cleanup scope paths |
 | **v0.1.1827** | Apple `.disk-cleanup-item-path` opaque color-mix (63% ink on `#ffffff`); no glass opacity on Disk Cleanup category paths |
@@ -28,9 +29,9 @@ Overnight Track B kept shipping Apple WebView idle cut (#14) opaque-type remaps.
 - Debug.log: quiet (no ERROR/WARN/panic clusters in the scan window).
 
 ## Fitness
-Process Details Advanced disclosure type uses opaque `color-mix` on Apple (no glass opacity).
-Advanced no longer uses glass `opacity` on Apple — less compositor work for #14, same readable muted type via `color-mix`.
+Disk Cleanup header summary type uses opaque `color-mix` on Apple (no glass opacity).
+Summary no longer uses glass `opacity` on Apple — less compositor work for #14, same readable muted type via `color-mix`.
 
 ## Next fuel
 
-`.disk-cleanup-section .disk-cleanup-summary` (shared opacity 0.72). Icon-strip images stay on opacity. `#chat-send-btn:disabled` is a disabled state. `.monitor-item.is-checking` / `.is-pending` stay whole-row transient opacity. Hover `.ops-tab-digit` opacity stays interaction state.
+Scan remaining shared `opacity: 0.72` type without `.apple-shell` overrides. Icon-strip images stay on opacity. `#chat-send-btn:disabled` is a disabled state. `.monitor-item.is-checking` / `.is-pending` stay whole-row transient opacity. Hover `.ops-tab-digit` opacity stays interaction state.
