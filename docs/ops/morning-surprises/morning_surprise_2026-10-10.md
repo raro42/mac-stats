@@ -6,10 +6,11 @@ Overnight Track B kept shipping the Apple theme **opaque type** chain for GitHub
 
 Latest keep:
 
-- **v0.1.1840** — Apple Agent Ops `.ops-health-value` mixes type against opaque near-white health cards (`color-mix` 84% ink). No glass `opacity` on Version · Discord · Redmine · Next schedule · Last delivery · Digest values.
+- **v0.1.1841** — Apple AI Chat `.chat-filter-miss-msg` mixes type against opaque white filter-miss shell (`color-mix` 77% ink). No glass `opacity` on the You · Assistant · Errors empty message line.
 
 Earlier same-night keeps (sample of the chain):
 
+- **v0.1.1840** — Agent Ops `.ops-health-value` opaque type
 - **v0.1.1839** — AI Chat `.chat-empty-title` opaque type
 - **v0.1.1838** — Agent Ops `.ops-row-meta` opaque type
 - **v0.1.1837** — AI Chat `.chat-empty-copy` opaque type
@@ -24,7 +25,6 @@ Full keep log: `~/.mac-stats/improvements/autoresearch/results.tsv` (many `#14` 
 
 ## Next fuel
 
-- `.chat-filter-miss-msg` (0.88)
 - `.disk-cleanup-item-stat` (0.85)
 - `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85)
 - Skip `.rings-filter-miss-hint` (node removed); skip disabled / whole-row transient opacity
@@ -33,6 +33,6 @@ Full keep log: `~/.mac-stats/improvements/autoresearch/results.tsv` (many `#14` 
 
 - Digester: MEMORY / MEMORY_APPEND slow turns already have shipped lanes — open empty.
 - Debug.log: no ERROR/WARN/panic clusters in the scan window at the last tick.
-- Install/kickstart after v0.1.1840; process alive with `-vv`.
+- Install/kickstart after v0.1.1841; process alive with `-vv`.
 
-Generated: 2026-10-10T05:31:02.324274-07:00
+Generated: 2026-10-10T05:54:50.311676-07:00
