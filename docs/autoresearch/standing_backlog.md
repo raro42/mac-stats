@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1839
+
+- Apple AI Chat empty title (`.chat-empty-title`) mixes type color against an opaque white empty shell (`color-mix` 41% `#0c0c10` on `#ffffff`; ready wash 45%). No glass `opacity` on the empty-title line (resting or Ready). `.apple-shell` beats the later shared `opacity: 0.92` / ready `1` on inherit. Empty copy already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1838
 
 - Apple Agent Ops row meta (`.ops-row-meta`) mixes type color against an opaque near-white list row (`color-mix` 51% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. `.apple-shell` beats the later shared `opacity: 0.58` on inherit. Skips `.ops-updated-ago` / `.ops-keyboard-hint` (already opaque). AI Chat empty copy already opaque. P2 reliability / GitHub #14.

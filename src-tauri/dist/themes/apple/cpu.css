@@ -2930,6 +2930,20 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .chat-empty-title opacity: 0.92 / ready 1. */
+.apple-shell .chat-empty-title {
+  /* Was opacity 0.92 on inherit (~45% ink from empty shell) → ~41% ink on the white empty shell. */
+  color: color-mix(in srgb, #0c0c10 41%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .chat-empty.is-ready .chat-empty-title {
+  /* Was opacity 1 on inherit (~45% ink) → ~45% ink on the ready wash. */
+  color: color-mix(in srgb, #0c0c10 45%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .chat-empty-copy opacity: 0.78 / ready 0.88. */
 .apple-shell .chat-empty-copy {
   /* Was opacity 0.78 on inherit (~45% ink from empty shell) → ~35% ink on the white empty shell. */
