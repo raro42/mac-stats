@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1833
+
+- Apple Disk Cleanup meta labels (`.disk-cleanup-meta-label`) mix type color against an opaque white meta card (`color-mix` 57% `#0c0c10` on `#ffffff`). No glass `opacity` on Reclaimable now · Next automatic run · Runs when · Enabled scopes. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Soft-delete hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1832
 
 - Apple Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) mixes type color against an opaque shell fill (`color-mix` 57% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the hint line. `.apple-shell` beats the later shared `opacity: 0.65` on inherited type. Force Quit hint already opaque. P2 reliability / GitHub #14.
