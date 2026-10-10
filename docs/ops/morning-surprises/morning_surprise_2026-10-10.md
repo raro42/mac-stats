@@ -1,24 +1,26 @@
 # Morning surprise — 2026-10-10
 
-Overnight Track B kept shipping the Apple opaque-type chain (#14). Digester open stayed empty; design review and layout daily were not due (or already used for the day).
+Overnight Track B (product code) for Ralf.
 
-## Shipped tonight (highlights)
+## Shipped tonight
 
-- **v0.1.1831** — Apple `.force-quit-hint` opaque color-mix (62% ink on white Process Details card). No glass `opacity` on “Force Quit ends the process immediately.”
-- **v0.1.1830** — Apple `.disk-cleanup-section .disk-cleanup-summary` opaque (63% ink on shell fill).
-- **v0.1.1829** — Apple `.force-quit-advanced > summary` opaque (63% ink on white card).
-- **v0.1.1828** — Apple `.disk-cleanup-scope-path` opaque.
-- **v0.1.1827** — Apple `.disk-cleanup-item-path` opaque.
-- Earlier same night: logs-viewer-prefix, filter-chip kb-hints, history-chart-caption, ops-empty-tab-hint, ops-updated-ago, Perplexity/Debug/AI Chat kb-hints, footer toolbar hint (see `results.tsv` / CHANGELOG).
+| Version | What |
+|---------|------|
+| **v0.1.1832** | Apple Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) — opaque `color-mix` (57% ink on shell `#f7f7fa`); no glass `opacity` (#14). |
+| **v0.1.1831** | Apple Process Details Force Quit hint (`.force-quit-hint`) — opaque `color-mix` (62% ink on white); no glass `opacity` (#14). |
+| **v0.1.1830** | Apple Disk Cleanup header summary — opaque `color-mix` (63% ink on shell); no glass `opacity` (#14). |
+| **v0.1.1829** | Apple Process Details Advanced disclosure — opaque `color-mix` (63% ink on white); no glass `opacity` (#14). |
+| **v0.1.1828** | Apple Disk Cleanup scope path — opaque `color-mix` (63% ink on near-white); no glass `opacity` (#14). |
 
-## Fuel / skips
+## Fuel
 
-- Digester: open empty (MEMORY / MEMORY_APPEND already have shipped lanes).
-- Design review: grace (feature-agent-ops recommended).
-- Layout daily: data-poster ok; one layout experiment/day already done.
-- Debug.log: quiet in the scanned window.
+- Digester open empty; design review in grace; layout daily already done for data-poster.
+- Standing backlog P2 / GitHub **#14** Apple opaque type chain.
+
+## Latest keep
+
+`a56c9d10` — v0.1.1832 soft-hint opaque type. Installed to `/Applications`.
 
 ## Next
 
-- Continue #14 on remaining glass type (0.65 / 0.78) without `.apple-shell` overrides, or dark-theme contrast when layout daily is due again.
-
+`.disk-cleanup-meta-label` (0.65) or `.process-detail-section .process-detail-label` / 0.78 hint lines.
