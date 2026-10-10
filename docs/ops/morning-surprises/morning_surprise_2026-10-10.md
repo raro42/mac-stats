@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 CEST). Digester open stayed empty; fuel from st
 
 | Version | What |
 |---|---|
+| **v0.1.1808** | `.ops-filter-row-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops search · match · Clear move hint; #14) |
 | **v0.1.1807** | `.ops-overview-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops Agents · Schedules · Live · Knowledge · Recent · Runs · Digest move hint; #14) |
 | **v0.1.1806** | `.ops-health-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops Version · Discord · Redmine · Schedule · Delivery · Digest move hint; #14) |
 | **v0.1.1805** | `.ops-tab-bar-kb-hint` opaque `color-mix` 63% `#0c0c10` on `#f7f7fa` (Agent Ops Overview · tabs move hint; #14) |
@@ -25,6 +26,6 @@ Overnight Track B (20:00–06:00 CEST). Digester open stayed empty; fuel from st
 - Debug.log quiet (no ERROR/WARN clusters).
 
 ## Next
-- Apple Agent Ops `.ops-filter-row-kb-hint` glass type (#14 chain).
+- Apple Agent Ops `.ops-refresh-row-kb-hint` glass type (#14 chain).
 - Dark theme layout daily tomorrow.
 - Capture `feature-cpu-metrics` / `feature-agent-ops` when Mac is reachable.
