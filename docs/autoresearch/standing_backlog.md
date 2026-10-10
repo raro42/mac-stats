@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1844
+
+- Apple Monitors empty summary and collapsed glance (`.monitors-summary.is-empty` · `.monitors-collapsed-glance.is-empty`) mix type color against an opaque white summary card (`color-mix` 75% `#0c0c10` on `#ffffff`). No glass `opacity` on the empty summary line. `.apple-shell` beats the later shared `opacity: 0.85` on inherit. Design review surface (feature-monitors); Mac capture deferred. Empty hint already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1843
 
 - Apple Disk Cleanup category stats (`.disk-cleanup-item-stat`) mix type color against an opaque white category row (`color-mix` 75% `#0c0c10` on `#ffffff`). No glass `opacity` on the reclaim size line. `.apple-shell` beats the later shared `opacity: 0.85` on inherit. Design review surface (feature-disk-cleanup); Mac capture deferred. Category path already opaque. P2 reliability / GitHub #14.
