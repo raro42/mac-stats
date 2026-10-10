@@ -6,7 +6,8 @@ Overnight autoresearch (Track B) kept shipping Apple theme opaque-type cuts for 
 
 | Version | What |
 |--------|------|
-| **v0.1.1850** | Agent Ops `.ops-subhead` — Live · Recent files · Active schedules · Recent deliveries labels use opaque `color-mix` (44% `#0c0c10` on `#f7f7fa`), not glass `opacity`. |
+| **v0.1.1851** | Agent Ops `.ops-insight-sub` — Insights Slowest · Candidates · Lanes (and related) section labels use opaque `color-mix` (44% `#0c0c10` on `#f7f7fa`), not glass `opacity`. |
+| v0.1.1850 | Agent Ops `.ops-subhead` opaque type |
 | v0.1.1849 | Agent Ops `.ops-agent-save-status` opaque type |
 | v0.1.1848 | Agent Ops `.ops-detail-meta` opaque type |
 | v0.1.1847 | Agent Ops `.ops-hint` opaque type |
@@ -18,7 +19,7 @@ Overnight autoresearch (Track B) kept shipping Apple theme opaque-type cuts for 
 
 ## Next fuel
 
-- `.ops-insight-sub` / `.ops-insight-line` / `.ops-overview-head-count` still use shared glass `opacity` on Apple.
+- `.ops-insight-line` / `.ops-overview-head-count` still use shared glass `opacity` on Apple.
 - Recapture `feature-agent-ops.png` when a Mac CPU window is available.
 
 ## Notes
