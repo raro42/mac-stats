@@ -2,7 +2,8 @@
 
 ## Shipped overnight
 
-- **v0.1.1820** — Apple Debug Log list keyboard hint (`.logs-kb-hint`) uses opaque `color-mix` (63% ink on `#f7f7fa`). No glass `opacity` on the log-line move hint (WebView idle / GitHub #14).
+- **v0.1.1821** — Apple Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) uses opaque `color-mix` (63% ink on `#ffffff`). No glass `opacity` on the key · Save key move hint (WebView idle / GitHub #14).
+- **v0.1.1820** — Apple Debug Log list keyboard hint (`.logs-kb-hint`) uses opaque `color-mix` (63% ink on `#f7f7fa`). No glass `opacity` on the log-line move hint.
 - **v0.1.1819** — Apple Debug Log toolbar keyboard hint (`.logs-toolbar-kb-hint`) uses opaque `color-mix` (63% ink on `#f7f7fa`). No glass `opacity` on the Refresh · Open in editor · Auto-refresh move hint.
 - **v0.1.1818** — Apple Perplexity search-box keyboard hint (`.perplexity-search-kb-hint`) uses opaque `color-mix` (63% ink on white). No glass `opacity` on the query · Search move hint.
 - **v0.1.1817** — Apple Perplexity results keyboard hint (`.perplexity-kb-hint`) uses opaque `color-mix` (63% ink on white). No glass `opacity` on the results-list move hint.
@@ -25,5 +26,6 @@
 
 ## Next fuel
 
-- Remaining Apple kb-hint glass opacity: `.perplexity-setup-kb-hint`, then other shared `opacity: 0.72` kb-hints without `.apple-shell` overrides.
+- All `*-kb-hint` classes now have Apple opaque overrides.
+- Next shared `opacity: 0.72` type without `.apple-shell` overrides: `.ops-updated-ago`, `.ops-empty-tab-hint`, `.history-chart-caption`, `.logs-viewer-prefix`, `.disk-cleanup-item-path`, `.disk-cleanup-scope-path`.
 - Layout daily: dark theme still due tomorrow.
