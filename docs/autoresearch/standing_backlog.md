@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1825
+
+- Apple filter-chip keyboard hints (`.filter-chip-kb-hint`) mix type color against an opaque shell fill (`color-mix` 63% `#0c0c10` on `#f7f7fa`). No glass `opacity` on the All · On · Off / lane chip move hints. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. History sparkline captions already opaque. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1824
 
 - Apple history sparkline captions (`.history-chart-caption`) mix type color against an opaque white chart fill (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the CPU · GPU · Freq · Temp labels. `.apple-shell` beats the later shared `opacity: 0.72` on inherited `--text`. Empty-tab hint already opaque. P2 reliability / GitHub #14.
