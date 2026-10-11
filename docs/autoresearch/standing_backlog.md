@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1860
+
+- Apple Agent Ops collapsed empty glance (`.agent-ops-collapsed-glance.is-empty`) mixes type color against an opaque near-white glance wash (`color-mix` 75% `#0c0c10` on `#ffffff`). No glass `opacity` on the collapsed Agent Ops empty line. `.apple-shell` beats the later shared `opacity: 0.85`. Standing P2 #14; Mac capture deferred. Empty shells already opaque. Next: remaining Agent Ops / dark-shell glass type (e.g. `.ops-empty-filter-title` / `.ops-filter-caption` / other attention glances). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1859
 
 - Apple Agent Ops empty shells (`.ops-empty` resting · hover) mix type color against an opaque near-white empty wash (`color-mix` 69% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights empty panels. `.apple-shell` beats the later shared `opacity: 0.78` / hover `0.92`. Standing P2 #14; Mac capture deferred. Tab digit keys already opaque. Next: remaining Agent Ops / dark-shell glass type (e.g. `.ops-empty-filter-title` / attention glances). P2 reliability / GitHub #14.
