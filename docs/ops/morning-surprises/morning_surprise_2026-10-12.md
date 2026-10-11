@@ -6,12 +6,12 @@ Overnight Track B kept shipping while you slept.
 
 | Version | What |
 |---------|------|
+| **v0.1.1881** | Apple Agent Ops loading shell (`.ops-loading`) opaque type — `color-mix` 55% `#0c0c10` on `#ffffff`, no glass `opacity` on Loading… (#14) |
 | **v0.1.1880** | Apple Agent Ops filter caption (`.ops-filter-caption`) opaque type — `color-mix` 66% `#0c0c10` on `#ffffff`, no glass `opacity` under the search row (#14) |
 | **v0.1.1879** | Data Poster / Dark Monitors filter attention glance remaps onto `#0e0e14` (Up / Down / Slow) |
 | **v0.1.1878** | Data Poster / Dark Monitors Down/Slow attention glance remaps onto `#0e0e14` (layout daily) |
 | **v0.1.1877** | Apple Agent Ops Runs lane Clear opaque type |
-| **v0.1.1876** | Apple Agent Ops Runs lane counts opaque type |
-| **v0.1.1875** | Apple Agent Ops Runs lane chips opaque type |
+| **v0.1.1876** | Apple Agent Ops Runs lane chips / counts opaque type |
 
 ## Tried / context
 
@@ -21,7 +21,7 @@ Overnight Track B kept shipping while you slept.
 
 ## Next fuel
 
-- `.ops-loading` type opacity / `.ops-badge.off` glass type
+- `.ops-badge.off` glass type
 - Screenshot `feature-agent-ops` when TCC allows
 
-_Refreshed ~00:50 CEST after v0.1.1880 keep._
+_Refreshed ~01:15 CEST after v0.1.1881 keep._
