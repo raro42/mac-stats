@@ -3102,6 +3102,33 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .ops-tab-count opacity: 0.78 / zero 0.42 / hover 0.92. */
+.apple-shell .ops-tab-count {
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .ops-tab-count.is-zero {
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .agent-ops-tab:hover .ops-tab-count:not(.is-zero),
+.apple-shell .ops-file-tab:hover .ops-tab-count:not(.is-zero) {
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .agent-ops-tab.active .ops-tab-count,
+.apple-shell .ops-file-tab.active .ops-tab-count {
+  /* Active already uses accent at opacity 1 — keep glass off. */
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .monitor-backoff-hint opacity: 0.78. */
 .apple-shell .monitor-backoff-hint {
   /* Was opacity 0.78 on --muted (50% ink) → ~39% ink on the white monitor row. */

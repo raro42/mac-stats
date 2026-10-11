@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1857
+
+- Apple Agent Ops tab count pills (`.ops-tab-count` resting · zero · hover · active) mix type color against an opaque near-white tab wash (`color-mix` 69% / 37% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs inventory pills. `.apple-shell` beats the later shared `opacity: 0.78` / zero `0.42` / hover `0.92`. Standing P2 #14; Mac capture deferred. Close control already opaque. Next: `.ops-tab-digit` / `.ops-empty` glass type. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1856
 
 - Apple Agent Ops close control (`.ops-close-btn` resting · hover) mix type color against an opaque near-white close wash (`color-mix` 62% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Hide Agent Ops ×. `.apple-shell` beats the later shared `opacity: 0.7` / hover `1`. Standing P2 #14; Mac capture deferred. Overview Open links already opaque. Next: `.ops-tab-count` / `.ops-tab-digit` / `.ops-empty` glass type. P2 reliability / GitHub #14.
