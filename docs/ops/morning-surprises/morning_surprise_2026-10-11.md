@@ -1,28 +1,26 @@
 # Morning surprise — 2026-10-11
 
-Overnight Track B kept shipping WebView idle cut (#14) opaque type on Apple Agent Ops.
+Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub **#14** (WebView idle / Graphics and Media).
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1856** | Agent Ops close × (`.ops-close-btn`) opaque `color-mix` type — no glass opacity on Hide Agent Ops |
-| **v0.1.1855** | Overview Open links (`.ops-overview-link`) opaque type |
-| **v0.1.1854** | Overview head-count pills opaque type |
-| **v0.1.1853** | Insights body lines opaque type |
-| **v0.1.1852** | Layout daily: Data Poster / Dark Monitors collapsed glance remap (no white slab) |
-| **v0.1.1851** | Insights section labels opaque type |
+| **v0.1.1857** | Agent Ops tab count pills (`.ops-tab-count`) opaque `color-mix` type on near-white wash |
+| **v0.1.1856** | Agent Ops close control (`.ops-close-btn`) opaque type |
+| **v0.1.1855** | Agent Ops overview Open links (`.ops-overview-link`) opaque type |
+| **v0.1.1854** | Agent Ops overview head counts (`.ops-overview-head-count`) opaque type |
+| **v0.1.1853** | Agent Ops Insights lines (`.ops-insight-line`) opaque type |
+| **v0.1.1852** | Layout daily: Data Poster/Dark Monitors collapsed glance `#ffffff` → `#0e0e14` |
 
-## Also this night
+## Latest tick (~02:05)
 
-- Digester open stayed empty (instant noise filtered).
-- Design-review screens still in grace; Mac capture of `feature-agent-ops.png` deferred (Linux rack).
-- Layout daily marked for `data-poster`; next theme `dark` tomorrow.
-- Sibling OpenClaw/Hermes git missing on this host.
-- Debug.log quiet (no ERROR/WARN clusters).
+- Digester open empty; design review grace; layout daily already done (data-poster).
+- Fuel: standing P2 #14 → `.ops-tab-count`.
+- Ratchet keep @ `b7d6561d`; pushed `main`.
 
-## Next fuel
+## Still open
 
-- `.ops-tab-count` / `.ops-tab-digit` / `.ops-empty` glass type on Apple
-- Dark layout daily when due
-- Recapture Agent Ops feature screen on Mac when reachable
+- `.ops-tab-digit` / `.ops-empty` glass type
+- Dark layout daily (tomorrow)
+- Recapture `feature-agent-ops.png` when a Mac CPU window is reachable
