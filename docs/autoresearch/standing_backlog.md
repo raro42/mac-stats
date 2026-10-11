@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1862
+
+- Apple Agent Ops filter Clear chip (`.ops-filter-clear` resting · hover) mixes type color against an opaque near-white clear wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the filter Clear control. `.apple-shell` beats the later shared `opacity: 0.88` / hover `1`. Standing P2 #14; Mac capture deferred. Filter match already opaque. Next: `.ops-keyboard-hint` is `display: none` (skip); other Agent Ops / dark-shell glass type (e.g. `.ops-empty-filter-msg` / attention glances). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1861
 
 - Apple Agent Ops filter match chip (`.ops-filter-match` resting · All · Partial · Zero) mixes type color against an opaque near-white match wash (`color-mix` 75% / 84% `#0c0c10` on `#ffffff`). No glass `opacity` on the N/M filter count chip. `.apple-shell` beats the later shared `opacity: 0.85` / state `0.95`. Standing P2 #14; Mac capture deferred. Collapsed empty glance already opaque. Next: `.ops-filter-clear` / `.ops-keyboard-hint` / other Agent Ops glass type. P2 reliability / GitHub #14.
