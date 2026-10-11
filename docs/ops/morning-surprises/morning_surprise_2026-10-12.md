@@ -1,25 +1,20 @@
 # Morning surprise — 2026-10-12
 
-Overnight Track B (Apple theme glass type / WebView idle #14) kept shipping Agent Ops opaque type.
+Overnight Track B kept shipping Apple Agent Ops glass-type cuts for GitHub **#14**.
 
-## Shipped tonight (highlights)
+## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.1868** | Agents kind Clear `.ops-agents-enabled-filter-clear` resting · hover opaque (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`) — Clear beside All · On · Off |
+| **v0.1.1869** | Schedules kind chips (`.ops-schedules-kind-chip` resting · hover · active) opaque type on near-white wash — All · Jobs · Deliveries |
+| **v0.1.1868** | Agents kind Clear (`.ops-agents-enabled-filter-clear`) opaque type |
 
-## Last keep this tick
+## Why it matters
 
-- **v0.1.1868** @ `913d0939` — Agents Clear no longer uses glass `opacity` on Apple.
+Glass `opacity` on chip labels keeps the WebView compositor busy. Opaque `color-mix` type on a solid wash is the same look with less idle work.
 
-## Next fuel
+## Next
 
-- `.ops-schedules-kind-chip` / Schedules · Knowledge · Runs kind chips + Clear controls
-- Dark layout daily (when due)
-- Recapture `feature-agent-ops.png` when Mac + TCC allow
-
-## Fuel notes
-
-- Digester open empty; design review in grace; layout daily data-poster done for 2026-10-11.
-- Sibling OpenClaw/Hermes git missing on this host.
-- Debug.log: no ERROR/WARN clusters in scan windows.
+- `.ops-schedules-kind-count` / `.ops-schedules-kind-filter-clear`
+- Knowledge · Runs kind chips + Clear
+- Recapture `feature-agent-ops.png` when macOS TCC allows
