@@ -3218,6 +3218,20 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .ops-badge.off opacity: 0.6 / button hover 1. */
+.apple-shell .ops-badge.off {
+  /* Was opacity 0.6 on inherit (~88% ink) → ~53% ink on the near-white Off badge wash. */
+  color: color-mix(in srgb, #0c0c10 53%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell button.ops-badge.off:hover {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white Off badge wash. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .ops-session-kind-chip opacity: 0.88 / hover·active 1. */
 .apple-shell .ops-session-kind-chip {
   /* Was opacity 0.88 on inherit (~88% ink) → ~77% ink on the near-white Sessions chip. */

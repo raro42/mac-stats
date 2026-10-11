@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~01:40):** Agent Ops Off badge `.ops-badge.off` opaque type (v0.1.1882). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~01:15):** Agent Ops loading `.ops-loading` opaque type (v0.1.1881). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~00:50):** Agent Ops filter caption `.ops-filter-caption` opaque type (v0.1.1880). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~00:30):** Data Poster / Dark Monitors filter attention glance `.monitors-filter-attention-glance` dark remap (v0.1.1879). Recapture of `theme-data-poster.png` / `feature-monitors.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
