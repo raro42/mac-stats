@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1875
+
+- Apple Agent Ops Runs lane chips (`.ops-runs-lane-chip` resting · hover · active) mixes type color against an opaque near-white chip wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Instant · Lite · Direct · Slow · Fail. `.apple-shell` beats the later shared `opacity: 0.88` / hover·active `1`. Standing P2 #14; Mac capture deferred. Knowledge Clear opaque in v0.1.1874. Next: `.ops-runs-lane-count` / `.ops-runs-lane-filter-clear`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1874
 
 - Apple Agent Ops Knowledge kind Clear (`.ops-memory-kind-filter-clear` resting · hover) mixes type color against an opaque near-white chip wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Knowledge Clear control beside All · Discord · Core. `.apple-shell` beats the later shared `opacity: 0.92` / hover `1`. Standing P2 #14; Mac capture deferred. Knowledge kind counts opaque in v0.1.1873. Next: Runs lane chips (`.ops-runs-lane-chip`) / counts / Clear. P2 reliability / GitHub #14.
