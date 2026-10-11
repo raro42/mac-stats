@@ -1,30 +1,28 @@
 # Morning surprise — 2026-10-11
 
-Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub **#14** (WebView idle / Graphics and Media).
+Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub #14 (WebView idle / glass alpha).
 
-## Shipped tonight
+## Shipped tonight (highlights)
 
-| Version | What |
-|---------|------|
-| **v0.1.1861** | Agent Ops filter match chip (`.ops-filter-match` resting · All · Partial · Zero) opaque `color-mix` type on near-white wash |
-| **v0.1.1860** | Agent Ops collapsed empty glance (`.agent-ops-collapsed-glance.is-empty`) opaque `color-mix` type on near-white wash |
-| **v0.1.1859** | Agent Ops empty shells (`.ops-empty`) opaque `color-mix` type on near-white wash |
-| **v0.1.1858** | Agent Ops tab digit keys (`.ops-tab-digit`) opaque `color-mix` type on near-white wash |
-| **v0.1.1857** | Agent Ops tab count pills (`.ops-tab-count`) opaque `color-mix` type on near-white wash |
-| **v0.1.1856** | Agent Ops close control (`.ops-close-btn`) opaque type |
-| **v0.1.1855** | Agent Ops overview Open links (`.ops-overview-link`) opaque type |
-| **v0.1.1854** | Agent Ops overview head counts (`.ops-overview-head-count`) opaque type |
-| **v0.1.1853** | Agent Ops Insights lines (`.ops-insight-line`) opaque type |
-| **v0.1.1852** | Layout daily: Data Poster/Dark Monitors collapsed glance `#ffffff` → `#0e0e14` |
+- **v0.1.1862** — Agent Ops filter Clear chip (`.ops-filter-clear` resting · hover) opaque `color-mix` on near-white wash. No glass opacity on Clear.
+- **v0.1.1861** — filter match chip (`.ops-filter-match`) opaque type.
+- **v0.1.1860** — collapsed empty glance (`.agent-ops-collapsed-glance.is-empty`) opaque type.
+- **v0.1.1859** — empty shells (`.ops-empty`) opaque type.
+- **v0.1.1858** — tab digit keys (`.ops-tab-digit`) opaque type.
+- **v0.1.1857** — tab count pills (`.ops-tab-count`) opaque type.
+- **v0.1.1856** — close control (`.ops-close-btn`) opaque type.
+- **v0.1.1855** — overview Open links (`.ops-overview-link`) opaque type.
+- **v0.1.1854** — overview head counts (`.ops-overview-head-count`) opaque type.
+- **v0.1.1853** — Insights lines (`.ops-insight-line`) opaque type.
+- **v0.1.1852** — layout daily: Data Poster / Dark Monitors collapsed glance remap `#ffffff` → `#0e0e14`.
 
-## Latest tick (~03:40)
+## Fuel / next
 
-- Digester open empty; design review grace; layout daily already done for today.
-- Fuel: standing P2 #14 → `.ops-filter-match` (live filter N/M chip; named `.ops-filter-caption` is dead CSS).
-- Ratchet keep @ `ad2039d3`; pushed `main`.
+- Digester open stayed empty; design review in grace; layout daily done for data-poster today.
+- Next glass type: other Agent Ops / dark-shell (e.g. `.ops-empty-filter-msg` / attention glances). `.ops-keyboard-hint` is `display: none` (skip).
+- Capture `feature-agent-ops.png` when a Mac window is reachable.
 
-## Still open
+## Notes
 
-- `.ops-filter-clear` / `.ops-keyboard-hint` / other Agent Ops glass type
-- Dark layout daily (next calendar day)
-- Recapture `feature-agent-ops.png` when a Mac CPU window is reachable
+- Linux rack: theme CSS only; no /Applications install/kickstart this window.
+- Sibling OpenClaw/Hermes git missing on this host.
