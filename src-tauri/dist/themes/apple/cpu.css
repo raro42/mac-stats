@@ -3150,6 +3150,20 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .ops-empty opacity: 0.78 / hover 0.92. */
+.apple-shell .ops-empty {
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white empty wash. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
+}
+
+.apple-shell .ops-empty:hover {
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white empty wash. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .monitor-backoff-hint opacity: 0.78. */
 .apple-shell .monitor-backoff-hint {
   /* Was opacity 0.78 on --muted (50% ink) → ~39% ink on the white monitor row. */
