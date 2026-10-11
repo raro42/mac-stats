@@ -6,7 +6,8 @@ Overnight Track B kept shipping Apple Agent Ops glass-type cuts for GitHub **#14
 
 | Version | What |
 |---------|------|
-| **v0.1.1871** | Schedules kind Clear (`.ops-schedules-kind-filter-clear` resting · hover) opaque type on near-white wash — Clear beside All · Jobs · Deliveries |
+| **v0.1.1872** | Knowledge kind chips (`.ops-memory-kind-chip` resting · hover · active) opaque type on near-white wash — All · Discord · Core |
+| **v0.1.1871** | Schedules kind Clear (`.ops-schedules-kind-filter-clear` resting · hover) opaque type — Clear beside All · Jobs · Deliveries |
 | **v0.1.1870** | Schedules kind counts (`.ops-schedules-kind-count` resting · `.is-zero`) opaque type — Jobs · Deliveries inventory digits |
 | **v0.1.1869** | Schedules kind chips (`.ops-schedules-kind-chip` resting · hover · active) opaque type — All · Jobs · Deliveries |
 | **v0.1.1868** | Agents kind Clear (`.ops-agents-enabled-filter-clear`) opaque type |
@@ -17,5 +18,5 @@ Glass `opacity` on chip labels keeps the WebView compositor busy. Opaque `color-
 
 ## Next
 
-- `.ops-memory-kind-chip` / Knowledge · Runs kind chips + Clear
+- `.ops-memory-kind-count` / `.ops-memory-kind-filter-clear` / Runs lane chips + Clear
 - Recapture `feature-agent-ops.png` when macOS TCC allows
