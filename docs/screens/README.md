@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-11 (~23:40):** Agent Ops Runs lane Clear `.ops-runs-lane-filter-clear` opaque type (v0.1.1877). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~23:17):** Agent Ops Runs lane counts `.ops-runs-lane-count` opaque type (v0.1.1876). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~22:52):** Agent Ops Runs lane chips `.ops-runs-lane-chip` opaque type (v0.1.1875). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~22:30):** Agent Ops Knowledge kind Clear `.ops-memory-kind-filter-clear` opaque type (v0.1.1874). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.

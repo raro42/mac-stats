@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1877
+
+- Apple Agent Ops Runs lane Clear (`.ops-runs-lane-filter-clear` resting · hover) mixes type color against an opaque near-white chip wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Runs Clear control beside All · Instant · Lite · Direct · Slow · Fail. `.apple-shell` beats the later shared `opacity: 0.92` / hover `1`. Standing P2 #14; Mac capture deferred. Runs lane counts opaque in v0.1.1876. Next: `.ops-filter-caption` (`.ops-keyboard-hint` is `display: none`; skip). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1876
 
 - Apple Agent Ops Runs lane counts (`.ops-runs-lane-count` resting · `.is-zero`) mixes type color against an opaque near-white chip wash (`color-mix` 75% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on Instant · Lite · Direct · Slow · Fail inventory digits. `.apple-shell` beats the later shared `opacity: 0.85` / `.is-zero` `0.42`. Standing P2 #14; Mac capture deferred. Runs lane chips opaque in v0.1.1875. Next: `.ops-runs-lane-filter-clear`. P2 reliability / GitHub #14.
