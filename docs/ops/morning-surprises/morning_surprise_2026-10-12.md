@@ -1,27 +1,23 @@
 # Morning surprise — 2026-10-12
 
-Overnight Track B kept shipping while you slept.
+Overnight Track B kept shipping Apple Agent Ops opaque type for WebView idle cut (#14). Digester open stayed empty; design review and layout daily were not due (data-poster already today).
 
-## Shipped tonight
+## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
-| **v0.1.1881** | Apple Agent Ops loading shell (`.ops-loading`) opaque type — `color-mix` 55% `#0c0c10` on `#ffffff`, no glass `opacity` on Loading… (#14) |
-| **v0.1.1880** | Apple Agent Ops filter caption (`.ops-filter-caption`) opaque type — `color-mix` 66% `#0c0c10` on `#ffffff`, no glass `opacity` under the search row (#14) |
-| **v0.1.1879** | Data Poster / Dark Monitors filter attention glance remaps onto `#0e0e14` (Up / Down / Slow) |
-| **v0.1.1878** | Data Poster / Dark Monitors Down/Slow attention glance remaps onto `#0e0e14` (layout daily) |
-| **v0.1.1877** | Apple Agent Ops Runs lane Clear opaque type |
-| **v0.1.1876** | Apple Agent Ops Runs lane chips / counts opaque type |
+| **v0.1.1878** | Data Poster / Dark `.monitors-attention-glance` remap onto `#0e0e14` (Down/Slow) |
+| **v0.1.1879** | Data Poster / Dark `.monitors-filter-attention-glance` remap onto `#0e0e14` |
+| **v0.1.1880** | Apple `.ops-filter-caption` opaque type |
+| **v0.1.1881** | Apple `.ops-loading` opaque type |
+| **v0.1.1882** | Apple `.ops-badge.off` opaque type (resting · hover) |
 
-## Tried / context
+## Latest tick (~01:40)
 
-- Digester open stayed empty (instant-only window).
-- Design review still in grace; layout daily data-poster done earlier tonight.
-- Standing P2 / GitHub #14 opaque-type ratchet continues on Agent Ops chrome.
+- Fuel: standing after v0.1.1881 — `.ops-badge.off` glass type.
+- Keep @ 839b1b40 — Off badge mixes `color-mix` 53% / 88% `#0c0c10` on `#ffffff`; no glass `opacity`.
+- Next: `button.ops-badge:disabled` glass type (`.ops-keyboard-hint` is `display: none`; skip). Recapture `feature-agent-ops.png` when a Mac CPU window + TCC allow.
 
-## Next fuel
+## Not a quiet night
 
-- `.ops-badge.off` glass type
-- Screenshot `feature-agent-ops` when TCC allows
-
-_Refreshed ~01:15 CEST after v0.1.1881 keep._
+Empty digester alone is not the surprise — five product keeps landed in this window.
