@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1880
+
+- Apple Agent Ops filter caption (`.ops-filter-caption`) mixes type color against an opaque near-white wash (`color-mix` 66% `#0c0c10` on `#ffffff`). No glass `opacity` on the filter caption under the search row. `.apple-shell` beats the later shared `opacity: 0.75`. Standing P2 #14; Mac capture deferred. `.ops-keyboard-hint` is `display: none` (skip). Next: `.ops-loading` type opacity / `.ops-badge.off` glass type. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1879
 
 - Data Poster / Dark Monitors filter attention glance (`.monitors-filter-attention-glance` resting · hover · focus · is-filter · is-up-filter · is-down-filter · is-slow-filter) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab when Up / Down / Slow filter attention shows. Mac capture deferred. Down/Slow attention remapped in v0.1.1878. Next: standing `.ops-filter-caption` Apple opaque type. Standing P2 / GitHub #14.
