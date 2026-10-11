@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1879
+
+- Data Poster / Dark Monitors filter attention glance (`.monitors-filter-attention-glance` resting · hover · focus · is-filter · is-up-filter · is-down-filter · is-slow-filter) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab when Up / Down / Slow filter attention shows. Mac capture deferred. Down/Slow attention remapped in v0.1.1878. Next: standing `.ops-filter-caption` Apple opaque type. Standing P2 / GitHub #14.
+
 ## Overnight merge — v0.1.1878
 
 - Data Poster / Dark Monitors Down/Slow attention glance (`.monitors-attention-glance` resting · hover · focus · has-down · has-slow) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab when a host is Down or Slow. Layout daily 2026-10-12; Mac capture deferred. Collapsed glance remapped in v0.1.1852. Next: `.monitors-filter-attention-glance` dark remap, then standing `.ops-filter-caption` Apple opaque type. Layout daily / GitHub #14.

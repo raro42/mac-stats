@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1879] - 2026-10-12
+
+### Changed
+- **Layout daily follow-up (Data Poster / Dark)** — Monitors filter attention glance (`.monitors-filter-attention-glance` resting · hover · focus · is-filter · is-up-filter · is-down-filter · is-slow-filter) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab when Up / Down / Slow filter attention shows on dark shells. Down/Slow attention glance remapped in v0.1.1878.
+
 ## [0.1.1878] - 2026-10-12
 
 ### Changed
