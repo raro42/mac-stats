@@ -4,6 +4,7 @@ Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub #14 (WebV
 
 ## Shipped tonight (highlights)
 
+- **v0.1.1865** — Agent Ops Sessions kind Clear (`.ops-session-kind-filter-clear` resting · hover) opaque `color-mix` 81% / 88% on near-white wash. No glass opacity on Sessions Clear beside All · Live · Files.
 - **v0.1.1864** — Agent Ops Sessions kind counts (`.ops-session-kind-count` resting · `.is-zero`) opaque `color-mix` on near-white wash. No glass opacity on Live · Files inventory digits.
 - **v0.1.1863** — Agent Ops Sessions kind chips (`.ops-session-kind-chip` resting · hover · active) opaque `color-mix` on near-white wash. No glass opacity on All · Live · Files.
 - **v0.1.1862** — Agent Ops filter Clear chip (`.ops-filter-clear` resting · hover) opaque `color-mix` on near-white wash. No glass opacity on Clear.
@@ -21,7 +22,7 @@ Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub #14 (WebV
 ## Fuel / next
 
 - Digester open stayed empty; design review in grace; layout daily done for data-poster today.
-- Next glass type: `.ops-session-kind-filter-clear` / other kind chips (Agents On·Off, Schedules, Knowledge, Runs). `.ops-empty-filter-msg` has no opacity of its own (skip). `.ops-keyboard-hint` is `display: none` (skip).
+- Next glass type: other kind chips (Agents On·Off, Schedules, Knowledge, Runs) / their Clear controls. `.ops-empty-filter-msg` has no opacity of its own (skip). `.ops-keyboard-hint` is `display: none` (skip).
 - Capture `feature-agent-ops.png` when a Mac window is reachable.
 
 ## Notes
