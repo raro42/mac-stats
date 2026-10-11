@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1868
+
+- Apple Agent Ops Agents kind Clear (`.ops-agents-enabled-filter-clear` resting · hover) mixes type color against an opaque near-white chip wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Agents Clear control beside All · On · Off. `.apple-shell` beats the later shared `opacity: 0.92` / hover `1`. Standing P2 #14; Mac capture deferred. Agents kind counts opaque in v0.1.1867. Next: other kind chips (Schedules, Knowledge, Runs) / their Clear controls. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1867
 
 - Apple Agent Ops Agents kind counts (`.ops-agents-enabled-count` resting · `.is-zero`) mixes type color against an opaque near-white chip wash (`color-mix` 75% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on On · Off inventory digits. `.apple-shell` beats the later shared `opacity: 0.85` / `.is-zero` `0.42`. Standing P2 #14; Mac capture deferred. Agents kind chips opaque in v0.1.1866. Next: `.ops-agents-enabled-filter-clear` / other kind chips (Schedules, Knowledge, Runs). P2 reliability / GitHub #14.
