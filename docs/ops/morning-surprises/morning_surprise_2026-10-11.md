@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub **#14** (
 
 | Version | What |
 |---------|------|
+| **v0.1.1859** | Agent Ops empty shells (`.ops-empty`) opaque `color-mix` type on near-white wash |
 | **v0.1.1858** | Agent Ops tab digit keys (`.ops-tab-digit`) opaque `color-mix` type on near-white wash |
 | **v0.1.1857** | Agent Ops tab count pills (`.ops-tab-count`) opaque `color-mix` type on near-white wash |
 | **v0.1.1856** | Agent Ops close control (`.ops-close-btn`) opaque type |
@@ -14,14 +15,14 @@ Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub **#14** (
 | **v0.1.1853** | Agent Ops Insights lines (`.ops-insight-line`) opaque type |
 | **v0.1.1852** | Layout daily: Data Poster/Dark Monitors collapsed glance `#ffffff` → `#0e0e14` |
 
-## Latest tick (~02:25)
+## Latest tick (~02:48)
 
 - Digester open empty; design review grace; layout daily already done (data-poster).
-- Fuel: standing P2 #14 → `.ops-tab-digit`.
-- Ratchet keep @ `dd1e3955`; pushed `main`.
+- Fuel: standing P2 #14 → `.ops-empty`.
+- Ratchet keep @ `3911bea5`; pushed `main`.
 
 ## Still open
 
-- `.ops-empty` glass type
+- Remaining Agent Ops / dark-shell glass type (e.g. `.ops-empty-filter-title` / attention glances)
 - Dark layout daily (tomorrow)
 - Recapture `feature-agent-ops.png` when a Mac CPU window is reachable
