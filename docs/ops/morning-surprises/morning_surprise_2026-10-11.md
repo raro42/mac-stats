@@ -1,32 +1,40 @@
 # Morning surprise — 2026-10-11
 
-Overnight Track B kept shipping Apple Agent Ops opaque type for GitHub #14 (WebView idle / glass alpha).
+Overnight Track B (Apple theme glass type / WebView idle #14) kept shipping Agent Ops opaque type.
 
 ## Shipped tonight (highlights)
 
-- **v0.1.1866** — Agent Ops Agents kind chips (`.ops-agents-enabled-chip` resting · hover · active) opaque `color-mix` 77% / 88% on near-white wash. No glass opacity on All · On · Off.
-- **v0.1.1865** — Agent Ops Sessions kind Clear (`.ops-session-kind-filter-clear` resting · hover) opaque `color-mix` 81% / 88% on near-white wash. No glass opacity on Sessions Clear beside All · Live · Files.
-- **v0.1.1864** — Agent Ops Sessions kind counts (`.ops-session-kind-count` resting · `.is-zero`) opaque `color-mix` on near-white wash. No glass opacity on Live · Files inventory digits.
-- **v0.1.1863** — Agent Ops Sessions kind chips (`.ops-session-kind-chip` resting · hover · active) opaque `color-mix` on near-white wash. No glass opacity on All · Live · Files.
-- **v0.1.1862** — Agent Ops filter Clear chip (`.ops-filter-clear` resting · hover) opaque `color-mix` on near-white wash. No glass opacity on Clear.
-- **v0.1.1861** — filter match chip (`.ops-filter-match`) opaque type.
-- **v0.1.1860** — collapsed empty glance (`.agent-ops-collapsed-glance.is-empty`) opaque type.
-- **v0.1.1859** — empty shells (`.ops-empty`) opaque type.
-- **v0.1.1858** — tab digit keys (`.ops-tab-digit`) opaque type.
-- **v0.1.1857** — tab count pills (`.ops-tab-count`) opaque type.
-- **v0.1.1856** — close control (`.ops-close-btn`) opaque type.
-- **v0.1.1855** — overview Open links (`.ops-overview-link`) opaque type.
-- **v0.1.1854** — overview head counts (`.ops-overview-head-count`) opaque type.
-- **v0.1.1853** — Insights lines (`.ops-insight-line`) opaque type.
-- **v0.1.1852** — layout daily: Data Poster / Dark Monitors collapsed glance remap `#ffffff` → `#0e0e14`.
+| Version | What |
+|---------|------|
+| **v0.1.1867** | Agents kind counts `.ops-agents-enabled-count` resting · `.is-zero` opaque (`color-mix` 75% / 37% `#0c0c10` on `#ffffff`) — On · Off inventory digits |
+| **v0.1.1866** | Agents kind chips `.ops-agents-enabled-chip` resting · hover · active opaque |
+| **v0.1.1865** | Sessions kind Clear `.ops-session-kind-filter-clear` opaque |
+| **v0.1.1864** | Sessions kind counts `.ops-session-kind-count` opaque |
+| **v0.1.1863** | Sessions kind chips `.ops-session-kind-chip` opaque |
+| **v0.1.1862** | Filter Clear `.ops-filter-clear` opaque |
+| **v0.1.1861** | Filter match `.ops-filter-match` opaque |
+| **v0.1.1860** | Collapsed empty glance `.agent-ops-collapsed-glance.is-empty` opaque |
+| **v0.1.1859** | Empty shells `.ops-empty` opaque |
+| **v0.1.1858** | Tab digits `.ops-tab-digit` opaque |
+| **v0.1.1857** | Tab counts `.ops-tab-count` opaque |
+| **v0.1.1856** | Close `.ops-close-btn` opaque |
+| **v0.1.1855** | Overview Open `.ops-overview-link` opaque |
+| **v0.1.1854** | Overview head counts `.ops-overview-head-count` opaque |
+| **v0.1.1853** | Insights lines `.ops-insight-line` opaque |
+| **v0.1.1852** | Layout daily: Data Poster / Dark Monitors collapsed glance remap |
 
-## Fuel / next
+## Last keep this tick
 
-- Digester open stayed empty; design review in grace; layout daily done for data-poster today.
-- Next glass type: `.ops-agents-enabled-count` / `.ops-agents-enabled-filter-clear` / other kind chips (Schedules, Knowledge, Runs).
-- Capture `feature-agent-ops.png` when a Mac window is reachable.
+- **v0.1.1867** @ `01e349fc` — Agents On · Off count digits no longer use glass `opacity` on Apple.
 
-## Notes
+## Next fuel
 
-- Linux rack: theme CSS only; no /Applications install/kickstart this window.
+- `.ops-agents-enabled-filter-clear` / Schedules · Knowledge · Runs kind chips
+- Dark layout daily (tomorrow)
+- Recapture `feature-agent-ops.png` when Mac + TCC allow
+
+## Fuel notes
+
+- Digester open empty all night; design review in grace; layout daily data-poster done.
 - Sibling OpenClaw/Hermes git missing on this host.
+- Debug.log: no ERROR/WARN clusters in scan windows.
