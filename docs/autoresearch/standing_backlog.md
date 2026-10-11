@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1878
+
+- Data Poster / Dark Monitors Down/Slow attention glance (`.monitors-attention-glance` resting · hover · focus · has-down · has-slow) remaps Apple `#ffffff` washes onto `#0e0e14`. No white slab when a host is Down or Slow. Layout daily 2026-10-12; Mac capture deferred. Collapsed glance remapped in v0.1.1852. Next: `.monitors-filter-attention-glance` dark remap, then standing `.ops-filter-caption` Apple opaque type. Layout daily / GitHub #14.
+
 ## Overnight merge — v0.1.1877
 
 - Apple Agent Ops Runs lane Clear (`.ops-runs-lane-filter-clear` resting · hover) mixes type color against an opaque near-white chip wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Runs Clear control beside All · Instant · Lite · Direct · Slow · Fail. `.apple-shell` beats the later shared `opacity: 0.92` / hover `1`. Standing P2 #14; Mac capture deferred. Runs lane counts opaque in v0.1.1876. Next: `.ops-filter-caption` (`.ops-keyboard-hint` is `display: none`; skip). P2 reliability / GitHub #14.
