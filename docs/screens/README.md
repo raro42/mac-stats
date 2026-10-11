@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-11 (~04:25):** Agent Ops Sessions kind chips `.ops-session-kind-chip` opaque type (v0.1.1863). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~04:00):** Agent Ops filter Clear `.ops-filter-clear` opaque type (v0.1.1862). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~03:35):** Agent Ops filter match `.ops-filter-match` opaque type (v0.1.1861). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-11 (~03:15):** Agent Ops collapsed empty glance `.agent-ops-collapsed-glance.is-empty` opaque type (v0.1.1860). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
