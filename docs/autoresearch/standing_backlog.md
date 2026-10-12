@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1907
+
+- Shared rings filter count (`.rings-filter-count`) mixes type color against an opaque near-white wash (`color-mix` 79% `#0c0c10` on `#ffffff`). No glass `opacity` on the Hot count beside All · Hot. Standing P2 #14; design-review fuel (feature-cpu-metrics); Mac capture deferred. Ops close opaque in v0.1.1906; rings chips opaque in v0.1.1905. Next: shared `.chat-filter-count` glass opacity (0.9), or shared `.processes-filter-count` (0.9 / zero 0.42). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1906
 
-- Shared Agent Ops close (`.ops-close-btn` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 62% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the × control in the Agent Ops header. Standing P2 #14; Mac capture deferred. Apple close opaque in v0.1.1856; rings chips opaque in v0.1.1905. Next: shared `.rings-filter-count` glass opacity (0.9). P2 reliability / GitHub #14.
+- Shared Agent Ops close (`.ops-close-btn` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 62% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the × control in the Agent Ops header. Standing P2 #14; Mac capture deferred. Apple close opaque in v0.1.1856; rings chips opaque in v0.1.1905. Next done in v0.1.1907 (`.rings-filter-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1905
 
