@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared AI Chat filter counts.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Top Processes filter counts.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1909** | Shared Top Processes filter counts (`.processes-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Pinned · Hot inventory digits (design review `feature-processes`; Mac capture deferred) |
 | **v0.1.1908** | Shared AI Chat filter counts (`.chat-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on You · Assistant · Errors inventory digits |
 | **v0.1.1907** | Shared rings filter count (`.rings-filter-count`) opaque type — no glass `opacity` on the Hot count beside All · Hot (design review `feature-cpu-metrics`; Mac capture deferred) |
 | **v0.1.1906** | Shared Agent Ops close (`.ops-close-btn` resting · hover) opaque type — no glass `opacity` on the × in the Agent Ops header (Apple close opaque in v0.1.1856) |
@@ -24,12 +25,12 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. AI Chat role counts now match the opaque Clear chip beside them.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Filter inventory digits now match the opaque filter chips and Clear controls.
 
 ## Still open
 
-Shared `.processes-filter-count` / `.monitors-filter-count` still glass at 0.9 (zero 0.42). Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-cpu-metrics` / `feature-ai-chat` / `feature-processes` when a Mac CPU window + Screen Recording TCC allow.
+Shared `.logs-filter-count` still glass at 0.9 (zero 0.42); then `.monitors-filter-count` / `.disk-cleanup-filter-count` / `.perplexity-filter-count` / `.disk-cleanup-scope-filter-count`. Layout-daily dark still due (screens missing). Recapture stale `feature-*` screens when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `cee626bd` — v0.1.1908 shared `.chat-filter-count` opaque.
+Latest keep: `7780ef33` — v0.1.1909 shared `.processes-filter-count` opaque.
