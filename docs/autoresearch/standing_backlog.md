@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1920
+
+- Shared AI Chat filter chips (`.chat-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · You · Assistant · Errors beside the message list. Standing P2 #14; design-review fuel (feature-ai-chat); Mac capture deferred. Processes filter chips opaque in v0.1.1919. Next: shared `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` glass opacity (0.88), or shared `.processes-filter-clear` / `.monitors-filter-clear` (0.92). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1919
 
-- Shared Top Processes filter chips (`.processes-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Pinned · Hot beside the process list. Standing P2 #14; design-review fuel (feature-processes); Mac capture deferred. Scope filter Clear opaque in v0.1.1918. Next: shared `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` glass opacity (0.88), or shared `.processes-filter-clear` / `.monitors-filter-clear` (0.92). P2 reliability / GitHub #14.
+- Shared Top Processes filter chips (`.processes-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Pinned · Hot beside the process list. Standing P2 #14; design-review fuel (feature-processes); Mac capture deferred. Scope filter Clear opaque in v0.1.1918. Next done in v0.1.1920 (`.chat-filter-chip`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1918
 
