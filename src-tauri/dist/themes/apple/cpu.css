@@ -1244,9 +1244,15 @@ border-radius: 24px;
   pointer-events: none;
 }
 
-.apple-github-link[aria-busy="true"],
-.apple-github-link[aria-disabled="true"] {
-  opacity: 0.7;
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell #github-link beats the later shared #github-link[aria-busy] opacity: 0.7. */
+/* Was opacity 0.7 on inherit (~28% ink) → ~20% ink on the shell fill. */
+.apple-shell #github-link.apple-github-link[aria-busy="true"],
+.apple-shell #github-link.apple-github-link[aria-disabled="true"],
+.apple-shell .apple-github-link[aria-busy="true"],
+.apple-shell .apple-github-link[aria-disabled="true"] {
+  color: color-mix(in srgb, #0c0c10 20%, #f7f7fa);
+  opacity: 1;
   pointer-events: none;
   cursor: wait;
 }

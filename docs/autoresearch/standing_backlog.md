@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1890
+
+- Apple footer GitHub link busy/disabled (`.apple-github-link[aria-busy]` / `[aria-disabled]`) mixes type color against an opaque shell wash (`color-mix` 20% `#0c0c10` on `#f7f7fa`). No glass `opacity` while the link waits. `.apple-shell #github-link` beats the later shared `opacity: 0.7`. Standing P2 #14; Mac capture deferred. Force Quit disabled already opaque. Next: shared `#refresh-btn.is-refreshing` / `#github-link[aria-busy]` (0.7) for non-Apple themes, or `.app-version:active` glass opacity (0.7). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1889
 
 - Apple Force Quit disabled (`.force-quit-btn:disabled`) mixes type color against an opaque near-white wash (`color-mix` 63% `#ff3b30` on `#ffffff`). No glass `opacity` while Force Quit waits. Standing P2 #14; Mac capture deferred. Clean now disabled already opaque. Next: `.apple-github-link[aria-busy="true"]` / `[aria-disabled="true"]` glass opacity (0.7), or shared `#refresh-btn.is-refreshing` / `#github-link[aria-busy]` (0.7). P2 reliability / GitHub #14.
