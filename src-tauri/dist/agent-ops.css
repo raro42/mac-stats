@@ -1202,22 +1202,26 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   overflow: visible;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-close-btn {
   margin-left: auto;
   background: color-mix(in srgb, currentColor 4%, #ffffff);
   border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
-  color: inherit;
+  /* Was opacity 0.7 on inherit (~88% ink) → ~62% ink on the near-white Ops close control. */
+  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
   border-radius: 8px;
   width: 28px;
   height: 28px;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 1;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .ops-close-btn:hover {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white Ops close control. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
