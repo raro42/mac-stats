@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared AI Chat filter chips.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Monitors filter chips.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1921** | Shared Monitors filter chips (`.monitors-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Up · Down · Slow beside the monitor list (design review `feature-monitors`; Mac capture deferred) |
 | **v0.1.1920** | Shared AI Chat filter chips (`.chat-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · You · Assistant · Errors beside the message list (design review `feature-ai-chat`; Mac capture deferred) |
 | **v0.1.1919** | Shared Top Processes filter chips (`.processes-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Pinned · Hot beside the process list (design review `feature-processes`; Mac capture deferred) |
 | **v0.1.1918** | Shared Disk Cleanup scope filter Clear (`.disk-cleanup-scope-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · On · Off (design review `feature-disk-cleanup`; Mac capture deferred) |
@@ -36,12 +37,14 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. AI Chat All · You · Assistant · Errors chips now match the opaque filter counts beside them.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Monitors All · Up · Down · Slow chips now match the opaque filter counts beside them.
 
 ## Still open
 
-Shared `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` still glass at opacity 0.88. Also shared `.processes-filter-clear` / `.monitors-filter-clear` at 0.92. Layout-daily dark still due (screens missing). Recapture stale feature screens when a Mac CPU window + Screen Recording TCC allow.
+- Next fuel: shared `.logs-toolbar .logs-filter-chip` (0.88), or `.processes-filter-clear` / `.monitors-filter-clear` (0.92).
+- Design review still due for feature-cpu-metrics.png (Mac capture deferred / TCC).
+- Layout daily due (data-poster) — deferred this tick.
 
 ## Ratchet
 
-Latest keep: `2fba4173` — v0.1.1920 shared `.chat-filter-chip` opaque.
+Latest keep: `57e84c16` — v0.1.1921 shared `.monitors-filter-chip` opaque.
