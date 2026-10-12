@@ -6053,15 +6053,22 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 38%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .disk-cleanup-scope-filter-count {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  opacity: 0.85;
+  min-width: 1.1em;
+  text-align: center;
+  /* Was opacity 0.85 on inherit (~88% ink) → ~75% ink on the near-white Disk Cleanup scope chip. */
+  color: color-mix(in srgb, #0c0c10 75%, #ffffff);
+  opacity: 1;
 }
 
 .disk-cleanup-scope-filter-count.is-zero {
   font-weight: 600;
-  opacity: 0.42;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Disk Cleanup scope chip. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

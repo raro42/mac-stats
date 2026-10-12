@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1914
+
+- Shared Disk Cleanup scope filter counts (`.disk-cleanup-scope-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 75% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the On · Off counts beside All. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Category filter counts opaque in v0.1.1913. Next: shared `.disk-cleanup-scope-filter-chip` / `.disk-cleanup-filter-chip` glass opacity (0.88). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1913
 
 - Shared Disk Cleanup category filter counts (`.disk-cleanup-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Reclaim · Big · Clean counts beside All. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Perplexity filter counts opaque in v0.1.1912. Next: shared `.disk-cleanup-scope-filter-count` glass opacity (0.85 / zero 0.42). P2 reliability / GitHub #14.
