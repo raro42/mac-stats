@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1922
+
+- Shared Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Error · Warn beside the log toolbar. Standing P2 #14; Mac capture deferred. Monitors filter chips opaque in v0.1.1921. Next: shared `.processes-filter-clear` / `.monitors-filter-clear` / `.logs-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1921
 
 - Shared Monitors filter chips (`.monitors-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Up · Down · Slow beside the monitor list. Standing P2 #14; design-review fuel (feature-monitors); Mac capture deferred. AI Chat filter chips opaque in v0.1.1920. Next: shared `.logs-toolbar .logs-filter-chip` glass opacity (0.88), or shared `.processes-filter-clear` / `.monitors-filter-clear` / `.chat-filter-clear` already opaque — prefer `.logs-toolbar .logs-filter-chip` or `.processes-filter-clear` (0.92). P2 reliability / GitHub #14.

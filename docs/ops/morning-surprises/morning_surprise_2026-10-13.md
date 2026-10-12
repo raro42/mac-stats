@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Monitors filter chips.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Debug Log filter chips.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1922** | Shared Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Error · Warn beside the log toolbar |
 | **v0.1.1921** | Shared Monitors filter chips (`.monitors-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Up · Down · Slow beside the monitor list (design review `feature-monitors`; Mac capture deferred) |
 | **v0.1.1920** | Shared AI Chat filter chips (`.chat-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · You · Assistant · Errors beside the message list (design review `feature-ai-chat`; Mac capture deferred) |
 | **v0.1.1919** | Shared Top Processes filter chips (`.processes-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Pinned · Hot beside the process list (design review `feature-processes`; Mac capture deferred) |
@@ -37,14 +38,12 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Monitors All · Up · Down · Slow chips now match the opaque filter counts beside them.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Debug Log All · Error · Warn chips now match the opaque Error · Warn filter counts beside them.
 
 ## Still open
 
-- Next fuel: shared `.logs-toolbar .logs-filter-chip` (0.88), or `.processes-filter-clear` / `.monitors-filter-clear` (0.92).
-- Design review still due for feature-cpu-metrics.png (Mac capture deferred / TCC).
-- Layout daily due (data-poster) — deferred this tick.
+Shared `.processes-filter-clear` / `.monitors-filter-clear` / `.logs-filter-clear` still glass at opacity 0.92. Layout-daily dark still due (screens missing). Recapture stale feature screens when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `57e84c16` — v0.1.1921 shared `.monitors-filter-chip` opaque.
+Latest keep: `d7de9bd8` — v0.1.1922 shared `.logs-toolbar .logs-filter-chip` opaque.
