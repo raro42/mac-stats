@@ -3182,13 +3182,16 @@ textarea.ops-agent-editor.is-dirty {
   );
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .process-list-header-pin {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 22px;
   font-size: 11px;
-  opacity: 0.55;
+  /* Was opacity 0.55 on inherit (~88% ink) → ~48% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 48%, #ffffff);
+  opacity: 1;
   letter-spacing: 0;
 }
 

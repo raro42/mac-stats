@@ -60,6 +60,8 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~20:55):** Shared Top Processes pin column header opaque type (v0.1.1899). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
+
 - **2026-10-12 (~20:30):** Shared Perplexity Search disabled opaque type (v0.1.1898). Recapture of `feature-ai-chat.png` / Perplexity deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
 
 - **2026-10-12 (~20:10):** Shared AI Chat Clear disabled opaque type (v0.1.1897). Recapture of `feature-ai-chat.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.

@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1899
+
+- Shared Top Processes pin column header (`.process-list-header-pin`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` on the ★ header. Standing P2 #14; Mac capture deferred. Row pin opaque in v0.1.1896 (Apple). Next: shared `.disk-cleanup-toolbar .disk-cleanup-primary:disabled` glass opacity (0.55) still in `agent-ops.css`, or shared `.process-pin` glass opacity (0.45). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1898
 
 - Shared Perplexity Search disabled (`#perplexity-search-btn:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while Search waits. Standing P2 #14; design-review fuel (feature-ai-chat / Perplexity); Mac capture deferred. Apple Search disabled already opaque. Next: shared `.disk-cleanup-toolbar .disk-cleanup-primary:disabled` glass opacity (0.55) still in `agent-ops.css`, or `.process-list-header-pin` glass opacity (0.55). P2 reliability / GitHub #14.
