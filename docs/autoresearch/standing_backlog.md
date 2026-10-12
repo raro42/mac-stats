@@ -23,9 +23,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 - Shared AI Chat filter counts (`.chat-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on You · Assistant · Errors inventory digits. Standing P2 #14; Mac capture deferred. Rings filter count opaque in v0.1.1907. Next: shared `.processes-filter-count` glass opacity (0.9 / zero 0.42), or shared `.monitors-filter-count` (0.9 / zero 0.42). P2 reliability / GitHub #14.
 
+## Overnight merge — v0.1.1910
+
+- Shared Debug Log filter counts (`.logs-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Error · Warn counts beside All. Standing P2 #14; Mac capture deferred. Processes filter counts opaque in v0.1.1909. Next: shared `.monitors-filter-count` glass opacity (0.9 / zero 0.42), or shared `.perplexity-filter-count` / `.disk-cleanup-filter-count`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1909
 
-- Shared Top Processes filter counts (`.processes-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Pinned · Hot counts beside All. Standing P2 #14; design-review fuel (feature-processes); Mac capture deferred. Chat filter counts opaque in v0.1.1908. Next: shared `.logs-filter-count` glass opacity (0.9 / zero 0.42). P2 reliability / GitHub #14.
+- Shared Top Processes filter counts (`.processes-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Pinned · Hot counts beside All. Standing P2 #14; design-review fuel (feature-processes); Mac capture deferred. Chat filter counts opaque in v0.1.1908. Next done in v0.1.1910 (`.logs-filter-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1908
 

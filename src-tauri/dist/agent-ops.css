@@ -3980,17 +3980,22 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 40%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .logs-filter-count {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   min-width: 1.1em;
   text-align: center;
-  opacity: 0.9;
+  /* Was opacity 0.9 on inherit (~88% ink) → ~79% ink on the near-white Debug Log chip. */
+  color: color-mix(in srgb, #0c0c10 79%, #ffffff);
+  opacity: 1;
 }
 
 .logs-filter-count.is-zero {
   font-weight: 600;
-  opacity: 0.42;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Debug Log chip. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
 /* Clear beside All·Error·Warn when a filter is active (Disk / Monitors / Processes / AI Chat Clear parity). */
