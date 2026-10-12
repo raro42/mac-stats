@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple / dark-shell glass cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1888** | Disk Cleanup Clean now disabled (`.disk-cleanup-primary:disabled`) opaque type — no glass `opacity` while Clean now waits |
 | **v0.1.1887** | Perplexity Search disabled (`#perplexity-search-btn:disabled`) opaque type — no glass `opacity` while Search waits |
 | **v0.1.1886** | AI Chat Clear disabled (`#chat-clear-btn:disabled`) opaque type — no glass `opacity` while Clear waits |
 | **v0.1.1885** | AI Chat Send disabled (`#chat-send-btn:disabled`) opaque type/fill — no glass `opacity` while Send waits |
@@ -23,8 +24,8 @@ Glass `opacity` on busy chrome keeps WebView Graphics and Media hot. Opaque `col
 
 ## Still open
 
-`.disk-cleanup-primary:disabled` glass opacity in shared `agent-ops.css` (0.55); also `.force-quit-btn:disabled` (Apple theme still `opacity: 0.7`). Recapture `feature-ai-chat.png` when a Mac CPU window + Screen Recording TCC allow.
+`.force-quit-btn:disabled` glass opacity in Apple theme (still `opacity: 0.7`). Recapture `feature-disk-cleanup.png` / `feature-ai-chat.png` when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `fb599281` — v0.1.1887 Perplexity Search disabled opaque.
+Latest keep: `d5bd22e9` — v0.1.1888 Disk Cleanup Clean now disabled opaque.
