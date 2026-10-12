@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1883
+
+- Apple Agent Ops badge disabled (`button.ops-badge:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while a toggle waits. `.apple-shell` beats the later shared `opacity: 0.55`. Standing P2 #14; Mac capture deferred. Off badge already opaque. Next: `.ops-agent-edit-actions .btn-primary:disabled` glass type (`.ops-keyboard-hint` is `display: none`; skip). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1882
 
 - Apple Agent Ops Off badge (`.ops-badge.off` resting · `button.ops-badge.off:hover`) mixes type color against an opaque near-white wash (`color-mix` 53% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on the Off badge. `.apple-shell` beats the later shared `opacity: 0.6` / hover `1`. Standing P2 #14; Mac capture deferred. Loading shell already opaque. Next: `button.ops-badge:disabled` glass type (`.ops-keyboard-hint` is `display: none`; skip). P2 reliability / GitHub #14.
