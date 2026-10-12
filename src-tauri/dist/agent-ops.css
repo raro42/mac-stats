@@ -10763,9 +10763,12 @@ button.is-just-saved,
   box-shadow: none;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* Was opacity 0.7 on inherit (~88% ink) → ~62% ink on the near-white wash. */
 #github-link[aria-busy="true"],
 #github-link[aria-disabled="true"] {
-  opacity: 0.7;
+  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
+  opacity: 1;
   pointer-events: none;
   cursor: wait;
 }
@@ -10798,8 +10801,11 @@ button.is-just-saved,
 }
 
 /* Header metrics Refresh (↻) — dim while fetching; no rotate (Graphics and Media #14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* Was opacity 0.7 on inherit (~88% ink) → ~62% ink on the near-white wash. */
 #refresh-btn.is-refreshing {
-  opacity: 0.7;
+  color: color-mix(in srgb, #0c0c10 62%, #ffffff);
+  opacity: 1;
   cursor: wait;
   animation: none;
   transform: none;
