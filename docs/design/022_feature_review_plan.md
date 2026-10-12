@@ -894,3 +894,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #17.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.1894**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-10-12 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #18 Data Poster Top Processes contrast)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.1895** (`cc167c62`): Data Poster / Dark Top Processes glances, filter chips, filter-miss shells, and pinned rows remap Apple `#ffffff` washes onto `#0e0e14`. `src/agent-ops.css` matches `src-tauri/dist/agent-ops.css`. `scripts/layout_daily_review.py` tracks `.processes-top-glance`, `.processes-filter-chip`, `.process-row.is-pinned`. Changelog **[0.1.1895] Fixed** already names GitHub #18. **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #18 fix.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #18.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.1895**). Did not start a second process.

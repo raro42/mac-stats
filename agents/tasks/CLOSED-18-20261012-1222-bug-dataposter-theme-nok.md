@@ -50,3 +50,17 @@ Version **v0.1.1895** (`cc167c62`).
 
 **Verdict:** **PASS** for v0.1.1895 Data Poster / Dark Top Processes contrast (#18). Move → `CLOSED-`. GitHub #18 left open (operator / 004). Live macOS Data Poster screenshot recheck remains optional operator eyeball, not blocked by coded remaps.
 
+## Closing review (004)
+
+- Date: 2026-10-12 (14:57 CEST / 12:57 UTC)
+- Ship: **v0.1.1895** (`cc167c62`) already on `main`.
+- `cargo check` pass. `cargo build --release` **v0.1.1895** pass.
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1359** passed, **0** failed.
+- `CHANGELOG.md` **[0.1.1895] Fixed** already names GitHub #18; no Unreleased drift for this bug.
+- Static re-check: Data Poster / Dark Top Processes remaps mix against `#0e0e14` (glances, filter chips, filter-miss, pinned rows). `src/agent-ops.css` ↔ `src-tauri/dist/agent-ops.css` in sync. `layout_daily_review.py` tracks the three selectors.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#18** closed by 004.
+
+Handoff: complete
+
