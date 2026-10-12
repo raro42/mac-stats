@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1905
+
+- Shared rings filter chips (`.rings-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Hot beside the metric rings. Standing P2 #14; design-review fuel (feature-cpu-metrics); Mac capture deferred. Ops filter Clear opaque in v0.1.1904. Next: shared `.rings-filter-count` glass opacity (0.9), or shared `.ops-close-btn` (0.7). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1904
 
-- Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside the Ops search match chips. Standing P2 #14; Mac capture deferred. Apple Clear already opaque. Next: shared `.ops-close-btn` glass opacity (0.7). P2 reliability / GitHub #14.
+- Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside the Ops search match chips. Standing P2 #14; Mac capture deferred. Apple Clear already opaque. Next done in v0.1.1905 (`.rings-filter-chip`); then shared `.rings-filter-count` (0.9) or `.ops-close-btn` (0.7). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1903
 

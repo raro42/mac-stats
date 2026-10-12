@@ -1,31 +1,21 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Standing queue after AI Chat Clear: shared Ops filter Clear.
+Overnight Track B (20:00–06:00 local).
 
-## Shipped this night (latest first)
+## Shipped
 
 | Version | What |
 |---------|------|
-| **v0.1.1904** | Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside Ops search match chips (standing P2 #14; Apple Clear already opaque) |
-| **v0.1.1903** | Shared AI Chat filter Clear (`.chat-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · You · Assistant · Errors |
-| **v0.1.1902** | Shared Top Processes pin (`.process-pin` resting · hover · focus · pinned) opaque type — no glass `opacity` on the pin control (Apple pin opaque in v0.1.1896) |
-| **v0.1.1901** | Shared Disk Cleanup Clean now disabled (`.disk-cleanup-toolbar .disk-cleanup-primary:disabled`) opaque type — no glass `opacity` while Clean now waits (design review `feature-disk-cleanup`; Mac capture deferred) |
-| **v0.1.1900** | Apple AI Chat filter Clear (`.chat-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · You · Assistant · Errors (design review `feature-ai-chat`; Mac capture deferred) |
-| **v0.1.1899** | Shared Top Processes pin column header (`.process-list-header-pin`) opaque type — no glass `opacity` on the ★ header |
-| **v0.1.1898** | Shared Perplexity Search disabled (`#perplexity-search-btn:disabled`) opaque type — no glass `opacity` while Search waits |
-| **v0.1.1897** | Shared AI Chat Clear disabled (`#chat-clear-btn:disabled`) opaque type — no glass `opacity` while Clear waits |
-| **v0.1.1896** | Apple Top Processes pin (`.process-pin` resting · hover · focus · pinned) opaque type — no glass `opacity` on the pin (design review `feature-processes`; Mac capture deferred) |
+| **v0.1.1904** | Shared Agent Ops filter Clear (`.ops-filter-clear`) opaque type — no glass `opacity` beside Ops search match chips (#14). Parallel tick. |
+| **v0.1.1905** | Shared rings filter chips (`.rings-filter-chip`) opaque type — All · Hot beside CPU · GPU · Freq · Temp. No glass `opacity` (#14 / design-review `feature-cpu-metrics`). |
 
-Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster / Dark Top Processes contrast (#18); **v0.1.1894** update banner brew hint (#17); **v0.1.1893** Changelog Close/Escape (#16).
+## Tried / context
 
-## Why it matters
+- Digester open pointed at stale `feature-cpu-metrics.png` (~36d).
+- Design review due; Mac window capture deferred (TCC / prior asset kept).
+- Layout daily (data-poster) still due — left for a later tick (one experiment this tick).
+- Version race: parallel tick took v0.1.1904 for Ops filter Clear; rings ship landed as v0.1.1905.
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Shared Ops filter Clear now matches Apple.
+## Next fuel
 
-## Still open
-
-Shared `.ops-close-btn` still glass at 0.7. Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-ai-chat` / `feature-processes` when a Mac CPU window + Screen Recording TCC allow.
-
-## Ratchet
-
-Latest keep: `92f4adfe` — v0.1.1904 shared `.ops-filter-clear` opaque.
+- Shared `.rings-filter-count` glass opacity (0.9), or `.ops-close-btn` (0.7).
