@@ -60,6 +60,8 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~23:35):** Shared Monitors filter counts opaque type (v0.1.1911). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared filter-count glass: `.disk-cleanup-filter-count` / `.perplexity-filter-count`.
+
 - **2026-10-12 (~22:40):** Shared Agent Ops close opaque type (v0.1.1906). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 
 - **2026-10-12 (~22:20):** Shared rings filter chips opaque type (v0.1.1905). Recapture of `feature-cpu-metrics.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
