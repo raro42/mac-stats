@@ -60,6 +60,8 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~23:55):** Shared Disk Cleanup category filter counts opaque type (v0.1.1913). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared filter-count glass: `.disk-cleanup-scope-filter-count`.
+
 - **2026-10-12 (~23:50):** Shared Perplexity filter counts opaque type (v0.1.1912). Recapture of `feature-ai-chat.png` / Perplexity deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept. Next shared filter-count glass: `.disk-cleanup-filter-count` / `.disk-cleanup-scope-filter-count`.
 
 - **2026-10-12 (~23:35):** Shared Monitors filter counts opaque type (v0.1.1911). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked.
