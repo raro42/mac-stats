@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1901
+
+- Shared Disk Cleanup Clean now disabled (`.disk-cleanup-toolbar .disk-cleanup-primary:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while Clean now waits. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Apple Clean now disabled already opaque in v0.1.1888. Next: shared `.process-pin` glass opacity (0.45), or shared `.chat-filter-clear` glass opacity (Apple opaque in v0.1.1900). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1900
 
 - Apple AI Chat filter Clear (`.chat-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · You · Assistant · Errors. Design review feature-ai-chat; Mac capture deferred. Standing P2 #14. Next: shared `.disk-cleanup-toolbar .disk-cleanup-primary:disabled` glass opacity (0.55) still in `agent-ops.css`, or shared `.process-pin` / `.chat-filter-clear` glass opacity. P2 reliability / GitHub #14.
