@@ -988,8 +988,11 @@ border-radius: 24px;
   background: color-mix(in srgb, #ff3b30 20%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* Was opacity 0.7 on inherit (~90% #ff3b30) → ~63% red on the near-white wash. */
 .force-quit-btn:disabled {
-  opacity: 0.7;
+  color: color-mix(in srgb, #ff3b30 63%, #ffffff);
+  opacity: 1;
   cursor: wait;
   animation: none;
 }
