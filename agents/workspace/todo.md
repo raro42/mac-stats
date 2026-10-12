@@ -5,7 +5,7 @@
 - [x] Remap Apple `#ffffff` washes onto `#0e0e14` for data-poster (and dark if shared)
 - [x] Sync dist if editing `src/`; bump patch + CHANGELOG
 - [x] `cargo check` in `src-tauri/`
-- [ ] Commit + push `origin/main`
+- [x] Commit + push `origin/main`
 - [x] Rename `WIP-18-…` → `UNTESTED-18-…` (do not close GitHub issue)
 
 ## Review
