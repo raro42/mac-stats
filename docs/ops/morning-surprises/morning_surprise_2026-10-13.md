@@ -1,12 +1,13 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Disk Cleanup category filter counts.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Disk Cleanup scope filter counts.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
-| **v0.1.1913** | Shared Disk Cleanup category filter counts (`.disk-cleanup-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Reclaim · Big · Clean inventory digits beside All (design review `feature-disk-cleanup`; Mac capture deferred) |
+| **v0.1.1914** | Shared Disk Cleanup scope filter counts (`.disk-cleanup-scope-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on On · Off inventory digits beside All (design review `feature-disk-cleanup`; Mac capture deferred) |
+| **v0.1.1913** | Shared Disk Cleanup category filter counts (`.disk-cleanup-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Reclaim · Big · Clean beside All (design review `feature-disk-cleanup`; Mac capture deferred) |
 | **v0.1.1912** | Shared Perplexity filter counts (`.perplexity-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Top · Snippet inventory digits beside All |
 | **v0.1.1911** | Shared Monitors filter counts (`.monitors-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Up · Down · Slow beside All (design review `feature-monitors`; Mac capture deferred) |
 | **v0.1.1910** | Shared Debug Log filter counts (`.logs-filter-count` resting · `.is-zero`) opaque type — no glass `opacity` on Error · Warn inventory digits beside All |
@@ -29,12 +30,12 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Disk Cleanup Reclaim · Big · Clean counts now match the opaque filter chips beside them.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Disk Cleanup On · Off scope counts now match the opaque category counts beside them.
 
 ## Still open
 
-Shared `.disk-cleanup-scope-filter-count` (0.85 / zero 0.42) still glass. Layout-daily dark still due (screens missing). Recapture stale feature screens when a Mac CPU window + Screen Recording TCC allow.
+Shared `.disk-cleanup-scope-filter-chip` / `.disk-cleanup-filter-chip` still glass at opacity 0.88. Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-cpu-metrics` / `feature-ai-chat` / `feature-processes` / `feature-monitors` / `feature-disk-cleanup` when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `43d45eb2` — v0.1.1913 shared `.disk-cleanup-filter-count` opaque.
+Latest keep: `a7b0d1e8` — v0.1.1914 shared `.disk-cleanup-scope-filter-count` opaque.
