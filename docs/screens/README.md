@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-13 (~00:42):** Shared Disk Cleanup category filter Clear opaque type (v0.1.1917). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.disk-cleanup-scope-filter-clear` opacity 0.92.
 - **2026-10-13 (~00:40):** Shared Disk Cleanup category filter chips opaque type (v0.1.1916). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.disk-cleanup-filter-clear` opacity 0.92.
 - **2026-10-13 (~00:20):** Shared Disk Cleanup scope filter chips opaque type (v0.1.1915). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.disk-cleanup-filter-chip` opacity 0.88.
 

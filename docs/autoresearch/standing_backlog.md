@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1917
+
+- Shared Disk Cleanup category filter Clear (`.disk-cleanup-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Reclaim · Big · Clean. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Category filter chips opaque in v0.1.1916. Next: shared `.disk-cleanup-scope-filter-clear` glass opacity (0.92), or shared `.processes-filter-chip` / `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1916
 
-- Shared Disk Cleanup category filter chips (`.disk-cleanup-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Reclaim · Big · Clean beside the category list. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Scope filter chips opaque in v0.1.1915. Next: shared `.disk-cleanup-filter-clear` glass opacity (0.92), or shared `.disk-cleanup-scope-filter-clear`. P2 reliability / GitHub #14.
+- Shared Disk Cleanup category filter chips (`.disk-cleanup-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Reclaim · Big · Clean beside the category list. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Scope filter chips opaque in v0.1.1915. Next done in v0.1.1917 (`.disk-cleanup-filter-clear`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1915
 
