@@ -40,6 +40,11 @@ WASH_SELECTORS = (
     ".chat-empty",
     ".chat-filter-chip",
     ".monitors-filter-chip",
+    ".processes-top-glance",
+    ".processes-top-gpu-glance",
+    ".processes-top-ram-glance",
+    ".processes-filter-chip",
+    ".process-row.is-pinned",
 )
 
 

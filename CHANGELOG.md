@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1895] - 2026-10-12
+
+### Fixed
+- **Data Poster / Dark Top Processes contrast (#18)** — Top CPU · GPU · RAM glances, filter chips, filter-miss shells, and pinned process rows remap Apple `#ffffff` washes onto `#0e0e14`. No white slabs or unread white-on-light text on dark shells.
+
 ## [0.1.1894] - 2026-10-12
 
 ### Fixed
