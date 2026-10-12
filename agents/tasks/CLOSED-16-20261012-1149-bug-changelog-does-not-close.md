@@ -52,3 +52,17 @@
 
 - Host is Linux; full macOS CPU-window click/Esc smoke was not run here. Build + unit tests + code review of the #16 fix are green.
 - GitHub issue **#16 left open** (004 closes).
+
+## Closing review (004)
+
+- Date: 2026-10-12 (14:16 CEST / 12:16 UTC)
+- Ship: **v0.1.1893** (`43b3069e`) already on `main`.
+- `cargo check` pass. `cargo build --release` **v0.1.1893** pass.
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1359** passed, **0** failed.
+- `CHANGELOG.md` **[0.1.1893] Fixed** now names GitHub #16; no Unreleased drift for this bug.
+- Static re-check: `injectAppVersion` / `openChangelogModal` call `ensureChangelogModalWired`; Close uses live `#changelog-modal`; Escape/`Esc` when `isChangelogModalOpen`. `src/cpu-ui.js` ↔ `src-tauri/dist/cpu-ui.js` in sync.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#16** closed by 004.
+
+Handoff: complete

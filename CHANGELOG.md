@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.1893] - 2026-10-12
 
 ### Fixed
-- **Changelog Close and Escape** — Opening the changelog from the footer version now wires the Close (×) button and Escape handlers. Previously the version click path skipped that wiring, so × and Esc did nothing.
+- **Changelog Close and Escape (#16)** — Opening the changelog from the footer version now wires the Close (×) button and Escape handlers. Previously the version click path skipped that wiring, so × and Esc did nothing.
 
 ## [0.1.1892] - 2026-10-12
 

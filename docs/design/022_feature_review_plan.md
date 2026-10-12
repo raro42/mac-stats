@@ -876,3 +876,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `io_other_error`, `manual_is_multiple_of`, `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #15.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.1762**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-10-12 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #16 changelog Close/Escape)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.1893** (`43b3069e`): footer version open path calls `ensureChangelogModalWired` before `openChangelogModal`; Close uses live `#changelog-modal`; Escape/`Esc` closes when open. `src/cpu-ui.js` matches `src-tauri/dist/cpu-ui.js`. Changelog **[0.1.1893] Fixed** names GitHub #16 (004 added `(#16)` for parity with #15). **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #16 fix.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `manual_clamp`, `io_other_error`, `manual_is_multiple_of`, `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #16.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.1893**). Did not start a second process.
