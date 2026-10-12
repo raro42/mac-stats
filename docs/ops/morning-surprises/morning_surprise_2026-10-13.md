@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops close.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared rings filter count.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1907** | Shared rings filter count (`.rings-filter-count`) opaque type — no glass `opacity` on the Hot count beside All · Hot (design review `feature-cpu-metrics`; Mac capture deferred) |
 | **v0.1.1906** | Shared Agent Ops close (`.ops-close-btn` resting · hover) opaque type — no glass `opacity` on the × in the Agent Ops header (Apple close opaque in v0.1.1856) |
 | **v0.1.1905** | Shared rings filter chips (`.rings-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Hot beside the metric rings (design review `feature-cpu-metrics`; Mac capture deferred) |
 | **v0.1.1904** | Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside Ops search match chips (Apple Clear already opaque) |
@@ -22,12 +23,12 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Agent Ops close now matches the rest of the opaque chrome queue.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Rings Hot counts now match the opaque All · Hot chips.
 
 ## Still open
 
-Shared `.rings-filter-count` still glass at 0.9. Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-cpu-metrics` / `feature-ai-chat` / `feature-processes` when a Mac CPU window + Screen Recording TCC allow.
+Shared `.chat-filter-count` / `.processes-filter-count` still glass at 0.9 (zero 0.42). Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-cpu-metrics` / `feature-ai-chat` / `feature-processes` when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `66c18e1a` — v0.1.1906 shared `.ops-close-btn` opaque.
+Latest keep: `47c1c4ec` — v0.1.1907 shared `.rings-filter-count` opaque.
