@@ -9338,8 +9338,11 @@ button.monitor-detail-url.is-just-saved {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
   outline-offset: 2px;
 }
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 #perplexity-search-btn:disabled {
-  opacity: 0.55;
+  /* Was opacity 0.55 on inherit (~88% ink) → ~48% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 48%, #ffffff);
+  opacity: 1;
   cursor: not-allowed;
 }
 
