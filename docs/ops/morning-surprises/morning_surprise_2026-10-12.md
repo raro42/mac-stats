@@ -4,10 +4,11 @@ Overnight Track B kept shipping Apple Agent Ops / dark-shell glass-type cuts for
 
 ## Latest keep
 
-**v0.1.1883** — Apple Agent Ops badge disabled (`button.ops-badge:disabled`) mixes type against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while a toggle waits.
+**v0.1.1884** — Apple Agent Ops Save when disabled (`.ops-agent-edit-actions .btn-primary:disabled`) mixes type against an opaque near-white wash (`color-mix` 40% `#0c0c10` on `#ffffff`). No glass `opacity` while Save waits for edits.
 
 ## Also tonight
 
+- **v0.1.1883** — badge disabled `button.ops-badge:disabled` opaque type
 - **v0.1.1882** — Off badge `.ops-badge.off` opaque type
 - **v0.1.1881** — `.ops-loading` opaque type
 - **v0.1.1880** — `.ops-filter-caption` opaque type
@@ -16,4 +17,4 @@ Overnight Track B kept shipping Apple Agent Ops / dark-shell glass-type cuts for
 
 ## Next
 
-`.ops-agent-edit-actions .btn-primary:disabled` glass type. Recapture `feature-agent-ops.png` when a Mac CPU window + Screen Recording TCC allow.
+`#chat-send-btn:disabled` glass opacity in Apple theme (still `opacity: 0.55` in `cpu.css`). Recapture `feature-agent-ops.png` when a Mac CPU window + Screen Recording TCC allow.
