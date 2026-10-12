@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1923
+
+- Shared Top Processes filter Clear (`.processes-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Pinned · Hot. Standing P2 #14; design-review fuel (feature-processes); Mac capture deferred. Debug Log filter chips opaque in v0.1.1922. Next: shared `.monitors-filter-clear` / `.logs-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1922
 
-- Shared Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Error · Warn beside the log toolbar. Standing P2 #14; Mac capture deferred. Monitors filter chips opaque in v0.1.1921. Next: shared `.processes-filter-clear` / `.monitors-filter-clear` / `.logs-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+- Shared Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Error · Warn beside the log toolbar. Standing P2 #14; Mac capture deferred. Monitors filter chips opaque in v0.1.1921. Next done in v0.1.1923 (`.processes-filter-clear`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1921
 
