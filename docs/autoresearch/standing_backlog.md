@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1888
+
+- Apple Disk Cleanup Clean now disabled (`.disk-cleanup-toolbar .disk-cleanup-primary:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while Clean now waits. `.apple-shell` beats the later shared `opacity: 0.55`. Standing P2 #14; Mac capture deferred. Search disabled already opaque. Next: `.force-quit-btn:disabled` glass opacity in Apple theme (0.7). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1887
 
 - Apple Perplexity Search disabled (`#perplexity-search-btn:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while Search waits. `.apple-shell` beats the later shared `opacity: 0.55`. Standing P2 #14; Mac capture deferred. Clear disabled already opaque. Next: `.disk-cleanup-primary:disabled` glass opacity in shared `agent-ops.css` (0.55) / Apple theme override (`.force-quit-btn:disabled` also still glass at 0.7). P2 reliability / GitHub #14.

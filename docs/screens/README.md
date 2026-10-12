@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~04:05):** Disk Cleanup Clean now disabled `.disk-cleanup-primary:disabled` opaque type (v0.1.1888). Recapture of `feature-disk-cleanup.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~03:40):** Perplexity Search disabled `#perplexity-search-btn:disabled` opaque type (v0.1.1887). Recapture of `feature-ai-chat.png` / Perplexity deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~03:15):** AI Chat Clear disabled `#chat-clear-btn:disabled` opaque type (v0.1.1886). Recapture of `feature-ai-chat.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~02:50):** AI Chat Send disabled `#chat-send-btn:disabled` opaque type/fill (v0.1.1885). Recapture of `feature-ai-chat.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
