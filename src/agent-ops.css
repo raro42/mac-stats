@@ -3921,7 +3921,7 @@ textarea.ops-agent-editor.is-dirty {
   margin-left: auto;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .logs-toolbar .logs-filter-chip {
   appearance: none;
   display: inline-flex;
@@ -3936,19 +3936,22 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 6px;
   border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
   background: color-mix(in srgb, currentColor 4%, #ffffff);
-  color: inherit;
+  /* Was opacity 0.88 on inherit (~88% ink) → ~77% ink on the near-white Debug Log chip. */
+  color: color-mix(in srgb, #0c0c10 77%, #ffffff);
   cursor: pointer;
   transform: none;
-  opacity: 0.88;
+  opacity: 1;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
-    opacity 0.15s ease,
+    color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 .logs-toolbar .logs-filter-chip:hover {
   transform: none;
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white Debug Log chip. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, currentColor 7%, #ffffff);
   border-color: color-mix(in srgb, currentColor 20%, #ffffff);
@@ -3960,6 +3963,8 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .logs-toolbar .logs-filter-chip.is-active {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white Debug Log chip. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, #ffffff);
