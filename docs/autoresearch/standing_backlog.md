@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1908
+
+- Shared AI Chat filter counts (`.chat-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on You · Assistant · Errors inventory digits. Standing P2 #14; Mac capture deferred. Rings filter count opaque in v0.1.1907. Next: shared `.processes-filter-count` glass opacity (0.9 / zero 0.42), or shared `.monitors-filter-count` (0.9 / zero 0.42). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1907
 
-- Shared rings filter count (`.rings-filter-count`) mixes type color against an opaque near-white wash (`color-mix` 79% `#0c0c10` on `#ffffff`). No glass `opacity` on the Hot count beside All · Hot. Standing P2 #14; design-review fuel (feature-cpu-metrics); Mac capture deferred. Ops close opaque in v0.1.1906; rings chips opaque in v0.1.1905. Next: shared `.chat-filter-count` glass opacity (0.9), or shared `.processes-filter-count` (0.9 / zero 0.42). P2 reliability / GitHub #14.
+- Shared rings filter count (`.rings-filter-count`) mixes type color against an opaque near-white wash (`color-mix` 79% `#0c0c10` on `#ffffff`). No glass `opacity` on the Hot count beside All · Hot. Standing P2 #14; design-review fuel (feature-cpu-metrics); Mac capture deferred. Ops close opaque in v0.1.1906; rings chips opaque in v0.1.1905. Next done in v0.1.1908 (`.chat-filter-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1906
 
