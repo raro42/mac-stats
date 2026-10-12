@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Disk Cleanup scope filter Clear.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Top Processes filter chips.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1919** | Shared Top Processes filter chips (`.processes-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Pinned · Hot beside the process list (design review `feature-processes`; Mac capture deferred) |
 | **v0.1.1918** | Shared Disk Cleanup scope filter Clear (`.disk-cleanup-scope-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · On · Off (design review `feature-disk-cleanup`; Mac capture deferred) |
 | **v0.1.1917** | Shared Disk Cleanup category filter Clear (`.disk-cleanup-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Reclaim · Big · Clean (design review `feature-disk-cleanup`; Mac capture deferred) |
 | **v0.1.1916** | Shared Disk Cleanup category filter chips (`.disk-cleanup-filter-chip` resting · hover · active) opaque type — no glass `opacity` on All · Reclaim · Big · Clean beside the category list (design review `feature-disk-cleanup`; Mac capture deferred) |
@@ -34,13 +35,12 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Disk Cleanup scope Clear beside All · On · Off now matches the opaque category Clear beside All · Reclaim · Big · Clean.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Top Processes All · Pinned · Hot chips now match the opaque filter counts beside them.
 
 ## Still open
 
-Shared `.processes-filter-chip` / `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` still glass at opacity 0.88. Layout-daily dark still due (screens missing). Recapture stale feature screens when a Mac CPU window + Screen Recording TCC allow.
-
+Shared `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` still glass at opacity 0.88. Also shared `.processes-filter-clear` / `.monitors-filter-clear` at 0.92. Layout-daily dark still due (screens missing). Recapture stale feature screens when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `70d0b95c` — v0.1.1918 shared `.disk-cleanup-scope-filter-clear` opaque.
+Latest keep: `bf57f47a` — v0.1.1919 shared `.processes-filter-chip` opaque.
