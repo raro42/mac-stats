@@ -4531,3 +4531,11 @@ border-radius: 24px;
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared #chat-clear-btn:disabled opacity: 0.45. */
+.apple-shell #chat-clear-btn:disabled {
+  /* Was opacity 0.45 on inherit (~88% ink) → ~40% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 40%, #ffffff);
+  opacity: 1;
+}

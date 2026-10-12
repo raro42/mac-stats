@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1886
+
+- Apple AI Chat Clear disabled (`#chat-clear-btn:disabled`) mixes type color against an opaque near-white wash (`color-mix` 40% `#0c0c10` on `#ffffff`). No glass `opacity` while Clear waits. `.apple-shell` beats the later shared `opacity: 0.45`. Standing P2 #14; Mac capture deferred. Send disabled already opaque. Next: `#perplexity-search-btn:disabled` glass opacity in shared `agent-ops.css` (0.55) / Apple theme override (`.disk-cleanup-primary:disabled` / `.force-quit-btn:disabled` also still glass). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1885
 
 - Apple AI Chat Send disabled (`#chat-send-btn:disabled`) mixes white type and accent fill against opaque washes (`color-mix` 55% `#ffffff` on accent / 50% accent on `#ffffff`). No glass `opacity` while Send waits. Standing P2 #14; Mac capture deferred. Save disabled already opaque. Next: `#chat-clear-btn:disabled` glass opacity in shared `agent-ops.css` (0.45) / Apple theme override. P2 reliability / GitHub #14.
