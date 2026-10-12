@@ -9453,12 +9453,16 @@ button.monitor-detail-url.is-just-saved {
   font-weight: 700;
   min-width: 1.1em;
   text-align: center;
-  opacity: 0.9;
+  /* Was opacity 0.9 on inherit (~88% ink) → ~79% ink on the near-white Perplexity chip. */
+  color: color-mix(in srgb, #0c0c10 79%, #ffffff);
+  opacity: 1;
 }
 
 .perplexity-filter-count.is-zero {
   font-weight: 600;
-  opacity: 0.42;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Perplexity chip. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
 .perplexity-filter-chip[data-perplexity-filter='top'].has-hits {
