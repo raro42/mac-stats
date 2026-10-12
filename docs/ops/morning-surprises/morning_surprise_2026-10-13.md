@@ -1,24 +1,31 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept shipping WebView idle (#14) opaque-type polish.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Standing queue after AI Chat Clear: shared Ops filter Clear.
 
-## Shipped
+## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
-| **v0.1.1903** | Shared AI Chat `.chat-filter-clear` resting · hover — opaque `color-mix` type (81% / 88% ink). No glass `opacity` on Clear beside All · You · Assistant · Errors. |
-| **v0.1.1902** | Shared Top Processes `.process-pin` resting · hover · focus · pinned — opaque type (parallel tick). |
-| **v0.1.1901** | Shared Disk Cleanup Clean now disabled — opaque type. |
-| **v0.1.1900** | Apple AI Chat `.chat-filter-clear` opaque type. |
-| **v0.1.1899** | Shared `.process-list-header-pin` opaque type. |
+| **v0.1.1904** | Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside Ops search match chips (standing P2 #14; Apple Clear already opaque) |
+| **v0.1.1903** | Shared AI Chat filter Clear (`.chat-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · You · Assistant · Errors |
+| **v0.1.1902** | Shared Top Processes pin (`.process-pin` resting · hover · focus · pinned) opaque type — no glass `opacity` on the pin control (Apple pin opaque in v0.1.1896) |
+| **v0.1.1901** | Shared Disk Cleanup Clean now disabled (`.disk-cleanup-toolbar .disk-cleanup-primary:disabled`) opaque type — no glass `opacity` while Clean now waits (design review `feature-disk-cleanup`; Mac capture deferred) |
+| **v0.1.1900** | Apple AI Chat filter Clear (`.chat-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · You · Assistant · Errors (design review `feature-ai-chat`; Mac capture deferred) |
+| **v0.1.1899** | Shared Top Processes pin column header (`.process-list-header-pin`) opaque type — no glass `opacity` on the ★ header |
+| **v0.1.1898** | Shared Perplexity Search disabled (`#perplexity-search-btn:disabled`) opaque type — no glass `opacity` while Search waits |
+| **v0.1.1897** | Shared AI Chat Clear disabled (`#chat-clear-btn:disabled`) opaque type — no glass `opacity` while Clear waits |
+| **v0.1.1896** | Apple Top Processes pin (`.process-pin` resting · hover · focus · pinned) opaque type — no glass `opacity` on the pin (design review `feature-processes`; Mac capture deferred) |
 
-## Tried / notes
+Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster / Dark Top Processes contrast (#18); **v0.1.1894** update banner brew hint (#17); **v0.1.1893** Changelog Close/Escape (#16).
 
-- Digester open stayed on stale design-review screens (`feature-cpu-metrics` ~36d). Mac window capture deferred again; CSS polish still lands.
-- Layout daily still due (screens missing) — one layout keep already earlier tonight; skipped second.
-- Parallel ticks raced on `.process-pin` (v0.1.1902); this tick took shared `.chat-filter-clear` instead.
+## Why it matters
 
-## Next fuel
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Shared Ops filter Clear now matches Apple.
 
-- Scan `src/agent-ops.css` for remaining interactive glass `opacity: 0.xx` (filter Clear / toolbar waits).
-- Design-review capture for `feature-cpu-metrics.png` when a Mac window warm-up window is free.
+## Still open
+
+Shared `.ops-close-btn` still glass at 0.7. Layout-daily dark still due (screens missing). Recapture `feature-agent-ops` / `feature-ai-chat` / `feature-processes` when a Mac CPU window + Screen Recording TCC allow.
+
+## Ratchet
+
+Latest keep: `92f4adfe` — v0.1.1904 shared `.ops-filter-clear` opaque.

@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1904
+
+- Shared Agent Ops filter Clear (`.ops-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside the Ops search match chips. Standing P2 #14; Mac capture deferred. Apple Clear already opaque. Next: shared `.ops-close-btn` glass opacity (0.7). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1903
 
-- Shared AI Chat filter Clear (`.chat-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · You · Assistant · Errors. Standing P2 #14; design-review fuel (feature-ai-chat); Mac capture deferred. Apple Clear opaque in v0.1.1900; pin opaque in v0.1.1902. Next: shared `.ops-filter-clear` glass opacity (0.88) still in `agent-ops.css`, or `.ops-close-btn` (0.7). P2 reliability / GitHub #14.
+- Shared AI Chat filter Clear (`.chat-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · You · Assistant · Errors. Standing P2 #14; design-review fuel (feature-ai-chat); Mac capture deferred. Apple Clear opaque in v0.1.1900; pin opaque in v0.1.1902. Next done in v0.1.1904 (`.ops-filter-clear`); then shared `.ops-close-btn` glass opacity (0.7). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1902
 
