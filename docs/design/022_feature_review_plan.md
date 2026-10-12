@@ -885,3 +885,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `manual_clamp`, `io_other_error`, `manual_is_multiple_of`, `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #16.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.1893**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-10-12 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #17 update banner brew hint)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.1894** (`22411e73`): update banner leads with **Release notes / DMG**; brew labeled **Homebrew installs only**. `src/cpu.js` matches `src-tauri/dist/cpu.js`. README Updates + `docs/homebrew.md` cover DMG vs cask. Changelog **[0.1.1894] Fixed** already names GitHub #17. **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #17 fix.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #17.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.1894**). Did not start a second process.

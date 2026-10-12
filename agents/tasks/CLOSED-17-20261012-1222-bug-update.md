@@ -47,3 +47,17 @@
 
 - Host is Linux; full macOS CPU-window update-banner smoke was not run here. Build + unit tests + code/docs review of the #17 fix are green.
 - GitHub issue **#17 left open** (004 closes).
+
+## Closing review (004)
+
+- Date: 2026-10-12 (14:36 CEST / 12:36 UTC)
+- Ship: **v0.1.1894** (`22411e73`) already on `main`.
+- `cargo check` pass. `cargo build --release` **v0.1.1894** pass.
+- `cargo clippy --all-targets -- -D warnings` fail (pre-existing lints; not this fix).
+- `cargo test --offline`: **1359** passed, **0** failed.
+- `CHANGELOG.md` **[0.1.1894] Fixed** already names GitHub #17; no Unreleased drift for this bug.
+- Static re-check: `checkForAppUpdate` leads with Release notes / DMG; Homebrew path labeled Homebrew-only. `src/cpu.js` ↔ `src-tauri/dist/cpu.js` in sync. README Updates + `docs/homebrew.md` cover DMG vs cask.
+- Smoke block appended in `docs/design/022_feature_review_plan.md`. No FEAT-D* row. No `pkill`.
+- GitHub issue **#17** closed by 004.
+
+Handoff: complete
