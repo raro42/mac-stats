@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1902
+
+- Shared Top Processes pin (`.process-pin` resting · hover · focus-visible · pinned) mixes type color against an opaque near-white wash (`color-mix` 40% / 84% `#0c0c10` on `#ffffff`; pinned accent mix). No glass `opacity` on the pin control. Standing P2 #14; Mac capture deferred. Apple pin opaque in v0.1.1896; pin header opaque in v0.1.1899. Next: shared `.chat-filter-clear` glass opacity (0.92) still in `agent-ops.css` (Apple opaque in v0.1.1900). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1901
 
 - Shared Disk Cleanup Clean now disabled (`.disk-cleanup-toolbar .disk-cleanup-primary:disabled`) mixes type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` while Clean now waits. Standing P2 #14; design-review fuel (feature-disk-cleanup); Mac capture deferred. Apple Clean now disabled already opaque in v0.1.1888. Next: shared `.process-pin` glass opacity (0.45), or shared `.chat-filter-clear` glass opacity (Apple opaque in v0.1.1900). P2 reliability / GitHub #14.
