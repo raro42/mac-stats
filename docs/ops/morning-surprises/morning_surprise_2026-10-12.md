@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-12
 
-Overnight Track B kept shipping Apple / dark-shell glass cuts for GitHub **#14**.
+Overnight Track B kept shipping Apple / shared-sheet glass cuts for GitHub **#14**.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1891** | Shared Refresh busy + GitHub busy/disabled (`#refresh-btn.is-refreshing`, `#github-link[aria-busy]` / `[aria-disabled]`) opaque type — no glass `opacity` while those controls wait |
 | **v0.1.1890** | Footer GitHub busy/disabled (`.apple-github-link[aria-busy]` / `[aria-disabled]`) opaque type — no glass `opacity` while the link waits |
 | **v0.1.1889** | Force Quit disabled (`.force-quit-btn:disabled`) opaque type — no glass `opacity` while Force Quit waits |
 | **v0.1.1888** | Disk Cleanup Clean now disabled (`.disk-cleanup-primary:disabled`) opaque type — no glass `opacity` while Clean now waits |
@@ -26,8 +27,8 @@ Glass `opacity` on busy chrome keeps WebView Graphics and Media hot. Opaque `col
 
 ## Still open
 
-Shared `#refresh-btn.is-refreshing` / `#github-link[aria-busy]` (0.7) for non-Apple themes, or `.app-version:active` glass opacity (0.7). Recapture CPU footer / `feature-processes.png` when a Mac CPU window + Screen Recording TCC allow.
+Apple `.app-version:active` glass opacity (0.7), or shared `#chat-clear-btn:disabled` / `#perplexity-search-btn:disabled` still on glass opacity in `agent-ops.css`. Recapture CPU header/footer / `feature-processes.png` when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `77e4af80` — v0.1.1890 footer GitHub busy/disabled opaque.
+Latest keep: `b571554e` — v0.1.1891 shared Refresh/GitHub busy opaque.
