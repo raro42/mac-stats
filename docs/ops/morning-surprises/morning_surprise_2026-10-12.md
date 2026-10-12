@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple / shared-sheet glass cuts for GitHub **#14
 
 | Version | What |
 |---------|------|
+| **v0.1.1892** | Apple footer version pressed (`.app-version:active`) opaque type — no glass `opacity` while the version waits on press |
 | **v0.1.1891** | Shared Refresh busy + GitHub busy/disabled (`#refresh-btn.is-refreshing`, `#github-link[aria-busy]` / `[aria-disabled]`) opaque type — no glass `opacity` while those controls wait |
 | **v0.1.1890** | Footer GitHub busy/disabled (`.apple-github-link[aria-busy]` / `[aria-disabled]`) opaque type — no glass `opacity` while the link waits |
 | **v0.1.1889** | Force Quit disabled (`.force-quit-btn:disabled`) opaque type — no glass `opacity` while Force Quit waits |
@@ -27,8 +28,8 @@ Glass `opacity` on busy chrome keeps WebView Graphics and Media hot. Opaque `col
 
 ## Still open
 
-Apple `.app-version:active` glass opacity (0.7), or shared `#chat-clear-btn:disabled` / `#perplexity-search-btn:disabled` still on glass opacity in `agent-ops.css`. Recapture CPU header/footer / `feature-processes.png` when a Mac CPU window + Screen Recording TCC allow.
+Shared `#chat-clear-btn:disabled` / `#perplexity-search-btn:disabled` still on glass opacity in `agent-ops.css` (Apple overrides already opaque). Recapture CPU footer when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `b571554e` — v0.1.1891 shared Refresh/GitHub busy opaque.
+Latest keep: `2e6c3dd6` — v0.1.1892 Apple `.app-version:active` opaque.
