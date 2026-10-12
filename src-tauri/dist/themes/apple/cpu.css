@@ -3240,6 +3240,14 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* .apple-shell beats the later shared .ops-agent-edit-actions .btn-primary:disabled opacity: 0.45. */
+.apple-shell .ops-agent-edit-actions .btn-primary:disabled {
+  /* Was opacity 0.45 on inherit (~88% ink) → ~40% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 40%, #ffffff);
+  opacity: 1;
+}
+
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 /* .apple-shell beats the later shared .ops-session-kind-chip opacity: 0.88 / hover·active 1. */
 .apple-shell .ops-session-kind-chip {
   /* Was opacity 0.88 on inherit (~88% ink) → ~77% ink on the near-white Sessions chip. */
