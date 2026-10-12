@@ -6,6 +6,7 @@ Overnight Track B kept shipping Apple / dark-shell glass cuts for GitHub **#14**
 
 | Version | What |
 |---------|------|
+| **v0.1.1890** | Footer GitHub busy/disabled (`.apple-github-link[aria-busy]` / `[aria-disabled]`) opaque type — no glass `opacity` while the link waits |
 | **v0.1.1889** | Force Quit disabled (`.force-quit-btn:disabled`) opaque type — no glass `opacity` while Force Quit waits |
 | **v0.1.1888** | Disk Cleanup Clean now disabled (`.disk-cleanup-primary:disabled`) opaque type — no glass `opacity` while Clean now waits |
 | **v0.1.1887** | Perplexity Search disabled (`#perplexity-search-btn:disabled`) opaque type — no glass `opacity` while Search waits |
@@ -25,8 +26,8 @@ Glass `opacity` on busy chrome keeps WebView Graphics and Media hot. Opaque `col
 
 ## Still open
 
-`.apple-github-link[aria-busy="true"]` / `[aria-disabled="true"]` glass opacity (0.7), or shared `#refresh-btn.is-refreshing` / `#github-link[aria-busy]` (0.7). Recapture `feature-processes.png` / `feature-disk-cleanup.png` when a Mac CPU window + Screen Recording TCC allow.
+Shared `#refresh-btn.is-refreshing` / `#github-link[aria-busy]` (0.7) for non-Apple themes, or `.app-version:active` glass opacity (0.7). Recapture CPU footer / `feature-processes.png` when a Mac CPU window + Screen Recording TCC allow.
 
 ## Ratchet
 
-Latest keep: `ddfc4896` — v0.1.1889 Force Quit disabled opaque.
+Latest keep: `77e4af80` — v0.1.1890 footer GitHub busy/disabled opaque.
