@@ -27,7 +27,21 @@ Requires **Apple Silicon** (the published DMG is `aarch64` only).
 Tap remote: https://github.com/raro42/homebrew-mac-stats  
 (`brew tap raro42/mac-stats` maps to that repo by Homebrew convention.)
 
+## Updating
+
+**Homebrew cask install:**
+
+```bash
+brew upgrade --cask mac-stats
+```
+
+**DMG or `install.sh` install:** you do not have a Homebrew cask. `brew upgrade --cask mac-stats` will say the cask is not installed. Download the latest DMG from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest), or re-run the [install.sh](../install.sh) one-liner.
+
 ## Troubleshooting
+
+### `Cask 'mac-stats' is not installed`
+
+You ran `brew upgrade` but installed from the DMG (or the one-liner fell back to DMG). Use the DMG from GitHub Releases, or install the cask once (`brew tap raro42/mac-stats` then `brew install --cask mac-stats`) if you want brew upgrades later.
 
 ### `Cask 'mac-stats' is unavailable: No Cask with this name exists`
 

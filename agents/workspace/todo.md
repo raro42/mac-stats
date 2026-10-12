@@ -1,12 +1,13 @@
-# WIP-16: changelog does not close
+# WIP-17 — update banner brew hint
 
-- [x] Find changelog popover open/close handlers (X + ESC)
-- [x] Fix close on X click and Escape
-- [x] `cargo check` in `src-tauri/`
-- [x] Rename WIP-16 → UNTESTED-16
-- [x] Commit + push origin/main (do not close GitHub issue)
+## Plan
+- [x] Fix in-app update banner: do not imply every install can `brew upgrade --cask mac-stats`
+- [x] Lead with Release notes / DMG; brew only if Homebrew cask install
+- [x] Align README Updates + docs/homebrew.md
+- [x] sync-dist.sh; cargo check in src-tauri/
+- [x] Commit + push; rename WIP-17 → UNTESTED-17; do not close #17
 
 ## Review
-- Cause: footer version click in `injectAppVersion` opened the modal with `stopPropagation`, so `ensureChangelogModalWired` never ran and Close/Escape stayed unwired.
-- Fix: call `ensureChangelogModalWired()` from `openChangelogModal` (and the inject path); Escape looks up the live modal.
-- Ship: v0.1.1893 on `main` (`43b3069e`). Issue #16 left open for tester.
+- Root cause: banner always showed `brew upgrade --cask mac-stats`; DMG / install.sh users have no cask.
+- Fix: banner + README + homebrew.md clarify DMG path vs Homebrew-only upgrade.
+- v0.1.1894. Issue #17 left open for tester / 004.
