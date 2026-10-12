@@ -60,6 +60,8 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-13 (~01:25):** Shared AI Chat filter chips opaque type (v0.1.1920). Recapture of `feature-ai-chat.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` opacity 0.88, or `.processes-filter-clear` / `.monitors-filter-clear` opacity 0.92.
+- **2026-10-13 (~01:05):** Shared Top Processes filter chips opaque type (v0.1.1919). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.chat-filter-chip` opacity 0.88.
 - **2026-10-13 (~01:00):** Shared Disk Cleanup scope filter Clear opaque type (v0.1.1918). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.processes-filter-chip` / `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` opacity 0.88.
 - **2026-10-13 (~00:42):** Shared Disk Cleanup category filter Clear opaque type (v0.1.1917). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.disk-cleanup-scope-filter-clear` opacity 0.92.
 - **2026-10-13 (~00:40):** Shared Disk Cleanup category filter chips opaque type (v0.1.1916). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.disk-cleanup-filter-clear` opacity 0.92.
