@@ -4575,7 +4575,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .disk-cleanup-toolbar .disk-cleanup-primary:disabled opacity: 0.55. */
+/* Shared .disk-cleanup-toolbar .disk-cleanup-primary:disabled is opaque as of v0.1.1900. */
 .apple-shell .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
   /* Was opacity 0.55 on inherit (~88% ink) → ~48% ink on the near-white wash. */
   color: color-mix(in srgb, #0c0c10 48%, #ffffff);
