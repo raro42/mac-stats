@@ -4553,7 +4553,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .chat-filter-clear opacity: 0.92 / hover 1. */
+/* Shared .chat-filter-clear is opaque as of v0.1.1903; keep Apple mix. */
 .apple-shell .chat-filter-clear {
   /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white AI Chat Clear chip. */
   color: color-mix(in srgb, #0c0c10 81%, #ffffff);
