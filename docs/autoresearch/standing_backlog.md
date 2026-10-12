@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
-## Overnight merge — v0.1.1908
+## Overnight merge — v0.1.1912
 
-- Shared AI Chat filter counts (`.chat-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on You · Assistant · Errors inventory digits. Standing P2 #14; Mac capture deferred. Rings filter count opaque in v0.1.1907. Next: shared `.processes-filter-count` glass opacity (0.9 / zero 0.42), or shared `.monitors-filter-count` (0.9 / zero 0.42). P2 reliability / GitHub #14.
+- Shared Perplexity filter counts (`.perplexity-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Top · Snippet counts beside All. Standing P2 #14; Mac capture deferred. Monitors filter counts opaque in v0.1.1911. Next: shared `.disk-cleanup-filter-count` glass opacity (0.9 / zero 0.42), or shared `.disk-cleanup-scope-filter-count` (0.85 / zero 0.42). P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.1911
+
+- Shared Monitors filter counts (`.monitors-filter-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on the Up · Down · Slow counts beside All. Standing P2 #14; design-review fuel (feature-monitors); Mac capture deferred. Debug Log filter counts opaque in v0.1.1910. Next done in v0.1.1912 (`.perplexity-filter-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1910
 
