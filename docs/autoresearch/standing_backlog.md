@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1903
+
+- Shared AI Chat filter Clear (`.chat-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · You · Assistant · Errors. Standing P2 #14; design-review fuel (feature-ai-chat); Mac capture deferred. Apple Clear opaque in v0.1.1900; pin opaque in v0.1.1902. Next: shared `.ops-filter-clear` glass opacity (0.88) still in `agent-ops.css`, or `.ops-close-btn` (0.7). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1902
 
 - Shared Top Processes pin (`.process-pin` resting · hover · focus-visible · pinned) mixes type color against an opaque near-white wash (`color-mix` 40% / 84% `#0c0c10` on `#ffffff`; pinned accent mix). No glass `opacity` on the pin control. Standing P2 #14; Mac capture deferred. Apple pin opaque in v0.1.1896; pin header opaque in v0.1.1899. Next: shared `.chat-filter-clear` glass opacity (0.92) still in `agent-ops.css` (Apple opaque in v0.1.1900). P2 reliability / GitHub #14.
