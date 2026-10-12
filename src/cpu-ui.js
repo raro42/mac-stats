@@ -4936,6 +4936,7 @@
               e.stopPropagation();
               if (el.classList.contains("is-just-saved")) return;
               console.log("Version clicked (from injectAppVersion), opening changelog modal");
+              ensureChangelogModalWired();
               openChangelogModal(changelogModal, changelogBody, el);
             });
           }
@@ -4973,6 +4974,9 @@
   function openChangelogModal(changelogModal, changelogBody, triggerEl) {
     if (!changelogModal || !changelogBody) return;
     if (triggerEl && triggerEl.classList.contains("is-just-saved")) return;
+    // Version clicks from injectAppVersion stopPropagation, so the document
+    // open path never runs ensureChangelogModalWired — wire close/ESC here.
+    ensureChangelogModalWired();
     changelogFocusReturn = document.activeElement;
     changelogModal.style.display = "flex";
     changelogModal.setAttribute("aria-hidden", "false");
@@ -5307,10 +5311,12 @@
     if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
     wireChangelogBodyToolbarKeyboard(changelogBody);
 
-    // Close modal handlers
+    // Close modal handlers (look up live nodes — do not rely only on init-time refs)
     if (closeChangelog) {
-      closeChangelog.addEventListener("click", () => {
-        closeChangelogModal(changelogModal);
+      closeChangelog.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeChangelogModal(document.getElementById("changelog-modal"));
       });
     }
 
@@ -5320,11 +5326,14 @@
       }
     });
 
-    // ESC key to close
+    // ESC key to close (fresh lookup; Esc + Escape)
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && changelogModal.style.display !== "none") {
-        closeChangelogModal(changelogModal);
-      }
+      if (e.key !== "Escape" && e.key !== "Esc") return;
+      const modal = document.getElementById("changelog-modal");
+      if (!modal || !isChangelogModalOpen()) return;
+      e.preventDefault();
+      e.stopPropagation();
+      closeChangelogModal(modal);
     });
   }
 

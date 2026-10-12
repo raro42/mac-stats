@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1893] - 2026-10-12
+
+### Fixed
+- **Changelog Close and Escape** — Opening the changelog from the footer version now wires the Close (×) button and Escape handlers. Previously the version click path skipped that wiring, so × and Esc did nothing.
+
 ## [0.1.1892] - 2026-10-12
 
 ### Changed
