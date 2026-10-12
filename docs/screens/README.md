@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~05:40):** Apple `.app-version:active` opaque type (v0.1.1892). Recapture of CPU footer deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~05:15):** Shared `#refresh-btn.is-refreshing` + `#github-link[aria-busy]` / `[aria-disabled]` opaque type (v0.1.1891). Recapture of CPU header/footer deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~04:50):** Footer GitHub busy/disabled `.apple-github-link[aria-busy]` / `[aria-disabled]` opaque type (v0.1.1890). Recapture of CPU footer deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~04:25):** Force Quit disabled `.force-quit-btn:disabled` opaque type (v0.1.1889). Recapture of `feature-processes.png` deferred (Linux rack / no macOS CPU window); prior asset kept.

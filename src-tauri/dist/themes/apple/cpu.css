@@ -1216,8 +1216,11 @@ border-radius: 24px;
   outline-offset: 2px;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* Was opacity 0.7 on inherit (~88% ink via --text on hover) → ~62% ink on the shell fill. */
 .app-version:active {
-  opacity: 0.7;
+  color: color-mix(in srgb, #0c0c10 62%, #f7f7fa);
+  opacity: 1;
 }
 
 .apple-github-link {
