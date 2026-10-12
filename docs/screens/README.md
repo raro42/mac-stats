@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-12 (~02:50):** AI Chat Send disabled `#chat-send-btn:disabled` opaque type/fill (v0.1.1885). Recapture of `feature-ai-chat.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~02:25):** Agent Ops Save disabled `.ops-agent-edit-actions .btn-primary:disabled` opaque type (v0.1.1884). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~02:01):** Agent Ops badge disabled `button.ops-badge:disabled` opaque type (v0.1.1883). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.
 - **2026-10-12 (~01:40):** Agent Ops Off badge `.ops-badge.off` opaque type (v0.1.1882). Recapture of `feature-agent-ops.png` deferred (Linux rack / no macOS CPU window); prior asset kept.

@@ -4522,8 +4522,12 @@ border-radius: 24px;
   background: color-mix(in srgb, #0064dc 95%, #ffffff);
 }
 
+/* Opaque type/fill — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn:disabled {
-  opacity: 0.55;
+  /* Was opacity 0.55 on white type + accent wash → muted opaque mix. */
+  color: color-mix(in srgb, #ffffff 55%, var(--accent, #007aff));
+  background: color-mix(in srgb, var(--accent, #007aff) 50%, #ffffff);
+  opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
 }
