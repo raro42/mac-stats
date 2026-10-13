@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1962 (~00:55 CEST)
+
+**Keep:** Shared Agent Ops save status (`.ops-agent-save-status`) — type mixes against an opaque near-white wash (`color-mix` 62% ink). No glass `opacity` on the Agents Save status line. Apple shell fill beat kept.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Save status line keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). First attempt raced on duplicate `.ops-detail-meta` (discard); this ship is save status as **v0.1.1962**.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `46c3e07b` → pushed `main`.
+
+**Next:** `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1961 (~00:47 CEST)
 
 **Keep:** Shared Agent Ops detail meta (`.ops-detail-meta`) — type mixes against an opaque near-white wash (`color-mix` 66% ink). No glass `opacity` on the Agents soul/skill/mood path line. Apple shell fill beat kept.
