@@ -4,6 +4,7 @@
 
 - **Shipped:** Shared Agent Ops `.ops-tab-digit` resting · hover · active uses opaque `color-mix` type (37% / 63% ink on near-white; active accent). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs digit keys.
 - **Fuel:** standing P2 #14 after v0.1.1945 Overview Open; design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Keep:** `09a6dfd1`. Install/kickstart done.
 - **Next:** `.ops-empty` (0.78 / hover 0.92), or `.ops-overview-count` / `.ops-hint` / `.ops-tab-bar-kb-hint` / `.ops-loading`.
 
 ## ~21:25 — v0.1.1945 Overview Open opaque (#14)
