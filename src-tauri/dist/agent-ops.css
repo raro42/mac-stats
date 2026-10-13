@@ -6355,10 +6355,20 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #0a84ff 28%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-session-kind-count {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  opacity: 0.85;
+  /* Was opacity 0.85 on inherit (~88% ink) → ~79% ink on the near-white Sessions chip. */
+  color: color-mix(in srgb, #0c0c10 79%, #ffffff);
+  opacity: 1;
+}
+
+.ops-session-kind-count.is-zero {
+  font-weight: 600;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Sessions chip. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
 /* Agent Ops Agents — All · On · Off (Sessions / Monitors parity) */
@@ -7785,7 +7795,6 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 1;
 }
 
-.ops-session-kind-count.is-zero,
 .ops-agents-enabled-count.is-zero,
 .ops-schedules-kind-count.is-zero {
   font-weight: 600;
