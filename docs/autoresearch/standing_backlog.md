@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1961
+
+- Shared Agent Ops detail meta (`.ops-detail-meta`) mixes type color against an opaque near-white wash (`color-mix` 66% `#0c0c10` on `#ffffff`). No glass `opacity` on the Agents soul/skill/mood path line. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred. Row meta opaque in v0.1.1960. Next: shared `.ops-agent-save-status` glass opacity (0.7), or `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1960
 
-- Shared Agent Ops row meta (`.ops-row-meta`, skip Updated stamp · keyboard hint dual-classes) mixes type color against an opaque near-white wash (`color-mix` 51% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Standing P2 #14; design-review fuel (feature-agent-ops list chrome); Mac capture deferred. AI Chat empty-state opaque in v0.1.1959. Next: shared `.ops-detail-meta` glass opacity (0.75), or `.ops-agent-save-status` (0.7), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops row meta (`.ops-row-meta`, skip Updated stamp · keyboard hint dual-classes) mixes type color against an opaque near-white wash (`color-mix` 51% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Standing P2 #14; design-review fuel (feature-agent-ops list chrome); Mac capture deferred. AI Chat empty-state opaque in v0.1.1959. Next done in v0.1.1961 (`.ops-detail-meta`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1959
 

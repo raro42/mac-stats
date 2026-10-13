@@ -2211,9 +2211,12 @@ textarea.ops-agent-editor.is-dirty {
   min-width: 80px;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-detail-meta {
   font-size: 12px;
-  opacity: 0.75;
+  /* Was opacity 0.75 on inherit (~88% ink) → ~66% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 66%, #ffffff);
+  opacity: 1;
   margin-bottom: 8px;
 }
 

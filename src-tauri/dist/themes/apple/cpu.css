@@ -3000,7 +3000,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .ops-detail-meta opacity: 0.75. */
+/* Shared .ops-detail-meta already opaque (v0.1.1961); keep Apple beat for shell fill. */
 .apple-shell .ops-detail-meta {
   /* Was opacity 0.75 on inherit (~88% ink) → ~66% ink on the shell fill. */
   color: color-mix(in srgb, #0c0c10 66%, #f7f7fa);
