@@ -1,15 +1,25 @@
 # Morning surprise — 2026-10-14
 
+## ~22:31 — v0.1.1950 Agent Ops tab-bar keyboard hint opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-tab-bar-kb-hint` uses opaque `color-mix` type (63% ink on near-white). No glass `opacity` on the keyboard line under Overview · Agents · Sessions · Schedules · Knowledge · Runs.
+- **Fuel:** standing P2 #14 after v0.1.1949 overview hints; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture deferred (TCC / menu-bar pattern).
+- **Keep:** `3854dfaa`. Install/kickstart done.
+- **Next:** `.ops-loading` (0.62), or `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
+
 ## ~22:15 — v0.1.1949 Agent Ops overview hint type opaque (#14)
 
-Shared `.ops-hint` mixes type against an opaque near-white wash (`color-mix` 40% `#0c0c10` on `#ffffff`). No glass `opacity` on the quiet helper line under Overview cards. Overview body counts landed as sibling **v0.1.1948** (race); this tick kept the next fuel.
+- **Shipped:** Shared Agent Ops `.ops-hint` uses opaque `color-mix` type (40% ink on near-white). No glass `opacity` on the quiet helper line under Overview cards.
+- **Fuel:** standing P2 #14 after v0.1.1948 overview body counts; digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred.
+- **Keep:** `31e8bafc`.
+- **Next:** done in v0.1.1950 (`.ops-tab-bar-kb-hint`).
 
 ## ~22:10 — v0.1.1948 Agent Ops overview body counts opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-overview-count` uses opaque `color-mix` type (48% ink on near-white). No glass `opacity` on the secondary count line under Overview card titles.
-- **Fuel:** standing P2 #14 after v0.1.1947 empty shells; digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred. Sibling race landed this before our identical commit.
-- **Keep:** `3ca93c4f`.
-- **Next:** done in v0.1.1949 (`.ops-hint`).
+- **Fuel:** standing P2 #14 after v0.1.1947 empty shells; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture deferred (no on-screen CPU window / TCC pattern).
+- **Keep:** `3ca93c4f`. Install/kickstart done.
+- **Next:** `.ops-hint` (0.45), or `.ops-tab-bar-kb-hint` (0.72) / `.ops-loading` (0.62) / `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
 
 ## ~21:50 — v0.1.1947 Agent Ops empty shell type opaque (#14)
 
