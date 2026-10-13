@@ -1,5 +1,16 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1953 (~23:05 CEST)
+
+**Keep:** Shared Agent Ops health-strip keyboard hint (`.ops-health-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the keyboard line under Version · Discord · Redmine · Next schedule · Last delivery · Digest.
+
+**Why:** WebView idle cut (#14). Glass alpha on health-strip chrome keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design review due=false (grace); layout daily due=false. Standing #14 after v0.1.1952 `.ops-empty-tab-hint`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `0e6a163b` → pushed `main`.
+
+**Next:** `.ops-overview-kb-hint` / filter kb-hints, or layout-daily data-poster / Mac capture of stale CPU metrics screen.
 
 ## Shipped — v0.1.1952 (~22:55 CEST)
 
@@ -11,14 +22,21 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `baad03e5` → pushed `main`.
 
-**Next:** `.ops-health-kb-hint` / overview + filter kb-hints, or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1953 (`.ops-health-kb-hint`).
+
+## ~22:40 — v0.1.1951 Agent Ops loading shell opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-loading` uses opaque `color-mix` type (55% ink on near-white). No glass `opacity` on the Loading… panel under Overview · Agents · Sessions · Schedules · Knowledge · Runs.
+- **Fuel:** standing P2 #14 after v0.1.1950 tab-bar keyboard hint; digester empty; design-review due=false (grace); layout daily due=false; Mac capture deferred.
+- **Keep:** `d4903150`. Linux rack: CSS only (no install/kickstart).
+- **Next:** `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
 
 ## ~22:31 — v0.1.1950 Agent Ops tab-bar keyboard hint opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-tab-bar-kb-hint` uses opaque `color-mix` type (63% ink on near-white). No glass `opacity` on the keyboard line under Overview · Agents · Sessions · Schedules · Knowledge · Runs.
 - **Fuel:** standing P2 #14 after v0.1.1949 overview hints; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture deferred (TCC / menu-bar pattern).
 - **Keep:** `3854dfaa`. Install/kickstart done.
-- **Next:** `.ops-loading` (0.62), or `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
+- **Next:** done in v0.1.1951 (`.ops-loading`).
 
 ## ~22:15 — v0.1.1949 Agent Ops overview hint type opaque (#14)
 
