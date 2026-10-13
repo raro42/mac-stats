@@ -2245,22 +2245,26 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-empty {
   margin: 2px 0;
   padding: 16px 14px;
   font-size: 12px;
   line-height: 1.45;
-  opacity: 0.78;
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white empty wash. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
   border-radius: 10px;
   border: 1px dashed color-mix(in srgb, currentColor 22%, #ffffff);
   background: color-mix(in srgb, currentColor 4%, #ffffff);
   text-align: center;
-  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .ops-empty:hover {
-  opacity: 0.92;
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white empty wash. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
   background: color-mix(in srgb, var(--accent, #007aff) 6%, #ffffff);
 }

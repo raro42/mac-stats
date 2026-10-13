@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1947
+
+- Shared Agent Ops empty shells (`.ops-empty` resting · hover) mix type color against an opaque near-white wash (`color-mix` 69% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs empty panels. Standing P2 #14; design-review fuel (feature-agent-ops empty chrome); Mac capture deferred. Tab digit keys opaque in v0.1.1946. Next: shared `.ops-overview-count` glass opacity (0.55), or shared `.ops-hint` (0.45) / `.ops-tab-bar-kb-hint` (0.72) / `.ops-loading` (0.62) / `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1946
 
-- Shared Agent Ops tab digit keys (`.ops-tab-digit` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 37% / 63% `#0c0c10` on `#ffffff`; active accent). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs digit keys. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; TCC blocked window capture). Overview Open opaque in v0.1.1945. Next: shared `.ops-empty` glass opacity (0.78 / hover 0.92), or shared `.ops-overview-count` (0.55) / `.ops-hint` (0.45) / `.ops-tab-bar-kb-hint` (0.72) / `.ops-loading` (0.62), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops tab digit keys (`.ops-tab-digit` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 37% / 63% `#0c0c10` on `#ffffff`; active accent). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs digit keys. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; TCC blocked window capture). Overview Open opaque in v0.1.1945. Next done in v0.1.1947 (`.ops-empty`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1945
 
