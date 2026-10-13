@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1931
+
+- Shared Agent Ops Runs filter Clear (`.ops-runs-lane-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Instant · Lite · Direct · Slow · Fail. Standing P2 #14; design-review fuel (feature-agent-ops Runs); Mac capture deferred. Knowledge filter Clear opaque in v0.1.1930. Next: shared `.ops-runs-lane-chip` glass opacity (0.88). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1930
 
-- Shared Agent Ops Knowledge filter Clear (`.ops-memory-kind-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Discord · Core. Standing P2 #14; design-review fuel (feature-agent-ops Knowledge); Mac capture deferred. Schedules filter Clear opaque in v0.1.1929. Next: shared `.ops-runs-lane-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+- Shared Agent Ops Knowledge filter Clear (`.ops-memory-kind-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Discord · Core. Standing P2 #14; design-review fuel (feature-agent-ops Knowledge); Mac capture deferred. Schedules filter Clear opaque in v0.1.1929. Next done in v0.1.1931 (`.ops-runs-lane-filter-clear`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1929
 
