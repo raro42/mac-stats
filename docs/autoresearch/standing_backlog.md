@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1928
+
+- Shared Agent Ops Agents filter Clear (`.ops-agents-enabled-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · On · Off. Standing P2 #14; design-review fuel (feature-agent-ops Agents); Mac capture deferred. Sessions filter Clear opaque in v0.1.1927. Next: shared `.ops-schedules-kind-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1927
 
-- Shared Agent Ops Sessions filter Clear (`.ops-session-kind-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Live · Files. Standing P2 #14; design-review fuel (feature-agent-ops Sessions); Mac capture deferred. Perplexity filter Clear opaque in v0.1.1926. Next: shared `.ops-agents-enabled-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+- Shared Agent Ops Sessions filter Clear (`.ops-session-kind-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Live · Files. Standing P2 #14; design-review fuel (feature-agent-ops Sessions); Mac capture deferred. Perplexity filter Clear opaque in v0.1.1926. Next done in v0.1.1928 (`.ops-agents-enabled-filter-clear`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1926
 
