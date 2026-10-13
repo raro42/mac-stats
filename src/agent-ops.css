@@ -6642,10 +6642,20 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #0a84ff 36%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-schedules-kind-count {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  opacity: 0.85;
+  /* Was opacity 0.85 on inherit (~88% ink) → ~79% ink on the near-white Schedules chip. */
+  color: color-mix(in srgb, #0c0c10 79%, #ffffff);
+  opacity: 1;
+}
+
+.ops-schedules-kind-count.is-zero {
+  font-weight: 600;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Schedules chip. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
 /* Agent Ops Knowledge — All · Discord · Core (Sessions Live/Files parity) */
@@ -7813,11 +7823,6 @@ textarea.ops-agent-editor.is-dirty {
   /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white Runs lane chip. */
   color: color-mix(in srgb, #0c0c10 37%, #ffffff);
   opacity: 1;
-}
-
-.ops-schedules-kind-count.is-zero {
-  font-weight: 600;
-  opacity: 0.42;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
