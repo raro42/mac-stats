@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1959 (~00:22 CEST)
+
+**Keep:** Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) — type mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy.
+
+**Why:** Layout-daily Data Poster (AI Chat) + WebView idle cut (#14). Glass alpha on empty-state copy keeps Graphics and Media busy; dark remaps keep Data Poster readable.
+
+**Fuel:** Digester empty; design review due=false (grace); layout daily due=true (data-poster). Prefer layout over standing `.ops-row-meta`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `16fe82e4` → pushed `main`. Layout marked checked for data-poster today.
+
+**Next:** `.ops-row-meta` (0.58), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1958 (~00:04 CEST)
 
 **Keep:** Shared Agent Ops Updated stamp (`.ops-updated-ago`) — type mixes against an opaque near-white wash (`color-mix` 63% / 69% / 81% ink for resting · visible · hover). No glass `opacity` on the Updated line beside Refresh.
@@ -10,7 +22,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep → push `main`.
 
-**Next:** `.ops-row-meta` (0.58), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1959 (layout-daily chat-empty type).
 
 ## Shipped — v0.1.1957 (~23:58 CEST)
 
