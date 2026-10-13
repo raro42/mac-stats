@@ -1,11 +1,18 @@
 # Morning surprise — 2026-10-13
 
 
+
+## ~04:18 — v0.1.1931 Runs filter Clear opaque (#14)
+
+- **Shipped:** Shared Agent Ops Runs `.ops-runs-lane-filter-clear` resting · hover uses opaque `color-mix` type (81% / 88% ink on near-white). No glass `opacity` on Clear beside All · Instant · Lite · Direct · Slow · Fail.
+- **Fuel:** standing P2 #14 after parallel v0.1.1930 Knowledge Clear; design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Next:** `.ops-runs-lane-chip` (0.88).
+
 ## ~04:15 — v0.1.1930 Knowledge filter Clear opaque (#14)
 
 - **Shipped:** Shared Agent Ops Knowledge `.ops-memory-kind-filter-clear` resting · hover uses opaque `color-mix` type (81% / 88% ink on near-white). No glass `opacity` on Clear beside All · Discord · Core.
 - **Fuel:** standing P2 #14 after v0.1.1929 Schedules Clear; design-review due=false (grace); Mac capture deferred.
-- **Next:** `.ops-runs-lane-filter-clear` (0.92).
+- **Next:** done in v0.1.1931 (`.ops-runs-lane-filter-clear`).
 
 Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Knowledge filter Clear.
 
@@ -13,6 +20,7 @@ Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: share
 
 | Version | What |
 |---------|------|
+| **v0.1.1931** | Shared Agent Ops Runs filter Clear (`.ops-runs-lane-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Instant · Lite · Direct · Slow · Fail (design review `feature-agent-ops` Runs; Mac capture deferred) |
 | **v0.1.1930** | Shared Agent Ops Knowledge filter Clear (`.ops-memory-kind-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Discord · Core (design review `feature-agent-ops` Knowledge; Mac capture deferred) |
 | **v0.1.1929** | Shared Agent Ops Schedules filter Clear (`.ops-schedules-kind-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Jobs · Deliveries (design review `feature-agent-ops` Schedules; Mac capture deferred) |
 | **v0.1.1928** | Shared Agent Ops Agents filter Clear (`.ops-agents-enabled-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · On · Off (design review `feature-agent-ops` Agents; Mac capture deferred) |
@@ -57,10 +65,10 @@ Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `co
 
 ## Still open
 
-- Next fuel: shared `.ops-schedules-kind-filter-clear` glass opacity (0.92).
+- Next fuel: shared `.ops-runs-lane-chip` glass opacity (0.88).
 - Design review still in grace for feature-agent-ops.png (Mac capture deferred / TCC).
 - Layout daily: data-poster checked today; dark / neon / futuristic / architect still [DUE] screen missing.
 
 ## Ratchet
 
-Latest keep: `a09b0084` — v0.1.1928 shared `.ops-agents-enabled-filter-clear` opaque.
+Latest keep: `f9f4a0f5` — v0.1.1931 shared `.ops-runs-lane-filter-clear` opaque.
