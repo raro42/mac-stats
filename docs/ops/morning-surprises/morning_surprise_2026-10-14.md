@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1966 (~01:42 CEST)
+
+**Keep:** Shared Agent Ops Insights keyboard hint (`.ops-insights-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Insights move hint under Slowest · Candidates. Apple shell fill beat kept.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Insights keyboard line keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window / single-instance). Parallel tick shipped preview-row as **v0.1.1965**; this ship is Insights as **v0.1.1966**.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `f4fa576f` → pushed `main`.
+
+**Next:** `.ops-refresh-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1965 (~01:36 CEST)
 
 **Keep:** Shared Agent Ops preview-row keyboard hint (`.ops-preview-row-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Copy · Load into AI Chat move hint under Sessions · Schedules · Knowledge · Runs previews. Apple shell fill beat kept.
@@ -10,7 +22,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `bb9817e8` → pushed `main`. Also backfilled results.tsv keep for v0.1.1964 @ `98a52ccf`.
 
-**Next:** `.ops-insights-kb-hint` / `.ops-refresh-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1966 (`.ops-insights-kb-hint`).
 
 ## Shipped — v0.1.1964 (~01:18 CEST)
 
