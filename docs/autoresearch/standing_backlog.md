@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1949
+
+- Shared Agent Ops overview hints (`.ops-hint`) mix type color against an opaque near-white wash (`color-mix` 40% `#0c0c10` on `#ffffff`). No glass `opacity` on the quiet helper line under Overview cards. Standing P2 #14; design-review fuel (feature-agent-ops Overview); Mac capture deferred. Overview body counts opaque in v0.1.1948. Next: shared `.ops-tab-bar-kb-hint` glass opacity (0.72), or shared `.ops-loading` (0.62) / `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1948
 
-- Shared Agent Ops overview body counts (`.ops-overview-count`) mix type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` on the secondary count line under Overview card titles. Standing P2 #14; design-review fuel (feature-agent-ops Overview); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Empty shells opaque in v0.1.1947. Next: shared `.ops-hint` glass opacity (0.45), or shared `.ops-tab-bar-kb-hint` (0.72) / `.ops-loading` (0.62) / `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops overview body counts (`.ops-overview-count`) mix type color against an opaque near-white wash (`color-mix` 48% `#0c0c10` on `#ffffff`). No glass `opacity` on the secondary count line under Overview card titles. Standing P2 #14; design-review fuel (feature-agent-ops Overview); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Empty shells opaque in v0.1.1947. Next done in v0.1.1949 (`.ops-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1947
 
