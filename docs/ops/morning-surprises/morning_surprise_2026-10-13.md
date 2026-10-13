@@ -1,5 +1,10 @@
 # Morning surprise — 2026-10-13
 
+## ~20:00 — v0.1.1940 Schedules filter chips opaque (#14)
+
+- **Shipped:** Shared Agent Ops Schedules `.ops-schedules-kind-chip` resting · hover · active uses opaque `color-mix` type (77% / 88% ink on near-white). No glass `opacity` on All · Jobs · Deliveries.
+- **Fuel:** standing P2 #14 after v0.1.1939 Agents counts; design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Next:** `.ops-schedules-kind-count` (0.85 / zero 0.42).
 
 ## ~05:57 — v0.1.1939 Agents filter counts opaque (#14)
 
@@ -49,12 +54,13 @@
 - **Fuel:** standing P2 #14 after v0.1.1929 Schedules Clear; design-review due=false (grace); Mac capture deferred.
 - **Next:** `.ops-runs-lane-filter-clear` (0.92).
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Agents filter counts.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Schedules filter chips.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1940** | Shared Agent Ops Schedules filter chips (`.ops-schedules-kind-chip` resting · hover · active) opaque type — no glass `opacity` on All · Jobs · Deliveries (design review `feature-agent-ops` Schedules; Mac capture deferred) |
 | **v0.1.1939** | Shared Agent Ops Agents filter counts (`.ops-agents-enabled-count` resting · `.is-zero`) opaque type — no glass `opacity` on On · Off counts (design review `feature-agent-ops` Agents; Mac capture deferred) |
 | **v0.1.1938** | Shared Agent Ops Agents filter chips (`.ops-agents-enabled-chip` resting · hover · active) opaque type — no glass `opacity` on All · On · Off (design review `feature-agent-ops` Agents; Mac capture deferred) |
 | **v0.1.1937** | Shared Agent Ops Sessions filter counts (`.ops-session-kind-count` resting · `.is-zero`) opaque type — no glass `opacity` on Live · Files counts (design review `feature-agent-ops` Sessions; Mac capture deferred) |

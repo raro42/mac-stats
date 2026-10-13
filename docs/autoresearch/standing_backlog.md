@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1940
+
+- Shared Agent Ops Schedules filter chips (`.ops-schedules-kind-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Jobs · Deliveries. Standing P2 #14; design-review fuel (feature-agent-ops Schedules); Mac capture deferred. Agents counts opaque in v0.1.1939. Next: shared `.ops-schedules-kind-count` glass opacity (0.85 / zero 0.42). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1939
 
-- Shared Agent Ops Agents filter counts (`.ops-agents-enabled-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on On · Off counts. Standing P2 #14; design-review fuel (feature-agent-ops Agents); Mac capture deferred. Agents chips opaque in v0.1.1938. Next: shared `.ops-schedules-kind-count` glass opacity (0.85 / zero 0.42), or shared `.ops-schedules-kind-chip` (0.88). P2 reliability / GitHub #14.
+- Shared Agent Ops Agents filter counts (`.ops-agents-enabled-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on On · Off counts. Standing P2 #14; design-review fuel (feature-agent-ops Agents); Mac capture deferred. Agents chips opaque in v0.1.1938. Next done in v0.1.1940 (`.ops-schedules-kind-chip`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1938
 
