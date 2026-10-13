@@ -1,5 +1,18 @@
 # Morning surprise — 2026-10-13
 
+
+## Shipped — v0.1.1952 (~22:55 CEST)
+
+**Keep:** Shared Agent Ops empty-tab hint (`.ops-empty-tab-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the hint under Agents · Sessions · Schedules · Knowledge · Runs empty panels.
+
+**Why:** WebView idle cut (#14). Glass alpha on empty-tab chrome keeps Graphics and Media busy.
+
+**Fuel:** Digester + design review due (stale `feature-cpu-metrics.png`); Mac capture deferred (TCC). Standing #14 after parallel v0.1.1951 `.ops-loading`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `baad03e5` → pushed `main`.
+
+**Next:** `.ops-health-kb-hint` / overview + filter kb-hints, or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+
 ## ~20:29 — v0.1.1941 Schedules filter counts opaque (#14)
 
 - **Shipped:** Shared Agent Ops Schedules `.ops-schedules-kind-count` resting · `.is-zero` uses opaque `color-mix` type (79% / 37% ink on near-white). No glass `opacity` on Jobs · Deliveries counts.
