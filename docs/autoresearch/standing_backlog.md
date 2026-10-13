@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1956
+
+- Shared Agent Ops filter caption (`.ops-filter-caption`) mixes type color against an opaque near-white wash (`color-mix` 66% `#0c0c10` on `#ffffff`). No glass `opacity` on the filter caption under search · match · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter chrome); Mac capture deferred. Filter-row keyboard hint opaque in v0.1.1955. Next: shared `.ops-keyboard-hint` glass opacity (0.7), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1955
 
-- Shared Agent Ops filter-row keyboard hint (`.ops-filter-row-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the keyboard line under search · match · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter row); Mac capture deferred. Overview keyboard hint opaque in v0.1.1954. Next: shared `.ops-filter-caption` glass opacity (0.75), or shared `.ops-keyboard-hint` (0.7), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops filter-row keyboard hint (`.ops-filter-row-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the keyboard line under search · match · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter row); Mac capture deferred. Overview keyboard hint opaque in v0.1.1954. Next done in v0.1.1956 (`.ops-filter-caption`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1954
 

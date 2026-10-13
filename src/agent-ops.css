@@ -1453,9 +1453,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-filter-caption {
   padding: 0 4px 8px;
-  opacity: 0.75;
+  /* Was opacity 0.75 on inherit (~88% ink) → ~66% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 66%, #ffffff);
+  opacity: 1;
   font-size: 12px;
 }
 
