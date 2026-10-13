@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1957 (~23:58 CEST)
+
+**Keep:** Shared Agent Ops keyboard hint (`.ops-keyboard-hint`) — type mixes against an opaque near-white wash (`color-mix` 62% ink). No glass `opacity` on the soft keyboard tip line (flash keyframes stay opaque too).
+
+**Why:** WebView idle cut (#14). Glass alpha on soft keyboard tip chrome keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design review due=false (grace); layout daily due=false. Standing #14 after v0.1.1956 `.ops-filter-caption`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `18466d9c` → pushed `main`.
+
+**Next:** `.ops-row-meta` (0.58), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1956 (~23:43 CEST)
 
 **Keep:** Shared Agent Ops filter caption (`.ops-filter-caption`) — type mixes against an opaque near-white wash (`color-mix` 66% ink). No glass `opacity` on the caption under search · match · Clear.
@@ -10,7 +22,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `f3c90084` → pushed `main`.
 
-**Next:** `.ops-keyboard-hint` (0.7), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1957 (`.ops-keyboard-hint`).
 
 ## Shipped — v0.1.1955 (~23:33 CEST)
 
