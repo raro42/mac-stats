@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1935
+
+- Shared Agent Ops Knowledge filter counts (`.ops-memory-kind-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on Discord · Core counts. Standing P2 #14; design-review fuel (feature-agent-ops Knowledge); Mac capture deferred. Knowledge chips opaque in v0.1.1934. Next: shared `.ops-session-kind-chip` glass opacity (0.88), or shared `.ops-session-kind-count` / `.ops-agents-enabled-count` / `.ops-schedules-kind-count` (0.85 / zero 0.42). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1934
 
-- Shared Agent Ops Knowledge filter chips (`.ops-memory-kind-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Discord · Core. Standing P2 #14; design-review fuel (feature-agent-ops Knowledge); Mac capture deferred. Runs lane counts opaque in v0.1.1933. Next: shared `.ops-memory-kind-count` glass opacity (0.85 / zero 0.42), or shared `.ops-session-kind-chip` (0.88). P2 reliability / GitHub #14.
+- Shared Agent Ops Knowledge filter chips (`.ops-memory-kind-chip` resting · hover · active) mix type color against an opaque near-white wash (`color-mix` 77% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on All · Discord · Core. Standing P2 #14; design-review fuel (feature-agent-ops Knowledge); Mac capture deferred. Runs lane counts opaque in v0.1.1933. Next done in v0.1.1935 (`.ops-memory-kind-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1933
 

@@ -1,16 +1,23 @@
 # Morning surprise — 2026-10-13
 
-## ~05:03 — v0.1.1934 Knowledge filter chips opaque (#14)
+
+## ~05:07 — v0.1.1935 Knowledge filter counts opaque (#14)
+
+- **Shipped:** Shared Agent Ops Knowledge `.ops-memory-kind-count` resting · `.is-zero` uses opaque `color-mix` type (79% / 37% ink on near-white). No glass `opacity` on Discord · Core counts.
+- **Fuel:** standing P2 #14 after parallel v0.1.1934 Knowledge chips (this tick raced on chips, discard, then shipped counts); design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Next:** `.ops-session-kind-chip` (0.88), or `.ops-session-kind-count` / `.ops-agents-enabled-count` / `.ops-schedules-kind-count` (0.85 / zero 0.42).
+
+## ~05:04 — v0.1.1934 Knowledge filter chips opaque (#14)
 
 - **Shipped:** Shared Agent Ops Knowledge `.ops-memory-kind-chip` resting · hover · active uses opaque `color-mix` type (77% / 88% ink on near-white). No glass `opacity` on All · Discord · Core.
-- **Fuel:** standing P2 #14 after v0.1.1933 Runs lane counts; design-review due=false (grace); Mac capture deferred.
+- **Fuel:** standing P2 #14 after v0.1.1933 Runs lane counts; design-review due (stale feature-cpu-metrics); Mac capture deferred.
 - **Next:** `.ops-memory-kind-count` (0.85 / zero 0.42), or `.ops-session-kind-chip` (0.88).
 
 ## ~04:43 — v0.1.1933 Runs lane filter counts opaque (#14)
 
-- **Shipped:** Shared Agent Ops Runs `.ops-runs-lane-count` resting · `.is-zero` uses opaque `color-mix` type (79% / 37% ink on near-white). No glass `opacity` on Instant · Lite · Direct · Slow · Fail digits.
-- **Fuel:** standing P2 #14 after v0.1.1932 Runs lane chips; design-review due=false (grace); Mac capture deferred.
-- **Next:** `.ops-memory-kind-chip` (0.88).
+- **Shipped:** Shared Agent Ops Runs `.ops-runs-lane-count` resting · `.is-zero` uses opaque `color-mix` type (79% / 37% ink on near-white). No glass `opacity` on Instant · Lite · Direct · Slow · Fail counts.
+- **Fuel:** standing P2 #14 after parallel v0.1.1932 Runs lane chips (this tick raced on chips, then shipped counts); design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Next:** `.ops-memory-kind-chip` / `.ops-session-kind-count` / `.ops-agents-enabled-count` / `.ops-schedules-kind-count` / `.ops-memory-kind-count` (0.85 / zero 0.42).
 
 ## ~04:40 — v0.1.1932 Runs lane filter chips opaque (#14)
 
@@ -24,14 +31,15 @@
 - **Fuel:** standing P2 #14 after v0.1.1929 Schedules Clear; design-review due=false (grace); Mac capture deferred.
 - **Next:** `.ops-runs-lane-filter-clear` (0.92).
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Knowledge filter chips.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Knowledge filter counts.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1935** | Shared Agent Ops Knowledge filter counts (`.ops-memory-kind-count` resting · `.is-zero`) opaque type — no glass `opacity` on Discord · Core counts (design review `feature-agent-ops` Knowledge; Mac capture deferred) |
 | **v0.1.1934** | Shared Agent Ops Knowledge filter chips (`.ops-memory-kind-chip` resting · hover · active) opaque type — no glass `opacity` on All · Discord · Core (design review `feature-agent-ops` Knowledge; Mac capture deferred) |
-| **v0.1.1933** | Shared Agent Ops Runs lane filter counts (`.ops-runs-lane-count` resting · `.is-zero`) opaque type — no glass `opacity` on Instant · Lite · Direct · Slow · Fail digits (design review `feature-agent-ops` Runs; Mac capture deferred) |
+| **v0.1.1933** | Shared Agent Ops Runs lane filter counts (`.ops-runs-lane-count` resting · `.is-zero`) opaque type — no glass `opacity` on Instant · Lite · Direct · Slow · Fail counts (design review `feature-agent-ops` Runs; Mac capture deferred) |
 | **v0.1.1932** | Shared Agent Ops Runs lane filter chips (`.ops-runs-lane-chip` resting · hover · active) opaque type — no glass `opacity` on All · Instant · Lite · Direct · Slow · Fail (design review `feature-agent-ops` Runs; Mac capture deferred) |
 | **v0.1.1931** | Shared Agent Ops Runs filter Clear (`.ops-runs-lane-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Instant · Lite · Direct · Slow · Fail (design review `feature-agent-ops` Runs; Mac capture deferred) |
 | **v0.1.1930** | Shared Agent Ops Knowledge filter Clear (`.ops-memory-kind-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Discord · Core (design review `feature-agent-ops` Knowledge; Mac capture deferred) |
@@ -74,14 +82,14 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Knowledge chips now match the opaque Runs lane chips for non-Apple themes too.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Agents Clear now matches the opaque Sessions / Perplexity Clear chips for non-Apple themes too.
 
 ## Still open
 
-- Next fuel: shared `.ops-memory-kind-count` glass opacity (0.85 / zero 0.42), or shared `.ops-session-kind-chip` (0.88).
+- Next fuel: shared `.ops-session-kind-chip` glass opacity (0.88), or Ops filter counts (`.ops-session-kind-count` / `.ops-agents-enabled-count` / `.ops-schedules-kind-count`).
 - Design review still in grace for feature-agent-ops.png (Mac capture deferred / TCC).
 - Layout daily: data-poster checked today; dark / neon / futuristic / architect still [DUE] screen missing.
 
 ## Ratchet
 
-Latest keep: `021fde9a` — v0.1.1934 shared `.ops-memory-kind-chip` opaque.
+Latest keep: `a09b0084` — v0.1.1928 shared `.ops-agents-enabled-filter-clear` opaque.
