@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-13 (~20:50):** Shared Agent Ops filter match opaque type (v0.1.1942). Recapture of `feature-agent-ops.png` / `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next shared glass: `.ops-overview-head-count` opacity 0.78 / zero 0.42 / hover 0.92, or `.ops-tab-count`.
 - **2026-10-13 (~01:25):** Shared AI Chat filter chips opaque type (v0.1.1920). Recapture of `feature-ai-chat.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` opacity 0.88, or `.processes-filter-clear` / `.monitors-filter-clear` opacity 0.92.
 - **2026-10-13 (~01:05):** Shared Top Processes filter chips opaque type (v0.1.1919). Recapture of `feature-processes.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.chat-filter-chip` opacity 0.88.
 - **2026-10-13 (~01:00):** Shared Disk Cleanup scope filter Clear opaque type (v0.1.1918). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior asset kept; polish grace marked. Next shared glass: `.processes-filter-chip` / `.chat-filter-chip` / `.monitors-filter-chip` / `.logs-toolbar .logs-filter-chip` opacity 0.88.
