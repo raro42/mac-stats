@@ -1,16 +1,28 @@
 # Morning surprise — 2026-10-14
 
-## Shipped — v0.1.1959 (~00:22 CEST)
+## Shipped — v0.1.1960 (~00:30 CEST)
 
-**Keep:** Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) — type mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy.
+**Keep:** Shared Agent Ops row meta (`.ops-row-meta`) — type mixes against an opaque near-white wash (`color-mix` 51% ink). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Updated stamp and keyboard-hint dual-classes keep their own opaque rules.
 
-**Why:** Layout-daily Data Poster (AI Chat) + WebView idle cut (#14). Glass alpha on empty-state copy keeps Graphics and Media busy; dark remaps keep Data Poster readable.
+**Why:** WebView idle cut (#14). Glass alpha on list meta lines keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design review due=false (grace); layout daily due=true (data-poster). Prefer layout over standing `.ops-row-meta`.
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (TCC). Parallel tick took layout-daily Data Poster empty-state as **v0.1.1959**; this ship is row meta as **v0.1.1960**.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `16fe82e4` → pushed `main`. Layout marked checked for data-poster today.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `0a94bec0` → pushed `main`.
 
-**Next:** `.ops-row-meta` (0.58), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale CPU metrics screen.
+**Next:** `.ops-detail-meta` (0.75), or `.ops-agent-save-status` (0.7), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+
+## Shipped — v0.1.1959 (~00:20 CEST)
+
+**Keep:** Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) — mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% ink on near-white; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy.
+
+**Why:** Layout-daily Data Poster + WebView idle cut (#14). Glass alpha on empty Chat chrome keeps Graphics and Media busy.
+
+**Fuel:** Layout daily due (data-poster). Parallel to standing #14 ops-row-meta (this tick).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep → pushed `main`.
+
+**Next:** done in v0.1.1960 (`.ops-row-meta`).
 
 ## Shipped — v0.1.1958 (~00:04 CEST)
 
@@ -22,7 +34,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep → push `main`.
 
-**Next:** done in v0.1.1959 (layout-daily chat-empty type).
+**Next:** done in v0.1.1959 (layout-daily chat-empty) / v0.1.1960 (`.ops-row-meta`).
 
 ## Shipped — v0.1.1957 (~23:58 CEST)
 
