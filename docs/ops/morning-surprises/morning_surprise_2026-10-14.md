@@ -7,6 +7,13 @@
 - **Keep:** `fe6a1173`. Install/kickstart done.
 - **Next:** `.ops-overview-link` (0.75 / hover·focus 1), or `.ops-tab-digit` (0.42 / hover 0.72 / active 0.95), or layout-daily Data Poster / Mac capture of `feature-cpu-metrics.png`.
 
+## ~20:56 — v0.1.1943 Overview head counts opaque (#14)
+
+- **Shipped:** Shared Agent Ops Overview `.ops-overview-head-count` resting · zero · hover · active-zero uses opaque `color-mix` type (69% / 37% / 81% ink on near-white; active-zero 55% accent). No glass `opacity` on Overview inventory pills.
+- **Fuel:** standing P2 #14 after v0.1.1942 filter match; digester empty; design-review due=false (grace); layout daily due=false; Mac capture deferred.
+- **Keep:** `3f27d964`.
+- **Next:** `.ops-tab-count` — done in v0.1.1944.
+
 ## ~20:50 — v0.1.1942 Agent Ops filter match opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-filter-match` resting · All · Partial · Zero uses opaque `color-mix` type (75% / 84% ink on near-white). No glass `opacity` on the N/M filter count chip beside search · Clear.
