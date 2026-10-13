@@ -1,18 +1,24 @@
 # Morning surprise — 2026-10-14
 
+## ~21:45 — v0.1.1946 Agent Ops tab digit keys opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-tab-digit` resting · hover · active uses opaque `color-mix` type (37% / 63% ink on near-white; active accent). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs digit keys.
+- **Fuel:** standing P2 #14 after v0.1.1945 Overview Open; design-review due (stale feature-cpu-metrics); Mac capture deferred.
+- **Next:** `.ops-empty` (0.78 / hover 0.92), or `.ops-overview-count` / `.ops-hint` / `.ops-tab-bar-kb-hint` / `.ops-loading`.
+
 ## ~21:25 — v0.1.1945 Overview Open opaque (#14)
 
 - **Shipped:** Shared Agent Ops Overview `.ops-overview-link` resting · hover · focus-visible · active-card uses opaque `color-mix` type (66% / 88% ink on near-white). No glass `opacity` on Open beside Agents · Schedules · Sessions · Knowledge · Runs · Digest.
 - **Fuel:** standing P2 #14 after v0.1.1944 tab counts; digester empty; design-review due=false (grace); layout daily due=false; Mac capture deferred.
 - **Keep:** `0669eb16`.
-- **Next:** `.ops-tab-digit` (0.42 / hover 0.72 / active 0.95), or `.agent-ops-tab` / `.ops-file-tab` (0.8).
+- **Next:** `.ops-tab-digit` — done in v0.1.1946.
 
 ## ~21:20 — v0.1.1944 Agent Ops tab count pills opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-tab-count` resting · zero · hover · active uses opaque `color-mix` type (69% / 37% / 81% ink on near-white). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs inventory pills.
 - **Fuel:** standing P2 #14 after v0.1.1943 overview head counts; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture attempted (CPU window open) — TCC blocked (`could not create image from window`). Parallel-tick race on head-count discarded first.
 - **Keep:** `fe6a1173`. Install/kickstart done.
-- **Next:** `.ops-overview-link` — done in v0.1.1945. Remaining: `.ops-tab-digit` (0.42 / hover 0.72 / active 0.95), or `.agent-ops-tab` / `.ops-file-tab` (0.8), or layout-daily Data Poster / Mac capture of `feature-cpu-metrics.png`.
+- **Next:** `.ops-overview-link` — done in v0.1.1945. `.ops-tab-digit` — done in v0.1.1946.
 
 ## ~20:56 — v0.1.1943 Overview head counts opaque (#14)
 
