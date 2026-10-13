@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-13
 
-Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Sessions filter Clear.
+Overnight Track B kept cutting glass `opacity` for GitHub **#14**. Latest: shared Agent Ops Agents filter Clear.
 
 ## Shipped this night (latest first)
 
 | Version | What |
 |---------|------|
+| **v0.1.1928** | Shared Agent Ops Agents filter Clear (`.ops-agents-enabled-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · On · Off (design review `feature-agent-ops` Agents; Mac capture deferred) |
 | **v0.1.1927** | Shared Agent Ops Sessions filter Clear (`.ops-session-kind-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Live · Files (design review `feature-agent-ops` Sessions; Mac capture deferred) |
 | **v0.1.1926** | Shared Perplexity filter Clear (`.perplexity-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Top · Snippet (design review Perplexity chrome; Mac capture deferred) |
 | **v0.1.1925** | Shared Debug Log filter Clear (`.logs-filter-clear` resting · hover) opaque type — no glass `opacity` on Clear beside All · Error · Warn (design review Debug Log chrome; Mac capture deferred) |
@@ -43,14 +44,14 @@ Also on main since the prior morning note (daytime): **v0.1.1895** Data Poster /
 
 ## Why it matters
 
-Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Sessions Clear now matches the opaque Perplexity / Debug Log Clear chips for non-Apple themes too.
+Glass `opacity` on muted chrome keeps WebView Graphics and Media hot. Opaque `color-mix` washes keep the muted look without that layer cost. Agents Clear now matches the opaque Sessions / Perplexity Clear chips for non-Apple themes too.
 
 ## Still open
 
-- Next fuel: shared `.ops-agents-enabled-filter-clear` glass opacity (0.92).
-- Design review still due for feature-cpu-metrics.png (Mac capture deferred / TCC).
-- Layout daily due (data-poster) — deferred this tick.
+- Next fuel: shared `.ops-schedules-kind-filter-clear` glass opacity (0.92).
+- Design review still in grace for feature-agent-ops.png (Mac capture deferred / TCC).
+- Layout daily: data-poster checked today; dark / neon / futuristic / architect still [DUE] screen missing.
 
 ## Ratchet
 
-Latest keep: `359e689b` — v0.1.1927 shared `.ops-session-kind-filter-clear` opaque.
+Latest keep: `a09b0084` — v0.1.1928 shared `.ops-agents-enabled-filter-clear` opaque.
