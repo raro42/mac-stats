@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1945
+
+- Shared Agent Ops Overview Open control (`.ops-overview-link` resting · hover · focus-visible · active-card) mixes type color against an opaque near-white wash (`color-mix` 66% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Open beside Agents · Schedules · Sessions · Knowledge · Runs · Digest. Standing P2 #14; design-review fuel (feature-agent-ops Overview); Mac capture deferred. Tab count pills opaque in v0.1.1944. Next: shared `.ops-tab-digit` glass opacity (0.42 / hover 0.72 / active 0.95), or shared `.agent-ops-tab` / `.ops-file-tab` (0.8), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1944
 
-- Shared Agent Ops tab count pills (`.ops-tab-count` resting · zero · hover · active) mix type color against an opaque near-white wash (`color-mix` 69% / 37% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs inventory pills. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; TCC blocked window capture). Overview head counts opaque in v0.1.1943. Next: shared `.ops-overview-link` glass opacity (0.75 / hover·focus 1), or shared `.ops-tab-digit` (0.42 / hover 0.72 / active 0.95), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops tab count pills (`.ops-tab-count` resting · zero · hover · active) mix type color against an opaque near-white wash (`color-mix` 69% / 37% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs inventory pills. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; TCC blocked window capture). Overview head counts opaque in v0.1.1943. Next done in v0.1.1945 (`.ops-overview-link`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1943
 

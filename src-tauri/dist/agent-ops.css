@@ -1558,7 +1558,9 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-overview-card.is-active .ops-overview-link {
+  /* Active already uses full type at opacity 1 — keep glass off. */
   opacity: 1;
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
   background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
 }
@@ -1630,27 +1632,32 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-overview-link {
   flex-shrink: 0;
   background: color-mix(in srgb, currentColor 4%, #ffffff);
   border: 1px solid color-mix(in srgb, currentColor 18%, #ffffff);
-  color: inherit;
-  opacity: 0.75;
+  /* Was opacity 0.75 on inherit (~88% ink) → ~66% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 66%, #ffffff);
+  opacity: 1;
   border-radius: 6px;
   padding: 3px 8px;
   font-size: 11px;
   cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease,
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 .ops-overview-link:hover {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
 
 .ops-overview-link:focus-visible {
   outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
