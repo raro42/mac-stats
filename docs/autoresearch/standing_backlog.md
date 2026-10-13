@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1964
+
+- Shared Agent Ops edit-actions keyboard hint (`.ops-agent-edit-actions-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Save · Load into AI Chat · Back move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). File-tab hint opaque in v0.1.1963. Next: shared `.ops-preview-row-kb-hint` / `.ops-insights-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1963
 
 - Shared Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Soul · Skill · Mood move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred. Save status opaque in v0.1.1962. Next: shared `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
