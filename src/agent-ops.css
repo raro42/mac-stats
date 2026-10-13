@@ -1743,6 +1743,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   }
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-tab-digit {
   display: inline-block;
   min-width: 0.9em;
@@ -1751,20 +1752,24 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
-  opacity: 0.42;
-  color: inherit;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white tab wash. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
   vertical-align: 0.05em;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .agent-ops-tab:hover .ops-tab-digit,
 .ops-file-tab:hover .ops-tab-digit {
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white tab wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
 }
 
 .agent-ops-tab.active .ops-tab-digit,
 .ops-file-tab.active .ops-tab-digit {
-  opacity: 0.95;
+  /* Active already uses accent at opacity 0.95 — keep glass off. */
+  opacity: 1;
   color: var(--accent, #007aff);
 }
 
