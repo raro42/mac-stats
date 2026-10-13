@@ -6630,7 +6630,8 @@ textarea.ops-agent-editor.is-dirty {
   appearance: none;
   border: 1px solid color-mix(in srgb, var(--accent, #007aff) 32%, #ffffff);
   background: color-mix(in srgb, var(--accent, #007aff) 10%, #ffffff);
-  color: inherit;
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white Knowledge Clear chip. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
   font: inherit;
   font-size: 11px;
   font-weight: 600;
@@ -6639,11 +6640,11 @@ textarea.ops-agent-editor.is-dirty {
   padding: 5px 9px;
   border-radius: 6px;
   cursor: pointer;
-  opacity: 0.92;
+  opacity: 1;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
-    opacity 0.15s ease,
+    color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
@@ -6652,6 +6653,8 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .ops-memory-kind-filter-clear:hover {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white Knowledge Clear chip. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, var(--accent, #007aff) 16%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #007aff) 44%, #ffffff);
