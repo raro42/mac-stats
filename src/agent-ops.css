@@ -2232,17 +2232,22 @@ textarea.ops-agent-editor.is-dirty {
   border-bottom: 1px solid color-mix(in srgb, currentColor 10%, #ffffff);
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-updated-ago {
   margin: 0 2px;
   padding: 2px 0;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
   font-variant-numeric: tabular-nums;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .ops-updated-ago:not([hidden]) {
-  opacity: 0.78;
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
 }
 
 .ops-updated-ago[role='button'] {
@@ -2250,11 +2255,13 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 6px;
   padding: 2px 6px;
   margin: 0 -2px;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .ops-updated-ago[role='button']:hover {
-  opacity: 0.92;
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
   background: color-mix(in srgb, currentColor 8%, #ffffff);
 }
 

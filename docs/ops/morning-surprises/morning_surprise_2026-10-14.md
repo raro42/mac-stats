@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1958 (~00:04 CEST)
+
+**Keep:** Shared Agent Ops Updated stamp (`.ops-updated-ago`) — type mixes against an opaque near-white wash (`color-mix` 63% / 69% / 81% ink for resting · visible · hover). No glass `opacity` on the Updated line beside Refresh.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Updated stamp keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (TCC). Parallel tick took v0.1.1957 `.ops-keyboard-hint`; this ship is Updated stamp as **v0.1.1958**.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep → push `main`.
+
+**Next:** `.ops-row-meta` (0.58), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1957 (~23:58 CEST)
 
 **Keep:** Shared Agent Ops keyboard hint (`.ops-keyboard-hint`) — type mixes against an opaque near-white wash (`color-mix` 62% ink). No glass `opacity` on the soft keyboard tip line (flash keyframes stay opaque too).
@@ -10,7 +22,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `18466d9c` → pushed `main`.
 
-**Next:** `.ops-row-meta` (0.58), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1958 (`.ops-updated-ago`).
 
 ## Shipped — v0.1.1956 (~23:43 CEST)
 
