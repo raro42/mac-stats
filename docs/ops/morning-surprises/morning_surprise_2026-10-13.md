@@ -1,30 +1,6 @@
 # Morning surprise — 2026-10-13
 
 
-## Shipped — v0.1.1954 (~23:18 CEST)
-
-**Keep:** Shared Agent Ops overview keyboard hint (`.ops-overview-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the keyboard line under Overview cards.
-
-**Why:** WebView idle cut (#14). Glass alpha on Overview keyboard chrome keeps Graphics and Media busy.
-
-**Fuel:** Digester + design review due (stale `feature-cpu-metrics.png`); Mac capture deferred (TCC). Standing #14 after parallel v0.1.1953 `.ops-health-kb-hint`.
-
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `d2d28c25` → pushed `main`.
-
-**Next:** `.ops-filter-row-kb-hint` / `.ops-filter-caption`, or layout-daily data-poster / Mac capture of stale CPU metrics screen.
-
-## Shipped — v0.1.1953 (~23:05 CEST)
-
-**Keep:** Shared Agent Ops health-strip keyboard hint (`.ops-health-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the keyboard line under Version · Discord · Redmine · Next schedule · Last delivery · Digest.
-
-**Why:** WebView idle cut (#14). Glass alpha on health-strip keyboard chrome keeps Graphics and Media busy.
-
-**Fuel:** Digester + design review due (stale `feature-cpu-metrics.png`); Mac capture deferred (TCC). Standing #14 after v0.1.1952 `.ops-empty-tab-hint`.
-
-**Verify:** keep @ `0e6a163b` → pushed `main`.
-
-**Next:** done in v0.1.1954 (`.ops-overview-kb-hint`).
-
 ## Shipped — v0.1.1952 (~22:55 CEST)
 
 **Keep:** Shared Agent Ops empty-tab hint (`.ops-empty-tab-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the hint under Agents · Sessions · Schedules · Knowledge · Runs empty panels.
