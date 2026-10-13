@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1956 (~23:43 CEST)
+
+**Keep:** Shared Agent Ops filter caption (`.ops-filter-caption`) — type mixes against an opaque near-white wash (`color-mix` 66% ink). No glass `opacity` on the caption under search · match · Clear.
+
+**Why:** WebView idle cut (#14). Glass alpha on filter caption chrome keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (TCC). Standing #14 after parallel v0.1.1955 `.ops-filter-row-kb-hint`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `f3c90084` → pushed `main`.
+
+**Next:** `.ops-keyboard-hint` (0.7), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1955 (~23:33 CEST)
 
 **Keep:** Shared Agent Ops filter-row keyboard hint (`.ops-filter-row-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the keyboard line under search · match · Clear.
