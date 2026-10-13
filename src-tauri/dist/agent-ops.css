@@ -1578,6 +1578,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   letter-spacing: 0.01em;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-overview-head-count {
   flex-shrink: 0;
   max-width: 52%;
@@ -1590,12 +1591,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
-  color: inherit;
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
   background: color-mix(in srgb, currentColor 10%, #ffffff);
   border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
-  opacity: 0.78;
-  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease,
-    color 0.15s ease;
+  opacity: 1;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .ops-overview-head-count[hidden] {
@@ -1603,14 +1604,19 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-overview-head-count.is-zero {
-  opacity: 0.42;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
-.ops-overview-card:hover .ops-overview-head-count {
-  opacity: 0.92;
+.ops-overview-card:hover .ops-overview-head-count:not(.is-zero) {
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
 }
 
 .ops-overview-card.is-active .ops-overview-head-count {
+  /* Active already uses accent at opacity 1 — keep glass off. */
   opacity: 1;
   color: var(--accent, #007aff);
   background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
@@ -1618,7 +1624,9 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-overview-card.is-active .ops-overview-head-count.is-zero {
-  opacity: 0.55;
+  /* Was opacity 0.55 on accent → ~55% accent on the near-white overview card. */
+  color: color-mix(in srgb, var(--accent, #007aff) 55%, #ffffff);
+  opacity: 1;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */

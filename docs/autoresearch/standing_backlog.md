@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1943
+
+- Shared Agent Ops overview head counts (`.ops-overview-head-count` resting · zero · hover · active-zero) mix type color against an opaque near-white wash (`color-mix` 69% / 37% / 81% `#0c0c10` on `#ffffff`; active-zero 55% accent). No glass `opacity` on the Overview inventory pills. Standing P2 #14; design-review fuel (feature-agent-ops Overview); Mac capture deferred. Filter match opaque in v0.1.1942. Next: shared `.ops-tab-count` glass opacity (0.78 / zero 0.42 / hover 0.92), or shared `.ops-overview-link` (0.75), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1942
 
-- Shared Agent Ops filter match (`.ops-filter-match` resting · All · Partial · Zero) mixes type color against an opaque near-white wash (`color-mix` 75% / 84% `#0c0c10` on `#ffffff`). No glass `opacity` on the N/M filter count chip beside search · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter row); Mac capture deferred (digester recommended stale feature-cpu-metrics). Schedules counts opaque in v0.1.1941. Next: shared `.ops-overview-head-count` glass opacity (0.78 / zero 0.42 / hover 0.92), or shared `.ops-tab-count` (0.78 / zero 0.42), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops filter match (`.ops-filter-match` resting · All · Partial · Zero) mixes type color against an opaque near-white wash (`color-mix` 75% / 84% `#0c0c10` on `#ffffff`). No glass `opacity` on the N/M filter count chip beside search · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter row); Mac capture deferred (digester recommended stale feature-cpu-metrics). Schedules counts opaque in v0.1.1941. Next done in v0.1.1943 (`.ops-overview-head-count`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1941
 
