@@ -1691,9 +1691,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   padding: 6px 8px;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-overview-count {
   font-size: 11px;
-  opacity: 0.55;
+  /* Was opacity 0.55 on inherit (~88% ink) → ~48% ink on the near-white overview card. */
+  color: color-mix(in srgb, #0c0c10 48%, #ffffff);
+  opacity: 1;
   margin-bottom: 2px;
   font-variant-numeric: tabular-nums;
 }
