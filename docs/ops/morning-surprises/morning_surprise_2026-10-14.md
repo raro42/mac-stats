@@ -1,5 +1,12 @@
 # Morning surprise — 2026-10-14
 
+## ~21:50 — v0.1.1947 Agent Ops empty shell type opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-empty` resting · hover uses opaque `color-mix` type (69% / 81% ink on near-white). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs empty panels.
+- **Fuel:** standing P2 #14 after v0.1.1946 tab digits; digester empty; design-review due=false (grace); layout daily due=false; Mac capture deferred.
+- **Keep:** `48780e97`. Linux rack: CSS only (no install/kickstart).
+- **Next:** `.ops-overview-count` (0.55), or `.ops-hint` / `.ops-tab-bar-kb-hint` / `.ops-loading` / `.ops-empty-tab-hint`.
+
 ## ~21:45 — v0.1.1946 Agent Ops tab digit keys opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-tab-digit` resting · hover · active uses opaque `color-mix` type (37% / 63% ink on near-white; active accent). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs digit keys.
