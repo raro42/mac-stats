@@ -2229,10 +2229,13 @@ textarea.ops-agent-editor.is-dirty {
   margin-bottom: 8px;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-file-tab-kb-hint {
   margin: -4px 0 8px;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
 }
 
 .ops-agent-edit-actions-kb-hint {

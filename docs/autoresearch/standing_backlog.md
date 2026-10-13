@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1963
+
+- Shared Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Soul · Skill · Mood move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred. Save status opaque in v0.1.1962. Next: shared `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1962
 
-- Shared Agent Ops save status (`.ops-agent-save-status`) mixes type color against an opaque near-white wash (`color-mix` 62% `#0c0c10` on `#ffffff`). No glass `opacity` on the Agents Save status line. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Detail meta opaque in v0.1.1961. Next: shared `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops save status (`.ops-agent-save-status`) mixes type color against an opaque near-white wash (`color-mix` 62% `#0c0c10` on `#ffffff`). No glass `opacity` on the Agents Save status line. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops editor chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Detail meta opaque in v0.1.1961. Next done in v0.1.1963 (`.ops-file-tab-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1961
 
