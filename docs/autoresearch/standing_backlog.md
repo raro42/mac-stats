@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1953
+
+- Shared Agent Ops health-strip keyboard hint (`.ops-health-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the keyboard line under Version · Discord · Redmine · Next schedule · Last delivery · Digest. Standing P2 #14; design-review fuel (feature-agent-ops health chrome); Mac capture deferred. Empty-tab hint opaque in v0.1.1952. Next: shared `.ops-overview-kb-hint` glass opacity (0.72), or shared `.ops-filter-row-kb-hint` / `.ops-filter-caption` (0.75), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1952
 
-- Shared Agent Ops empty-tab hint (`.ops-empty-tab-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the hint under Agents · Sessions · Schedules · Knowledge · Runs empty panels. Standing P2 #14; design-review fuel (feature-agent-ops empty chrome); Mac capture deferred. Loading shell opaque in v0.1.1951. Next: shared `.ops-health-kb-hint` glass opacity (0.72), or shared `.ops-overview-kb-hint` / `.ops-filter-row-kb-hint` / `.ops-filter-caption` (0.75), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops empty-tab hint (`.ops-empty-tab-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the hint under Agents · Sessions · Schedules · Knowledge · Runs empty panels. Standing P2 #14; design-review fuel (feature-agent-ops empty chrome); Mac capture deferred. Loading shell opaque in v0.1.1951. Next done in v0.1.1953 (`.ops-health-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1951
 
