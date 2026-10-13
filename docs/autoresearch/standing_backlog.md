@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1942
+
+- Shared Agent Ops filter match (`.ops-filter-match` resting · All · Partial · Zero) mixes type color against an opaque near-white wash (`color-mix` 75% / 84% `#0c0c10` on `#ffffff`). No glass `opacity` on the N/M filter count chip beside search · Clear. Standing P2 #14; design-review fuel (feature-agent-ops filter row); Mac capture deferred (digester recommended stale feature-cpu-metrics). Schedules counts opaque in v0.1.1941. Next: shared `.ops-overview-head-count` glass opacity (0.78 / zero 0.42 / hover 0.92), or shared `.ops-tab-count` (0.78 / zero 0.42), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1941
 
 - Shared Agent Ops Schedules filter counts (`.ops-schedules-kind-count` resting · `.is-zero`) mix type color against an opaque near-white wash (`color-mix` 79% / 37% `#0c0c10` on `#ffffff`). No glass `opacity` on Jobs · Deliveries counts. Standing P2 #14; design-review fuel (feature-agent-ops Schedules); Mac capture deferred. Schedules chips opaque in v0.1.1940. Next: shared `.ops-filter-match` glass opacity (0.85 / all·partial·zero 0.95), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.

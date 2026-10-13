@@ -3184,7 +3184,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .ops-filter-match opacity: 0.85 / state 0.95. */
+/* Shared .ops-filter-match is opaque too (v0.1.1942); keep Apple parity. */
 .apple-shell .ops-filter-match {
   /* Was opacity 0.85 on inherit (~88% ink) → ~75% ink on the near-white match chip. */
   color: color-mix(in srgb, #0c0c10 75%, #ffffff);
