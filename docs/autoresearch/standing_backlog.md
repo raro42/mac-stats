@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1959
+
+- Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy. Layout-daily Data Poster (AI Chat); P2 #14. Next: shared `.ops-row-meta` glass opacity (0.58), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1958
 
-- Shared Agent Ops Updated stamp (`.ops-updated-ago` resting · visible · hover) mixes type color against an opaque near-white wash (`color-mix` 63% / 69% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on the Updated line beside Refresh. Standing P2 #14; design-review fuel (feature-agent-ops refresh chrome); Mac capture deferred. Keyboard hint opaque in v0.1.1957. Next: shared `.ops-row-meta` glass opacity (0.58), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops Updated stamp (`.ops-updated-ago` resting · visible · hover) mixes type color against an opaque near-white wash (`color-mix` 63% / 69% / 81% `#0c0c10` on `#ffffff`). No glass `opacity` on the Updated line beside Refresh. Standing P2 #14; design-review fuel (feature-agent-ops refresh chrome); Mac capture deferred. Keyboard hint opaque in v0.1.1957. Next done in v0.1.1959 (layout-daily chat-empty type). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1957
 
