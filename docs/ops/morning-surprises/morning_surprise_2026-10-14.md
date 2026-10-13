@@ -1,5 +1,12 @@
 # Morning surprise — 2026-10-14
 
+## ~22:10 — v0.1.1948 Agent Ops overview body counts opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-overview-count` uses opaque `color-mix` type (48% ink on near-white). No glass `opacity` on the secondary count line under Overview card titles.
+- **Fuel:** standing P2 #14 after v0.1.1947 empty shells; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture deferred (no on-screen CPU window / TCC pattern).
+- **Keep:** `3ca93c4f`. Install/kickstart done.
+- **Next:** `.ops-hint` (0.45), or `.ops-tab-bar-kb-hint` (0.72) / `.ops-loading` (0.62) / `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
+
 ## ~21:50 — v0.1.1947 Agent Ops empty shell type opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-empty` resting · hover uses opaque `color-mix` type (69% / 81% ink on near-white). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs empty panels.
