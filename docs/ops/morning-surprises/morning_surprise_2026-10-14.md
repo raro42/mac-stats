@@ -1,16 +1,28 @@
 # Morning surprise — 2026-10-14
 
-## Shipped — v0.1.1963 (~01:12 CEST)
+## Shipped — v0.1.1964 (~01:18 CEST)
 
-**Keep:** Shared Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Soul / Skill / Mood move hint. Apple shell fill beat kept.
+**Keep:** Shared Agent Ops edit-actions keyboard hint (`.ops-agent-edit-actions-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Save · Load into AI Chat · Back move hint. Apple shell fill beat kept.
 
-**Why:** WebView idle cut (#14). Glass alpha on the file-tab keyboard hint keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the editor actions keyboard line keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design-review due=false; layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1962 (`.ops-agent-save-status`).
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Parallel tick shipped file-tab hint as **v0.1.1963**; this ship is edit-actions as **v0.1.1964**.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `b6e34539` → pushed `main`. Also backfilled missing results.tsv keep for v0.1.1962.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `98a52ccf` → pushed `main`.
 
-**Next:** `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+**Next:** `.ops-preview-row-kb-hint` / `.ops-insights-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+
+## Shipped — v0.1.1963 (~01:10 CEST)
+
+**Keep:** Shared Agent Ops file-tab keyboard hint (`.ops-file-tab-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Soul · Skill · Mood move hint. Apple shell fill beat kept.
+
+**Why:** WebView idle cut (#14). Glass alpha on the file-tab keyboard line keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred. Standing #14 after v0.1.1962 save status.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `b6e34539` → pushed `main`.
+
+**Next:** done in v0.1.1964 (`.ops-agent-edit-actions-kb-hint`).
 
 ## Shipped — v0.1.1962 (~00:55 CEST)
 
@@ -18,11 +30,11 @@
 
 **Why:** WebView idle cut (#14). Glass alpha on the Save status line keeps Graphics and Media busy.
 
-**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Sibling ship; results.tsv keep backfilled this tick.
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). First attempt raced on duplicate `.ops-detail-meta` (discard); this ship is save status as **v0.1.1962**.
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `46c3e07b` → pushed `main`.
 
-**Next:** done in v0.1.1963 (`.ops-file-tab-kb-hint`).
+**Next:** `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
 
 ## Shipped — v0.1.1961 (~00:47 CEST)
 
@@ -34,7 +46,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `a63a83b7` → pushed `main`.
 
-**Next:** done in v0.1.1962 (`.ops-agent-save-status`) / v0.1.1963 (`.ops-file-tab-kb-hint`).
+**Next:** `.ops-agent-save-status` (0.7), or `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
 
 ## Shipped — v0.1.1960 (~00:30 CEST)
 
