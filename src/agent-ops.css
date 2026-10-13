@@ -1670,7 +1670,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   flex: 1;
 }
 
-/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-loading {
   margin: 2px 0;
   padding: 12px 10px;
@@ -1678,9 +1678,10 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   font-size: 12px;
   line-height: 1.4;
   letter-spacing: 0.01em;
-  color: inherit;
-  /* Static opacity — infinite opacity pulse kept the WebView compositor busy. */
-  opacity: 0.62;
+  /* Was opacity 0.62 on inherit (~88% ink) → ~55% ink on the near-white wash.
+     Static mix: infinite opacity pulse kept the WebView compositor busy. */
+  color: color-mix(in srgb, #0c0c10 55%, #ffffff);
+  opacity: 1;
   border-radius: 8px;
   border: 1px dashed color-mix(in srgb, currentColor 18%, #ffffff);
   background: color-mix(in srgb, currentColor 4%, #ffffff);

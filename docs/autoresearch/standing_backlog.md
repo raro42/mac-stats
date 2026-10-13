@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1951
+
+- Shared Agent Ops loading shell (`.ops-loading`) mixes type color against an opaque near-white wash (`color-mix` 55% `#0c0c10` on `#ffffff`). No glass `opacity` on the Loading… panel under Overview · Agents · Sessions · Schedules · Knowledge · Runs. Standing P2 #14; design-review fuel (feature-agent-ops loading chrome); Mac capture deferred. Tab-bar keyboard hint opaque in v0.1.1950. Next: shared `.ops-empty-tab-hint` glass opacity (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1950
 
-- Shared Agent Ops tab-bar keyboard hint (`.ops-tab-bar-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the keyboard line under Overview · Agents · Sessions · Schedules · Knowledge · Runs. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred. Overview hints opaque in v0.1.1949. Next: shared `.ops-loading` glass opacity (0.62), or shared `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops tab-bar keyboard hint (`.ops-tab-bar-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the keyboard line under Overview · Agents · Sessions · Schedules · Knowledge · Runs. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred. Overview hints opaque in v0.1.1949. Next done in v0.1.1951 (`.ops-loading`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1949
 
