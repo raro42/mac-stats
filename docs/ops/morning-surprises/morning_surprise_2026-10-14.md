@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1961 (~00:47 CEST)
+
+**Keep:** Shared Agent Ops detail meta (`.ops-detail-meta`) — type mixes against an opaque near-white wash (`color-mix` 66% ink). No glass `opacity` on the Agents soul/skill/mood path line. Apple shell fill beat kept.
+
+**Why:** WebView idle cut (#14). Glass alpha on the editor path line keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false; layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1960 (`.ops-row-meta`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `a63a83b7` → pushed `main`.
+
+**Next:** `.ops-agent-save-status` (0.7), or `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1960 (~00:30 CEST)
 
 **Keep:** Shared Agent Ops row meta (`.ops-row-meta`) — type mixes against an opaque near-white wash (`color-mix` 51% ink). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Updated stamp and keyboard-hint dual-classes keep their own opaque rules.
@@ -10,17 +22,18 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `0a94bec0` → pushed `main`.
 
-**Next:** `.ops-detail-meta` (0.75), or `.ops-agent-save-status` (0.7), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale CPU metrics screen.
+**Next:** done in v0.1.1961 (`.ops-detail-meta`).
 
-## Shipped — v0.1.1959 (~00:20 CEST)
 
-**Keep:** Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) — mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% ink on near-white; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy.
+## Shipped — v0.1.1959 (~00:22 CEST)
 
-**Why:** Layout-daily Data Poster + WebView idle cut (#14). Glass alpha on empty Chat chrome keeps Graphics and Media busy.
+**Keep:** Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) — type mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy.
 
-**Fuel:** Layout daily due (data-poster). Parallel to standing #14 ops-row-meta (this tick).
+**Why:** Layout-daily Data Poster (AI Chat) + WebView idle cut (#14). Glass alpha on empty-state copy keeps Graphics and Media busy; dark remaps keep Data Poster readable.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep → pushed `main`.
+**Fuel:** Digester empty; design review due=false (grace); layout daily due=true (data-poster). Prefer layout over standing `.ops-row-meta`.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `16fe82e4` → pushed `main`. Layout marked checked for data-poster today.
 
 **Next:** done in v0.1.1960 (`.ops-row-meta`).
 
@@ -34,7 +47,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep → push `main`.
 
-**Next:** done in v0.1.1959 (layout-daily chat-empty) / v0.1.1960 (`.ops-row-meta`).
+**Next:** done in v0.1.1959 (layout-daily chat-empty type).
 
 ## Shipped — v0.1.1957 (~23:58 CEST)
 
