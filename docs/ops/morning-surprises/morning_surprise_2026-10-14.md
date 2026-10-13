@@ -34,7 +34,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `f3c90084` → pushed `main`.
 
-**Next:** done in v0.1.1957 (`.ops-keyboard-hint`).
+**Next:** `.ops-keyboard-hint` (0.7), or layout-daily data-poster / Mac capture of stale CPU metrics screen.
 
 ## Shipped — v0.1.1955 (~23:33 CEST)
 
