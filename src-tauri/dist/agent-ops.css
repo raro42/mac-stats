@@ -2014,7 +2014,14 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-row-title { font-size: 13px; font-weight: 600; }
-.ops-row-meta { font-size: 11px; opacity: 0.58; }
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
+/* Skip .ops-updated-ago / .ops-keyboard-hint — those already have their own opaque rules. */
+.ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  font-size: 11px;
+  /* Was opacity 0.58 on inherit (~88% ink) → ~51% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 51%, #ffffff);
+  opacity: 1;
+}
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-badge {

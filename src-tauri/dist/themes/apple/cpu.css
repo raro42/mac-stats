@@ -3511,7 +3511,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .ops-row-meta opacity: 0.58. */
+/* Shared .ops-row-meta already opaque (v0.1.1960); keep Apple beat for shell fill. */
 /* Skip .ops-updated-ago / .ops-keyboard-hint — those already have their own opaque rules. */
 .apple-shell .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
   /* Was opacity 0.58 on inherit (~88% ink) → ~51% ink on the near-white ops row. */

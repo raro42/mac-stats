@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1960
+
+- Shared Agent Ops row meta (`.ops-row-meta`, skip Updated stamp · keyboard hint dual-classes) mixes type color against an opaque near-white wash (`color-mix` 51% `#0c0c10` on `#ffffff`). No glass `opacity` on Agents · Sessions · Schedules · Knowledge · Runs · Insights meta lines. Standing P2 #14; design-review fuel (feature-agent-ops list chrome); Mac capture deferred. AI Chat empty-state opaque in v0.1.1959. Next: shared `.ops-detail-meta` glass opacity (0.75), or `.ops-agent-save-status` (0.7), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1959
 
-- Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy. Layout-daily Data Poster (AI Chat); P2 #14. Next: shared `.ops-row-meta` glass opacity (0.58), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared AI Chat empty-state type (`.chat-empty-title` · `.chat-empty-copy`, Ready included) mixes against an opaque wash (`color-mix` 81% / 69% / 88% / 77% `#0c0c10` on `#ffffff`; Data Poster / Dark light ink on `#0e0e14`). No glass `opacity` on the empty list title or copy. Layout-daily Data Poster (AI Chat); P2 #14. Next done in v0.1.1960 (`.ops-row-meta`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1958
 
