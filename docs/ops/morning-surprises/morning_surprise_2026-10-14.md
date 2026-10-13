@@ -1,11 +1,18 @@
 # Morning surprise — 2026-10-14
 
+## ~22:40 — v0.1.1951 Agent Ops loading shell opaque (#14)
+
+- **Shipped:** Shared Agent Ops `.ops-loading` uses opaque `color-mix` type (55% ink on near-white). No glass `opacity` on the Loading… panel under Overview · Agents · Sessions · Schedules · Knowledge · Runs.
+- **Fuel:** standing P2 #14 after v0.1.1950 tab-bar keyboard hint; digester empty; design-review due=false (grace); layout daily due=false; Mac capture deferred.
+- **Keep:** `d4903150`. Linux rack: CSS only (no install/kickstart).
+- **Next:** `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
+
 ## ~22:31 — v0.1.1950 Agent Ops tab-bar keyboard hint opaque (#14)
 
 - **Shipped:** Shared Agent Ops `.ops-tab-bar-kb-hint` uses opaque `color-mix` type (63% ink on near-white). No glass `opacity` on the keyboard line under Overview · Agents · Sessions · Schedules · Knowledge · Runs.
 - **Fuel:** standing P2 #14 after v0.1.1949 overview hints; digester open design-review stale `feature-cpu-metrics.png` (~36.8d); design-review due=true; layout daily due (data-poster) deferred; Mac capture deferred (TCC / menu-bar pattern).
 - **Keep:** `3854dfaa`. Install/kickstart done.
-- **Next:** `.ops-loading` (0.62), or `.ops-empty-tab-hint` (0.72), or layout-daily data-poster / Mac capture of stale `feature-cpu-metrics.png`.
+- **Next:** done in v0.1.1951 (`.ops-loading`).
 
 ## ~22:15 — v0.1.1949 Agent Ops overview hint type opaque (#14)
 
