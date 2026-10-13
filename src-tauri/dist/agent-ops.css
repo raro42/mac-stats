@@ -1762,6 +1762,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-tab-count {
   display: inline-block;
   margin-left: 6px;
@@ -1772,12 +1773,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
   vertical-align: 0.05em;
-  color: inherit;
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
   background: color-mix(in srgb, currentColor 10%, #ffffff);
   border: 1px solid color-mix(in srgb, currentColor 14%, #ffffff);
-  opacity: 0.78;
-  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease,
-    color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .ops-tab-count[hidden] {
@@ -1785,16 +1786,21 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-tab-count.is-zero {
-  opacity: 0.42;
+  /* Was opacity 0.42 on inherit (~88% ink) → ~37% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 37%, #ffffff);
+  opacity: 1;
 }
 
-.agent-ops-tab:hover .ops-tab-count,
-.ops-file-tab:hover .ops-tab-count {
-  opacity: 0.92;
+.agent-ops-tab:hover .ops-tab-count:not(.is-zero),
+.ops-file-tab:hover .ops-tab-count:not(.is-zero) {
+  /* Was opacity 0.92 on inherit (~88% ink) → ~81% ink on the near-white tab pill. */
+  color: color-mix(in srgb, #0c0c10 81%, #ffffff);
+  opacity: 1;
 }
 
 .agent-ops-tab.active .ops-tab-count,
 .ops-file-tab.active .ops-tab-count {
+  /* Active already uses accent at opacity 1 — keep glass off. */
   opacity: 1;
   color: var(--accent, #007aff);
   background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
