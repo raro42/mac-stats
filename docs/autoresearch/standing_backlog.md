@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1926
+
+- Shared Perplexity filter Clear (`.perplexity-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Top · Snippet. Standing P2 #14; design-review fuel (Perplexity chrome); Mac capture deferred. Debug Log filter Clear opaque in v0.1.1925. Next: shared `.ops-session-kind-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1925
 
-- Shared Debug Log filter Clear (`.logs-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Error · Warn. Standing P2 #14; design-review fuel (Debug Log chrome); Mac capture deferred. Monitors filter Clear opaque in v0.1.1924. Next: shared `.perplexity-filter-clear` glass opacity (0.92). P2 reliability / GitHub #14.
+- Shared Debug Log filter Clear (`.logs-filter-clear` resting · hover) mixes type color against an opaque near-white wash (`color-mix` 81% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Clear beside All · Error · Warn. Standing P2 #14; design-review fuel (Debug Log chrome); Mac capture deferred. Monitors filter Clear opaque in v0.1.1924. Next done in v0.1.1926 (`.perplexity-filter-clear`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1924
 
