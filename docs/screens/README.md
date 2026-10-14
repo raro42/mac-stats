@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-14 (~02:25):** Shared AI Chat empty keyboard hint opaque type (v0.1.1969 — `.chat-empty-kb-hint`). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / single-instance); prior asset kept. Next shared glass: `.ops-subhead` opacity 0.5.
 - **2026-10-14 (~02:08):** Shared Agent Ops tabs opaque type (v0.1.1968 — `.agent-ops-tab` / `.ops-file-tab`). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / single-instance); prior asset kept. Next shared glass: `.chat-empty-kb-hint` opacity 0.72, or `.ops-subhead` opacity 0.5.
 - **2026-10-14 (~02:00):** Shared Agent Ops refresh-row keyboard hint opaque type (v0.1.1967). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / single-instance); prior asset kept. Next shared glass: `.agent-ops-tab` / `.ops-file-tab` resting 0.8, or `.chat-empty-kb-hint` opacity 0.72.
 - **2026-10-14 (~01:42):** Shared Agent Ops Insights keyboard hint opaque type (v0.1.1966). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / single-instance); prior asset kept. Next shared glass: `.ops-refresh-row-kb-hint` opacity 0.72, or `.agent-ops-tab` / `.ops-file-tab` resting 0.8.

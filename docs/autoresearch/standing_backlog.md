@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1969
+
+- Shared AI Chat empty keyboard hint (`.chat-empty-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the starter-chip move hint under Ready / empty AI Chat. Standing P2 #14; design-review fuel (feature-ai-chat empty chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Tab strip opaque in v0.1.1968. Next: shared `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1968
 
-- Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) mix type color against an opaque near-white wash (`color-mix` 70% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Refresh-row kb-hint opaque in v0.1.1967. Next: shared `.chat-empty-kb-hint` (0.72), or `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) mix type color against an opaque near-white wash (`color-mix` 70% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Refresh-row kb-hint opaque in v0.1.1967. Next done in v0.1.1969 (`.chat-empty-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1967
 
