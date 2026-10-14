@@ -1,16 +1,16 @@
 # Morning surprise — 2026-10-14
 
-## Latest ship — v0.1.1981 (~04:57)
+## Latest ship — v0.1.1982 (~05:05)
 
-**Keep:** Shared Disk Cleanup category list keyboard hint (`.disk-cleanup-list-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the category-row move hint.
+**Keep:** Shared Disk Cleanup add-scope toolbar keyboard hint (`.disk-cleanup-add-scope-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on label · path · days · Recursive · Add scope.
 
-**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup list keyboard hint keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup add-scope toolbar keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1980 (`.disk-cleanup-toolbar-kb-hint`).
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png` (37.1d). Design review due=true; Mac capture deferred (Screen Recording TCC / no on-screen CPU window). Layout-daily due=true (data-poster) deferred — one #14 experiment this tick. Standing P2 #14 after v0.1.1981 (`.disk-cleanup-list-kb-hint`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `defa9b2d` → push `main`. Also backfilled results.tsv keep for v0.1.1980.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `a9ad9b3c` → push `main`.
 
-**Next:** shared `.disk-cleanup-add-scope-toolbar-kb-hint` (0.72), or `.disk-cleanup-kb-hint` (0.72 scope list), or Mac capture when TCC allows.
+**Next:** shared `.disk-cleanup-kb-hint` (0.72 scope list), or `.monitors-kb-hint` (0.72), or Mac capture when TCC allows.
 
 ## Latest ship — v0.1.1980 (~04:41)
 
