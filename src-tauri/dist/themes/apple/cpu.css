@@ -2645,7 +2645,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .disk-cleanup-add-scope-toolbar-kb-hint opacity: 0.72. */
+/* Shared .disk-cleanup-add-scope-toolbar-kb-hint is opaque too (v0.1.1982). */
 .apple-shell .disk-cleanup-add-scope-toolbar-kb-hint {
   /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the white Disk Cleanup panel. */
   color: color-mix(in srgb, #0c0c10 63%, #ffffff);

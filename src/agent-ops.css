@@ -832,7 +832,9 @@ body.theme-dark .disk-cleanup-meta-kb-hint,
 body.theme-data-poster .disk-cleanup-toolbar-kb-hint,
 body.theme-dark .disk-cleanup-toolbar-kb-hint,
 body.theme-data-poster .disk-cleanup-list-kb-hint,
-body.theme-dark .disk-cleanup-list-kb-hint {
+body.theme-dark .disk-cleanup-list-kb-hint,
+body.theme-data-poster .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-dark .disk-cleanup-add-scope-toolbar-kb-hint {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
@@ -9565,7 +9567,9 @@ button.monitor-detail-url.is-just-saved {
   grid-column: 1 / -1;
   margin: 0;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
 }
 
 .disk-cleanup-add-scope-toolbar-kb-hint[hidden] {
