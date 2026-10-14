@@ -1,14 +1,13 @@
-# WIP-18 — Data Poster theme white-on-white (#18)
+# WIP-19 — Note Linux as development/testing host in README (#19)
 
 ## Plan
-- [x] Identify Top Processes white slabs (summary glances + pinned row) from issue screenshot
-- [x] Remap Apple `#ffffff` washes onto `#0e0e14` for data-poster (and dark if shared)
-- [x] Sync dist if editing `src/`; bump patch + CHANGELOG
+- [x] Add a short README note: product target remains macOS Apple Silicon; agent/dev/test work often runs on Linux
+- [x] CHANGELOG `[Unreleased]` docs line
 - [x] `cargo check` in `src-tauri/`
 - [x] Commit + push `origin/main`
-- [x] Rename `WIP-18-…` → `UNTESTED-18-…` (do not close GitHub issue)
+- [x] Rename `WIP-19-…` → `UNTESTED-19-…` (do not close GitHub issue)
 
 ## Review
-- Cause: shared `agent-ops.css` Top Processes glances / pinned rows / filter chips mixed against `#ffffff` (Apple opaque washes).
-- Fix: dark remaps for Data Poster + Dark onto `#0e0e14` (v0.1.1895). Layout daily helper now tracks those selectors.
-- `cargo check` OK (warnings only, unrelated Linux stubs).
+- Issue asked only to document that development/testing often runs on Linux, not to ship a Linux menu-bar product.
+- README callout under the Apple Silicon note + Build from source sentence; CHANGELOG `[Unreleased]`.
+- `cargo check` OK (existing Linux stub warnings only).

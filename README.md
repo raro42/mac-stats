@@ -16,6 +16,8 @@ Apple Silicon only. Optional local AI agent when you want company (off by defaul
 [![macOS](https://img.shields.io/badge/macOS%20Apple%20Silicon-000000?style=flat-square&logo=apple&logoColor=white)](https://www.apple.com/macos/)
 
 > **Apple Silicon only** (arm64). Intel Macs are not supported by the published DMG / Homebrew cask.
+>
+> Day-to-day **development and testing** (agents, harness, many scripts) often runs on **Linux**. That is a contributor/host fact, not a second product target. The shipped menu-bar app remains macOS Apple Silicon.
 
 **Free MIT · local-first · no cloud telemetry.** Core glanceable metrics in the menu bar; optional Ollama / Discord agent when you want it — off by default.
 
@@ -244,7 +246,7 @@ git checkout v0.1.257   # pin when possible
 ./run
 ```
 
-Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.257`.
+A full app build needs macOS (Rust + Xcode CLT / Tauri). Agent loops, overnight harness, and many repo checks also run on Linux. Checksums: `./scripts/print-release-checksums.sh v0.1.257`.
 
 Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md). How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 
