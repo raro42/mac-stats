@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1978
+
+- Shared header toolbar keyboard hint (`.header-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Refresh · Settings move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-cpu-metrics header chrome); Mac capture deferred. Footer hint opaque in v0.1.1977. Next: shared `.disk-cleanup-meta-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1977
 
-- Shared footer toolbar keyboard hint (`.footer-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the version · GitHub move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome); Mac capture deferred. Icon-line hint opaque in v0.1.1976. Next: shared `.header-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared footer toolbar keyboard hint (`.footer-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the version · GitHub move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome); Mac capture deferred. Icon-line hint opaque in v0.1.1976. Next done in v0.1.1978 (`.header-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1976
 

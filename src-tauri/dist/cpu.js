@@ -24484,11 +24484,14 @@ function ensureCpuHeaderToolbarKbStyles() {
   const style = document.createElement('style');
   style.id = 'mac-stats-header-toolbar-kb-styles';
   style.textContent = `
+    /* Opaque type — glass alpha stays in Graphics and Media (#14). */
     .header-toolbar-kb-hint {
       display: none;
       margin: 2px 0 0;
       font-size: 11px;
-      opacity: 0.72;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+      opacity: 1;
       width: 100%;
       text-align: right;
     }
