@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1967
+
+- Shared Agent Ops refresh-row keyboard hint (`.ops-refresh-row-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Refresh · Refresh digest · Updated move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops refresh chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Insights hint opaque in v0.1.1966. Next: shared `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1966
 
-- Shared Agent Ops Insights keyboard hint (`.ops-insights-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Insights move hint under Slowest · Candidates. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops Insights chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Preview-row hint opaque in v0.1.1965. Next: shared `.ops-refresh-row-kb-hint` (0.72), or `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops Insights keyboard hint (`.ops-insights-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Insights move hint under Slowest · Candidates. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops Insights chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Preview-row hint opaque in v0.1.1965. Next done in v0.1.1967 (`.ops-refresh-row-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1965
 
