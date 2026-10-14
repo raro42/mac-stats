@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1991
+
+- Shared Process Details header keyboard hint (`.process-details-header-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the title · Close move hint. Standing P2 #14; design-review fuel (Process Details header chrome); Mac capture deferred. Hero toolbar hint opaque in v0.1.1990. Next: shared `.changelog-header-kb-hint` (0.72), or `.logs-viewer-prefix` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1990
 
-- Shared Process Details hero toolbar keyboard hint (`.process-detail-hero-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the name · PID move hint. Standing P2 #14; design-review fuel (Process Details hero chrome); Mac capture deferred. Debug Log hint opaque in v0.1.1989. Next: shared `.process-details-header-kb-hint` (0.72), or `.logs-viewer-prefix` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Process Details hero toolbar keyboard hint (`.process-detail-hero-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the name · PID move hint. Standing P2 #14; design-review fuel (Process Details hero chrome); Mac capture deferred. Debug Log hint opaque in v0.1.1989. Next done in v0.1.1991 (`.process-details-header-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1989
 
