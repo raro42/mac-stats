@@ -7,6 +7,18 @@
 - **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `fef27f02`.
 - **Next:** `.power-strip-kb-hint` / `.ring-gauge-kb-hint`, or Mac capture when a CPU window is on screen.
 
+## Shipped — v0.1.1971 (~02:50 CEST)
+
+**Keep:** Shared AI Chat composer keyboard hint (`.chat-composer-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the input · Clear · Send move hint.
+
+**Why:** WebView idle cut (#14). Glass alpha on the composer keyboard hint keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1970 (`.ops-subhead`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9fbe0310` → push `main`. Also backfilled results.tsv keep for v0.1.1970.
+
+**Next:** shared `.ops-insight-sub` (0.5), or `.power-strip-kb-hint` (0.72), or Mac capture when TCC allows.
+
 ## Shipped — v0.1.1970 (~02:35 CEST)
 
 **Keep:** Shared Agent Ops section subheads (`.ops-subhead`) — type mixes against an opaque near-white wash (`color-mix` 44% ink; Data Poster / Dark `46%` white on `#0e0e14`). No glass `opacity` on Live · Recent files · Active schedules · Recent deliveries.
