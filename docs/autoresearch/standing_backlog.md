@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1988
+
+- Shared AI Chat message-list keyboard hint (`.chat-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the message-row move hint. Standing P2 #14; design-review fuel (feature-ai-chat list chrome); Mac capture deferred. Perplexity results hint opaque in v0.1.1987. Next: shared `.logs-kb-hint` (0.72), or `.process-detail-hero-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1987
 
-- Shared Perplexity results keyboard hint (`.perplexity-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the result-row move hint. Standing P2 #14; design-review fuel (Perplexity results chrome); Mac capture deferred. Details hint opaque in v0.1.1986. Next: shared `.chat-kb-hint` (0.72), or `.logs-kb-hint` (0.72), or `.process-detail-hero-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity results keyboard hint (`.perplexity-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the result-row move hint. Standing P2 #14; design-review fuel (Perplexity results chrome); Mac capture deferred. Details hint opaque in v0.1.1986. Next done in v0.1.1988 (`.chat-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1986
 
