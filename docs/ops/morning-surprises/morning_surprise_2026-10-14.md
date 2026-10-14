@@ -1,5 +1,17 @@
 # Morning surprise — 2026-10-14
 
+## Shipped — v0.1.1968 (~02:08 CEST)
+
+**Keep:** Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) — type mixes against an opaque near-white wash (`color-mix` 70% / 88% ink). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood.
+
+**Why:** WebView idle cut (#14). Glass alpha on the tab strip keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Discarded duplicate v0.1.1967 refresh-row (parallel @ `69d7b4c1`); this ship is tabs as **v0.1.1968**.
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep after commit → push `main`.
+
+**Next:** `.chat-empty-kb-hint` (0.72), or `.ops-subhead` (0.5), or Mac capture of stale CPU metrics screen.
+
 ## Shipped — v0.1.1967 (~02:00 CEST)
 
 **Keep:** Shared Agent Ops refresh-row keyboard hint (`.ops-refresh-row-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink). No glass `opacity` on the Refresh · Refresh digest · Updated move hint. Apple shell fill beat kept.
