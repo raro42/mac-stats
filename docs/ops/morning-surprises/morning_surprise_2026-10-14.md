@@ -12,6 +12,18 @@
 
 **Next:** shared `.disk-cleanup-kb-hint` (0.72 scope list), or `.monitors-kb-hint` (0.72), or Mac capture when TCC allows.
 
+## Latest ship — v0.1.1981 (~04:57)
+
+**Keep:** Shared Disk Cleanup category list keyboard hint (`.disk-cleanup-list-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the category-row move hint.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup list keyboard hint keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1980 (`.disk-cleanup-toolbar-kb-hint`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `defa9b2d` → push `main`. Also backfilled results.tsv keep for v0.1.1980.
+
+**Next:** done in v0.1.1982 (`.disk-cleanup-add-scope-toolbar-kb-hint`).
+
 ## Latest ship — v0.1.1980 (~04:41)
 
 **Keep:** Shared Disk Cleanup action toolbar keyboard hint (`.disk-cleanup-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on Clean now · Refresh · Save scopes.
