@@ -1,16 +1,22 @@
 # Morning surprise — 2026-10-15
 
-## Latest ship — v0.1.1993 (~22:55)
+## Latest ship — v0.1.1994 (~23:20)
+
+**Keep:** Shared Debug Log viewer prefix (`.logs-viewer-prefix`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the path/prefix line.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Debug Log path/prefix line keeps Graphics and Media busy (non-Apple themes; Apple shell already opaque since v0.1.1826).
+
+**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~29.1d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1993 (`.changelog-body-toolbar-kb-hint`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `f4b98d34` → push `main`.
+
+**Next:** shared `.logs-toolbar-kb-hint` (0.72), or `.settings-header-kb-hint` (0.72), or Mac capture when TCC allows.
+
+## Earlier — v0.1.1993 (~22:55)
 
 **Keep:** Shared Changelog body keyboard hint (`.changelog-body-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the version-heading move hint.
 
-**Why:** WebView idle cut (#14). Glass alpha on the Changelog body keyboard hint keeps Graphics and Media busy (non-Apple themes; Apple shell already opaque).
-
-**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~29.1d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1992 (`.changelog-header-kb-hint`).
-
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `98cc671e` → push `main`.
-
-**Next:** shared `.logs-viewer-prefix` (0.72), or Mac capture when TCC allows.
+**Verify:** keep @ `98cc671e`.
 
 ## Earlier — v0.1.1992 (~22:34)
 
