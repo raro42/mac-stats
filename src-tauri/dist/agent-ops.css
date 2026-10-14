@@ -1956,6 +1956,12 @@ body.theme-dark .ops-subhead {
   color: color-mix(in srgb, #ffffff 46%, #0e0e14);
   opacity: 1;
 }
+body.theme-data-poster .ops-insight-sub,
+body.theme-dark .ops-insight-sub {
+  /* Was opacity 0.5 on inherit (~92% white) → ~46% white on #0e0e14. */
+  color: color-mix(in srgb, #ffffff 46%, #0e0e14);
+  opacity: 1;
+}
 
 .ops-list {
   display: flex;
@@ -9576,12 +9582,15 @@ button.monitor-detail-url.is-just-saved {
   margin-bottom: 4px;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .ops-insight-sub {
   margin-top: 8px;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  opacity: 0.5;
+  /* Was opacity 0.5 on inherit (~88% ink) → ~44% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 44%, #ffffff);
+  opacity: 1;
 }
 
 .ops-insight-line {
