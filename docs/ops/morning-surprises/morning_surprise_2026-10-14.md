@@ -1,11 +1,28 @@
 # Morning surprise — 2026-10-14
 
-## Shipped — v0.1.1972 (~02:57)
+## Latest ship — v0.1.1973 (~03:15)
 
-- **What:** Shared Agent Ops Insights section labels (`.ops-insight-sub`) now use opaque `color-mix` type (44% `#0c0c10` on `#ffffff`; Data Poster / Dark 46% white on `#0e0e14`). No glass `opacity` on Slowest · Candidates · Lanes.
-- **Why:** Standing P2 #14 / WebView idle cut — glass alpha on Insights subheads keeps Graphics and Media busy. Digester recommended stale `feature-cpu-metrics` capture; Mac window capture deferred (menu-bar only / TCC). Parallel tick already had v0.1.1971 `.chat-composer-kb-hint` (duplicate discarded).
-- **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `fef27f02`.
-- **Next:** `.power-strip-kb-hint` / `.ring-gauge-kb-hint`, or Mac capture when a CPU window is on screen.
+**Keep:** Shared power strip keyboard hint (`.power-strip-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on Bat · LPM · Power.
+
+**Why:** WebView idle cut (#14). Glass alpha on the strip keyboard hint keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1972 (`.ops-insight-sub`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9e484fa8` → push `main`. Also backfilled results.tsv keep for v0.1.1972.
+
+**Next:** shared `.ring-gauge-kb-hint` (0.72), or `.history-sparkline-kb-hint` (0.72), or Mac capture when TCC allows.
+
+## Shipped — v0.1.1972 (~02:57 CEST)
+
+**Keep:** Shared Agent Ops Insights section labels (`.ops-insight-sub`) — type mixes against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark 46% `#ffffff` on `#0e0e14`). No glass `opacity` on Slowest · Candidates · Lanes.
+
+**Why:** WebView idle cut (#14). Glass alpha on Insights subheads keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false (grace). Standing P2 #14 after v0.1.1971 (`.chat-composer-kb-hint`). Duplicate chat-composer discarded (parallel).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `fef27f02` → push `main` (results.tsv backfilled on next tick).
+
+**Next:** done in v0.1.1973 (`.power-strip-kb-hint`).
 
 ## Shipped — v0.1.1971 (~02:50 CEST)
 
@@ -17,7 +34,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9fbe0310` → push `main`. Also backfilled results.tsv keep for v0.1.1970.
 
-**Next:** shared `.ops-insight-sub` (0.5), or `.power-strip-kb-hint` (0.72), or Mac capture when TCC allows.
+**Next:** done in v0.1.1972 (`.ops-insight-sub`).
 
 ## Shipped — v0.1.1970 (~02:35 CEST)
 
@@ -29,19 +46,19 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `500f1803` → push `main`.
 
-**Next:** `.chat-composer-kb-hint` (0.72), or `.ops-insight-sub` (0.5), or Mac capture when TCC allows.
+**Next:** done in v0.1.1971 (`.chat-composer-kb-hint`).
 
-## Shipped — v0.1.1969 (~02:30 CEST)
+## Shipped — v0.1.1969 (~02:25 CEST)
 
-**Keep:** Shared AI Chat empty keyboard hint (`.chat-empty-kb-hint`) — type mixes against an opaque near-white wash (`color-mix` 63% ink; Data Poster / Dark `66%` white on `#0e0e14`). No glass `opacity` on the empty-list move hint.
+**Keep:** Shared AI Chat empty keyboard hint (`.chat-empty-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the starter-chip move hint.
 
-**Why:** WebView idle cut (#14). Glass alpha on the empty keyboard tip keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the empty AI Chat keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester open design-review stale `feature-cpu-metrics.png` (37d). CPU window opened via menu-bar click; Mac capture still deferred (`screencapture -l` → Screen Recording TCC). Standing next after v0.1.1968 tabs.
+**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1968 (`.agent-ops-tab` / `.ops-file-tab`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `dbf7f262` → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `27bec93f` → pushed `main`.
 
-**Next:** done in v0.1.1970 (`.ops-subhead`).
+**Next:** shared `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`.
 
 ## Shipped — v0.1.1968 (~02:08 CEST)
 
@@ -51,7 +68,7 @@
 
 **Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Discarded duplicate v0.1.1967 refresh-row (parallel @ `69d7b4c1`); this ship is tabs as **v0.1.1968**.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `326cfcda` → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep after commit → push `main`.
 
 **Next:** done in v0.1.1969 (`.chat-empty-kb-hint`).
 
