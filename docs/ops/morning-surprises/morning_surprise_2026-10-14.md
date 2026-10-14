@@ -8,7 +8,7 @@
 
 **Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Discarded duplicate v0.1.1967 refresh-row (parallel @ `69d7b4c1`); this ship is tabs as **v0.1.1968**.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep after commit → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `326cfcda` → push `main`.
 
 **Next:** `.chat-empty-kb-hint` (0.72), or `.ops-subhead` (0.5), or Mac capture of stale CPU metrics screen.
 
