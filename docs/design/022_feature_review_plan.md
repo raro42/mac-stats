@@ -903,3 +903,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #18.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.1895**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-10-14 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #19 README Linux dev host)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Docs already on `main` as `22ddbd6a`: README callout + Build-from-source note that Linux is a common **dev / agent / harness** host; product target stays macOS Apple Silicon. Changelog **[Unreleased] Changed** already names GitHub #19. No version bump (docs-only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #19 docs change.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `assertions_on_constants`, `manual_is_multiple_of`, `items_after_test_module`). Not caused by #19.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.1985**). Did not start a second process.
