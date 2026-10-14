@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1999
+
+- Shared Monitors add-form toolbar keyboard hint (`.monitor-add-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the URL · Cancel · Add Monitor move hint. Standing P2 #14; design-review fuel (Monitors add-form toolbar chrome); Mac capture deferred. Ollama settings toolbar opaque in v0.1.1998. Next: shared `.monitor-detail-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1998
 
 - Shared Ollama settings toolbar keyboard hint (`.ollama-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the system prompt · Reset · Save move hint. Standing P2 #14; design-review fuel (Ollama settings toolbar chrome); Mac capture deferred. Header opaque in v0.1.1997. Next: shared `.monitor-add-toolbar-kb-hint` (0.72), or `.monitor-detail-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
