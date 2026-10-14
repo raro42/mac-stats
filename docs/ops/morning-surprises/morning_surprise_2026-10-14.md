@@ -1,28 +1,40 @@
 # Morning surprise — 2026-10-14
 
+## Latest ship — v0.1.1985 (~05:46)
+
+**Keep:** Shared Top Processes list keyboard hint (`.processes-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the process-row move hint.
+
+**Why:** WebView idle cut (#14). Glass alpha on the Top Processes list keyboard hint keeps Graphics and Media busy.
+
+**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~28.4d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1984 (`.monitors-kb-hint`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `a92a977b` → push `main`. Also backfilled results.tsv keep for v0.1.1984.
+
+**Next:** shared `.details-kb-hint` (0.72), or Mac capture when TCC allows.
+
 ## Latest ship — v0.1.1984 (~05:30)
 
 **Keep:** Shared Monitors list keyboard hint (`.monitors-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the monitor-row move hint.
 
 **Why:** WebView idle cut (#14). Glass alpha on the Monitors list keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester open design-review stale `feature-cpu-metrics.png` (37.1d). Design review due=true; Mac capture deferred (Screen Recording TCC / no on-screen CPU window). Layout-daily due=true (data-poster, remaps already shipped earlier). Standing P2 #14 after parallel v0.1.1983 (`.disk-cleanup-kb-hint`); discarded duplicate scope-list tick (parallel @ 39a81115).
+**Fuel:** Digester empty; design-review due=false; layout-daily due=false. Standing P2 #14 after v0.1.1983 (`.disk-cleanup-kb-hint`).
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `0c00d0f9` → push `main`.
 
-**Next:** shared `.processes-kb-hint` (0.72), or `.details-kb-hint` (0.72), or Mac capture when TCC allows.
+**Next:** done in v0.1.1985 (`.processes-kb-hint`).
 
 ## Latest ship — v0.1.1983 (~05:22)
 
 **Keep:** Shared Disk Cleanup scope list keyboard hint (`.disk-cleanup-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the scope-row move hint.
 
-**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup scope-list keyboard hint keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup scope list keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester open design-review; standing P2 #14 after v0.1.1982. Parallel tick shipped this first.
+**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~28.4d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1982 (`.disk-cleanup-add-scope-toolbar-kb-hint`).
 
-**Verify:** keep @ `39a81115` → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `39a81115` → push `main`. Also backfilled results.tsv keep for v0.1.1982.
 
-**Next:** done in v0.1.1984 (`.monitors-kb-hint`).
+**Next:** shared `.monitors-kb-hint` (0.72), or `.processes-kb-hint` (0.72), or Mac capture when TCC allows.
 
 ## Latest ship — v0.1.1982 (~05:05)
 
