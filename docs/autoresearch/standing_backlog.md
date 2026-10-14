@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1996
+
+- Shared Settings header keyboard hint (`.settings-header-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the title · Close move hint. Standing P2 #14; layout-daily data-poster + design-review fuel (Settings header chrome); Mac capture deferred. Logs toolbar opaque in v0.1.1995. Next: shared `.ollama-settings-header-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1995
 
-- Shared Debug Log toolbar keyboard hint (`.logs-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Refresh · Open in editor · Auto-refresh move hint. Standing P2 #14; design-review fuel (Debug Log toolbar chrome); Mac capture deferred. Viewer prefix opaque in v0.1.1994. Next: shared `.settings-header-kb-hint` (0.72), or `.ollama-settings-header-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Debug Log toolbar keyboard hint (`.logs-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Refresh · Open in editor · Auto-refresh move hint. Standing P2 #14; design-review fuel (Debug Log toolbar chrome); Mac capture deferred. Viewer prefix opaque in v0.1.1994. Next done in v0.1.1996 (`.settings-header-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1994
 
