@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1984
+
+- Shared Monitors list keyboard hint (`.monitors-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the monitor-row move hint. Standing P2 #14; design-review fuel (feature-monitors list chrome); Mac capture deferred. Scope-list hint opaque in v0.1.1983. Next: shared `.processes-kb-hint` (0.72), or `.details-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1983
 
 - Shared Disk Cleanup scope list keyboard hint (`.disk-cleanup-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the scope-row move hint. Standing P2 #14; design-review fuel (feature-disk-cleanup scope chrome); Mac capture deferred. Add-scope toolbar opaque in v0.1.1982. Next: shared `.monitors-kb-hint` (0.72), or `.processes-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
