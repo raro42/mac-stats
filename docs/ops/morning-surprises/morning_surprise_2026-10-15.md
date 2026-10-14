@@ -8,7 +8,7 @@
 
 **Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~29.0d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1987 (`.perplexity-kb-hint`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `001f1999` → push `main`.
 
 **Next:** shared `.logs-kb-hint` (0.72), or `.process-detail-hero-toolbar-kb-hint` (0.72), or Mac capture when TCC allows.
 
