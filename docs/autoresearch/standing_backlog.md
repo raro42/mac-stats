@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1971
+
+- Shared AI Chat composer keyboard hint (`.chat-composer-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the input · Clear · Send move hint. Standing P2 #14; design-review fuel (feature-ai-chat composer chrome); Mac capture deferred. Section subheads opaque in v0.1.1970. Next: shared `.ops-insight-sub` (0.5), or `.power-strip-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1970
 
-- Shared Agent Ops section subheads (`.ops-subhead`) mix type color against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark `46%` `#ffffff` on `#0e0e14`). No glass `opacity` on Live · Recent files · Active schedules · Recent deliveries. Standing P2 #14; design-review fuel (feature-agent-ops Overview chrome). Duplicate chat-empty-kb-hint discarded (parallel @ 27bec93f). Next: shared `.chat-composer-kb-hint` (0.72), or `.ops-insight-sub` (0.5), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Agent Ops section subheads (`.ops-subhead`) mix type color against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark `46%` `#ffffff` on `#0e0e14`). No glass `opacity` on Live · Recent files · Active schedules · Recent deliveries. Standing P2 #14; design-review fuel (feature-agent-ops Overview chrome). Duplicate chat-empty-kb-hint discarded (parallel @ 27bec93f). Next done in v0.1.1971 (`.chat-composer-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1969
 
