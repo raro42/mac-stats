@@ -870,7 +870,9 @@ body.theme-dark .ollama-settings-header-kb-hint,
 body.theme-data-poster .ollama-settings-toolbar-kb-hint,
 body.theme-dark .ollama-settings-toolbar-kb-hint,
 body.theme-data-poster .monitor-add-toolbar-kb-hint,
-body.theme-dark .monitor-add-toolbar-kb-hint {
+body.theme-dark .monitor-add-toolbar-kb-hint,
+body.theme-data-poster .monitor-detail-toolbar-kb-hint,
+body.theme-dark .monitor-detail-toolbar-kb-hint {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
@@ -8548,7 +8550,9 @@ button.monitor-detail-url.is-just-saved {
   flex: 1 1 100%;
   margin: 0;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
 }
 
 .monitor-detail-toolbar-kb-hint[hidden] {
