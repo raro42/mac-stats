@@ -854,7 +854,9 @@ body.theme-dark .logs-kb-hint,
 body.theme-data-poster .process-detail-hero-toolbar-kb-hint,
 body.theme-dark .process-detail-hero-toolbar-kb-hint,
 body.theme-data-poster .process-details-header-kb-hint,
-body.theme-dark .process-details-header-kb-hint {
+body.theme-dark .process-details-header-kb-hint,
+body.theme-data-poster .changelog-header-kb-hint,
+body.theme-dark .changelog-header-kb-hint {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
@@ -3490,7 +3492,9 @@ textarea.ops-agent-editor.is-dirty {
 .process-details-header-kb-hint {
   margin: 0;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
   flex: 1 1 auto;
   text-align: center;
 }
@@ -3502,7 +3506,9 @@ textarea.ops-agent-editor.is-dirty {
 .changelog-header-kb-hint {
   margin: 0;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
   flex: 1 1 auto;
   text-align: center;
 }
