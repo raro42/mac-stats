@@ -2693,7 +2693,7 @@ border-radius: 24px;
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
-/* .apple-shell beats the later shared .details-kb-hint opacity: 0.72. */
+/* Shared .details-kb-hint is opaque too (v0.1.1986). */
 .apple-shell .details-kb-hint {
   /* Was opacity 0.72 on --text (88% ink) → ~63% ink on the white Details panel. */
   color: color-mix(in srgb, #0c0c10 63%, #ffffff);

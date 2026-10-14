@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1986
+
+- Shared Details keyboard hint (`.details-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Details value move hint. Standing P2 #14; design-review fuel (feature-cpu-metrics Details chrome); Mac capture deferred. Top Processes list hint opaque in v0.1.1985. Next: shared `.process-detail-hero-toolbar-kb-hint` (0.72), or `.perplexity-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1985
 
-- Shared Top Processes list keyboard hint (`.processes-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the process-row move hint. Standing P2 #14; design-review fuel (feature-processes list chrome); Mac capture deferred. Monitors list hint opaque in v0.1.1984. Next: shared `.details-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Top Processes list keyboard hint (`.processes-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the process-row move hint. Standing P2 #14; design-review fuel (feature-processes list chrome); Mac capture deferred. Monitors list hint opaque in v0.1.1984. Next done in v0.1.1986 (`.details-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1984
 
