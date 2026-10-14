@@ -1,16 +1,22 @@
 # Morning surprise — 2026-10-15
 
-## Latest ship — v0.1.1989 (~21:20)
+## Latest ship — v0.1.1990 (~21:45)
 
-**Keep:** Shared Debug Log keyboard hint (`.logs-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the log-line move hint.
+**Keep:** Shared Process Details hero toolbar keyboard hint (`.process-detail-hero-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the name · PID move hint.
 
-**Why:** WebView idle cut (#14). Glass alpha on the Debug Log keyboard hint keeps Graphics and Media busy (non-Apple themes; Apple shell already opaque).
+**Why:** WebView idle cut (#14). Glass alpha on the Process Details hero toolbar keyboard hint keeps Graphics and Media busy (non-Apple themes; Apple shell already opaque).
 
-**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~29.1d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1988 (`.chat-kb-hint`).
+**Fuel:** Digester empty; design-review due=false (grace; recommended feature-agent-ops ~29.1d); layout-daily due=false (data-poster ok today; dark still [DUE] screen missing). Standing P2 #14 after v0.1.1989 (`.logs-kb-hint`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `dad51607` → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `4707d123` → push `main`.
 
-**Next:** shared `.process-detail-hero-toolbar-kb-hint` (0.72), or `.logs-viewer-prefix` (0.72), or Mac capture when TCC allows.
+**Next:** shared `.process-details-header-kb-hint` (0.72), or `.logs-viewer-prefix` (0.72), or Mac capture when TCC allows.
+
+## Earlier — v0.1.1989 (~21:20)
+
+**Keep:** Shared Debug Log keyboard hint (`.logs-kb-hint`) — opaque wash (63% / 66%). No glass `opacity` on the log-line move hint.
+
+**Verify:** keep @ `dad51607`.
 
 ## Earlier — v0.1.1988 (~20:55)
 
