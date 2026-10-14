@@ -185,15 +185,15 @@
     style.textContent = `
       .modal-header-kb-hint,
       .process-details-header-kb-hint,
-      .changelog-header-kb-hint,
-      .ollama-settings-header-kb-hint {
+      .changelog-header-kb-hint {
         margin: 0;
         font-size: 11px;
         opacity: 0.72;
         flex: 1 1 auto;
         text-align: center;
       }
-      .settings-header-kb-hint {
+      .settings-header-kb-hint,
+      .ollama-settings-header-kb-hint {
         margin: 0;
         font-size: 11px;
         /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
