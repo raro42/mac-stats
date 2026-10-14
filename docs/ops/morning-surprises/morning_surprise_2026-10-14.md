@@ -1,28 +1,28 @@
 # Morning surprise — 2026-10-14
 
-## Latest ship — v0.1.1979 (~04:30)
+## Latest ship — v0.1.1980 (~04:41)
 
-**Keep:** Shared Disk Cleanup meta keyboard hint (`.disk-cleanup-meta-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on Reclaimable · Next · Runs when · Enabled scopes.
+**Keep:** Shared Disk Cleanup action toolbar keyboard hint (`.disk-cleanup-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on Clean now · Refresh · Save scopes.
 
-**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup meta keyboard hint keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the Disk Cleanup toolbar keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1978 (`.header-toolbar-kb-hint`).
+**Fuel:** Digester open pointed at stale feature-cpu-metrics; design-review due=true but Mac capture deferred (menu-bar / Control Center only, no on-screen CPU window). Standing P2 #14 next after v0.1.1979 (`.disk-cleanup-meta-kb-hint`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `22671d18` → push `main`. Also backfilled results.tsv keep for v0.1.1978.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `5de7a97d` → push `main`.
 
-**Next:** shared `.disk-cleanup-toolbar-kb-hint` (0.72), or Mac capture when TCC allows.
+**Next:** shared `.disk-cleanup-list-kb-hint` (0.72), or `.disk-cleanup-add-scope-toolbar-kb-hint` (0.72), or Mac capture when TCC allows.
 
-## Shipped — v0.1.1978 (~04:20)
+## Latest ship — v0.1.1978 (~04:20)
 
 **Keep:** Shared header toolbar keyboard hint (`.header-toolbar-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on Refresh · Settings.
 
 **Why:** WebView idle cut (#14). Glass alpha on the header toolbar keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1977 (`.footer-toolbar-kb-hint`).
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png` (37.1d). Design review due=true; Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Layout-daily due=true (data-poster) deferred — one #14 experiment this tick. Standing P2 #14 after parallel v0.1.1977 (`.footer-toolbar-kb-hint`); discarded duplicate footer tick @ a5303823.
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9d5f5acc` → push `main` (results.tsv backfilled on next tick).
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9d5f5acc` → push `main`.
 
-**Next:** done in v0.1.1979 (`.disk-cleanup-meta-kb-hint`).
+**Next:** shared `.disk-cleanup-meta-kb-hint` (0.72), or Mac capture when TCC allows.
 
 ## Shipped — v0.1.1977 (~04:05)
 
@@ -34,7 +34,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `a5303823` → push `main`. Also backfilled results.tsv keep for v0.1.1976.
 
-**Next:** shared `.header-toolbar-kb-hint` (0.72), or Mac capture when TCC allows.
+**Next:** done in v0.1.1978 (`.header-toolbar-kb-hint`).
 
 ## Shipped — v0.1.1976 (~03:50)
 
