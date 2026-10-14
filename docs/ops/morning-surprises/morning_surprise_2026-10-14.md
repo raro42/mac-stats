@@ -1,6 +1,18 @@
 # Morning surprise — 2026-10-14
 
-## Latest ship — v0.1.1975 (~03:40)
+## Latest ship — v0.1.1976 (~03:50)
+
+**Keep:** Shared section icon-line keyboard hint (`.icon-line-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on Monitors · AI Chat · Perplexity · Logs · Discord · Disk Cleanup · Agent Ops.
+
+**Why:** WebView idle cut (#14). Glass alpha on the section strip keyboard hint keeps Graphics and Media busy.
+
+**Fuel:** Digester open design-review stale `feature-cpu-metrics.png` (37d). Design review due=true; Mac capture deferred (Screen Recording TCC / no on-screen CPU window). Layout-daily due=true (data-poster) deferred — one #14 experiment this tick. Standing P2 #14 after v0.1.1975 (`.history-sparkline-kb-hint`).
+
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9ec6e5a8` → push `main`.
+
+**Next:** shared `.footer-toolbar-kb-hint` (0.72), or `.header-toolbar-kb-hint` (0.72), or Mac capture when TCC allows.
+
+## Shipped — v0.1.1975 (~03:40)
 
 **Keep:** Shared history sparkline keyboard hint (`.history-sparkline-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on CPU · GPU · Freq · Temp charts.
 
@@ -14,17 +26,13 @@
 
 ## Shipped — v0.1.1974 (~03:25)
 
-**Keep:** Shared ring gauge keyboard hint (`.ring-gauge-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on CPU · GPU · Freq · Temp.
+- **What:** Shared ring gauge keyboard hint (`.ring-gauge-kb-hint`) now uses opaque `color-mix` type (63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% white on `#0e0e14`). No glass `opacity` on CPU · GPU · Freq · Temp. cpu.js inject matched.
+- **Why:** Standing P2 #14 / WebView idle cut — glass alpha on the ring move hint keeps Graphics and Media busy. Digester recommended stale `feature-cpu-metrics` capture; Mac window capture deferred (menu-bar only / TCC). Parallel tick already had v0.1.1973 `.power-strip-kb-hint`.
+- **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `b0d9e196`.
+- **Next:** `.history-sparkline-kb-hint` / `.icon-line-kb-hint`, or Mac capture when a CPU window is on screen.
 
-**Why:** WebView idle cut (#14). Glass alpha on the ring gauge keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester empty; design-review due=false (grace). Standing P2 #14 after v0.1.1973 (`.power-strip-kb-hint`).
-
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `b0d9e196` → push `main` (results.tsv backfilled on next tick).
-
-**Next:** done in v0.1.1975 (`.history-sparkline-kb-hint`).
-
-## Latest ship — v0.1.1973 (~03:15)
+## Shipped — v0.1.1973 (~03:15)
 
 **Keep:** Shared power strip keyboard hint (`.power-strip-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). cpu.js inject matched. No glass `opacity` on Bat · LPM · Power.
 
@@ -34,7 +42,7 @@
 
 **Verify:** `autoresearch_ratchet.py verify` OK → keep @ `9e484fa8` → push `main`. Also backfilled results.tsv keep for v0.1.1972.
 
-**Next:** shared `.ring-gauge-kb-hint` (0.72), or `.history-sparkline-kb-hint` (0.72), or Mac capture when TCC allows.
+**Next:** done in v0.1.1974 (`.ring-gauge-kb-hint`).
 
 ## Shipped — v0.1.1972 (~02:57 CEST)
 
