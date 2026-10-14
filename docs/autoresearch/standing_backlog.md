@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1968
+
+- Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) mix type color against an opaque near-white wash (`color-mix` 70% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood. Standing P2 #14; design-review fuel (feature-agent-ops tab strip); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Refresh-row kb-hint opaque in v0.1.1967. Next: shared `.chat-empty-kb-hint` (0.72), or `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1967
 
-- Shared Agent Ops refresh-row keyboard hint (`.ops-refresh-row-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Refresh · Refresh digest · Updated move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops refresh chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Insights hint opaque in v0.1.1966. Next: shared `.agent-ops-tab` / `.ops-file-tab` resting (0.8), or `.chat-empty-kb-hint` (0.72), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
+- Shared Agent Ops refresh-row keyboard hint (`.ops-refresh-row-kb-hint`) mixes type color against an opaque near-white wash (`color-mix` 63% `#0c0c10` on `#ffffff`). No glass `opacity` on the Refresh · Refresh digest · Updated move hint. Apple shell fill beat kept. Standing P2 #14; design-review fuel (feature-agent-ops refresh chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Insights hint opaque in v0.1.1966. Next done in v0.1.1968 (`.agent-ops-tab` / `.ops-file-tab`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1966
 

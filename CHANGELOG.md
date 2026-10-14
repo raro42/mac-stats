@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.1968] - 2026-10-14
+
+### Changed
+- **CPU window WebView idle cut (#14 follow-up)** — Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) mix type color against an opaque near-white wash (`color-mix` 70% / 88% `#0c0c10` on `#ffffff`). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood. Design review `feature-agent-ops` tab strip (Mac capture of stale `feature-cpu-metrics` deferred). Refresh-row keyboard hint opaque in v0.1.1967.
+
 ## [0.1.1967] - 2026-10-14
 
 ### Changed

@@ -1869,20 +1869,24 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .agent-ops-tab, .ops-file-tab {
   background: color-mix(in srgb, currentColor 6%, #ffffff);
   border: 1px solid color-mix(in srgb, currentColor 12%, #ffffff);
-  color: inherit;
+  /* Was opacity 0.8 on inherit (~88% ink) → ~70% ink on the near-white tab wash. */
+  color: color-mix(in srgb, #0c0c10 70%, #ffffff);
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 12px;
   cursor: pointer;
-  opacity: 0.8;
-  transition: background 0.15s ease, border-color 0.15s ease,
-    opacity 0.15s ease, box-shadow 0.15s ease;
+  opacity: 1;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .agent-ops-tab:hover, .ops-file-tab:hover {
+  /* Was opacity 1 on inherit (~88% ink) → ~88% ink on the near-white tab wash. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   background: color-mix(in srgb, currentColor 10%, #ffffff);
   border-color: color-mix(in srgb, currentColor 20%, #ffffff);
@@ -1890,6 +1894,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 .agent-ops-tab:focus-visible, .ops-file-tab:focus-visible {
   outline: none;
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   border-color: color-mix(in srgb, #0a84ff 55%, #ffffff);
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #ffffff);
@@ -1900,6 +1905,8 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   background: color-mix(in srgb, var(--accent, #007aff) 7%, #ffffff);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, #ffffff);
   box-shadow: none;
+  /* Active already uses full type at opacity 1 — keep glass off. */
+  color: color-mix(in srgb, #0c0c10 88%, #ffffff);
   opacity: 1;
   font-weight: 600;
 }
