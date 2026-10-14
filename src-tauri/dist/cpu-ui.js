@@ -5078,7 +5078,8 @@
       .changelog-body-toolbar-kb-hint {
         margin: 0 0 8px;
         font-size: 11px;
-        opacity: 0.72;
+        color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+        opacity: 1;
         text-align: center;
       }
       .changelog-body-toolbar-kb-hint[hidden] {
