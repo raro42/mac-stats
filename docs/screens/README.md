@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-14 (~03:15):** Shared power strip keyboard hint opaque type (v0.1.1973 — `.power-strip-kb-hint`; Data Poster / Dark remaps; cpu.js inject matched). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next shared glass: `.ring-gauge-kb-hint` opacity 0.72, or `.history-sparkline-kb-hint` opacity 0.72.
 - **2026-10-14 (~02:57):** Shared Agent Ops Insights section labels opaque type (v0.1.1972 — `.ops-insight-sub`; Data Poster / Dark remaps). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next shared glass: `.power-strip-kb-hint` opacity 0.72, or `.ring-gauge-kb-hint` opacity 0.72.
 - **2026-10-14 (~02:50):** Shared AI Chat composer keyboard hint opaque type (v0.1.1971 — `.chat-composer-kb-hint`; Data Poster / Dark remaps). Recapture of `feature-cpu-metrics.png` deferred (Screen Recording TCC); prior asset kept. Next shared glass: `.ops-insight-sub` opacity 0.5, or `.power-strip-kb-hint` opacity 0.72.
 - **2026-10-14 (~02:35):** Shared Agent Ops section subheads opaque type (v0.1.1970 — `.ops-subhead`; Data Poster / Dark remaps). Recapture of `feature-cpu-metrics.png` deferred (Screen Recording TCC); prior asset kept. Next shared glass: `.chat-composer-kb-hint` opacity 0.72, or `.ops-insight-sub` opacity 0.5.

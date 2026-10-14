@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1973
+
+- Shared power strip keyboard hint (`.power-strip-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Bat · LPM · Power move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-cpu-metrics strip chrome); Mac capture deferred. Insights subheads opaque in v0.1.1972. Next: shared `.ring-gauge-kb-hint` (0.72), or `.history-sparkline-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1972
 
-- Shared Agent Ops Insights section labels (`.ops-insight-sub`) mix type color against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark `46%` `#ffffff` on `#0e0e14`). No glass `opacity` on Slowest · Candidates · Lanes and related Insight subheads. Standing P2 #14; design-review fuel (feature-agent-ops Insights chrome). Duplicate chat-composer-kb-hint discarded (parallel @ 9fbe0310). Next: shared `.power-strip-kb-hint` (0.72), or `.ring-gauge-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Agent Ops Insights section labels (`.ops-insight-sub`) mix type color against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark `46%` `#ffffff` on `#0e0e14`). No glass `opacity` on Slowest · Candidates · Lanes and related Insight subheads. Standing P2 #14; design-review fuel (feature-agent-ops Insights chrome). Duplicate chat-composer-kb-hint discarded (parallel @ 9fbe0310). Next done in v0.1.1973 (`.power-strip-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1971
 
