@@ -1,16 +1,16 @@
 # Morning surprise — 2026-10-14
 
-## Shipped — v0.1.1968 (~02:08 CEST)
+## Shipped — v0.1.1969 (~02:25 CEST)
 
-**Keep:** Shared Agent Ops tabs (`.agent-ops-tab` / `.ops-file-tab` resting · hover · focus · active) — type mixes against an opaque near-white wash (`color-mix` 70% / 88% ink). No glass `opacity` on Overview · Agents · Sessions · Schedules · Knowledge · Runs or Soul · Skill · Mood.
+**Keep:** Shared AI Chat empty keyboard hint (`.chat-empty-kb-hint`) — type mixes against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the starter-chip move hint.
 
-**Why:** WebView idle cut (#14). Glass alpha on the tab strip keeps Graphics and Media busy.
+**Why:** WebView idle cut (#14). Glass alpha on the empty AI Chat keyboard hint keeps Graphics and Media busy.
 
-**Fuel:** Digester open design-review stale `feature-cpu-metrics.png`; Mac capture deferred (no on-screen CPU window). Discarded duplicate v0.1.1967 refresh-row (parallel @ `69d7b4c1`); this ship is tabs as **v0.1.1968**.
+**Fuel:** Digester empty; design-review due=false (grace); layout-daily due=false (data-poster ok today). Standing P2 #14 after v0.1.1968 (`.agent-ops-tab` / `.ops-file-tab`).
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `326cfcda` → push `main`.
+**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `27bec93f` → pushed `main`.
 
-**Next:** `.chat-empty-kb-hint` (0.72), or `.ops-subhead` (0.5), or Mac capture of stale CPU metrics screen.
+**Next:** shared `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`.
 
 ## Shipped — v0.1.1967 (~02:00 CEST)
 
