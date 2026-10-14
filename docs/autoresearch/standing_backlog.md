@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1980
+
+- Shared Disk Cleanup action toolbar keyboard hint (`.disk-cleanup-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Clean now · Refresh · Save scopes move hint. Standing P2 #14; design-review fuel (feature-disk-cleanup toolbar chrome); Mac capture deferred. Meta hint opaque in v0.1.1979. Next: shared `.disk-cleanup-list-kb-hint` (0.72), or `.disk-cleanup-add-scope-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1979
 
-- Shared Disk Cleanup meta keyboard hint (`.disk-cleanup-meta-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Reclaimable · Next · Runs when · Enabled scopes move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-disk-cleanup meta chrome); Mac capture deferred. Header toolbar hint opaque in v0.1.1978. Next: shared `.disk-cleanup-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Disk Cleanup meta keyboard hint (`.disk-cleanup-meta-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Reclaimable · Next · Runs when · Enabled scopes move hint (cpu.js inject matched). Standing P2 #14; design-review fuel (feature-disk-cleanup meta chrome); Mac capture deferred. Header toolbar hint opaque in v0.1.1978. Next done in v0.1.1980 (`.disk-cleanup-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1978
 
