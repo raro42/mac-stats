@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1970
+
+- Shared Agent Ops section subheads (`.ops-subhead`) mix type color against an opaque near-white wash (`color-mix` 44% `#0c0c10` on `#ffffff`; Data Poster / Dark `46%` `#ffffff` on `#0e0e14`). No glass `opacity` on Live · Recent files · Active schedules · Recent deliveries. Standing P2 #14; design-review fuel (feature-agent-ops Overview chrome). Duplicate chat-empty-kb-hint discarded (parallel @ 27bec93f). Next: shared `.chat-composer-kb-hint` (0.72), or `.ops-insight-sub` (0.5), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1969
 
 - Shared AI Chat empty keyboard hint (`.chat-empty-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the starter-chip move hint under Ready / empty AI Chat. Standing P2 #14; design-review fuel (feature-ai-chat empty chrome); Mac capture deferred (digester recommended stale feature-cpu-metrics; no on-screen CPU window). Tab strip opaque in v0.1.1968. Next: shared `.ops-subhead` (0.5), or Mac capture of stale `feature-cpu-metrics.png`. P2 reliability / GitHub #14.
