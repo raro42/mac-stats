@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1983
+
+- Shared Disk Cleanup scope list keyboard hint (`.disk-cleanup-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the scope-row move hint. Standing P2 #14; design-review fuel (feature-disk-cleanup scope chrome); Mac capture deferred. Add-scope toolbar opaque in v0.1.1982. Next: shared `.monitors-kb-hint` (0.72), or `.processes-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1982
 
-- Shared Disk Cleanup add-scope toolbar keyboard hint (`.disk-cleanup-add-scope-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the label · path · days · Recursive · Add scope move hint. Standing P2 #14; design-review fuel (feature-disk-cleanup add-scope chrome); Mac capture deferred. List hint opaque in v0.1.1981. Next: shared `.disk-cleanup-kb-hint` (0.72 scope list), or `.monitors-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Disk Cleanup add-scope toolbar keyboard hint (`.disk-cleanup-add-scope-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the label · path · days · Recursive · Add scope move hint. Standing P2 #14; design-review fuel (feature-disk-cleanup add-scope chrome); Mac capture deferred. List hint opaque in v0.1.1981. Next done in v0.1.1983 (`.disk-cleanup-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1981
 
