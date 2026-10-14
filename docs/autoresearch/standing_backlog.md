@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.1987
+
+- Shared Perplexity results keyboard hint (`.perplexity-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the result-row move hint. Standing P2 #14; design-review fuel (Perplexity results chrome); Mac capture deferred. Details hint opaque in v0.1.1986. Next: shared `.chat-kb-hint` (0.72), or `.logs-kb-hint` (0.72), or `.process-detail-hero-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.1986
 
-- Shared Details keyboard hint (`.details-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Details value move hint. Standing P2 #14; design-review fuel (feature-cpu-metrics Details chrome); Mac capture deferred. Top Processes list hint opaque in v0.1.1985. Next: shared `.process-detail-hero-toolbar-kb-hint` (0.72), or `.perplexity-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Details keyboard hint (`.details-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Details value move hint. Standing P2 #14; design-review fuel (feature-cpu-metrics Details chrome); Mac capture deferred. Top Processes list hint opaque in v0.1.1985. Next done in v0.1.1987 (`.perplexity-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.1985
 

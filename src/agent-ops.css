@@ -844,7 +844,9 @@ body.theme-dark .monitors-kb-hint,
 body.theme-data-poster .processes-kb-hint,
 body.theme-dark .processes-kb-hint,
 body.theme-data-poster .details-kb-hint,
-body.theme-dark .details-kb-hint {
+body.theme-dark .details-kb-hint,
+body.theme-data-poster .perplexity-kb-hint,
+body.theme-dark .perplexity-kb-hint {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
@@ -3963,7 +3965,9 @@ textarea.ops-agent-editor.is-dirty {
 .perplexity-kb-hint {
   margin: 6px 0 8px;
   font-size: 11px;
-  opacity: 0.72;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
 }
 
 .perplexity-kb-hint[hidden] {
