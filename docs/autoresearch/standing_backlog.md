@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2008
+
+- Shared Cursor agent settings toolbar keyboard hint (`.cursor-agent-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the workspace · executable · Save · Clear move hint. Standing P2 #14; design-review fuel (Cursor agent settings toolbar chrome); Mac capture deferred. Browser settings toolbar opaque in v0.1.2007. Next: shared `.telegram-settings-toolbar-kb-hint` (0.72), or `.slack-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2007
 
-- Shared Browser settings toolbar keyboard hint (`.browser-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the path · port · Save · Clear move hint. Standing P2 #14; design-review fuel (Browser settings toolbar chrome); Mac capture deferred. MCP settings toolbar opaque in v0.1.2006. Next: shared `.cursor-agent-settings-toolbar-kb-hint` (0.72), or `.telegram-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Browser settings toolbar keyboard hint (`.browser-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the path · port · Save · Clear move hint. Standing P2 #14; design-review fuel (Browser settings toolbar chrome); Mac capture deferred. MCP settings toolbar opaque in v0.1.2006. Next done in v0.1.2008 (`.cursor-agent-settings-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2006
 
