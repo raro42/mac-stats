@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2018
+
+- Shared AI Chat response latency label (`.response-time`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the reply timing line. Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Setup kb-hint opaque in v0.1.2017. Next: shared `.monitor-checked-ago` (0.72), or `.monitor-detail-note` / `.disk-cleanup-summary` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2017
 
-- Shared Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save key move hint. Standing P2 #14; design-review fuel (Perplexity setup chrome); Mac capture deferred. Search-box opaque in v0.1.2016. Last shared `*-kb-hint` glass opacity cleared. Next: shared `.response-time` (0.72), or `.monitor-checked-ago` / `.monitor-detail-note` / `.disk-cleanup-summary` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save key move hint. Standing P2 #14; design-review fuel (Perplexity setup chrome); Mac capture deferred. Search-box opaque in v0.1.2016. Last shared `*-kb-hint` glass opacity cleared. Next done in v0.1.2018 (`.response-time`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2016
 
