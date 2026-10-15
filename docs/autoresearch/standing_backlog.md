@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2011
+
+- Shared theme-list keyboard hint (`.theme-list-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the theme-button move hint. Standing P2 #14; design-review fuel (theme list chrome); Mac capture deferred. Slack settings toolbar opaque in v0.1.2010. Next: shared `.appearance-setting-kb-hint` (0.72), or `.product-setting-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2010
 
-- Shared Slack settings toolbar keyboard hint (`.slack-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the webhook · Save · Clear move hint. Standing P2 #14; design-review fuel (Slack settings toolbar chrome); Mac capture deferred. Telegram settings toolbar opaque in v0.1.2009. Next: shared `.theme-list-kb-hint` (0.72), or `.appearance-setting-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Slack settings toolbar keyboard hint (`.slack-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the webhook · Save · Clear move hint. Standing P2 #14; design-review fuel (Slack settings toolbar chrome); Mac capture deferred. Telegram settings toolbar opaque in v0.1.2009. Next done in v0.1.2011 (`.theme-list-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2009
 
