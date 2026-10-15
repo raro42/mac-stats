@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2019
+
+- Shared Monitors last-checked age (`.monitor-checked-ago`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Down 75%; Data Poster / Dark 66% `#ffffff` on `#0e0e14`, Down 78%). No glass `opacity` on the checked-ago line. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Response-time opaque in v0.1.2018. Next: shared `.monitor-detail-note` (0.72), or `.disk-cleanup-summary` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2018
 
-- Shared AI Chat response latency label (`.response-time`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the reply timing line. Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Setup kb-hint opaque in v0.1.2017. Next: shared `.monitor-checked-ago` (0.72), or `.monitor-detail-note` / `.disk-cleanup-summary` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared AI Chat response latency label (`.response-time`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the reply timing line. Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Setup kb-hint opaque in v0.1.2017. Next done in v0.1.2019 (`.monitor-checked-ago`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2017
 
