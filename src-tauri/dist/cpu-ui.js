@@ -1196,7 +1196,14 @@
       .product-setting-kb-hint {
         margin: 8px 0 0;
         font-size: 11px;
-        opacity: 0.72;
+        /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+        color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+        opacity: 1;
+      }
+      body.theme-data-poster .product-setting-kb-hint,
+      body.theme-dark .product-setting-kb-hint {
+        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        opacity: 1;
       }
       .product-setting-kb-hint[hidden] {
         display: none !important;
