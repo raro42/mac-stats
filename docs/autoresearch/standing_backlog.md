@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2002
+
+- Shared Perplexity settings toolbar keyboard hint (`.perplexity-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save · Clear move hint. Standing P2 #14; design-review fuel (Perplexity settings toolbar chrome); Mac capture deferred. Discord settings toolbar opaque in v0.1.2001. Next: shared `.brave-settings-toolbar-kb-hint` (0.72), or `.redmine-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2001
 
-- Shared Discord settings toolbar keyboard hint (`.discord-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the token · Save · Clear · View logs move hint. Standing P2 #14; design-review fuel (Discord settings toolbar chrome); Mac capture deferred. Monitors detail toolbar opaque in v0.1.2000. Next: shared `.perplexity-settings-toolbar-kb-hint` (0.72), or `.brave-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Discord settings toolbar keyboard hint (`.discord-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the token · Save · Clear · View logs move hint. Standing P2 #14; design-review fuel (Discord settings toolbar chrome); Mac capture deferred. Monitors detail toolbar opaque in v0.1.2000. Next done in v0.1.2002 (`.perplexity-settings-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2000
 
