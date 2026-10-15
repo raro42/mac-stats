@@ -7066,6 +7066,30 @@ function forceQuitToolbarBothOnScreen(wrap) {
   return !!details.open;
 }
 
+function ensureForceQuitToolbarKbStyles() {
+  if (document.getElementById("mac-stats-force-quit-toolbar-kb-styles")) return;
+  const style = document.createElement("style");
+  style.id = "mac-stats-force-quit-toolbar-kb-styles";
+  style.textContent = `
+    .force-quit-toolbar-kb-hint {
+      margin: 8px 0 0;
+      font-size: 11px;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+      opacity: 1;
+    }
+    body.theme-data-poster .force-quit-toolbar-kb-hint,
+    body.theme-dark .force-quit-toolbar-kb-hint {
+      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      opacity: 1;
+    }
+    .force-quit-toolbar-kb-hint[hidden] {
+      display: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /** Theme HTML and the detail body ship the hint inside the force-quit section. It stays hidden until Advanced and Force Quit are both on screen. Create it only on older shells. */
 function ensureForceQuitToolbarKbHint(section) {
   const wrap = section || document.querySelector(".force-quit-section");
@@ -7093,6 +7117,7 @@ function ensureForceQuitToolbarKbHint(section) {
 function ensureForceQuitToolbarKeyboard(section) {
   const wrap = section || document.querySelector(".force-quit-section");
   if (!wrap) return;
+  ensureForceQuitToolbarKbStyles();
   ensureForceQuitToolbarKbHint(wrap);
   refreshForceQuitToolbarRovingTabindex(wrap);
   if (wrap.dataset.forceQuitToolbarKbWired === "1") return;

@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2015
+
+- Shared Force Quit toolbar keyboard hint (`.force-quit-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Advanced · Force Quit move hint. Standing P2 #14; design-review fuel (Process Details Force Quit chrome); Mac capture deferred. Credentials section opaque in v0.1.2014. Next: shared `.perplexity-search-kb-hint` (0.72), or `.perplexity-setup-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2014
 
-- Shared Credentials section keyboard hint (`.credentials-section-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Credentials move hint. Standing P2 #14; design-review fuel (Credentials settings chrome); Mac capture deferred. Product setting opaque in v0.1.2013. Next: shared `.force-quit-toolbar-kb-hint` (0.72), or `.perplexity-search-kb-hint` / `.perplexity-setup-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Credentials section keyboard hint (`.credentials-section-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Credentials move hint. Standing P2 #14; design-review fuel (Credentials settings chrome); Mac capture deferred. Product setting opaque in v0.1.2013. Next done in v0.1.2015 (`.force-quit-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2013
 
