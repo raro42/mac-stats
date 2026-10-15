@@ -912,7 +912,9 @@ body.theme-dark .response-time,
 body.theme-data-poster .monitor-checked-ago,
 body.theme-dark .monitor-checked-ago,
 body.theme-data-poster .monitor-detail-note,
-body.theme-dark .monitor-detail-note {
+body.theme-dark .monitor-detail-note,
+body.theme-data-poster .disk-cleanup-summary,
+body.theme-dark .disk-cleanup-summary {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
