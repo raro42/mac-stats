@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) keyboard-hint opaque wash
 
 | Version | What |
 |---|---|
+| **v0.1.2002** | Shared `.perplexity-settings-toolbar-kb-hint` opaque color-mix (key · Save · Clear) |
 | **v0.1.2001** | Shared `.discord-toolbar-kb-hint` opaque color-mix (token · Save · Clear · View logs) |
 | **v0.1.2000** | Shared `.monitor-detail-toolbar-kb-hint` opaque color-mix (Check now · Remove) |
 | **v0.1.1999** | Shared `.monitor-add-toolbar-kb-hint` opaque color-mix (URL · Cancel · Add Monitor) |
@@ -15,12 +16,11 @@ Overnight Track B kept shipping WebView idle-cut (#14) keyboard-hint opaque wash
 | **v0.1.1995** | Shared `.logs-toolbar-kb-hint` opaque color-mix (Refresh · Open · Auto-refresh) |
 | **v0.1.1994** | Shared `.logs-viewer-prefix` opaque color-mix |
 | **v0.1.1993** | Shared `.changelog-body-toolbar-kb-hint` opaque color-mix |
-| **v0.1.1992** | Shared `.changelog-header-kb-hint` opaque color-mix |
 
 ## Next fuel
 
-- Shared `.perplexity-settings-toolbar-kb-hint` still glass `opacity` 0.72
 - Shared `.brave-settings-toolbar-kb-hint` still glass `opacity` 0.72
+- Shared `.redmine-settings-toolbar-kb-hint` still glass `opacity` 0.72
 - Mac feature-screen capture when TCC allows (design-review grace)
 - Digester open was empty all night; standing P2 #14 remains the fuel line
 
