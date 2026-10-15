@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2004
+
+- Shared Redmine settings toolbar keyboard hint (`.redmine-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the URL · key · Save · Clear move hint. Standing P2 #14; design-review fuel (Redmine settings toolbar chrome); Mac capture deferred. Brave settings toolbar opaque in v0.1.2003. Next: shared `.mastodon-settings-toolbar-kb-hint` (0.72), or `.mcp-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2003
 
-- Shared Brave settings toolbar keyboard hint (`.brave-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save · Clear move hint. Standing P2 #14; design-review fuel (Brave settings toolbar chrome); Mac capture deferred. Perplexity settings toolbar opaque in v0.1.2002. Next: shared `.redmine-settings-toolbar-kb-hint` (0.72), or `.mastodon-settings-toolbar-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Brave settings toolbar keyboard hint (`.brave-settings-toolbar-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save · Clear move hint. Standing P2 #14; design-review fuel (Brave settings toolbar chrome); Mac capture deferred. Perplexity settings toolbar opaque in v0.1.2002. Next done in v0.1.2004 (`.redmine-settings-toolbar-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2002
 
