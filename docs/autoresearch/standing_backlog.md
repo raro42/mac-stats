@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2014
+
+- Shared Credentials section keyboard hint (`.credentials-section-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Credentials move hint. Standing P2 #14; design-review fuel (Credentials settings chrome); Mac capture deferred. Product setting opaque in v0.1.2013. Next: shared `.force-quit-toolbar-kb-hint` (0.72), or `.perplexity-search-kb-hint` / `.perplexity-setup-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2013
 
-- Shared Product setting keyboard hint (`.product-setting-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Product section move hint. Standing P2 #14; design-review fuel (Product settings chrome); Mac capture deferred. Appearance setting opaque in v0.1.2012. Next: shared `.credentials-section-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Product setting keyboard hint (`.product-setting-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Product section move hint. Standing P2 #14; design-review fuel (Product settings chrome); Mac capture deferred. Appearance setting opaque in v0.1.2012. Next done in v0.1.2014 (`.credentials-section-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2012
 
