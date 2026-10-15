@@ -918,10 +918,20 @@ body.theme-dark .disk-cleanup-summary,
 body.theme-data-poster .history-chart-caption,
 body.theme-dark .history-chart-caption,
 body.theme-data-poster .force-quit-advanced > summary,
-body.theme-dark .force-quit-advanced > summary {
+body.theme-dark .force-quit-advanced > summary,
+body.theme-data-poster .disk-cleanup-item-path,
+body.theme-dark .disk-cleanup-item-path,
+body.theme-data-poster .disk-cleanup-scope-path,
+body.theme-dark .disk-cleanup-scope-path {
   /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
+}
+body.theme-data-poster .disk-cleanup-item-path:hover,
+body.theme-dark .disk-cleanup-item-path:hover,
+body.theme-data-poster .disk-cleanup-scope-path:hover,
+body.theme-dark .disk-cleanup-scope-path:hover {
+  color: var(--text, rgba(255, 255, 255, 0.92));
 }
 body.theme-data-poster .monitor-item.is-down .monitor-checked-ago,
 body.theme-dark .monitor-item.is-down .monitor-checked-ago {
@@ -9291,8 +9301,9 @@ button.monitor-detail-url.is-just-saved {
   font: inherit;
   font-size: 11px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  opacity: 0.72;
-  color: inherit;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
   text-align: left;
   cursor: pointer;
   word-break: break-all;
@@ -9301,6 +9312,7 @@ button.monitor-detail-url.is-just-saved {
 .disk-cleanup-item-path:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
+  color: inherit;
   opacity: 1;
 }
 .disk-cleanup-item-path:focus-visible {
@@ -9594,8 +9606,9 @@ button.monitor-detail-url.is-just-saved {
   font: inherit;
   font-size: 11px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  opacity: 0.72;
-  color: inherit;
+  /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+  opacity: 1;
   text-align: left;
   cursor: pointer;
   overflow: hidden;
@@ -9606,6 +9619,7 @@ button.monitor-detail-url.is-just-saved {
 .disk-cleanup-scope-path:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
+  color: inherit;
   opacity: 1;
 }
 .disk-cleanup-scope-path:focus-visible {
