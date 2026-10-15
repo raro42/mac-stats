@@ -17768,8 +17768,34 @@ const PERPLEXITY_SEARCH_KB_HINT_EMPTY =
 const PERPLEXITY_SEARCH_KB_HINT_RESULTS =
   '← → / h l · Home/End move · at start ← last result · Search → footer · Enter searches from input';
 
+function ensurePerplexitySearchKbStyles() {
+  if (document.getElementById('mac-stats-perplexity-search-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-perplexity-search-kb-styles';
+  style.textContent = `
+    .perplexity-search-kb-hint {
+      flex: 1 1 100%;
+      margin: 0;
+      font-size: 11px;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+      opacity: 1;
+    }
+    body.theme-data-poster .perplexity-search-kb-hint,
+    body.theme-dark .perplexity-search-kb-hint {
+      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      opacity: 1;
+    }
+    .perplexity-search-kb-hint[hidden] {
+      display: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /** Theme HTML ships the hint under the query and Search. Create it only on older shells. */
 function ensurePerplexitySearchKbHint(container) {
+  ensurePerplexitySearchKbStyles();
   const row = container || document.querySelector('.perplexity-search-box');
   if (!row) return;
   let hint = document.getElementById('perplexity-search-kb-hint');
