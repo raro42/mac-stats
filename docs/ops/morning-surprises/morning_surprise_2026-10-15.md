@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) keyboard-hint opaque wash
 
 | Version | What |
 |---|---|
+| **v0.1.2010** | Shared `.slack-settings-toolbar-kb-hint` opaque color-mix (webhook · Save · Clear) |
 | **v0.1.2009** | Shared `.telegram-settings-toolbar-kb-hint` opaque color-mix (token · chat id · Save · Clear) |
 | **v0.1.2008** | Shared `.cursor-agent-settings-toolbar-kb-hint` opaque color-mix (workspace · executable · Save · Clear) |
 | **v0.1.2007** | Shared `.browser-settings-toolbar-kb-hint` opaque color-mix (path · port · Save · Clear) |
@@ -24,8 +25,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) keyboard-hint opaque wash
 
 ## Next fuel
 
-- Shared `.slack-settings-toolbar-kb-hint` still glass `opacity` 0.72
-- Shared `.theme-list-kb-hint` / `.appearance-setting-kb-hint` / `.product-setting-kb-hint` still glass
+- Shared `.theme-list-kb-hint` / `.appearance-setting-kb-hint` / `.product-setting-kb-hint` still glass `opacity` 0.72
 - Mac feature-screen capture when TCC allows (design-review grace)
 - Digester open was empty all night; standing P2 #14 remains the fuel line
 
@@ -34,3 +34,4 @@ Overnight Track B kept shipping WebView idle-cut (#14) keyboard-hint opaque wash
 - Design review: due=false (grace on stale feature screens)
 - Layout daily: data-poster checked; dark screen still missing
 - No debug.log ERROR/WARN clusters in recent windows
+- Last keep @ d7a0c460 (v0.1.2010 Slack settings toolbar kb-hint)
