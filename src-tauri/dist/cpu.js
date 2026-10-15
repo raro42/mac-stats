@@ -17947,11 +17947,37 @@ function refreshPerplexitySetupRovingTabindex(container, preferred) {
 const PERPLEXITY_SETUP_KB_HINT =
   '← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field';
 
+function ensurePerplexitySetupKbStyles() {
+  if (document.getElementById('mac-stats-perplexity-setup-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-perplexity-setup-kb-styles';
+  style.textContent = `
+    .perplexity-setup-kb-hint {
+      flex: 1 1 100%;
+      margin: 0;
+      font-size: 11px;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+      opacity: 1;
+    }
+    body.theme-data-poster .perplexity-setup-kb-hint,
+    body.theme-dark .perplexity-setup-kb-hint {
+      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      opacity: 1;
+    }
+    .perplexity-setup-kb-hint[hidden] {
+      display: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /**
  * Theme HTML ships the hint under key · Save key.
  * It stays hidden until the setup panel is on screen. Create it only on older shells.
  */
 function ensurePerplexitySetupKbHint(container) {
+  ensurePerplexitySetupKbStyles();
   const row = container || document.querySelector('.perplexity-setup-row');
   if (!row) return;
   let hint = document.getElementById('perplexity-setup-kb-hint');

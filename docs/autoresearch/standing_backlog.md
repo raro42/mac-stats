@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2017
+
+- Shared Perplexity setup keyboard hint (`.perplexity-setup-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the key · Save key move hint. Standing P2 #14; design-review fuel (Perplexity setup chrome); Mac capture deferred. Search-box opaque in v0.1.2016. Last shared `*-kb-hint` glass opacity cleared. Next: shared `.response-time` (0.72), or `.monitor-checked-ago` / `.monitor-detail-note` / `.disk-cleanup-summary` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2016
 
-- Shared Perplexity search-box keyboard hint (`.perplexity-search-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the query · Search move hint. Standing P2 #14; design-review fuel (Perplexity search chrome); Mac capture deferred. Force Quit toolbar opaque in v0.1.2015. Next: shared `.perplexity-setup-kb-hint` (0.72), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity search-box keyboard hint (`.perplexity-search-kb-hint`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the query · Search move hint. Standing P2 #14; design-review fuel (Perplexity search chrome); Mac capture deferred. Force Quit toolbar opaque in v0.1.2015. Next done in v0.1.2017 (`.perplexity-setup-kb-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2015
 
