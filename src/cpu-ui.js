@@ -3564,6 +3564,30 @@
   const CREDENTIALS_SECTION_KB_HINT =
     "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header";
 
+  function ensureCredentialsSectionKbStyles() {
+    if (document.getElementById("mac-stats-credentials-section-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-credentials-section-kb-styles";
+    style.textContent = `
+      .credentials-section-kb-hint {
+        margin: 8px 0 0;
+        font-size: 11px;
+        /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+        color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+        opacity: 1;
+      }
+      body.theme-data-poster .credentials-section-kb-hint,
+      body.theme-dark .credentials-section-kb-hint {
+        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        opacity: 1;
+      }
+      .credentials-section-kb-hint[hidden] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   /**
    * Theme HTML ships the hint at the end of the Credentials section.
    * It stays hidden until Settings is open. Create it only on older shells.
@@ -3598,6 +3622,7 @@
    */
   function wireCredentialsSectionToolbarKeyboard(section) {
     if (!section) return;
+    ensureCredentialsSectionKbStyles();
     ensureCredentialsSectionKbHint(section);
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
