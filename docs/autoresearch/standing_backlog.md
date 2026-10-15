@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2023
+
+- Shared Process Details Advanced disclosure (`.force-quit-advanced > summary`) mixes type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Advanced summary line. Standing P2 #14; design-review fuel (Process Details chrome); Mac capture deferred. History chart captions opaque in v0.1.2022. Next: shared `.disk-cleanup-item-path` / `.disk-cleanup-scope-path` (0.72), or `.force-quit-hint` (0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2022
 
-- Shared history sparkline captions (`.history-chart-caption`) mix type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the CPU · GPU · Freq · Temp chart labels. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome); Mac capture deferred. Disk Cleanup summary opaque in v0.1.2021. Next: shared `.force-quit-advanced > summary` (0.72), or `.disk-cleanup-item-path` / `.disk-cleanup-scope-path` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared history sparkline captions (`.history-chart-caption`) mix type color against an opaque wash (`color-mix` 63% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the CPU · GPU · Freq · Temp chart labels. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome); Mac capture deferred. Disk Cleanup summary opaque in v0.1.2021. Next done in v0.1.2023 (`.force-quit-advanced > summary`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2021
 
