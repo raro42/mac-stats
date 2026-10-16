@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2034
+
+- Shared Agent Ops health labels (`.ops-health-label`) mix type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on Version · Discord · Next schedule and the other health card titles. Standing P2 #14; design-review fuel (Agent Ops chrome); Mac capture deferred. Category size opaque in v0.1.2033. Next: shared `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85), or `.process-list-header` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2033
 
-- Shared Disk Cleanup category size line (`.disk-cleanup-item-stat`) mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster / Dark 78% `#ffffff` on `#0e0e14`). No glass `opacity` on the reclaim bytes · file count. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Scope kind opaque in v0.1.2032. Next: shared `.ops-health-label` (0.55), or `.perplexity-setup-lead` / `.perplexity-setup-note` (0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Disk Cleanup category size line (`.disk-cleanup-item-stat`) mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster / Dark 78% `#ffffff` on `#0e0e14`). No glass `opacity` on the reclaim bytes · file count. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Scope kind opaque in v0.1.2032. Next done in v0.1.2034 (`.ops-health-label`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2032
 
