@@ -926,7 +926,9 @@ body.theme-dark .disk-cleanup-scope-path,
 body.theme-data-poster .force-quit-hint,
 body.theme-dark .force-quit-hint,
 body.theme-data-poster .disk-cleanup-soft-hint,
-body.theme-dark .disk-cleanup-soft-hint {
+body.theme-dark .disk-cleanup-soft-hint,
+body.theme-data-poster .disk-cleanup-meta-label,
+body.theme-dark .disk-cleanup-meta-label {
   /* Was opacity 0.72/0.7/0.65 on inherit (~92% white) → ~66% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
@@ -9091,7 +9093,9 @@ button.monitor-detail-url.is-just-saved {
 
 .disk-cleanup-meta-label {
   font-size: 11px;
-  opacity: 0.65;
+  /* Was opacity 0.65 on inherit (~88% ink) → ~57% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 57%, #ffffff);
+  opacity: 1;
   margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
