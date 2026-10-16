@@ -984,7 +984,11 @@ body.theme-futuristic .logs-filter-miss-hint,
 body.theme-data-poster .monitors-filter-miss-hint,
 body.theme-dark .monitors-filter-miss-hint,
 body.theme-neon .monitors-filter-miss-hint,
-body.theme-futuristic .monitors-filter-miss-hint {
+body.theme-futuristic .monitors-filter-miss-hint,
+body.theme-data-poster .disk-cleanup-filter-miss-hint,
+body.theme-dark .disk-cleanup-filter-miss-hint,
+body.theme-neon .disk-cleanup-filter-miss-hint,
+body.theme-futuristic .disk-cleanup-filter-miss-hint {
   /* Was opacity 0.9 on --muted. Opaque muted RGB, then 90% on #0e0e14. */
   color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0e0e14);
   opacity: 1;
@@ -9590,11 +9594,20 @@ button.monitor-detail-url.is-just-saved {
 .disk-cleanup-empty-hint,
 .disk-cleanup-filter-miss-hint {
   font-size: 12px;
-  color: var(--muted);
   margin-bottom: 10px;
   line-height: 1.4;
   max-width: 28em;
+}
+
+.disk-cleanup-empty-hint {
+  color: var(--muted);
   opacity: 0.9;
+}
+
+.disk-cleanup-filter-miss-hint {
+  /* Was opacity 0.9 on --muted (often already translucent). Opaque muted RGB, then 90% on the wash. */
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 90%, #ffffff);
+  opacity: 1;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
