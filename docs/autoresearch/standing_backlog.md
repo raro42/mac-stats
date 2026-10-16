@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2040
+
+- Shared Perplexity key status (`.perplexity-config-status`) mixes the opaque muted color into the wash (70% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 70% on `#0e0e14`). No glass `opacity` on the API key line. Standing P2 #14; design-review fuel (Perplexity header chrome); Mac capture deferred. Result snippet opaque in v0.1.2039. Next: shared `.rings-filter-miss-hint` (0.78), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2039
 
-- Shared Perplexity result snippet (`.perplexity-result-snippet`) mixes type color against an opaque wash (`color-mix` 62% `#0c0c10` on `#ffffff`; Data Poster / Dark 64% `#ffffff` on `#0e0e14`). No glass `opacity` on the snippet body under a result. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Result list opaque in v0.1.2038. Next: shared `.perplexity-config-status` (0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity result snippet (`.perplexity-result-snippet`) mixes type color against an opaque wash (`color-mix` 62% `#0c0c10` on `#ffffff`; Data Poster / Dark 64% `#ffffff` on `#0e0e14`). No glass `opacity` on the snippet body under a result. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Result list opaque in v0.1.2038. Next done in v0.1.2040 (`.perplexity-config-status`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2038
 
