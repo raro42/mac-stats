@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2032
+
+- Shared Disk Cleanup scope kind (`.disk-cleanup-scope-kind`) mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the (builtin/custom) kind span. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Category policy/samples opaque in v0.1.2031. Next: shared `.disk-cleanup-item-stat` (0.85), or `.ops-health-label` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2031
 
-- Shared Disk Cleanup category policy and samples (`.disk-cleanup-item-policy` · `.disk-cleanup-item-samples`) mix type color against an opaque wash (`color-mix` 55% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the policy/samples lines. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Process Details PID opaque in v0.1.2030. Next: shared `.disk-cleanup-scope-kind` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Disk Cleanup category policy and samples (`.disk-cleanup-item-policy` · `.disk-cleanup-item-samples`) mix type color against an opaque wash (`color-mix` 55% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the policy/samples lines. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Process Details PID opaque in v0.1.2030. Next done in v0.1.2032 (`.disk-cleanup-scope-kind`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2030
 
