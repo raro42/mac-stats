@@ -1,22 +1,30 @@
 # Morning surprise — 2026-10-16
 
-Overnight Track B kept shipping WebView idle-cut contrast (#14) while Mac screenshot capture stays deferred on the Linux rack.
+Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the CPU window shared sheet. Digester was empty; Mac screenshot refresh stayed deferred on the Linux rack.
 
-## Shipped tonight
+## Shipped tonight (keeps)
 
-- **v0.1.2030** — Process Details click-to-copy PID (`.process-detail-pid`) drops glass `opacity` for an opaque `color-mix` wash (55% ink on light; 66% white on Data Poster / Dark).
-- Earlier same night: v0.1.2029 chat-exec labels, v0.1.2028 process-detail labels, and a run of Disk Cleanup / Force Quit / history caption opaque chrome (see CHANGELOG).
-
-## Tried / deferred
-
-- Digester open: empty (no new Slowest fuel).
-- Design review still due on `feature-cpu-metrics.png` (~39d) — capture needs macOS TCC.
-- Layout daily due for data-poster / dark screens — missing on Linux.
+| Version | What |
+|---------|------|
+| **v0.1.2031** | Disk Cleanup category **policy · samples** — opaque `color-mix` (was glass `opacity` 0.62) |
+| **v0.1.2030** | Process Details **PID** click-to-copy — opaque wash |
+| **v0.1.2029** | AI Chat exec card labels (Code executed · Result · …) |
+| **v0.1.2028** | Process Details metric labels |
+| **v0.1.2027** | Disk Cleanup meta card titles |
+| **v0.1.2026** | Disk Cleanup soft-delete hint |
+| **v0.1.2025** | Force Quit hint |
+| **v0.1.2024** | Disk Cleanup category/scope paths |
 
 ## Why it matters
 
-Secondary Process Details chrome stays readable without glass alpha, which is compositor work the idle cut is trying to avoid. PID copy is a high-frequency glance control.
+Glass `opacity` on secondary labels forces the compositor to blend every paint. Mixing ink onto an opaque wash keeps the same look and cuts idle WebView work (#14).
 
-## Next
+## Still open
 
-- `.disk-cleanup-item-policy` / `.disk-cleanup-item-samples` (opacity 0.62), or Mac capture of stale CPU metrics screen when TCC allows.
+- Shared `.disk-cleanup-scope-kind` still uses glass `opacity` 0.55.
+- Design-review screen `feature-cpu-metrics.png` is stale (~39d) — needs Mac TCC capture.
+- Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
+
+## Ratchet
+
+Latest keep: `a3a959bc` — v0.1.2031 disk-cleanup policy/samples opaque.
