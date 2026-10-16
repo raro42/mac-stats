@@ -1,16 +1,22 @@
 # Morning surprise — 2026-10-16
 
-Overnight Track B (WebView idle / #14 opaque type washes). Digester empty; design-review Mac capture deferred on Linux rack.
+Overnight Track B kept shipping WebView idle-cut contrast (#14) while Mac screenshot capture stays deferred on the Linux rack.
 
-| Version | What shipped |
-|---------|----------------|
-| **v0.1.2029** | AI Chat exec labels (`.chat-exec-label`) — opaque color-mix, no glass opacity |
-| **v0.1.2028** | Process Details metric labels (`.process-detail-section .process-detail-label`) — opaque color-mix, no glass opacity |
-| **v0.1.2027** | Disk Cleanup meta labels (`.disk-cleanup-meta-label`) — opaque color-mix |
-| **v0.1.2026** | Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) — opaque color-mix |
-| **v0.1.2025** | Force Quit hint (`.force-quit-hint`) — opaque color-mix |
-| **v0.1.2024** | Disk Cleanup path labels — opaque color-mix |
-| **v0.1.2023** | Force Quit Advanced summary — opaque color-mix |
-| **v0.1.2022** | History sparkline captions — opaque color-mix |
+## Shipped tonight
 
-Next fuel: `.process-detail-pid` glass opacity, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
+- **v0.1.2030** — Process Details click-to-copy PID (`.process-detail-pid`) drops glass `opacity` for an opaque `color-mix` wash (55% ink on light; 66% white on Data Poster / Dark).
+- Earlier same night: v0.1.2029 chat-exec labels, v0.1.2028 process-detail labels, and a run of Disk Cleanup / Force Quit / history caption opaque chrome (see CHANGELOG).
+
+## Tried / deferred
+
+- Digester open: empty (no new Slowest fuel).
+- Design review still due on `feature-cpu-metrics.png` (~39d) — capture needs macOS TCC.
+- Layout daily due for data-poster / dark screens — missing on Linux.
+
+## Why it matters
+
+Secondary Process Details chrome stays readable without glass alpha, which is compositor work the idle cut is trying to avoid. PID copy is a high-frequency glance control.
+
+## Next
+
+- `.disk-cleanup-item-policy` / `.disk-cleanup-item-samples` (opacity 0.62), or Mac capture of stale CPU metrics screen when TCC allows.
