@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2033** | Disk Cleanup category **size** (bytes · file count) — opaque `color-mix` (was glass `opacity` 0.85) |
 | **v0.1.2032** | Disk Cleanup scope **kind** (builtin/custom) — opaque `color-mix` (was glass `opacity` 0.55) |
 | **v0.1.2031** | Disk Cleanup category **policy · samples** — opaque `color-mix` (was glass `opacity` 0.62) |
 | **v0.1.2030** | Process Details **PID** click-to-copy — opaque wash |
@@ -22,10 +23,10 @@ Glass `opacity` on secondary labels forces the compositor to blend every paint. 
 
 ## Still open
 
-- Shared `.disk-cleanup-item-stat` still uses glass `opacity` 0.85; `.ops-health-label` still 0.55.
+- Shared `.ops-health-label` still uses glass `opacity` 0.55; Perplexity setup lead/note still 0.85.
 - Design-review screen `feature-cpu-metrics.png` is stale (~39d) — needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
 
 ## Ratchet
 
-Latest keep: `83dc8980` — v0.1.2032 disk-cleanup scope-kind opaque.
+Latest keep: `6edaa0bd` — v0.1.2033 disk-cleanup category size line opaque.
