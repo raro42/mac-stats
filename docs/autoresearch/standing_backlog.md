@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2049
+
+- Shared Perplexity empty hint (`.perplexity-empty-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty search hint. Filter-miss hint stays its own rule. Standing P2 #14; design-review fuel (Perplexity chrome); Mac capture deferred. Monitors empty hint opaque in v0.1.2048. Next: shared `.monitor-latency` (0.9 on `--muted`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2048
 
-- Shared Monitors empty hint (`.monitors-empty-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty list hint. Filter-miss hint stays its own rule. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Disk Cleanup empty hint opaque in v0.1.2047. Next: shared `.perplexity-empty-hint` (0.9 on `--muted`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Monitors empty hint (`.monitors-empty-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty list hint. Filter-miss hint stays its own rule. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Disk Cleanup empty hint opaque in v0.1.2047. Next done in v0.1.2049 (`.perplexity-empty-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2047
 
