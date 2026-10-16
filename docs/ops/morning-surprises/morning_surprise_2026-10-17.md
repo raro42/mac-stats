@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2047** | Disk Cleanup empty category/scope hint: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2046** | Disk Cleanup Reclaim/Big/Clean empty hint: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2045** | Monitors Up/Down/Slow empty hint: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2044** | Debug Log Error/Warn empty hint: opaque muted mix (was glass `opacity` 0.9) |
@@ -24,11 +25,11 @@ Glass `opacity` on those lines forces the compositor to blend every paint. Mixin
 
 ## Still open
 
-- Shared `.disk-cleanup-empty-hint` still uses glass `opacity` 0.9 (filter-miss hint split off in v0.1.2046).
 - Shared `.monitors-empty-hint` still uses glass `opacity` 0.9 (filter-miss hint split off in v0.1.2045).
+- Shared `.perplexity-empty-hint` still uses glass `opacity` 0.9 (filter-miss hint already opaque).
 - Design-review screen `feature-cpu-metrics.png` is stale (~40d). Needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
 
 ## Ratchet
 
-Latest keep: `9f110272`. v0.1.2046 Disk Cleanup filter-miss hint opaque.
+Latest keep: `c360b91b`. v0.1.2047 Disk Cleanup empty hint opaque.
