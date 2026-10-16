@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2036
+
+- Shared Top Processes column header (`.process-list-header`) mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). The header hairline mixes against that same wash. No glass `opacity` on Pin · name · CPU · GPU. Standing P2 #14; design-review fuel (Top Processes chrome); Mac capture deferred. Perplexity setup copy opaque in v0.1.2035. Next: shared `.perplexity-result-meta` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2035
 
-- Shared Perplexity setup copy (`.perplexity-setup-lead` · `.perplexity-setup-note`) mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster / Dark 78% `#ffffff` on `#0e0e14`). The visible error note mixes a pale red the same way (was glass `opacity` 0.55). No glass `opacity` on the key prompt or the error line. Standing P2 #14; design-review fuel (Perplexity setup chrome); Mac capture deferred. Health labels opaque in v0.1.2034. Next: shared `.process-list-header` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity setup copy (`.perplexity-setup-lead` · `.perplexity-setup-note`) mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster / Dark 78% `#ffffff` on `#0e0e14`). The visible error note mixes a pale red the same way (was glass `opacity` 0.55). No glass `opacity` on the key prompt or the error line. Standing P2 #14; design-review fuel (Perplexity setup chrome); Mac capture deferred. Health labels opaque in v0.1.2034. Next done in v0.1.2036 (`.process-list-header`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2034
 
