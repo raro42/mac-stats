@@ -6,7 +6,8 @@ Overnight Track B (20:00–06:00) kept shipping the WebView idle-cut opaque-wash
 
 | Version | What got nicer |
 |---------|----------------|
-| **v0.1.2026** | Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) — opaque color-mix, no glass opacity |
+| **v0.1.2027** | Disk Cleanup meta labels (`.disk-cleanup-meta-label`) — opaque color-mix, no glass opacity |
+| **v0.1.2026** | Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) |
 | **v0.1.2025** | Process Details Force Quit hint (`.force-quit-hint`) |
 | **v0.1.2024** | Disk Cleanup path labels (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path`) |
 | **v0.1.2023** | Force Quit Advanced summary (`.force-quit-advanced > summary`) |
@@ -18,7 +19,7 @@ Earlier same night / late prior window also kept Monitors detail note, checked-a
 ## Still open
 
 - Mac window-only recapture of stale `feature-cpu-metrics.png` when TCC allows
-- Next opaque candidate: `.disk-cleanup-meta-label` (0.65)
+- Next opaque candidates: `.process-detail-section .process-detail-label` (0.65), `.chat-exec-label` (0.65)
 - Layout daily screens (data-poster / dark / …) missing on Linux
 
 ## Note
