@@ -961,6 +961,12 @@ body.theme-dark .disk-cleanup-item-stat {
   color: color-mix(in srgb, #ffffff 78%, #0e0e14);
   opacity: 1;
 }
+body.theme-data-poster .perplexity-result-list,
+body.theme-dark .perplexity-result-list {
+  /* Was opacity 0.78 on inherit (~92% white) → ~72% white on #0e0e14. */
+  color: color-mix(in srgb, #ffffff 72%, #0e0e14);
+  opacity: 1;
+}
 body.theme-data-poster .perplexity-setup-note:not([hidden]),
 body.theme-dark .perplexity-setup-note:not([hidden]) {
   /* Was opacity 0.55 on a 70% #c44 mix → pale red on #0e0e14. */
@@ -10187,7 +10193,9 @@ button.monitor-detail-url.is-just-saved {
   margin: 6px 0 0;
   padding-left: 1.15em;
   font-size: 12px;
-  opacity: 0.78;
+  /* Was opacity 0.78 on inherit (~88% ink) → ~69% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 69%, #ffffff);
+  opacity: 1;
   line-height: 1.45;
 }
 .perplexity-result-list li {

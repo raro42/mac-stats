@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2038
+
+- Shared Perplexity result list (`.perplexity-result-list`) mixes type color against an opaque wash (`color-mix` 69% `#0c0c10` on `#ffffff`; Data Poster / Dark 72% `#ffffff` on `#0e0e14`). No glass `opacity` on the bullet list under a snippet. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Result meta opaque in v0.1.2037. Next: shared `.perplexity-result-snippet` (0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2037
 
-- Shared Perplexity result meta (`.perplexity-result-meta`) mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the source · time line under a result. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Top Processes column header opaque in v0.1.2036. Next: shared `.perplexity-result-list` (0.78), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Perplexity result meta (`.perplexity-result-meta`) mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the source · time line under a result. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Top Processes column header opaque in v0.1.2036. Next done in v0.1.2038 (`.perplexity-result-list`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2036
 
