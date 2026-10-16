@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2045
+
+- Shared Monitors filter-miss hint (`.monitors-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Up, Down, or Slow hint. Split from `.monitors-empty-hint`, which still uses glass `opacity` 0.9. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Debug Log filter-miss hint opaque in v0.1.2044. Next: shared `.disk-cleanup-filter-miss-hint` (0.9 on `--muted`; still grouped with `.disk-cleanup-empty-hint`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2044
 
-- Shared Debug Log filter-miss hint (`.logs-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Error or Warn hint. Standing P2 #14; design-review fuel (Debug Log chrome); Mac capture deferred. Perplexity filter-miss hint opaque in v0.1.2043. Next: shared `.monitors-filter-miss-hint` (0.9 on `--muted`; still grouped with `.monitors-empty-hint`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Debug Log filter-miss hint (`.logs-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Error or Warn hint. Standing P2 #14; design-review fuel (Debug Log chrome); Mac capture deferred. Perplexity filter-miss hint opaque in v0.1.2043. Next done in v0.1.2045 (`.monitors-filter-miss-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2043
 
