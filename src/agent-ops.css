@@ -947,10 +947,20 @@ body.theme-dark .ops-health-label {
   color: color-mix(in srgb, #ffffff 66%, #0e0e14);
   opacity: 1;
 }
+body.theme-data-poster .perplexity-setup-lead,
+body.theme-dark .perplexity-setup-lead,
+body.theme-data-poster .perplexity-setup-note,
+body.theme-dark .perplexity-setup-note,
 body.theme-data-poster .disk-cleanup-item-stat,
 body.theme-dark .disk-cleanup-item-stat {
   /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
   color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  opacity: 1;
+}
+body.theme-data-poster .perplexity-setup-note:not([hidden]),
+body.theme-dark .perplexity-setup-note:not([hidden]) {
+  /* Was opacity 0.55 on a 70% #c44 mix → pale red on #0e0e14. */
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0e0e14);
   opacity: 1;
 }
 body.theme-data-poster .process-detail-pid:hover,
@@ -10394,7 +10404,9 @@ button.monitor-detail-url.is-just-saved {
 .perplexity-setup-lead,
 .perplexity-setup-note {
   margin: 0;
-  opacity: 0.85;
+  /* Was opacity 0.85 on inherit (~88% ink) → ~75% ink on the near-white wash. */
+  color: color-mix(in srgb, #0c0c10 75%, #ffffff);
+  opacity: 1;
   font-size: 0.92em;
   line-height: 1.4;
 }
@@ -10453,9 +10465,10 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .perplexity-setup-note:not([hidden]) {
-  color: color-mix(in srgb, #c44 70%, currentColor);
+  /* Was opacity 0.55 on a 70% #c44 mix → pale red on the near-white wash. */
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #0c0c10) 55%, #ffffff);
   font-size: 11px;
-  opacity: 0.55;
+  opacity: 1;
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
