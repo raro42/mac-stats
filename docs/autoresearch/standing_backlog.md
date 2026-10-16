@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2043
+
+- Shared Perplexity filter-miss hint (`.perplexity-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Top or Snippet hint. Standing P2 #14; design-review fuel (Perplexity result chrome); Mac capture deferred. Top Processes filter-miss hint opaque in v0.1.2042. Next: shared `.logs-filter-miss-hint` (0.9 on `--muted`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2042
 
-- Shared Top Processes filter-miss hint (`.processes-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Hot or Pinned hint. Standing P2 #14; design-review fuel (Top Processes chrome); Mac capture deferred. Rings filter-miss hint opaque in v0.1.2041. Next: shared `.perplexity-filter-miss-hint` (0.9 on `--muted`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Top Processes filter-miss hint (`.processes-filter-miss-hint`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the empty Hot or Pinned hint. Standing P2 #14; design-review fuel (Top Processes chrome); Mac capture deferred. Rings filter-miss hint opaque in v0.1.2041. Next done in v0.1.2043 (`.perplexity-filter-miss-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2041
 
