@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2035** | Perplexity setup key prompt and error note — opaque `color-mix` (was glass `opacity` 0.85 / 0.55) |
 | **v0.1.2034** | Agent Ops health card titles (Version · Discord · Next schedule · …) — opaque `color-mix` (was glass `opacity` 0.55) |
 | **v0.1.2033** | Disk Cleanup category **size** (bytes · file count) — opaque `color-mix` (was glass `opacity` 0.85) |
 | **v0.1.2032** | Disk Cleanup scope **kind** (builtin/custom) — opaque `color-mix` (was glass `opacity` 0.55) |
@@ -24,10 +25,10 @@ Glass `opacity` on secondary labels forces the compositor to blend every paint. 
 
 ## Still open
 
-- Shared `.perplexity-setup-lead` / `.perplexity-setup-note` still use glass `opacity` 0.85; process list header still 0.55.
+- Shared `.process-list-header` still uses glass `opacity` 0.55.
 - Design-review screen `feature-cpu-metrics.png` is stale (~39d) — needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
 
 ## Ratchet
 
-Latest keep: `08d0c6be` — v0.1.2034 Agent Ops health labels opaque.
+Latest keep: `c3a3bcb2` — v0.1.2035 Perplexity setup copy opaque.
