@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2026
+
+- Shared Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) mixes type color against an opaque wash (`color-mix` 57% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Move to Trash hint line. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Force Quit hint opaque in v0.1.2025. Next: shared `.disk-cleanup-meta-label` (0.65), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2025
 
-- Shared Process Details Force Quit hint (`.force-quit-hint`) mixes type color against an opaque wash (`color-mix` 62% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Force Quit hint line. Standing P2 #14; design-review fuel (Process Details chrome); Mac capture deferred. Disk Cleanup path labels opaque in v0.1.2024. Next: shared `.disk-cleanup-soft-hint` (0.65), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Process Details Force Quit hint (`.force-quit-hint`) mixes type color against an opaque wash (`color-mix` 62% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the Force Quit hint line. Standing P2 #14; design-review fuel (Process Details chrome); Mac capture deferred. Disk Cleanup path labels opaque in v0.1.2024. Next done in v0.1.2026 (`.disk-cleanup-soft-hint`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2024
 
