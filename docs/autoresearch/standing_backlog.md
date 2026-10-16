@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2030
+
+- Shared Process Details PID button (`.process-detail-pid`) mixes type color against an opaque wash (`color-mix` 55% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on the click-to-copy PID control. Standing P2 #14; design-review fuel (Process Details chrome); Mac capture deferred. AI Chat exec labels opaque in v0.1.2029. Next: shared `.disk-cleanup-item-policy` / `.disk-cleanup-item-samples` (0.62), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2029
 
-- Shared AI Chat exec card labels (`.chat-exec-label`) mix type color against an opaque wash (`color-mix` 57% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on Code executed · Result · Intermediate · Final. Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Process Details metric labels opaque in v0.1.2028. Next: shared `.process-detail-pid` (0.62), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared AI Chat exec card labels (`.chat-exec-label`) mix type color against an opaque wash (`color-mix` 57% `#0c0c10` on `#ffffff`; Data Poster / Dark 66% `#ffffff` on `#0e0e14`). No glass `opacity` on Code executed · Result · Intermediate · Final. Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Process Details metric labels opaque in v0.1.2028. Next done in v0.1.2030 (`.process-detail-pid`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2028
 
