@@ -1,24 +1,26 @@
 # Morning surprise — 2026-10-16
 
-Overnight Track B ratchet (Linux rack). Digester empty; design review due (stale `feature-cpu-metrics.png`, Mac capture deferred); layout-daily due (screens missing on Linux). Fuel stayed on standing P2 / GitHub #14 opaque type washes.
+Overnight Track B (20:00–06:00) kept shipping the WebView idle-cut opaque-wash series (#14). Digester stayed empty; design-review Mac capture for `feature-cpu-metrics.png` is still deferred on the Linux rack.
 
-## Shipped tonight
+## Shipped tonight (keeps)
 
-| Version | What |
-|---------|------|
-| **v0.1.2025** | Shared `.force-quit-hint` opaque color-mix (62% `#0c0c10` on `#ffffff`; Data Poster/Dark 66% `#ffffff` on `#0e0e14`) — Force Quit hint line, no glass opacity |
-| **v0.1.2024** | Shared `.disk-cleanup-item-path` / `.disk-cleanup-scope-path` opaque (63% / 66%) |
-| **v0.1.2023** | Shared `.force-quit-advanced > summary` opaque (63% / 66%) |
-| **v0.1.2022** | Shared `.history-chart-caption` opaque (63% / 66%) |
-| **v0.1.2021** | Shared `.disk-cleanup-summary` opaque (63% / 66%) |
-| **v0.1.2020** | Shared `.monitor-detail-note` opaque (63% / 66%) |
-| **v0.1.2019** | Shared `.monitor-checked-ago` opaque (incl. Down) |
-| **v0.1.2018** | Shared `.response-time` opaque |
-| **v0.1.2017** | Shared `.perplexity-setup-kb-hint` opaque |
+| Version | What got nicer |
+|---------|----------------|
+| **v0.1.2026** | Disk Cleanup soft-delete hint (`.disk-cleanup-soft-hint`) — opaque color-mix, no glass opacity |
+| **v0.1.2025** | Process Details Force Quit hint (`.force-quit-hint`) |
+| **v0.1.2024** | Disk Cleanup path labels (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path`) |
+| **v0.1.2023** | Force Quit Advanced summary (`.force-quit-advanced > summary`) |
+| **v0.1.2022** | History sparkline captions (`.history-chart-caption`) |
+| **v0.1.2021** | Disk Cleanup summary (`.disk-cleanup-summary`) |
 
-Latest keep @ `8a349d9d` on `main`.
+Earlier same night / late prior window also kept Monitors detail note, checked-ago, AI Chat response-time, and kb-hint chrome opaque (see `results.tsv`).
 
-## Next
+## Still open
 
-- Shared `.disk-cleanup-soft-hint` (0.65), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
-- Layout-daily Data Poster when a theme screen can be captured.
+- Mac window-only recapture of stale `feature-cpu-metrics.png` when TCC allows
+- Next opaque candidate: `.disk-cleanup-meta-label` (0.65)
+- Layout daily screens (data-poster / dark / …) missing on Linux
+
+## Note
+
+Empty digester alone is not the surprise. Product CSS keeps moved the ratchet.
