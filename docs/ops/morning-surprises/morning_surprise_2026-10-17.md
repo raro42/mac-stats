@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2056** | AI Chat filter-miss copy (You · Assistant · Errors empty hint): opaque ink mix (was glass `opacity` 0.88) |
 | **v0.1.2055** | Agent Ops health values (Version · Discord · schedule bodies): opaque ink mix (was glass `opacity` 0.95) |
 | **v0.1.2054** | Monitors backoff hint (DOWN recheck countdown): opaque muted mix (was glass `opacity` 0.78) |
 | **v0.1.2053** | Monitors detail keys: opaque muted mix (was glass `opacity` 0.78) |
@@ -33,10 +34,10 @@ Glass `opacity` on those lines forces the compositor to blend every paint. Mixin
 
 ## Still open
 
-- Shared `.chat-filter-miss-msg` still uses glass `opacity` 0.88.
+- Shared `.perplexity-filter-chip` still uses glass `opacity` 0.88.
 - Design-review screen `feature-cpu-metrics.png` is stale (~40d). Needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
 
 ## Ratchet
 
-Latest keep: `e65b9d1e`. v0.1.2055 Agent Ops health values opaque.
+Latest keep: `aeac8fe9`. v0.1.2056 AI Chat filter-miss copy opaque.
