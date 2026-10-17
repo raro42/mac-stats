@@ -1,0 +1,18 @@
+# Morning surprise — 2026-10-18
+
+Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the CPU window shared sheet. Digester was empty; Mac screenshot refresh stayed deferred on the Linux rack.
+
+## Shipped tonight (keeps)
+
+| Version | What |
+|---------|------|
+| **v0.1.2060** | Disk Cleanup empty shell: load-error line uses an opaque ink mix (was glass `opacity` 0.75); dark shells remap onto `#0e0e14`. List-empty and filter-miss copy stay their own colors |
+
+## Why it matters
+
+Glass `opacity` on that shell forces the compositor to blend every paint. Mixing ink onto an opaque wash keeps the same look and cuts idle WebView work (#14).
+
+## Still open
+
+- Shared `.logs-viewer.is-empty` still uses glass `opacity` 0.75.
+- Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
