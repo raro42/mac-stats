@@ -1009,6 +1009,14 @@ body.theme-futuristic .monitor-latency {
   color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0e0e14);
   opacity: 1;
 }
+body.theme-data-poster .monitor-detail-k,
+body.theme-dark .monitor-detail-k,
+body.theme-neon .monitor-detail-k,
+body.theme-futuristic .monitor-detail-k {
+  /* Was opacity 0.78 on --muted. Opaque muted RGB, then 78% on #0e0e14. */
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0e0e14);
+  opacity: 1;
+}
 body.theme-data-poster .perplexity-result-snippet,
 body.theme-dark .perplexity-result-snippet {
   /* Was opacity 0.7 on inherit (~92% white) → ~64% white on #0e0e14. */
@@ -8688,8 +8696,9 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .monitor-detail-k {
-  color: var(--muted, currentColor);
-  opacity: 0.78;
+  /* Was opacity 0.78 on --muted (often already translucent). Opaque muted RGB, then 78% on the wash. */
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #ffffff);
+  opacity: 1;
   font-weight: 500;
 }
 
