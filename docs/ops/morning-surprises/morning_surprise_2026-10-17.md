@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2058** | Disk Cleanup Recurse label: opaque ink mix (was glass `opacity` 0.8); dark shells remap onto `#0e0e14` |
 | **v0.1.2057** | Perplexity filter chips (All · Top · Snippet): opaque ink mix (was glass `opacity` 0.88); dark shells remap onto `#0e0e14` |
 | **v0.1.2056** | AI Chat filter-miss copy (You · Assistant · Errors empty hint): opaque ink mix (was glass `opacity` 0.88) |
 | **v0.1.2055** | Agent Ops health values (Version · Discord · schedule bodies): opaque ink mix (was glass `opacity` 0.95) |
@@ -35,10 +36,6 @@ Glass `opacity` on those lines forces the compositor to blend every paint. Mixin
 
 ## Still open
 
-- Shared `.disk-cleanup-scope-rec` still uses glass `opacity` 0.8.
+- Shared `.process-empty` still uses glass `opacity` 0.78; `.disk-cleanup-empty` still uses 0.75.
 - Design-review screen `feature-cpu-metrics.png` is stale (~40d). Needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
-
-## Ratchet
-
-Latest keep: `465de37f`. v0.1.2057 Perplexity filter chips opaque.

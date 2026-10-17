@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2058
+
+- Shared Disk Cleanup Recurse label (`.disk-cleanup-scope-rec`) mixes type color against an opaque wash (`color-mix` 70% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 74% `#ffffff` on `#0e0e14`). No glass `opacity` on the Recurse checkbox label. Standing P2 #14; design-review fuel (Disk Cleanup scope chrome); Mac capture deferred. Perplexity filter chips opaque in v0.1.2057. Next: shared `.process-empty` (0.78), or `.disk-cleanup-empty` (0.75), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2053
 
 - Shared Monitors detail keys (`.monitor-detail-k`) mix the opaque muted color into the wash (78% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 78% on `#0e0e14`). No glass `opacity` on the key labels in an open monitor detail. Standing P2 #14; design-review fuel (Monitors detail chrome); Mac capture deferred. Clickable insight lines opaque in v0.1.2052. Next: shared `.monitor-backoff-hint` (0.78 on muted), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
