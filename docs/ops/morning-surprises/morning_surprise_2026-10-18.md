@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2064** | Agent Ops collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
 | **v0.1.2063** | Monitors collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
 | **v0.1.2062** | Monitors empty summary: empty summary line uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
 | **v0.1.2061** | Debug Log empty viewer: empty log line uses an opaque ink mix (was glass `opacity` 0.75); dark shells remap onto `#0e0e14`. Filter-miss copy stays its own colors |
@@ -17,5 +18,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Shared `.agent-ops-collapsed-glance.is-empty` still uses glass `opacity` 0.85.
+- Shared `.ollama-collapsed-glance.is-empty` still uses glass `opacity` 0.85.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
