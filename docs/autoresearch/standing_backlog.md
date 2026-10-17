@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2072
+
+- Shared Agent Ops Save (`.ops-agent-edit-actions .btn-primary:disabled`) drops glass `opacity` 0.45. The disabled Save mixes a quiet blue wash (`color-mix` 36% `#2196f3` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 36% `#2196f3` on `#0e0e14`) and a quiet label (45% `#ffffff` on that blue, dark shells 45% `#ffffff` on `#0e0e14`). The cursor stays pointer. Standing P2 #14; design-review fuel (Agent Ops edit chrome); Mac capture deferred. Off badge opaque in v0.1.2071. Next: `.chat-empty-chip` (0.95), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2071
 
 - Shared Agent Ops Off badge (`.ops-badge.off`) drops glass `opacity` 0.6. The Off badge mixes type color against an opaque wash (`color-mix` 53% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 55% `#ffffff` on `#0e0e14`). Standing P2 #14; design-review fuel (Agent Ops badge chrome); Mac capture deferred. Waiting badge opaque in v0.1.2070. Next: `.ops-agent-edit-actions .btn-primary:disabled` (0.45), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

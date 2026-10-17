@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2072** | Agent Ops Save while disabled: quiet blue wash and label, no glass `opacity` 0.45; dark shells remap onto `#0e0e14`. Cursor stays pointer |
 | **v0.1.2071** | Agent Ops Off badge: badge type uses an opaque ink mix (was glass `opacity` 0.6); dark shells remap onto `#0e0e14` |
 | **v0.1.2070** | Agent Ops On/Off badge while waiting: badge type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Cursor stays wait |
 | **v0.1.2069** | Disk Cleanup disabled scope row: row type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Off toggle stays clickable |
@@ -25,5 +26,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Agent Ops Save while disabled (`.ops-agent-edit-actions .btn-primary:disabled`) still uses glass `opacity` 0.45.
+- AI Chat starter chips (`.chat-empty-chip`) still use glass `opacity` 0.95.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.

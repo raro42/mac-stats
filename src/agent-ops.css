@@ -2551,9 +2551,23 @@ textarea.ops-agent-editor.is-dirty {
   cursor: pointer;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ops-agent-edit-actions .btn-primary:disabled {
-  opacity: 0.45;
+  opacity: 1;
   cursor: pointer;
+  /* Was opacity 0.45 over rgba(33, 150, 243, 0.8) → ~36% blue on the wash. */
+  background: color-mix(in srgb, #2196f3 36%, #ffffff);
+  /* Was opacity 0.45 on #fff → ~45% white mixed into that blue. */
+  color: color-mix(in srgb, #ffffff 45%, #2196f3);
+}
+
+body.theme-data-poster .ops-agent-edit-actions .btn-primary:disabled,
+body.theme-dark .ops-agent-edit-actions .btn-primary:disabled,
+body.theme-neon .ops-agent-edit-actions .btn-primary:disabled,
+body.theme-futuristic .ops-agent-edit-actions .btn-primary:disabled {
+  /* Was opacity 0.45 over the blue fill on #0e0e14. */
+  background: color-mix(in srgb, #2196f3 36%, #0e0e14);
+  color: color-mix(in srgb, #ffffff 45%, #0e0e14);
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
