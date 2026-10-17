@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2070
+
+- Shared Agent Ops On/Off badge (`button.ops-badge:disabled`) drops glass `opacity` 0.55. The waiting badge mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 51% `#ffffff` on `#0e0e14`). The cursor stays wait. Standing P2 #14; design-review fuel (Agent Ops badge chrome); Mac capture deferred. Disk Cleanup disabled scope row opaque in v0.1.2069. Next: `.ops-badge.off` (0.6), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2069
 
 - Shared Disk Cleanup disabled scope row (`.disk-cleanup-scope-row.is-disabled`) drops glass `opacity` 0.55. The row mixes type color against an opaque wash (`color-mix` 48% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 51% `#ffffff` on `#0e0e14`). The Off toggle stays clickable. Standing P2 #14; design-review fuel (Disk Cleanup scope chrome); Mac capture deferred. Removing row opaque in v0.1.2068. Next: `button.ops-badge:disabled` (0.55), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
