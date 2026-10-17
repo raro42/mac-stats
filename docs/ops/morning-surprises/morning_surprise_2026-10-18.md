@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2068** | Monitors removing row: row type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Clicks stay off. Ollama and MCP streams use `Response::chunk()` so a clean cargo check builds |
 | **v0.1.2067** | Monitors pending row: row type uses an opaque ink mix (was glass `opacity` 0.78); dark shells remap onto `#0e0e14`. Dashed border stays |
 | **v0.1.2066** | Monitors checking row: row type uses an opaque ink mix (was glass `opacity` 0.72); dark shells remap onto `#0e0e14`. Latency stays accent |
 | **v0.1.2065** | AI Chat collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
@@ -21,5 +22,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Shared `.monitor-item.is-removing` still uses glass `opacity` 0.55.
+- Shared `.disk-cleanup-scope-row.is-disabled` still uses glass `opacity` 0.55.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
