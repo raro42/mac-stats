@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2070** | Agent Ops On/Off badge while waiting: badge type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Cursor stays wait |
 | **v0.1.2069** | Disk Cleanup disabled scope row: row type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Off toggle stays clickable |
 | **v0.1.2068** | Monitors removing row: row type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Clicks stay off. Ollama and MCP streams use `Response::chunk()` so a clean cargo check builds |
 | **v0.1.2067** | Monitors pending row: row type uses an opaque ink mix (was glass `opacity` 0.78); dark shells remap onto `#0e0e14`. Dashed border stays |
@@ -23,5 +24,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- `button.ops-badge:disabled` still uses glass `opacity` 0.55.
+- `.ops-badge.off` still uses glass `opacity` 0.6.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
