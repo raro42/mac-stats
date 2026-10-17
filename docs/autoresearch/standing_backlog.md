@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2065
+
+- Shared AI Chat collapsed empty glance (`.ollama-collapsed-glance.is-empty`) drops glass `opacity` 0.85. The empty glance mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 78% `#ffffff` on `#0e0e14`). Standing P2 #14; design-review fuel (AI Chat chrome); Mac capture deferred. Agent Ops collapsed empty glance opaque in v0.1.2064. Next: shared `.monitor-item.is-checking` (0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2064
 
 - Shared Agent Ops collapsed empty glance (`.agent-ops-collapsed-glance.is-empty`) drops glass `opacity` 0.85. The empty glance mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 78% `#ffffff` on `#0e0e14`). Standing P2 #14; design-review fuel (Agent Ops chrome); Mac capture deferred. Monitors collapsed empty glance opaque in v0.1.2063. Next: shared `.ollama-collapsed-glance.is-empty` (0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
