@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2051
+
+- Shared Agent Ops insight lines (`.ops-insight-line`, not clickable) mix type color against an opaque wash (`color-mix` 70% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 74% `#ffffff` on `#0e0e14`). No glass `opacity` on those lines. Clickable rows stay at glass `opacity` 0.9. Standing P2 #14; design-review fuel (Agent Ops Insights chrome); Mac capture deferred. Monitors latency opaque in v0.1.2050. Next: shared `.ops-insight-line.is-clickable` (0.9 on inherit), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2050
 
-- Shared Monitors latency (`.monitor-latency`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the response-time line. Checking, Slow, and Down keep their own colors. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Perplexity empty hint opaque in v0.1.2049. Next: shared `.ops-insight-line` (0.8 on inherit), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+- Shared Monitors latency (`.monitor-latency`) mixes the opaque muted color into the wash (90% on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 90% on `#0e0e14`). No glass `opacity` on the response-time line. Checking, Slow, and Down keep their own colors. Standing P2 #14; design-review fuel (Monitors list chrome); Mac capture deferred. Perplexity empty hint opaque in v0.1.2049. Next done in v0.1.2051 (`.ops-insight-line`). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2049
 
