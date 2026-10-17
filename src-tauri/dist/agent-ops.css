@@ -1012,7 +1012,11 @@ body.theme-futuristic .monitor-latency {
 body.theme-data-poster .monitor-detail-k,
 body.theme-dark .monitor-detail-k,
 body.theme-neon .monitor-detail-k,
-body.theme-futuristic .monitor-detail-k {
+body.theme-futuristic .monitor-detail-k,
+body.theme-data-poster .monitor-backoff-hint,
+body.theme-dark .monitor-backoff-hint,
+body.theme-neon .monitor-backoff-hint,
+body.theme-futuristic .monitor-backoff-hint {
   /* Was opacity 0.78 on --muted. Opaque muted RGB, then 78% on #0e0e14. */
   color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0e0e14);
   opacity: 1;
@@ -9013,8 +9017,9 @@ button.monitor-detail-url.is-just-saved {
   line-height: 1.35;
   font-weight: 450;
   letter-spacing: 0.01em;
-  color: var(--muted, currentColor);
-  opacity: 0.78;
+  /* Was opacity 0.78 on --muted (often already translucent). Opaque muted RGB, then 78% on the wash. */
+  color: color-mix(in srgb, rgb(from var(--muted, #6b6b70) r g b) 78%, #ffffff);
+  opacity: 1;
 }
 
 .monitor-history {
