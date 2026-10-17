@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2073** | AI Chat starter chips: quiet accent wash and label, no glass `opacity` 0.95; dark shells remap onto `#0e0e14`. Hover still jumps to the full accent wash |
 | **v0.1.2072** | Agent Ops Save while disabled: quiet blue wash and label, no glass `opacity` 0.45; dark shells remap onto `#0e0e14`. Cursor stays pointer |
 | **v0.1.2071** | Agent Ops Off badge: badge type uses an opaque ink mix (was glass `opacity` 0.6); dark shells remap onto `#0e0e14` |
 | **v0.1.2070** | Agent Ops On/Off badge while waiting: badge type uses an opaque ink mix (was glass `opacity` 0.55); dark shells remap onto `#0e0e14`. Cursor stays wait |
@@ -26,5 +27,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- AI Chat starter chips (`.chat-empty-chip`) still use glass `opacity` 0.95.
+- Section-open icon images (`#icon-*.section-open img`) still use glass `opacity` 0.95.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
