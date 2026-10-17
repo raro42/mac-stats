@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2066** | Monitors checking row: row type uses an opaque ink mix (was glass `opacity` 0.72); dark shells remap onto `#0e0e14`. Latency stays accent |
 | **v0.1.2065** | AI Chat collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
 | **v0.1.2064** | Agent Ops collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
 | **v0.1.2063** | Monitors collapsed empty glance: empty glance uses an opaque ink mix (was glass `opacity` 0.85); dark shells remap onto `#0e0e14` |
@@ -19,5 +20,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Shared `.monitor-item.is-checking` still uses glass `opacity` 0.72.
+- Shared `.monitor-item.is-pending` still uses glass `opacity` 0.78.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
