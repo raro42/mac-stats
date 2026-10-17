@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2050** | Monitors latency line: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2049** | Perplexity empty search hint: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2048** | Monitors empty list hint: opaque muted mix (was glass `opacity` 0.9) |
 | **v0.1.2047** | Disk Cleanup empty category/scope hint: opaque muted mix (was glass `opacity` 0.9) |
@@ -27,10 +28,10 @@ Glass `opacity` on those lines forces the compositor to blend every paint. Mixin
 
 ## Still open
 
-- Shared `.monitor-latency` still uses glass `opacity` 0.9 on `--muted`.
+- Shared `.ops-insight-line` still uses glass `opacity` 0.8 on inherit.
 - Design-review screen `feature-cpu-metrics.png` is stale (~40d). Needs Mac TCC capture.
 - Layout daily review themes (Data Poster / dark / …) still marked due (screens missing on Linux).
 
 ## Ratchet
 
-Latest keep: `33763014`. v0.1.2049 Perplexity empty hint opaque.
+Latest keep: `1474626f`. v0.1.2050 Monitors latency opaque.
