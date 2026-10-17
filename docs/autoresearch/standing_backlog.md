@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2052
+
+- Shared Agent Ops clickable insight lines (`.ops-insight-line.is-clickable`) mix type color against an opaque wash (`color-mix` 79% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 83% `#ffffff` on `#0e0e14`). Hover and selected bump to full inherit strength (88% / 92%). No glass `opacity` on those rows. Standing P2 #14; design-review fuel (Agent Ops Insights chrome); Mac capture deferred. Non-clickable insight lines opaque in v0.1.2051. Next: shared `.monitor-detail-k` (0.78 on muted), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2051
 
 - Shared Agent Ops insight lines (`.ops-insight-line`, not clickable) mix type color against an opaque wash (`color-mix` 70% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 74% `#ffffff` on `#0e0e14`). No glass `opacity` on those lines. Clickable rows stay at glass `opacity` 0.9. Standing P2 #14; design-review fuel (Agent Ops Insights chrome); Mac capture deferred. Monitors latency opaque in v0.1.2050. Next: shared `.ops-insight-line.is-clickable` (0.9 on inherit), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
