@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2060
+
+- Shared Disk Cleanup empty shell (`.disk-cleanup-empty`) drops glass `opacity` 0.75. The load-error line mixes type color against an opaque wash (`color-mix` 66% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 69% `#ffffff` on `#0e0e14`). List-empty and filter-miss copy keep their own colors. Standing P2 #14; design-review fuel (Disk Cleanup chrome); Mac capture deferred. Top Processes empty shell opaque in v0.1.2059. Next: shared `.logs-viewer.is-empty` (0.75), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2058
 
 - Shared Disk Cleanup Recurse label (`.disk-cleanup-scope-rec`) mixes type color against an opaque wash (`color-mix` 70% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 74% `#ffffff` on `#0e0e14`). No glass `opacity` on the Recurse checkbox label. Standing P2 #14; design-review fuel (Disk Cleanup scope chrome); Mac capture deferred. Perplexity filter chips opaque in v0.1.2057. Next: shared `.process-empty` (0.78), or `.disk-cleanup-empty` (0.75), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
