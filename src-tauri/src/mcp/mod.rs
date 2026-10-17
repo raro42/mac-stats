@@ -287,7 +287,6 @@ async fn run_mcp_rpc(
     params: Option<serde_json::Value>,
     client: &reqwest::Client,
 ) -> Result<JsonRpcResponse, String> {
-    use futures_util::StreamExt;
     use tokio::sync::mpsc;
 
     info!(
@@ -310,26 +309,29 @@ async fn run_mcp_rpc(
     }
     let (tx_endpoint, mut rx_endpoint) = mpsc::unbounded_channel::<String>();
     let (tx_message, mut rx_message) = mpsc::unbounded_channel::<JsonRpcResponse>();
-    let mut stream = resp.bytes_stream();
+    // chunk() is on by default. bytes_stream() needs the reqwest `stream` feature.
+    let mut resp = resp;
     let mut buf = String::new();
     let read_task = tokio::spawn(async move {
-        while let Some(chunk) = stream.next().await {
-            if let Ok(bytes) = chunk {
-                if let Ok(s) = String::from_utf8(bytes.to_vec()) {
-                    buf.push_str(&s);
-                    while let Some((event, data, rest)) = parse_one_sse_event(&buf) {
-                        buf = rest.to_string();
-                        if event.as_deref() == Some("endpoint") {
-                            let url = data.unwrap_or_default().trim().to_string();
-                            if !url.is_empty() {
-                                let _ = tx_endpoint.send(url);
-                            }
-                        } else if event.as_deref() == Some("message") {
-                            if let Some(d) = data {
-                                if !d.is_empty() {
-                                    if let Ok(j) = serde_json::from_str::<JsonRpcResponse>(&d) {
-                                        let _ = tx_message.send(j);
-                                    }
+        loop {
+            let bytes = match resp.chunk().await {
+                Ok(Some(bytes)) => bytes,
+                _ => break,
+            };
+            if let Ok(s) = String::from_utf8(bytes.to_vec()) {
+                buf.push_str(&s);
+                while let Some((event, data, rest)) = parse_one_sse_event(&buf) {
+                    buf = rest.to_string();
+                    if event.as_deref() == Some("endpoint") {
+                        let url = data.unwrap_or_default().trim().to_string();
+                        if !url.is_empty() {
+                            let _ = tx_endpoint.send(url);
+                        }
+                    } else if event.as_deref() == Some("message") {
+                        if let Some(d) = data {
+                            if !d.is_empty() {
+                                if let Ok(j) = serde_json::from_str::<JsonRpcResponse>(&d) {
+                                    let _ = tx_message.send(j);
                                 }
                             }
                         }

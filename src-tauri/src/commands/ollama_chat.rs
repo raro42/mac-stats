@@ -399,7 +399,6 @@ async fn send_ollama_chat_messages_streaming_inner(
     options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use crate::state::APP_HANDLE;
-    use futures_util::StreamExt;
     use tracing::{debug, info};
 
     let messages = deduplicate_consecutive_messages(messages);
@@ -467,7 +466,8 @@ async fn send_ollama_chat_messages_streaming_inner(
         .get()
         .ok_or_else(|| "App handle not available for streaming".to_string())?
         .clone();
-    let mut stream = resp.bytes_stream();
+    // chunk() is on by default. bytes_stream() needs the reqwest `stream` feature.
+    let mut resp = resp;
     let mut buf = Vec::<u8>::new();
     let mut full_content = String::new();
 
@@ -480,11 +480,11 @@ async fn send_ollama_chat_messages_streaming_inner(
         let next_item = if coalesce_ms > 0 && !pending_emit.is_empty() {
             tokio::time::timeout(
                 tokio::time::Duration::from_millis(coalesce_ms),
-                stream.next(),
+                resp.chunk(),
             )
             .await
         } else {
-            Ok(stream.next().await)
+            Ok(resp.chunk().await)
         };
 
         match next_item {
@@ -497,7 +497,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                     "coalesced",
                 );
             }
-            Ok(None) => {
+            Ok(Ok(None)) => {
                 flush_stream_ui_chunk(
                     &app_handle,
                     &mut dedup,
@@ -507,8 +507,8 @@ async fn send_ollama_chat_messages_streaming_inner(
                 );
                 break;
             }
-            Ok(Some(Err(e))) => return Err(format!("Stream read error: {}", e)),
-            Ok(Some(Ok(chunk))) => {
+            Ok(Err(e)) => return Err(format!("Stream read error: {}", e)),
+            Ok(Ok(Some(chunk))) => {
                 buf.extend_from_slice(&chunk);
                 while let Some(pos) = buf.iter().position(|&b| b == b'\n') {
                     let line = std::mem::take(&mut buf);
