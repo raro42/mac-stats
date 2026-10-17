@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2062
+
+- Shared Monitors empty summary (`.monitors-summary.is-empty`) drops glass `opacity` 0.85. The empty summary line mixes type color against an opaque wash (`color-mix` 75% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 78% `#ffffff` on `#0e0e14`). Standing P2 #14; design-review fuel (Monitors chrome); Mac capture deferred. Debug Log empty viewer opaque in v0.1.2061. Next: shared `.monitors-collapsed-glance.is-empty` (0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2061
 
 - Shared Debug Log empty viewer (`.logs-viewer.is-empty`) drops glass `opacity` 0.75. The empty log line mixes type color against an opaque wash (`color-mix` 66% `#0c0c10` on `#ffffff`; Data Poster, Dark, Neon, and Futuristic 69% `#ffffff` on `#0e0e14`). Filter-miss copy keeps its own colors. Standing P2 #14; design-review fuel (Debug Log chrome); Mac capture deferred. Disk Cleanup empty shell opaque in v0.1.2060. Next: shared `.monitors-summary.is-empty` (0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
