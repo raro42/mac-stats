@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2078
+
+- Low Power Mode busy chip (`.lpm-info.is-busy`) drops glass `opacity` 0.72. Label and value mix 63% `#0c0c10` on `#ffffff` (On value mixes 72% `#248a3d` on `#ffffff`). Data Poster, Dark, Neon, and Futuristic mix 66% `#ffffff` on `#0e0e14` (On value 72% `#248a3d` on `#0e0e14`). The switch stays full strength. Clicks stay off while the chip is busy. Standing P2 #14; design-review fuel (power strip chrome); Mac capture deferred. Keyboard hints opaque in v0.1.2077. Next: iOS Data Poster ring glow (`ios/src/themes/data-poster.css` `.ring::before`, 0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2077
 
 - Filter-chip and modal header keyboard hints (`.filter-chip-kb-hint`, `.modal-header-kb-hint`, `.process-details-header-kb-hint`, `.changelog-header-kb-hint`) drop glass `opacity` 0.72. The line mixes 63% `#0c0c10` on `#ffffff` (Data Poster, Dark, Neon, and Futuristic 66% `#ffffff` on `#0e0e14`). The runtime sheet no longer puts glass back on Process Details and Changelog header hints. Standing P2 #14; design-review fuel (keyboard hint chrome); Mac capture deferred. Force Quit disclosure glyph opaque in v0.1.2076. Next: Low Power Mode busy chip (`.lpm-info.is-busy`, 0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

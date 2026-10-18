@@ -3578,9 +3578,41 @@ function ensureRamStripStyles() {
       left: 18px;
       transform: none;
     }
+    /* Opaque type — glass alpha stays in Graphics and Media (#14). */
     .lpm-info.is-busy {
-      opacity: 0.72;
+      opacity: 1;
       pointer-events: none;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+    }
+    .lpm-info.is-busy .lpm-label,
+    .lpm-info.is-busy .lpm-value {
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+    }
+    .lpm-info.is-on.is-busy .lpm-value {
+      /* Was opacity 0.72 on #248a3d over the near-white wash. */
+      color: color-mix(in srgb, #248a3d 72%, #ffffff);
+    }
+    body.theme-data-poster .lpm-info.is-busy,
+    body.theme-dark .lpm-info.is-busy,
+    body.theme-neon .lpm-info.is-busy,
+    body.theme-futuristic .lpm-info.is-busy,
+    body.theme-data-poster .lpm-info.is-busy .lpm-label,
+    body.theme-dark .lpm-info.is-busy .lpm-label,
+    body.theme-neon .lpm-info.is-busy .lpm-label,
+    body.theme-futuristic .lpm-info.is-busy .lpm-label,
+    body.theme-data-poster .lpm-info.is-busy .lpm-value,
+    body.theme-dark .lpm-info.is-busy .lpm-value,
+    body.theme-neon .lpm-info.is-busy .lpm-value,
+    body.theme-futuristic .lpm-info.is-busy .lpm-value {
+      /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
+      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+    }
+    body.theme-data-poster .lpm-info.is-on.is-busy .lpm-value,
+    body.theme-dark .lpm-info.is-on.is-busy .lpm-value,
+    body.theme-neon .lpm-info.is-on.is-busy .lpm-value,
+    body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
+      color: color-mix(in srgb, #248a3d 72%, #0e0e14);
     }
     .lpm-info.is-lpm-flash {
       box-shadow: none;
