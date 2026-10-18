@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2092
+
+- Light Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Light `cpu.css`) drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9). Those bitmaps paint at full strength on the white chip. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Apple section icon images opaque in v0.1.2091. Next: Apple Ready/Slow/Down image opacity (same 0.85 / 0.8), or Swiss section icon image filters (`brightness` / `opacity()`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. Architect, Material, and the dark shells still dim the bitmap with filters. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2091
 
 - Apple section icon images (`.icon-line-item img` in Apple `cpu.css`) drop glass `opacity` 0.55 (hover 0.75). The bitmap paints at full strength on the white chip. Ready, Slow, and Down images still use their own opacity. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Light section icon images opaque in v0.1.2090. Next: Light Ready/Slow/Down image opacity (0.85 / 0.8), or Swiss section icon image filters (`brightness` / `opacity()`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. Architect, Material, and the dark shells still dim the bitmap with filters. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.

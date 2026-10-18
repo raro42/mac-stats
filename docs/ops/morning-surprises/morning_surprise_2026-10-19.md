@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque paints. Digester w
 
 | Version | What |
 |---------|------|
+| **v0.1.2092** | Light Ready, Slow, and Down section icons: those bitmaps paint at full strength on the white chip. Was glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) |
 | **v0.1.2091** | Apple section icon images: the bitmap paints at full strength on the white chip. Was glass `opacity` 0.55 (hover 0.75). Ready, Slow, and Down still dim their own images |
 | **v0.1.2090** | Light section icon images: the bitmap paints at full strength on the white chip. Was glass `opacity` 0.55 (hover 0.75). Ready, Slow, and Down still dim their own images |
 | **v0.1.2089** | Bat glyph with no battery: mixes the dim ink into the strip (20% ink on Apple and Light, 31% `#ebebf5` on Data Poster). Was glass `opacity` 0.4 |
@@ -22,5 +23,5 @@ Glass `opacity` on those controls forces the compositor to blend every paint. Mi
 
 ## Still open
 
-- Light Ready, Slow, and Down images still dim (0.85 / 0.8). Swiss, Architect, Material, and the dark shells still dim that bitmap with filters. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
+- Apple Ready, Slow, and Down images still dim (0.85 / 0.8). Swiss, Architect, Material, and the dark shells still dim that bitmap with filters. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
 - Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.

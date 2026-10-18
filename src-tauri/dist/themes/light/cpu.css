@@ -1418,12 +1418,14 @@ body {
 
 .icon-line-item.status-good img {
   filter: none;
-  opacity: 0.85;
+  /* Was opacity 0.85 (hover 0.95) on the Ready bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-good:hover img {
   filter: none;
-  opacity: 0.95;
+  opacity: 1;
 }
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
@@ -1442,11 +1444,13 @@ body {
 
 .icon-line-item.status-warning img {
   filter: none;
-  opacity: 0.8;
+  /* Was opacity 0.8 (hover 0.9) on the Slow bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-warning:hover img {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
@@ -1471,11 +1475,13 @@ body {
 
 .icon-line-item.status-bad img {
   filter: none;
-  opacity: 0.85;
+  /* Was opacity 0.85 (hover 0.95) on the Down bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-bad:hover img {
-  opacity: 0.95;
+  opacity: 1;
 }
 
 /* Empty slots: hide — unfinished placeholders fought the glass UI */
