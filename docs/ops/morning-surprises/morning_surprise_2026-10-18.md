@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2079** | iOS Data Poster ring glow: CPU and RAM mix the ring color at 46.75% and 13.6% (was glass `opacity` 0.85). Storage mixes 38.25% and white scanlines at 0.051. Battery mixes 59.5% and white scanlines at 0.068 |
 | **v0.1.2078** | Low Power Mode chip while busy: label and value mix 63% `#0c0c10` on `#ffffff` (was glass `opacity` 0.72). On value mixes 72% `#248a3d`. Dark shells remap onto `#0e0e14`. The switch stays full strength. Clicks stay off |
 | **v0.1.2077** | Filter-chip and modal header keyboard hints: line mixes 63% `#0c0c10` on `#ffffff` (was glass `opacity` 0.72). Dark shells remap onto `#0e0e14`. Injected sheet no longer puts glass back on Process Details and Changelog header hints |
 | **v0.1.2076** | Force Quit disclosure glyph: chevron mixes 44% `#0c0c10` on `#ffffff` (was glass `opacity` 0.7). Dark shells remap onto `#0e0e14` |
@@ -32,5 +33,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Desktop CPU window source no longer uses fractional `opacity`. Next glass is the iOS Data Poster ring glow (`.ring::before`, 0.85) or the orphan dashboard insight emphasis.
+- Desktop CPU window source no longer uses fractional `opacity`. iOS Data Poster ring glow is opaque. Next glass is the iOS mini bars (`.poster-bars`, 0.85) or the orphan dashboard insight emphasis.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.

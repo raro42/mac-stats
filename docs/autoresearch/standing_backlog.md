@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2079
+
+- iOS Data Poster ring glow (`ios/src/themes/data-poster.css` `.ring::before`) drops glass `opacity` 0.85. CPU and RAM mix the ring color at 46.75% and 13.6% into transparent. Storage mixes 38.25% and white scanlines at 0.051. Battery mixes 59.5% and white scanlines at 0.068. Standing P2 #14; design-review fuel (iOS poster tiles); Mac capture deferred. Low Power Mode busy chip opaque in v0.1.2078. Next: iOS Data Poster mini bars (`.poster-bars`, 0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2078
 
 - Low Power Mode busy chip (`.lpm-info.is-busy`) drops glass `opacity` 0.72. Label and value mix 63% `#0c0c10` on `#ffffff` (On value mixes 72% `#248a3d` on `#ffffff`). Data Poster, Dark, Neon, and Futuristic mix 66% `#ffffff` on `#0e0e14` (On value 72% `#248a3d` on `#0e0e14`). The switch stays full strength. Clicks stay off while the chip is busy. Standing P2 #14; design-review fuel (power strip chrome); Mac capture deferred. Keyboard hints opaque in v0.1.2077. Next: iOS Data Poster ring glow (`ios/src/themes/data-poster.css` `.ring::before`, 0.85), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

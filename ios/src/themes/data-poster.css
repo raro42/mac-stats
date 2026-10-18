@@ -90,35 +90,36 @@
 }
 
 /* Tinted glow + scanlines per tile: .poster-tile::before (cpu.css:180-204), tinted with
-   the tile's color (it turns orange/red with the warn/crit level). */
+   the tile's color (it turns orange/red with the warn/crit level). Opacity 0.85 is folded
+   into the accent stops so the layer stays opaque to the compositor. */
 :root[data-theme="data-poster"] .ring::before {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.85;
   pointer-events: none;
 }
 
-/* CPU = .usage; RAM (the desktop GPU tile has no glow) uses the same recipe. */
+/* CPU = .usage; RAM (the desktop GPU tile has no glow) uses the same recipe.
+   55% and 16% stops were 0.85. */
 :root[data-theme="data-poster"] .ring.accent-cpu::before,
 :root[data-theme="data-poster"] .ring.accent-ram::before {
   background:
-    radial-gradient(circle at 50% 20%, color-mix(in srgb, var(--ring-color) 55%, transparent), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ring-color) 16%, transparent) 0 1px, transparent 1px 10px);
+    radial-gradient(circle at 50% 20%, color-mix(in srgb, var(--ring-color) 46.75%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ring-color) 13.6%, transparent) 0 1px, transparent 1px 10px);
 }
 
-/* Storage = .freq. */
+/* Storage = .freq. 45% and white 0.06 were 0.85. */
 :root[data-theme="data-poster"] .ring.accent-disk::before {
   background:
-    radial-gradient(circle at 70% 35%, color-mix(in srgb, var(--ring-color) 45%, transparent), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 10px);
+    radial-gradient(circle at 70% 35%, color-mix(in srgb, var(--ring-color) 38.25%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.051) 0 1px, transparent 1px 10px);
 }
 
-/* Battery = .heat. */
+/* Battery = .heat. 70% and white 0.08 were 0.85. */
 :root[data-theme="data-poster"] .ring.accent-battery::before {
   background:
-    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ring-color) 70%, transparent), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 10px);
+    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ring-color) 59.5%, transparent), rgba(0, 0, 0, 0) 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.068) 0 1px, transparent 1px 10px);
 }
 
 /* No ring: the value layer spans the whole tile, number centered (.metric-value),
