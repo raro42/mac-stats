@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2075
+
+- Shared Debug Log Copied badge (`.logs-line[role='option'].is-just-copied::after`) drops glass `opacity` 0.95. The label mixes 96% `#34c759` on `#ffffff` (the copied line wash stays 18% green on `#ffffff` in every theme). Standing P2 #14; design-review fuel (Debug Log line chrome); Mac capture deferred. Section-open icon images opaque in v0.1.2074. Next: Force Quit disclosure glyph (`.force-quit-advanced > summary::before`, 0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2074
 
 - Shared section-open icon images (`#icon-*.section-open img`) drop glass `opacity` 0.95. Open Monitors, AI Chat, Perplexity, Debug Log, Disk Cleanup, and Agent Ops glyphs paint at full opacity. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. AI Chat starter chips opaque in v0.1.2073. Next: Debug Log Copied badge (`.logs-line[role='option'].is-just-copied::after`, 0.95), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

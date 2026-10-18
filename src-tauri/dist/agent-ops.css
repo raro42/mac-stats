@@ -4821,6 +4821,7 @@ body.theme-futuristic .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
   box-shadow: none;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .logs-line[role='option'].is-just-copied::after {
   content: 'Copied';
   position: absolute;
@@ -4830,8 +4831,9 @@ body.theme-futuristic .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
   font-weight: 700;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   letter-spacing: 0.02em;
-  color: #34c759;
-  opacity: 0.95;
+  /* Was opacity 0.95 on #34c759 over the copied wash (18% green on #ffffff) → ~96% green on #ffffff. */
+  color: color-mix(in srgb, #34c759 96%, #ffffff);
+  opacity: 1;
   pointer-events: none;
 }
 

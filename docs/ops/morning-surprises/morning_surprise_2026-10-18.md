@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2075** | Debug Log Copied badge: label mixes 96% `#34c759` on `#ffffff` (was glass `opacity` 0.95). Same near-white copied wash on every theme |
 | **v0.1.2074** | Section-open icon images: open Monitors, AI Chat, Perplexity, Debug Log, Disk Cleanup, and Agent Ops glyphs paint at full opacity (was glass `opacity` 0.95) |
 | **v0.1.2073** | AI Chat starter chips: quiet accent wash and label, no glass `opacity` 0.95; dark shells remap onto `#0e0e14`. Hover still jumps to the full accent wash |
 | **v0.1.2072** | Agent Ops Save while disabled: quiet blue wash and label, no glass `opacity` 0.45; dark shells remap onto `#0e0e14`. Cursor stays pointer |
@@ -28,5 +29,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Debug Log Copied badge (`.logs-line[role='option'].is-just-copied::after`) still uses glass `opacity` 0.95.
+- Force Quit disclosure glyph (`.force-quit-advanced > summary::before`) still uses glass `opacity` 0.7.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
