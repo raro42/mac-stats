@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2089
+
+- No-battery icon (`.battery-icon.no-battery` in each theme `cpu.css`) drops glass `opacity` 0.4. Apple and Light mix 20% `#0c0c10` on the strip `#ececf1`. Swiss mixes that ink on 40% white over `#f6f6f6`. Architect uses `#f1f1f1`, Material `#ebe4d9`, Neon `#08120c`. Data Poster mixes 31% `#ebebf5` on `#0b0b10` (old 78% glyph times 0.4). Dark mixes 20% `#0c0c10` on `#0a0a0a`. Futuristic mixes 20% `#c7c7c7` on `#111123`. Standing P2 #14; design-review fuel (power strip chrome); Mac capture deferred. AI-off section icons opaque in v0.1.2088. Next: section icon images (`.icon-line-item img`, `opacity` 0.55 resting / 0.75 hover in Light `cpu.css`; Swiss, Architect, Material, and the dark shells still dim the bitmap), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2088
 
 - AI-off section icons (`src/cpu-ui.js` `applyAiUiVisibility`, class `.is-ai-off`) drop glass `opacity` 0.55. The chip mixes 55% of its fill into the shell (Apple and Light `#f7f7fa`, Swiss white, Architect `#f1f1f1`, Material `#ebe4d9`, Data Poster `#0b0b10`, Dark panel `#0a0a0a`, Neon `#08120c`, Futuristic `#111123`). Ready, Slow, and Down stay full strength. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Judge failure-only label opaque in v0.1.2087. Next: battery icon with no battery (`.battery-icon.no-battery`, `opacity` 0.4 in theme `cpu.css`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.

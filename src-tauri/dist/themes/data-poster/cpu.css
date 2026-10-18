@@ -1111,7 +1111,9 @@ body {
 }
 
 .battery-icon.no-battery {
-  opacity: 0.4;
+  /* Was opacity 0.4 on rgba(235, 235, 245, 0.78) over the poster field #0b0b10. */
+  opacity: 1;
+  color: color-mix(in srgb, #ebebf5 31%, #0b0b10);
 }
 
 .battery-level {

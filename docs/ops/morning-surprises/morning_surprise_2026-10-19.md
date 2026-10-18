@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque paints. Digester w
 
 | Version | What |
 |---------|------|
+| **v0.1.2089** | Bat glyph with no battery: mixes the dim ink into the strip (20% ink on Apple and Light, 31% `#ebebf5` on Data Poster). Was glass `opacity` 0.4 |
 | **v0.1.2088** | AI Chat, Perplexity, Discord, and Agent Ops icons while local AI is off: the chip mixes 55% of its fill into the shell. Ready, Slow, and Down stay full strength. Was glass `opacity` 0.55 |
 | **v0.1.2087** | Settings "Judge on failure only" while Judge is off: 48% ink on white (41% white on Data Poster and Futuristic, 44% mint on Neon, 44% green on Dark). Was glass `opacity` 0.55 |
 | **v0.1.2086** | Agent Ops insight emphasis: the question mixes 70% of the line color into the wash (53% white on the dark dashboard sheet). Was glass `opacity` 0.7 |
@@ -19,5 +20,5 @@ Glass `opacity` on those controls forces the compositor to blend every paint. Mi
 
 ## Still open
 
-- Battery icon with no battery (`.battery-icon.no-battery`, `opacity` 0.4 in theme `cpu.css`) still uses glass opacity. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
+- Section icon images (`.icon-line-item img`, `opacity` 0.55 resting and 0.75 on hover in Light `cpu.css`) still use glass opacity. Swiss, Architect, Material, and the dark shells still dim that bitmap. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
 - Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.

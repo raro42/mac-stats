@@ -1110,7 +1110,9 @@ body {
 }
 
 .battery-icon.no-battery {
-  opacity: 0.4;
+  /* Was opacity 0.4 on rgba(199, 199, 199, 0.50) over the shell #111123. */
+  opacity: 1;
+  color: color-mix(in srgb, #c7c7c7 20%, #111123);
 }
 
 .battery-level {
