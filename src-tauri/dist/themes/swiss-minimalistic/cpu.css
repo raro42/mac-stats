@@ -1326,13 +1326,15 @@ body {
   height: 14px;
   display: block;
   object-fit: contain;
-  /* Soft neutral glyph for raster/SVG logos (Ollama) */
-  filter: brightness(0) saturate(100%) invert(45%) opacity(0.55);
+  /* Was brightness(0) invert opacity(0.55) (hover invert opacity(0.7)).
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  filter: none;
   opacity: 1;
 }
 
 .icon-line-item:hover img {
-  filter: brightness(0) saturate(100%) invert(35%) opacity(0.7);
+  filter: none;
+  opacity: 1;
 }
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */

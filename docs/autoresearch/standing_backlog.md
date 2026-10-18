@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2094
+
+- Swiss section icon images (`.icon-line-item img` in Swiss `cpu.css`) drop the glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). The bitmap paints at full strength on the white chip. Ready, Slow, and Down still tint and dim their own images. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Apple Ready, Slow, and Down opaque in v0.1.2093. Next: Architect section icon image filters (same `brightness` / `opacity()`), or Architect Ready/Slow/Down image opacity (0.85 / 0.8), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. Material and the dark shells still dim the resting bitmap with filters. Swiss Ready, Slow, and Down still use filters. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2093
 
 - Apple Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Apple `cpu.css`) drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9). Those bitmaps paint at full strength on the white chip. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Light Ready, Slow, and Down opaque in v0.1.2092. Next: Swiss section icon image filters (`brightness` / `opacity()`), or Architect Ready/Slow/Down image opacity (same 0.85 / 0.8), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. Material and the dark shells still dim the bitmap with filters. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
