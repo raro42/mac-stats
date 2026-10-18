@@ -4437,7 +4437,9 @@
         // sections also use .collapsed; keep icon row icons dimmed when off
         el.style.display = enabled ? "" : "none";
       } else if (el.classList.contains("icon-line-item")) {
-        el.style.opacity = enabled ? "" : "0.55";
+        // Dim with .is-ai-off (opaque mix). Inline opacity kept a glass layer (#14).
+        el.style.opacity = "";
+        el.classList.toggle("is-ai-off", !enabled);
         // Keep clickable when AI is off (GitHub #11) — click can enable AI or open Settings.
         el.style.pointerEvents = "";
         el.dataset.aiGated = enabled ? "0" : "1";

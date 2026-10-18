@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2088] - 2026-10-18
+
+### Changed
+- **AI-off section icons:** AI Chat, Perplexity, Discord, and Agent Ops icons drop glass `opacity` 0.55 while local AI is off. The chip mixes 55% of its fill into the shell (Apple and Light `#f7f7fa`, Swiss white, Architect `#f1f1f1`, Material `#ebe4d9`, Data Poster `#0b0b10`, Dark panel `#0a0a0a`, Neon `#08120c`, Futuristic `#111123`). Ready, Slow, and Down stays full strength. Design review fuel (section icon chrome). Judge failure-only label opaque in v0.1.2087.
+
 ## [0.1.2087] - 2026-10-18
 
 ### Changed

@@ -533,6 +533,103 @@ body:hover {
   opacity: 1;
 }
 
+/*
+ * AI off: the icon row used inline opacity 0.55, which blended the whole chip.
+ * Mix the chip into the shell instead. Alerts stay on their status washes.
+ */
+.icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  opacity: 1;
+  /* White chip over the Apple / Light shell #f7f7fa. */
+  background: color-mix(in srgb, #ffffff 55%, #f7f7fa);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #f7f7fa);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #f7f7fa);
+}
+.icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  opacity: 1;
+  background: color-mix(in srgb, #ececf1 55%, #f7f7fa);
+  border-color: color-mix(in srgb, #dcdce2 55%, #f7f7fa);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #f7f7fa);
+}
+
+body.theme-swiss-minimalistic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: #ffffff;
+  border-color: color-mix(in srgb, #e6e6ea 55%, #ffffff);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #ffffff);
+}
+body.theme-swiss-minimalistic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #ececf1 55%, #ffffff);
+  border-color: color-mix(in srgb, #dcdce2 55%, #ffffff);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #ffffff);
+}
+
+body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #ffffff 55%, #f1f1f1);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #f1f1f1);
+}
+body.theme-architect .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #ececf1 55%, #f1f1f1);
+  border-color: color-mix(in srgb, #dcdce2 55%, #f1f1f1);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #f1f1f1);
+}
+
+body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #ffffff 55%, #ebe4d9);
+  border-color: color-mix(in srgb, #e6e6ea 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 42%, #ffffff) 55%, #ebe4d9);
+}
+body.theme-material .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #ececf1 55%, #ebe4d9);
+  border-color: color-mix(in srgb, #dcdce2 55%, #ebe4d9);
+  color: color-mix(in srgb, color-mix(in srgb, #0c0c10 72%, #ececf1) 55%, #ebe4d9);
+}
+
+body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  /* Chip #16161e over the poster field #0b0b10. Glyph was 95% white on the chip. */
+  background: color-mix(in srgb, #16161e 55%, #0b0b10);
+  border-color: color-mix(in srgb, #3a3a44 55%, #0b0b10);
+  color: color-mix(in srgb, color-mix(in srgb, #ffffff 95%, #16161e) 55%, #0b0b10);
+}
+body.theme-data-poster .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #1e1e28 55%, #0b0b10);
+  border-color: color-mix(in srgb, #4a4a54 55%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+}
+
+body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  /* Chip matches the panel #0a0a0a, so the fill stays put. Glyph was 45% #ebebf5. */
+  background: #0a0a0a;
+  border-color: color-mix(in srgb, #004400 55%, #0a0a0a);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #0a0a0a) 55%, #0a0a0a);
+}
+body.theme-dark .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #121212 55%, #0a0a0a);
+  border-color: color-mix(in srgb, #006600 55%, #0a0a0a);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #121212) 55%, #0a0a0a);
+}
+
+body.theme-neon .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #06110a 55%, #08120c);
+  border-color: color-mix(in srgb, #1a3a22 55%, #08120c);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #06110a) 55%, #08120c);
+}
+body.theme-neon .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #0a1a10 55%, #08120c);
+  border-color: color-mix(in srgb, #2a5a32 55%, #08120c);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #0a1a10) 55%, #08120c);
+}
+
+body.theme-futuristic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim) {
+  background: color-mix(in srgb, #0a0a12 55%, #111123);
+  border-color: color-mix(in srgb, #2a2a3a 55%, #111123);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 45%, #0a0a12) 55%, #111123);
+}
+body.theme-futuristic .icon-line-item.is-ai-off:not(.status-good):not(.status-warning):not(.status-bad):not(.has-reclaim):hover {
+  background: color-mix(in srgb, #12121c 55%, #111123);
+  border-color: color-mix(in srgb, #3a3a4a 55%, #111123);
+  color: color-mix(in srgb, color-mix(in srgb, #ebebf5 85%, #12121c) 55%, #111123);
+}
+
 #icon-monitors.status-bad,
 #icon-monitors.status-warning,
 #icon-ollama.status-bad,

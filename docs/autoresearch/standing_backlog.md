@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2088
+
+- AI-off section icons (`src/cpu-ui.js` `applyAiUiVisibility`, class `.is-ai-off`) drop glass `opacity` 0.55. The chip mixes 55% of its fill into the shell (Apple and Light `#f7f7fa`, Swiss white, Architect `#f1f1f1`, Material `#ebe4d9`, Data Poster `#0b0b10`, Dark panel `#0a0a0a`, Neon `#08120c`, Futuristic `#111123`). Ready, Slow, and Down stay full strength. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Judge failure-only label opaque in v0.1.2087. Next: battery icon with no battery (`.battery-icon.no-battery`, `opacity` 0.4 in theme `cpu.css`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2087
 
 - Settings judge failure-only label (`src/cpu-ui.js` `.toggle-label.is-judge-off`) drops glass `opacity` 0.55 while Judge is off. The label mixes 48% `#0c0c10` on `#ffffff` (Data Poster and Futuristic 41% `#ffffff` on `#0e0e14`, Neon 44% `#c8ffd2` on `#0e0e14`, Dark 44% `#00ff00` on `#000000`). Standing P2 #14; design-review fuel (Settings Product); Mac capture deferred. Insight emphasis opaque in v0.1.2086. Next: AI-off section icons (`src/cpu-ui.js` `applyAiUiVisibility` `el.style.opacity = "0.55"`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
