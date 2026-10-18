@@ -168,6 +168,9 @@
   pointer-events: none;
 }
 
+/* Mini bar chart. Opacity 0.85 used to sit on this canvas (bars drew at 0.9, so the
+   tile saw 0.765). That factor now lives in poster-chart.ts, so the canvas has no
+   CSS opacity for the compositor. */
 :root[data-theme="data-poster"] .poster-bars {
   display: block;
   position: absolute;
@@ -177,7 +180,6 @@
   right: 12px;
   width: 54px;
   height: 38px;
-  opacity: 0.85;
 }
 
 :root[data-theme="data-poster"] .poster-line {
