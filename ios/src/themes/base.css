@@ -743,8 +743,11 @@ body.i18n-pending {
   font-weight: 600;
 }
 
+/* Disabled chat Send used glass opacity 0.4. Mix the fill and label into the composer bar. */
 .composer-send:disabled {
-  opacity: 0.4;
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent) 40%, var(--bg));
+  color: color-mix(in srgb, var(--on-accent) 40%, var(--bg));
 }
 
 /* Automatic benchmark progress (debug only) */

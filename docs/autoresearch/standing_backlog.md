@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2085
+
+- iOS chat Send while disabled (`ios/src/themes/base.css` `.composer-send:disabled`) drops glass `opacity` 0.4. The fill mixes 40% of the accent into the composer bar. The label mixes 40% of the on-accent color into the bar. Standing P2 #14; design-review fuel (iOS chat composer); Mac capture deferred. Lab buttons opaque in v0.1.2084. Next: Agent Ops insight emphasis (`src/dashboard.css` `.ops-insight-line em`, 0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2084
 
 - iOS lab button while disabled (`ios/src/themes/base.css` `.lab-btn:disabled`) drops glass `opacity` 0.5. The fill mixes 50% of the track into the card. The label mixes 50% of the text color into the card. Generate (`.lab-send:disabled`) mixes 50% of the accent and the on-accent label into the card. Standing P2 #14; design-review fuel (iOS lab controls); Mac capture deferred. Thermal passed step opaque in v0.1.2083. Next: iOS chat send while disabled (`.composer-send:disabled`, 0.4), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
