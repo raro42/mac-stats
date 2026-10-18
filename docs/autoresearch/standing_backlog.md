@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2084
+
+- iOS lab button while disabled (`ios/src/themes/base.css` `.lab-btn:disabled`) drops glass `opacity` 0.5. The fill mixes 50% of the track into the card. The label mixes 50% of the text color into the card. Generate (`.lab-send:disabled`) mixes 50% of the accent and the on-accent label into the card. Standing P2 #14; design-review fuel (iOS lab controls); Mac capture deferred. Thermal passed step opaque in v0.1.2083. Next: iOS chat send while disabled (`.composer-send:disabled`, 0.4), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2083
 
 - iOS thermal passed step (`ios/src/themes/base.css` `.thermal-step.is-passed::before`) drops glass `opacity` 0.35. The bar mixes 35% of the step color into transparent. Standing P2 #14; design-review fuel (iOS thermal tiles); Mac capture deferred. Light ring glow opaque in v0.1.2082. Next: iOS lab button while disabled (`ios/src/themes/base.css` `.lab-btn:disabled`, 0.5), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

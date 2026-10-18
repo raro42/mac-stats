@@ -472,8 +472,11 @@ body.i18n-pending {
   font-weight: 600;
 }
 
+/* Disabled lab buttons used glass opacity 0.5. Mix the fill and label into the card. */
 .lab-btn:disabled {
-  opacity: 0.5;
+  opacity: 1;
+  background: color-mix(in srgb, var(--track) 50%, var(--card));
+  color: color-mix(in srgb, var(--fg) 50%, var(--card));
 }
 
 .lab-send {
@@ -481,6 +484,11 @@ body.i18n-pending {
   margin-top: 8px;
   background: var(--accent);
   color: var(--on-accent);
+}
+
+.lab-send:disabled {
+  background: color-mix(in srgb, var(--accent) 50%, var(--card));
+  color: color-mix(in srgb, var(--on-accent) 50%, var(--card));
 }
 
 .lab-output {
