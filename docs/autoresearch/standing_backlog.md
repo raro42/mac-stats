@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2081
+
+- iOS Data Poster line chart (`ios/src/themes/data-poster.css` `.poster-line`) drops glass `opacity` 0.9. The stroke paints at 0.72 (old 0.8 draw alpha times 0.9) and the fill at 0.135 (old 0.15 times 0.9) in `poster-chart.ts`. Standing P2 #14; design-review fuel (iOS poster tiles); Mac capture deferred. Mini bars opaque in v0.1.2080. Next: iOS light ring glow (`ios/src/themes/light.css` `.ring::after`, 0.65), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2080
 
 - iOS Data Poster mini bars (`ios/src/themes/data-poster.css` `.poster-bars`) drop glass `opacity` 0.85. Bars paint at 0.765 (the old 0.9 canvas alpha times 0.85) in `poster-chart.ts`. Standing P2 #14; design-review fuel (iOS poster tiles); Mac capture deferred. Ring glow opaque in v0.1.2079. Next: iOS Data Poster line chart (`.poster-line`, 0.9), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

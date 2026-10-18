@@ -182,6 +182,9 @@
   height: 38px;
 }
 
+/* Mini line chart. Opacity 0.9 used to sit on this canvas (stroke drew at 0.8 and
+   fill at 0.15, so the tile saw 0.72 / 0.135). Those factors now live in
+   poster-chart.ts, so the canvas has no CSS opacity for the compositor. */
 :root[data-theme="data-poster"] .poster-line {
   display: block;
   position: absolute;
@@ -190,7 +193,6 @@
   left: 0;
   width: 100%;
   height: 40px;
-  opacity: 0.9;
 }
 
 :root[data-theme="data-poster"] .card h2,

@@ -1,7 +1,8 @@
 // Data Poster mini charts: a 12-bar chart and a 60-point line chart per tile, ported from
 // the desktop theme (src-tauri/dist/themes/data-poster/poster-charts.js): same buffer
 // sizes, moving average of 5 for display, auto-scaling max with 10% headroom, and the
-// tile color at 0.765 (bars: 0.9 draw alpha times the old CSS 0.85) / 0.8 (line) / 0.15 (fill).
+// tile color at 0.765 (bars: 0.9 draw alpha times the old CSS 0.85),
+// line stroke 0.72 (0.8 times the old CSS 0.9), fill 0.135 (0.15 times that 0.9).
 
 const BAR_COUNT = 12;
 const LINE_POINTS = 60;
@@ -105,13 +106,15 @@ export class PosterChart {
       ctx.closePath();
       const color = this.color();
       ctx.fillStyle = color;
-      ctx.globalAlpha = 0.15;
+      // 0.15 * 0.9. The old CSS opacity on .poster-line is folded in here.
+      ctx.globalAlpha = 0.135;
       ctx.fill();
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
       for (const p of points) ctx.lineTo(p.x, p.y);
       ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.8;
+      // 0.8 * 0.9. Same fold as the fill.
+      ctx.globalAlpha = 0.72;
       ctx.lineWidth = 2;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
