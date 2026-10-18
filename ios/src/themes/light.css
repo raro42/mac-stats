@@ -91,7 +91,8 @@
   overflow: visible;
 }
 
-/* cpu.css:214-221 .metric-card::after: soft white highlight behind the gauge. */
+/* cpu.css:214-221 .metric-card::after: soft white highlight behind the gauge.
+   The 0.6 stop was glass opacity 0.65 (0.6 * 0.65 = 0.39). */
 :root[data-theme="light"] .ring {
   isolation: isolate;
 }
@@ -102,8 +103,7 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: radial-gradient(140px 140px at 50% 20%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 60%);
-  opacity: 0.65;
+  background: radial-gradient(140px 140px at 50% 20%, rgba(255, 255, 255, 0.39), rgba(255, 255, 255, 0) 60%);
   pointer-events: none;
 }
 
