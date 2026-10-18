@@ -522,13 +522,15 @@ body:hover {
   filter: none;
 }
 
+/* Opaque glyph — glass alpha stays in Graphics and Media (#14). */
 #icon-monitors.section-open img,
 #icon-ollama.section-open img,
 #icon-perplexity.section-open img,
 #icon-logs.section-open img,
 #icon-disk-cleanup.section-open img,
 #icon-agent-ops.section-open img {
-  opacity: 0.95;
+  /* Was opacity 0.95 on the open-section bitmap. Full paint, no extra blend. */
+  opacity: 1;
 }
 
 #icon-monitors.status-bad,

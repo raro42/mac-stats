@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2074
+
+- Shared section-open icon images (`#icon-*.section-open img`) drop glass `opacity` 0.95. Open Monitors, AI Chat, Perplexity, Debug Log, Disk Cleanup, and Agent Ops glyphs paint at full opacity. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. AI Chat starter chips opaque in v0.1.2073. Next: Debug Log Copied badge (`.logs-line[role='option'].is-just-copied::after`, 0.95), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2073
 
 - Shared AI Chat starter chips (`.chat-empty-chip`) drop glass `opacity` 0.95. The chip mixes a quiet accent wash (border 27% accent on `#ffffff`, fill 10% accent on `#ffffff`; Data Poster, Dark, Neon, and Futuristic border 34% accent and fill 13% accent on `#0e0e14`) and a quiet label (84% `#0c0c10` on `#ffffff`; dark shells 87% `#ffffff` on `#0e0e14`). Hover still jumps to the full accent wash. Standing P2 #14; design-review fuel (AI Chat empty chrome); Mac capture deferred. Disabled Save opaque in v0.1.2072. Next: section-open icon images (`#icon-*.section-open img`, 0.95), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
