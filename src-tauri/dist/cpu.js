@@ -5499,9 +5499,19 @@ function ensureFilterChipKbStyles() {
       display: none;
       margin: 2px 0 0;
       font-size: 11px;
-      opacity: 0.72;
+      /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+      color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+      opacity: 1;
       width: 100%;
       flex-basis: 100%;
+    }
+    body.theme-data-poster .filter-chip-kb-hint,
+    body.theme-dark .filter-chip-kb-hint,
+    body.theme-neon .filter-chip-kb-hint,
+    body.theme-futuristic .filter-chip-kb-hint {
+      /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
+      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      opacity: 1;
     }
     .processes-filter-chips,
     .monitors-filter-chips,

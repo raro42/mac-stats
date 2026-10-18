@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2077
+
+- Filter-chip and modal header keyboard hints (`.filter-chip-kb-hint`, `.modal-header-kb-hint`, `.process-details-header-kb-hint`, `.changelog-header-kb-hint`) drop glass `opacity` 0.72. The line mixes 63% `#0c0c10` on `#ffffff` (Data Poster, Dark, Neon, and Futuristic 66% `#ffffff` on `#0e0e14`). The runtime sheet no longer puts glass back on Process Details and Changelog header hints. Standing P2 #14; design-review fuel (keyboard hint chrome); Mac capture deferred. Force Quit disclosure glyph opaque in v0.1.2076. Next: Low Power Mode busy chip (`.lpm-info.is-busy`, 0.72), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2076
 
 - Shared Force Quit disclosure glyph (`.force-quit-advanced > summary::before`) drops glass `opacity` 0.7. The chevron mixes 44% `#0c0c10` on `#ffffff` (Data Poster, Dark, Neon, and Futuristic 46% `#ffffff` on `#0e0e14`). Standing P2 #14; design-review fuel (Process Details chrome); Mac capture deferred. Debug Log Copied badge opaque in v0.1.2075. Next: Apple `.process-row:active` (0.92), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

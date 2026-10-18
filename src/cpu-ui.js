@@ -188,9 +188,27 @@
       .changelog-header-kb-hint {
         margin: 0;
         font-size: 11px;
-        opacity: 0.72;
+        /* Was opacity 0.72 on inherit (~88% ink) → ~63% ink on the near-white wash. */
+        color: color-mix(in srgb, #0c0c10 63%, #ffffff);
+        opacity: 1;
         flex: 1 1 auto;
         text-align: center;
+      }
+      body.theme-data-poster .modal-header-kb-hint,
+      body.theme-dark .modal-header-kb-hint,
+      body.theme-neon .modal-header-kb-hint,
+      body.theme-futuristic .modal-header-kb-hint,
+      body.theme-data-poster .process-details-header-kb-hint,
+      body.theme-dark .process-details-header-kb-hint,
+      body.theme-neon .process-details-header-kb-hint,
+      body.theme-futuristic .process-details-header-kb-hint,
+      body.theme-data-poster .changelog-header-kb-hint,
+      body.theme-dark .changelog-header-kb-hint,
+      body.theme-neon .changelog-header-kb-hint,
+      body.theme-futuristic .changelog-header-kb-hint {
+        /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
+        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        opacity: 1;
       }
       .settings-header-kb-hint,
       .ollama-settings-header-kb-hint {

@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque type washes on the
 
 | Version | What |
 |---------|------|
+| **v0.1.2077** | Filter-chip and modal header keyboard hints: line mixes 63% `#0c0c10` on `#ffffff` (was glass `opacity` 0.72). Dark shells remap onto `#0e0e14`. Injected sheet no longer puts glass back on Process Details and Changelog header hints |
 | **v0.1.2076** | Force Quit disclosure glyph: chevron mixes 44% `#0c0c10` on `#ffffff` (was glass `opacity` 0.7). Dark shells remap onto `#0e0e14` |
 | **v0.1.2075** | Debug Log Copied badge: label mixes 96% `#34c759` on `#ffffff` (was glass `opacity` 0.95). Same near-white copied wash on every theme |
 | **v0.1.2074** | Section-open icon images: open Monitors, AI Chat, Perplexity, Debug Log, Disk Cleanup, and Agent Ops glyphs paint at full opacity (was glass `opacity` 0.95) |
@@ -30,5 +31,5 @@ Glass `opacity` on that shell forces the compositor to blend every paint. Mixing
 
 ## Still open
 
-- Apple process row while pressed (`.process-row:active`) still uses glass `opacity` 0.92.
+- Low Power Mode chip while busy (`.lpm-info.is-busy`) still uses glass `opacity` 0.72.
 - Design-review screen `feature-cpu-metrics.png` is stale (~41d). Needs Mac TCC capture.
