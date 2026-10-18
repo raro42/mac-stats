@@ -4025,7 +4025,8 @@
         .closest?.(".setting-toggle")
         ?.querySelector(".toggle-label");
       if (label) {
-        label.style.opacity = on ? "" : "0.55";
+        label.classList.toggle("is-judge-off", !on);
+        label.style.opacity = "";
       }
     };
 

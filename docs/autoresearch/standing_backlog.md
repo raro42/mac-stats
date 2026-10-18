@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2087
+
+- Settings judge failure-only label (`src/cpu-ui.js` `.toggle-label.is-judge-off`) drops glass `opacity` 0.55 while Judge is off. The label mixes 48% `#0c0c10` on `#ffffff` (Data Poster and Futuristic 41% `#ffffff` on `#0e0e14`, Neon 44% `#c8ffd2` on `#0e0e14`, Dark 44% `#00ff00` on `#000000`). Standing P2 #14; design-review fuel (Settings Product); Mac capture deferred. Insight emphasis opaque in v0.1.2086. Next: AI-off section icons (`src/cpu-ui.js` `applyAiUiVisibility` `el.style.opacity = "0.55"`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2086
 
 - Agent Ops insight emphasis (`src/dashboard.css` and `src/agent-ops.css` `.ops-insight-line em`) drops glass `opacity` 0.7. The emphasis mixes 70% of the line color into the wash (near-white on Apple, `#0e0e14` on Data Poster, Dark, Neon, and Futuristic). The dark dashboard sheet mixes 53% white into `#0e0e14`. Standing P2 #14; design-review fuel (Agent Ops Insights); Mac capture deferred. iOS chat Send opaque in v0.1.2085. Next: Settings judge failure-only label (`src/cpu-ui.js` `label.style.opacity = "0.55"`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.

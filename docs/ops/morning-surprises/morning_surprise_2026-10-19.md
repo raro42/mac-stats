@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque paints. Digester w
 
 | Version | What |
 |---------|------|
+| **v0.1.2087** | Settings "Judge on failure only" while Judge is off: 48% ink on white (41% white on Data Poster and Futuristic, 44% mint on Neon, 44% green on Dark). Was glass `opacity` 0.55 |
 | **v0.1.2086** | Agent Ops insight emphasis: the question mixes 70% of the line color into the wash (53% white on the dark dashboard sheet). Was glass `opacity` 0.7 |
 | **v0.1.2085** | iOS chat Send while disabled: fill mixes 40% of the accent into the composer bar, label mixes 40% of the on-accent color. Was glass `opacity` 0.4 |
 | **v0.1.2084** | iOS lab buttons while disabled: fill mixes 50% of the track into the card, label mixes 50% of the text color (Generate uses the accent). Was glass `opacity` 0.5 |
@@ -17,5 +18,5 @@ Glass `opacity` on those controls forces the compositor to blend every paint. Mi
 
 ## Still open
 
-- Settings judge failure-only label (`src/cpu-ui.js` `label.style.opacity = "0.55"`) still uses glass opacity when Judge is off. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
+- AI-off section icons (`src/cpu-ui.js` `applyAiUiVisibility`, `opacity` 0.55) still use glass opacity when local AI is off. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
 - Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.
