@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2083
+
+- iOS thermal passed step (`ios/src/themes/base.css` `.thermal-step.is-passed::before`) drops glass `opacity` 0.35. The bar mixes 35% of the step color into transparent. Standing P2 #14; design-review fuel (iOS thermal tiles); Mac capture deferred. Light ring glow opaque in v0.1.2082. Next: iOS lab button while disabled (`ios/src/themes/base.css` `.lab-btn:disabled`, 0.5), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2082
 
 - iOS light ring glow (`ios/src/themes/light.css` `.ring::after`) drops glass `opacity` 0.65. The white stop paints at 0.39 (old 0.6 times 0.65). Standing P2 #14; design-review fuel (iOS light tiles); Mac capture deferred. Data Poster line chart opaque in v0.1.2081. Next: iOS thermal passed step (`ios/src/themes/base.css` `.thermal-step.is-passed::before`, 0.35), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. P2 reliability / GitHub #14.

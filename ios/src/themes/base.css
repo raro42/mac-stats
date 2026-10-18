@@ -854,9 +854,9 @@ body.i18n-pending {
   --step-color: var(--thermal-critical);
 }
 
+/* Passed steps used glass opacity 0.35 on the step color. Mix it in so the bar looks the same. */
 .thermal-step.is-passed::before {
-  background: var(--step-color);
-  opacity: 0.35;
+  background: color-mix(in srgb, var(--step-color) 35%, transparent);
 }
 
 .thermal-step.is-current {
