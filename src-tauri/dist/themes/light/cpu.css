@@ -1384,14 +1384,15 @@ body {
   height: 14px;
   display: block;
   object-fit: contain;
-  /* Opacity only — multi-step CSS filters keep Graphics and Media busy (#14). */
+  /* Was opacity 0.55 (hover 0.75) on the bitmap over the white chip.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
   filter: none;
-  opacity: 0.55;
+  opacity: 1;
 }
 
 .icon-line-item:hover img {
   filter: none;
-  opacity: 0.75;
+  opacity: 1;
 }
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */

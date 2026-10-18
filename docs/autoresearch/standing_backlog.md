@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2090
+
+- Light section icon images (`.icon-line-item img` in Light `cpu.css`) drop glass `opacity` 0.55 (hover 0.75). The bitmap paints at full strength on the white chip. Ready, Slow, and Down images still use their own opacity. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. No-battery icon opaque in v0.1.2089. Next: Apple section icon images (same `.icon-line-item img` 0.55 / hover 0.75 in Apple `cpu.css`), or Light Ready/Slow/Down image opacity (0.85 / 0.8), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. Swiss, Architect, Material, and the dark shells still dim the bitmap with filters. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2089
 
 - No-battery icon (`.battery-icon.no-battery` in each theme `cpu.css`) drops glass `opacity` 0.4. Apple and Light mix 20% `#0c0c10` on the strip `#ececf1`. Swiss mixes that ink on 40% white over `#f6f6f6`. Architect uses `#f1f1f1`, Material `#ebe4d9`, Neon `#08120c`. Data Poster mixes 31% `#ebebf5` on `#0b0b10` (old 78% glyph times 0.4). Dark mixes 20% `#0c0c10` on `#0a0a0a`. Futuristic mixes 20% `#c7c7c7` on `#111123`. Standing P2 #14; design-review fuel (power strip chrome); Mac capture deferred. AI-off section icons opaque in v0.1.2088. Next: section icon images (`.icon-line-item img`, `opacity` 0.55 resting / 0.75 hover in Light `cpu.css`; Swiss, Architect, Material, and the dark shells still dim the bitmap), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
