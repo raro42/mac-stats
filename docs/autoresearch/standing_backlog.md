@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2086
+
+- Agent Ops insight emphasis (`src/dashboard.css` and `src/agent-ops.css` `.ops-insight-line em`) drops glass `opacity` 0.7. The emphasis mixes 70% of the line color into the wash (near-white on Apple, `#0e0e14` on Data Poster, Dark, Neon, and Futuristic). The dark dashboard sheet mixes 53% white into `#0e0e14`. Standing P2 #14; design-review fuel (Agent Ops Insights); Mac capture deferred. iOS chat Send opaque in v0.1.2085. Next: Settings judge failure-only label (`src/cpu-ui.js` `label.style.opacity = "0.55"`), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2085
 
 - iOS chat Send while disabled (`ios/src/themes/base.css` `.composer-send:disabled`) drops glass `opacity` 0.4. The fill mixes 40% of the accent into the composer bar. The label mixes 40% of the on-accent color into the bar. Standing P2 #14; design-review fuel (iOS chat composer); Mac capture deferred. Lab buttons opaque in v0.1.2084. Next: Agent Ops insight emphasis (`src/dashboard.css` `.ops-insight-line em`, 0.7), or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.

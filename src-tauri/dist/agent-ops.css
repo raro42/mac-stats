@@ -10405,6 +10405,22 @@ body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
   opacity: 1;
 }
 
+/* Opaque emphasis — glass alpha stays in Graphics and Media (#14). */
+.ops-insight-line em {
+  font-style: normal;
+  /* Was opacity 0.7 on the line color, blended into the near-white wash. */
+  color: color-mix(in srgb, currentColor 70%, #ffffff);
+  opacity: 1;
+}
+
+body.theme-data-poster .ops-insight-line em,
+body.theme-dark .ops-insight-line em,
+body.theme-neon .ops-insight-line em,
+body.theme-futuristic .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #0e0e14);
+  opacity: 1;
+}
+
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .btn-secondary.ops-refresh,
 .agent-ops-section .btn-secondary {
