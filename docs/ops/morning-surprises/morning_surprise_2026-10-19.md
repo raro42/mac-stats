@@ -6,6 +6,7 @@ Overnight Track B kept shipping WebView idle-cut (#14) opaque paints. Digester w
 
 | Version | What |
 |---------|------|
+| **v0.1.2096** | Material section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
 | **v0.1.2095** | Architect section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
 | **v0.1.2094** | Swiss section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
 | **v0.1.2093** | Apple Ready, Slow, and Down section icons: those bitmaps paint at full strength on the white chip. Was glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) |
@@ -26,5 +27,5 @@ Glass `opacity` on those controls forces the compositor to blend every paint. Mi
 
 ## Still open
 
-- Material section icon images still use `brightness` / `opacity()` filters. Architect, Material, and the dark shells still dim Ready, Slow, and Down bitmaps (0.85 / 0.8). Swiss Ready, Slow, and Down still tint with filters. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
+- Data Poster section icon images still use a `brightness` / `invert` filter. Neon and Futuristic still dim the resting bitmap with filters. Dark still uses `opacity` 0.45. Architect, Material, and the dark shells still dim Ready, Slow, and Down bitmaps (0.85 / 0.8). Swiss Ready, Slow, and Down still tint with filters. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
 - Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.
