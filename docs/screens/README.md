@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-19 (~02:45):** Swiss Ready, Slow, and Down section icon images opaque (v0.1.2100, drop glass opacity and colorizing filters). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Data Poster Ready/Slow/Down, or Neon/Futuristic resting opacity filters, or Dark resting opacity 0.45, or Mac capture when TCC allows.
 - **2026-10-18 (~20:35):** Material Ready · Slow · Down section icon images opaque (v0.1.2099 — drop glass opacity + colorizing filters). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Swiss Ready/Slow/Down, or Data Poster Ready/Slow/Down, or Neon/Futuristic resting opacity filters, or Mac capture when TCC allows.
 - **2026-10-19 (~02:20):** Data Poster resting section icon: Ollama mark paints in the chip color (v0.1.2098 — drop `brightness` / `invert`). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Material Ready/Slow/Down image filters, or Mac capture when TCC allows.
 - **2026-10-18 (~20:05):** Architect Ready · Slow · Down section icon images opaque (v0.1.2097 — drop glass opacity + colorizing filters). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Data Poster resting icon filter, or Material Ready/Slow/Down, or Mac capture when TCC allows.
