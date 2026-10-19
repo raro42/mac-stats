@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2110
+
+- Dark theme footer (`.theme-footer` in Dark `cpu.css`) drops glass `opacity` 0.6 (hover 1). Type mixes against the opaque shell fill (`color-mix` 60% `#008800` on `#0a0a0a`; hover full muted). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (no on-screen CPU window). Architect footer opaque in v0.1.2109. Next: Futuristic/Neon theme-footer glass, Material `.theme-footer` styles (HTML has the class; CSS may still inherit glass), or Data Poster footer glass gradient, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2109
 
 - Architect theme footer (`.arch-footer` in Architect `cpu.css`) drops glass `opacity` 0.5 (hover 0.8). Type mixes against the opaque shell fill (`color-mix` 28% / 44% `#232d41` on `#f1f1f1`). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (no on-screen CPU window). Swiss footer opaque in v0.1.2108. Next: Material `.theme-footer` styles (HTML has the class; CSS may still inherit glass), Dark/Futuristic/Neon theme-footer glass, or Data Poster footer glass gradient, or Mac capture when TCC allows. P2 reliability / GitHub #14.

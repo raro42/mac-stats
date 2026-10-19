@@ -808,36 +808,40 @@ padding: 18px 18px 16px;
   padding-bottom: 4px;
   font-size: 10px;
   font-weight: 400;
-  color: var(--text-muted);
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
+  /* Opaque type — glass alpha stays in Graphics and Media (#14). */
+  /* Was opacity 0.6 on --text-muted (#008800) → ~60% ink on the shell fill. */
+  color: color-mix(in srgb, #008800 60%, #0a0a0a);
+  transition: color 0.15s ease;
 }
 
 .theme-footer:hover {
-  opacity: 1;
+  /* Was opacity 1 on --text-muted. */
+  color: #008800;
 }
 
 .theme-version {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
-  transition: opacity 0.2s ease;
+  transition: color 0.15s ease;
   cursor: pointer;
   user-select: none;
 }
 
 .theme-version:hover {
-  opacity: 0.7;
+  color: var(--text);
 }
 
 .theme-version:active {
-  opacity: 0.6;
+  /* Was opacity 0.6 on inherit (~60% muted) → ~36% ink on the shell fill. */
+  color: color-mix(in srgb, #008800 36%, #0a0a0a);
+  opacity: 1;
 }
 
 .theme-github-link {
   color: inherit;
   text-decoration: none;
   position: relative;
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .theme-github-link::after {
@@ -847,18 +851,18 @@ padding: 18px 18px 16px;
   left: 0;
   right: 0;
   height: 1px;
-  background: currentColor;
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
+  /* Opaque underline — was opacity 0.4 on currentColor. */
+  background: color-mix(in srgb, currentColor 40%, #0a0a0a);
+  transition: background 0.15s ease;
 }
 
 .theme-github-link:hover {
   color: var(--text);
-  opacity: 1;
 }
 
 .theme-github-link:hover::after {
-  opacity: 0.8;
+  /* Was opacity 0.8 on currentColor. */
+  background: color-mix(in srgb, currentColor 80%, #0a0a0a);
 }
 
 /* Changelog Modal Styling */
