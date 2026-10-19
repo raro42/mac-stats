@@ -1,25 +1,22 @@
 # Morning surprise — 2026-10-19
 
-Overnight autoresearch (Track B) kept shipping WebView idle chrome (#14) while Screen Recording TCC blocked a fresh `feature-cpu-metrics.png` capture.
+Overnight Track B kept shipping glass-opacity cuts (#14) while `feature-cpu-metrics.png` capture stayed blocked (no CPU window on screen / Screen Recording).
 
-## Shipped tonight (selected)
+## Shipped this tick (~04:40 EDT)
 
-| Version | Keep | What |
-|---------|------|------|
-| **v0.1.2126** | 97f89582 | Light AI Chat thinking + response-time opaque color-mix on `#f7f7fa` |
-| v0.1.2125 | fe2aeab5 | Futuristic AI Chat thinking + response-time opaque |
-| v0.1.2124 | dc06fc3d | Neon AI Chat thinking + response-time opaque |
-| v0.1.2123 | 22b57892 | Dark AI Chat thinking + response-time opaque |
-| v0.1.2122 | ba599756 | Data Poster AI Chat thinking + response-time (layout-daily) |
-| v0.1.2121–2120 | … | Data Poster / Swiss CPU card + Details header hover opaque |
+| Version | Keep | What got better |
+|---------|------|-----------------|
+| **v0.1.2127** | Material AI Chat thinking + response-time opaque | Thinking / timing labels mix ink on `#ebe4d9` with no WebView alpha |
+
+## Earlier tonight (highlights)
+
+- AI Chat thinking/response-time opaque across Data Poster → Dark → Neon → Futuristic → Light (v0.1.2122–2126)
+- Theme card/header hover opaque sequence through Data Poster (v0.1.2115–2121)
+- Design-review helper still flags `feature-cpu-metrics.png` (~42d) and `feature-monitors.png` as stale
 
 ## Still open
 
-- Mac window-only capture of stale `docs/screens/feature-cpu-metrics.png` (~42d) when TCC allows
-- Swiss / Material / Architect AI Chat thinking / response-time glass opacity
+1. Recapture `docs/screens/feature-cpu-metrics.png` when window capture works
+2. Architect + Swiss AI Chat thinking/response-time glass (same pattern)
+3. Layout-daily dark/neon/futuristic/architect screens still missing
 
-## Notes
-
-- Digester Slowest empty; design-review due=true every tick (stale metrics screen)
-- Layout-daily data-poster already checked today
-- Debug.log: no ERROR/WARN/panic clusters in the scan window
