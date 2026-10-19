@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2104
+
+- Neon and Futuristic Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Neon and Futuristic `cpu.css`) drop glass `opacity` 0.9 / 0.85 (hover 1 / 0.95) and the colorizing `brightness` / `invert` filters. Those bitmaps paint at full strength on the dark chip. Boot contrast CSS in `cpu.html` matches. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Dark resting opaque in v0.1.2103. Next: Dark Ready/Slow/Down opacity 0.9 / 0.85, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2103
 
 - Dark resting section icons (`.icon-line-item img` opacity 0.45 / hover 0.75 in Dark `cpu.css`) drop glass opacity. The Ollama mark (`.ollama-glyph`) paints in the chip color, so it stays light on the dark chip. Ready, Slow, and Down image rules still dim their own bitmaps. Boot contrast CSS in `cpu.html` matches. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Neon and Futuristic resting opaque in v0.1.2102. Next: Neon/Futuristic Ready/Slow/Down image opacity and colorizing filters, or Dark Ready/Slow/Down opacity 0.9 / 0.85, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.

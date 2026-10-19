@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2104] - 2026-10-19
+
+### Changed
+- **Neon and Futuristic Ready, Slow, and Down section icons:** Those bitmaps (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Neon and Futuristic) drop glass `opacity` 0.9 / 0.85 (hover 1 / 0.95) and the colorizing `brightness` / `invert` filters. Ready, Slow, and Down paint at full strength on the dark chip. Boot contrast CSS matches. Design review fuel (section icon chrome). Dark resting section icons opaque in v0.1.2103.
+
 ## [0.1.2103] - 2026-10-19
 
 ### Changed

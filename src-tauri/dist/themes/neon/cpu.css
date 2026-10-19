@@ -1233,11 +1233,14 @@ body::before {
 }
 
 .icon-line-item.status-good img {
-  filter: brightness(0) saturate(100%) invert(68%) sepia(40%) saturate(500%) hue-rotate(85deg) brightness(100%) contrast(90%);
-  opacity: 0.9;
+  filter: none;
+  /* Was opacity 0.9 (hover 1) plus a colorizing filter on the Ready bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-good:hover img {
+  filter: none;
   opacity: 1;
 }
 
@@ -1256,12 +1259,15 @@ body::before {
 }
 
 .icon-line-item.status-warning img {
-  filter: brightness(0) saturate(100%) invert(75%) sepia(45%) saturate(700%) hue-rotate(5deg) brightness(105%) contrast(90%);
-  opacity: 0.85;
+  filter: none;
+  /* Was opacity 0.85 (hover 0.95) plus a colorizing filter on the Slow bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-warning:hover img {
-  opacity: 0.95;
+  filter: none;
+  opacity: 1;
 }
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
@@ -1285,11 +1291,14 @@ body::before {
 }
 
 .icon-line-item.status-bad img {
-  filter: brightness(0) saturate(100%) invert(45%) sepia(70%) saturate(2000%) hue-rotate(340deg) brightness(105%) contrast(95%);
-  opacity: 0.9;
+  filter: none;
+  /* Was opacity 0.9 (hover 1) plus a colorizing filter on the Down bitmap.
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-bad:hover img {
+  filter: none;
   opacity: 1;
 }
 
