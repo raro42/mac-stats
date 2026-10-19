@@ -27,8 +27,10 @@
         color: var(--accent, #55c7ff) !important; opacity: 1 !important;
       }
       .icon-line-item.status-good { color: rgba(52, 199, 89, 0.95) !important; }
-      .icon-line-item.status-good img {
-        filter: brightness(0) saturate(100%) invert(48%) sepia(45%) saturate(550%) hue-rotate(95deg) brightness(95%) contrast(88%) !important;
+      .icon-line-item.status-good img,
+      .icon-line-item.status-warning img,
+      .icon-line-item.status-bad img {
+        filter: none !important;
         opacity: 1 !important;
       }
     </style>

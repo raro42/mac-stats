@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2101
+
+- Data Poster Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Data Poster `cpu.css`) drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) and the colorizing `brightness` / `invert` filters. Those bitmaps paint at full strength on the dark chip. Boot contrast CSS in `cpu.html` matches. Standing P2 #14; design-review + layout-daily fuel (Data Poster icon chrome); Mac capture deferred. Swiss Ready, Slow, and Down opaque in v0.1.2100. Next: Neon/Futuristic resting `opacity()` filters, or Dark resting `opacity` 0.45, or Neon/Futuristic Ready/Slow/Down, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2100
 
 - Swiss Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Swiss `cpu.css`) drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) and the colorizing `brightness` / `invert` filters. Those bitmaps paint at full strength on the white chip. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Material Ready, Slow, and Down opaque in v0.1.2099. Next: Data Poster Ready/Slow/Down image opacity + filters, or Neon/Futuristic resting `opacity()` filters, or Dark resting `opacity` 0.45, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
