@@ -1208,10 +1208,13 @@ padding: 18px 18px 16px;
 
 .icon-line-item.status-good img {
   filter: none;
-  opacity: 0.9;
+  /* Was opacity 0.9 (hover 1) on the Ready bitmap.
+     Full paint. Dim opacity still costs compositor work (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-good:hover img {
+  filter: none;
   opacity: 1;
 }
 
@@ -1231,11 +1234,14 @@ padding: 18px 18px 16px;
 
 .icon-line-item.status-warning img {
   filter: none;
-  opacity: 0.85;
+  /* Was opacity 0.85 (hover 0.95) on the Slow bitmap.
+     Full paint. Dim opacity still costs compositor work (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-warning:hover img {
-  opacity: 0.95;
+  filter: none;
+  opacity: 1;
 }
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
@@ -1260,10 +1266,13 @@ padding: 18px 18px 16px;
 
 .icon-line-item.status-bad img {
   filter: none;
-  opacity: 0.9;
+  /* Was opacity 0.9 (hover 1) on the Down bitmap.
+     Full paint. Dim opacity still costs compositor work (#14). */
+  opacity: 1;
 }
 
 .icon-line-item.status-bad:hover img {
+  filter: none;
   opacity: 1;
 }
 
