@@ -2,14 +2,15 @@
 
 Overnight Track B kept shipping glass-opacity cuts (#14) while `feature-cpu-metrics.png` capture stayed blocked (`screencapture -l` unavailable / no CPU window on screen).
 
-## Shipped this tick (~21:44 CEST)
+## Shipped this tick (~22:12 CEST)
 
 | Version | Keep | What got better |
 |---------|------|-----------------|
-| **v0.1.2135** | Neon AI Chat composer shell opaque | `.chat-input-container` resting / `:focus-within` mix on `#08120c`. No WebView glass alpha |
+| **v0.1.2136** | Futuristic AI Chat composer shell opaque | `.chat-input-container` resting / `:focus-within` mix on `#111123`. No WebView glass alpha |
 
 ## Earlier today (highlights)
 
+- Neon AI Chat composer shell opaque (v0.1.2135)
 - Dark AI Chat composer shell opaque (v0.1.2134)
 - Light AI Chat composer shell opaque (v0.1.2133)
 - Material AI Chat composer shell opaque (v0.1.2132)
@@ -22,6 +23,6 @@ Overnight Track B kept shipping glass-opacity cuts (#14) while `feature-cpu-metr
 ## Still open
 
 1. Recapture `docs/screens/feature-cpu-metrics.png` when window capture works
-2. Futuristic / Data Poster AI Chat composer shells still use glass `transparent`
+2. Data Poster AI Chat composer shell still uses glass `transparent`
 3. Swiss `#chat-input` / Send may still carry glass rgba
 4. Layout-daily dark/neon/futuristic/architect screens still missing
