@@ -4,7 +4,8 @@
 
 | Version | What |
 |---------|------|
-| **v0.1.2118** | Material `#cpu-usage-card:hover` / `.collapsible-header:hover` opaque color-mix on paper `#ebe4d9` (#14). Stray Material CSS brace removed. |
+| **v0.1.2119** | Architect `#cpu-usage-card:hover` / `.collapsible-header:hover` opaque color-mix on shell `#f1f1f1` (#14). |
+| v0.1.2118 | Material CPU card / Details hover opaque (+ stray brace fix) |
 | v0.1.2117 | Futuristic CPU card / Details hover opaque |
 | v0.1.2116 | Neon CPU card / Details hover opaque |
 | v0.1.2115 | Dark CPU card / Details hover opaque |
@@ -18,9 +19,9 @@
 
 ## Next fuel
 
-- Architect / Swiss / Data Poster `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity.
+- Swiss / Data Poster `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity.
 - Or Mac capture when TCC allows.
 
 ## Ratchet
 
-- Keep @ `2398fa8c` — v0.1.2118 Material hover opaque.
+- Keep @ `4a5d1073` — v0.1.2119 Architect hover opaque.
