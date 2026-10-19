@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2117
+
+- Futuristic `#cpu-usage-card:hover` and `.collapsible-header:hover` drop glass opacity (0.9 / 0.7). Usage card stays full strength; Details headers mix a quiet `color-mix` wash on `#111123` at full opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Neon hover opaque in v0.1.2116. Next: Material/Architect/Swiss/Data Poster card/header hover glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2116
 
 - Neon `#cpu-usage-card:hover` and `.collapsible-header:hover` drop glass opacity (0.9 / 0.7). Usage card stays full strength; Details headers mix a quiet `color-mix` wash on `#08120c` at full opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Dark hover opaque in v0.1.2115. Next: Futuristic/Material/Architect/Swiss/Data Poster card/header hover glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
