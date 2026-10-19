@@ -1,15 +1,34 @@
 # Morning surprise — 2026-10-19
 
-## Latest ship — v0.1.2097 (~20:05 local 2026-10-18)
+Overnight Track B kept shipping WebView idle-cut (#14) opaque paints. Digester was empty; Mac screenshot refresh stayed deferred on the Linux rack.
 
-**Keep:** Architect Ready · Slow · Down section icon images (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Architect `cpu.css`) — drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) and the colorizing `brightness` / `invert` filters. Those bitmaps paint at full strength on the white chip.
+## Shipped tonight (keeps)
 
-**Why:** WebView idle cut (#14). Glass alpha and multi-step CSS filters on Ready / Slow / Down icons keep Graphics and Media busy.
+| Version | What |
+|---------|------|
+| **v0.1.2098** | Data Poster resting section icon: the Ollama mark paints in the chip color, so it stays light on the dark chip. Was a glass `brightness` / `invert` filter. Ready, Slow, and Down image rules still tint their own bitmaps |
+| **v0.1.2097** | Architect Ready, Slow, and Down section icons: those bitmaps paint at full strength on the white chip. Was glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) plus colorizing filters |
+| **v0.1.2096** | Material section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
+| **v0.1.2095** | Architect section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
+| **v0.1.2094** | Swiss section icon images: the bitmap paints at full strength on the white chip. Was a glass `brightness` / `opacity()` filter (resting `opacity(0.55)`, hover `opacity(0.7)`). Ready, Slow, and Down still tint and dim their own images |
+| **v0.1.2093** | Apple Ready, Slow, and Down section icons: those bitmaps paint at full strength on the white chip. Was glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) |
+| **v0.1.2092** | Light Ready, Slow, and Down section icons: those bitmaps paint at full strength on the white chip. Was glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) |
+| **v0.1.2091** | Apple section icon images: the bitmap paints at full strength on the white chip. Was glass `opacity` 0.55 (hover 0.75). Ready, Slow, and Down still dim their own images |
+| **v0.1.2090** | Light section icon images: the bitmap paints at full strength on the white chip. Was glass `opacity` 0.55 (hover 0.75). Ready, Slow, and Down still dim their own images |
+| **v0.1.2089** | Bat glyph with no battery: mixes the dim ink into the strip (20% ink on Apple and Light, 31% `#ebebf5` on Data Poster). Was glass `opacity` 0.4 |
+| **v0.1.2088** | AI Chat, Perplexity, Discord, and Agent Ops icons while local AI is off: the chip mixes 55% of its fill into the shell. Ready, Slow, and Down stay full strength. Was glass `opacity` 0.55 |
+| **v0.1.2087** | Settings "Judge on failure only" while Judge is off: 48% ink on white (41% white on Data Poster and Futuristic, 44% mint on Neon, 44% green on Dark). Was glass `opacity` 0.55 |
+| **v0.1.2086** | Agent Ops insight emphasis: the question mixes 70% of the line color into the wash (53% white on the dark dashboard sheet). Was glass `opacity` 0.7 |
+| **v0.1.2085** | iOS chat Send while disabled: fill mixes 40% of the accent into the composer bar, label mixes 40% of the on-accent color. Was glass `opacity` 0.4 |
+| **v0.1.2084** | iOS lab buttons while disabled: fill mixes 50% of the track into the card, label mixes 50% of the text color (Generate uses the accent). Was glass `opacity` 0.5 |
+| **v0.1.2083** | iOS thermal passed step: the scale bar mixes 35% of the step color into transparent (was glass `opacity` 0.35) |
 
-**Fuel:** Digester open → overnight design review (stale `feature-cpu-metrics.png`, 42.0d). Design review due=true; Mac capture deferred (menu-bar only / no on-screen CPU window). Layout-daily due=true (data-poster). First attempt discarded: duplicate `.processes-kb-hint` after lagging local tree vs origin at v0.1.2096. Standing next after Material resting icons (v0.1.2096): Architect Ready/Slow/Down.
+## Why it matters
 
-**Verify:** `autoresearch_ratchet.py verify` OK → keep @ `5f27522a` → push `main`.
+Glass `opacity` on those controls forces the compositor to blend every paint. Mixing the color into the wash (or into the bar, the card, or transparent for the thermal bar) keeps the same look and cuts idle work (#14).
 
-**Discard earlier this tick:** duplicate v0.1.1985 processes-kb-hint (origin already past that cut @ v0.1.2096).
+## Still open
 
-**Next:** Data Poster section icon image filter (`brightness` / `invert`), or Material Ready/Slow/Down, or Swiss Ready/Slow/Down, or Neon/Futuristic resting `opacity()` filters, or Dark resting `opacity` 0.45, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
+- Material Ready, Slow, and Down section icons still use glass `opacity` 0.85 / 0.8 and colorizing filters. Swiss Ready, Slow, and Down still tint with filters. Neon and Futuristic still dim the resting bitmap with filters. Dark still uses `opacity` 0.45. The thermal pulse keyframe stays, because that is a 2.4s animation on the current step.
+- Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.
+- Design-review screen `feature-cpu-metrics.png` is stale (~42d). Needs Mac TCC capture.
