@@ -1,21 +1,24 @@
 # Morning surprise — 2026-10-19
 
-Overnight autoresearch kept shipping Graphics and Media (#14) glass cuts on theme chrome.
+Overnight Track B kept shipping theme footer chrome (design-review fuel while `feature-cpu-metrics.png` stays stale — Screen Recording / no on-screen CPU window).
 
-## Shipped this night (window 20:00–06:00)
+## Shipped tonight
 
-Latest keep: **v0.1.2110** — Dark theme footer (`.theme-footer`) drops glass `opacity` 0.6 / hover 1. Type mixes muted green (`#008800`) into the opaque shell fill (`#0a0a0a`). Version and GitHub hover/active use color, not opacity.
+| Version | What |
+|---------|------|
+| **v0.1.2111** | Material `.theme-footer` opaque `color-mix` (CSS was missing) |
+| **v0.1.2110** | Dark `.theme-footer` drops glass opacity |
+| **v0.1.2109** | Architect `.arch-footer` opaque color-mix |
+| **v0.1.2108** | Swiss `.theme-footer` opaque color-mix |
+| **v0.1.2107** | Light `.theme-footer` opaque color-mix |
 
-Also tonight (earlier ticks): Architect footer (**v0.1.2109**), Swiss footer (**v0.1.2108**), Light footer (**v0.1.2107**), Apple Top Processes row press (**v0.1.2106**), Dark Ready/Slow/Down icons (**v0.1.2105**), Neon/Futuristic Ready/Slow/Down (**v0.1.2104**), and more section-icon / footer opacity cuts back through the evening.
+## Tried / deferred
 
-## Design review
-
-Still due: stale `feature-agent-ops.png` (~33d) and `feature-cpu-metrics.png` (~42d). Mac capture deferred on the Linux rack (no Screen Recording TCC / no on-screen CPU window).
+- Recapture of `docs/screens/feature-cpu-metrics.png` — no on-screen CPU window / Screen Recording TCC.
+- Digester Slowest empty after instant-lane filters.
 
 ## Next fuel
 
-Futuristic or Neon theme-footer glass, Material `.theme-footer` styles, Data Poster footer glass gradient, or a real Mac window capture when TCC allows.
-
-## Digester
-
-Open candidates: empty (no runs in window).
+- Futuristic / Neon theme-footer glass cuts
+- Data Poster footer glass gradient
+- Mac capture of stale feature screens when TCC allows
