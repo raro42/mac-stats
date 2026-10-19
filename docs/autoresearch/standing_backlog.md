@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2137
+
+- Data Poster AI Chat `.chat-input-container` resting and `:focus-within` drop glass `transparent` washes. Border, fill, and focus ring mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat composer on Data Poster). Futuristic composer shell opaque in v0.1.2136. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Swiss `#chat-input` / Send glass, or Data Poster `#chat-input` rgba, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2136
 
 - Futuristic AI Chat `.chat-input-container` resting and `:focus-within` drop glass `transparent` washes. Border, fill, and focus ring mix against the opaque shell fill `#111123`. Standing P2 #14; design-review fuel (AI Chat composer on Futuristic). Neon composer shell opaque in v0.1.2135. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Data Poster AI Chat composer shell, or Swiss `#chat-input` / Send glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
