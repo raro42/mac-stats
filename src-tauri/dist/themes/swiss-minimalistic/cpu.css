@@ -170,22 +170,25 @@ body {
 /* Usage card clickable */
 #cpu-usage-card {
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: none;
 }
 
+/* Opaque — glass alpha stays in Graphics and Media (#14). */
 #cpu-usage-card:hover {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /* Collapsible header styling */
 .collapsible-header {
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.2s;
+  transition: background 0.15s ease;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .collapsible-header:hover {
-  opacity: 0.7;
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 6%, #ffffff);
 }
 
 .metric-label {
