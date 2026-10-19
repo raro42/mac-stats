@@ -2248,8 +2248,11 @@ body {
   font-style: italic;
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .chat-message.thinking {
-  opacity: 0.7;
+  /* Was opacity 0.7 on --text (~85% ink) → ~60% ink on the paper shell. */
+  color: color-mix(in srgb, #18181a 60%, #ebe4d9);
+  opacity: 1;
 }
 
 .thinking-animation {
@@ -2293,13 +2296,15 @@ body {
   }
 }
 
+/* Opaque type — glass alpha stays in Graphics and Media (#14). */
 .response-time {
   font-size: 7px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Was opacity 0.6 on muted (~55% ink) → ~33% ink on the paper shell. */
+  color: color-mix(in srgb, #18181a 33%, #ebe4d9);
   margin-bottom: 4px;
   font-weight: 400;
   letter-spacing: 0.3px;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .chat-input-container {
