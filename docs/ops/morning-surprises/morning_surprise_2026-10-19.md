@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00 local) kept shipping glass→opaque cuts for We
 
 | Version | What |
 |---------|------|
+| **v0.1.2116** | Neon CPU card + Details hover opaque (`#cpu-usage-card:hover` / `.collapsible-header:hover`; color-mix on `#08120c`) |
 | **v0.1.2115** | Dark CPU card + Details hover opaque (`#cpu-usage-card:hover` / `.collapsible-header:hover`; color-mix on `#0a0a0a`) |
 | **v0.1.2114** | Light CPU card + Details hover opaque |
 | **v0.1.2113** | Data Poster theme footer opaque strip |
@@ -19,7 +20,7 @@ Overnight Track B (20:00–06:00 local) kept shipping glass→opaque cuts for We
 ## Still open
 
 - Recapture stale `docs/screens/feature-cpu-metrics.png` (~42d) when Screen Recording TCC allows.
-- Remaining theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass (Neon, Futuristic, Material, Architect, Swiss, Data Poster).
+- Remaining theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass (Futuristic, Material, Architect, Swiss, Data Poster).
 
 ## Note
 
