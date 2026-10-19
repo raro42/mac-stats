@@ -6,6 +6,18 @@
     <style id="theme-boot-paint">html,body{background:#000000;color-scheme:dark;margin:0;min-height:100%}</style>
     <link rel="stylesheet" href="./cpu.css" />
     <link rel="stylesheet" href="../../agent-ops.css?v=0.1.1387" />
+    <!-- dark-icon-contrast -->
+    <style id="dark-icon-contrast">
+      .icon-line-item:not(.status-good):not(.status-warning):not(.status-bad) img {
+        filter: none !important; opacity: 1 !important;
+      }
+      .ollama-glyph {
+        width: 14px; height: 14px; display: block; flex-shrink: 0;
+        background-color: currentColor !important;
+        -webkit-mask: url("/assets/ollama.svg") center / contain no-repeat !important;
+        mask: url("/assets/ollama.svg") center / contain no-repeat !important;
+      }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>mac-stats · glad you're here</title>
   </head>
@@ -146,7 +158,7 @@
         
         <!-- Icon 2: Ollama (Official Ollama icon) -->
         <button class="icon-line-item" id="icon-ollama" title="AI Chat (Ollama)">
-          <img src="/assets/ollama.svg" alt="Ollama" />
+          <span class="ollama-glyph" role="img" aria-label="Ollama"></span>
         </button>
         
         
