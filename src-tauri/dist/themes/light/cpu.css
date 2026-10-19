@@ -2477,33 +2477,36 @@ body {
   background: color-mix(in srgb, var(--accent, #007aff) 5%, #f7f7fa);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Tokens here are rgba (--panel 0.94, --hairline 0.10, --text 0.86, --muted 0.55, Send 0.9). Mix on #f7f7fa. */
 #chat-input {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: color-mix(in srgb, #f5f5fa 94%, #f7f7fa);
+  border: 1px solid color-mix(in srgb, #0c0c10 10%, #f7f7fa);
   border-radius: 8px;
   padding: 8px 12px;
-  color: var(--text, var(--ink, inherit));
+  color: color-mix(in srgb, #0c0c10 86%, #f7f7fa);
   font-size: 13px;
   font-family: inherit;
 }
 
 #chat-input:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: #6aa6df;
+  background: color-mix(in srgb, #f5f5fa 98%, #f7f7fa);
 }
 
 #chat-input::placeholder {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: color-mix(in srgb, #0c0c10 55%, #f7f7fa);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, #007aff 90%, #f7f7fa);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -2512,7 +2515,7 @@ body {
 }
 
 #chat-send-btn:hover {
-  background: rgba(0, 122, 255, 1);
+  background: #007aff;
 }
 
 /* Debug Log viewer */
