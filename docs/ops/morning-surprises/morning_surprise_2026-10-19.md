@@ -2,14 +2,15 @@
 
 Overnight Track B kept shipping glass-opacity cuts (#14) while `feature-cpu-metrics.png` capture stayed blocked (`screencapture -l` unavailable / no CPU window on screen).
 
-## Shipped this tick (~23:28 CEST)
+## Shipped this tick (~23:47 CEST)
 
 | Version | Keep | What got better |
 |---------|------|-----------------|
-| **v0.1.2139** | Data Poster AI Chat field and Send opaque | `#chat-input` and `#chat-send-btn` mix on `#0b0b10`. No WebView glass rgba |
+| **v0.1.2140** | Architect AI Chat field and Send opaque | `#chat-input` and `#chat-send-btn` mix on `#f1f1f1`. No WebView glass rgba |
 
 ## Earlier today (highlights)
 
+- Data Poster AI Chat field and Send opaque (v0.1.2139)
 - Swiss AI Chat field and Send opaque (v0.1.2138)
 - Data Poster AI Chat composer shell opaque (v0.1.2137)
 - Futuristic AI Chat composer shell opaque (v0.1.2136)
@@ -26,6 +27,6 @@ Overnight Track B kept shipping glass-opacity cuts (#14) while `feature-cpu-metr
 ## Still open
 
 1. Recapture `docs/screens/feature-cpu-metrics.png` when window capture works
-2. Architect `#chat-input` still uses rgba glass on the field
+2. Material `#chat-input` still uses rgba glass on the field
 3. Other theme composer fields may still carry glass rgba
 4. Layout-daily dark/neon/futuristic/architect screens still missing
