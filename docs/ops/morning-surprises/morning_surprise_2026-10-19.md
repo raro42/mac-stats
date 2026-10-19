@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-19
 
-Overnight Track B (20:00–06:00 local). Digester Slowest empty; design-review stale `feature-cpu-metrics.png` (~42d) and `feature-agent-ops.png` (~33d) stayed open. On the Mac, the CPU window was on screen; `screencapture -l` still failed (Screen Recording TCC). Standing P2 #14 (WebView glass opacity) fueled the keeps. Layout-daily Data Poster marked checked after v0.1.2101.
+Overnight Track B (20:00–06:00 local). Digester Slowest empty; design-review stale `feature-cpu-metrics.png` (~42d) and `feature-agent-ops.png` (~33d) stayed open. On the Mac, Screen Recording TCC still blocks `screencapture -l`. Standing P2 #14 (WebView glass opacity) fueled the keeps. Layout-daily Data Poster marked checked after v0.1.2101.
 
 ## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
+| **v0.1.2108** | Swiss theme footer — drop glass opacity 0.5 / hover 0.8; color-mix type on shell fill |
 | **v0.1.2107** | Light theme footer — drop glass opacity 0.5 / hover 0.8; color-mix type on shell fill |
 | **v0.1.2106** | Apple Top Processes `.process-row:active` — drop glass opacity 0.92; quiet `color-mix` press wash at full opacity |
 | **v0.1.2105** | Dark Ready · Slow · Down section icons — drop glass opacity 0.9 / 0.85; boot contrast CSS matched |
@@ -16,22 +17,21 @@ Overnight Track B (20:00–06:00 local). Digester Slowest empty; design-review s
 | **v0.1.2100** | Swiss Ready · Slow · Down section icons — drop glass opacity + colorizing filters |
 | **v0.1.2099** | Material Ready · Slow · Down section icons — drop glass opacity + colorizing filters |
 | **v0.1.2098** | Data Poster resting section icons — Ollama mark paints in chip color (no `brightness` / `invert`) |
-| **v0.1.2097** | Architect Ready · Slow · Down section icons — drop glass opacity + colorizing filters |
 
-## This tick (~22:05 Mac)
+## This tick (~04:25 Linux rack)
 
-- Fuel: digester design-review → Light `.theme-footer` glass after parallel v0.1.2106 (Apple Top Processes press).
-- Keep — Light footer opaque (`color-mix`); Mac capture deferred (TCC). Renumbered to **v0.1.2107** after rebase.
+- Fuel: digester empty → design-review due (Mac capture deferred) → standing P2 #14 Swiss theme-footer glass after v0.1.2107.
+- Keep — Swiss footer opaque (`color-mix` on `#f6f6f6`); Mac capture deferred.
 - Layout daily due=false (data-poster already checked today).
 
 ## Why it matters
 
-Glass `opacity` on the footer and process-row press keeps Graphics and Media busy. Opaque type and press washes cut idle work (#14). Fresh marketing screenshots still need Screen Recording permission.
+Glass `opacity` on the footer keeps Graphics and Media busy. Opaque type cuts idle work (#14). Fresh marketing screenshots still need Screen Recording permission.
 
 ## Next fuel
 
-Architect / Swiss / Material / Dark / Futuristic / Neon / Data Poster theme-footer glass, or other theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
+Dark / Futuristic / Neon theme-footer glass, or Data Poster footer glass gradient, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
 
 ## Note
 
-Empty digester alone is not a surprise — the night moved the glass-opacity ratchet on section icon chrome, Top Processes press, and the Light footer (#14).
+Empty digester alone is not a surprise — the night moved the glass-opacity ratchet on section icon chrome, Top Processes press, and Light + Swiss footers (#14).
