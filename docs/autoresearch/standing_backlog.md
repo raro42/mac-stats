@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2124
+
+- Neon AI Chat `.chat-message.thinking` and `.response-time` drop glass opacity (0.7 / 0.6). Thinking mixes 64% `#e6ffe6` on `#08120c`; response time mixes 36% `#b4e6b4` on the same fill. Standing P2 #14; design-review fuel (AI Chat on Neon). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Dark opaque in v0.1.2123. Next: Futuristic/Light/Swiss/Material/Architect AI Chat thinking/response-time glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2123
 
 - Dark AI Chat `.chat-message.thinking` and `.response-time` drop glass opacity (0.7 / 0.6). Thinking mixes 70% `#00ff00` on `#0a0a0a`; response time mixes 60% `#008800` on the same fill. Standing P2 #14; design-review fuel (AI Chat on Dark). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Data Poster opaque in v0.1.2122. Next: Neon/Futuristic/Light/Swiss/Material/Architect AI Chat thinking/response-time glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
