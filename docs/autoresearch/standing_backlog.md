@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2114
+
+- Light `#cpu-usage-card:hover` and `.collapsible-header:hover` drop glass `opacity` 0.9 / 0.7. The usage card stays full strength on hover. Details headers mix a quiet `color-mix` wash on the shell fill `#f7f7fa` at full opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome). Mac capture deferred (no on-screen CPU window). Data Poster footer opaque in v0.1.2113. Next: Swiss/other theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2113
 
 - Data Poster theme footer (`.theme-footer` in Data Poster `cpu.css`) drops the glass `rgba` strip gradient. Opaque `color-mix` stops of `#08080c` on `#0b0b10`. Separator glow and GitHub underline / text-shadow glass are gone. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (no on-screen CPU window). Futuristic/Neon footers opaque in v0.1.2112. Next: Mac capture of stale `feature-cpu-metrics.png` when TCC allows, or the next glass cut on remaining chrome. P2 reliability / GitHub #14.
