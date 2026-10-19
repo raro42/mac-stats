@@ -516,8 +516,13 @@ border-radius: 24px;
   border-bottom: none;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .process-row:active {
-  opacity: 0.92;
+  /* Was opacity 0.92 on the whole row.
+     Shared sheet already mixes a press wash; dim opacity still costs compositor work. */
+  opacity: 1;
+  box-shadow: none;
+  background: color-mix(in srgb, currentColor 12%, #ffffff);
 }
 
 .process-name {
