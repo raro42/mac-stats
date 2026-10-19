@@ -1188,12 +1188,27 @@ body::before {
   height: 14px;
   display: block;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(1) opacity(0.45);
+  /* Was brightness(0) saturate(100%) invert(1) opacity(0.45).
+     Full paint. A filter would keep Graphics and Media busy (#14). */
+  filter: none;
   opacity: 1;
 }
 
 .icon-line-item:hover img {
-  filter: brightness(0) saturate(100%) invert(1) opacity(0.75);
+  /* Was brightness(0) saturate(100%) invert(1) opacity(0.75). */
+  filter: none;
+  opacity: 1;
+}
+
+/* Ollama ships as a dark bitmap. Paint it in the chip color. No filter layer (#14). */
+.ollama-glyph {
+  width: 14px;
+  height: 14px;
+  display: block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask: url("/assets/ollama.svg") center / contain no-repeat;
+  mask: url("/assets/ollama.svg") center / contain no-repeat;
 }
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */

@@ -1591,6 +1591,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   filter: none;
   opacity: 1;
 }
+body.theme-neon .icon-line-item:not(.status-good):not(.status-bad):not(.status-warning) img,
+body.theme-futuristic .icon-line-item:not(.status-good):not(.status-bad):not(.status-warning) img {
+  /* Was brightness(0) saturate(100%) invert(1) opacity(0.45). The Ollama mark is .ollama-glyph. */
+  filter: none;
+  opacity: 1;
+}
 
 
 /*
