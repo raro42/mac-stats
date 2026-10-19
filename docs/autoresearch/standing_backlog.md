@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2108
+
+- Swiss theme footer (`.theme-footer` in Swiss-minimalistic `cpu.css`) drops glass `opacity` 0.5 (hover 0.8). Type mixes against the opaque shell fill (`color-mix` 25% / 40% `#121216` on `#f6f6f6`). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred on Linux rack. Light footer opaque in v0.1.2107. Next: Dark/Futuristic/Neon theme-footer glass (Architect and Material have no `.theme-footer`), or Data Poster footer glass gradient, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2107
 
-- Light theme footer (`.theme-footer` in Light `cpu.css`) drops glass `opacity` 0.5 (hover 0.8). Type mixes against the opaque shell fill (`color-mix` 28% / 44% `#0c0c10` on `#f7f7fa`). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (`screencapture -l` TCC could not create image; window was on screen). Apple Top Processes row press opaque in v0.1.2106. Next: Architect/Swiss/Material/Dark/Futuristic/Neon/Data Poster theme-footer glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+- Light theme footer (`.theme-footer` in Light `cpu.css`) drops glass `opacity` 0.5 (hover 0.8). Type mixes against the opaque shell fill (`color-mix` 28% / 44% `#0c0c10` on `#f7f7fa`). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (`screencapture -l` TCC could not create image; window was on screen). Apple Top Processes row press opaque in v0.1.2106. Next: Swiss theme-footer glass (shipped v0.1.2108), or Dark/Futuristic/Neon/Data Poster, or Mac capture when TCC allows. P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2106
 
