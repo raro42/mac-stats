@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2099
+
+- Material Ready, Slow, and Down section icons (`.icon-line-item.status-good img`, `.status-warning img`, `.status-bad img` in Material `cpu.css`) drop glass `opacity` 0.85 / 0.8 (hover 0.95 / 0.9) and the colorizing `brightness` / `invert` filters. Those bitmaps paint at full strength on the white chip. Standing P2 #14; design-review fuel (section icon chrome); Mac capture deferred. Data Poster resting section icons opaque in v0.1.2098. Next: Swiss Ready/Slow/Down image opacity + filters, or Data Poster Ready/Slow/Down, or Neon/Futuristic resting `opacity()` filters, or Dark resting `opacity` 0.45, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2098
 
 - Data Poster resting section icon images (`.icon-line-item img` and the boot `brightness` / `invert` rule in Data Poster) drop the glass filter. The Ollama mark (`.ollama-glyph`) paints in the chip color, so it stays light on the dark chip. Ready, Slow, and Down image rules still tint their own bitmaps. Standing P2 #14; layout-daily fuel (Data Poster icon chrome); Mac capture deferred. Architect Ready, Slow, and Down opaque in v0.1.2097. Next: Material Ready/Slow/Down image opacity (0.85 / 0.8) and colorizing filters, or Swiss Ready/Slow/Down, or Neon/Futuristic resting `opacity()` filters, or Dark resting `opacity` 0.45, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
