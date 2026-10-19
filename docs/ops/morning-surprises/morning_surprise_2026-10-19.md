@@ -1,27 +1,20 @@
 # Morning surprise — 2026-10-19
 
-## Shipped tonight
+Overnight Track B kept shipping GitHub **#14** opaque chrome on the CPU metrics surface (design-review fuel; Mac capture of `feature-cpu-metrics.png` still deferred — no on-screen CPU window / Screen Recording TCC).
 
-| Version | What |
-|---------|------|
-| **v0.1.2119** | Architect `#cpu-usage-card:hover` / `.collapsible-header:hover` opaque color-mix on shell `#f1f1f1` (#14). |
-| v0.1.2118 | Material CPU card / Details hover opaque (+ stray brace fix) |
-| v0.1.2117 | Futuristic CPU card / Details hover opaque |
-| v0.1.2116 | Neon CPU card / Details hover opaque |
-| v0.1.2115 | Dark CPU card / Details hover opaque |
-| v0.1.2114 | Light CPU card / Details hover opaque |
-| v0.1.2113 | Data Poster theme footer opaque strip |
+## Latest keep this tick
+- **v0.1.2120** — Swiss `#cpu-usage-card:hover` / `.collapsible-header:hover` opaque (`color-mix` wash on `#ffffff`).
 
-## Deferred
+## Earlier tonight (sample)
+- **v0.1.2119** Architect card/header hover opaque
+- **v0.1.2118** Material card/header hover opaque
+- **v0.1.2117** Futuristic card/header hover opaque
+- **v0.1.2116** Neon · **v0.1.2115** Dark · **v0.1.2114** Light card/header hover
+- Footer glass cuts through **v0.1.2113** Data Poster and earlier theme footers
 
-- Mac capture of stale `docs/screens/feature-cpu-metrics.png` (~42d) — no on-screen CPU window / Screen Recording TCC.
-- Layout daily (data-poster) — deferred; #14 glass cuts took the tick.
+## Still open
+- Data Poster `#cpu-usage-card:hover` / `.collapsible-header:hover` glass
+- Mac capture of stale `docs/screens/feature-cpu-metrics.png` when TCC allows
+- Layout daily (data-poster) still due — deferred behind #14 hover sequence
 
-## Next fuel
-
-- Swiss / Data Poster `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity.
-- Or Mac capture when TCC allows.
-
-## Ratchet
-
-- Keep @ `4a5d1073` — v0.1.2119 Architect hover opaque.
+Digester Slowest empty; design-review + standing #14 drove the night.
