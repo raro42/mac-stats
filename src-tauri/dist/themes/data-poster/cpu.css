@@ -429,8 +429,14 @@ body {
   margin-bottom: -20px;
   padding: 12px 24px 14px;
   border-top: 1px solid var(--hairline);
-  background:
-    linear-gradient(180deg, rgba(8, 8, 12, 0.55), rgba(8, 8, 12, 0.92) 35%, rgba(8, 8, 12, 0.96));
+  /* Opaque strip — glass alpha stays in Graphics and Media (#14). */
+  /* Was rgba(8,8,12,0.55 / 0.92 / 0.96) glass gradient over the poster field. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #08080c 55%, #0b0b10),
+    color-mix(in srgb, #08080c 92%, #0b0b10) 35%,
+    color-mix(in srgb, #08080c 96%, #0b0b10)
+  );
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.08em;
@@ -442,8 +448,9 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--accent) 70%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+  /* Opaque accent dot — was 70% accent on transparent + glass glow. */
+  background: color-mix(in srgb, var(--accent) 70%, #0b0b10);
+  box-shadow: none;
   flex-shrink: 0;
 }
 
@@ -461,7 +468,8 @@ body {
 }
 
 .theme-version:active {
-  color: color-mix(in srgb, var(--text) 80%, transparent);
+  /* Was 80% text on transparent. */
+  color: color-mix(in srgb, var(--text) 80%, #0b0b10);
 }
 
 .theme-github-link {
@@ -469,7 +477,7 @@ body {
   text-decoration: none;
   letter-spacing: 0.1em;
   position: relative;
-  transition: color 0.15s ease, text-shadow 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .theme-github-link::after {
@@ -479,18 +487,19 @@ body {
   right: 0;
   bottom: -2px;
   height: 1px;
-  background: currentColor;
-  opacity: 0.35;
-  transition: opacity 0.15s ease;
+  /* Opaque underline — was opacity 0.35 on currentColor. */
+  background: color-mix(in srgb, currentColor 35%, #0b0b10);
+  transition: background 0.15s ease;
 }
 
 .theme-github-link:hover {
   color: color-mix(in srgb, var(--accent) 85%, #fff);
-  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 40%, transparent);
+  /* Dropped glass text-shadow glow (was 40% accent on transparent). */
 }
 
 .theme-github-link:hover::after {
-  opacity: 0.7;
+  /* Was opacity 0.7 on currentColor. */
+  background: color-mix(in srgb, currentColor 70%, #0b0b10);
 }
 
 .settings-modal {
