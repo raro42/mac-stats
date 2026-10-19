@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2141
+
+- Material AI Chat `#chat-input` and `#chat-send-btn` drop glass rgba (`--panel` 0.96, `--hairline` 0.14, `--text` 0.85, `--muted` 0.55, Send `rgba(0, 122, 255, 0.9)`). Field, focus, placeholder, and Send mix against the opaque shell fill `#ebe4d9`. Standing P2 #14; design-review fuel (AI Chat on Material). Architect field and Send opaque in v0.1.2140. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Light `#chat-input` rgba, or Dark/Neon/Futuristic composer fields, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2140
 
 - Architect AI Chat `#chat-input` and `#chat-send-btn` drop glass rgba (`--panel` 0.94, `--line` 0.20, `--ink` 0.88, Send `rgba(0, 122, 255, 0.9)`). Field, focus, placeholder, and Send mix against the opaque shell fill `#f1f1f1`. Standing P2 #14; design-review fuel (AI Chat on Architect). Data Poster field and Send opaque in v0.1.2139. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Material `#chat-input` rgba, or other theme composer fields, or Mac capture when TCC allows. P2 reliability / GitHub #14.
