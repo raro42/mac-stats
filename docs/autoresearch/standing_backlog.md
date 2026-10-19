@@ -19,9 +19,13 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2107
+
+- Light theme footer (`.theme-footer` in Light `cpu.css`) drops glass `opacity` 0.5 (hover 0.8). Type mixes against the opaque shell fill (`color-mix` 28% / 44% `#0c0c10` on `#f7f7fa`). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (`screencapture -l` TCC could not create image; window was on screen). Apple Top Processes row press opaque in v0.1.2106. Next: Architect/Swiss/Material/Dark/Futuristic/Neon/Data Poster theme-footer glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2106
 
-- Apple Top Processes row press (`.process-row:active` in Apple `cpu.css`) drops glass `opacity` 0.92. The row mixes a quiet press wash (`color-mix` 12% `currentColor` on `#ffffff`) at full opacity, matching the shared sheet. Standing P2 #14; design-review fuel (Top Processes chrome); Mac capture deferred. Dark Ready, Slow, and Down opaque in v0.1.2105. Next: Light/other theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
+- Apple Top Processes row press (`.process-row:active` in Apple `cpu.css`) drops glass `opacity` 0.92. The row mixes a quiet press wash (`color-mix` 12% `currentColor` on `#ffffff`) at full opacity, matching the shared sheet. Standing P2 #14; design-review fuel (Top Processes chrome); Mac capture deferred. Dark Ready, Slow, and Down opaque in v0.1.2105. Next: Light theme-footer glass (shipped v0.1.2107), or other theme `#cpu-usage-card:hover` / `.collapsible-header:hover` glass opacity, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows. The thermal pulse keyframe stays (2.4s animation). P2 reliability / GitHub #14.
 
 ## Overnight merge — v0.1.2105
 
