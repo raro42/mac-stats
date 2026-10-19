@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2126
+
+- Light AI Chat `.chat-message.thinking` and `.response-time` drop glass opacity (0.7 / 0.6). Thinking mixes 60% `#0c0c10` on `#f7f7fa`; response time mixes 36% `#0c0c10` on the same fill. Standing P2 #14; design-review fuel (AI Chat on Light). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Futuristic opaque in v0.1.2125. Next: Swiss/Material/Architect AI Chat thinking/response-time glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2125
 
 - Futuristic AI Chat `.chat-message.thinking` and `.response-time` drop glass opacity (0.7 / 0.6). Thinking mixes 64% white on `#111123`; response time mixes 36% white on the same fill. Standing P2 #14; design-review fuel (AI Chat on Futuristic). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Neon opaque in v0.1.2124. Next: Light/Swiss/Material/Architect AI Chat thinking/response-time glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.

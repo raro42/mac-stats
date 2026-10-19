@@ -6,7 +6,8 @@ Overnight autoresearch (Track B) kept shipping WebView idle chrome (#14) while S
 
 | Version | Keep | What |
 |---------|------|------|
-| **v0.1.2125** | fe2aeab5 | Futuristic AI Chat thinking + response-time opaque color-mix on `#111123` |
+| **v0.1.2126** | 97f89582 | Light AI Chat thinking + response-time opaque color-mix on `#f7f7fa` |
+| v0.1.2125 | fe2aeab5 | Futuristic AI Chat thinking + response-time opaque |
 | v0.1.2124 | dc06fc3d | Neon AI Chat thinking + response-time opaque |
 | v0.1.2123 | 22b57892 | Dark AI Chat thinking + response-time opaque |
 | v0.1.2122 | ba599756 | Data Poster AI Chat thinking + response-time (layout-daily) |
@@ -15,7 +16,7 @@ Overnight autoresearch (Track B) kept shipping WebView idle chrome (#14) while S
 ## Still open
 
 - Mac window-only capture of stale `docs/screens/feature-cpu-metrics.png` (~42d) when TCC allows
-- Light / Swiss / Material / Architect AI Chat thinking / response-time glass opacity
+- Swiss / Material / Architect AI Chat thinking / response-time glass opacity
 
 ## Notes
 
