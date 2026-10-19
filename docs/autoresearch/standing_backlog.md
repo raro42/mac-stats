@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2145
+
+- Futuristic AI Chat `#chat-input` and `#chat-send-btn` drop glass rgba (var() chains with rgba fallbacks, Send `rgba(0, 122, 255, 0.9)`). Field, focus, placeholder, and Send mix against the opaque shell fill `#111123`. Standing P2 #14; design-review fuel (AI Chat on Futuristic). Neon field and Send opaque in v0.1.2144. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: remaining theme composer fields (Apple if glass remains), or other glass chrome, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2144
 
 - Neon AI Chat `#chat-input` and `#chat-send-btn` drop glass rgba (var() chains with rgba fallbacks, Send `rgba(0, 122, 255, 0.9)`). Field, focus, placeholder, and Send mix against the opaque shell fill `#08120c`. Standing P2 #14; design-review fuel (AI Chat on Neon). Dark field and Send opaque in v0.1.2143. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Futuristic `#chat-input` rgba, or other theme composer fields, or Mac capture when TCC allows. P2 reliability / GitHub #14.
