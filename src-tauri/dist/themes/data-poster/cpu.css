@@ -2308,34 +2308,37 @@ body {
   background: color-mix(in srgb, var(--accent, #007aff) 5%, #0b0b10);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Field was rgba(14, 14, 20, 0.94); hairline and type were white glass. Mix on #0b0b10. */
 #chat-input {
   flex: 1;
   /* Dark panel only — never fall back to light glass on this theme (#15). */
-  background: rgba(14, 14, 20, 0.94);
-  border: 1px solid var(--hairline, rgba(255, 255, 255, 0.16));
+  background: color-mix(in srgb, #0e0e14 94%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   padding: 8px 12px;
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   font-size: 13px;
   font-family: inherit;
 }
 
 #chat-input:focus {
   outline: none;
-  border-color: var(--accent, #55c7ff);
-  background: rgba(18, 18, 26, 0.96);
+  border-color: #55c7ff;
+  background: color-mix(in srgb, #12121a 96%, #0b0b10);
 }
 
 #chat-input::placeholder {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: color-mix(in srgb, #ffffff 60%, #0b0b10);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, #007aff 90%, #0b0b10);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -2344,7 +2347,7 @@ body {
 }
 
 #chat-send-btn:hover {
-  background: rgba(0, 122, 255, 1);
+  background: #007aff;
 }
 
 /* History section and charts */
