@@ -1,30 +1,27 @@
 # Morning surprise — 2026-10-19
 
-Overnight autoresearch (Track B) kept product glass cuts for GitHub **#14**.
+Overnight Track B (20:00–06:00 local) kept shipping glass→opaque cuts for WebView idle (#14).
 
-## Shipped tonight (keeps)
+## Shipped this window (latest first)
 
 | Version | What |
 |---------|------|
-| **v0.1.2112** | Futuristic `.theme-footer` drops glass opacity 0.6 / hover 0.9; Neon gains opaque footer `color-mix` on `#08120c` (CSS was missing). |
-| **v0.1.2111** | Material `.theme-footer` opaque type on paper shell (CSS was missing). |
-| **v0.1.2110** | Dark `.theme-footer` drops glass opacity; muted green `color-mix` on `#0a0a0a`. |
-| **v0.1.2109–2107** | Architect / Swiss / Light theme footers opaque. |
-| Earlier tonight | Section-icon and Apple Top Processes press glass cuts (see `results.tsv`). |
-
-Latest keep @ `2e3edcc` (v0.1.2112).
+| **v0.1.2113** | Data Poster `.theme-footer` opaque strip (`color-mix` on `#0b0b10`; no glass rgba gradient / sep glow) |
+| **v0.1.2112** | Futuristic + Neon `.theme-footer` opaque (Neon CSS was missing) |
+| v0.1.2111 | Material `.theme-footer` opaque type (CSS was missing) |
+| v0.1.2110 | Dark `.theme-footer` opaque color-mix |
+| v0.1.2109–2107 | Architect / Swiss / Light theme footers opaque |
+| earlier | Section-icon Ready/Slow/Down + resting opacity cuts across themes |
 
 ## Tried / deferred
 
-- Digester open: empty (no runs in window).
-- Design review due (`feature-agent-ops` ~33d, `feature-cpu-metrics` ~42d) — Mac window-only capture deferred on Linux rack (no TCC / no on-screen CPU window).
-- Layout daily: already marked for today (`due=false`); dark/neon screens still missing on this host.
-- Sibling harnesses: OpenClaw / Hermes git missing on rack — no port this tick.
-- `debug.log`: no ERROR/WARN clusters in the scan window.
+- Duplicate Futuristic-only v0.1.2112 discarded (parallel already shipped Futuristic+Neon @ `2e3edcc0`).
+- Mac capture of stale `docs/screens/feature-cpu-metrics.png` (~42d) — no on-screen CPU window / Screen Recording TCC.
+- Digester Slowest empty after instant-lane filters.
+- Layout daily already checked data-poster today.
 
 ## Next fuel
 
-- Data Poster footer glass gradient / `transparent` mixes, or Mac capture of stale `feature-cpu-metrics.png` when TCC allows.
-- Thermal pulse keyframe stays (2.4s animation).
+Mac capture of stale `feature-cpu-metrics.png` when TCC allows, or the next glass cut on remaining chrome.
 
-Generated: 2026-10-19T05:15:57
+Generated: 2026-10-19T03:29:26.964349+00:00
