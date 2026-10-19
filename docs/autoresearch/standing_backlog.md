@@ -19,6 +19,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2122
+
+- Data Poster AI Chat `.chat-message.thinking` and `.response-time` drop glass opacity (0.7 / 0.6). Thinking mixes 64% white on `#0b0b10`; response time mixes 36% white on the same fill. Standing P2 #14; layout-daily data-poster + design-review fuel. Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Next: Dark/Neon/Futuristic/Light/Swiss/Material/Architect AI Chat thinking/response-time glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.2121
+
+- Data Poster `#cpu-usage-card:hover` and `.collapsible-header:hover` drop glass opacity (0.9 / 0.7). Usage card stays full strength; Details headers mix a quiet `color-mix` wash on `#0b0b10` at full opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Theme card/header hover sequence complete. Next: layout-daily data-poster AI Chat glass (shipped v0.1.2122), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2120
 
 - Swiss `#cpu-usage-card:hover` and `.collapsible-header:hover` drop glass opacity (0.9 / 0.7). Usage card stays full strength; Details headers mix a quiet `color-mix` wash on `#ffffff` at full opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics chrome). Mac capture deferred (no on-screen CPU window / Screen Recording TCC). Architect hover opaque in v0.1.2119. Next: Data Poster card/header hover glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
