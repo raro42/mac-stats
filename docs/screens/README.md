@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-10-19 (~02:20):** Data Poster resting section icon: Ollama mark paints in the chip color (v0.1.2098 — drop `brightness` / `invert`). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Material Ready/Slow/Down image filters, or Mac capture when TCC allows.
 - **2026-10-18 (~20:05):** Architect Ready · Slow · Down section icon images opaque (v0.1.2097 — drop glass opacity + colorizing filters). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next: Data Poster resting icon filter, or Material Ready/Slow/Down, or Mac capture when TCC allows.
 - **2026-10-14 (~04:35):** Shared Disk Cleanup meta keyboard hint opaque type (v0.1.1979 — `.disk-cleanup-meta-kb-hint`; Data Poster / Dark remaps; cpu.js inject matched). Recapture of `feature-disk-cleanup.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next shared glass: `.disk-cleanup-toolbar-kb-hint` opacity 0.72.
 - **2026-10-14 (~04:20):** Shared header toolbar keyboard hint opaque type (v0.1.1978 — `.header-toolbar-kb-hint`; Data Poster / Dark remaps; cpu.js inject matched). Recapture of `feature-cpu-metrics.png` deferred (no on-screen CPU window / Screen Recording TCC); prior asset kept. Next shared glass: `.disk-cleanup-meta-kb-hint` opacity 0.72.

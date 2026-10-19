@@ -10,7 +10,15 @@
     <style id="data-poster-icon-contrast">
       .icon-line-item { color: #ffffff !important; opacity: 1 !important; }
       .icon-line-item svg { color: inherit !important; opacity: 1 !important; stroke: currentColor !important; }
-      .icon-line-item img { filter: brightness(0) saturate(100%) invert(1) !important; opacity: 1 !important; }
+      .icon-line-item:not(.status-good):not(.status-warning):not(.status-bad) img {
+        filter: none !important; opacity: 1 !important;
+      }
+      .ollama-glyph {
+        width: 14px; height: 14px; display: block; flex-shrink: 0;
+        background-color: currentColor !important;
+        -webkit-mask: url("/assets/ollama.svg") center / contain no-repeat !important;
+        mask: url("/assets/ollama.svg") center / contain no-repeat !important;
+      }
       #icon-monitors, #icon-ollama, #icon-perplexity, #icon-logs, #icon-disk-cleanup, #icon-agent-ops {
         color: #ffffff !important; opacity: 1 !important;
       }
@@ -174,7 +182,7 @@
         
         <!-- Icon 2: Ollama (Official Ollama icon) -->
         <button class="icon-line-item" id="icon-ollama" title="AI Chat (Ollama)">
-          <img src="/assets/ollama.svg" alt="Ollama" />
+          <span class="ollama-glyph" role="img" aria-label="Ollama"></span>
         </button>
         
         

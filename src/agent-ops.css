@@ -1587,7 +1587,8 @@ body.theme-data-poster #icon-agent-ops.status-good {
   color: rgba(52, 199, 89, 0.95);
 }
 body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.status-warning) img {
-  filter: brightness(0) saturate(100%) invert(1);
+  /* Was brightness(0) saturate(100%) invert(1). The Ollama mark is .ollama-glyph. */
+  filter: none;
   opacity: 1;
 }
 
