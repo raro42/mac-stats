@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2112] - 2026-10-19
+
+### Changed
+- **Futuristic and Neon theme footers:** The version · GitHub footer (`.theme-footer`) drops glass opacity. Futuristic mixes white on `#111123` at full opacity (was `rgba(255,255,255,0.5)` under opacity 0.6 / hover 0.9). Neon gains matching opaque type styles (`color-mix` muted green on `#08120c`; HTML already had the footer; CSS was missing). Version and GitHub hover/active use color, not opacity. Design review fuel (feature-cpu-metrics footer chrome). Material footer opaque in v0.1.2111; Mac capture of `feature-cpu-metrics.png` still deferred (no on-screen CPU window / Screen Recording TCC).
+
 ## [0.1.2111] - 2026-10-19
 
 ### Changed

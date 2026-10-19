@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2112
+
+- Futuristic theme footer (`.theme-footer` in Futuristic `cpu.css`) drops glass `opacity` 0.6 (hover 0.9). Type mixes against the opaque shell fill (`color-mix` 30% / 45% `#ffffff` on `#111123`). Neon gains matching opaque type styles (muted `#b4e6b4` on `#08120c`; HTML already had the footer; CSS was missing). Version and GitHub hover/active use color, not opacity. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (no on-screen CPU window). Material footer opaque in v0.1.2111. Next: Data Poster footer glass gradient / transparent mixes, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2111
 
 - Material theme footer (`.theme-footer` in Material `cpu.css`) gains opaque type styles. Type mixes against the paper shell fill (`color-mix` 28% / 44% `#18181a` on `#ebe4d9`). Version and GitHub hover/active use color, not opacity. HTML already had the footer; CSS was missing. Standing P2 #14; design-review fuel (feature-cpu-metrics footer chrome). Mac capture deferred (no on-screen CPU window). Dark footer opaque in v0.1.2110. Next: Futuristic/Neon theme-footer glass, or Data Poster footer glass gradient, or Mac capture when TCC allows. P2 reliability / GitHub #14.
