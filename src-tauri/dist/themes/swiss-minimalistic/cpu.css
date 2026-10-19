@@ -2415,42 +2415,64 @@ body {
   background: color-mix(in srgb, var(--accent, #007aff) 5%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+/* Tokens here are rgba (--panel 0.94, --hairline 0.10, --accent 0.68). Mix opaque ink on #ffffff. */
 #chat-input {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: color-mix(in srgb, #121216 5%, #ffffff);
+  border: 1px solid color-mix(in srgb, #121216 10%, #ffffff);
   border-radius: 8px;
   padding: 8px 12px;
-  color: var(--text, var(--ink, inherit));
+  color: #121216;
   font-size: 13px;
   font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+#chat-input:hover {
+  background: color-mix(in srgb, #121216 7%, #ffffff);
+  border-color: color-mix(in srgb, #121216 22%, #ffffff);
 }
 
 #chat-input:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: color-mix(in srgb, #121216 55%, #ffffff);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #121216 18%, #ffffff);
 }
 
 #chat-input::placeholder {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: color-mix(in srgb, #121216 55%, #ffffff);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 #chat-send-btn {
-  background: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, #007aff 90%, #ffffff);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.2s;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
   font-family: inherit;
+  box-shadow: none;
 }
 
 #chat-send-btn:hover {
-  background: rgba(0, 122, 255, 1);
+  background: #007aff;
+  box-shadow: none;
+}
+
+#chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #ffffff);
+  outline-offset: 2px;
+}
+
+#chat-send-btn:active {
+  box-shadow: none;
+  background: color-mix(in srgb, #0064dc 95%, #ffffff);
 }
 
 /* Debug Log viewer */

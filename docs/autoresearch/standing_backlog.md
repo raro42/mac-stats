@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2138
+
+- Swiss Minimalistic AI Chat `#chat-input` and `#chat-send-btn` drop glass rgba (`--panel` 0.94, `--hairline` 0.10, Send `rgba(0, 122, 255, 0.9)`). Field, hover, focus ring, and Send mix against the opaque shell fill `#ffffff`. Standing P2 #14; design-review fuel (AI Chat on Swiss). Data Poster composer shell opaque in v0.1.2137. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Data Poster `#chat-input` rgba, or other theme composer fields, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2137
 
 - Data Poster AI Chat `.chat-input-container` resting and `:focus-within` drop glass `transparent` washes. Border, fill, and focus ring mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat composer on Data Poster). Futuristic composer shell opaque in v0.1.2136. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Swiss `#chat-input` / Send glass, or Data Poster `#chat-input` rgba, or Mac capture when TCC allows. P2 reliability / GitHub #14.
