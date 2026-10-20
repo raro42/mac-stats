@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2147
+
+- Futuristic Ollama settings `.popover-btn-secondary` drops glass `--panel` / rgba fallbacks. Resting and hover mix fill, type, and border against the opaque shell fill `#111123`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Futuristic). Primary opaque in v0.1.2146. Mac capture deferred (no on-screen CPU window). Next: Futuristic Ollama popover shell / textarea glass, or other theme Ollama primary buttons, or Mac capture of `feature-agent-ops.png` when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2146
 
 - Futuristic Ollama settings `.ollama-settings-popover .popover-btn-primary` drops glass rgba (`rgba(0, 122, 255, 0.9)`). Save resting and hover mix against the opaque shell fill `#111123`. Standing P2 #14; design-review fuel (AI Chat Ollama popover on Futuristic). Field and Send opaque in v0.1.2145. Mac capture deferred (no on-screen CPU window / Screen Recording TCC / `screencapture -l` unavailable). Next: Futuristic `.ollama-settings-popover .popover-btn-secondary` glass rgba, or other theme Ollama primary / secondary popover glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
