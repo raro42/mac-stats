@@ -1,24 +1,24 @@
 # Morning surprise — 2026-10-20
 
-Overnight Track B (20:00+ EDT window) kept through **v0.1.2151**.
+Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-review fuel while Agent Ops Mac capture stays deferred on the Linux rack).
 
-## Shipped
+## Shipped tonight (highlights)
 
-- **v0.1.2148** — Futuristic Ollama settings **popover shell** (`.popover-content`) opaque on `#111123`.
-- **v0.1.2149** — Futuristic Ollama **textarea** + header/Close chrome opaque on `#111123`.
-- **v0.1.2150** (parallel tick) — Neon Ollama settings **Save** (`.popover-btn-primary`) opaque on `#08120c`.
-- **v0.1.2151** — Neon Ollama settings **Reset** (`.popover-btn-secondary`) drops glass `--panel` / rgba. Fill, type, and border mix against `#08120c`. Standing P2 #14 / design-review fuel (AI Chat settings on Neon).
+- **v0.1.2152** — Neon Ollama settings popover shell (`.popover-content`) opaque on `#08120c` (no glass panel rgba / soft shadow).
+- **v0.1.2151** — Neon Ollama secondary (Reset) opaque on `#08120c`.
+- **v0.1.2150** — Neon Ollama Save opaque on `#08120c`.
+- **v0.1.2149** — Futuristic Ollama textarea + header chrome opaque on `#111123`.
+- **v0.1.2148** — Futuristic Ollama popover shell opaque on `#111123`.
+- Earlier in the window: Futuristic through Neon AI Chat field/Send and composer shells (v0.1.2143–2147 chain).
 
-## Tried / discarded this tick
+## Tried / deferred
 
-- Local Neon Save as v0.1.2150 — parallel already shipped @ `74ea2dbe`; discarded and shipped secondary as **v0.1.2151**.
+- Digester open: empty (0 turns in 7d).
+- Sibling OpenClaw / Hermes: git missing on this rack; no port.
+- Mac recapture of `feature-agent-ops.png`: deferred (no on-screen CPU window / `screencapture -l` unavailable).
+- Layout-daily Data Poster screen still due for capture; named glass fuel won each tick.
 
-## Still open
+## Next fuel
 
-- Design-review screenshot: `docs/screens/feature-agent-ops.png` still ~34d stale (`screencapture -l` unavailable / no Screen Recording TCC path).
-- Next glass: Neon Ollama popover shell / textarea, or other theme Ollama primary, or Mac capture when TCC allows.
-
-## Notes
-
-- Digester open was design-review only. Layout-daily already clear for data-poster today.
-- App reinstalled + kickstarted at **0.1.2151**.
+- Neon Ollama textarea / header chrome glass, or other theme Ollama popover shell.
+- Mac capture when TCC / CPU window allows.
