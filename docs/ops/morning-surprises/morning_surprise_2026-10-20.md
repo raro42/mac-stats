@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-r
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2167** — Architect Ollama secondary (Reset) opaque on `#f1f1f1` (no glass `--panel` / rgba).
 - **v0.1.2166** — Architect Ollama Save opaque on `#f1f1f1` (no glass rgba).
 - **v0.1.2165** — Material Ollama settings textarea + header hairline + Close hover opaque on `#ebe4d9` (no glass `--panel` / rgba).
 - **v0.1.2164** — Material Ollama settings popover shell (`.popover-content`) opaque on `#ebe4d9` (no glass `--panel` / rgba / soft shadow).
