@@ -19,6 +19,14 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2151
+
+- Neon Ollama settings `.popover-btn-secondary` drops glass `--panel` / rgba fallbacks. Resting and hover mix fill, type, and border against the opaque shell fill `#08120c`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Neon). Primary opaque in v0.1.2150. Mac capture deferred (no on-screen CPU window). Next: Neon Ollama popover shell / textarea glass, or other theme Ollama primary, or Mac capture of `feature-agent-ops.png` when TCC allows. P2 reliability / GitHub #14.
+
+## Overnight merge — v0.1.2150
+
+- Neon Ollama settings `.popover-btn-primary` drops glass rgba (`rgba(0, 122, 255, 0.9)`). Resting and hover mix against the opaque shell fill `#08120c`. Standing P2 #14; design-review fuel (AI Chat Ollama popover on Neon). Futuristic chrome opaque through v0.1.2149. Mac capture deferred. Next: Neon secondary (shipped v0.1.2151), shell/textarea, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2148
 
 - Futuristic Ollama settings `.ollama-settings-popover .popover-content` drops glass `--panel` / rgba fallbacks and soft panel shadow. Fill and border mix against the opaque shell fill `#111123`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Futuristic). Secondary opaque in v0.1.2147. Mac capture deferred (no on-screen CPU window). Next: Futuristic Ollama textarea glass, or other theme Ollama popover shell / primary, or Mac capture of `feature-agent-ops.png` when TCC allows. P2 reliability / GitHub #14.

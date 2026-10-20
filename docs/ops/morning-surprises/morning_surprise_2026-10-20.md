@@ -1,26 +1,24 @@
 # Morning surprise — 2026-10-20
 
-Overnight Track B (glass / #14) kept shipping while digester stayed empty.
+Overnight Track B (20:00+ EDT window) kept through **v0.1.2151**.
 
-## Shipped tonight
+## Shipped
 
-| Version | What |
-|---------|------|
-| v0.1.2145 | Futuristic AI Chat field + Send opaque on `#111123` |
-| v0.1.2146 | Futuristic Ollama Save opaque |
-| v0.1.2147 | Futuristic Ollama secondary button opaque |
-| v0.1.2148 | Futuristic Ollama popover shell opaque |
-| v0.1.2149 | Futuristic Ollama textarea + header chrome opaque |
-| **v0.1.2150** | **Neon Ollama Save** mixes on `#08120c` (no glass rgba) |
+- **v0.1.2148** — Futuristic Ollama settings **popover shell** (`.popover-content`) opaque on `#111123`.
+- **v0.1.2149** — Futuristic Ollama **textarea** + header/Close chrome opaque on `#111123`.
+- **v0.1.2150** (parallel tick) — Neon Ollama settings **Save** (`.popover-btn-primary`) opaque on `#08120c`.
+- **v0.1.2151** — Neon Ollama settings **Reset** (`.popover-btn-secondary`) drops glass `--panel` / rgba. Fill, type, and border mix against `#08120c`. Standing P2 #14 / design-review fuel (AI Chat settings on Neon).
 
-## This tick (≈03:03)
+## Tried / discarded this tick
 
-- Digester: empty (0 turns / 7d)
-- Design review: due (`feature-agent-ops.png` ~34d stale) — Mac capture deferred on Linux rack
-- Layout daily: due (Data Poster) — deferred; continued glass ratchet instead
-- Keep: Neon Ollama settings Save button opaque wash
+- Local Neon Save as v0.1.2150 — parallel already shipped @ `74ea2dbe`; discarded and shipped secondary as **v0.1.2151**.
 
-## Next fuel
+## Still open
 
-- Neon Ollama secondary / popover shell / textarea glass
-- Or Mac window-only capture of `feature-agent-ops.png` when TCC allows
+- Design-review screenshot: `docs/screens/feature-agent-ops.png` still ~34d stale (`screencapture -l` unavailable / no Screen Recording TCC path).
+- Next glass: Neon Ollama popover shell / textarea, or other theme Ollama primary, or Mac capture when TCC allows.
+
+## Notes
+
+- Digester open was design-review only. Layout-daily already clear for data-poster today.
+- App reinstalled + kickstarted at **0.1.2151**.
