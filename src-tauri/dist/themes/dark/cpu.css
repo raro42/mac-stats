@@ -1827,13 +1827,14 @@ padding: 0;
   z-index: 2000;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-content {
   width: min(500px, 90vw);
   border-radius: 16px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
-padding: 0;
+  background: #0a0a0a;
+  border: 1px solid color-mix(in srgb, #00ff00 14%, #0a0a0a);
+  box-shadow: none;
+  padding: 0;
   overflow: hidden;
 }
 
