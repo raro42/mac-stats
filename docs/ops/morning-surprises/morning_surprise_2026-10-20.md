@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-r
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2153** — Neon Ollama settings textarea + header hairline + Close hover opaque on `#08120c` (no glass panel rgba).
 - **v0.1.2152** — Neon Ollama settings popover shell (`.popover-content`) opaque on `#08120c` (no glass panel rgba / soft shadow).
 - **v0.1.2151** — Neon Ollama secondary (Reset) opaque on `#08120c`.
 - **v0.1.2150** — Neon Ollama Save opaque on `#08120c`.
@@ -20,5 +21,5 @@ Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-r
 
 ## Next fuel
 
-- Neon Ollama textarea / header chrome glass, or other theme Ollama popover shell.
+- Other theme Ollama popover shell / textarea glass (Dark / Light / …), or remaining Neon glass elsewhere.
 - Mac capture when TCC / CPU window allows.
