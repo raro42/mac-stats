@@ -1923,7 +1923,8 @@ body::before {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque mix — glass alpha stays in Graphics and Media (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #46ff78 14%, #08120c);
 }
 
 .ollama-settings-popover .popover-header h3 {
@@ -1950,8 +1951,9 @@ body::before {
   transition: all 0.2s;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-close:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1967,24 +1969,27 @@ body::before {
   margin-bottom: 8px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-body textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border: 1px solid color-mix(in srgb, #46ff78 14%, #08120c);
   border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
   line-height: 1.5;
-  color: var(--text, var(--ink, inherit));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  color: color-mix(in srgb, #e6ffe6 92%, #08120c);
+  background: color-mix(in srgb, #ffffff 5%, #08120c);
   resize: vertical;
   box-sizing: border-box;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ollama-settings-popover .popover-body textarea:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.9)))));
+  border-color: color-mix(in srgb, #007aff 55%, #08120c);
+  background: #08120c;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #007aff 18%, #08120c);
 }
 
 .ollama-settings-popover .popover-actions {
