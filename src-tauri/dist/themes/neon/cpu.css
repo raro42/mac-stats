@@ -2004,14 +2004,16 @@ body::before {
   border: 1px solid transparent;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-settings-popover .popover-btn-primary {
-  background: rgba(0, 122, 255, 0.9);
-  color: white;
-  border-color: rgba(0, 122, 255, 0.9);
+  background: color-mix(in srgb, #007aff 90%, #08120c);
+  color: #ffffff;
+  border-color: color-mix(in srgb, #007aff 90%, #08120c);
 }
 
 .ollama-settings-popover .popover-btn-primary:hover {
-  background: rgba(0, 122, 255, 1);
+  background: #007aff;
+  border-color: #007aff;
 }
 
 .ollama-settings-popover .popover-btn-secondary {
