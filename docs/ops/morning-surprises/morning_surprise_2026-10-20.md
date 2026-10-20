@@ -4,6 +4,7 @@ Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-r
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2161** — Light Ollama settings textarea + header hairline + Close hover opaque on `#f7f7fa` (no glass `--panel` / rgba).
 - **v0.1.2160** — Light Ollama settings popover shell (`.popover-content`) opaque on `#f7f7fa` (no glass `--panel` / rgba / soft shadow).
 - **v0.1.2159** — Light Ollama secondary (Reset) opaque on `#f7f7fa` (no glass `--panel` / rgba).
 - **v0.1.2158** — Light Ollama Save opaque on `#f7f7fa` (no glass rgba).
@@ -28,5 +29,5 @@ Overnight autoresearch kept shipping WebView glass cuts for GitHub #14 (design-r
 
 ## Next fuel
 
-- Light Ollama textarea / header chrome glass rgba, or other theme Ollama popover shell (Material / Architect / …).
+- Other theme Ollama popover shell / Save glass (Material · Architect · Swiss · Apple · Data Poster).
 - Mac capture when TCC / CPU window allows.

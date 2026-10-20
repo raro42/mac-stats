@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2161
+
+- Light Ollama settings `.popover-body textarea` + header hairline + Close hover drop glass `--panel` / rgba fallbacks. Resting, focus, and hover mix against the opaque shell fill `#f7f7fa`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Light). Shell opaque in v0.1.2160. Mac capture deferred (`screencapture -l` unavailable). Next: other theme Ollama popover shell / Save glass (Material · Architect · Swiss · Apple · Data Poster), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2160
 
 - Light Ollama settings `.ollama-settings-popover .popover-content` drops glass `--panel` / rgba fallbacks and soft panel shadow. Fill and border mix against the opaque shell fill `#f7f7fa`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Light). Secondary opaque in v0.1.2159. Mac capture deferred (`screencapture -l` unavailable). Next: Light Ollama textarea / header chrome glass, or other theme Ollama popover shell, or Mac capture when TCC allows. P2 reliability / GitHub #14.
