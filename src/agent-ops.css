@@ -12565,3 +12565,14 @@ body.theme-data-poster #force-quit-process-btn.is-just-saved {
   animation: none;
   box-shadow: none;
 }
+/*
+ * Data Poster: Top Processes list header hairline + selected row still mixed
+ * Apple #ffffff → white slab on the poster field #0b0b10.
+ */
+body.theme-data-poster .process-list-header {
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-data-poster .process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
+}
