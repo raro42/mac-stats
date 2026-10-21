@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 | Version | What |
 |---------|------|
+| v0.1.2187 | Data Poster AI Chat `.model-text` resting + hover opaque on `#0b0b10` (no glass muted/hairline rgba) |
 | v0.1.2186 | Data Poster AI Chat markdown in bubbles (blockquote / code / pre / table / hr / link) opaque on `#0b0b10` |
 | v0.1.2185 | Data Poster AI Chat `.model-select-dropdown` opaque on `#0b0b10` (no glass rgba / soft shadow) |
 | v0.1.2184 | Data Poster AI Chat `.chat-message.user` / `.assistant` opaque on `#0b0b10` (no glass rgba) |
@@ -22,10 +23,10 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 ## Still open
 
-- Data Poster `.model-text` hover wash; thinking-dots if still glass
+- Data Poster thinking-dots if still glass
 - Stale design-review screens (`feature-agent-ops.png` ~36d) — Mac `screencapture -l` / Screen Recording TCC still blocked on this rack
 - Digester empty (ask Werner something)
 
 ## Fitness
 
-Markdown chrome inside Data Poster chat bubbles no longer paints glass hairline washes through the shell. Same opaque mix pattern as the bubbles and model select.
+The Data Poster model name chip no longer paints a glass hairline hover wash through the shell. Resting muted type and hover fill mix against the opaque `#0b0b10` field, same pattern as the model select.
