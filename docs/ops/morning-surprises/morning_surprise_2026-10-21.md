@@ -1,23 +1,25 @@
 # Morning surprise — 2026-10-21
 
-Overnight Track B kept shipping Data Poster Settings opaque washes for GitHub #14 (design-review fuel while Mac `screencapture -l` stays blocked on the Linux rack).
+Overnight Track B kept shipping Data Poster opaque washes for GitHub #14 (design-review fuel; Mac window capture still blocked on this Linux rack).
 
-## Shipped tonight
+## Shipped tonight (selected)
 
-- **v0.1.2193** — Settings `.settings-btn` / primary, `.settings-help-sheet`, `.setting-toggle` (and removed duplicate glass toggle override) mix on `#0b0b10`.
-- **v0.1.2192** — Settings inputs / Discord token fields.
-- **v0.1.2191** — Settings header / Close / theme list.
-- **v0.1.2190** — Settings `.settings-card` shell.
-- Earlier in the window: AI Chat ollama-menu, thinking-dots, model-text, markdown, bubbles, model-select-dropdown (see CHANGELOG).
+| Version | What |
+|---------|------|
+| **v0.1.2194** | Settings product glances (AI · Compact · Judge · Downloads · Ori · Having fun · Voice STT · Help) + toggle Saved flash mix on `#0b0b10` (no Apple `#ffffff` white slab) |
+| **v0.1.2193** | Settings buttons / help sheet / toggles opaque |
+| **v0.1.2192** | Settings inputs opaque |
+| **v0.1.2191** | Settings header / Close / theme-list opaque |
+| **v0.1.2190** | Settings `.settings-card` shell opaque |
+| **v0.1.2189** | AI Chat ollama-menu opaque |
+| **v0.1.2188** | AI Chat thinking-dots opaque |
 
-## Tried / deferred
+## Still open
 
-- Digester open: empty (no runs in window).
-- `feature-agent-ops.png` still ~36d stale; window capture needs macOS Screen Recording TCC.
-- Layout daily already done for 2026-10-21.
+- Data Poster Settings credential glances / Save-button flashes if still white-slab
+- Force Quit / process-detail glass on Data Poster
+- Stale design-review screens (`feature-agent-ops` ~36d) when TCC / `screencapture -l` works on Mac
 
-## Next
+## Fitness
 
-- Settings product glances / Save flash / credential hairlines if still glass on Data Poster.
-- Force Quit / process-detail glass on Data Poster.
-- Recapture Agent Ops when Mac TCC allows.
+Settings Product Off/On/Help glances no longer paint a white slab on the opaque Data Poster Settings shell.
