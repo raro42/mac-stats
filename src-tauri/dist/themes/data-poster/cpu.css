@@ -659,6 +659,7 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .settings-input,
 .discord-token-input {
   width: 100%;
@@ -667,22 +668,29 @@ body {
   margin: 0;
   padding: 6px 10px;
   border-radius: 9px;
-  border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   font-size: 13px;
   outline: none;
 }
 
 .settings-input::placeholder,
 .discord-token-input::placeholder {
-  color: rgba(255, 255, 255, 0.38);
+  color: color-mix(in srgb, #ffffff 38%, #0b0b10);
+}
+
+.settings-input:hover,
+.discord-token-input:hover {
+  background: color-mix(in srgb, #ffffff 10%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 22%, #0b0b10);
 }
 
 .settings-input:focus,
 .discord-token-input:focus {
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .settings-actions {

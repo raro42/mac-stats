@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2192
+
+- Data Poster Settings `.settings-input` / `.discord-token-input` resting / hover / focus and placeholder drop glass `--hairline` / rgba fallbacks. Fill, type, border, and focus ring mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Header / theme-list opaque in v0.1.2191. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings buttons / help-sheet / toggles if still glass (`rgba` / `var(--hairline)`), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2191
 
 - Data Poster Settings header hairline, Close (`.icon-btn` resting / hover), and `.theme-item` resting / hover / focus-visible / current drop glass `--hairline` / rgba fallbacks. Fill and border mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Shell opaque in v0.1.2190. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings inputs / buttons / help-sheet / toggles if still glass (`rgba` / `var(--hairline)`), or Mac capture when TCC allows. P2 reliability / GitHub #14.
