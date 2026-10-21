@@ -12435,3 +12435,96 @@ body.theme-data-poster .setting-toggle .toggle-label.is-just-saved {
   background: color-mix(in srgb, #34c759 16%, #0b0b10);
   box-shadow: none;
 }
+/*
+ * Data Poster: Settings credential glances + credential Save flashes still mixed
+ * Apple #ffffff washes → white slab on the opaque Settings shell (#0b0b10).
+ */
+body.theme-data-poster .settings-brave-key-attention-glance,
+body.theme-data-poster .settings-redmine-attention-glance,
+body.theme-data-poster .settings-mastodon-attention-glance,
+body.theme-data-poster .settings-mcp-attention-glance,
+body.theme-data-poster .settings-browser-attention-glance,
+body.theme-data-poster .settings-cursor-agent-attention-glance,
+body.theme-data-poster .settings-telegram-attention-glance,
+body.theme-data-poster .settings-slack-attention-glance,
+body.theme-data-poster .settings-signal-attention-glance,
+body.theme-data-poster .settings-perplexity-key-attention-glance,
+body.theme-data-poster .settings-discord-token-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .settings-brave-key-attention-glance:hover,
+body.theme-data-poster .settings-redmine-attention-glance:hover,
+body.theme-data-poster .settings-mastodon-attention-glance:hover,
+body.theme-data-poster .settings-mcp-attention-glance:hover,
+body.theme-data-poster .settings-browser-attention-glance:hover,
+body.theme-data-poster .settings-cursor-agent-attention-glance:hover,
+body.theme-data-poster .settings-telegram-attention-glance:hover,
+body.theme-data-poster .settings-slack-attention-glance:hover,
+body.theme-data-poster .settings-signal-attention-glance:hover,
+body.theme-data-poster .settings-perplexity-key-attention-glance:hover,
+body.theme-data-poster .settings-discord-token-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .settings-brave-key-attention-glance:focus-visible,
+body.theme-data-poster .settings-redmine-attention-glance:focus-visible,
+body.theme-data-poster .settings-mastodon-attention-glance:focus-visible,
+body.theme-data-poster .settings-mcp-attention-glance:focus-visible,
+body.theme-data-poster .settings-browser-attention-glance:focus-visible,
+body.theme-data-poster .settings-cursor-agent-attention-glance:focus-visible,
+body.theme-data-poster .settings-telegram-attention-glance:focus-visible,
+body.theme-data-poster .settings-slack-attention-glance:focus-visible,
+body.theme-data-poster .settings-signal-attention-glance:focus-visible,
+body.theme-data-poster .settings-perplexity-key-attention-glance:focus-visible,
+body.theme-data-poster .settings-discord-token-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .settings-brave-key-attention-glance.is-not-set,
+body.theme-data-poster .settings-redmine-attention-glance.is-not-set,
+body.theme-data-poster .settings-redmine-attention-glance.is-partial,
+body.theme-data-poster .settings-mastodon-attention-glance.is-not-set,
+body.theme-data-poster .settings-mastodon-attention-glance.is-partial,
+body.theme-data-poster .settings-mcp-attention-glance.is-not-set,
+body.theme-data-poster .settings-browser-attention-glance.is-not-set,
+body.theme-data-poster .settings-cursor-agent-attention-glance.is-not-set,
+body.theme-data-poster .settings-telegram-attention-glance.is-not-set,
+body.theme-data-poster .settings-telegram-attention-glance.is-partial,
+body.theme-data-poster .settings-slack-attention-glance.is-not-set,
+body.theme-data-poster .settings-slack-attention-glance.is-partial,
+body.theme-data-poster .settings-signal-attention-glance.is-not-wired,
+body.theme-data-poster .settings-perplexity-key-attention-glance.is-not-set,
+body.theme-data-poster .settings-discord-token-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 48%, var(--text, currentColor));
+}
+/* Soft Save flash (shared button.is-just-saved / Settings secondary) on opaque shell. */
+body.theme-data-poster .settings-card button.is-just-saved,
+body.theme-data-poster .settings-card .popover-btn-secondary.is-just-saved,
+body.theme-data-poster #settings-reset-defaults-btn.is-just-saved,
+body.theme-data-poster #view-debug-log.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, rgba(255, 255, 255, 0.92));
+  box-shadow: none;
+}
+/* Solid primary Save flashes — keep green readable; mix onto #0b0b10 not #ffffff. */
+body.theme-data-poster #perplexity-save-key.is-just-saved,
+body.theme-data-poster #brave-save-key.is-just-saved,
+body.theme-data-poster #redmine-save.is-just-saved,
+body.theme-data-poster #mastodon-save.is-just-saved,
+body.theme-data-poster #mcp-save.is-just-saved,
+body.theme-data-poster #browser-save.is-just-saved,
+body.theme-data-poster #cursor-agent-save.is-just-saved,
+body.theme-data-poster #telegram-save.is-just-saved,
+body.theme-data-poster #slack-save.is-just-saved,
+body.theme-data-poster #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  box-shadow: none;
+}

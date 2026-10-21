@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2195
+
+- Data Poster Settings credential attention glances (Brave · Redmine · Mastodon · MCP · Browser · Cursor · Telegram · Slack · Signal · Perplexity · Discord) and Settings Save flashes (soft card `button.is-just-saved` + solid credential Save keys) drop Apple `#ffffff` washes. Fill, border, and flash mix against the opaque Settings shell `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Product glances opaque in v0.1.2194. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Force Quit / process-detail glass if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2194
 
 - Data Poster Settings product attention glances (AI · Compact · Judge · Downloads · Ori · Having fun · Voice STT · Help) and `.setting-toggle .toggle-label.is-just-saved` drop Apple `#ffffff` washes. Fill, border, and flash mix against the opaque Settings shell `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Buttons/help/toggles opaque in v0.1.2193. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings credential glances / Save-button flashes if still white-slab, or Force Quit / process-detail glass on Data Poster, or Mac capture when TCC allows. P2 reliability / GitHub #14.
