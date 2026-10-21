@@ -523,9 +523,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 22px;
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-shadow);
+  /* Opaque shell — glass alpha stays in Graphics and Media (#14). */
+  background: #0b0b10;
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  box-shadow: none;
   padding: 18px 18px 16px;
   overflow: hidden;
   color: var(--text);
