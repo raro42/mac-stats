@@ -12370,3 +12370,68 @@ body.theme-dark .setting-toggle .toggle-label.is-judge-off {
   background: color-mix(in srgb, #34c759 16%, #ffffff);
   box-shadow: none;
 }
+/*
+ * Data Poster: Settings product glances + product-toggle Saved flash still mixed
+ * Apple #ffffff washes → white slab on the opaque Settings shell (#0b0b10).
+ */
+body.theme-data-poster .settings-ai-attention-glance,
+body.theme-data-poster .settings-compact-attention-glance,
+body.theme-data-poster .settings-judge-attention-glance,
+body.theme-data-poster .settings-downloads-attention-glance,
+body.theme-data-poster .settings-ori-attention-glance,
+body.theme-data-poster .settings-having-fun-attention-glance,
+body.theme-data-poster .settings-voice-stt-attention-glance,
+body.theme-data-poster .settings-help-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .settings-ai-attention-glance:hover,
+body.theme-data-poster .settings-compact-attention-glance:hover,
+body.theme-data-poster .settings-judge-attention-glance:hover,
+body.theme-data-poster .settings-downloads-attention-glance:hover,
+body.theme-data-poster .settings-ori-attention-glance:hover,
+body.theme-data-poster .settings-having-fun-attention-glance:hover,
+body.theme-data-poster .settings-voice-stt-attention-glance:hover,
+body.theme-data-poster .settings-help-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .settings-ai-attention-glance:focus-visible,
+body.theme-data-poster .settings-compact-attention-glance:focus-visible,
+body.theme-data-poster .settings-judge-attention-glance:focus-visible,
+body.theme-data-poster .settings-downloads-attention-glance:focus-visible,
+body.theme-data-poster .settings-ori-attention-glance:focus-visible,
+body.theme-data-poster .settings-having-fun-attention-glance:focus-visible,
+body.theme-data-poster .settings-voice-stt-attention-glance:focus-visible,
+body.theme-data-poster .settings-help-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .settings-ai-attention-glance.is-off,
+body.theme-data-poster .settings-judge-attention-glance.is-off,
+body.theme-data-poster .settings-downloads-attention-glance.is-off,
+body.theme-data-poster .settings-ori-attention-glance.is-off,
+body.theme-data-poster .settings-having-fun-attention-glance.is-off,
+body.theme-data-poster .settings-voice-stt-attention-glance.is-off,
+body.theme-data-poster .settings-compact-attention-glance.is-on {
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9500 55%, var(--text, currentColor));
+}
+body.theme-data-poster .settings-help-attention-glance.is-closed {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 55%, var(--text, currentColor));
+}
+body.theme-data-poster .settings-help-attention-glance.is-open {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
+body.theme-data-poster .setting-toggle .toggle-label.is-just-saved {
+  color: color-mix(in srgb, #34c759 72%, #ffffff);
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  box-shadow: none;
+}

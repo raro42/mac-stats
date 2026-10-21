@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2194
+
+- Data Poster Settings product attention glances (AI · Compact · Judge · Downloads · Ori · Having fun · Voice STT · Help) and `.setting-toggle .toggle-label.is-just-saved` drop Apple `#ffffff` washes. Fill, border, and flash mix against the opaque Settings shell `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Buttons/help/toggles opaque in v0.1.2193. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings credential glances / Save-button flashes if still white-slab, or Force Quit / process-detail glass on Data Poster, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2193
 
 - Data Poster Settings `.settings-btn` / `.settings-btn-primary` resting / hover, `.settings-help-sheet`, and `.setting-toggle` track / checked / knob drop glass `--hairline` / rgba fallbacks (and soft knob shadow). Fill, type, and border mix against the opaque shell fill `#0b0b10`. Duplicate glass toggle override removed. Standing P2 #14; design-review fuel (Settings on Data Poster). Inputs opaque in v0.1.2192. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings product glances / Save flash / credential section hairlines if still glass, or Force Quit / process-detail glass on Data Poster, or Mac capture when TCC allows. P2 reliability / GitHub #14.
