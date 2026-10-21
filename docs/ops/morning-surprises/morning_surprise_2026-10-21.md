@@ -6,7 +6,8 @@ Overnight autoresearch (Track B) kept shipping Data Poster Settings opaque washe
 
 | Version | What |
 |---------|------|
-| **v0.1.2191** | Data Poster Settings header hairline, Close (`.icon-btn`), and `.theme-item` mix against opaque `#0b0b10` (no glass hairline/rgba) |
+| **v0.1.2192** | Data Poster Settings `.settings-input` / `.discord-token-input` resting / hover / focus + placeholder mix against opaque `#0b0b10` (no glass hairline/rgba) |
+| v0.1.2191 | Data Poster Settings header hairline, Close (`.icon-btn`), and `.theme-item` opaque |
 | v0.1.2190 | Data Poster `.settings-card` opaque shell |
 | v0.1.2189 | Data Poster `.ollama-menu` / menu-btn / menu-item opaque |
 | v0.1.2188 | Data Poster `.thinking-dots span` opaque |
@@ -16,10 +17,10 @@ Overnight autoresearch (Track B) kept shipping Data Poster Settings opaque washe
 ## Tried / deferred
 
 - Digester open: empty (0 turns / 7d).
-- Design review due (`feature-agent-ops` ~36d stale): screenshot blocked; polished Settings chrome instead.
+- Design review due (`feature-agent-ops` ~36d stale): screenshot blocked; polished Settings inputs instead.
 - Layout daily: already done today.
 - Sibling harnesses: OpenClaw / Hermes git missing on this host.
 
 ## Next fuel
 
-Data Poster Settings inputs / buttons / help-sheet / toggles if still glass, or Mac capture when TCC allows.
+Data Poster Settings buttons / help-sheet / toggles if still glass, or Mac capture when TCC allows.
