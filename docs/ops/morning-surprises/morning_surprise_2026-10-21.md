@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 | Version | What |
 |---------|------|
+| v0.1.2190 | Data Poster Settings `.settings-card` opaque on `#0b0b10` (no glass panel rgba / soft shadow) |
 | v0.1.2189 | Data Poster AI Chat `.ollama-menu` / `.ollama-menu-btn` / `.ollama-menu-item` opaque on `#0b0b10` (no glass panel/muted rgba / soft shadow) |
 | v0.1.2188 | Data Poster AI Chat `.thinking-dots span` opaque on `#0b0b10` (no glass muted rgba) |
 | v0.1.2187 | Data Poster AI Chat `.model-text` resting + hover opaque on `#0b0b10` (no glass muted/hairline rgba) |
@@ -25,10 +26,10 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 ## Still open
 
-- Data Poster `.settings-card` / Settings shell if still glass (`var(--panel)`)
+- Data Poster Settings header / Close / inputs / theme-list if still glass (`var(--hairline)` / rgba)
 - Stale design-review screens (`feature-agent-ops.png` ~36d) — Mac `screencapture -l` / Screen Recording TCC still blocked on this rack
 - Digester empty (ask Werner something)
 
 ## Fitness
 
-The Data Poster Ollama ⋯ menu no longer paints glass panel rgba through the shell. Menu shell, button type/hover, and item hover mix against the opaque `#0b0b10` field, same pattern as thinking-dots and model-text.
+The Data Poster Settings modal shell no longer paints glass `--panel` rgba or a soft panel shadow through the card. Fill and border mix against the opaque `#0b0b10` field, same pattern as the Ollama menu and Monitors settings popovers.
