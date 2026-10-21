@@ -12576,3 +12576,54 @@ body.theme-data-poster .process-row.is-selected {
   background: color-mix(in srgb, #0a84ff 12%, #0b0b10);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, #0b0b10);
 }
+/*
+ * Data Poster: Agent Ops health strip still mixed Apple #ffffff washes
+ * (close · kb hint · health cards ok/warn/bad/active) → white slab on #0b0b10.
+ * Design-review fuel (feature-agent-ops) + standing P2 #14.
+ */
+body.theme-data-poster .ops-close-btn {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+}
+body.theme-data-poster .ops-close-btn:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .ops-health-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.ops-health-clickable:hover {
+  border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.ops-health-clickable:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.ops-health-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.ops-health-warn {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.ops-health-bad {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .ops-health-card.is-active.ops-health-clickable:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
+}

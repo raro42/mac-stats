@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2198
+
+- Data Poster Agent Ops health strip (`.ops-close-btn`, `.ops-health-kb-hint`, `.ops-health-card` resting / hover / focus / ok / warn / bad / active) drop Apple `#ffffff` mixes. Fill, border, type, and active ring mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Process-list opaque in v0.1.2197. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Agent Ops overview cards / filter row / tabs if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2197
 
 - Data Poster Top Processes `.process-list-header` hairline and `.process-row.is-selected` wash drop Apple `#ffffff` mixes. Border and selection wash mix against the opaque shell `#0b0b10`. Standing P2 #14; process-list chrome after Process Details opaque in v0.1.2196. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass, or process-detail label / other list chrome if still white-slab, or Mac capture when TCC allows. P2 reliability / GitHub #14.
