@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2176
+
+- Data Poster Ollama settings `.ollama-settings-popover .popover-content` drops glass `--panel` / rgba fallbacks and soft panel shadow. Fill and border mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Data Poster). Reset opaque in v0.1.2175. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Ollama textarea / header chrome glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2175
 
 - Data Poster Ollama settings `.ollama-settings-popover .popover-btn-secondary` drops glass `--panel` / rgba fallbacks. Reset resting and hover mix fill, type, and border against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat Ollama settings on Data Poster). Primary opaque in v0.1.2174. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.ollama-settings-popover .popover-content` / textarea / header chrome glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
