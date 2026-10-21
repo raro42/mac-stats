@@ -1,26 +1,24 @@
 # Morning surprise — 2026-10-21
 
-Overnight Track B kept shipping the GitHub **#14** opaque-wash chain. After Data Poster Monitors list rows went opaque, this tick cut glass on Remove and the add-form URL field.
+Overnight Track B kept shipping Data Poster Monitors glass cuts for GitHub #14 (WebView idle / opaque washes). Digester stayed empty (0 turns / 7d). Design-review screenshot of `feature-agent-ops.png` still deferred on this Linux rack (`screencapture -l` / Screen Recording TCC unavailable).
 
-## Shipped tonight (keeps)
+## Shipped tonight (highlights)
 
-| Version | What |
-|---------|------|
-| **v0.1.2180** | Data Poster Monitors Remove + add-form hairline / URL input opaque `#0b0b10` |
-| **v0.1.2179** | Data Poster Monitors header hairline + Close hover + list-row opaque `#0b0b10` |
-| **v0.1.2178** | Data Poster Monitors settings `.popover-content` opaque `#0b0b10` |
-| **v0.1.2177** | Data Poster Ollama textarea + header hairline + Close hover opaque `#0b0b10` |
-| **v0.1.2176** | Data Poster `.ollama-settings-popover .popover-content` opaque `#0b0b10` |
-| **v0.1.2175** | Data Poster Ollama Reset secondary opaque |
-| **v0.1.2174** | Data Poster Ollama Save primary opaque |
-| earlier | Swiss / Architect / Material / Light / Dark / Neon / Futuristic Ollama #14 chain |
+| Version | What got nicer |
+|---------|----------------|
+| **v0.1.2181** | Data Poster Monitors **Add** (`.add-btn-small`) — opaque `#0b0b10` mix, no glass rgba |
+| **v0.1.2180** | Data Poster Monitors **Remove** + add-form URL / hairline |
+| **v0.1.2179** | Data Poster Monitors settings header / Close / list rows |
+| **v0.1.2178** | Data Poster Monitors settings popover shell |
+| **v0.1.2177–2174** | Data Poster Ollama popover chrome / Save / Reset |
+| **v0.1.2173–2170** | Swiss Ollama popover chrome |
 
-## Still open
+## Tried / deferred
 
-- Data Poster Monitors `.add-btn-small` glass
-- Data Poster model-select / chat-messages glass if still translucent
-- Mac window-only capture of `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows
+- Mac window-only capture of Agent Ops / Monitors screens — blocked on this host; CSS polish continues as design-review fuel.
+- Layout-daily: data-poster done earlier; due=false for the rest of today.
 
-## Digester
+## Next fuel
 
-Empty (0 turns / 7d). Fuel came from design-review + standing backlog P2 #14, not quiet.
+- Data Poster `.model-select` / `.chat-messages` glass
+- `feature-agent-ops.png` when TCC allows
