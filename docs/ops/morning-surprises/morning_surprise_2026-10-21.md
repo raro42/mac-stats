@@ -6,6 +6,7 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 | Version | What |
 |---------|------|
+| v0.1.2185 | Data Poster AI Chat `.model-select-dropdown` opaque on `#0b0b10` (no glass rgba / soft shadow) |
 | v0.1.2184 | Data Poster AI Chat `.chat-message.user` / `.assistant` opaque on `#0b0b10` (no glass rgba) |
 | v0.1.2183 | Data Poster AI Chat `.chat-messages` opaque on `#0b0b10` (no glass rgba) |
 | v0.1.2182 | Data Poster AI Chat `.model-select` opaque on `#0b0b10` (no glass rgba) |
@@ -20,10 +21,10 @@ Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for Git
 
 ## Still open
 
-- Data Poster `.model-select-dropdown` (and markdown / thinking glass inside bubbles)
+- Data Poster markdown / thinking glass inside chat bubbles; `.model-text` hover wash
 - Stale design-review screens (`feature-agent-ops.png` ~35d) — Mac `screencapture -l` / Screen Recording TCC still blocked on this rack
 - Digester empty (ask Werner something)
 
 ## Fitness
 
-User and assistant bubbles on Data Poster no longer paint through the shell. Same opaque mix pattern as the message list and model-select.
+Model picker dropdown on Data Poster no longer paints glass through the shell. Same opaque mix pattern as the select control and message bubbles.

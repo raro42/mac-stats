@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2185
+
+- Data Poster AI Chat `.model-select-dropdown` shell and option hover drop glass `--panel` / rgba fallbacks and soft panel shadow. Fill and border mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat on Data Poster). Model select control opaque in v0.1.2182. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster markdown / thinking glass inside bubbles, or `.model-text` hover wash, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2184
 
 - Data Poster AI Chat `.chat-message.user` / `.chat-message.assistant` drop glass `--panel` / rgba fallbacks. User accent wash and assistant fill mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat on Data Poster). Message list opaque in v0.1.2183. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.model-select-dropdown` glass, or markdown / thinking glass inside bubbles, or Mac capture when TCC allows. P2 reliability / GitHub #14.
