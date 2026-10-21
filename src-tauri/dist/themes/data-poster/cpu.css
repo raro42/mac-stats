@@ -2028,9 +2028,11 @@ body {
   opacity: 0.8;
 }
 
+/* Opaque type + wash — glass alpha stays in Graphics and Media (#14). */
 .model-text {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Was muted rgba(~60% gray) glass → ~48% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
   cursor: pointer;
   user-select: none;
   padding: 2px 4px;
@@ -2043,8 +2045,8 @@ body {
 }
 
 .model-text:hover {
-  color: var(--text, var(--ink, inherit));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
