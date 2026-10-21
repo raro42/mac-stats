@@ -2146,14 +2146,15 @@ body {
   word-wrap: break-word;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-message.user {
-  background: rgba(0, 122, 255, 0.1);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, #0b0b10);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }
 
 .chat-message.assistant {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }
