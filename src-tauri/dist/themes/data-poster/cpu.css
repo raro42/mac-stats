@@ -2047,13 +2047,14 @@ body {
   background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .model-select-dropdown {
   position: absolute;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: none;
   z-index: 1000;
   min-width: 200px;
   max-height: 300px;
@@ -2068,7 +2069,7 @@ body {
 }
 
 .model-select-dropdown option:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .ollama-model-selector {
