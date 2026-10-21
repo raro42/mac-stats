@@ -2310,11 +2310,13 @@ body {
   align-items: center;
 }
 
+/* Opaque dots — glass alpha stays in Graphics and Media (#14). */
 .thinking-dots span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Was muted rgba(~60% white) glass → ~60% white on the poster field. */
+  background: color-mix(in srgb, #ffffff 60%, #0b0b10);
   animation: none; /* was thinking-pulse; WebView CPU */
 }
 
