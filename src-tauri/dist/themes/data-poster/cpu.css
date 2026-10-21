@@ -1592,26 +1592,34 @@ body {
   margin-left: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-remove-btn {
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ff3b30 20%, #0b0b10);
   color: #ff3b30;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .monitor-remove-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
-  border-color: rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+}
+
+.monitor-remove-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, #0b0b10);
+  outline-offset: 2px;
 }
 
 .add-monitor-form {
   padding-top: 20px;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque mix — glass alpha stays in Graphics and Media (#14). */
+  border-top: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
 }
 
 .add-monitor-form h4 {
@@ -1629,23 +1637,26 @@ body {
   margin-bottom: 8px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .add-monitor-form input {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
   color: var(--text, var(--ink, inherit));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   box-sizing: border-box;
   margin-bottom: 16px;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .add-monitor-form input:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.9)))));
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  background: #0b0b10;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 
 .add-btn-small {
