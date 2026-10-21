@@ -1,24 +1,27 @@
 # Morning surprise — 2026-10-21
 
-Overnight Track B kept shipping Data Poster Monitors glass cuts for GitHub #14 (WebView idle / opaque washes). Digester stayed empty (0 turns / 7d). Design-review screenshot of `feature-agent-ops.png` still deferred on this Linux rack (`screencapture -l` / Screen Recording TCC unavailable).
+Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for GitHub #14.
 
-## Shipped tonight (highlights)
+## Shipped tonight (keeps)
 
-| Version | What got nicer |
-|---------|----------------|
-| **v0.1.2181** | Data Poster Monitors **Add** (`.add-btn-small`) — opaque `#0b0b10` mix, no glass rgba |
-| **v0.1.2180** | Data Poster Monitors **Remove** + add-form URL / hairline |
-| **v0.1.2179** | Data Poster Monitors settings header / Close / list rows |
-| **v0.1.2178** | Data Poster Monitors settings popover shell |
-| **v0.1.2177–2174** | Data Poster Ollama popover chrome / Save / Reset |
-| **v0.1.2173–2170** | Swiss Ollama popover chrome |
+| Version | What |
+|---------|------|
+| v0.1.2182 | Data Poster AI Chat `.model-select` opaque on `#0b0b10` (no glass rgba) |
+| v0.1.2181 | Data Poster Monitors `.add-btn-small` opaque |
+| v0.1.2180 | Data Poster Monitors Remove + add-form opaque |
+| v0.1.2179 | Data Poster Monitors header / Close / list-row opaque |
+| v0.1.2178 | Data Poster Monitors settings `.popover-content` opaque |
+| v0.1.2177 | Data Poster Ollama textarea + header chrome opaque |
+| v0.1.2176 | Data Poster Ollama `.popover-content` opaque |
+| v0.1.2175 | Data Poster Ollama Reset secondary opaque |
+| v0.1.2174 | Data Poster Ollama Save primary opaque |
 
-## Tried / deferred
+## Still open
 
-- Mac window-only capture of Agent Ops / Monitors screens — blocked on this host; CSS polish continues as design-review fuel.
-- Layout-daily: data-poster done earlier; due=false for the rest of today.
+- Data Poster `.chat-messages` (and message bubbles / model-select-dropdown) glass
+- Stale design-review screens (`feature-agent-ops.png` ~35d) — Mac `screencapture -l` / Screen Recording TCC still blocked on this rack
+- Digester empty (ask Werner something)
 
-## Next fuel
+## Fitness
 
-- Data Poster `.model-select` / `.chat-messages` glass
-- `feature-agent-ops.png` when TCC allows
+AI Chat model picker on Data Poster no longer paints through the shell. Same opaque mix pattern as Monitors Add and the Ollama popover.
