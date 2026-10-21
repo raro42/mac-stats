@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2196
+
+- Data Poster Process Details hero / sections / row hairlines and Force Quit (theme resting + confirming + Saved flash) drop Apple `#ffffff` washes and theme glass `rgba`. Fill, border, and flash mix against the opaque shell `#0b0b10`. Standing P2 #14; layout-daily fuel (Data Poster). Credential glances opaque in v0.1.2195. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass, or process-list header / other Process Details chrome if still white-slab, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2195
 
 - Data Poster Settings credential attention glances (Brave · Redmine · Mastodon · MCP · Browser · Cursor · Telegram · Slack · Signal · Perplexity · Discord) and Settings Save flashes (soft card `button.is-just-saved` + solid credential Save keys) drop Apple `#ffffff` washes. Fill, border, and flash mix against the opaque Settings shell `#0b0b10`. Standing P2 #14; design-review fuel (Settings on Data Poster). Product glances opaque in v0.1.2194. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Force Quit / process-detail glass if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
