@@ -1659,28 +1659,36 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .add-btn-small {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: #0b0b10;
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 6px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, #888))));
   padding: 4px 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s;
+  box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   position: relative;
   z-index: 10;
 }
 
 .add-btn-small:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.4)))));
-  border-color: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.15)))));
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 20%, #0b0b10);
+  color: var(--text, var(--ink, inherit));
+}
+
+.add-btn-small:focus-visible {
+  outline: 2px solid color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  outline-offset: 2px;
   color: var(--text, var(--ink, inherit));
 }
 
 .add-btn-small:active {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  background: color-mix(in srgb, #ffffff 10%, #0b0b10);
 }
 
 .monitors-list {
