@@ -1,26 +1,23 @@
 # Morning surprise — 2026-10-21
 
-Overnight autoresearch (Track B) kept shipping Data Poster Settings opaque washes for GitHub #14 / design-review fuel. Mac window capture for stale `feature-agent-ops.png` is still blocked on this Linux rack (`screencapture -l` / Screen Recording TCC).
+Overnight Track B kept shipping Data Poster Settings opaque washes for GitHub #14 (design-review fuel while Mac `screencapture -l` stays blocked on the Linux rack).
 
-## Shipped tonight (keeps)
+## Shipped tonight
 
-| Version | What |
-|---------|------|
-| **v0.1.2192** | Data Poster Settings `.settings-input` / `.discord-token-input` resting / hover / focus + placeholder mix against opaque `#0b0b10` (no glass hairline/rgba) |
-| v0.1.2191 | Data Poster Settings header hairline, Close (`.icon-btn`), and `.theme-item` opaque |
-| v0.1.2190 | Data Poster `.settings-card` opaque shell |
-| v0.1.2189 | Data Poster `.ollama-menu` / menu-btn / menu-item opaque |
-| v0.1.2188 | Data Poster `.thinking-dots span` opaque |
-| v0.1.2187 | Data Poster `.model-text` resting + hover opaque |
-| v0.1.2186 | Data Poster chat markdown blockquote/code/pre/table/hr/link opaque |
+- **v0.1.2193** — Settings `.settings-btn` / primary, `.settings-help-sheet`, `.setting-toggle` (and removed duplicate glass toggle override) mix on `#0b0b10`.
+- **v0.1.2192** — Settings inputs / Discord token fields.
+- **v0.1.2191** — Settings header / Close / theme list.
+- **v0.1.2190** — Settings `.settings-card` shell.
+- Earlier in the window: AI Chat ollama-menu, thinking-dots, model-text, markdown, bubbles, model-select-dropdown (see CHANGELOG).
 
 ## Tried / deferred
 
-- Digester open: empty (0 turns / 7d).
-- Design review due (`feature-agent-ops` ~36d stale): screenshot blocked; polished Settings inputs instead.
-- Layout daily: already done today.
-- Sibling harnesses: OpenClaw / Hermes git missing on this host.
+- Digester open: empty (no runs in window).
+- `feature-agent-ops.png` still ~36d stale; window capture needs macOS Screen Recording TCC.
+- Layout daily already done for 2026-10-21.
 
-## Next fuel
+## Next
 
-Data Poster Settings buttons / help-sheet / toggles if still glass, or Mac capture when TCC allows.
+- Settings product glances / Save flash / credential hairlines if still glass on Data Poster.
+- Force Quit / process-detail glass on Data Poster.
+- Recapture Agent Ops when Mac TCC allows.
