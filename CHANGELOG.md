@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2189] - 2026-10-21
+
+### Changed
+- **Data Poster AI Chat ollama menu:** `.ollama-menu` shell, `.ollama-menu-btn` resting / hover / focus-visible, and `.ollama-menu-item` hover drop glass `--panel` / `--muted` / rgba fallbacks and soft panel shadow. Fill, type, and border mix against the opaque shell fill `#0b0b10`. Design-review fuel (AI Chat on Data Poster) plus standing P2 #14. Thinking-dots opaque in v0.1.2188. Mac capture of `feature-agent-ops.png` / `feature-ai-chat.png` still deferred when `screencapture -l` / Screen Recording TCC blocks window capture.
+
 ## [0.1.2188] - 2026-10-21
 
 ### Changed

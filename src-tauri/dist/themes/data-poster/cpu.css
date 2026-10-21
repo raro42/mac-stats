@@ -1824,10 +1824,12 @@ body {
   gap: 6px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .ollama-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Was muted rgba(~60% gray) glass → ~48% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
@@ -1839,17 +1841,24 @@ body {
 }
 
 .ollama-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
-  color: var(--text, var(--ink, inherit));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
 
+.ollama-menu-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  outline-offset: 2px;
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+
+/* Opaque shell — glass alpha stays in Graphics and Media (#14). */
 .ollama-menu {
   position: fixed;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: #0b0b10;
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: none;
   z-index: 1000;
   min-width: 140px;
 }
@@ -1861,14 +1870,14 @@ body {
   text-align: left;
   background: transparent;
   border: none;
-  color: var(--text, var(--ink, inherit));
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .ollama-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .ollama-settings-popover {

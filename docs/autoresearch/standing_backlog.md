@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2189
+
+- Data Poster AI Chat `.ollama-menu` shell, `.ollama-menu-btn` resting / hover / focus-visible, and `.ollama-menu-item` hover drop glass `--panel` / `--muted` / rgba fallbacks and soft panel shadow. Fill, type, and border mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat on Data Poster). Thinking-dots opaque in v0.1.2188. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.settings-card` / Settings shell if still glass (`var(--panel)`), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2188
 
 - Data Poster AI Chat `.thinking-dots span` drop glass `--muted` / rgba fallbacks. Dot fill mixes against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat on Data Poster). Model-text opaque in v0.1.2187. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.ollama-menu` / `.ollama-menu-btn` if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
