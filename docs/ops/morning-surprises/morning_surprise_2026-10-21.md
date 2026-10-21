@@ -1,11 +1,12 @@
 # Morning surprise — 2026-10-21
 
-Overnight Track B kept shipping the GitHub **#14** opaque-wash chain. After the Data Poster Monitors settings shell went opaque, this tick cut the remaining glass on header, Close, and list rows.
+Overnight Track B kept shipping the GitHub **#14** opaque-wash chain. After Data Poster Monitors list rows went opaque, this tick cut glass on Remove and the add-form URL field.
 
 ## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
+| **v0.1.2180** | Data Poster Monitors Remove + add-form hairline / URL input opaque `#0b0b10` |
 | **v0.1.2179** | Data Poster Monitors header hairline + Close hover + list-row opaque `#0b0b10` |
 | **v0.1.2178** | Data Poster Monitors settings `.popover-content` opaque `#0b0b10` |
 | **v0.1.2177** | Data Poster Ollama textarea + header hairline + Close hover opaque `#0b0b10` |
@@ -16,7 +17,7 @@ Overnight Track B kept shipping the GitHub **#14** opaque-wash chain. After the 
 
 ## Still open
 
-- Data Poster Monitors Remove / add-form glass
+- Data Poster Monitors `.add-btn-small` glass
 - Data Poster model-select / chat-messages glass if still translucent
 - Mac window-only capture of `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows
 
