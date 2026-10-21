@@ -12528,3 +12528,40 @@ body.theme-data-poster #discord-save-token.is-just-saved {
   color: #fff !important;
   box-shadow: none;
 }
+/*
+ * Data Poster: Process Details hero / sections / Force Quit still mixed Apple
+ * #ffffff washes (and theme glass rgba on Force Quit) → white slab on #0b0b10.
+ */
+body.theme-data-poster .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
+body.theme-data-poster .process-detail-name.is-just-saved,
+body.theme-data-poster .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+body.theme-data-poster .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .force-quit-section {
+  border-top-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-data-poster .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  animation: none;
+}
+body.theme-data-poster #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}

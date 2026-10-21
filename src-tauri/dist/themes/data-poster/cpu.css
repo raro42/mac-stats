@@ -833,37 +833,46 @@ body {
   padding: 6px 0;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .force-quit-section {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid color-mix(in srgb, #ffffff 10%, #0b0b10);
 }
 
+/* Opaque wash — glass rgba → mix on poster field #0b0b10 (#14). */
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 59, 48, 0.15);
-  border: 1px solid rgba(255, 59, 48, 0.4);
+  background: color-mix(in srgb, #ff3b30 15%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ff3b30 40%, #0b0b10);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.9);
+  color: color-mix(in srgb, #ffffff 90%, #0b0b10);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   font-family: inherit;
+  box-shadow: none;
 }
 
 .force-quit-btn:hover {
-  background: rgba(255, 59, 48, 0.25);
-  border-color: rgba(255, 59, 48, 0.5);
+  background: color-mix(in srgb, #ff3b30 25%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 50%, #0b0b10);
+}
+
+.force-quit-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 70%, #0b0b10);
+  outline-offset: 2px;
 }
 
 .force-quit-btn:active {
-  background: rgba(255, 59, 48, 0.35);
+  background: color-mix(in srgb, #ff3b30 35%, #0b0b10);
 }
 
 .force-quit-btn:disabled {
-  opacity: 0.7;
+  color: color-mix(in srgb, #ff3b30 63%, #0b0b10);
+  opacity: 1;
   cursor: wait;
   animation: none;
 }
