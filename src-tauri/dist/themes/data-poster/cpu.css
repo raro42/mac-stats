@@ -2120,15 +2120,22 @@ body {
   margin-top: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .chat-messages {
   max-height: 200px;
   overflow-y: auto;
   margin-bottom: 12px;
   padding: 12px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   font-size: 13px;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-messages:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 14%, #0b0b10);
 }
 
 .chat-message {
