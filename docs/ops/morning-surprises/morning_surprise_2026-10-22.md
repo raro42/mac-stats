@@ -1,22 +1,20 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B (autoresearch) on the Linux rack.
+Overnight Track B kept shipping Data Poster opaque washes (GitHub #14) so dark theme chrome is not a white slab.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2196** — Data Poster Process Details / Force Quit opaque on `#0b0b10`
-  - `.process-detail-hero` / `.process-detail-section` / row hairlines remap off Apple `#ffffff`
-  - Force Quit theme control drops glass `rgba`; confirming + Saved flashes mix on poster field
-  - Layout-daily (Data Poster) + standing P2 / GitHub #14
+- **v0.1.2197** — Data Poster Top Processes list header hairline + selected-row wash mix on `#0b0b10` (no Apple `#ffffff`).
+- **v0.1.2196** — Data Poster Process Details / Force Quit opaque on `#0b0b10` (layout-daily).
+- Earlier same window (2026-10-21 evening into this night): Settings credential glances / Save flashes (**v0.1.2195**), product glances (**v0.1.2194**), and the Settings chrome chain before that.
 
-## Also tried / context
+## Tried / deferred
 
-- Digester open was empty (no runs in window).
-- Design review still due (`feature-agent-ops` ~36d) — Mac window capture blocked here (`screencapture -l` / TCC).
-- Prior night closed on **v0.1.2195** Settings credential glances.
+- Digester open empty (no runs in window).
+- Design review still due for `feature-agent-ops.png` (~36d stale) — Mac window capture blocked on Linux rack (`screencapture -l` / TCC).
+- Sibling harnesses: OpenClaw / Hermes paths missing on this rack.
 
-## Next fuel
+## Next
 
-- Settings section hairlines on Data Poster if still glass
-- Other Process Details chrome / process-list header if still white-slab
-- Mac capture of stale feature screens when TCC allows
+- Data Poster Settings section hairlines if still glass, or remaining process-list / Process Details chrome.
+- Recapture Agent Ops when a Mac with Screen Recording can shoot window-only.
