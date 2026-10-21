@@ -700,13 +700,14 @@ body {
   margin-top: 2px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .settings-btn {
   height: 30px;
   padding: 0 11px;
   border-radius: 8px;
-  border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -715,17 +716,17 @@ body {
 }
 
 .settings-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: color-mix(in srgb, #ffffff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 22%, #0b0b10);
 }
 
 .settings-btn-primary {
-  background: color-mix(in srgb, var(--accent) 32%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+  background: color-mix(in srgb, #55c7ff 32%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 48%, #0b0b10);
 }
 
 .settings-btn-primary:hover {
-  background: color-mix(in srgb, var(--accent) 42%, transparent);
+  background: color-mix(in srgb, #55c7ff 42%, #0b0b10);
 }
 
 .settings-help-sheet {
@@ -734,12 +735,12 @@ body {
   max-height: 160px;
   overflow: auto;
   border-radius: 10px;
-  border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   font-size: 11px;
   line-height: 1.45;
   white-space: pre-wrap;
-  color: var(--muted);
+  color: color-mix(in srgb, #ffffff 60%, #0b0b10);
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
@@ -758,8 +759,8 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid color-mix(in srgb, #ffffff 16%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
   appearance: none;
   cursor: pointer;
   position: relative;
@@ -768,8 +769,8 @@ body {
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: color-mix(in srgb, var(--accent) 72%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 80%, transparent);
+  background: color-mix(in srgb, #55c7ff 72%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 80%, #0b0b10);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -778,11 +779,11 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: white;
+  background: #ffffff;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -793,7 +794,7 @@ body {
 .toggle-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
 
 
@@ -867,54 +868,6 @@ body {
   animation: none;
 }
 
-
-.setting-toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.setting-toggle input[type="checkbox"] {
-  width: 44px;
-  height: 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  appearance: none;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.2s ease;
-}
-
-.setting-toggle input[type="checkbox"]:checked {
-  background: rgba(85, 199, 255, 0.6);
-  border-color: rgba(85, 199, 255, 0.4);
-}
-
-.setting-toggle input[type="checkbox"]::before {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  top: 2px;
-  left: 2px;
-  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.setting-toggle input[type="checkbox"]:checked::before {
-  left: 22px;
-  transform: none;
-}
-
-.toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.74);
-}
 
 /* Changelog Modal Styling */
 .changelog-card {
