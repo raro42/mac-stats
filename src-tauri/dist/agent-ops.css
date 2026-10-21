@@ -12627,3 +12627,97 @@ body.theme-data-poster .ops-health-card.is-active:not(.ops-health-ok):not(.ops-h
 body.theme-data-poster .ops-health-card.is-active.ops-health-clickable:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
 }
+/*
+ * Data Poster: Agent Ops overview cards still mixed Apple #ffffff washes
+ * (kb hint · cards ok/warn/bad/active · head-count · Open link · count) → white slab on #0b0b10.
+ * Design-review fuel (feature-agent-ops) + standing P2 #14.
+ */
+body.theme-data-poster .ops-overview-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card {
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card:hover {
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.ops-overview-clickable:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.ops-health-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.ops-health-warn {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.ops-health-bad {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active.ops-health-ok,
+body.theme-data-poster .ops-overview-card.is-active.ops-health-warn,
+body.theme-data-poster .ops-overview-card.is-active.ops-health-bad {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active:hover {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active.ops-health-ok:hover,
+body.theme-data-poster .ops-overview-card.is-active.ops-health-warn:hover,
+body.theme-data-poster .ops-overview-card.is-active.ops-health-bad:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active .ops-overview-link {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-head-count {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-head-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card:hover .ops-overview-head-count:not(.is-zero) {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active .ops-overview-head-count {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-card.is-active .ops-overview-head-count.is-zero {
+  color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-link {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-link:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-link:focus-visible {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-count {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
