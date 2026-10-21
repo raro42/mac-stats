@@ -1,35 +1,25 @@
 # Morning surprise — 2026-10-21
 
-Overnight autoresearch (Track B) kept shipping opaque Data Poster chrome for GitHub #14.
+Overnight autoresearch (Track B) kept shipping Data Poster Settings opaque washes for GitHub #14 / design-review fuel. Mac window capture for stale `feature-agent-ops.png` is still blocked on this Linux rack (`screencapture -l` / Screen Recording TCC).
 
 ## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
-| v0.1.2190 | Data Poster Settings `.settings-card` opaque on `#0b0b10` (no glass panel rgba / soft shadow) |
-| v0.1.2189 | Data Poster AI Chat `.ollama-menu` / `.ollama-menu-btn` / `.ollama-menu-item` opaque on `#0b0b10` (no glass panel/muted rgba / soft shadow) |
-| v0.1.2188 | Data Poster AI Chat `.thinking-dots span` opaque on `#0b0b10` (no glass muted rgba) |
-| v0.1.2187 | Data Poster AI Chat `.model-text` resting + hover opaque on `#0b0b10` (no glass muted/hairline rgba) |
-| v0.1.2186 | Data Poster AI Chat markdown in bubbles (blockquote / code / pre / table / hr / link) opaque on `#0b0b10` |
-| v0.1.2185 | Data Poster AI Chat `.model-select-dropdown` opaque on `#0b0b10` (no glass rgba / soft shadow) |
-| v0.1.2184 | Data Poster AI Chat `.chat-message.user` / `.assistant` opaque on `#0b0b10` (no glass rgba) |
-| v0.1.2183 | Data Poster AI Chat `.chat-messages` opaque on `#0b0b10` (no glass rgba) |
-| v0.1.2182 | Data Poster AI Chat `.model-select` opaque on `#0b0b10` (no glass rgba) |
-| v0.1.2181 | Data Poster Monitors `.add-btn-small` opaque |
-| v0.1.2180 | Data Poster Monitors Remove + add-form opaque |
-| v0.1.2179 | Data Poster Monitors header / Close / list-row opaque |
-| v0.1.2178 | Data Poster Monitors settings `.popover-content` opaque |
-| v0.1.2177 | Data Poster Ollama textarea + header chrome opaque |
-| v0.1.2176 | Data Poster Ollama `.popover-content` opaque |
-| v0.1.2175 | Data Poster Ollama Reset secondary opaque |
-| v0.1.2174 | Data Poster Ollama Save primary opaque |
+| **v0.1.2191** | Data Poster Settings header hairline, Close (`.icon-btn`), and `.theme-item` mix against opaque `#0b0b10` (no glass hairline/rgba) |
+| v0.1.2190 | Data Poster `.settings-card` opaque shell |
+| v0.1.2189 | Data Poster `.ollama-menu` / menu-btn / menu-item opaque |
+| v0.1.2188 | Data Poster `.thinking-dots span` opaque |
+| v0.1.2187 | Data Poster `.model-text` resting + hover opaque |
+| v0.1.2186 | Data Poster chat markdown blockquote/code/pre/table/hr/link opaque |
 
-## Still open
+## Tried / deferred
 
-- Data Poster Settings header / Close / inputs / theme-list if still glass (`var(--hairline)` / rgba)
-- Stale design-review screens (`feature-agent-ops.png` ~36d) — Mac `screencapture -l` / Screen Recording TCC still blocked on this rack
-- Digester empty (ask Werner something)
+- Digester open: empty (0 turns / 7d).
+- Design review due (`feature-agent-ops` ~36d stale): screenshot blocked; polished Settings chrome instead.
+- Layout daily: already done today.
+- Sibling harnesses: OpenClaw / Hermes git missing on this host.
 
-## Fitness
+## Next fuel
 
-The Data Poster Settings modal shell no longer paints glass `--panel` rgba or a soft panel shadow through the card. Fill and border mix against the opaque `#0b0b10` field, same pattern as the Ollama menu and Monitors settings popovers.
+Data Poster Settings inputs / buttons / help-sheet / toggles if still glass, or Mac capture when TCC allows.
