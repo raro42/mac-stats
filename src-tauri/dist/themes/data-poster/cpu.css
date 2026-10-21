@@ -2085,27 +2085,35 @@ body {
   font-weight: 500;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .model-select {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text, var(--ink, inherit));
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease, outline-color 0.15s ease;
 }
 
 .model-select:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: color-mix(in srgb, var(--accent, #007aff) 30%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+}
+
+.model-select:focus-visible {
+  outline: 2px solid color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, #0b0b10);
 }
 
 .model-select:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.6)))));
+  background: color-mix(in srgb, #ffffff 7%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, #0b0b10);
 }
 
 .ollama-chat {

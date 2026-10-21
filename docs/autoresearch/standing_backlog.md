@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2182
+
+- Data Poster AI Chat `.model-select` drops glass `--panel` / rgba fallbacks. Resting / hover / focus / focus-visible mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (AI Chat on Data Poster). Monitors Add opaque in v0.1.2181. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.chat-messages` glass, or model-select-dropdown glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2181
 
 - Data Poster Monitors Add control drops glass `--panel` / rgba fallbacks. `.add-btn-small` resting / hover / focus-visible / active mix against the opaque shell fill `#0b0b10`. Standing P2 #14; design-review fuel (Monitors settings on Data Poster). Remove + add-form opaque in v0.1.2180. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster model-select / chat-messages glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
