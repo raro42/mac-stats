@@ -1,25 +1,26 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B kept shipping Data Poster opaque washes (GitHub #14) so dark theme chrome is not a white slab. Design-review fuel continued on Agent Ops kind-filter chips after filter row / tabs.
+Overnight Track B kept shipping Data Poster Agent Ops opaque washes (GitHub #14 / design-review fuel). Digester stayed empty; design review was due (AI Chat stale); this tick continued the Agent Ops white-slab series.
 
-## Shipped tonight
+## Shipped
 
-- **v0.1.2201** — Data Poster Agent Ops kind-filter chips (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries · Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear / counts) mix on `#0b0b10` (no Apple `#ffffff`).
-- **v0.1.2200** — Data Poster Agent Ops filter row + tab strip (kb hints · search · match · Clear · digit · count · tabs) mix on `#0b0b10`.
-- **v0.1.2199** — Data Poster Agent Ops overview cards (kb hint · cards ok/warn/bad/active · head-count · Open link · count) mix on `#0b0b10`.
-- **v0.1.2198** — Data Poster Agent Ops health strip (close · kb hint · health cards ok/warn/bad/active) mix on `#0b0b10`.
-- **v0.1.2197** — Data Poster Top Processes list header hairline + selected-row wash mix on `#0b0b10`.
-- **v0.1.2196** — Data Poster Process Details / Force Quit opaque on `#0b0b10` (layout-daily).
-- Earlier same window (2026-10-21 evening into this night): Settings credential glances / Save flashes (**v0.1.2195**), product glances (**v0.1.2194**), and the Settings chrome chain before that.
+| Version | What |
+|---------|------|
+| **v0.1.2202** | Agent Ops list rows: `.ops-row` (resting / hover / focus / selected / Copied), `.ops-row-meta`, `.ops-badge` On/Off, Runs Lite·Slow·Fail — mix on `#0b0b10` (no Apple `#ffffff` slab) |
+| v0.1.2201 | Agent Ops kind-filter chips (Sessions / Agents / Schedules / Knowledge / Runs + Clear) |
+| v0.1.2200 | Agent Ops filter row + tab strip |
+| v0.1.2199 | Agent Ops overview cards |
+| v0.1.2198 | Agent Ops health strip |
 
 ## Tried / deferred
 
-- Digester open empty (no runs in window).
-- Design review still due for screenshots (`feature-ai-chat` ~68d recommended; `feature-agent-ops` polish-grace) — Mac window capture blocked on Linux rack (`screencapture -l` / TCC). Kind-filter CSS polished anyway.
-- Sibling harnesses: OpenClaw / Hermes paths missing on this rack.
+- Window-only `feature-agent-ops.png` / `feature-ai-chat.png` capture: still deferred (`screencapture -l` / Screen Recording TCC not available on this Linux overnight host).
+- Digester open: empty (0 runs in 7d).
+- Layout daily: already marked ok for Data Poster today.
 
-## Next
+## Next fuel
 
-- Data Poster Agent Ops list rows (`.ops-row` / badge / Lite·Slow·Fail) if still white-slab.
-- Settings section hairlines if still glass.
-- Recapture Agent Ops when a Mac with Screen Recording can shoot window-only.
+- Data Poster `.ops-session-copy-chip` / empty shells / preview if still white-slab
+- Settings section hairlines if still glass
+- Mac capture when TCC allows
+- Design-review AI Chat polish once Agent Ops list chrome is settled
