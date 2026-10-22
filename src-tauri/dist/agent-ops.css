@@ -13498,3 +13498,58 @@ body.theme-data-poster .chat-answer-glance.is-just-copied {
 body.theme-data-poster .ollama-collapsed-glance.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat empty shell (+ title/copy/chips) still mixed early DP
+ * remaps on `#0e0e14`, while shared Apple `#ffffff` state rules still win →
+ * white slab / wrong ink on the opaque shell `#0b0b10`. Design-review fuel
+ * (feature-ai-chat) + standing P2 #14. Glances opaque in v0.1.2209.
+ */
+body.theme-data-poster .chat-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .chat-empty.is-ready {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-data-poster .chat-empty.is-no-model,
+body.theme-data-poster .chat-empty.is-offline,
+body.theme-data-poster .chat-empty.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
+body.theme-data-poster .chat-empty.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 32%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-data-poster .chat-empty-title {
+  color: color-mix(in srgb, #ffffff 85%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .chat-empty-copy {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .chat-empty.is-ready .chat-empty-title {
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .chat-empty.is-ready .chat-empty-copy {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .chat-empty-chip {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 13%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .chat-empty-chip:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
