@@ -1,22 +1,18 @@
 # Morning surprise — 2026-10-23
 
-Overnight autoresearch (Track B) kept shipping Data Poster opaque washes for GitHub #14 / WebView idle chrome.
+Overnight Track B kept shipping Data Poster opaque remaps (standing P2 #14 / GitHub #14). Digester empty; design review due on stale feature screens (Mac capture still blocked on this rack).
 
 ## Shipped tonight
 
-| Version | What |
-|---------|------|
-| **v0.1.2220** | Data Poster `.metric-card.is-hot` / `.is-ok` / `.is-fair` mix against `#0b0b10` (no Apple `#ffffff` white slab on CPU · GPU · Freq · Temp ring Hot / Ok / Fair) |
+- **v0.1.2221** — Data Poster rings Hot-filter miss (`.rings-filter-miss` / CTA) mixes against opaque shell `#0b0b10` (no Apple white slab). Design-review fuel: `feature-cpu-metrics`.
+- **v0.1.2220** — Data Poster metric-card Hot / Ok / Fair opaque `#0b0b10`.
+- **v0.1.2219** — Data Poster history-chart Hot / Ok / Fair opaque `#0b0b10`.
+- **v0.1.2218** — Data Poster Monitors focus / Copied opaque `#0b0b10`.
+- **v0.1.2217** — Data Poster Monitors status / selected opaque `#0b0b10`.
+- **v0.1.2216** — Data Poster history-chart / time-range opaque `#0b0b10`.
+- **v0.1.2215** — Data Poster monitor-item / history hairline opaque `#0b0b10`.
 
-Earlier same night window (2026-10-22 evening): v0.1.2215–2219 covered Monitors rows/focus, history-chart resting + Hot/Ok/Fair.
+## Still open
 
-## Context
-
-- Digester: empty (0 turns / 7d).
-- Design review: still due (stale `feature-ai-chat` / `feature-cpu-metrics`); Mac capture deferred on this Linux rack (`screencapture -l` / TCC).
-- Layout daily: Data Poster contrast fix (this tick).
-- Debug.log: quiet in the scan window.
-
-## Next fuel
-
-Other Data Poster Apple `#ffffff` leftovers, or window-only Mac capture when Screen Recording allows.
+- Other Data Poster Apple `#ffffff` leftovers (shared focus washes; older filter-miss shells still on `#0e0e14`).
+- Window-only Mac capture of stale `feature-*.png` when Screen Recording TCC / `screencapture -l` allows.
