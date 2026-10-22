@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2201
+
+- Data Poster Agent Ops kind-filter chips (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries · Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear / counts) drop Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Filter row / tabs opaque in v0.1.2200. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Agent Ops list rows (`.ops-row` / badge / Lite·Slow·Fail) if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2200
 
 - Data Poster Agent Ops filter row + tab strip (`.ops-filter-row-kb-hint`, `.ops-filter-input`, `.ops-filter-match`, `.ops-filter-clear`, `.ops-filter-caption`, `.ops-keyboard-hint`, `.ops-tab-bar-kb-hint`, `.ops-tab-digit`, `.ops-tab-count`, `.agent-ops-tab` / `.ops-file-tab`) drop Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Overview cards opaque in v0.1.2199. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Agent Ops kind-filter chips / list rows if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.

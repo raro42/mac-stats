@@ -12842,3 +12842,199 @@ body.theme-data-poster .ops-file-tab.active:hover {
   background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
 }
+/*
+ * Data Poster: Agent Ops kind-filter chips still mixed Apple #ffffff washes
+ * (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries ·
+ *  Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear)
+ * → white slab on #0b0b10. Design-review fuel (feature-agent-ops) + standing P2 #14.
+ */
+body.theme-data-poster .ops-session-kind-filter-clear,
+body.theme-data-poster .ops-agents-enabled-filter-clear,
+body.theme-data-poster .ops-schedules-kind-filter-clear,
+body.theme-data-poster .ops-memory-kind-filter-clear,
+body.theme-data-poster .ops-runs-lane-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-filter-clear:hover,
+body.theme-data-poster .ops-agents-enabled-filter-clear:hover,
+body.theme-data-poster .ops-schedules-kind-filter-clear:hover,
+body.theme-data-poster .ops-memory-kind-filter-clear:hover,
+body.theme-data-poster .ops-runs-lane-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-filter-clear:focus-visible,
+body.theme-data-poster .ops-agents-enabled-filter-clear:focus-visible,
+body.theme-data-poster .ops-schedules-kind-filter-clear:focus-visible,
+body.theme-data-poster .ops-memory-kind-filter-clear:focus-visible,
+body.theme-data-poster .ops-runs-lane-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-filter-clear.is-just-saved,
+body.theme-data-poster .ops-agents-enabled-filter-clear.is-just-saved,
+body.theme-data-poster .ops-schedules-kind-filter-clear.is-just-saved,
+body.theme-data-poster .ops-memory-kind-filter-clear.is-just-saved,
+body.theme-data-poster .ops-runs-lane-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+body.theme-data-poster .ops-session-kind-chip,
+body.theme-data-poster .ops-agents-enabled-chip,
+body.theme-data-poster .ops-schedules-kind-chip,
+body.theme-data-poster .ops-memory-kind-chip,
+body.theme-data-poster .ops-runs-lane-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip:hover,
+body.theme-data-poster .ops-agents-enabled-chip:hover,
+body.theme-data-poster .ops-schedules-kind-chip:hover,
+body.theme-data-poster .ops-memory-kind-chip:hover,
+body.theme-data-poster .ops-runs-lane-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip:focus-visible,
+body.theme-data-poster .ops-agents-enabled-chip:focus-visible,
+body.theme-data-poster .ops-schedules-kind-chip:focus-visible,
+body.theme-data-poster .ops-memory-kind-chip:focus-visible,
+body.theme-data-poster .ops-runs-lane-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip.is-active,
+body.theme-data-poster .ops-agents-enabled-chip.is-active,
+body.theme-data-poster .ops-schedules-kind-chip.is-active,
+body.theme-data-poster .ops-memory-kind-chip.is-active,
+body.theme-data-poster .ops-runs-lane-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-count,
+body.theme-data-poster .ops-agents-enabled-count,
+body.theme-data-poster .ops-schedules-kind-count,
+body.theme-data-poster .ops-memory-kind-count,
+body.theme-data-poster .ops-runs-lane-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-count.is-zero,
+body.theme-data-poster .ops-agents-enabled-count.is-zero,
+body.theme-data-poster .ops-schedules-kind-count.is-zero,
+body.theme-data-poster .ops-memory-kind-count.is-zero,
+body.theme-data-poster .ops-runs-lane-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
+/* Sessions Live / Files */
+body.theme-data-poster .ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip[data-ops-session-kind='live'].is-active {
+  background: color-mix(in srgb, #30d158 18%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
+  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+}
+body.theme-data-poster .ops-session-kind-chip[data-ops-session-kind='files'].is-active {
+  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+}
+/* Agents On / Off */
+body.theme-data-poster .ops-agents-enabled-chip[data-ops-agents-enabled='on'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+}
+body.theme-data-poster .ops-agents-enabled-chip[data-ops-agents-enabled='on'].is-active {
+  background: color-mix(in srgb, #30d158 18%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
+}
+body.theme-data-poster .ops-agents-enabled-chip[data-ops-agents-enabled='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-data-poster .ops-agents-enabled-chip[data-ops-agents-enabled='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #0b0b10);
+}
+/* Schedules Jobs / Deliveries */
+body.theme-data-poster .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+}
+body.theme-data-poster .ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].is-active {
+  background: color-mix(in srgb, #30d158 18%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
+}
+body.theme-data-poster .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
+  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+}
+body.theme-data-poster .ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
+  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+}
+/* Knowledge Discord / Core */
+body.theme-data-poster .ops-memory-kind-chip[data-ops-memory-kind='discord'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+}
+body.theme-data-poster .ops-memory-kind-chip[data-ops-memory-kind='discord'].is-active {
+  background: color-mix(in srgb, #30d158 18%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
+}
+body.theme-data-poster .ops-memory-kind-chip[data-ops-memory-kind='core'].has-hits {
+  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+}
+body.theme-data-poster .ops-memory-kind-chip[data-ops-memory-kind='core'].is-active {
+  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+}
+/* Runs Instant · Lite · Direct · Slow · Fail */
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='instant'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='instant'].is-active {
+  background: color-mix(in srgb, #30d158 18%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 36%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='lite'].has-hits {
+  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='lite'].is-active {
+  background: color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 36%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='direct'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='direct'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='slow'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='slow'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 36%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='fail'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-data-poster .ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
+}
