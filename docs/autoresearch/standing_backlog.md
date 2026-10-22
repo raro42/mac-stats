@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2204
+
+- Data Poster Agent Ops edit-actions / agent-editor (`textarea.ops-agent-editor` focus / dirty, disabled Save, `.ops-agent-save-status`, `.ops-detail-meta`, file-tab / edit-actions / preview-row / Insights keyboard hints, Agent Ops `.btn-secondary` Refresh / Back / Load into AI Chat, Save / Loaded flashes) drop Apple `#ffffff` mixes. Fill, border, type, and outline mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Copy/empty/preview opaque in v0.1.2203. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or design-review AI Chat polish (`feature-ai-chat` recommended), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2203
 
 - Data Poster Agent Ops copy chip / empty / preview (`.ops-session-copy-chip` resting / hover / focus / Copied, `.ops-empty` resting / hover / filter-miss calm / Fail-empty, `.ops-empty-tab-hint`, `.ops-clear-filter`, overview empty CTA calm, `.ops-preview`, `.ops-loading`) drop Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). List rows opaque in v0.1.2202. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass, or edit-actions / agent-editor if still white-slab, or design-review AI Chat polish, or Mac capture when TCC allows. P2 reliability / GitHub #14.

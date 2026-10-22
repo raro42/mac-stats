@@ -13197,3 +13197,61 @@ body.theme-data-poster .ops-overview-body > .ops-empty-overview-cta.is-calm {
   border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
   background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
 }
+/*
+ * Data Poster: Agent Ops edit-actions / agent-editor still mixed Apple #ffffff
+ * washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after copy/empty/preview in v0.1.2203.
+ */
+body.theme-data-poster textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+}
+body.theme-data-poster textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #0b0b10);
+}
+body.theme-data-poster .ops-agent-edit-actions .btn-primary:disabled {
+  background: color-mix(in srgb, #2196f3 36%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 45%, #0b0b10);
+}
+body.theme-data-poster .ops-agent-save-status {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+}
+body.theme-data-poster .ops-detail-meta {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
+body.theme-data-poster .ops-file-tab-kb-hint,
+body.theme-data-poster .ops-agent-edit-actions-kb-hint,
+body.theme-data-poster .ops-preview-row-kb-hint,
+body.theme-data-poster .ops-insights-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+}
+body.theme-data-poster .btn-secondary.ops-refresh,
+body.theme-data-poster .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+body.theme-data-poster .btn-secondary.ops-refresh:hover,
+body.theme-data-poster .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .btn-secondary.ops-refresh:focus-visible,
+body.theme-data-poster .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #0b0b10);
+}
+body.theme-data-poster #ops-agent-save.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+body.theme-data-poster #ops-session-load-chat.is-just-saved,
+body.theme-data-poster #ops-runs-load-chat.is-just-saved,
+body.theme-data-poster #ops-schedules-load-chat.is-just-saved,
+body.theme-data-poster #ops-memory-load-chat.is-just-saved,
+body.theme-data-poster #ops-agent-load-chat.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, rgba(255, 255, 255, 0.92));
+  box-shadow: none;
+}
