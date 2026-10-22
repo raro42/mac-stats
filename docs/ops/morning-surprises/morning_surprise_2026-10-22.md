@@ -1,27 +1,28 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B kept shipping Data Poster Agent Ops opaque washes (GitHub #14 / design-review fuel). Digester stayed empty; design review was due (AI Chat recommended, Agent Ops in grace); this tick finished the copy-chip / empty / preview slab after list rows.
+Overnight Track B kept shipping Data Poster Agent Ops opaque remaps (GitHub #14 / white-slab series). Digester stayed empty; design review still due (AI Chat screen stale; Agent Ops in grace).
 
-## Shipped
+## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
-| **v0.1.2203** | Agent Ops copy chip / empty / preview: `.ops-session-copy-chip`, `.ops-empty` (+ filter-miss calm / Fail-empty / Clear), `.ops-preview`, `.ops-loading` — mix on `#0b0b10` (no Apple `#ffffff` slab) |
-| v0.1.2202 | Agent Ops list rows (`.ops-row` / badge / Lite·Slow·Fail) |
-| v0.1.2201 | Agent Ops kind-filter chips (Sessions / Agents / Schedules / Knowledge / Runs + Clear) |
-| v0.1.2200 | Agent Ops filter row + tab strip |
-| v0.1.2199 | Agent Ops overview cards |
-| v0.1.2198 | Agent Ops health strip |
+| **v0.1.2204** | Agent Ops edit-actions / agent-editor (focus/dirty, disabled Save, muted hints, secondary buttons, Save/Loaded flashes) → `#0b0b10` |
+| **v0.1.2203** | Agent Ops copy-chip / empty / preview / loading → `#0b0b10` |
+| **v0.1.2202** | Agent Ops list rows / badge / Lite·Slow·Fail → `#0b0b10` |
+| **v0.1.2201** | Agent Ops kind-filter chips → `#0b0b10` |
+| **v0.1.2200** | Agent Ops filter row + tabs → `#0b0b10` |
+| **v0.1.2199** | Agent Ops overview cards → `#0b0b10` |
+| **v0.1.2198** | Agent Ops health strip → `#0b0b10` |
+| **v0.1.2197** | Top Processes list header + selected row → `#0b0b10` |
 
-## Tried / deferred
+Latest keep: `53246cda` — v0.1.2204.
 
-- Window-only `feature-agent-ops.png` / `feature-ai-chat.png` capture: still deferred (`screencapture -l` / Screen Recording TCC not available on this Linux overnight host).
-- Digester open: empty (0 runs in 7d).
-- Layout daily: already marked ok for Data Poster today.
+## Not done / next
 
-## Next fuel
+- Mac window capture for `feature-agent-ops.png` / `feature-ai-chat.png` still blocked on this Linux rack (`screencapture -l`).
+- Next polish: Data Poster Settings section hairlines if still glass, or design-review AI Chat surface.
+- Layout daily already ran for data-poster today; dark/neon/futuristic/architect screens still missing.
 
-- Data Poster Settings section hairlines if still glass
-- Agent edit-actions / agent-editor if still white-slab
-- Design-review AI Chat polish (recommended screen still stale)
-- Mac capture when TCC allows
+## Fitness
+
+Agents editor chrome on Data Poster no longer paints Apple white-slab washes over the opaque shell.
