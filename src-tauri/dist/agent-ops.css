@@ -13323,3 +13323,58 @@ body.theme-data-poster .chat-filter-clear.is-just-saved {
   border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
   color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
+/*
+ * Data Poster: AI Chat filter chips (All·You·Assistant·Errors) hit / active /
+ * focus / count still mixed Apple `#ffffff` washes → white slab on the opaque
+ * shell `#0b0b10`. Earlier DP remaps used `#0e0e14` for resting chips; the more
+ * specific You/Assistant/Errors has-hits + is-active rules still won with
+ * `#ffffff`. Design-review fuel (feature-ai-chat) + standing P2 #14. Filter
+ * Clear opaque in v0.1.2206.
+ */
+body.theme-data-poster .chat-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='errors'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-chip[data-chat-filter='errors'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
