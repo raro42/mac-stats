@@ -13553,3 +13553,29 @@ body.theme-data-poster .chat-empty-chip:hover {
 body.theme-data-poster .chat-empty-chip:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
+/*
+ * Data Poster: Monitors status / selected rows still mixed Apple #ffffff washes
+ * (is-selected · is-down · is-slow) → white slab on the opaque shell #0b0b10.
+ * Resting / hover row chrome opaque in v0.1.2215. Design-review fuel
+ * (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+}
+body.theme-data-poster .monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 6%, #0b0b10);
+}
+body.theme-data-poster .monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+}
+body.theme-data-poster .monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+body.theme-data-poster .monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 10%, #0b0b10);
+}
