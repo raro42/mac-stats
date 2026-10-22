@@ -13701,3 +13701,35 @@ body.theme-data-poster #chat-input:focus {
   background: color-mix(in srgb, currentColor 6%, #0b0b10);
   color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
+/*
+ * Data Poster: Monitors filter-miss shell / empty CTA still mixed against early
+ * #0e0e14 (.monitors-filter-miss · Down/Slow/Up empty · .monitors-empty-cta) →
+ * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss
+ * opaque remaps. Design-review fuel (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitors-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-miss.is-down-empty,
+body.theme-data-poster .monitors-filter-miss.is-slow-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-miss.is-up-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .monitors-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .monitors-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+}
+body.theme-data-poster .monitors-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
