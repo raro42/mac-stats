@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2216
+
+- Data Poster history-chart / time-range (`.history-chart-container`, `.history-controls label`, `.time-range-dropdown` resting / hover / focus, `.history-tooltip`) drop glass rgba washes. Fill, border, type, and focus mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-cpu-metrics`). Monitor-item / history hairline opaque in v0.1.2215. Mac capture deferred (`screencapture -l` unavailable). Next: agent-ops Data Poster `.monitor-item` is-down / selected still on Apple `#ffffff`, or shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on `#ffffff`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2215
 
 - Data Poster Monitors list rows / history hairline (`.monitor-item` resting / hover, `.monitor-info` type, `.monitor-history` border-top) drop glass `var(--panel)` / `var(--hairline)` / rgba washes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-monitors`). Debug Log opaque in v0.1.2214. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster history-chart / time-range glass, or agent-ops Data Poster `.monitor-item` is-down / selected still on Apple `#ffffff`, or Mac capture when TCC allows. P2 reliability / GitHub #14.

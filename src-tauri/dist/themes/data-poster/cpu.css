@@ -2449,13 +2449,15 @@ body {
   display: none;/* Don't shrink history section */
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .history-chart-container {
   position: relative;
   height: 40px;
-  border: 1px solid var(--border);
+  /* Was var(--border) unset + rgba(0,0,0,0.3) glass over the poster field. */
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, #000000 30%, #0b0b10);
 }
 
 .history-chart {
@@ -2475,13 +2477,15 @@ body {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Was muted rgba(~80% gray) glass → ~48% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
   font-weight: 500;
 }
 
 .time-range-dropdown {
-  background: rgba(85, 199, 255, 0.05);
-  border: 1px solid rgba(85, 199, 255, 0.3);
+  /* Was accent rgba 0.05 / 0.3 glass over the poster field. */
+  background: color-mix(in srgb, #55c7ff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #55c7ff 30%, #0b0b10);
   border-radius: 4px;
   color: #55c7ff;
   padding: 4px 8px;
@@ -2492,29 +2496,31 @@ body {
 }
 
 .time-range-dropdown:hover {
-  background: rgba(85, 199, 255, 0.1);
-  border-color: rgba(85, 199, 255, 0.5);
+  background: color-mix(in srgb, #55c7ff 10%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 50%, #0b0b10);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(85, 199, 255, 0.15);
-  border-color: rgba(85, 199, 255, 0.7);
-  box-shadow: 0 0 0 2px rgba(85, 199, 255, 0.1);
+  background: color-mix(in srgb, #55c7ff 15%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 70%, #0b0b10);
+  /* Was soft glass focus ring rgba(85,199,255,0.1). */
+  box-shadow: 0 0 0 2px color-mix(in srgb, #55c7ff 10%, #0b0b10);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
+  background: #0b0b10;
   color: #55c7ff;
 }
 
-/* History tooltip */
+/* History tooltip — opaque wash vs poster shell #0b0b10 (#14). */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
+  /* Was rgba(0,0,0,0.95) glass + soft drop shadow. */
+  background: color-mix(in srgb, #000000 95%, #0b0b10);
   color: #55c7ff;
   padding: 8px 12px;
-  border: 1px solid rgba(85, 199, 255, 0.5);
+  border: 1px solid color-mix(in srgb, #55c7ff 50%, #0b0b10);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2523,7 +2529,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: none;
 }
 
 /* Debug Log viewer — opaque wash vs poster shell #0b0b10 (#14). */
