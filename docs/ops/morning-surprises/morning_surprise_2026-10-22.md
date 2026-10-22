@@ -1,15 +1,24 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B kept shipping Data Poster opaque remaps (GitHub #14 / standing P2).
+Overnight Track B kept shipping Data Poster opaque chrome (GitHub #14 / glass-out). Digester stayed empty; design review stayed due (stale feature screens; Mac capture still blocked on this Linux rack).
 
-## Shipped tonight
-- **v0.1.2215** — Data Poster Monitors `.monitor-item` / `.monitor-history` hairline opaque `#0b0b10` (no glass `var(--panel)` / `var(--hairline)`).
-- Earlier same night: **v0.1.2214** Debug Log toolbar/viewer; **v0.1.2213** LPM strip; **v0.1.2212** collapse/Monitors menu; **v0.1.2211** footer/battery hairlines; **v0.1.2210** AI Chat empty shell (and prior AI Chat / Agent Ops opaque chain).
+## Shipped tonight (latest first)
+
+- **v0.1.2216** — Data Poster history-chart / time-range (`.history-chart-container`, time-range dropdown, controls label, tooltip) opaque `#0b0b10` mix. Keep @ `ca9e3dd6`.
+- **v0.1.2215** — Data Poster Monitors list rows / history hairline opaque. Keep @ `50138eb5`.
+- **v0.1.2214** — Data Poster Debug Log toolbar / viewer opaque. Keep @ `8d23849`.
+- **v0.1.2213** — Data Poster LPM strip track opaque. Keep @ `eb512e7`.
+- **v0.1.2212** — Data Poster collapse-btn / monitors-menu opaque. Keep @ `5e82c82`.
+- **v0.1.2211** — Data Poster theme-footer / battery-power-strip hairlines opaque. Keep @ `a8b8136`.
+- **v0.1.2210** — Data Poster AI Chat empty shell opaque. Keep @ `5f754b5`.
 
 ## Tried / deferred
-- Digester open empty (0 turns / 7d).
-- Mac window capture still deferred (`screencapture -l` / Screen Recording TCC unavailable on this Linux rack).
-- Design review still due on stale `feature-ai-chat.png` (~69d) — polish landed in CSS; recapture waits for Mac TCC.
+
+- Window-only screenshots for stale `feature-ai-chat` / `feature-monitors` / `feature-cpu-metrics` — deferred (`screencapture -l` / Screen Recording TCC unavailable on Linux).
+- Sibling OpenClaw / Hermes ports — git missing on this host.
 
 ## Next fuel
-- Data Poster history-chart / time-range glass, or agent-ops Data Poster `.monitor-item` is-down / selected still on Apple `#ffffff`, or Mac capture when TCC allows.
+
+- agent-ops Data Poster `.monitor-item` is-down / selected still on Apple `#ffffff`
+- shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on `#ffffff`
+- Mac capture when TCC allows
