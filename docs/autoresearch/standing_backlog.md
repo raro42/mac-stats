@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2219
+
+- Data Poster history-chart Hot / Ok / Fair (`.history-chart-container.is-hot`, `.is-ok`, `.is-fair`) drop Apple `#ffffff` washes. Status washes mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-cpu-metrics`). Resting history-chart opaque in v0.1.2216. Mac capture deferred (`screencapture -l` unavailable). Next: shared `.metric-card.is-hot` / `.is-ok` / `.is-fair` still on `#ffffff`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2218
 
 - Data Poster Monitors focus / Copied (`.monitor-item:focus-visible`, `.monitor-item.is-just-copied`, Copied badge `::after`) drop Apple `#ffffff` washes. Fill, border, focus ring, and badge mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-monitors`). Status / selected opaque in v0.1.2217. Mac capture deferred (`screencapture -l` unavailable). Next: shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on `#ffffff`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
