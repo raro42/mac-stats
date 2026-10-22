@@ -13433,3 +13433,68 @@ body.theme-data-poster .chat-offline-attention-glance.is-just-copied {
   border-color: color-mix(in srgb, #34c759 42%, #0b0b10);
   background: color-mix(in srgb, #34c759 14%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat model / turn / answer / errors glances (+ collapsed)
+ * still mixed early DP remaps on `#0e0e14`, while Apple `#ffffff` state rules
+ * (has-answer / has-errors / is-circuit / focus / Copied) still win → white
+ * slab on the opaque shell `#0b0b10`. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14. Offline glance opaque in v0.1.2208.
+ */
+body.theme-data-poster .chat-model-glance,
+body.theme-data-poster .chat-turn-glance,
+body.theme-data-poster .chat-answer-glance,
+body.theme-data-poster .chat-errors-glance,
+body.theme-data-poster .ollama-collapsed-glance,
+body.theme-data-poster .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+body.theme-data-poster .chat-model-glance:hover,
+body.theme-data-poster .chat-turn-glance:hover,
+body.theme-data-poster .chat-answer-glance:hover,
+body.theme-data-poster .chat-errors-glance:hover,
+body.theme-data-poster .ollama-collapsed-glance:hover,
+body.theme-data-poster .chat-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .chat-model-glance:focus-visible,
+body.theme-data-poster .chat-turn-glance:focus-visible,
+body.theme-data-poster .chat-answer-glance:focus-visible,
+body.theme-data-poster .chat-errors-glance:focus-visible,
+body.theme-data-poster .ollama-collapsed-glance:focus-visible,
+body.theme-data-poster .chat-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .chat-model-glance.is-online,
+body.theme-data-poster .chat-turn-glance.is-ok:not(.is-active),
+body.theme-data-poster .chat-answer-glance.has-answer:not(.has-errors),
+body.theme-data-poster .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .chat-model-glance.is-offline,
+body.theme-data-poster .chat-model-glance.is-online.is-no-model,
+body.theme-data-poster .chat-model-glance.is-offline.is-circuit,
+body.theme-data-poster .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-data-poster .chat-turn-glance.is-active,
+body.theme-data-poster .ollama-collapsed-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+body.theme-data-poster .chat-answer-glance.has-errors,
+body.theme-data-poster .chat-errors-glance.has-errors,
+body.theme-data-poster .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-data-poster .chat-answer-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-data-poster .ollama-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+}
