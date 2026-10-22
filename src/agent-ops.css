@@ -13131,3 +13131,69 @@ body.theme-data-poster #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
 body.theme-data-poster #ops-runs-list .ops-row.is-fail .ops-row-meta {
   color: color-mix(in srgb, #ff3b30 88%, #ffffff);
 }
+/*
+ * Data Poster: Agent Ops copy chips / empty shells / preview / loading still mixed
+ * Apple #ffffff washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after list rows in v0.1.2202.
+ */
+body.theme-data-poster .ops-loading {
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-data-poster .ops-preview {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-data-poster .ops-session-copy-chip {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0b0b10);
+}
+body.theme-data-poster .ops-session-copy-chip:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+}
+body.theme-data-poster .ops-session-copy-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .ops-session-copy-chip.is-just-saved {
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10);
+  background: color-mix(in srgb, #34c759 14%, #0b0b10);
+}
+body.theme-data-poster .ops-empty {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-data-poster .ops-empty:hover {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+}
+body.theme-data-poster .ops-empty-filter-miss.is-calm,
+body.theme-data-poster .ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .ops-empty-filter-miss.is-fail-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .ops-empty-tab-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+}
+body.theme-data-poster .ops-clear-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+}
+body.theme-data-poster .ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-data-poster .ops-clear-filter:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
