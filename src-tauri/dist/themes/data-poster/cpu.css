@@ -1075,9 +1075,10 @@ body {
 }
 
 .lpm-info .lpm-toggle {
-  /* Opaque dark track — shared Apple #ececf1 wash reads as a white chip here (#15). */
-  background: color-mix(in srgb, var(--muted, #888) 28%, #0e0e14);
-  border-color: color-mix(in srgb, var(--muted, #888) 36%, #0e0e14);
+  /* Opaque dark track — mix against poster shell #0b0b10 (not early #0e0e14). */
+  /* Shared Apple #ececf1 wash reads as a white chip here (#14 / #15). */
+  background: color-mix(in srgb, var(--muted, #888) 28%, #0b0b10);
+  border-color: color-mix(in srgb, var(--muted, #888) 36%, #0b0b10);
 }
 
 .lpm-toggle::after {
