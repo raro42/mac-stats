@@ -4,6 +4,7 @@ Overnight Track B kept shipping Data Poster opaque washes (GitHub #14) so dark p
 
 ## Shipped tonight (keep)
 
+- **v0.1.2219** — History sparkline Hot / Ok / Fair (`.history-chart-container.is-hot` · `.is-ok` · `.is-fair`) mix against `#0b0b10`.
 - **v0.1.2218** — Monitors focus / Copied (`.monitor-item:focus-visible`, `.is-just-copied`, Copied badge) mix against `#0b0b10`.
 - **v0.1.2217** — Monitors status / selected (`.is-selected` · `.is-down` · `.is-slow`).
 - **v0.1.2216** — History chart / time-range opaque (no glass rgba).
@@ -16,5 +17,4 @@ Overnight Track B kept shipping Data Poster opaque washes (GitHub #14) so dark p
 ## Notes
 
 - Digester open stayed empty (0 turns / 7d). Design review still due (`feature-ai-chat` ~69d); Mac window capture deferred on this Linux rack (`screencapture -l` unavailable).
-- Next fuel: shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on Apple `#ffffff`.
-
+- Next fuel: shared `.metric-card.is-hot` / `.is-ok` / `.is-fair` still on Apple `#ffffff`.
