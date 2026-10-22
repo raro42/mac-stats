@@ -1,23 +1,20 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B (autoresearch) kept shipping Data Poster opaque chrome (#14).
+Overnight Track B kept shipping Data Poster opaque washes (GitHub #14) so dark poster chrome is not a white/glass slab.
 
-## Shipped tonight
+## Shipped tonight (keep)
 
-| Version | What |
-|---------|------|
-| **v0.1.2215** | Data Poster Monitors resting rows / history hairline opaque `#0b0b10` |
-| **v0.1.2216** | Data Poster history-chart / time-range opaque `#0b0b10` |
-| **v0.1.2217** | Data Poster Monitors selected · Down · Slow rows drop Apple `#ffffff` washes → mix on `#0b0b10` |
+- **v0.1.2218** — Monitors focus / Copied (`.monitor-item:focus-visible`, `.is-just-copied`, Copied badge) mix against `#0b0b10`.
+- **v0.1.2217** — Monitors status / selected (`.is-selected` · `.is-down` · `.is-slow`).
+- **v0.1.2216** — History chart / time-range opaque (no glass rgba).
+- **v0.1.2215** — Monitor rows / history hairline opaque.
+- **v0.1.2214** — Debug Log toolbar / viewer opaque.
+- **v0.1.2213** — LPM strip track `#0b0b10` (no early `#0e0e14`).
+- **v0.1.2212** — Collapse / Monitors menu opaque.
+- **v0.1.2211** — Theme footer / battery strip hairlines opaque.
 
-## Why it matters
+## Notes
 
-On Data Poster, shared Apple white washes made Down / Slow / selected External · Monitors rows look like a white slab on the dark poster field. They now read as quiet status tint on `#0b0b10`.
+- Digester open stayed empty (0 turns / 7d). Design review still due (`feature-ai-chat` ~69d); Mac window capture deferred on this Linux rack (`screencapture -l` unavailable).
+- Next fuel: shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on Apple `#ffffff`.
 
-## Next
-
-- Shared `.history-chart-container.is-hot` / `.is-ok` / `.is-fair` still on `#ffffff`
-- Data Poster `.monitor-item:focus-visible` / `.is-just-copied` if still white-slab
-- Mac window capture when Screen Recording TCC allows (stale `feature-monitors` / `feature-ai-chat`)
-
-Digester was empty; design review was due (`feature-ai-chat` recommended). Fuel came from standing backlog after 2216.
