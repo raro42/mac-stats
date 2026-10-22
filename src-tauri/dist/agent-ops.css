@@ -13299,3 +13299,27 @@ body.theme-data-poster #chat-send-btn.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
   border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
 }
+/*
+ * Data Poster: AI Chat filter Clear (`.chat-filter-clear` resting / hover /
+ * focus-visible / Cleared flash) still mixed Apple `#ffffff` washes → white
+ * slab on the opaque shell `#0b0b10`. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14. Message select / Clear button opaque in v0.1.2205.
+ */
+body.theme-data-poster .chat-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
