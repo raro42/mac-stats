@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2205
+
+- Data Poster AI Chat message select / Clear (`.chat-message` hover / focus-visible / selected / Copied, `#chat-clear-btn` resting / hover / focus / disabled, `#chat-send-btn` Saved flash) drop Apple `#ffffff` mixes. Fill, border, outline, and flash mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-ai-chat`). Agent Ops editor opaque in v0.1.2204. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or AI Chat filter Clear / offline-glance leftovers, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2204
 
 - Data Poster Agent Ops edit-actions / agent-editor (`textarea.ops-agent-editor` focus / dirty, disabled Save, `.ops-agent-save-status`, `.ops-detail-meta`, file-tab / edit-actions / preview-row / Insights keyboard hints, Agent Ops `.btn-secondary` Refresh / Back / Load into AI Chat, Save / Loaded flashes) drop Apple `#ffffff` mixes. Fill, border, type, and outline mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Copy/empty/preview opaque in v0.1.2203. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or design-review AI Chat polish (`feature-ai-chat` recommended), or Mac capture when TCC allows. P2 reliability / GitHub #14.

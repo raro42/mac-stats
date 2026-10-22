@@ -13255,3 +13255,47 @@ body.theme-data-poster #ops-agent-load-chat.is-just-saved {
   color: var(--text, rgba(255, 255, 255, 0.92));
   box-shadow: none;
 }
+/*
+ * Data Poster: AI Chat message hover / focus / selected / Copied + Clear
+ * still mixed Apple #ffffff washes → white slab on #0b0b10. Design-review
+ * fuel (feature-ai-chat) + standing P2 #14 after Agent Ops editor in v0.1.2204.
+ */
+body.theme-data-poster .chat-message[role='option']:hover,
+body.theme-data-poster .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 6%, #0b0b10);
+}
+body.theme-data-poster .chat-message[role='option']:focus-visible,
+body.theme-data-poster .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .chat-message[role='option'].is-selected,
+body.theme-data-poster .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
+}
+body.theme-data-poster .chat-message[role='option'].is-just-copied,
+body.theme-data-poster .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-data-poster .chat-message[role='option'].is-just-copied::after,
+body.theme-data-poster .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+body.theme-data-poster #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+}
+body.theme-data-poster #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
+}
+body.theme-data-poster #chat-clear-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+body.theme-data-poster #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #ffffff 40%, #0b0b10);
+}
+body.theme-data-poster #chat-send-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+}
