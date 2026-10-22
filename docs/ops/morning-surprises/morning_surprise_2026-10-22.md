@@ -1,20 +1,22 @@
 # Morning surprise — 2026-10-22
 
-Overnight Track B kept shipping Data Poster opaque washes (#14) so Chat is not a white slab on `#0b0b10`.
+Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14 / GitHub #14).
 
 ## Shipped tonight (so far)
 
-- **v0.1.2210** — AI Chat empty shell (`.chat-empty` ready · offline · chips) mixes against `#0b0b10` (design-review `feature-ai-chat`).
-- Earlier same night (before this tick window on main): v0.1.2205–2209 Chat select / filter / error / offline / glances.
+| Version | What |
+|---------|------|
+| **v0.1.2210** | AI Chat empty shell / title / copy / chips opaque `#0b0b10` (no early `#0e0e14` / Apple white slab) |
+| **v0.1.2211** | Theme footer + battery strip hairlines opaque `#0b0b10` (no glass `var(--hairline)`) |
 
-## Tried / deferred
+## Context
 
-- Digester empty (no runs).
-- Window screenshot of `feature-ai-chat.png` deferred (Linux host; no `screencapture -l`).
+- Digester open stayed empty (0 turns / 7d).
+- Design review still due (`feature-ai-chat` ~69d stale; Mac `screencapture -l` unavailable on this Linux rack).
+- Layout daily already done for Data Poster today.
 
-## Next
+## Next fuel
 
-- Data Poster Settings / battery / footer `var(--hairline)` glass leftovers.
-- Mac capture when Screen Recording TCC allows.
-
-Generated: 2026-10-22T20:12:45+02:00
+- Data Poster collapse-btn / monitors-menu hover glass (`var(--hairline)`)
+- LPM strip track still mixed on `#0e0e14`
+- Mac capture of stale feature screens when TCC allows
