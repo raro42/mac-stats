@@ -13633,3 +13633,27 @@ body.theme-data-poster .metric-card.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
   box-shadow: none;
 }
+/*
+ * Data Poster: rings Hot-filter miss shell / CTA still mixed Apple #ffffff washes
+ * (.rings-filter-miss · .rings-filter-miss-cta) → white slab on the opaque shell
+ * #0b0b10. Hint type already remapped earlier; shell + CTA catch up. Design-review
+ * fuel (feature-cpu-metrics) + standing P2 #14.
+ */
+body.theme-data-poster .rings-filter-miss {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-miss-hint {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .rings-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
