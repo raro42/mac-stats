@@ -4,6 +4,7 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 #14 / Git
 
 ## Shipped tonight
 
+- **v0.1.2222** — Data Poster AI Chat filter-miss (`.chat-filter-miss` / Errors·You·Assistant / CTA) mixes against opaque shell `#0b0b10` (no early `#0e0e14` slab). Design-review fuel: `feature-ai-chat`.
 - **v0.1.2221** — Data Poster rings Hot-filter miss (`.rings-filter-miss` / CTA) mixes against opaque shell `#0b0b10` (no Apple white slab). Design-review fuel: `feature-cpu-metrics`.
 - **v0.1.2220** — Data Poster metric-card Hot / Ok / Fair opaque `#0b0b10`.
 - **v0.1.2219** — Data Poster history-chart Hot / Ok / Fair opaque `#0b0b10`.
@@ -14,5 +15,5 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 #14 / Git
 
 ## Still open
 
-- Other Data Poster Apple `#ffffff` leftovers (shared focus washes; older filter-miss shells still on `#0e0e14`).
+- Other Data Poster filter-miss / focus leftovers still on `#0e0e14` (e.g. Monitors filter-miss, `#chat-input:focus`).
 - Window-only Mac capture of stale `feature-*.png` when Screen Recording TCC / `screencapture -l` allows.
