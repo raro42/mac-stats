@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2222
+
+- Data Poster AI Chat filter-miss (`.chat-filter-miss` / Errors·You·Assistant / CTA) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2221
 
 - Data Poster rings Hot-filter miss (`.rings-filter-miss` / CTA) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-cpu-metrics`.

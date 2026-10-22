@@ -13657,3 +13657,35 @@ body.theme-data-poster .rings-filter-miss-cta:hover {
 body.theme-data-poster .rings-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat filter-miss shell / CTA still mixed against early #0e0e14
+ * (.chat-filter-miss · Errors/You/Assistant · .chat-filter-miss-cta) → wrong dark
+ * slab on the opaque shell #0b0b10. Catch up to rings-filter-miss opaque remaps.
+ * Design-review fuel (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-data-poster .chat-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-miss.is-errors {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-miss.is-you,
+body.theme-data-poster .chat-filter-miss.is-assistant {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-data-poster .chat-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
