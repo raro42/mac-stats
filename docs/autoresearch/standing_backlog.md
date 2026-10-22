@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2211
+
+- Data Poster theme-footer / battery strip hairlines (`.theme-footer` border-top, `.battery-power-strip` border) drop glass `var(--hairline)` (`rgba(255,255,255,0.12)`). Borders mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-cpu-metrics`). Settings header hairline opaque in v0.1.2191; AI Chat empty shell opaque in v0.1.2210. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster collapse-btn / monitors-menu hover glass (`var(--hairline)`), or LPM strip track still on `#0e0e14`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2210
 
 - Data Poster AI Chat empty shell (`.chat-empty` resting / ready · no-model · offline · circuit · not-set, `.chat-empty-title` / `.chat-empty-copy`, `.chat-empty-chip` resting / hover / focus-visible) drop early `#0e0e14` remaps and Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-ai-chat`). Glances opaque in v0.1.2209. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or battery-strip / theme-footer `var(--hairline)`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
