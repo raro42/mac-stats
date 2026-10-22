@@ -13378,3 +13378,58 @@ body.theme-data-poster .chat-filter-count {
 body.theme-data-poster .chat-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat error bubble + offline attention glance still mixed
+ * Apple `#ffffff` washes (and early DP remaps on `#0e0e14` for resting /
+ * is-offline only). Specific state rules (circuit / ready / errors / …) and
+ * `.chat-message.assistant.is-error` still won with `#ffffff` → white slab on
+ * the opaque shell `#0b0b10`. Design-review fuel (feature-ai-chat) + standing
+ * P2 #14. Filter chips opaque in v0.1.2207.
+ */
+body.theme-data-poster .chat-message.assistant.is-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-offline,
+body.theme-data-poster .chat-offline-attention-glance.is-circuit,
+body.theme-data-poster .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-not-set,
+body.theme-data-poster .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-ready,
+body.theme-data-poster .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 42%, #0b0b10);
+  background: color-mix(in srgb, #34c759 14%, #0b0b10);
+}

@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2208
+
+- Data Poster AI Chat error bubble / offline glance (`.chat-message.assistant.is-error`, `.chat-offline-attention-glance` resting / hover / focus-visible / offline · circuit · no-model · not-set · errors · ready · last-answer · continue · filter · sending · just-copied) drop Apple `#ffffff` mixes. Fill and border mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-ai-chat`). Filter chips opaque in v0.1.2207. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or remaining AI Chat glances still on `#0e0e14`, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2207
 
 - Data Poster AI Chat filter chips (`.chat-filter-chip` resting / hover / focus-visible / active, You·Assistant·Errors `has-hits` / `is-active`, `.chat-filter-count` / zero) drop Apple `#ffffff` mixes. Fill, border, type, and focus mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-ai-chat`). Filter Clear opaque in v0.1.2206. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Settings section hairlines if still glass (`var(--hairline)`), or AI Chat error-bubble / offline-glance leftovers, or Mac capture when TCC allows. P2 reliability / GitHub #14.
