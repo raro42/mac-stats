@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2214
+
+- Data Poster Debug Log toolbar / viewer (`.logs-toolbar button` resting / hover / focus-visible, `.logs-viewer`, `.logs-path-hint`, `.logs-autorefresh`) drop glass `var(--hairline)` / rgba gray washes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (Debug Log). LPM strip opaque in v0.1.2213. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster monitor-item / history hairline glass (`var(--hairline)`), or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2213
 
 - Data Poster LPM strip track (`.lpm-info .lpm-toggle` fill / border) drops early `#0e0e14` remaps. Mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-cpu-metrics`). Collapse / Monitors menu opaque in v0.1.2212. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Debug Log toolbar / viewer glass (`var(--hairline)`), or monitor-item / history hairline glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.

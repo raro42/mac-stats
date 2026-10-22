@@ -2516,13 +2516,75 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
 }
 
-/* Debug Log viewer */
+/* Debug Log viewer — opaque wash vs poster shell #0b0b10 (#14). */
 
-.logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.logs-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,rgba(128,128,128,.3));background:rgba(128,128,128,.12);color:var(--text,inherit);cursor:pointer}
-.logs-autorefresh{font-size:12px;color:var(--muted,rgba(128,128,128,.8));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
-.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:rgba(0,0,0,.08);border:1px solid var(--hairline,rgba(128,128,128,.3));border-radius:10px;white-space:pre-wrap;word-break:break-word}
+.logs-path-hint {
+  font-size: 11px;
+  /* Was muted glass → ~55% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+  font-family: ui-monospace, Menlo, monospace;
+  margin-left: 8px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Opaque toolbar controls — was var(--hairline) / rgba gray glass. */
+.logs-toolbar button {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  cursor: pointer;
+}
+
+.logs-toolbar button:hover {
+  background: color-mix(in srgb, #ffffff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 20%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 94%, #0b0b10);
+}
+
+.logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  outline-offset: 2px;
+}
+
+.logs-autorefresh {
+  font-size: 12px;
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Opaque viewer shell — was rgba(0,0,0,.08) + var(--hairline) glass. */
+.logs-viewer {
+  margin: 0;
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 11px;
+  line-height: 1.45;
+  font-family: ui-monospace, Menlo, monospace;
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 4%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  border-radius: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
 
 /* Logs section */
