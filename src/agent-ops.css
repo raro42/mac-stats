@@ -13615,3 +13615,21 @@ body.theme-data-poster .history-chart-container.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 5%, #0b0b10);
   box-shadow: none;
 }
+/*
+ * Data Poster: ring metric Hot / Ok / Fair still mixed Apple #ffffff washes
+ * (.metric-card.is-hot · is-ok · is-fair) → white slab on the opaque shell
+ * #0b0b10. History-chart status opaque in v0.1.2219. Design-review fuel
+ * (feature-cpu-metrics) + standing P2 #14 + layout-daily Data Poster.
+ */
+body.theme-data-poster .metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .metric-card.is-ok:not(.is-hot):not(.is-fair) {
+  background-color: color-mix(in srgb, #34c759 7%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .metric-card.is-fair:not(.is-hot) {
+  background-color: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  box-shadow: none;
+}
