@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2202
+
+- Data Poster Agent Ops list rows (`.ops-row` resting / hover / focus / selected / Copied, `.ops-row-meta`, `.ops-badge` On/Off, Runs Lite·Slow·Fail) drop Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Kind-filter chips opaque in v0.1.2201. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster `.ops-session-copy-chip` / empty shells / preview if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
+
 ## Overnight merge — v0.1.2201
 
 - Data Poster Agent Ops kind-filter chips (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries · Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear / counts) drop Apple `#ffffff` mixes. Fill, border, and type mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review fuel (`feature-agent-ops`). Filter row / tabs opaque in v0.1.2200. Mac capture deferred (`screencapture -l` unavailable). Next: Data Poster Agent Ops list rows (`.ops-row` / badge / Lite·Slow·Fail) if still white-slab, or Settings section hairlines if still glass, or Mac capture when TCC allows. P2 reliability / GitHub #14.
