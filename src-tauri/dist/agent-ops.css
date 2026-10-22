@@ -13579,3 +13579,21 @@ body.theme-data-poster .monitor-item.is-slow:not(.is-down):not(.is-pending):hove
   border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
   background: color-mix(in srgb, #ff9500 10%, #0b0b10);
 }
+/*
+ * Data Poster: Monitors focus / Copied still mixed Apple #ffffff washes
+ * (:focus-visible · is-just-copied · Copied badge) → white slab on the opaque
+ * shell #0b0b10. Status / selected opaque in v0.1.2217. Design-review fuel
+ * (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitor-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+}
+body.theme-data-poster .monitor-item.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .monitor-item.is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
