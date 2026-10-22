@@ -1702,13 +1702,20 @@ body {
   margin-top: 12px;
 }
 
+/* Opaque wash — glass alpha stays in Graphics and Media (#14). */
 .monitor-item {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Was --panel / white glass 0.3 + var(--hairline) over the poster field. */
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;
   font-size: 13px;
+}
+
+.monitor-item:hover {
+  background: color-mix(in srgb, #ffffff 9%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 20%, #0b0b10);
 }
 
 .monitor-item-header {
@@ -1741,13 +1748,15 @@ body {
 
 .monitor-info > div:first-child {
   font-weight: 600;
-  color: var(--text, var(--ink, inherit));
+  /* Was var(--text) glass → ~92% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   margin-bottom: 2px;
 }
 
 .monitor-info > div:last-child {
   font-size: 11px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Was muted rgba(~60% gray) glass → ~48% white on the poster field. */
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
 }
 
 .monitor-history {
@@ -1756,7 +1765,8 @@ body {
   align-items: center;
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Was var(--hairline) rgba(255,255,255,0.12) glass over the poster field. */
+  border-top: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   min-height: 12px;
   flex-wrap: wrap;
 }
