@@ -13689,3 +13689,15 @@ body.theme-data-poster .chat-filter-miss-cta:hover {
 body.theme-data-poster .chat-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat composer focus (`#chat-input:focus`) still mixed against
+ * early `#0e0e14` → wrong dark slab / ring on the opaque shell `#0b0b10`.
+ * Catch up to filter-miss opaque remaps. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14.
+ */
+body.theme-data-poster #chat-input:focus {
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0b0b10);
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
