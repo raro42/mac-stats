@@ -6,6 +6,7 @@ Overnight Track B kept shipping Data Poster opaque washes (standing P2 #14 / Git
 
 | Version | What |
 |---------|------|
+| **v0.1.2214** | Debug Log toolbar / viewer (`.logs-toolbar button` · `.logs-viewer` · path/autorefresh) opaque `#0b0b10` mix (no glass `var(--hairline)` / rgba) |
 | **v0.1.2213** | LPM strip track (`.lpm-info .lpm-toggle`) mixes against `#0b0b10` (dropped early `#0e0e14`) |
 | **v0.1.2212** | Collapse / Monitors menu opaque (no glass hairline/panel) |
 | **v0.1.2211** | Theme-footer + battery-power-strip hairlines opaque |
@@ -20,4 +21,4 @@ Overnight Track B kept shipping Data Poster opaque washes (standing P2 #14 / Git
 
 ## Next fuel
 
-Data Poster Debug Log toolbar / viewer still on glass `var(--hairline)`, or monitor-item / history hairline glass, or Mac window-only capture when TCC allows.
+Data Poster monitor-item / history hairline glass (`var(--hairline)`), or Mac window-only capture when TCC allows.
