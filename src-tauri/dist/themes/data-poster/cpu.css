@@ -373,7 +373,8 @@ body {
   gap: 10px;
   align-items: center;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  /* Opaque hairline — was rgba(255,255,255,0.10) glass over the poster field (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #ffffff 10%, #0b0b10);
 }
 
 .process-name {
@@ -393,7 +394,8 @@ body {
 .process-bar {
   width: 80px;
   height: 3px;
-  background: rgba(255, 255, 255, 0.14);
+  /* Opaque track — was rgba(255,255,255,0.14) glass over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 14%, #0b0b10);
   border-radius: 99px;
   overflow: hidden;
 }
