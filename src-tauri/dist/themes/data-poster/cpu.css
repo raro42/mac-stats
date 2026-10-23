@@ -2400,8 +2400,8 @@ body {
 /* Field was rgba(14, 14, 20, 0.94); hairline and type were white glass. Mix on #0b0b10. */
 #chat-input {
   flex: 1;
-  /* Dark panel only — never fall back to light glass on this theme (#15). */
-  background: color-mix(in srgb, #0e0e14 94%, #0b0b10);
+  /* Opaque dark panel — mix against poster shell #0b0b10 (not early #0e0e14). */
+  background: color-mix(in srgb, #12121a 94%, #0b0b10);
   border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   padding: 8px 12px;
