@@ -13827,3 +13827,73 @@ body.theme-data-poster .processes-filter-miss-cta:hover {
 body.theme-data-poster .processes-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+
+/*
+ * Data Poster: Top Processes filter-attention / hot-attention glances + filter
+ * chips still mixed against early #0e0e14 (.processes-filter-attention-glance ·
+ * .processes-hot-attention-glance · .processes-filter-chip All/Pinned/Hot)
+ * → wrong dark slab on the opaque shell #0b0b10. Catch up to filter-miss /
+ * Top glances opaque remaps. Design-review fuel (feature-processes) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .processes-filter-attention-glance,
+body.theme-data-poster .processes-hot-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-attention-glance:hover,
+body.theme-data-poster .processes-hot-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-attention-glance:focus-visible,
+body.theme-data-poster .processes-hot-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
+}
+body.theme-data-poster .processes-filter-attention-glance.is-pinned {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-attention-glance.is-hot-filter,
+body.theme-data-poster .processes-hot-attention-glance.has-hot {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-data-poster .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 32%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 42%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+}

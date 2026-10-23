@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2228
+
+- Data Poster Top Processes filter-attention / chips (`.processes-filter-attention-glance` · `.processes-hot-attention-glance` · `.processes-filter-chip` All/Pinned/Hot) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`.
+
 ## Overnight merge — v0.1.2227
 
 - Data Poster Top Processes filter-miss (`.processes-filter-miss` · Hot/Pinned empty · `.processes-filter-miss-cta`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`.
