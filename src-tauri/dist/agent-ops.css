@@ -14035,3 +14035,29 @@ body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied {
 body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat filter-miss message type still mixed against early
+ * `#0e0e14` (`.chat-filter-miss-msg`) while the filter-miss shell / CTA already
+ * mix on the opaque shell `#0b0b10` → wrong ink on empty You/Assistant/Errors.
+ * Catch up to filter-miss shell opaque remaps. Design-review fuel
+ * (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-data-poster .chat-filter-miss-msg {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  opacity: 1;
+}
+/*
+ * Data Poster: AI Chat keyboard hints still mixed against early `#0e0e14`
+ * (`.chat-empty-kb-hint` · `.chat-composer-kb-hint` · `.chat-kb-hint` ·
+ * `.filter-chip-kb-hint`) while empty shell / filter-miss type already mix on
+ * the opaque shell `#0b0b10` → wrong muted ink under the composer and chips.
+ * Catch up to Agent Ops kb-hint opaque remaps. Design-review fuel
+ * (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-data-poster .chat-empty-kb-hint,
+body.theme-data-poster .chat-composer-kb-hint,
+body.theme-data-poster .chat-kb-hint,
+body.theme-data-poster .filter-chip-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
