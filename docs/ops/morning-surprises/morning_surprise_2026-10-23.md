@@ -1,19 +1,23 @@
 # Morning surprise — 2026-10-23
 
-Overnight Track B kept shipping Data Poster opaque remaps for GitHub **#14** (wrong dark slab / glass on the `#0b0b10` shell).
+Overnight Track B kept shipping Data Poster opaque washes (GitHub #14 / design-review fuel). Digester stayed empty; no debug.log clusters.
 
-## Shipped tonight (latest)
+## Shipped tonight
 
-- **v0.1.2227** — Top Processes filter-miss (`.processes-filter-miss` Hot / Pinned empty · `.processes-filter-miss-cta` resting / hover / focus) mix against `#0b0b10` (no early `#0e0e14`).
-- Earlier same night: **v0.1.2226** Top Processes glances; **v0.1.2225** AI Chat exec/answer cards; **v0.1.2224** Monitors filter-miss; **v0.1.2223** `#chat-input:focus`; **v0.1.2222** AI Chat filter-miss; **v0.1.2221** rings Hot-filter miss; **v0.1.2220** metric-card Hot/Ok/Fair.
+| Version | What |
+|---------|------|
+| **v0.1.2228** | Top Processes filter-attention / hot-attention glances + All · Pinned · Hot chips → mix on `#0b0b10` (not early `#0e0e14`) |
+| **v0.1.2227** | Top Processes filter-miss (Hot / Pinned empty + Clear CTA) → `#0b0b10` |
+| **v0.1.2226** | Top Processes Top CPU · GPU · RAM glances → `#0b0b10` |
+| **v0.1.2225** | AI Chat exec / answer cards → `#0b0b10` |
+| earlier | Monitors filter-miss, `#chat-input:focus`, chat-filter-miss, rings filter-miss, … |
 
-## Tried / deferred
+## Still open
 
-- Digester empty (0 turns / 7d).
-- Design review due (`feature-ai-chat` ~69.6d stale; also STALE `feature-processes`).
-- Mac window capture still deferred (`screencapture -l` / Screen Recording TCC).
-- Sibling OpenClaw/Hermes missing on this host.
+- Data Poster leftovers still on early `#0e0e14` (e.g. process-row pinned / pin chrome).
+- Stale feature screens need Mac `screencapture -l` when Screen Recording TCC allows.
+- Layout-daily dark/neon/… screens still missing remaps bookkeeping.
 
-## Next fuel
+## Fitness
 
-- Data Poster Top Processes filter-attention / filter chips still on `#0e0e14`, or other filter-miss leftovers, or Mac capture when TCC allows.
+Filter glances and chips on Top Processes no longer sit on the wrong dark slab when Data Poster is opaque.
