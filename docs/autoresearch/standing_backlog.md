@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2247
+
+- Data Poster Ollama settings keyboard hints (`.ollama-settings-header-kb-hint` · `.ollama-settings-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2246
 
 - Data Poster AI Chat response-time type (`.response-time`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.

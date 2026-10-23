@@ -14096,3 +14096,16 @@ body.theme-data-poster .response-time {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Ollama settings keyboard hints still mixed against early `#0e0e14`
+ * (`.ollama-settings-header-kb-hint` · `.ollama-settings-toolbar-kb-hint`) while
+ * AI Chat / metrics kb-hints already mix on the opaque shell `#0b0b10` → wrong
+ * muted ink under the Ollama settings title and Reset · Save row. Catch up to
+ * metrics kb-hint opaque remaps. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .ollama-settings-header-kb-hint,
+body.theme-data-poster .ollama-settings-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
