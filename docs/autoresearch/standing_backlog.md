@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2233
+
+- Data Poster AI Chat Send focus / active / disabled (`#chat-send-btn:focus-visible` · `:active` · `:disabled`) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2232
 
 - Data Poster Top Processes Copied flash (`.process-row.is-just-copied` · badge) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-processes`.
