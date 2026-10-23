@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2239
+
+- Data Poster Debug Log Copied flash (`.logs-line[role='option'].is-just-copied` · badge) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; Debug Log chrome / design-review adjacent.
+
 # Overnight standing backlog (Track B fuel)
 
 When digester **open** is empty, the overnight harness **must** pull from this list (top first). Cross out or move completed items down after a keep. Local overrides/merges live in `~/.mac-stats/improvements/standing_backlog.md` (merge, do not overwrite).
