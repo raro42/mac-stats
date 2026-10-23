@@ -14085,3 +14085,14 @@ body.theme-data-poster .history-sparkline-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: AI Chat response-time type still mixed against early `#0e0e14`
+ * (`.response-time`) while message / exec chrome already mix on the opaque
+ * shell `#0b0b10` → wrong muted ink under assistant turns. Catch up to
+ * chat-exec-label opaque remaps. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .response-time {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}

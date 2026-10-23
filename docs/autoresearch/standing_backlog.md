@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2246
+
+- Data Poster AI Chat response-time type (`.response-time`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2245
 
 - Data Poster metrics keyboard hints (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-cpu-metrics`.
