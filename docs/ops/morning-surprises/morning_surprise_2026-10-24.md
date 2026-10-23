@@ -6,6 +6,7 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 / GitHub 
 
 | Version | What |
 |---------|------|
+| **v0.1.2240** | Disk Cleanup Copied flash (`.disk-cleanup-item` / scope-row · badge · has-reclaim) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
 | **v0.1.2239** | Debug Log Copied flash (`.logs-line.is-just-copied` · badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
 | **v0.1.2238** | Details Copied flash (`.detail-value.is-just-copied` · badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
 | **v0.1.2237** | Details / Processes scrollbar (`.poster-details` · `.poster-processes` track / thumb / hover) mixes on opaque `#0b0b10` — no glass `rgba` frosted slab |
@@ -15,6 +16,6 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 / GitHub 
 
 ## Tried / deferred
 
-- More Data Poster leftovers (Disk Cleanup Copied still on Apple `#ffffff` with no DP override; AI Chat kb-hints still early `#0e0e14` shared with dark).
+- More Data Poster leftovers (Perplexity result Copied still on Apple `#ffffff` with no DP override; AI Chat kb-hints still early `#0e0e14` shared with dark).
 - Layout-daily dark / neon / futuristic / architect still due (data-poster done yesterday).
 - Mac window-only recapture of stale `feature-ai-chat` / `feature-processes` / `feature-cpu-metrics` when Screen Recording TCC allows.

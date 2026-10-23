@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2240
+
+- Data Poster Disk Cleanup Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied` · badge · has-reclaim) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; Disk Cleanup chrome / design-review adjacent.
+
 ## Overnight merge — v0.1.2239
 
 - Data Poster Debug Log Copied flash (`.logs-line[role='option'].is-just-copied` · badge) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; Debug Log chrome / design-review adjacent.
