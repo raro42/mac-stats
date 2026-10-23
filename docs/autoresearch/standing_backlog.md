@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2244
+
+- Data Poster AI Chat exec label (`.chat-exec-label`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`; layout-daily data-poster.
+
 ## Overnight merge — v0.1.2243
 
 - Data Poster AI Chat keyboard hints (`.chat-empty-kb-hint` · `.chat-composer-kb-hint` · `.chat-kb-hint` · `.filter-chip-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.

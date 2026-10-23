@@ -14061,3 +14061,14 @@ body.theme-data-poster .filter-chip-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: AI Chat exec label type still mixed against early `#0e0e14`
+ * (`.chat-exec-label`) while exec / answer cards already mix on the opaque
+ * shell `#0b0b10` → wrong muted ink above tool/exec code. Catch up to
+ * chat-exec-card opaque remaps. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14; layout-daily data-poster.
+ */
+body.theme-data-poster .chat-exec-label {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
