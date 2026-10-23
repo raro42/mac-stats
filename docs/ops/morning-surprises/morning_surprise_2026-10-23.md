@@ -1,20 +1,18 @@
 # Morning surprise — 2026-10-23
 
-Overnight Track B kept shipping Data Poster opaque remaps (GitHub #14 / design-review).
+Overnight Track B kept shipping Data Poster opaque remaps for GitHub **#14** (wrong dark slab / glass on the `#0b0b10` shell).
 
-## Shipped tonight
+## Shipped tonight (latest)
 
-| Version | What |
-|---------|------|
-| **v0.1.2225** | AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · final) mix against `#0b0b10` (no early `#0e0e14`) |
-| **v0.1.2224** | Monitors filter-miss / empty CTA opaque `#0b0b10` |
-| **v0.1.2223** | AI Chat `#chat-input:focus` opaque `#0b0b10` |
-| **v0.1.2222** | AI Chat filter-miss / CTA opaque `#0b0b10` |
-| **v0.1.2221** | Rings Hot-filter miss opaque `#0b0b10` (no Apple `#ffffff`) |
-| **v0.1.2220** | Metric-card Hot / Ok / Fair opaque `#0b0b10` |
+- **v0.1.2226** — Top Processes glances (`.processes-top-glance` · GPU · RAM resting / hover / focus / Hot / Ok) mix against `#0b0b10` (no early `#0e0e14`).
+- Earlier same night: **v0.1.2225** AI Chat exec/answer cards; **v0.1.2224** Monitors filter-miss; **v0.1.2223** `#chat-input:focus`; **v0.1.2222** AI Chat filter-miss; **v0.1.2221** rings Hot-filter miss; **v0.1.2220** metric-card Hot/Ok/Fair.
 
-## Notes
+## Tried / deferred
 
-- Digester open stayed empty (0 turns / 7d). Fuel was standing P2 #14 + design-review (`feature-ai-chat` ~70d stale).
-- Mac window capture still deferred on this Linux rack (`screencapture -l` / TCC).
-- Next: more Data Poster `#0e0e14` leftovers (Top Processes glances / shared focus), or shoot stale feature screens when a Mac with TCC allows.
+- Digester empty (0 turns / 7d).
+- Mac window capture still deferred (`screencapture -l` / Screen Recording TCC).
+- Sibling OpenClaw/Hermes missing on this host.
+
+## Next fuel
+
+- Data Poster Top Processes filter-attention / filter chips / filter-miss still on `#0e0e14`, or Mac capture when TCC allows.
