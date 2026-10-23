@@ -1,22 +1,23 @@
 # Morning surprise — 2026-10-24
 
-Overnight Track B kept shipping Data Poster opaque remaps (standing P2 / GitHub #14). Digester open stayed empty (0 turns / 7d). Design-review still due (`feature-ai-chat` ~70d stale); Mac `screencapture -l` unavailable on this Linux rack. Layout-daily already counted Data Poster on 2026-10-23.
+Overnight Track B kept shipping Data Poster opaque washes (standing P2 / GitHub #14). Digester stayed empty; design review stayed due on stale feature screens.
 
-## Shipped
+## Shipped last night
 
-| Version | What |
-|---------|------|
-| **v0.1.2241** | Perplexity result Copied flash (`.perplexity-result-item.is-just-copied` · badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
-| **v0.1.2240** | Disk Cleanup Copied flash (`.disk-cleanup-item` / scope-row · badge · has-reclaim) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
-| **v0.1.2239** | Debug Log Copied flash (`.logs-line.is-just-copied` · badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
-| **v0.1.2238** | Details Copied flash (`.detail-value.is-just-copied` · badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
-| **v0.1.2237** | Details / Processes scrollbar (`.poster-details` · `.poster-processes` track / thumb / hover) mixes on opaque `#0b0b10` — no glass `rgba` frosted slab |
-| **v0.1.2236** | LPM toggle knob (`.lpm-toggle::after`) mixes on opaque `#0b0b10` — no Apple `#fff` white slab on the power strip |
-| **v0.1.2235** | Changelog scrollbar (`.changelog-body` track / thumb / hover) mixes on opaque `#0b0b10` — no glass `rgba` frosted slab |
-| **v0.1.2234** | Settings toggle knob (`.setting-toggle input[type="checkbox"]::before`) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
+| Version | What got nicer |
+|---------|----------------|
+| **v0.1.2242** | AI Chat filter-miss message type (`.chat-filter-miss-msg`) mixes on shell `#0b0b10` (no early `#0e0e14`) so empty You / Assistant / Errors copy matches the filter-miss shell |
+| **v0.1.2241** | Perplexity result Copied flash opaque `#0b0b10` (no Apple `#ffffff`) |
+| **v0.1.2240** | Disk Cleanup Copied flash opaque `#0b0b10` |
+| **v0.1.2239** | Debug Log Copied flash opaque `#0b0b10` |
 
-## Tried / deferred
+## Design review
 
-- More Data Poster leftovers (AI Chat kb-hints still early `#0e0e14` shared with dark; Monitors row Copied if still Apple `#ffffff`).
-- Layout-daily dark / neon / futuristic / architect still due (data-poster done yesterday).
-- Mac window-only recapture of stale `feature-ai-chat` / `feature-processes` / `feature-cpu-metrics` when Screen Recording TCC allows.
+- Helper said **due** — recommended `feature-ai-chat.png` (~70d stale).
+- Polish landed on AI Chat filter-miss type (v0.1.2242). Window-only Mac recapture still deferred when `screencapture -l` / Screen Recording TCC is unavailable on this host.
+
+## Next fuel
+
+- Other AI Chat type leftovers still on early `#0e0e14` (shared kb-hint remaps), or Agent Ops / Settings hairlines.
+- Mac capture of `feature-ai-chat` / `feature-processes` when TCC allows.
+
