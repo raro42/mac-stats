@@ -13794,3 +13794,36 @@ body.theme-data-poster .processes-top-ram-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
+
+/*
+ * Data Poster: Top Processes filter-miss shell / CTA still mixed against early
+ * #0e0e14 (.processes-filter-miss · Hot/Pinned empty · .processes-filter-miss-cta)
+ * → wrong dark slab on the opaque shell #0b0b10. Catch up to Monitors /
+ * chat-filter-miss opaque remaps. Design-review fuel (feature-processes) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .processes-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss.is-hot-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss.is-pinned-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
