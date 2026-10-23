@@ -906,17 +906,20 @@ body {
 }
 
 .changelog-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  /* Opaque track — was rgba(255,255,255,0.05) glass over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb {
-  background: rgba(85, 199, 255, 0.4);
+  /* Opaque thumb — was rgba(85,199,255,0.4) glass over the poster field (#14). */
+  background: color-mix(in srgb, #55c7ff 40%, #0b0b10);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(85, 199, 255, 0.6);
+  /* Opaque hover — was rgba(85,199,255,0.6) glass over the poster field (#14). */
+  background: color-mix(in srgb, #55c7ff 60%, #0b0b10);
 }
 
 .changelog-loading,

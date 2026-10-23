@@ -19,6 +19,12 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+
+
+## Overnight merge — v0.1.2235
+
+- Data Poster Changelog scrollbar (`.changelog-body::-webkit-scrollbar-track` · thumb · hover) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; Changelog chrome / design-review adjacent.
+
 ## Overnight merge — v0.1.2234
 
 - Data Poster Settings toggle knob (`.setting-toggle input[type="checkbox"]::before`) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; Settings chrome / design-review adjacent.
