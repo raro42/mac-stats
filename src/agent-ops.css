@@ -13989,3 +13989,16 @@ body.theme-data-poster .details-grid > .detail-value[role='option'].is-just-copi
 body.theme-data-poster .details-grid > .detail-value[role='option'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
+/*
+ * Data Poster: Debug Log Copied flash still mixed Apple #ffffff washes
+ * (.logs-line[role='option'].is-just-copied · Copied badge) → white slab on
+ * the opaque shell #0b0b10. Details Copied opaque in v0.1.2238. Design-review
+ * adjacent (Debug Log) + standing P2 #14.
+ */
+body.theme-data-poster .logs-line[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .logs-line[role='option'].is-just-copied::after {
+  color: color-mix(in srgb, #34c759 96%, #0b0b10);
+}
