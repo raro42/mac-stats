@@ -14022,3 +14022,16 @@ body.theme-data-poster .disk-cleanup-scope-row.is-just-copied::after {
 body.theme-data-poster .disk-cleanup-item.has-reclaim.is-just-copied {
   box-shadow: inset 3px 0 0 color-mix(in srgb, #34c759 70%, #0b0b10);
 }
+/*
+ * Data Poster: Perplexity result Copied flash still mixed Apple #ffffff washes
+ * (.perplexity-result-item[role='option'].is-just-copied · Copied badge) →
+ * white slab on the opaque shell #0b0b10. Disk Cleanup Copied opaque in
+ * v0.1.2240. Design-review adjacent (Perplexity) + standing P2 #14.
+ */
+body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
