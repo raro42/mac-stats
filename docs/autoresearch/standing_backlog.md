@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2231
+
+- Data Poster Top Processes empty / name (`.process-empty` · theme `.process-name`) opaque `#0b0b10` mix (no early `#0e0e14` / glass rgba). Standing P2 #14; design-review `feature-processes`.
+
 ## Overnight merge — v0.1.2229
 
 - Data Poster AI Chat `#chat-input` resting opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.

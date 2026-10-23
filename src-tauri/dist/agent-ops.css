@@ -13930,3 +13930,14 @@ body.theme-data-poster .process-pin.is-just-saved {
 body.theme-data-poster .process-name.is-just-saved {
   background: color-mix(in srgb, #34c759 14%, #0b0b10);
 }
+/*
+ * Data Poster: Top Processes empty shell still mixed type against early #0e0e14
+ * and Apple #ffffff border/fill (.process-empty) → wrong dark / white slab on
+ * the opaque shell #0b0b10. Catch up to process-row / process-bar opaque remaps.
+ * Design-review fuel (feature-processes) + standing P2 #14.
+ */
+body.theme-data-poster .process-empty {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}

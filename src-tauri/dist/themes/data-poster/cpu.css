@@ -378,7 +378,8 @@ body {
 }
 
 .process-name {
-  color: rgba(255, 255, 255, 0.74);
+  /* Opaque type — was rgba(255,255,255,0.74) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -416,7 +417,8 @@ body {
 .process-empty {
   padding: 1rem;
   text-align: center;
-  color: rgba(255, 255, 255, 0.55);
+  /* Opaque type — was rgba(255,255,255,0.55) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
 }
 
 /* Poster credit strip � last in the panel scroll, not sticky over gauges or lists. */
