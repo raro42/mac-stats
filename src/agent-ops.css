@@ -14072,3 +14072,16 @@ body.theme-data-poster .chat-exec-label {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: metrics keyboard hints still mixed against early `#0e0e14`
+ * (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint`)
+ * while Bat/LPM/Power strip and ring cards already mix on the opaque shell
+ * `#0b0b10` → wrong muted ink under the gauges. Catch up to AI Chat kb-hint
+ * opaque remaps. Design-review fuel (feature-cpu-metrics) + standing P2 #14.
+ */
+body.theme-data-poster .power-strip-kb-hint,
+body.theme-data-poster .ring-gauge-kb-hint,
+body.theme-data-poster .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
