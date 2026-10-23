@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2242
+
+- Data Poster AI Chat filter-miss message type (`.chat-filter-miss-msg`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2241
 
 - Data Poster Perplexity result Copied flash (`.perplexity-result-item[role='option'].is-just-copied` · badge) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; Perplexity chrome / design-review adjacent.

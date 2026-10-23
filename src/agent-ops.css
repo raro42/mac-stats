@@ -14035,3 +14035,14 @@ body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied {
 body.theme-data-poster .perplexity-result-item[role='option'].is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
 }
+/*
+ * Data Poster: AI Chat filter-miss message type still mixed against early
+ * `#0e0e14` (`.chat-filter-miss-msg`) while the filter-miss shell / CTA already
+ * mix on the opaque shell `#0b0b10` → wrong ink on empty You/Assistant/Errors.
+ * Catch up to filter-miss shell opaque remaps. Design-review fuel
+ * (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-data-poster .chat-filter-miss-msg {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  opacity: 1;
+}
