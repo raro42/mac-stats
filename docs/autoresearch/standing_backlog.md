@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2232
+
+- Data Poster Top Processes Copied flash (`.process-row.is-just-copied` · badge) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-processes`.
+
 ## Overnight merge — v0.1.2231
 
 - Data Poster Top Processes empty / name (`.process-empty` · theme `.process-name`) opaque `#0b0b10` mix (no early `#0e0e14` / glass rgba). Standing P2 #14; design-review `feature-processes`.
