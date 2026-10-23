@@ -1,24 +1,25 @@
 # Morning surprise — 2026-10-23
 
-Overnight Track B kept shipping Data Poster opaque washes (GitHub #14 / design-review fuel). Digester stayed empty; no debug.log clusters.
+Overnight Track B kept shipping Data Poster opaque washes (GitHub #14 / design-review). Digester stayed empty; design review still due for stale feature screens (Mac capture deferred without `screencapture -l` / TCC).
 
-## Shipped tonight
+## Shipped tonight (keeps)
 
 | Version | What |
 |---------|------|
-| **v0.1.2229** | AI Chat `#chat-input` resting → mix on `#0b0b10` (not early `#0e0e14`; same `#12121a` panel as focus) |
-| **v0.1.2228** | Top Processes filter-attention / hot-attention glances + All · Pinned · Hot chips → `#0b0b10` |
-| **v0.1.2227** | Top Processes filter-miss (Hot / Pinned empty + Clear CTA) → `#0b0b10` |
-| **v0.1.2226** | Top Processes Top CPU · GPU · RAM glances → `#0b0b10` |
-| **v0.1.2225** | AI Chat exec / answer cards → `#0b0b10` |
-| earlier | Monitors filter-miss, `#chat-input:focus`, chat-filter-miss, rings filter-miss, … |
+| **v0.1.2230** | Top Processes rows/bars — `.process-row` hairline + `.process-bar` track opaque `#0b0b10`; pin/hover drop early `#0e0e14` |
+| **v0.1.2229** | AI Chat `#chat-input` resting opaque `#0b0b10` (no early `#0e0e14`) |
+| **v0.1.2228** | Top Processes filter-attention + All/Pinned/Hot chips opaque |
+| **v0.1.2227** | Top Processes filter-miss (Hot/Pinned empty + CTA) opaque |
+| **v0.1.2226** | Top Processes CPU/GPU/RAM glances opaque |
+| **v0.1.2225** | AI Chat exec/answer cards opaque |
+| **v0.1.2224** | Monitors filter-miss opaque |
+| **v0.1.2223** | AI Chat `#chat-input:focus` opaque |
+| **v0.1.2222** | AI Chat filter-miss opaque |
+
+HEAD: `0f1c9454` · ratchet keeps logged in `~/.mac-stats/improvements/autoresearch/results.tsv`.
 
 ## Still open
 
-- Data Poster process-row / process-bar still on rgba glass (not `#0e0e14`).
-- Stale feature screens need Mac `screencapture -l` when Screen Recording TCC allows.
-- Layout-daily dark/neon/… screens still missing remaps bookkeeping.
-
-## Fitness
-
-Idle AI Chat composer on Data Poster no longer sits on the wrong dark slab; last `#0e0e14` remap in that theme CSS is gone (comments only).
+- Stale design-review screens (`feature-ai-chat` ~70d, `feature-processes` ~70d) need Mac window capture when TCC allows.
+- Layout-daily dark/neon/futuristic/architect screens still missing.
+- More Data Poster glass/`#0e0e14` leftovers possible (process-name / process-empty type rgba).
