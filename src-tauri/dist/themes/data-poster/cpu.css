@@ -785,7 +785,8 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #ffffff;
+  /* Opaque knob — was Apple #ffffff slab over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 92%, #0b0b10);
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
