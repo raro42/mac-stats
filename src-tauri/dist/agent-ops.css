@@ -13733,3 +13733,27 @@ body.theme-data-poster .monitors-empty-cta:hover {
 body.theme-data-poster .monitors-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+
+/*
+ * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
+ * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
+ * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /
+ * composer-focus opaque remaps. Design-review fuel (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-data-poster .chat-exec-card {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  border-left-color: color-mix(in srgb, #34c759 75%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .chat-exec-code {
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .chat-answer-part {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .chat-answer-part.chat-answer-final {
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 10%, #0b0b10);
+}

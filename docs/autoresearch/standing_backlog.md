@@ -19,6 +19,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2225
+
+- Data Poster AI Chat exec / answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
+
 ## Overnight merge — v0.1.2224
 
 - Data Poster Monitors filter-miss (`.monitors-filter-miss` / Down·Slow·Up empty / `.monitors-empty-cta`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`.
