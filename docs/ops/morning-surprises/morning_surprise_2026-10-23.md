@@ -6,6 +6,7 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 / GitHub 
 
 | Version | What got nicer |
 |---------|----------------|
+| **v0.1.2233** | AI Chat Send focus / active / disabled (`#chat-send-btn:focus-visible` · `:active` · `:disabled`) mixes on opaque `#0b0b10` — no Apple `#ffffff` focus ring / white slab |
 | **v0.1.2232** | Top Processes Copied flash (`.process-row.is-just-copied` + badge) mixes on opaque `#0b0b10` — no Apple `#ffffff` white slab |
 | **v0.1.2231** | Top Processes empty / name (`.process-empty` · theme `.process-name`) opaque `#0b0b10` |
 | **v0.1.2230** | Top Processes rows / bars (`.process-row` · `.process-bar` · pin Saved) opaque `#0b0b10` |
@@ -28,7 +29,7 @@ Overnight Track B kept shipping Data Poster opaque remaps (standing P2 / GitHub 
 ## Still open
 
 - Design-review screens still STALE (`feature-ai-chat` ~70d, `feature-processes` ~70d) — Mac window capture when TCC allows.
-- More Data Poster Apple `#ffffff` / glass leftovers (Details Copied, changelog scrollbar track, settings toggle knob, other shared flashes).
+- More Data Poster Apple `#ffffff` / glass leftovers (Details Copied, Debug Log Copied, Disk Cleanup Copied, changelog scrollbar track, settings toggle knob).
 - Layout-daily dark / neon / futuristic / architect still due (data-poster done today).
 
 ## Not a quiet night
