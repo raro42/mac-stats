@@ -21,6 +21,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 
 
+## Overnight merge — v0.1.2237
+
+- Data Poster Details / Processes scrollbar (`.poster-details` · `.poster-processes` track · thumb · hover) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; Details / processes chrome / design-review adjacent.
+
 ## Overnight merge — v0.1.2236
 
 - Data Poster LPM toggle knob (`.lpm-toggle::after`) opaque `#0b0b10` mix (no Apple `#fff`). Standing P2 #14; design-review `feature-cpu-metrics` / power strip.

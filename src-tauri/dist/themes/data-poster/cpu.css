@@ -86,18 +86,21 @@ body {
 
 .poster-details::-webkit-scrollbar-track,
 .poster-processes::-webkit-scrollbar-track {
-  background: transparent;
+  /* Opaque track — was transparent glass over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
 }
 
 .poster-details::-webkit-scrollbar-thumb,
 .poster-processes::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  /* Opaque thumb — was rgba(255,255,255,0.15) glass over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 15%, #0b0b10);
   border-radius: 3px;
 }
 
 .poster-details::-webkit-scrollbar-thumb:hover,
 .poster-processes::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  /* Opaque hover — was rgba(255,255,255,0.25) glass over the poster field (#14). */
+  background: color-mix(in srgb, #ffffff 25%, #0b0b10);
 }
 
 .poster-header {
