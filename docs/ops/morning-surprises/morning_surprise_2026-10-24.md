@@ -4,13 +4,14 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
-- **v0.1.2275** — Data Poster section titles + detail rows opaque (`#14`).
-  - `.section-title`, `.detail-label`, and `.detail-value` mix against `#0b0b10` (no glass `rgba`).
+- **v0.1.2276** — Data Poster detail-row hairlines opaque (`#14`).
+  - `.detail-row` border-bottom mixes against `#0b0b10` (no glass `rgba`); matches `.process-row`.
   - Design-review fuel (`feature-cpu-metrics` chrome); Mac capture of stale `feature-agent-ops.png` still deferred (no on-screen CPU window).
-  - Keep @ `c5124ccb`; installed + pushed `origin/main`.
+  - Keep @ `8f5ac2df`; installed + pushed `origin/main`.
 
 ## Also this night (earlier ticks)
 
+- **v0.1.2275** — section titles + detail label/value type opaque.
 - **v0.1.2274** — metric subtext + subtitle opaque.
 - **v0.1.2273** — panel shell + `.metric-label` opaque.
 - Continued Data Poster opaque-glass cuts through v0.1.2272 (poster-tile, icon-btn, filter clears/chips, collapsed glances, Agent Ops health/insights, …).
@@ -22,4 +23,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Next fuel
 
-- `.detail-row` hairline glass rgba on Data Poster, or Mac capture when TCC allows.
+- Data Poster `--hairline` / `--rule` / `--panel-border` tokens still glass rgba, or Mac capture when TCC allows.
