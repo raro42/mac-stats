@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2283
+
+- Data Poster changelog error + modal backdrop / muted fallbacks (`.changelog-error`; `.settings-modal` · `.monitors-settings-popover` · `.ollama-settings-popover` backdrop fallbacks; Monitors/Ollama muted close/URL fallbacks) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review Changelog / Settings / AI Chat chrome. Next: remaining poster glass (e.g. agent-ops `var(--text, rgba(255,255,255,0.92))` fallbacks), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
 ## Overnight merge — v0.1.2282
 
 - Data Poster battery + icon-line status type (`.battery-icon` / `.battery-icon.charging`; `.icon-line-item` resting · Ready · Slow · Down; closed-icon + Ready overrides in agent-ops) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review icon-line / battery strip chrome. Next: remaining poster glass (e.g. destructive red type rgba at ~line 964, modal-backdrop fallbacks), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.

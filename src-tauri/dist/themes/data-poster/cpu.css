@@ -545,7 +545,8 @@ body {
 .settings-modal {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.72)));
+  /* Opaque backdrop fallback — was rgba(0,0,0,0.72) glass over the poster field (#14). */
+  background: var(--modal-backdrop, var(--modal, color-mix(in srgb, #000000 72%, #0b0b10)));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -961,7 +962,8 @@ body {
 }
 
 .changelog-error {
-  color: rgba(255, 59, 48, 0.9);
+  /* Opaque type — was rgba(255,59,48,0.9) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ff3b30 90%, #0b0b10);
 }
 
 .changelog-h2 {
@@ -1512,7 +1514,8 @@ body {
 .monitors-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  /* Opaque backdrop fallback — was rgba(0,0,0,0.5) glass over the poster field (#14). */
+  background: var(--modal-backdrop, var(--modal, color-mix(in srgb, #000000 50%, #0b0b10)));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1556,7 +1559,8 @@ body {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type fallback — was rgba(128,128,128,0.6) glass over the poster field (#14). */
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #0b0b10)))));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -1638,7 +1642,8 @@ body {
 
 .monitor-settings-item-url {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type fallback — was rgba(128,128,128,0.6) glass over the poster field (#14). */
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #0b0b10)))));
   word-break: break-all;
 }
 
@@ -1949,7 +1954,8 @@ body {
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  /* Opaque backdrop fallback — was rgba(0,0,0,0.5) glass over the poster field (#14). */
+  background: var(--modal-backdrop, var(--modal, color-mix(in srgb, #000000 50%, #0b0b10)));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1989,7 +1995,8 @@ body {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type fallback — was rgba(128,128,128,0.6) glass over the poster field (#14). */
+  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, color-mix(in srgb, #808080 60%, #0b0b10)))));
   cursor: pointer;
   padding: 0;
   width: 28px;
