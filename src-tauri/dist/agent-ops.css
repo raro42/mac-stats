@@ -14409,3 +14409,35 @@ body.theme-data-poster .monitors-collapsed-glance.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster: Monitors collapsed glance washes still mixed against early
+ * `#0e0e14` (shared data-poster/dark block) while AI Chat collapsed glances
+ * already mix on the opaque shell `#0b0b10` → wrong panel ink under the
+ * Monitors header when collapsed. Catch up to ollama/chat collapsed-glance
+ * opaque remaps. Design-review fuel (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-data-poster .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-data-poster .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
