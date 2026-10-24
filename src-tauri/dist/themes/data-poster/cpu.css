@@ -132,9 +132,10 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.70);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  border: 1px solid color-mix(in srgb, #ffffff 16%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 70%, #0b0b10);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -148,13 +149,18 @@ body {
 }
 
 .icon-btn:hover {
-  color: rgba(255, 255, 255, 0.92);
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.24);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 24%, #0b0b10);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+  outline-offset: 1px;
 }
 
 .icon-btn:active {
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, #ffffff 15%, #0b0b10);
 }
 
 .poster-rule {
