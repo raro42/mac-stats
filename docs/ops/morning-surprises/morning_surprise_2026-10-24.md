@@ -4,13 +4,14 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
-- **v0.1.2276** — Data Poster detail-row hairlines opaque (`#14`).
-  - `.detail-row` border-bottom mixes against `#0b0b10` (no glass `rgba`); matches `.process-row`.
-  - Design-review fuel (`feature-cpu-metrics` chrome); Mac capture of stale `feature-agent-ops.png` still deferred (no on-screen CPU window).
-  - Keep @ `8f5ac2df`; installed + pushed `origin/main`.
+- **v0.1.2277** — Data Poster chrome tokens opaque (`#14`).
+  - `--hairline`, `--rule`, and `--panel-border` mix against `#0b0b10` (no glass `rgba`); `.poster-rule` and leftover token chrome stay opaque.
+  - Design-review fuel (`feature-cpu-metrics` / Agent Ops chrome); Mac capture of stale `feature-agent-ops.png` still deferred (no on-screen CPU window / Quartz empty).
+  - Keep @ `738d07b1`; installed + pushed `origin/main`.
 
 ## Also this night (earlier ticks)
 
+- **v0.1.2276** — detail-row hairlines opaque.
 - **v0.1.2275** — section titles + detail label/value type opaque.
 - **v0.1.2274** — metric subtext + subtitle opaque.
 - **v0.1.2273** — panel shell + `.metric-label` opaque.
@@ -23,4 +24,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Next fuel
 
-- Data Poster `--hairline` / `--rule` / `--panel-border` tokens still glass rgba, or Mac capture when TCC allows.
+- Data Poster `--text` / `--muted` / `--panel` / `--ring-track` still glass rgba, or Mac capture when TCC allows.
