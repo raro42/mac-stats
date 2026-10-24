@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2270
+
+- Data Poster Monitors / Processes / Logs / Perplexity filter Clear (`.monitors-filter-clear` · `.processes-filter-clear` · `.logs-filter-clear` · `.perplexity-filter-clear` resting · hover · focus · is-just-saved) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-monitors` / `feature-processes`. Next: remaining filter-clear Apple `#ffffff` (if any), or Mac capture of stale `feature-agent-ops.png` / `feature-monitors.png` when TCC allows.
+
 ## Overnight merge — v0.1.2269
 
 - Data Poster Disk Cleanup filter / scope-filter Clear (`.disk-cleanup-filter-clear` · `.disk-cleanup-scope-filter-clear` resting · hover · focus · is-just-saved) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup`. Next: Monitors / Processes / Logs / Perplexity filter-clear still on Apple `#ffffff`, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
