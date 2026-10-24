@@ -14533,3 +14533,58 @@ body.theme-data-poster .monitors-filter-attention-glance.is-slow-filter {
   background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
+
+/*
+ * Data Poster: Monitors filter chips (All·Down·Up·Slow) hit / active / focus /
+ * count still mixed Apple `#ffffff` washes (and early `#0e0e14` remaps) → white
+ * slab on the opaque shell `#0b0b10`. Catch up to chat-filter-chip opaque remaps.
+ * Design-review fuel (feature-monitors) + standing P2 #14. Summary / attention
+ * opaque in v0.1.2262.
+ */
+body.theme-data-poster .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 38%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
