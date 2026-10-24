@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2293
+
+- Data Poster / Dark AI Chat exec + answer cards (`.chat-exec-card`; `.chat-exec-code`; `.chat-answer-part`; `.chat-answer-final`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: processes-top glances still on early `#0e0e14` (shared dark), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
+
 ## Overnight merge — v0.1.2292
 
 - Data Poster / Dark Top Processes list rows + pin (`.process-row` pinned/hover/active/focus; `.process-pin` hover/focus/Saved; `.process-name` Saved) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`. Next: processes-top glances still on early `#0e0e14` (shared dark), or chat-exec/answer cards, or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` when TCC allows.
