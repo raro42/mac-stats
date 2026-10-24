@@ -795,30 +795,30 @@ body.theme-data-poster .ollama-collapsed-glance,
 body.theme-data-poster .chat-collapsed-glance,
 body.theme-dark .ollama-collapsed-glance,
 body.theme-dark .chat-collapsed-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .ollama-collapsed-glance:hover,
 body.theme-dark .ollama-collapsed-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .ollama-collapsed-glance.is-offline,
 body.theme-dark .ollama-collapsed-glance.is-offline {
-  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 body.theme-data-poster .ollama-collapsed-glance.is-online,
 body.theme-dark .ollama-collapsed-glance.is-online {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 body.theme-data-poster .ollama-collapsed-glance.has-errors,
 body.theme-dark .ollama-collapsed-glance.has-errors {
-  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
 }
 
 /*
@@ -835,8 +835,8 @@ body.theme-dark .chat-turn-glance,
 body.theme-dark .chat-answer-glance,
 body.theme-dark .chat-errors-glance,
 body.theme-dark .chat-offline-attention-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
@@ -844,15 +844,15 @@ body.theme-data-poster .chat-model-glance:hover,
 body.theme-data-poster .chat-turn-glance:hover,
 body.theme-dark .chat-model-glance:hover,
 body.theme-dark .chat-turn-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .chat-model-glance.is-online,
 body.theme-data-poster .chat-turn-glance.is-ok:not(.is-active),
 body.theme-dark .chat-model-glance.is-online,
 body.theme-dark .chat-turn-glance.is-ok:not(.is-active) {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 body.theme-data-poster .chat-model-glance.is-offline,
 body.theme-data-poster .chat-model-glance.is-online.is-no-model,
@@ -860,25 +860,25 @@ body.theme-data-poster .chat-offline-attention-glance.is-offline,
 body.theme-dark .chat-model-glance.is-offline,
 body.theme-dark .chat-model-glance.is-online.is-no-model,
 body.theme-dark .chat-offline-attention-glance.is-offline {
-  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 body.theme-data-poster .chat-turn-glance.is-active,
 body.theme-dark .chat-turn-glance.is-active {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
 }
 body.theme-data-poster .chat-empty,
 body.theme-dark .chat-empty {
-  border-color: color-mix(in srgb, currentColor 18%, #0e0e14);
-  background: color-mix(in srgb, currentColor 6%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .chat-empty.is-ready,
 body.theme-dark .chat-empty.is-ready {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 body.theme-data-poster .chat-empty.is-no-model,
 body.theme-data-poster .chat-empty.is-offline,
@@ -886,13 +886,13 @@ body.theme-data-poster .chat-empty.is-circuit,
 body.theme-dark .chat-empty.is-no-model,
 body.theme-dark .chat-empty.is-offline,
 body.theme-dark .chat-empty.is-circuit {
-  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 body.theme-data-poster .chat-empty.is-not-set,
 body.theme-dark .chat-empty.is-not-set {
-  border-color: color-mix(in srgb, #ff3b30 32%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 32%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
 }
 /* Opaque type on dark ink — match empty-shell wash (#14 / layout-daily). */
 body.theme-data-poster .chat-empty-title,
