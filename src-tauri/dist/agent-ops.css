@@ -14154,3 +14154,16 @@ body.theme-data-poster .monitor-detail-toolbar-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Details / Processes keyboard hints still mixed against early
+ * `#0e0e14` (`.details-kb-hint` · `.processes-kb-hint`) while Monitors /
+ * Disk Cleanup kb-hints already mix on the opaque shell `#0b0b10` → wrong
+ * muted ink under the Details grid and Top Processes list. Catch up to
+ * Monitors kb-hint opaque remaps. Design-review fuel (feature-processes) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .details-kb-hint,
+body.theme-data-poster .processes-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
