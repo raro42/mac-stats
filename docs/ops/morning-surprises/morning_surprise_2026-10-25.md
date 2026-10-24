@@ -1,9 +1,10 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Digester stayed empty; design review still due on stale AI Chat / processes screens (Mac capture deferred — Linux rack, no TCC window grab).
+Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Digester stayed empty; design review still due on stale AI Chat / processes screens (Mac capture deferred — Linux rack, no TCC window grab). Layout-daily Data Poster marked checked after v0.1.2290.
 
 ## Shipped tonight (recent keeps)
 
+- **v0.1.2290** — Monitors filter-miss + empty CTA (`.monitors-filter-miss` Down/Slow/Up empty; `.monitors-empty-cta` resting/hover/focus): early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-monitors` + layout-daily Data Poster fuel.
 - **v0.1.2289** — Monitors + Perplexity filter chips (`.monitors-filter-chip` / `.perplexity-filter-chip` resting/hover/active; Perplexity Top/Snippet has-hits/is-active + focus): early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-monitors` / adjacent Perplexity fuel.
 - **v0.1.2288** — AI Chat filter chips (`.chat-filter-chip` resting/hover/active), `.chat-filter-miss` / CTA / msg, and `#chat-input:focus` washes: early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-ai-chat` fuel.
 - **v0.1.2287** — AI Chat collapsed glances (`.ollama-collapsed-glance` / `.chat-collapsed-glance`), model/turn/answer/errors/offline glances, and `.chat-empty` ready/offline/not-set washes: early `#0e0e14` → opaque `#0b0b10` mix.
@@ -13,9 +14,8 @@ Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Dig
 - **v0.1.2283** — changelog-error + modal-backdrop + muted close/URL fallbacks opaque.
 - **v0.1.2282** — battery-icon + icon-line Ready/Slow/Down type opaque.
 - **v0.1.2281** — process-bar-fill amber + changelog-code cyan washes opaque.
-- **v0.1.2280** — poster-bg grid + tile heat/usage/freq washes opaque.
 
 ## Still open
 
-- Monitors filter-miss / empty CTA still on early `#0e0e14`; Processes filter chips still early mixes.
+- Processes filter chips / filter-miss still on early `#0e0e14` in the shared Dark/DP block.
 - Recapture stale `docs/screens/feature-ai-chat.png` (and processes / cpu-metrics / disk-cleanup / monitors) when a Mac with Screen Recording can grab the CPU window only.
