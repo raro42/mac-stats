@@ -14195,3 +14195,23 @@ body.theme-data-poster .credentials-section-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Agent Ops health type + Refresh row tip still wrong on the
+ * opaque shell `#0b0b10`. Labels/values mix against early `#0e0e14`; the
+ * refresh kb-hint still uses the light Apple wash (dark ink on white) →
+ * nearly invisible under Refresh · Refresh digest. Catch up to health-card
+ * / health kb-hint opaque remaps. Design-review fuel (feature-agent-ops) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .ops-health-label {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-health-value {
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+  opacity: 1;
+}

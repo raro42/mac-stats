@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2253
+
+- Data Poster Agent Ops health type + Refresh tip (`.ops-health-label` · `.ops-health-value` · `.ops-refresh-row-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`; refresh tip drops light Apple wash). Standing P2 #14; design-review `feature-agent-ops`. Next: process-detail / force-quit / Debug Log / Perplexity kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2252
 
 - Data Poster Settings toolbar keyboard hints (`.settings-header-kb-hint` · `.modal-header-kb-hint` · Discord·…·Slack toolbars · `.theme-list-kb-hint` · `.appearance-setting-kb-hint` · `.product-setting-kb-hint` · `.credentials-section-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; Settings chrome / design-review adjacent. Next: process-detail / force-quit / Debug Log / Perplexity kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
