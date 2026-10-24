@@ -22,9 +22,10 @@
   /* Dark poster panels — never fall back to light glass (white-on-white Settings). */
   --panel: color-mix(in srgb, #0e0e14 94%, #0b0b10);
   --panel-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
-  --panel-shadow: 0 40px 120px rgba(0, 0, 0, 0.72);
-  --modal: rgba(0, 0, 0, 0.72);
-  --modal-backdrop: rgba(0, 0, 0, 0.72);
+  /* Opaque shadow / modal tokens — was black glass rgba over the poster field (#14). */
+  --panel-shadow: 0 40px 120px color-mix(in srgb, #000000 72%, #0b0b10);
+  --modal: color-mix(in srgb, #000000 72%, #0b0b10);
+  --modal-backdrop: color-mix(in srgb, #000000 72%, #0b0b10);
 }
 
 body {
@@ -33,7 +34,8 @@ body {
   overflow: hidden;
   padding: 24px;
   color: var(--text);
-  background: radial-gradient(1200px 900px at 30% 30%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0) 60%),
+  /* Opaque field wash — was white glass rgba radial over the poster field (#14). */
+  background: radial-gradient(1200px 900px at 30% 30%, color-mix(in srgb, #ffffff 6%, #0b0b10), #0b0b10 60%),
     linear-gradient(135deg, #07070b, #0b0b10 55%, #07070b);
 }
 
@@ -60,7 +62,8 @@ body {
   /* Opaque shell — glass alpha stays in Graphics and Media (#14). */
   border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
   background: color-mix(in srgb, #000000 46%, #0b0b10);
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.70);
+  /* Opaque shell shadow — was black glass rgba (#14); prefer token when set. */
+  box-shadow: var(--panel-shadow, 0 40px 120px color-mix(in srgb, #000000 70%, #0b0b10));
 
   padding: 20px;
   display: flex;
