@@ -4,15 +4,19 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
+- **v0.1.2281** — Data Poster process bar + changelog code washes opaque (`#14`).
+  - `.process-bar-fill` amber gradient end and `.changelog-code` cyan wash mix against `#0b0b10` (no glass `rgba`).
+  - Design-review fuel (`feature-processes` / Changelog chrome); Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` still deferred (Linux rack / no on-screen CPU window).
+  - Keep @ `8adcc3e4`; pushed `origin/main`.
+
 - **v0.1.2280** — Data Poster field grid + metric tile washes opaque (`#14`).
   - `.poster-bg` cyan glow / grid lines and `.poster-tile.heat` / `.usage` / `.freq` `::before` washes mix against `#0b0b10` (no glass `rgba`).
-  - Design-review fuel (`feature-cpu-metrics` chrome); Mac capture of stale `feature-ai-chat.png` / `feature-cpu-metrics.png` still deferred (Linux rack / no on-screen CPU window).
-  - Keep @ `717d78b9`; pushed `origin/main`.
+  - Keep @ `717d78b9`.
 
 ## Also this night (earlier ticks)
 
-- Prior night closed at **v0.1.2279** (modal / panel-shadow / body wash). This tick opens the 20:00–06:00 window with the next standing glass cut.
-- Nightly ratchet: keep row in `~/.mac-stats/improvements/autoresearch/results.tsv`.
+- Window opened at **v0.1.2280** (~20:11). This tick continues standing glass cuts.
+- Nightly ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
 
 ## Tried / deferred
 
@@ -20,4 +24,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Next fuel
 
-- Data Poster remaining glass (e.g. `.process-bar-fill` amber gradient rgba, chip/selection washes), or Mac capture when TCC allows.
+- Data Poster remaining glass (e.g. icon-line status type rgba, battery strip type rgba), or Mac capture when TCC allows.
