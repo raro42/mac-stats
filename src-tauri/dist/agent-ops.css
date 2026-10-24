@@ -14140,3 +14140,17 @@ body.theme-data-poster .disk-cleanup-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Monitors keyboard hints still mixed against early `#0e0e14`
+ * (`.monitors-kb-hint` · `.monitor-add-toolbar-kb-hint` ·
+ * `.monitor-detail-toolbar-kb-hint`) while Disk Cleanup / window chrome
+ * kb-hints already mix on the opaque shell `#0b0b10` → wrong muted ink under
+ * the monitor list, Add form, and Check now · Remove. Catch up to Disk Cleanup
+ * kb-hint opaque remaps. Design-review fuel (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitors-kb-hint,
+body.theme-data-poster .monitor-add-toolbar-kb-hint,
+body.theme-data-poster .monitor-detail-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}

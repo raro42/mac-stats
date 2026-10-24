@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2250
+
+- Data Poster Monitors keyboard hints (`.monitors-kb-hint` · `.monitor-add-toolbar-kb-hint` · `.monitor-detail-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: Details / Processes / Settings toolbar kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2249
 
 - Data Poster Disk Cleanup keyboard hints (`.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` · `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` · `.disk-cleanup-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-disk-cleanup`. Next: Monitors / Details / Processes / Settings toolbar kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
