@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2257
+
+- Data Poster Process Detail / Force Quit / Disk Cleanup / Perplexity muted labels (`.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.process-detail-label` · `.process-detail-pid` · policy/samples/kind · `.process-list-header` · `.perplexity-result-meta` · Force Quit advanced summary · setup lead/note · item-stat) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: remaining early `#0e0e14` muted type in the shared data-poster/dark block (if any), or Mac capture of stale `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2256
 
 - Data Poster muted path/meta type (`.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · `.monitor-detail-note` · `.disk-cleanup-summary` · `.disk-cleanup-item-path` · `.disk-cleanup-scope-path` · Down-monitor age) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: remaining non-hint muted type still on early `#0e0e14` (e.g. `.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.process-detail-label` · `.process-detail-pid` · policy/samples/kind · `.process-list-header` · `.perplexity-result-meta`), or Mac capture when TCC allows.

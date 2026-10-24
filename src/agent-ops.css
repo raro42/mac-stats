@@ -14274,3 +14274,38 @@ body.theme-data-poster .monitor-item.is-down .monitor-checked-ago {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: remaining muted labels still mixed against early `#0e0e14`
+ * (`.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` ·
+ * `.process-detail-label` · `.process-detail-pid` · `.disk-cleanup-item-policy` ·
+ * `.disk-cleanup-item-samples` · `.disk-cleanup-scope-kind` · `.process-list-header` ·
+ * `.perplexity-result-meta` · `.force-quit-advanced > summary`) while path/meta
+ * type already mixes on the opaque shell `#0b0b10` → wrong muted ink on Process
+ * Detail rows, Force Quit tip, Disk Cleanup meta, process list header, and
+ * Perplexity result meta. Catch up to muted path/meta opaque remaps.
+ * Design-review adjacent (feature-processes / Disk Cleanup / Perplexity) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .force-quit-hint,
+body.theme-data-poster .disk-cleanup-soft-hint,
+body.theme-data-poster .disk-cleanup-meta-label,
+body.theme-data-poster .process-detail-section .process-detail-label,
+body.theme-data-poster .process-detail-pid,
+body.theme-data-poster .disk-cleanup-item-policy,
+body.theme-data-poster .disk-cleanup-item-samples,
+body.theme-data-poster .disk-cleanup-scope-kind,
+body.theme-data-poster .process-list-header,
+body.theme-data-poster .perplexity-result-meta,
+body.theme-data-poster .force-quit-advanced > summary {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+/*
+ * Same shell catch-up for slightly stronger muted leads (were 78% on `#0e0e14`).
+ */
+body.theme-data-poster .perplexity-setup-lead,
+body.theme-data-poster .perplexity-setup-note,
+body.theme-data-poster .disk-cleanup-item-stat {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
