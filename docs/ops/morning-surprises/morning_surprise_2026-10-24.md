@@ -6,22 +6,17 @@ Overnight Track B kept shipping Data Poster opaque washes (standing P2 / GitHub 
 
 | Version | What got nicer |
 |---------|----------------|
+| **v0.1.2251** | Details / Processes keyboard hints (`.details-kb-hint` · `.processes-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so tips under the Details grid and Top Processes list match Monitors / Disk Cleanup hints |
 | **v0.1.2250** | Monitors keyboard hints (`.monitors-kb-hint` · `.monitor-add-toolbar-kb-hint` · `.monitor-detail-toolbar-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so tips under the monitor list, Add form, and Check now · Remove match Disk Cleanup / window chrome hints |
-| **v0.1.2249** | Disk Cleanup keyboard hints (`.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` · `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` · `.disk-cleanup-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so tips under Clean now, scopes, and the meta cards match window chrome hints |
-| **v0.1.2248** | Window chrome keyboard hints (`.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so tips under section icons, Refresh · Settings, and version · GitHub match metrics / Ollama kb-hints |
-| **v0.1.2247** | Ollama settings keyboard hints (`.ollama-settings-header-kb-hint` · `.ollama-settings-toolbar-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so tips under the title and Reset · Save match AI Chat / metrics kb-hints |
-| **v0.1.2246** | AI Chat response-time (`.response-time`) mixes on shell `#0b0b10` (no early `#0e0e14`) so latency stamps under assistant turns match the message / exec chrome |
-| **v0.1.2245** | Metrics keyboard hints (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so Bat / LPM / Power and ring tips match the opaque strip and gauge cards |
-| **v0.1.2244** | AI Chat exec label (`.chat-exec-label`) mixes on shell `#0b0b10` (no early `#0e0e14`) so tool/exec headings match the exec / answer cards |
-| **v0.1.2243** | AI Chat keyboard hints (`.chat-empty-kb-hint` · `.chat-composer-kb-hint` · `.chat-kb-hint` · `.filter-chip-kb-hint`) mix on shell `#0b0b10` (no early `#0e0e14`) so composer / chip tips match the empty shell |
-| **v0.1.2242** | AI Chat filter-miss message type (`.chat-filter-miss-msg`) mixes on shell `#0b0b10` (no early `#0e0e14`) so empty You / Assistant / Errors copy matches the filter-miss shell |
+| **v0.1.2249** | Disk Cleanup keyboard hints mix on shell `#0b0b10` (no early `#0e0e14`) |
+| **v0.1.2248** | Window chrome keyboard hints (icon line · footer · header) mix on shell `#0b0b10` |
 
 ## Design review
 
-- Helper said **due** — recommended `feature-ai-chat.png` (~70d stale); `feature-monitors.png` in grace; `feature-processes` / `feature-disk-cleanup` / `feature-cpu-metrics` also stale.
-- This tick polished Monitors keyboard hints (v0.1.2250) after Disk Cleanup kb-hints (v0.1.2249). Window-only Mac recapture still deferred when `screencapture -l` / Screen Recording TCC is unavailable on this host.
+- Helper said **due** — recommended `feature-agent-ops.png` (~38d stale); `feature-processes` / `feature-ai-chat` / `feature-monitors` also stale.
+- This tick polished Details / Processes keyboard hints (v0.1.2251) after Monitors (v0.1.2250). Window-only Mac recapture still deferred when `screencapture -l` / Screen Recording TCC is unavailable on this host.
 
 ## Next fuel
 
-- Details / Processes / Settings / credential toolbar kb-hints still on early `#0e0e14`.
-- Mac capture of `feature-ai-chat` / `feature-monitors` / `feature-disk-cleanup` when TCC allows.
+- Settings toolbar kb-hints / process-detail headers still on early `#0e0e14`.
+- Mac capture of stale feature screens when TCC allows.
