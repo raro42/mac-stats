@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2280
+
+- Data Poster field grid + metric tile washes (`.poster-bg` cyan glow / grid; `.poster-tile.heat` · `.usage` · `.freq` `::before`) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` chrome. Next: remaining poster glass (e.g. `.process-bar-fill` amber gradient rgba, chip/selection washes), or Mac capture of stale `feature-cpu-metrics.png` / `feature-ai-chat.png` when TCC allows.
 ## Overnight merge — v0.1.2279
 
 - Data Poster modal / panel-shadow / body wash (`--modal` · `--modal-backdrop` · `--panel-shadow`; body radial; `.poster-panel` shadow via token) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review Settings / Agent Ops chrome. Next: remaining poster glass (e.g. `.poster-bg` grid/radial rgba, tile heat/usage/freq washes), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
