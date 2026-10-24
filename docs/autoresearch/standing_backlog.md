@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2288
+
+- Data Poster / Dark AI Chat filter chips + filter-miss + composer focus (`.chat-filter-chip` resting/hover/active; `.chat-filter-miss` / CTA / msg; `#chat-input:focus`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: Monitors / Perplexity filter chips still on early `#0e0e14`, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
+
 ## Overnight merge — v0.1.2287
 
 - Data Poster / Dark AI Chat collapsed + empty washes (`.ollama-collapsed-glance` / `.chat-collapsed-glance`; model/turn/answer/errors/offline glances; `.chat-empty` ready/offline/not-set) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: remaining AI Chat filter chips / filter-miss / `#chat-input:focus` washes still on early `#0e0e14`, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
