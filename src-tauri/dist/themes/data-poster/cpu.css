@@ -55,8 +55,9 @@ body {
   overflow-y: auto;
   margin: 0 auto;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.46);
+  /* Opaque shell — glass alpha stays in Graphics and Media (#14). */
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #000000 46%, #0b0b10);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.70);
 
   padding: 20px;
@@ -242,7 +243,8 @@ body {
   position: relative;
   z-index: 1;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.70);
+  /* Opaque type — was rgba(255,255,255,0.70) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 70%, #0b0b10);
   margin-bottom: 10px;
 }
 

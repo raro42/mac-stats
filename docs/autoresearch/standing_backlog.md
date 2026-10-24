@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2273
+
+- Data Poster panel shell + metric labels (`.poster-panel` border · fill; `.metric-label` type) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` / Agent Ops chrome. Next: remaining poster chrome glass (e.g. `.metric-subtext` / `.metric-hint` / `.poster-subtitle` type rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
+
 ## Overnight merge — v0.1.2272
 
 - Data Poster metric tiles (`.poster-tile` border · fill) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` / Agent Ops chrome. Next: remaining poster chrome glass (e.g. `.poster-shell` / metric-label type rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
