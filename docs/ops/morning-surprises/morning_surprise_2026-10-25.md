@@ -4,7 +4,8 @@ Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Dig
 
 ## Shipped tonight (recent keeps)
 
-- **v0.1.2287** — AI Chat collapsed glances (`.ollama-collapsed-glance` / `.chat-collapsed-glance`), model/turn/answer/errors/offline glances, and `.chat-empty` ready/offline/not-set washes: early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-ai-chat` fuel.
+- **v0.1.2288** — AI Chat filter chips (`.chat-filter-chip` resting/hover/active), `.chat-filter-miss` / CTA / msg, and `#chat-input:focus` washes: early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-ai-chat` fuel.
+- **v0.1.2287** — AI Chat collapsed glances (`.ollama-collapsed-glance` / `.chat-collapsed-glance`), model/turn/answer/errors/offline glances, and `.chat-empty` ready/offline/not-set washes: early `#0e0e14` → opaque `#0b0b10` mix.
 - **v0.1.2286** — AI Chat empty title/copy (+ ready) and `.chat-empty-chip` resting/hover washes: early `#0e0e14` → opaque `#0b0b10` mix.
 - **v0.1.2285** — twenty shared `theme-dark` / `theme-data-poster` agent-ops `--text` glass type fallbacks → opaque `#0b0b10` mix.
 - **v0.1.2284** — agent-ops `--text` glass type fallbacks for Settings / AI Chat / Monitors / Details.
@@ -15,5 +16,5 @@ Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Dig
 
 ## Still open
 
-- Remaining AI Chat filter chips / filter-miss / `#chat-input:focus` washes still on early `#0e0e14`.
+- Monitors / Perplexity filter chips still on early `#0e0e14`.
 - Recapture stale `docs/screens/feature-ai-chat.png` (and processes / cpu-metrics / disk-cleanup / monitors) when a Mac with Screen Recording can grab the CPU window only.
