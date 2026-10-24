@@ -1,23 +1,25 @@
 # Morning surprise — 2026-10-24
 
-Overnight Track B (mac-stats product ratchet). Local ~23:15 EDT tick.
+Overnight Track B kept shipping Data Poster opaque Monitors washes (standing P2 #14 / GitHub WebView idle contrast). Digester stayed empty; design review stayed due on stale feature screens (AI Chat / Monitors / …). Linux rack: no window capture.
 
-## Shipped
+## Shipped tonight (keeps)
 
-- **v0.1.2261** — Data Poster Monitors collapsed glance washes: `.monitors-collapsed-glance` resting · hover · focus · has-down · is-all-up · has-slowest-hint mix on opaque shell `#0b0b10` (no early `#0e0e14`). Matches AI Chat collapsed-glance panel contrast under the Monitors header.
+| Version | What got better |
+|---------|-----------------|
+| **v0.1.2262** | Monitors summary + attention / filter-attention washes (`.monitors-summary` · `.monitors-attention-glance` · `.monitors-filter-attention-glance`) mix on opaque `#0b0b10` — always-visible strip and Down/Slow / filter chips match collapsed-glance contrast |
+| **v0.1.2261** | Monitors collapsed glance washes (resting · hover · focus · Down · Up · slowest) opaque `#0b0b10` |
+| **v0.1.2260** | Monitors collapsed empty glance opaque `#0b0b10` |
+| **v0.1.2259–2256** | Agent Ops Insights / muted type / path-meta catch-up |
+| **v0.1.2255–2250** | Changelog / Process Detail / Settings / Monitors / Disk Cleanup / chrome kb-hints |
 
-Earlier same night (already on main before this tick): v0.1.2251–v0.1.2260 Data Poster muted type / kb-hints / empty glances on `#0b0b10`.
+Latest keep: `89f939bd` (v0.1.2262).
 
 ## Tried / deferred
 
-- Mac window capture of stale `feature-agent-ops.png` (38d) / `feature-monitors.png`: deferred — `screencapture -l` illegal on this host; no on-screen CPU window via Quartz.
-- Layout daily: data-poster ok today (due=false).
+- Mac `screencapture -l` of stale `feature-ai-chat.png` / `feature-monitors.png` — deferred (Linux rack / TCC).
+- Layout daily already done for 2026-10-24.
+- Sibling OpenClaw / Hermes — git missing on this host.
 
 ## Next fuel
 
-- Monitors attention / filter-attention / summary washes still on early `#0e0e14`.
-- Or Mac capture when Screen Recording TCC allows.
-
-## Ratchet
-
-- keep @ `ae0d79a0` — Data Poster Monitors collapsed glance washes mix on #0b0b10. v0.1.2261
+Remaining early `#0e0e14` washes in shared data-poster/dark block (e.g. ollama/chat collapsed glances), or Mac capture when TCC allows.
