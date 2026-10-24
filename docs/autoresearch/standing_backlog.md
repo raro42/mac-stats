@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2248
+
+- Data Poster window chrome keyboard hints (`.icon-line-kb-hint` · `.footer-toolbar-kb-hint` · `.header-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat` chrome.
+
 ## Overnight merge — v0.1.2247
 
 - Data Poster Ollama settings keyboard hints (`.ollama-settings-header-kb-hint` · `.ollama-settings-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`.
