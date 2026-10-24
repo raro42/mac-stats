@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2275
+
+- Data Poster section titles + detail rows (`.section-title` · `.detail-label` · `.detail-value`) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` chrome. Next: remaining poster chrome glass (e.g. `.detail-row` hairline rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
+
 ## Overnight merge — v0.1.2274
 
 - Data Poster metric subtext + subtitle (`.metric-subtext` · `.metric-hint` · `.poster-subtitle`) opaque `#0b0b10` mix (no glass rgba / `--muted`). Standing P2 #14; design-review `feature-cpu-metrics` chrome. Next: remaining poster chrome glass (e.g. `.section-title` / `.detail-label` / `.detail-value` type rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
