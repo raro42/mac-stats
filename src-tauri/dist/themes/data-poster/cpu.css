@@ -433,7 +433,8 @@ body {
 .process-bar-fill {
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, var(--accent), rgba(255, 184, 74, 0.85));
+  /* Opaque fill — was amber glass rgba(255,184,74,0.85) over the poster field (#14). */
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent2) 85%, #0b0b10));
 }
 
 .process-percent {
@@ -1050,7 +1051,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(85, 199, 255, 0.15);
+  /* Opaque code wash — was cyan glass rgba(85,199,255,0.15) over the poster field (#14). */
+  background: color-mix(in srgb, var(--accent) 15%, #0b0b10);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
