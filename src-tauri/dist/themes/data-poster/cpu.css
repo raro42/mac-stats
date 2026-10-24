@@ -10,8 +10,9 @@
   --bg: #0b0b10;
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.60);
-  --hairline: rgba(255, 255, 255, 0.12);
-  --rule: rgba(255, 255, 255, 0.12);
+  /* Opaque chrome tokens — was white glass rgba over the poster field (#14). */
+  --hairline: color-mix(in srgb, #ffffff 12%, #0b0b10);
+  --rule: color-mix(in srgb, #ffffff 12%, #0b0b10);
 
   --accent: #55c7ff;
   --accent2: #ffb84a;
@@ -19,7 +20,7 @@
 
   /* Dark poster panels — never fall back to light glass (white-on-white Settings). */
   --panel: rgba(14, 14, 20, 0.94);
-  --panel-border: rgba(255, 255, 255, 0.16);
+  --panel-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
   --panel-shadow: 0 40px 120px rgba(0, 0, 0, 0.72);
   --modal: rgba(0, 0, 0, 0.72);
   --modal-backdrop: rgba(0, 0, 0, 0.72);
@@ -167,6 +168,7 @@ body {
 
 .poster-rule {
   height: 1px;
+  /* Opaque rule — inherits remapped --rule (was glass rgba via token) (#14). */
   background: var(--rule);
   flex-shrink: 0; /* Don't shrink rules */
 }

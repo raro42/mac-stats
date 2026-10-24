@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2277
+
+- Data Poster chrome tokens (`--hairline` · `--rule` · `--panel-border`) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` / Agent Ops chrome. Next: remaining poster glass tokens (e.g. `--text` / `--muted` / `--panel` / `--ring-track`), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
+
 ## Overnight merge — v0.1.2276
 
 - Data Poster detail-row hairlines (`.detail-row` border-bottom) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` chrome. Next: remaining poster chrome glass (e.g. `--hairline` / `--rule` / `--panel-border` tokens still rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
