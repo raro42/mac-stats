@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2267
+
+- Data Poster Perplexity / Disk Cleanup empty CTA + filter-miss washes (`.perplexity-setup-note:not([hidden])`; `.disk-cleanup-empty-cta` / `.perplexity-empty-cta`; `.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` / `.perplexity-filter-miss` + calm/reclaim/big/off/clean/on/top/snippet; `.perplexity-empty` / `.perplexity-empty-error`) opaque `#0b0b10` mix (no Apple `#ffffff` / early `#0e0e14`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Perplexity. Next: Disk Cleanup filter / scope-filter chips still on Apple `#ffffff`, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
+
 ## Overnight merge — v0.1.2266
 
 - Data Poster Perplexity config status + Disk Cleanup empty / Recurse (`.perplexity-config-status`; `.disk-cleanup-empty` wash + load-error type; `.disk-cleanup-scope-row label.disk-cleanup-scope-rec`) opaque `#0b0b10` mix (no early `#0e0e14` / Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Perplexity. Next: remaining early `#0e0e14` muted type (e.g. `.perplexity-setup-note` · Disk Cleanup empty CTA / filter-miss washes), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.

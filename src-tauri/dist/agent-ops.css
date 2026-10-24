@@ -14703,3 +14703,59 @@ body.theme-data-poster .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   color: color-mix(in srgb, #ffffff 74%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster: Perplexity setup-note error + Disk Cleanup / Perplexity empty CTA
+ * and filter-miss washes still mix Apple `#ffffff` (setup error still on early
+ * `#0e0e14`) → white/wrong slab on the opaque shell `#0b0b10`. Catch up to
+ * Monitors filter-miss / empty-cta opaque remaps. Design-review fuel
+ * (feature-disk-cleanup / adjacent Perplexity) + standing P2 #14.
+ * Perplexity status + Disk Cleanup empty/Recurse opaque in v0.1.2266.
+ */
+body.theme-data-poster .perplexity-setup-note:not([hidden]) {
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .disk-cleanup-empty-cta,
+body.theme-data-poster .perplexity-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-empty-cta:hover,
+body.theme-data-poster .perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-empty-cta:focus-visible,
+body.theme-data-poster .perplexity-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-miss,
+body.theme-data-poster .disk-cleanup-scope-filter-miss,
+body.theme-data-poster .perplexity-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-miss.is-reclaim-empty,
+body.theme-data-poster .disk-cleanup-filter-miss.is-big-empty,
+body.theme-data-poster .disk-cleanup-scope-filter-miss.is-off-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-miss.is-clean-empty,
+body.theme-data-poster .disk-cleanup-scope-filter-miss.is-on-empty,
+body.theme-data-poster .perplexity-filter-miss.is-top-empty,
+body.theme-data-poster .perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-data-poster .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-data-poster .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
