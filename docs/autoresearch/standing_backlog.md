@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2279
+
+- Data Poster modal / panel-shadow / body wash (`--modal` · `--modal-backdrop` · `--panel-shadow`; body radial; `.poster-panel` shadow via token) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review Settings / Agent Ops chrome. Next: remaining poster glass (e.g. `.poster-bg` grid/radial rgba, tile heat/usage/freq washes), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
 ## Overnight merge — v0.1.2278
 
 - Data Poster type / panel / ring-track tokens (`--text` · `--muted` · `--panel` · `--ring-track`) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` / Agent Ops chrome. Next: remaining poster glass (e.g. `--modal` / `--panel-shadow` / body gradient rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
