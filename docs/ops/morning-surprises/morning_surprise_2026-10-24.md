@@ -1,26 +1,26 @@
 # Morning surprise — 2026-10-24
 
-Overnight Track B kept shipping Data Poster opaque washes (#14) while Mac window capture stayed blocked (`screencapture -l` / Screen Recording TCC).
+Overnight Track B kept shipping Data Poster opaque filter-chip / Monitors washes (standing P2 #14 / GitHub WebView idle contrast). Digester stayed empty; design review stayed due on stale feature screens (AI Chat / Monitors / …). Linux rack: no window capture.
 
-## Shipped tonight (local EDT)
+## Shipped tonight (keeps)
 
-| Version | What |
-|---------|------|
-| **v0.1.2263** | Monitors filter chips (All·Down·Up·Slow + counts) mix on `#0b0b10` |
-| v0.1.2262 | Monitors summary + attention / filter-attention washes |
-| v0.1.2261 | Monitors collapsed glance washes |
-| v0.1.2260 | Monitors collapsed empty glance |
-| v0.1.2259 | Agent Ops Insights lines + collapsed empty glance |
-| v0.1.2258–2257 | Agent Ops / empty / Perplexity / Process Detail muted type |
+| Version | What got better |
+|---------|-----------------|
+| **v0.1.2264** | Perplexity filter chips (`.perplexity-filter-chip` · `.perplexity-filter-count` All·Top·Snippet) mix on opaque `#0b0b10` — match Monitors / AI Chat filter-chip contrast |
+| **v0.1.2263** | Monitors filter chips (All·Down·Up·Slow) opaque `#0b0b10` |
+| **v0.1.2262** | Monitors summary + attention / filter-attention washes opaque `#0b0b10` |
+| **v0.1.2261** | Monitors collapsed glance washes opaque `#0b0b10` |
+| **v0.1.2260** | Monitors collapsed empty glance opaque `#0b0b10` |
+| **v0.1.2259–2250** | Agent Ops / muted type / kb-hints catch-up |
 
-## Design review
+Latest keep: `50a887bc` (v0.1.2264).
 
-- Due all night (`feature-agent-ops.png` ~38d stale; also monitors / ai-chat / processes).
-- Recapture deferred every tick — no usable window capture on this host.
-- Polish landed as CSS remaps on the recommended/adjacent surfaces instead.
+## Tried / deferred
 
-## Next
+- Mac `screencapture -l` of stale `feature-ai-chat.png` / `feature-monitors.png` — deferred (Linux rack / TCC).
+- Layout daily already done for 2026-10-24.
+- Sibling OpenClaw / Hermes — git missing on this host.
 
-- Perplexity filter chips still on early `#0e0e14`.
-- Mac capture of stale `feature-*.png` when TCC allows.
-- Layout-daily dark/neon/futuristic/architect still due (data-poster ok today).
+## Next fuel
+
+Ollama/chat collapsed glances still on early `#0e0e14`, or Mac capture when TCC allows.
