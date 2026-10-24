@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2254
+
+- Data Poster Process Detail / Force Quit / Debug Log / Perplexity keyboard hints (`.process-detail-hero-toolbar-kb-hint` · `.process-details-header-kb-hint` · `.force-quit-toolbar-kb-hint` · `.logs-kb-hint` · `.logs-toolbar-kb-hint` · `.perplexity-kb-hint` · `.perplexity-search-kb-hint` · `.perplexity-setup-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: Changelog header/body kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2253
 
 - Data Poster Agent Ops health type + Refresh tip (`.ops-health-label` · `.ops-health-value` · `.ops-refresh-row-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`; refresh tip drops light Apple wash). Standing P2 #14; design-review `feature-agent-ops`. Next: process-detail / force-quit / Debug Log / Perplexity kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.

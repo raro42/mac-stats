@@ -14215,3 +14215,25 @@ body.theme-data-poster .ops-refresh-row-kb-hint {
   color: color-mix(in srgb, #ffffff 63%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Process Detail / Force Quit / Debug Log / Perplexity keyboard
+ * hints still mixed against early `#0e0e14` (`.process-detail-hero-toolbar-kb-hint`
+ * · `.process-details-header-kb-hint` · `.force-quit-toolbar-kb-hint` ·
+ * `.logs-kb-hint` · `.logs-toolbar-kb-hint` · `.perplexity-kb-hint` ·
+ * `.perplexity-search-kb-hint` · `.perplexity-setup-kb-hint`) while Settings /
+ * Details kb-hints already mix on the opaque shell `#0b0b10` → wrong muted ink
+ * under Process Detail, Force Quit, Debug Log, and Perplexity. Catch up to
+ * Settings kb-hint opaque remaps. Design-review fuel (feature-processes /
+ * Perplexity / Debug Log chrome) + standing P2 #14.
+ */
+body.theme-data-poster .process-detail-hero-toolbar-kb-hint,
+body.theme-data-poster .process-details-header-kb-hint,
+body.theme-data-poster .force-quit-toolbar-kb-hint,
+body.theme-data-poster .logs-kb-hint,
+body.theme-data-poster .logs-toolbar-kb-hint,
+body.theme-data-poster .perplexity-kb-hint,
+body.theme-data-poster .perplexity-search-kb-hint,
+body.theme-data-poster .perplexity-setup-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
