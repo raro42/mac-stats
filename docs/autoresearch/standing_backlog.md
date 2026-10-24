@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2286
+
+- Data Poster / Dark AI Chat empty shell (`.chat-empty-title` / `.chat-empty-copy` + ready; `.chat-empty-chip` resting/hover) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: remaining AI Chat / poster washes still on early `#0e0e14` (collapsed glances, filter chips, empty wash borders), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
 ## Overnight merge — v0.1.2285
 
 - Data Poster / Dark shared `--text` type fallbacks (20 shared theme-dark/data-poster agent-ops glances + chips: Monitors collapsed/attention/filter-attention; AI Chat model/turn/empty/filter-miss/composer focus; Top Processes glances/chips/filter-miss; path hover) opaque `#0b0b10` mix when `--text` unset (no glass rgba). Standing P2 #14; design-review `feature-ai-chat` chrome. Next: remaining poster glass elsewhere (dashboard/orphan rgba, iOS theme `--fg`, or other non-`--text` washes), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.

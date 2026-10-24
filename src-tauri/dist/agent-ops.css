@@ -897,25 +897,25 @@ body.theme-dark .chat-empty.is-not-set {
 /* Opaque type on dark ink — match empty-shell wash (#14 / layout-daily). */
 body.theme-data-poster .chat-empty-title,
 body.theme-dark .chat-empty-title {
-  /* Was opacity 0.92 on inherit (~92% white) → ~85% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 85%, #0e0e14);
+  /* Was opacity 0.92 on inherit (~92% white) → ~85% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 85%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty-copy,
 body.theme-dark .chat-empty-copy {
-  /* Was opacity 0.78 on inherit (~92% white) → ~72% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 72%, #0e0e14);
+  /* Was opacity 0.78 on inherit (~92% white) → ~72% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty.is-ready .chat-empty-title,
 body.theme-dark .chat-empty.is-ready .chat-empty-title {
-  color: color-mix(in srgb, #ffffff 92%, #0e0e14);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty.is-ready .chat-empty-copy,
 body.theme-dark .chat-empty.is-ready .chat-empty-copy {
-  /* Was opacity 0.88 on inherit (~92% white) → ~81% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 81%, #0e0e14);
+  /* Was opacity 0.88 on inherit (~92% white) → ~81% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty-kb-hint,
@@ -1186,20 +1186,20 @@ body.theme-data-poster .chat-empty-chip,
 body.theme-dark .chat-empty-chip,
 body.theme-neon .chat-empty-chip,
 body.theme-futuristic .chat-empty-chip {
-  /* Was opacity 0.95 over accent 36% on #0e0e14 → ~34% accent border. */
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0e0e14);
-  /* Was opacity 0.95 over accent 14% on #0e0e14 → ~13% accent fill. */
-  background: color-mix(in srgb, var(--accent, #55c7ff) 13%, #0e0e14);
-  /* Was opacity 0.95 on ~92% white → ~87% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 87%, #0e0e14);
+  /* Was opacity 0.95 over accent 36% → ~34% accent border; mix on #0b0b10 (was early #0e0e14). */
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  /* Was opacity 0.95 over accent 14% → ~13% accent fill; mix on #0b0b10 (was early #0e0e14). */
+  background: color-mix(in srgb, var(--accent, #55c7ff) 13%, #0b0b10);
+  /* Was opacity 0.95 on ~92% white → ~87% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty-chip:hover,
 body.theme-dark .chat-empty-chip:hover,
 body.theme-neon .chat-empty-chip:hover,
 body.theme-futuristic .chat-empty-chip:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }

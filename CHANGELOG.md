@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2286] - 2026-10-24
+
+### Changed
+- **Data Poster / Dark AI Chat empty shell:** `.chat-empty-title` / `.chat-empty-copy` (and ready variants) plus `.chat-empty-chip` resting/hover washes drop early `#0e0e14` mixes. Ink and chip chrome mix against the opaque shell `#0b0b10`. Standing P2 #14; design-review `feature-ai-chat`. Mac capture of stale feature screens still deferred when no on-screen CPU window / Screen Recording TCC blocks window capture.
+
 ## [0.1.2285] - 2026-10-24
 
 ### Changed
