@@ -121,7 +121,8 @@ body {
 .poster-subtitle {
   margin-top: 6px;
   font-size: 12px;
-  color: var(--muted);
+  /* Opaque type — was var(--muted) rgba(255,255,255,0.60) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 60%, #0b0b10);
 }
 
 .poster-actions {
@@ -294,7 +295,8 @@ body {
   bottom: 16px;
   left: 16px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.62);
+  /* Opaque type — was rgba(255,255,255,0.62) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
 }
 
 .metric-hint {
@@ -303,7 +305,8 @@ body {
   left: 16px;
   bottom: 10px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.60);
+  /* Opaque type — was rgba(255,255,255,0.60) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 60%, #0b0b10);
 }
 
 .chart-container {
