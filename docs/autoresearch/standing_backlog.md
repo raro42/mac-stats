@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2285
+
+- Data Poster / Dark shared `--text` type fallbacks (20 shared theme-dark/data-poster agent-ops glances + chips: Monitors collapsed/attention/filter-attention; AI Chat model/turn/empty/filter-miss/composer focus; Top Processes glances/chips/filter-miss; path hover) opaque `#0b0b10` mix when `--text` unset (no glass rgba). Standing P2 #14; design-review `feature-ai-chat` chrome. Next: remaining poster glass elsewhere (dashboard/orphan rgba, iOS theme `--fg`, or other non-`--text` washes), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
 ## Overnight merge — v0.1.2284
 
 - Data Poster agent-ops `--text` type fallbacks (Settings product/credential glances; soft Save + Agent Ops Load Chat flash; AI Chat model/turn/answer/errors + collapsed glances; Monitors collapsed/attention/filter-attention; Disk Cleanup / Details collapsed) opaque `#0b0b10` mix when `--text` unset (no glass rgba). Standing P2 #14; design-review `feature-ai-chat` / Settings / Monitors chrome. Next: remaining shared dark/poster glass text fallbacks (20 still on `rgba(255,255,255,0.92)` in shared theme-dark blocks), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
