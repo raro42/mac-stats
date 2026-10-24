@@ -14441,3 +14441,95 @@ body.theme-data-poster .monitors-collapsed-glance.has-slowest-hint {
   border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
   background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
+
+/*
+ * Data Poster: Monitors summary + attention / filter-attention glances still
+ * mixed against early `#0e0e14` (shared data-poster/dark block) while collapsed
+ * Monitors glances already mix on the opaque shell `#0b0b10` → wrong panel ink
+ * on the always-visible summary strip and Down/Slow / filter attention chips.
+ * Catch up to collapsed-glance opaque remaps. Design-review fuel
+ * (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
+
+body.theme-data-poster .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-data-poster .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+
+body.theme-data-poster .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
+}
+body.theme-data-poster .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 32%, #0b0b10);
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
+}
+body.theme-data-poster .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-data-poster .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}

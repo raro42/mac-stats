@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2262
+
+- Data Poster Monitors summary + attention / filter-attention washes (`.monitors-summary` resting · hover · focus · has-down · is-all-up · has-slowest-hint · is-empty; `.monitors-attention-glance` · `.monitors-filter-attention-glance` states) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: remaining early `#0e0e14` washes in shared data-poster/dark block (e.g. ollama/chat collapsed glances still on early ink), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2261
 
 - Data Poster Monitors collapsed glance washes (`.monitors-collapsed-glance` resting · hover · focus · has-down · is-all-up · has-slowest-hint) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: Monitors attention / filter-attention / summary washes still on early `#0e0e14`, or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
