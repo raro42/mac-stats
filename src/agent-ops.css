@@ -14167,3 +14167,31 @@ body.theme-data-poster .processes-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Settings toolbar keyboard hints still mixed against early
+ * `#0e0e14` (`.settings-header-kb-hint` · credential toolbars · Appearance /
+ * Product / theme-list · `.modal-header-kb-hint`) while Details / Processes /
+ * Ollama kb-hints already mix on the opaque shell `#0b0b10` → wrong muted ink
+ * under Settings title, Discord·…·Slack rows, and Appearance / Product.
+ * Catch up to Details / Processes kb-hint opaque remaps. Design-review fuel
+ * (Settings chrome) + standing P2 #14.
+ */
+body.theme-data-poster .settings-header-kb-hint,
+body.theme-data-poster .modal-header-kb-hint,
+body.theme-data-poster .discord-toolbar-kb-hint,
+body.theme-data-poster .perplexity-settings-toolbar-kb-hint,
+body.theme-data-poster .brave-settings-toolbar-kb-hint,
+body.theme-data-poster .redmine-settings-toolbar-kb-hint,
+body.theme-data-poster .mastodon-settings-toolbar-kb-hint,
+body.theme-data-poster .mcp-settings-toolbar-kb-hint,
+body.theme-data-poster .browser-settings-toolbar-kb-hint,
+body.theme-data-poster .cursor-agent-settings-toolbar-kb-hint,
+body.theme-data-poster .telegram-settings-toolbar-kb-hint,
+body.theme-data-poster .slack-settings-toolbar-kb-hint,
+body.theme-data-poster .theme-list-kb-hint,
+body.theme-data-poster .appearance-setting-kb-hint,
+body.theme-data-poster .product-setting-kb-hint,
+body.theme-data-poster .credentials-section-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
