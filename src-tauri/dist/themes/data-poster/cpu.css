@@ -8,18 +8,19 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
 
   --bg: #0b0b10;
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.60);
+  /* Opaque type / track / panel tokens — was glass rgba over the poster field (#14). */
+  --text: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  --muted: color-mix(in srgb, #ffffff 60%, #0b0b10);
   /* Opaque chrome tokens — was white glass rgba over the poster field (#14). */
   --hairline: color-mix(in srgb, #ffffff 12%, #0b0b10);
   --rule: color-mix(in srgb, #ffffff 12%, #0b0b10);
 
   --accent: #55c7ff;
   --accent2: #ffb84a;
-  --ring-track: rgba(255, 255, 255, 0.16);
+  --ring-track: color-mix(in srgb, #ffffff 16%, #0b0b10);
 
   /* Dark poster panels — never fall back to light glass (white-on-white Settings). */
-  --panel: rgba(14, 14, 20, 0.94);
+  --panel: color-mix(in srgb, #0e0e14 94%, #0b0b10);
   --panel-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
   --panel-shadow: 0 40px 120px rgba(0, 0, 0, 0.72);
   --modal: rgba(0, 0, 0, 0.72);
