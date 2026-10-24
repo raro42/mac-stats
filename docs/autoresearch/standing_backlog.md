@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2282
+
+- Data Poster battery + icon-line status type (`.battery-icon` / `.battery-icon.charging`; `.icon-line-item` resting · Ready · Slow · Down; closed-icon + Ready overrides in agent-ops) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review icon-line / battery strip chrome. Next: remaining poster glass (e.g. destructive red type rgba at ~line 964, modal-backdrop fallbacks), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
+
 ## Overnight merge — v0.1.2281
 
 - Data Poster process bar + changelog code washes (`.process-bar-fill` amber gradient end; `.changelog-code` cyan wash) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-processes` / Changelog chrome. Next: remaining poster glass (e.g. icon-line status type rgba, battery strip type rgba), or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` when TCC allows.
