@@ -14836,3 +14836,32 @@ body.theme-data-poster .disk-cleanup-filter-count.is-zero,
 body.theme-data-poster .disk-cleanup-scope-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+
+/*
+ * Data Poster: Disk Cleanup filter / scope-filter Clear still mix Apple
+ * `#ffffff` washes → white slab on the opaque shell `#0b0b10`. Catch up to
+ * chat / Agent Ops kind-filter Clear opaque remaps. Design-review fuel
+ * (feature-disk-cleanup) + standing P2 #14. Filter chips opaque in v0.1.2268.
+ */
+body.theme-data-poster .disk-cleanup-filter-clear,
+body.theme-data-poster .disk-cleanup-scope-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-clear:hover,
+body.theme-data-poster .disk-cleanup-scope-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-clear:focus-visible,
+body.theme-data-poster .disk-cleanup-scope-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-clear.is-just-saved,
+body.theme-data-poster .disk-cleanup-scope-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
