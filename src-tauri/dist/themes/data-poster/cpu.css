@@ -179,8 +179,9 @@ body {
 .poster-tile {
   position: relative;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.26);
+  /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
+  border: 1px solid color-mix(in srgb, #ffffff 14%, #0b0b10);
+  background: color-mix(in srgb, #000000 26%, #0b0b10);
   min-height: 190px;
   overflow: hidden;
   padding: 14px;

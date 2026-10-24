@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2272
+
+- Data Poster metric tiles (`.poster-tile` border · fill) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-cpu-metrics` / Agent Ops chrome. Next: remaining poster chrome glass (e.g. `.poster-shell` / metric-label type rgba), or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when TCC allows.
+
 ## Overnight merge — v0.1.2271
 
 - Data Poster header icon buttons (`.icon-btn` resting · hover · focus-visible · active) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review `feature-agent-ops` chrome. Next: remaining poster chrome glass (e.g. `.poster-tile` border/wash), or Mac capture of stale `feature-agent-ops.png` / `feature-monitors.png` when TCC allows.
