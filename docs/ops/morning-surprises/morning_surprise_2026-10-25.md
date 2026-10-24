@@ -4,9 +4,13 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Shipped
 
+- **v0.1.2283** — Data Poster changelog error + modal backdrop fallbacks opaque (`#14`).
+  - `.changelog-error` destructive red, Settings / Monitors / Ollama modal-backdrop fallbacks, and Monitors / Ollama muted close/URL fallbacks mix against `#0b0b10` (no glass `rgba`).
+  - Design-review fuel (Changelog / Settings / AI Chat chrome); Mac capture of stale `feature-ai-chat.png` still deferred (Linux rack / no on-screen CPU window).
+  - Keep @ `9bd94239`; pushed `origin/main`.
+
 - **v0.1.2282** — Data Poster battery + icon-line status type opaque (`#14`).
   - `.battery-icon` / `.battery-icon.charging` and `.icon-line-item` resting · Ready · Slow · Down glyph colors (plus closed-icon + Ready overrides) mix against `#0b0b10` (no glass `rgba`).
-  - Design-review fuel (icon-line / battery strip chrome); Mac capture of stale `feature-ai-chat.png` still deferred (Linux rack / no on-screen CPU window).
   - Keep @ `bd2b0d0b`; pushed `origin/main`.
 
 - **v0.1.2281** — Data Poster process bar + changelog code washes opaque (`#14`).
@@ -19,13 +23,4 @@ Overnight Track B (mac-stats autoresearch) for Ralf.
 
 ## Also this night (earlier ticks)
 
-- Window opened at **v0.1.2280** (~20:11). This tick continues standing glass cuts.
-- Nightly ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
-
-## Tried / deferred
-
-- Window-only recapture of `docs/screens/feature-ai-chat.png` (design-review recommended) — no on-screen CPU window / Screen Recording path unavailable this tick.
-
-## Next fuel
-
-- Data Poster remaining glass (e.g. destructive red type rgba, modal-backdrop fallbacks), or Mac capture when TCC allows.
+Standing P2 #14 opaque Data Poster chrome continues. Digester empty; design review due (AI chat recommended); layout daily already done today. Sibling harnesses missing on this rack.
