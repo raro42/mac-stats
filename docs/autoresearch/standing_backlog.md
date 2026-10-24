@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2266
+
+- Data Poster Perplexity config status + Disk Cleanup empty / Recurse (`.perplexity-config-status`; `.disk-cleanup-empty` wash + load-error type; `.disk-cleanup-scope-row label.disk-cleanup-scope-rec`) opaque `#0b0b10` mix (no early `#0e0e14` / Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Perplexity. Next: remaining early `#0e0e14` muted type (e.g. `.perplexity-setup-note` · Disk Cleanup empty CTA / filter-miss washes), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
+
 ## Overnight merge — v0.1.2265
 
 - Data Poster Disk Cleanup + Details collapsed glances (`.disk-cleanup-collapsed-glance` resting · hover · focus · has-reclaim · is-due · has-scopes-off · is-clean; `.details-collapsed-glance` resting · hover · focus · is-hot · is-ok) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Details. Next: remaining early `#0e0e14` muted type (e.g. `.perplexity-config-status` · `.disk-cleanup-empty` · `.disk-cleanup-scope-rec`), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
