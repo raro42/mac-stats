@@ -14123,3 +14123,20 @@ body.theme-data-poster .header-toolbar-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Disk Cleanup keyboard hints still mixed against early `#0e0e14`
+ * (`.disk-cleanup-meta-kb-hint` · `.disk-cleanup-toolbar-kb-hint` ·
+ * `.disk-cleanup-list-kb-hint` · `.disk-cleanup-add-scope-toolbar-kb-hint` ·
+ * `.disk-cleanup-kb-hint`) while window chrome kb-hints already mix on the
+ * opaque shell `#0b0b10` → wrong muted ink under Clean now, scopes, and the
+ * meta cards. Catch up to window-chrome kb-hint opaque remaps.
+ * Design-review fuel (feature-disk-cleanup) + standing P2 #14.
+ */
+body.theme-data-poster .disk-cleanup-meta-kb-hint,
+body.theme-data-poster .disk-cleanup-toolbar-kb-hint,
+body.theme-data-poster .disk-cleanup-list-kb-hint,
+body.theme-data-poster .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-data-poster .disk-cleanup-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
