@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2268
+
+- Data Poster Disk Cleanup filter / scope-filter chips (`.disk-cleanup-filter-chip` resting · hover · focus · is-active · Reclaim/Big/Clean has-hits/is-active; `.disk-cleanup-scope-filter-chip` On/Off; `.disk-cleanup-filter-count` / `.disk-cleanup-scope-filter-count` · `.is-zero`) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup`. Next: Disk Cleanup filter-clear / scope-filter-clear still on Apple `#ffffff`, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
+
 ## Overnight merge — v0.1.2267
 
 - Data Poster Perplexity / Disk Cleanup empty CTA + filter-miss washes (`.perplexity-setup-note:not([hidden])`; `.disk-cleanup-empty-cta` / `.perplexity-empty-cta`; `.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` / `.perplexity-filter-miss` + calm/reclaim/big/off/clean/on/top/snippet; `.perplexity-empty` / `.perplexity-empty-error`) opaque `#0b0b10` mix (no Apple `#ffffff` / early `#0e0e14`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Perplexity. Next: Disk Cleanup filter / scope-filter chips still on Apple `#ffffff`, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.

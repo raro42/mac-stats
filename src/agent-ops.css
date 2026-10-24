@@ -14759,3 +14759,80 @@ body.theme-data-poster .perplexity-empty-error {
   border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
 }
+
+/*
+ * Data Poster: Disk Cleanup filter / scope-filter chips (All·Reclaim·Big·Clean /
+ * All·On·Off) hit / active / focus / count still mix Apple `#ffffff` washes →
+ * white slab on the opaque shell `#0b0b10`. Catch up to Monitors / Perplexity
+ * filter-chip opaque remaps. Design-review fuel (feature-disk-cleanup) +
+ * standing P2 #14. Filter-miss / empty CTA opaque in v0.1.2267.
+ */
+body.theme-data-poster .disk-cleanup-filter-chip,
+body.theme-data-poster .disk-cleanup-scope-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip:hover,
+body.theme-data-poster .disk-cleanup-scope-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip:focus-visible,
+body.theme-data-poster .disk-cleanup-scope-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip.is-active,
+body.theme-data-poster .disk-cleanup-scope-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 28%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 38%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-count,
+body.theme-data-poster .disk-cleanup-scope-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-count.is-zero,
+body.theme-data-poster .disk-cleanup-scope-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
