@@ -1578,38 +1578,43 @@ body.theme-data-poster .processes-filter-miss-cta:focus-visible,
 body.theme-dark .processes-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+/*
+ * Data Poster / Dark: Top Processes list rows / pin still mixed against early
+ * #0e0e14 → wrong dark slab on the opaque shell #0b0b10. Catch up to filter
+ * chips / filter-miss. Design-review fuel (feature-processes) + standing P2 #14.
+ */
 body.theme-data-poster .process-row.is-pinned,
 body.theme-dark .process-row.is-pinned {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
 }
 body.theme-data-poster .process-row:hover,
 body.theme-dark .process-row:hover {
-  background: color-mix(in srgb, currentColor 10%, #0e0e14);
+  background: color-mix(in srgb, currentColor 10%, #0b0b10);
 }
 body.theme-data-poster .process-row:active,
 body.theme-dark .process-row:active {
-  background: color-mix(in srgb, currentColor 14%, #0e0e14);
+  background: color-mix(in srgb, currentColor 14%, #0b0b10);
 }
 body.theme-data-poster .process-row:focus-visible,
 body.theme-dark .process-row:focus-visible {
-  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0e0e14);
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
 body.theme-data-poster .process-pin:hover,
 body.theme-dark .process-pin:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
 body.theme-data-poster .process-pin:focus-visible,
 body.theme-dark .process-pin:focus-visible {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 40%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
 }
 body.theme-data-poster .process-pin.is-just-saved,
 body.theme-dark .process-pin.is-just-saved {
-  background: color-mix(in srgb, #34c759 22%, #0e0e14) !important;
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
 }
 body.theme-data-poster .process-name.is-just-saved,
 body.theme-dark .process-name.is-just-saved {
-  background: color-mix(in srgb, #34c759 14%, #0e0e14);
+  background: color-mix(in srgb, #34c759 14%, #0b0b10);
 }
 
 /* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
