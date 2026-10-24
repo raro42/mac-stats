@@ -14396,3 +14396,16 @@ body.theme-data-poster .agent-ops-collapsed-glance.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster: Monitors collapsed empty glance still mixed against early
+ * `#0e0e14` (`.monitors-collapsed-glance.is-empty`) while Agent Ops / Ollama
+ * collapsed empty glances already mix on the opaque shell `#0b0b10` → wrong
+ * muted ink under the Monitors header when nothing is watched. Catch up to
+ * agent-ops / ollama empty-glance opaque remaps. Design-review fuel
+ * (feature-monitors) + standing P2 #14.
+ */
+body.theme-data-poster .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}

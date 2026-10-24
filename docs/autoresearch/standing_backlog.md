@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2260
+
+- Data Poster Monitors collapsed empty glance (`.monitors-collapsed-glance.is-empty`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: remaining early `#0e0e14` muted type (e.g. Monitors collapsed glance washes / attention glances still on early ink), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2259
 
 - Data Poster Agent Ops Insights lines + collapsed empty glance (`.ops-insight-line` resting · clickable · hover · selected · `em` · `.agent-ops-collapsed-glance.is-empty`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-agent-ops`. Next: remaining early `#0e0e14` muted type (e.g. Monitors collapsed empty glance), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when TCC allows.
