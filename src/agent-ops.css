@@ -14365,3 +14365,34 @@ body.theme-data-poster .monitor-backoff-hint {
   color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster: Agent Ops Insights lines + collapsed empty glance still mixed
+ * against early `#0e0e14` (`.ops-insight-line` resting / clickable / hover /
+ * selected / `em`; `.agent-ops-collapsed-glance.is-empty`) while Insights
+ * subheads already mix on the opaque shell `#0b0b10` → wrong muted ink on
+ * Slowest / Candidates rows and the collapsed Agent Ops glance. Catch up to
+ * ops-subhead opaque remaps. Design-review fuel (feature-agent-ops) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #ffffff 83%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-insight-line.is-clickable:hover,
+body.theme-data-poster .ops-insight-line.is-clickable.is-selected {
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
