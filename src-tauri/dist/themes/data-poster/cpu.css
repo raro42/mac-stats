@@ -1142,7 +1142,8 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(235, 235, 245, 0.78);
+  /* Opaque type — was rgba(235,235,245,0.78) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ebebf5 78%, #0b0b10);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1150,7 +1151,8 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque type — was rgba(52,199,89,0.8) glass over the poster field (#14). */
+  color: color-mix(in srgb, #34c759 80%, #0b0b10);
 }
 
 .battery-icon.no-battery {
@@ -1208,7 +1210,8 @@ body {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.95);
+  /* Opaque type — was rgba(255,255,255,0.95) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 95%, #0b0b10);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
   border-radius: 9px;
@@ -1267,14 +1270,16 @@ body {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  color: rgba(36, 160, 90, 0.78);
+  /* Opaque type — was rgba(36,160,90,0.78) glass over the poster field (#14). */
+  color: color-mix(in srgb, #24a05a 78%, #0b0b10);
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  color: rgba(36, 160, 90, 0.92);
+  /* Opaque type — was rgba(36,160,90,0.92) glass over the poster field (#14). */
+  color: color-mix(in srgb, #24a05a 92%, #0b0b10);
   background: color-mix(in srgb, #34c759 10%, #0b0b10);
   border-color: color-mix(in srgb, #34c759 36%, #0b0b10);
   box-shadow: none;
@@ -1300,14 +1305,16 @@ body {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  color: rgba(200, 130, 20, 0.72);
+  /* Opaque type — was rgba(200,130,20,0.72) glass over the poster field (#14). */
+  color: color-mix(in srgb, #c88214 72%, #0b0b10);
   background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
   border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  color: rgba(200, 130, 20, 0.88);
+  /* Opaque type — was rgba(200,130,20,0.88) glass over the poster field (#14). */
+  color: color-mix(in srgb, #c88214 88%, #0b0b10);
   background: color-mix(in srgb, #ff9f0a 10%, #0b0b10);
   border-color: color-mix(in srgb, #ff9f0a 36%, #0b0b10);
 }
@@ -1326,14 +1333,16 @@ body {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  color: rgba(200, 55, 50, 0.78);
+  /* Opaque type — was rgba(200,55,50,0.78) glass over the poster field (#14). */
+  color: color-mix(in srgb, #c83732 78%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
   border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  color: rgba(200, 55, 50, 0.92);
+  /* Opaque type — was rgba(200,55,50,0.92) glass over the poster field (#14). */
+  color: color-mix(in srgb, #c83732 92%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
   border-color: color-mix(in srgb, #ff3b30 36%, #0b0b10);
 }

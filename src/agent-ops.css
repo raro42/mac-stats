@@ -1567,7 +1567,8 @@ body.theme-data-poster #icon-logs,
 body.theme-data-poster #icon-disk-cleanup,
 body.theme-data-poster #icon-agent-ops {
   opacity: 1;
-  color: rgba(255, 255, 255, 0.95);
+  /* Opaque type — was rgba(255,255,255,0.95) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 95%, #0b0b10);
 }
 body.theme-data-poster #icon-monitors.section-open,
 body.theme-data-poster #icon-ollama.section-open,
@@ -1584,7 +1585,8 @@ body.theme-data-poster #icon-ollama.status-good,
 body.theme-data-poster #icon-perplexity.status-good,
 body.theme-data-poster #icon-logs.status-good,
 body.theme-data-poster #icon-agent-ops.status-good {
-  color: rgba(52, 199, 89, 0.95);
+  /* Opaque type — was rgba(52,199,89,0.95) glass over the poster field (#14). */
+  color: color-mix(in srgb, #34c759 95%, #0b0b10);
 }
 body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.status-warning) img {
   /* Was brightness(0) saturate(100%) invert(1). The Ollama mark is .ollama-glyph. */
