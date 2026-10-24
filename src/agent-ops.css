@@ -14250,3 +14250,27 @@ body.theme-data-poster .changelog-body-toolbar-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: muted path/meta type still mixed against early `#0e0e14`
+ * (`.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` ·
+ * `.monitor-detail-note` · `.disk-cleanup-summary` · `.disk-cleanup-item-path` ·
+ * `.disk-cleanup-scope-path`) while kb-hints already mix on the opaque shell
+ * `#0b0b10` → wrong muted ink on Debug Log prefix, Monitors age, sparkline
+ * captions, and Disk Cleanup paths. Catch up to Changelog kb-hint opaque
+ * remaps. Design-review adjacent (Debug Log / Monitors / CPU metrics / Disk
+ * Cleanup) + standing P2 #14.
+ */
+body.theme-data-poster .logs-viewer-prefix,
+body.theme-data-poster .monitor-checked-ago,
+body.theme-data-poster .history-chart-caption,
+body.theme-data-poster .monitor-detail-note,
+body.theme-data-poster .disk-cleanup-summary,
+body.theme-data-poster .disk-cleanup-item-path,
+body.theme-data-poster .disk-cleanup-scope-path {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .monitor-item.is-down .monitor-checked-ago {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}

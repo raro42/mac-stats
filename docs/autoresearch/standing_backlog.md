@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2256
+
+- Data Poster muted path/meta type (`.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · `.monitor-detail-note` · `.disk-cleanup-summary` · `.disk-cleanup-item-path` · `.disk-cleanup-scope-path` · Down-monitor age) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: remaining non-hint muted type still on early `#0e0e14` (e.g. `.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.process-detail-label` · `.process-detail-pid` · policy/samples/kind · `.process-list-header` · `.perplexity-result-meta`), or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2255
 
 - Data Poster Changelog keyboard hints (`.changelog-header-kb-hint` · `.changelog-body-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Last early `#0e0e14` kb-hint pair. Standing P2 #14; Changelog chrome / design-review adjacent. Next: remaining non-hint muted type still on early `#0e0e14` (e.g. `.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · path/meta labels), or Mac capture when TCC allows.
