@@ -14588,3 +14588,50 @@ body.theme-data-poster .monitors-filter-count {
 body.theme-data-poster .monitors-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+
+/*
+ * Data Poster: Perplexity filter chips (All·Top·Snippet) hit / active / focus /
+ * count still mixed Apple `#ffffff` washes (and early `#0e0e14` remaps) → white
+ * slab on the opaque shell `#0b0b10`. Catch up to monitors/chat-filter-chip
+ * opaque remaps. Design-review fuel (feature-ai-chat adjacent Perplexity) +
+ * standing P2 #14. Monitors filter chips opaque in v0.1.2263.
+ */
+body.theme-data-poster .perplexity-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip[data-perplexity-filter='top'].has-hits {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip[data-perplexity-filter='top'].is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip[data-perplexity-filter='snippet'].has-hits {
+  background: color-mix(in srgb, #34c759 14%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 30%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-chip[data-perplexity-filter='snippet'].is-active {
+  background: color-mix(in srgb, #34c759 20%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}

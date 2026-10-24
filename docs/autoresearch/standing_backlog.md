@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2264
+
+- Data Poster Perplexity filter chips (`.perplexity-filter-chip` resting · hover · focus · is-active · Top/Snippet has-hits/is-active; `.perplexity-filter-count` · `.is-zero`) opaque `#0b0b10` mix (no Apple `#ffffff` / early `#0e0e14`). Standing P2 #14; design-review adjacent Perplexity / `feature-ai-chat`. Next: ollama/chat collapsed glances still on early `#0e0e14`, or Mac capture of stale `feature-ai-chat.png` / `feature-monitors.png` when TCC allows.
+
 ## Overnight merge — v0.1.2263
 
 - Data Poster Monitors filter chips (`.monitors-filter-chip` resting · hover · focus · is-active · Down/Up/Slow has-hits/is-active; `.monitors-filter-count` · `.is-zero`) opaque `#0b0b10` mix (no Apple `#ffffff` / early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: Perplexity filter chips still on early `#0e0e14`, or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
