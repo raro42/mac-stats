@@ -1458,12 +1458,18 @@ body.theme-dark .processes-top-ram-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
   background: color-mix(in srgb, #34c759 12%, #0e0e14);
 }
+/*
+ * Data Poster / Dark: Top Processes filter-attention / hot-attention glances +
+ * filter chips + filter-miss still mixed against early #0e0e14 → wrong dark
+ * slab on the opaque shell #0b0b10. Catch up to Monitors filter-miss /
+ * chat-filter chips. Design-review fuel (feature-processes) + standing P2 #14.
+ */
 body.theme-data-poster .processes-filter-attention-glance,
 body.theme-data-poster .processes-hot-attention-glance,
 body.theme-dark .processes-filter-attention-glance,
 body.theme-dark .processes-hot-attention-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
@@ -1471,106 +1477,106 @@ body.theme-data-poster .processes-filter-attention-glance:hover,
 body.theme-data-poster .processes-hot-attention-glance:hover,
 body.theme-dark .processes-filter-attention-glance:hover,
 body.theme-dark .processes-hot-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-attention-glance:focus-visible,
 body.theme-data-poster .processes-hot-attention-glance:focus-visible,
 body.theme-dark .processes-filter-attention-glance:focus-visible,
 body.theme-dark .processes-hot-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-attention-glance.is-filter,
 body.theme-dark .processes-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
 }
 body.theme-data-poster .processes-filter-attention-glance.is-pinned,
 body.theme-dark .processes-filter-attention-glance.is-pinned {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-attention-glance.is-hot-filter,
 body.theme-data-poster .processes-hot-attention-glance.has-hot,
 body.theme-dark .processes-filter-attention-glance.is-hot-filter,
 body.theme-dark .processes-hot-attention-glance.has-hot {
-  border-color: color-mix(in srgb, #ff9f0a 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9f0a 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
 body.theme-data-poster .processes-filter-chip,
 body.theme-dark .processes-filter-chip {
-  border-color: color-mix(in srgb, currentColor 18%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .processes-filter-chip:hover,
 body.theme-dark .processes-filter-chip:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip:focus-visible,
 body.theme-dark .processes-filter-chip:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip.is-active,
 body.theme-dark .processes-filter-chip.is-active {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0e0e14);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip[data-processes-filter='pinned'].has-hits,
 body.theme-dark .processes-filter-chip[data-processes-filter='pinned'].has-hits {
-  background: color-mix(in srgb, #ffd60a 14%, #0e0e14);
-  border-color: color-mix(in srgb, #ffd60a 32%, #0e0e14);
+  background: color-mix(in srgb, #ffd60a 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 32%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip[data-processes-filter='pinned'].is-active,
 body.theme-dark .processes-filter-chip[data-processes-filter='pinned'].is-active {
-  background: color-mix(in srgb, #ffd60a 22%, #0e0e14);
-  border-color: color-mix(in srgb, #ffd60a 42%, #0e0e14);
+  background: color-mix(in srgb, #ffd60a 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 42%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip[data-processes-filter='hot'].has-hits,
 body.theme-dark .processes-filter-chip[data-processes-filter='hot'].has-hits {
-  background: color-mix(in srgb, #ff9500 14%, #0e0e14);
-  border-color: color-mix(in srgb, #ff9500 30%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-chip[data-processes-filter='hot'].is-active,
 body.theme-dark .processes-filter-chip[data-processes-filter='hot'].is-active {
-  background: color-mix(in srgb, #ff9500 22%, #0e0e14);
-  border-color: color-mix(in srgb, #ff9500 40%, #0e0e14);
+  background: color-mix(in srgb, #ff9500 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-miss,
 body.theme-dark .processes-filter-miss {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .processes-filter-miss.is-hot-empty,
 body.theme-dark .processes-filter-miss.is-hot-empty {
-  border-color: color-mix(in srgb, #34c759 28%, #0e0e14);
-  background: color-mix(in srgb, #34c759 10%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-miss.is-pinned-empty,
 body.theme-dark .processes-filter-miss.is-pinned-empty {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-miss-cta,
 body.theme-dark .processes-filter-miss-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .processes-filter-miss-cta:hover,
 body.theme-dark .processes-filter-miss-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
 }
 body.theme-data-poster .processes-filter-miss-cta:focus-visible,
 body.theme-dark .processes-filter-miss-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
 body.theme-data-poster .process-row.is-pinned,
 body.theme-dark .process-row.is-pinned {

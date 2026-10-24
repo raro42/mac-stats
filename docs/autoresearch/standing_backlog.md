@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2291
+
+- Data Poster / Dark Top Processes filter chips + filter-miss (`.processes-filter-attention-glance` / `.processes-hot-attention-glance`; `.processes-filter-chip` All/Pinned/Hot; `.processes-filter-miss` / Hot/Pinned empty / CTA) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`. Next: process-row / pin washes still on early `#0e0e14`, or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2290
 
 - Data Poster / Dark Monitors filter-miss + empty CTA (`.monitors-filter-miss` Down/Slow/Up empty; `.monitors-empty-cta` resting/hover/focus) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`; layout-daily Data Poster. Next: Processes filter chips / filter-miss still on early `#0e0e14`, or Mac capture of stale `feature-ai-chat.png` / `feature-monitors.png` when TCC allows.
