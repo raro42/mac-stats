@@ -341,7 +341,8 @@ body {
   font-weight: 800;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.76);
+  /* Opaque type — was rgba(255,255,255,0.76) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 76%, #0b0b10);
   margin-bottom: 12px;
 }
 
@@ -362,7 +363,8 @@ body {
 }
 
 .detail-label {
-  color: rgba(255, 255, 255, 0.74);
+  /* Opaque type — was rgba(255,255,255,0.74) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -370,7 +372,8 @@ body {
 }
 
 .detail-value {
-  color: rgba(255, 255, 255, 0.82);
+  /* Opaque type — was rgba(255,255,255,0.82) glass over the poster field (#14). */
+  color: color-mix(in srgb, #ffffff 82%, #0b0b10);
   text-align: right;
   font-weight: 700;
   min-width: 50px;
