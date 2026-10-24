@@ -1,12 +1,13 @@
 # Morning surprise — 2026-10-24
 
-Overnight Track B kept shipping Data Poster opaque washes (#14) while Mac window capture stayed blocked (`screencapture -l` / Screen Recording TCC).
+Overnight Track B kept shipping Data Poster opaque washes (#14) while Mac window capture stayed blocked (no on-screen CPU window / `screencapture -l` / Screen Recording TCC).
 
 ## Shipped tonight (local EDT)
 
 | Version | What |
 |---------|------|
-| **v0.1.2265** | Disk Cleanup + Details collapsed glances mix on `#0b0b10` (no Apple `#ffffff`) |
+| **v0.1.2266** | Perplexity config status + Disk Cleanup empty / Recurse mix on `#0b0b10` (no early `#0e0e14` / Apple `#ffffff`) |
+| v0.1.2265 | Disk Cleanup + Details collapsed glances mix on `#0b0b10` (no Apple `#ffffff`) |
 | v0.1.2264 | Perplexity filter chips (All·Top·Snippet + counts) mix on `#0b0b10` |
 | v0.1.2263 | Monitors filter chips (All·Down·Up·Slow + counts) mix on `#0b0b10` |
 | v0.1.2262 | Monitors summary + attention / filter-attention washes |
@@ -24,9 +25,9 @@ Overnight Track B kept shipping Data Poster opaque washes (#14) while Mac window
 ## Layout daily
 
 - Helper reported data-poster / dark / neon / futuristic / architect due (missing remaps screens).
-- Tonight’s keep also serves layout-daily data-poster contrast (collapsed Disk Cleanup / Details glances).
+- Tonight’s keeps also serve layout-daily data-poster contrast (collapsed glances + empty / status type).
 
 ## Next
 
-- Remaining early `#0e0e14` muted type (e.g. `.perplexity-config-status` · `.disk-cleanup-empty` · `.disk-cleanup-scope-rec`).
+- Remaining early `#0e0e14` muted type (e.g. `.perplexity-setup-note` · Disk Cleanup empty CTA / filter-miss washes).
 - Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
