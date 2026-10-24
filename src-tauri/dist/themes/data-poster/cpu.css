@@ -42,10 +42,11 @@ body {
 .poster-bg {
   position: fixed;
   inset: 0;
+  /* Opaque field grid / glow — was cyan/white glass rgba over the poster field (#14). */
   background:
-    radial-gradient(900px 900px at 70% 70%, rgba(85, 199, 255, 0.10), rgba(0, 0, 0, 0) 58%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 24px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 24px);
+    radial-gradient(900px 900px at 70% 70%, color-mix(in srgb, #55c7ff 10%, #0b0b10), #0b0b10 58%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, #ffffff 4%, #0b0b10) 0, color-mix(in srgb, #ffffff 4%, #0b0b10) 1px, #0b0b10 1px, #0b0b10 24px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, #ffffff 3%, #0b0b10) 0, color-mix(in srgb, #ffffff 3%, #0b0b10) 1px, #0b0b10 1px, #0b0b10 24px);
   opacity: 0.25;
   pointer-events: none;
 }
@@ -204,21 +205,24 @@ body {
 }
 
 .poster-tile.heat::before {
+  /* Opaque heat wash — was amber/white glass rgba over the poster field (#14). */
   background:
-    radial-gradient(circle at 30% 30%, rgba(255, 184, 74, 0.70), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 10px);
+    radial-gradient(circle at 30% 30%, color-mix(in srgb, #ffb84a 70%, #0b0b10), #0b0b10 55%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, #ffffff 8%, #0b0b10) 0, color-mix(in srgb, #ffffff 8%, #0b0b10) 1px, #0b0b10 1px, #0b0b10 10px);
 }
 
 .poster-tile.usage::before {
+  /* Opaque usage wash — was cyan glass rgba over the poster field (#14). */
   background:
-    radial-gradient(circle at 50% 20%, rgba(85, 199, 255, 0.55), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, rgba(85, 199, 255, 0.16) 0, rgba(85, 199, 255, 0.16) 1px, transparent 1px, transparent 10px);
+    radial-gradient(circle at 50% 20%, color-mix(in srgb, #55c7ff 55%, #0b0b10), #0b0b10 55%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, #55c7ff 16%, #0b0b10) 0, color-mix(in srgb, #55c7ff 16%, #0b0b10) 1px, #0b0b10 1px, #0b0b10 10px);
 }
 
 .poster-tile.freq::before {
+  /* Opaque freq wash — was mint/white glass rgba over the poster field (#14). */
   background:
-    radial-gradient(circle at 70% 35%, rgba(96, 255, 170, 0.45), rgba(0, 0, 0, 0) 55%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px);
+    radial-gradient(circle at 70% 35%, color-mix(in srgb, #60ffaa 45%, #0b0b10), #0b0b10 55%),
+    repeating-linear-gradient(0deg, color-mix(in srgb, #ffffff 6%, #0b0b10) 0, color-mix(in srgb, #ffffff 6%, #0b0b10) 1px, #0b0b10 1px, #0b0b10 10px);
 }
 
 /* Usage card clickable */
