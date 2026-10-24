@@ -1,21 +1,18 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping Data Poster opaque chrome (standing P2 #14). Digester stayed empty; design review still due on stale AI Chat / processes screens (Mac capture deferred — Linux rack, no TCC window grab). Layout-daily Data Poster marked checked after v0.1.2290.
+Overnight Track B kept shipping opaque Data Poster / Dark washes (#14).
 
-## Shipped tonight (recent keeps)
+## Shipped
 
-- **v0.1.2290** — Monitors filter-miss + empty CTA (`.monitors-filter-miss` Down/Slow/Up empty; `.monitors-empty-cta` resting/hover/focus): early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-monitors` + layout-daily Data Poster fuel.
-- **v0.1.2289** — Monitors + Perplexity filter chips (`.monitors-filter-chip` / `.perplexity-filter-chip` resting/hover/active; Perplexity Top/Snippet has-hits/is-active + focus): early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-monitors` / adjacent Perplexity fuel.
-- **v0.1.2288** — AI Chat filter chips (`.chat-filter-chip` resting/hover/active), `.chat-filter-miss` / CTA / msg, and `#chat-input:focus` washes: early `#0e0e14` → opaque `#0b0b10` mix. Design-review `feature-ai-chat` fuel.
-- **v0.1.2287** — AI Chat collapsed glances (`.ollama-collapsed-glance` / `.chat-collapsed-glance`), model/turn/answer/errors/offline glances, and `.chat-empty` ready/offline/not-set washes: early `#0e0e14` → opaque `#0b0b10` mix.
-- **v0.1.2286** — AI Chat empty title/copy (+ ready) and `.chat-empty-chip` resting/hover washes: early `#0e0e14` → opaque `#0b0b10` mix.
-- **v0.1.2285** — twenty shared `theme-dark` / `theme-data-poster` agent-ops `--text` glass type fallbacks → opaque `#0b0b10` mix.
-- **v0.1.2284** — agent-ops `--text` glass type fallbacks for Settings / AI Chat / Monitors / Details.
-- **v0.1.2283** — changelog-error + modal-backdrop + muted close/URL fallbacks opaque.
-- **v0.1.2282** — battery-icon + icon-line Ready/Slow/Down type opaque.
-- **v0.1.2281** — process-bar-fill amber + changelog-code cyan washes opaque.
+- **v0.1.2291** — Top Processes filter chips + filter-miss / CTA (plus filter-attention / hot-attention glances) mix on opaque shell `#0b0b10` instead of early `#0e0e14`.
+- Earlier tonight: **v0.1.2290** Monitors filter-miss + empty CTA; **v0.1.2289** Monitors + Perplexity filter chips; **v0.1.2288** AI Chat filter chips + composer focus; **v0.1.2287** AI Chat collapsed glances; **v0.1.2286** AI Chat empty shell.
 
-## Still open
+## Tried / deferred
 
-- Processes filter chips / filter-miss still on early `#0e0e14` in the shared Dark/DP block.
-- Recapture stale `docs/screens/feature-ai-chat.png` (and processes / cpu-metrics / disk-cleanup / monitors) when a Mac with Screen Recording can grab the CPU window only.
+- Digester empty (0 runs / 7d). Sibling OpenClaw/Hermes git missing on Linux rack.
+- Window-only Mac screenshots for stale `feature-ai-chat.png` / `feature-processes.png` / `feature-monitors.png` still deferred (no TCC / no on-screen CPU window on this rack).
+
+## Next
+
+- process-row / pin washes still on early `#0e0e14`.
+- Mac capture when Screen Recording allows.
