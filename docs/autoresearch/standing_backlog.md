@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2258
+
+- Data Poster Agent Ops / empty / Perplexity muted type (`.ops-subhead` · `.ops-insight-sub` · Force Quit chevron · LPM busy · `.perplexity-result-list` · `.perplexity-result-snippet` · Debug Log / Monitors empty · filter-miss / empty hints · monitor detail k / backoff) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-agent-ops` / Monitors adjacent. Next: remaining early `#0e0e14` muted type in the shared data-poster/dark block (if any), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2257
 
 - Data Poster Process Detail / Force Quit / Disk Cleanup / Perplexity muted labels (`.force-quit-hint` · `.disk-cleanup-soft-hint` · `.disk-cleanup-meta-label` · `.process-detail-label` · `.process-detail-pid` · policy/samples/kind · `.process-list-header` · `.perplexity-result-meta` · Force Quit advanced summary · setup lead/note · item-stat) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: remaining early `#0e0e14` muted type in the shared data-poster/dark block (if any), or Mac capture of stale `feature-agent-ops.png` when TCC allows.

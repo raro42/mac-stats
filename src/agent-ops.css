@@ -14309,3 +14309,59 @@ body.theme-data-poster .disk-cleanup-item-stat {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster: remaining muted type still mixed against early `#0e0e14`
+ * (Agent Ops `.ops-subhead` · `.ops-insight-sub`; Force Quit chevron; LPM busy;
+ * Perplexity list/snippet; Debug Log / Monitors empty; filter-miss / empty hints;
+ * monitor detail k / backoff) while kb-hints and path/meta already mix on the
+ * opaque shell `#0b0b10` → wrong muted ink on Agent Ops Insights, empty shells,
+ * and Perplexity snippets. Catch up to muted-label opaque remaps.
+ * Design-review fuel (feature-agent-ops / feature-ai-chat adjacent / Monitors) +
+ * standing P2 #14.
+ */
+body.theme-data-poster .ops-subhead,
+body.theme-data-poster .ops-insight-sub,
+body.theme-data-poster .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .lpm-info.is-busy,
+body.theme-data-poster .lpm-info.is-busy .lpm-label,
+body.theme-data-poster .lpm-info.is-busy .lpm-value {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
+body.theme-data-poster .lpm-info.is-on.is-busy .lpm-value {
+  color: color-mix(in srgb, #248a3d 72%, #0b0b10);
+}
+body.theme-data-poster .perplexity-result-snippet {
+  color: color-mix(in srgb, #ffffff 64%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .perplexity-result-list {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+}
+body.theme-data-poster .monitors-summary.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-miss-hint,
+body.theme-data-poster .perplexity-filter-miss-hint,
+body.theme-data-poster .logs-filter-miss-hint,
+body.theme-data-poster .monitors-filter-miss-hint,
+body.theme-data-poster .disk-cleanup-filter-miss-hint,
+body.theme-data-poster .disk-cleanup-empty-hint,
+body.theme-data-poster .monitors-empty-hint,
+body.theme-data-poster .perplexity-empty-hint,
+body.theme-data-poster .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .monitor-detail-k,
+body.theme-data-poster .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0b0b10);
+  opacity: 1;
+}
