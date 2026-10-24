@@ -1302,9 +1302,9 @@ body.theme-dark #chat-input:focus {
 }
 
 /*
- * Data Poster / Dark: AI Chat filter-miss shells + empty CTAs still mixed against
- * early #0e0e14 → wrong dark slab when a filter has no rows. Monitors filter-miss
- * stays on early #0e0e14 below. Design-review fuel (feature-ai-chat) + standing P2 #14.
+ * Data Poster / Dark: AI Chat filter-miss shells + empty CTAs remapped to opaque
+ * shell #0b0b10 (v0.1.2288). Monitors filter-miss / empty CTA catch up below.
+ * Design-review fuel (feature-ai-chat / feature-monitors) + standing P2 #14.
  */
 body.theme-data-poster .chat-filter-miss,
 body.theme-dark .chat-filter-miss {
@@ -1341,10 +1341,15 @@ body.theme-data-poster .chat-filter-miss-cta:focus-visible,
 body.theme-dark .chat-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
+/*
+ * Data Poster / Dark: Monitors filter-miss shell / empty CTA still mixed against
+ * early #0e0e14 → wrong dark slab on the opaque shell #0b0b10. Catch up to
+ * chat-filter-miss. Design-review fuel (feature-monitors) + standing P2 #14.
+ */
 body.theme-data-poster .monitors-filter-miss,
 body.theme-dark .monitors-filter-miss {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
@@ -1352,29 +1357,29 @@ body.theme-data-poster .monitors-filter-miss.is-down-empty,
 body.theme-data-poster .monitors-filter-miss.is-slow-empty,
 body.theme-dark .monitors-filter-miss.is-down-empty,
 body.theme-dark .monitors-filter-miss.is-slow-empty {
-  border-color: color-mix(in srgb, #34c759 28%, #0e0e14);
-  background: color-mix(in srgb, #34c759 10%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 10%, #0b0b10);
 }
 body.theme-data-poster .monitors-filter-miss.is-up-empty,
 body.theme-dark .monitors-filter-miss.is-up-empty {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
 }
 body.theme-data-poster .monitors-empty-cta,
 body.theme-dark .monitors-empty-cta {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-empty-cta:hover,
 body.theme-dark .monitors-empty-cta:hover {
-  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0e0e14);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
 }
 body.theme-data-poster .monitors-empty-cta:focus-visible,
 body.theme-dark .monitors-empty-cta:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0e0e14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
 }
 
 /*
