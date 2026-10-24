@@ -14237,3 +14237,16 @@ body.theme-data-poster .perplexity-setup-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster: Changelog header/body keyboard hints still mixed against early
+ * `#0e0e14` (`.changelog-header-kb-hint` · `.changelog-body-toolbar-kb-hint`)
+ * while Process Detail / Settings / Details kb-hints already mix on the opaque
+ * shell `#0b0b10` → wrong muted ink under What's new and version rows. Catch up
+ * to Process Detail kb-hint opaque remaps. Design-review adjacent (Changelog
+ * chrome) + standing P2 #14. Last early `#0e0e14` kb-hint pair.
+ */
+body.theme-data-poster .changelog-header-kb-hint,
+body.theme-data-poster .changelog-body-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}

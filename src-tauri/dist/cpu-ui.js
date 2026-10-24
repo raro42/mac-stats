@@ -202,12 +202,16 @@
       body.theme-dark .process-details-header-kb-hint,
       body.theme-neon .process-details-header-kb-hint,
       body.theme-futuristic .process-details-header-kb-hint,
-      body.theme-data-poster .changelog-header-kb-hint,
       body.theme-dark .changelog-header-kb-hint,
       body.theme-neon .changelog-header-kb-hint,
       body.theme-futuristic .changelog-header-kb-hint {
         /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
         color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        opacity: 1;
+      }
+      body.theme-data-poster .changelog-header-kb-hint {
+        /* Match agent-ops opaque shell remap (no early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
       .settings-header-kb-hint,
@@ -5156,6 +5160,11 @@
         color: color-mix(in srgb, #0c0c10 63%, #ffffff);
         opacity: 1;
         text-align: center;
+      }
+      body.theme-data-poster .changelog-body-toolbar-kb-hint {
+        /* Match agent-ops opaque shell remap (no early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+        opacity: 1;
       }
       .changelog-body-toolbar-kb-hint[hidden] {
         display: none !important;

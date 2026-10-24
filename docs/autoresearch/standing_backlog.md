@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2255
+
+- Data Poster Changelog keyboard hints (`.changelog-header-kb-hint` · `.changelog-body-toolbar-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Last early `#0e0e14` kb-hint pair. Standing P2 #14; Changelog chrome / design-review adjacent. Next: remaining non-hint muted type still on early `#0e0e14` (e.g. `.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · path/meta labels), or Mac capture when TCC allows.
+
 ## Overnight merge — v0.1.2254
 
 - Data Poster Process Detail / Force Quit / Debug Log / Perplexity keyboard hints (`.process-detail-hero-toolbar-kb-hint` · `.process-details-header-kb-hint` · `.force-quit-toolbar-kb-hint` · `.logs-kb-hint` · `.logs-toolbar-kb-hint` · `.perplexity-kb-hint` · `.perplexity-search-kb-hint` · `.perplexity-setup-kb-hint`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent. Next: Changelog header/body kb-hints still on early `#0e0e14`, or Mac capture when TCC allows.
