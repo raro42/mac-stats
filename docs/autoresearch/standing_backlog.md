@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2265
+
+- Data Poster Disk Cleanup + Details collapsed glances (`.disk-cleanup-collapsed-glance` resting · hover · focus · has-reclaim · is-due · has-scopes-off · is-clean; `.details-collapsed-glance` resting · hover · focus · is-hot · is-ok) opaque `#0b0b10` mix (no Apple `#ffffff`). Standing P2 #14; design-review `feature-disk-cleanup` / adjacent Details. Next: remaining early `#0e0e14` muted type (e.g. `.perplexity-config-status` · `.disk-cleanup-empty` · `.disk-cleanup-scope-rec`), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
+
 ## Overnight merge — v0.1.2264
 
 - Data Poster Perplexity filter chips (`.perplexity-filter-chip` resting · hover · focus · is-active · Top/Snippet has-hits/is-active; `.perplexity-filter-count` · `.is-zero`) opaque `#0b0b10` mix (no Apple `#ffffff` / early `#0e0e14`). Standing P2 #14; design-review adjacent Perplexity / `feature-ai-chat`. Next: ollama/chat collapsed glances still on early `#0e0e14`, or Mac capture of stale `feature-ai-chat.png` / `feature-monitors.png` when TCC allows.

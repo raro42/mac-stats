@@ -14635,3 +14635,47 @@ body.theme-data-poster .perplexity-filter-count {
 body.theme-data-poster .perplexity-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+
+/*
+ * Data Poster: Disk Cleanup + Details collapsed glances still mix Apple
+ * `#ffffff` washes → white slab under the section headers on the opaque shell
+ * `#0b0b10`. Catch up to Monitors / AI Chat collapsed-glance opaque remaps.
+ * Design-review fuel (feature-disk-cleanup / adjacent Details) + standing P2 #14.
+ * Perplexity filter chips opaque in v0.1.2264.
+ */
+body.theme-data-poster .disk-cleanup-collapsed-glance,
+body.theme-data-poster .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, rgba(255, 255, 255, 0.92));
+}
+body.theme-data-poster .disk-cleanup-collapsed-glance:hover,
+body.theme-data-poster .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-collapsed-glance:focus-visible,
+body.theme-data-poster .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-collapsed-glance.is-due,
+body.theme-data-poster .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #0b0b10);
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+}
+body.theme-data-poster .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+body.theme-data-poster .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
