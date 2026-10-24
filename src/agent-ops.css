@@ -12386,7 +12386,8 @@ body.theme-data-poster .settings-voice-stt-attention-glance,
 body.theme-data-poster .settings-help-attention-glance {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .settings-ai-attention-glance:hover,
 body.theme-data-poster .settings-compact-attention-glance:hover,
@@ -12454,7 +12455,8 @@ body.theme-data-poster .settings-perplexity-key-attention-glance,
 body.theme-data-poster .settings-discord-token-attention-glance {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .settings-brave-key-attention-glance:hover,
 body.theme-data-poster .settings-redmine-attention-glance:hover,
@@ -12511,7 +12513,8 @@ body.theme-data-poster #settings-reset-defaults-btn.is-just-saved,
 body.theme-data-poster #view-debug-log.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
   border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
 /* Solid primary Save flashes — keep green readable; mix onto #0b0b10 not #ffffff. */
@@ -13254,7 +13257,8 @@ body.theme-data-poster #ops-memory-load-chat.is-just-saved,
 body.theme-data-poster #ops-agent-load-chat.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
   border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
 /*
@@ -13450,6 +13454,8 @@ body.theme-data-poster .ollama-collapsed-glance,
 body.theme-data-poster .chat-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
   background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .chat-model-glance:hover,
 body.theme-data-poster .chat-turn-glance:hover,
@@ -14422,7 +14428,8 @@ body.theme-data-poster .monitors-collapsed-glance.is-empty {
 body.theme-data-poster .monitors-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-collapsed-glance:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
@@ -14483,7 +14490,8 @@ body.theme-data-poster .monitors-summary.is-empty {
 body.theme-data-poster .monitors-attention-glance {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-attention-glance:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
@@ -14506,7 +14514,8 @@ body.theme-data-poster .monitors-attention-glance.has-slow {
 body.theme-data-poster .monitors-filter-attention-glance {
   border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
   background: color-mix(in srgb, currentColor 8%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-filter-attention-glance:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
@@ -14649,7 +14658,8 @@ body.theme-data-poster .disk-cleanup-collapsed-glance,
 body.theme-data-poster .details-collapsed-glance {
   border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
   background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
-  color: var(--text, rgba(255, 255, 255, 0.92));
+  /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .disk-cleanup-collapsed-glance:hover,
 body.theme-data-poster .details-collapsed-glance:hover {
