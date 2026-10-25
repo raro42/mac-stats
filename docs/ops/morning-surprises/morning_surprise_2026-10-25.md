@@ -4,6 +4,8 @@ Overnight Track B kept shipping opaque dark-theme chrome (standing P2 #14). Quie
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2323** — Neon AI Chat markdown (blockquote / code / pre / table / hr / link) opaque on `#08120c` (P2 #14).
+
 - **v0.1.2322** — Neon Ollama / AI Chat + late history chrome opaque on `#08120c` (menu, model select, chat washes, late history-chart inset, time-range, tooltip).
 - **v0.1.2321** — Neon Settings / Monitors panel + logs chrome opaque.
 - **v0.1.2320** — Neon icon-line + early Settings toggle + monitor-remove opaque.
