@@ -1,10 +1,11 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`).
+Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester open was design-review only (`feature-agent-ops.png` ~39d stale). Mac window capture still blocked (no on-screen CPU window / Screen Recording TCC).
 
 ## Shipped tonight (latest)
 
-- **v0.1.2310** — Futuristic toolbar `.icon-line-item` resting / hover / Ready / Slow / Down type and Changelog `.changelog-code` cyan wash mix on opaque `#0b0b10` (no glass rgba). Design-review adjacent `feature-ai-chat` / Changelog.
+- **v0.1.2311** — Futuristic Monitors menu / settings popover / list item / remove button / add form + Settings card panel drop white and red glass rgba; mix on opaque shell `#0b0b10`. Design-review adjacent `feature-monitors` / Settings.
+- **v0.1.2310** — Futuristic toolbar `.icon-line-item` resting / hover / Ready / Slow / Down type and Changelog `.changelog-code` cyan wash.
 
 ## Also kept this window (sample)
 
@@ -17,5 +18,6 @@ Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (st
 
 ## Still deferred
 
-- Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
-- Remaining Futuristic glass (panel fallbacks / monitor-remove red glass / body radial falls) and Neon glass tokens
+- Mac window-only recapture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / kin when Screen Recording TCC allows
+- Remaining Futuristic glass (body radial falls / later Ollama popover white falls / inset highlights) and Neon glass tokens
+- Layout-daily dark / neon / futuristic / architect shells still due (data-poster ok today)
