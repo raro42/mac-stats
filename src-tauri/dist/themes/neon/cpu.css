@@ -1914,29 +1914,32 @@ body::before {
 .ollama-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was rgba(128,128,128,0.6) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 60%, #08120c));
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: background 0.2s ease, color 0.2s ease;
   font-weight: 300;
   margin-left: 8px;
 }
 
 .ollama-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
   color: var(--text, var(--ink, inherit));
 }
 
 .ollama-menu {
   position: fixed;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 2%, #08120c));
+  border: 1px solid var(--hairline, color-mix(in srgb, #46ff78 14%, #08120c));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 45%, #08120c));
   z-index: 1000;
   min-width: 140px;
 }
@@ -1955,13 +1958,15 @@ body::before {
 }
 
 .ollama-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
 }
 
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  /* Opaque backdrop — was rgba(0,0,0,0.5) glass (#14). */
+  background: var(--modal-backdrop, color-mix(in srgb, #000000 50%, #08120c));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2001,7 +2006,8 @@ body::before {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was rgba(128,128,128,0.6) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 60%, #08120c));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -2117,7 +2123,8 @@ body::before {
 
 .model-text {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was rgba(128,128,128,0.6) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 60%, #08120c));
   cursor: pointer;
   user-select: none;
   padding: 2px 4px;
@@ -2131,16 +2138,18 @@ body::before {
 
 .model-text:hover {
   color: var(--text, var(--ink, inherit));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
 }
 
 .model-select-dropdown {
   position: absolute;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 5%, #08120c));
+  border: 1px solid var(--hairline, color-mix(in srgb, #46ff78 14%, #08120c));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 45%, #08120c));
   z-index: 1000;
   min-width: 200px;
   max-height: 300px;
@@ -2155,7 +2164,8 @@ body::before {
 }
 
 .model-select-dropdown option:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
 }
 
 .ollama-model-selector {
@@ -2174,25 +2184,27 @@ body::before {
 
 .model-select {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #08120c);
+  border: 1px solid color-mix(in srgb, #46ff78 14%, #08120c);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text, var(--ink, inherit));
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .model-select:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: color-mix(in srgb, #007aff 55%, #08120c);
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
 }
 
 .model-select:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.6)))));
+  background: color-mix(in srgb, #ffffff 7%, #08120c);
+  border-color: color-mix(in srgb, #46ff78 20%, #08120c);
 }
 
 .ollama-chat {
@@ -2204,8 +2216,9 @@ body::before {
   overflow-y: auto;
   margin-bottom: 12px;
   padding: 12px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #08120c);
+  border: 1px solid color-mix(in srgb, #46ff78 14%, #08120c);
   border-radius: 8px;
   font-size: 13px;
 }
@@ -2219,13 +2232,15 @@ body::before {
 }
 
 .chat-message.user {
-  background: rgba(0, 122, 255, 0.1);
+  /* Opaque wash — was rgba(0,122,255,0.1) glass (#14). */
+  background: color-mix(in srgb, #007aff 10%, #08120c);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }
 
 .chat-message.assistant {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #08120c);
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }
@@ -2484,12 +2499,13 @@ body::before {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.20);
+  /* Opaque inset wash — was rgba black/white glass (late duplicate of early #14). */
+  background: color-mix(in srgb, #000000 20%, #08120c);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    inset 0 1px 0 color-mix(in srgb, #78ffa0 15%, #08120c),
+    inset 0 -1px 0 color-mix(in srgb, #000000 20%, #08120c),
+    0 2px 8px color-mix(in srgb, #000000 15%, #08120c);
 }
 
 .history-chart {
@@ -2510,32 +2526,34 @@ body::before {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Opaque type — was rgba(128,128,128,0.8) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 80%, #08120c));
   font-weight: 500;
 }
 
 .time-range-dropdown {
-  background: rgba(0, 255, 0, 0.05);
-  border: 1px solid rgba(0, 255, 0, 0.3);
+  /* Opaque wash / hairline — was green glass rgba (#14). */
+  background: color-mix(in srgb, #00ff00 5%, #08120c);
+  border: 1px solid color-mix(in srgb, #00ff00 30%, #08120c);
   border-radius: 4px;
   color: #00ff00;
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(0, 255, 0, 0.1);
-  border-color: rgba(0, 255, 0, 0.5);
+  background: color-mix(in srgb, #00ff00 10%, #08120c);
+  border-color: color-mix(in srgb, #00ff00 50%, #08120c);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(0, 255, 0, 0.15);
-  border-color: rgba(0, 255, 0, 0.7);
-  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.1);
+  background: color-mix(in srgb, #00ff00 15%, #08120c);
+  border-color: color-mix(in srgb, #00ff00 70%, #08120c);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #00ff00 10%, #08120c);
 }
 
 .time-range-dropdown option {
@@ -2546,10 +2564,11 @@ body::before {
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
+  /* Opaque panel — was black/green glass rgba (#14). */
+  background: color-mix(in srgb, #000000 95%, #08120c);
   color: #00ff00;
   padding: 8px 12px;
-  border: 1px solid rgba(0, 255, 0, 0.5);
+  border: 1px solid color-mix(in srgb, #00ff00 50%, #08120c);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2558,7 +2577,7 @@ body::before {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #08120c);
 }
 
 /* Debug Log viewer */
