@@ -1,10 +1,11 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`).
+Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester open was design-review only (`feature-agent-ops.png` ~39d stale). Mac window capture still blocked (no on-screen CPU window / Screen Recording TCC).
 
 ## Shipped tonight (latest)
 
-- **v0.1.2312** — Futuristic Ollama / AI Chat chrome: `.ollama-menu` / menu button, settings popover backdrop, model select + dropdown, and chat message washes mix on opaque `#0b0b10` (no white / gray / accent glass rgba). Design-review adjacent `feature-ai-chat`.
+- **v0.1.2313** — Futuristic AI Chat markdown blockquote / code / pre / table / hr / link and late history-chart inset + time-range / tooltip drop black / white / cyan glass rgba; mix on opaque shell `#0b0b10`. Design-review adjacent `feature-ai-chat` / metrics history.
+- **v0.1.2312** — Futuristic Ollama / AI Chat chrome: `.ollama-menu` / menu button, settings popover backdrop, model select + dropdown, and chat message washes.
 
 ## Also kept this window (sample)
 
@@ -19,4 +20,5 @@ Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (st
 ## Still deferred
 
 - Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
-- Remaining Futuristic glass (markdown code/blockquote / history-chart inset / body radial falls) and Neon glass tokens
+- Remaining Futuristic glass (body radial falls / Settings checkbox duplicate glass / logs toolbar) and Neon glass tokens
+- Layout-daily dark / neon / futuristic / architect shells still due (data-poster ok today)
