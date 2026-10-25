@@ -1078,16 +1078,16 @@ body.theme-data-poster .perplexity-setup-note,
 body.theme-dark .perplexity-setup-note,
 body.theme-data-poster .disk-cleanup-item-stat,
 body.theme-dark .disk-cleanup-item-stat {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .perplexity-result-list,
 body.theme-dark .perplexity-result-list,
 body.theme-data-poster .rings-filter-miss-hint,
 body.theme-dark .rings-filter-miss-hint {
-  /* Was opacity 0.78 on inherit (~92% white) → ~72% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 72%, #0e0e14);
+  /* Was opacity 0.78 on inherit (~92% white) → ~72% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .processes-filter-miss-hint,
@@ -1144,12 +1144,16 @@ body.theme-futuristic .monitor-backoff-hint {
 }
 body.theme-data-poster .perplexity-result-snippet,
 body.theme-dark .perplexity-result-snippet {
-  /* Was opacity 0.7 on inherit (~92% white) → ~64% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 64%, #0e0e14);
+  /* Was opacity 0.7 on inherit (~92% white) → ~64% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 64%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .perplexity-config-status,
-body.theme-dark .perplexity-config-status,
+body.theme-dark .perplexity-config-status {
+  /* Was opacity 0.7 on --muted. Opaque muted RGB, then 70% on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0b0b10);
+  opacity: 1;
+}
 body.theme-neon .perplexity-config-status,
 body.theme-futuristic .perplexity-config-status {
   /* Was opacity 0.7 on --muted. Opaque muted RGB, then 70% on #0e0e14. */
@@ -1158,8 +1162,8 @@ body.theme-futuristic .perplexity-config-status {
 }
 body.theme-data-poster .perplexity-setup-note:not([hidden]),
 body.theme-dark .perplexity-setup-note:not([hidden]) {
-  /* Was opacity 0.55 on a 70% #c44 mix → pale red on #0e0e14. */
-  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0e0e14);
+  /* Was opacity 0.55 on a 70% #c44 mix → pale red; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, color-mix(in srgb, #c44 70%, #ffffff) 55%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .process-detail-pid:hover,
@@ -1178,8 +1182,8 @@ body.theme-dark .disk-cleanup-scope-path:hover {
 }
 body.theme-data-poster .monitor-item.is-down .monitor-checked-ago,
 body.theme-dark .monitor-item.is-down .monitor-checked-ago {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .chat-empty-chip,
