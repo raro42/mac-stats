@@ -1126,8 +1126,8 @@ body.theme-data-poster .monitor-latency,
 body.theme-dark .monitor-latency,
 body.theme-neon .monitor-latency,
 body.theme-futuristic .monitor-latency {
-  /* Was opacity 0.9 on --muted. Opaque muted RGB, then 90% on #0e0e14. */
-  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0e0e14);
+  /* Was opacity 0.9 on --muted. Opaque muted RGB, then 90% on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .monitor-detail-k,
@@ -1138,8 +1138,8 @@ body.theme-data-poster .monitor-backoff-hint,
 body.theme-dark .monitor-backoff-hint,
 body.theme-neon .monitor-backoff-hint,
 body.theme-futuristic .monitor-backoff-hint {
-  /* Was opacity 0.78 on --muted. Opaque muted RGB, then 78% on #0e0e14. */
-  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0e0e14);
+  /* Was opacity 0.78 on --muted. Opaque muted RGB, then 78% on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .perplexity-result-snippet,
@@ -3275,14 +3275,14 @@ body.theme-data-poster .lpm-info.is-busy .lpm-value,
 body.theme-dark .lpm-info.is-busy .lpm-value,
 body.theme-neon .lpm-info.is-busy .lpm-value,
 body.theme-futuristic .lpm-info.is-busy .lpm-value {
-  /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+  /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
 }
 body.theme-data-poster .lpm-info.is-on.is-busy .lpm-value,
 body.theme-dark .lpm-info.is-on.is-busy .lpm-value,
 body.theme-neon .lpm-info.is-on.is-busy .lpm-value,
 body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
-  color: color-mix(in srgb, #248a3d 72%, #0e0e14);
+  color: color-mix(in srgb, #248a3d 72%, #0b0b10);
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */

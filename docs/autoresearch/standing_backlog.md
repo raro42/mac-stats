@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2299
+
+- Data Poster / Dark filter-miss hints + LPM busy (filter-miss / empty hints; `.monitor-latency`; `.monitor-detail-k` / `.monitor-backoff-hint`; LPM busy label/value) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent Monitors / `feature-agent-ops`. Next: remaining early `#0e0e14` (empty shells · process-empty · ops-insight-line shared; neon/futuristic leftovers), or Mac capture of stale `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2298
 
 - Data Poster / Dark Perplexity + Down checked-ago type (`.perplexity-setup-lead` / `.perplexity-setup-note` + error; `.perplexity-result-list` / `.perplexity-result-snippet` / `.perplexity-config-status`; `.rings-filter-miss-hint`; `.disk-cleanup-item-stat`; Down `.monitor-checked-ago`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent Perplexity / `feature-monitors`. Next: remaining early `#0e0e14` (shared filter-miss / empty hints + monitor latency/detail; LPM busy; neon/futuristic leftovers), or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` when TCC allows.
