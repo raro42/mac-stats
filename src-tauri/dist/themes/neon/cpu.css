@@ -110,13 +110,15 @@ body::before {
 
 .details-section::-webkit-scrollbar-thumb,
 .processes-section::-webkit-scrollbar-thumb {
-  background: rgba(200, 255, 210, 0.15);
+  /* Opaque thumb — was rgba(200,255,210,0.15) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 15%, #08120c);
   border-radius: 3px;
 }
 
 .details-section::-webkit-scrollbar-thumb:hover,
 .processes-section::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 255, 210, 0.25);
+  /* Opaque hover — was rgba(200,255,210,0.25) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 25%, #08120c);
 }
 
 .panel-header {
@@ -138,7 +140,8 @@ body::before {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  color: rgba(230, 255, 230, 0.92);
+  /* Opaque type — was rgba(230,255,230,0.92) glass (#14). */
+  color: color-mix(in srgb, #e6ffe6 92%, #08120c);
 }
 
 .subtitle {
@@ -156,9 +159,10 @@ body::before {
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  border: 1px solid rgba(120, 255, 160, 0.25);
-  background: rgba(30, 60, 40, 0.35);
-  color: rgba(200, 255, 210, 0.78);
+  /* Opaque chrome — was green glass rgba (#14). */
+  border: 1px solid color-mix(in srgb, #78ffa0 25%, #08120c);
+  background: color-mix(in srgb, #1e3c28 35%, #08120c);
+  color: color-mix(in srgb, #c8ffd2 78%, #08120c);
   font-size: 18px;
   cursor: pointer;
 
@@ -166,20 +170,22 @@ body::before {
   align-items: center;
   justify-content: center;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.40), 0 0 12px rgba(120, 255, 160, 0.16);
+  box-shadow: 0 10px 30px color-mix(in srgb, #000000 40%, #08120c), 0 0 12px color-mix(in srgb, #78ffa0 16%, #08120c);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease;
 }
 
 .icon-btn:hover {
   transform: none;
-  color: rgba(225, 255, 235, 0.95);
+  /* Opaque hover type — was rgba(225,255,235,0.95) glass (#14). */
+  color: color-mix(in srgb, #e1ffeb 95%, #08120c);
 }
 
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, rgba(120, 255, 160, 0), rgba(120, 255, 160, 0.22), rgba(120, 255, 160, 0));
-  opacity: 0.9;
+  /* Opaque divider peak — was green glass rgba gradient (#14). */
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, #78ffa0 22%, #08120c), transparent);
+  opacity: 1;
 }
 
 .metrics-grid {
@@ -193,9 +199,10 @@ body::before {
 .metric-tile {
   position: relative;
   border-radius: 0;
-  background: rgba(8, 18, 12, 0.45);
+  /* Opaque tile wash — was rgba(8,18,12,0.45) glass (#14). */
+  background: color-mix(in srgb, #08120c 45%, #020302);
   border: none;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.50);
+  box-shadow: 0 18px 40px color-mix(in srgb, #000000 50%, #08120c);
   overflow: visible;
 
   min-height: 165px;
@@ -220,8 +227,9 @@ body::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 18%, rgba(120, 255, 160, 0.12), transparent 55%);
-  opacity: 0.9;
+  /* Opaque radial peak — was green glass rgba (#14). */
+  background: radial-gradient(circle at 50% 18%, color-mix(in srgb, #78ffa0 12%, #08120c), transparent 55%);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -349,9 +357,10 @@ body::before {
 
 .ring-track {
   fill: none;
-  stroke: rgba(120, 255, 160, 0.18);
+  /* Opaque track — was rgba(120,255,160,0.18) glass (#14). */
+  stroke: color-mix(in srgb, #78ffa0 18%, #08120c);
   stroke-width: 4;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .ring-progress {
@@ -372,7 +381,8 @@ body::before {
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  color: rgba(210, 255, 220, 0.75);
+  /* Opaque type — was rgba(210,255,220,0.75) glass (#14). */
+  color: color-mix(in srgb, #d2ffdc 75%, #08120c);
   text-transform: uppercase;
 }
 
