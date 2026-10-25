@@ -88,13 +88,15 @@ body {
 
 .arch-details::-webkit-scrollbar-thumb,
 .arch-processes::-webkit-scrollbar-thumb {
-  background: rgba(35, 45, 65, 0.15);
+  /* Opaque thumb — was rgba(35,45,65,0.15) glass (#14). */
+  background: color-mix(in srgb, #232d41 15%, #f1f1f1);
   border-radius: 3px;
 }
 
 .arch-details::-webkit-scrollbar-thumb:hover,
 .arch-processes::-webkit-scrollbar-thumb:hover {
-  background: rgba(35, 45, 65, 0.25);
+  /* Opaque hover — was rgba(35,45,65,0.25) glass (#14). */
+  background: color-mix(in srgb, #232d41 25%, #f1f1f1);
 }
 
 .arch-header {
@@ -115,7 +117,8 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  color: rgba(28, 28, 30, 0.92);
+  /* Opaque type — was rgba(28,28,30,0.92) glass (#14). */
+  color: color-mix(in srgb, #1c1c1e 92%, #f1f1f1);
 }
 
 .arch-subtitle {
@@ -130,7 +133,8 @@ body {
   gap: 0;
   border: 1px solid var(--line-strong);
   padding: 2px;
-  background: rgba(255, 255, 255, 0.42);
+  /* Opaque wash — was rgba(255,255,255,0.42) glass (#14). */
+  background: color-mix(in srgb, #ffffff 42%, #f1f1f1);
   border-radius: 10px;
 }
 
@@ -140,7 +144,8 @@ body {
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: rgba(35, 45, 65, 0.75);
+  /* Opaque type — was rgba(35,45,65,0.75) glass (#14). */
+  color: color-mix(in srgb, #232d41 75%, #f1f1f1);
   font-size: 16px;
   cursor: pointer;
   position: relative;
@@ -159,15 +164,18 @@ body {
   top: calc(50% - 10px);
   width: 1px;
   height: 20px;
-  background: rgba(35, 45, 65, 0.15);
+  /* Opaque divider — was rgba(35,45,65,0.15) glass (#14). */
+  background: color-mix(in srgb, #232d41 15%, #f1f1f1);
 }
 
 .icon-btn:hover {
-  background: rgba(35, 45, 65, 0.08);
+  /* Opaque hover wash — was rgba(35,45,65,0.08) glass (#14). */
+  background: color-mix(in srgb, #232d41 8%, #f1f1f1);
 }
 
 .icon-btn:active {
-  background: rgba(35, 45, 65, 0.12);
+  /* Opaque active wash — was rgba(35,45,65,0.12) glass (#14). */
+  background: color-mix(in srgb, #232d41 12%, #f1f1f1);
 }
 
 .arch-rule {
@@ -215,7 +223,8 @@ body {
   position: relative;
   border-radius: 14px;
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.20);
+  /* Opaque tile wash — was rgba(255,255,255,0.20) glass (#14). */
+  background: color-mix(in srgb, #ffffff 20%, #f1f1f1);
   padding: 18px 14px 14px;
   min-height: 180px;
   overflow: hidden;
@@ -344,7 +353,8 @@ body {
 
 .ring-track {
   fill: none;
-  stroke: var(--ring-track);
+  /* Opaque track — was var(--ring-track) rgba(35,45,65,0.20) glass (#14). */
+  stroke: color-mix(in srgb, #232d41 20%, #f1f1f1);
   stroke-width: 5;
   stroke-linecap: round;
 }
@@ -365,7 +375,8 @@ body {
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
-  color: rgb(1, 1, 1, 0.75);
+  /* Opaque type — was rgb(1,1,1,0.75) glass (#14). */
+  color: color-mix(in srgb, #010101 75%, #f1f1f1);
   text-transform: uppercase;
 }
 
