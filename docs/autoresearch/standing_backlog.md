@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2296
+
+- Data Poster / Dark shared muted type (kb-hints; `.response-time`; `.chat-exec-label`; path/meta labels in shared dark block) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: remaining early `#0e0e14` DP/Dark-only (`.ops-subhead` / `.ops-insight-sub`; Perplexity setup/list/snippet; Down `monitor-checked-ago`), or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2295
 
 - Data Poster / Dark Monitors summary + glances (`.monitors-summary`; `.monitors-collapsed-glance`; `.monitors-attention-glance`; `.monitors-filter-attention-glance` resting/hover/focus/Down/Up/Slow/filter) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: remaining early `#0e0e14` washes in shared dark block (if any), or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
