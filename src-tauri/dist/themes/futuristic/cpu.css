@@ -1849,29 +1849,32 @@ body {
 .ollama-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was rgba(128,128,128,0.6) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 60%, #0b0b10));
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: background 0.2s ease, color 0.2s ease;
   font-weight: 300;
   margin-left: 8px;
 }
 
 .ollama-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
   color: var(--text, var(--ink, inherit));
 }
 
 .ollama-menu {
   position: fixed;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 2%, #0b0b10));
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 45%, #0b0b10));
   z-index: 1000;
   min-width: 140px;
 }
@@ -1890,13 +1893,15 @@ body {
 }
 
 .ollama-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .ollama-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  /* Opaque backdrop — was rgba(0,0,0,0.5) glass (#14). */
+  background: var(--modal-backdrop, color-mix(in srgb, #000000 50%, #0b0b10));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2066,16 +2071,18 @@ body {
 
 .model-text:hover {
   color: var(--text, var(--ink, inherit));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .model-select-dropdown {
   position: absolute;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 5%, #0b0b10));
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 45%, #0b0b10));
   z-index: 1000;
   min-width: 200px;
   max-height: 300px;
@@ -2090,7 +2097,8 @@ body {
 }
 
 .model-select-dropdown option:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque wash — was gray glass rgba(128,128,128,0.1) (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .ollama-model-selector {
@@ -2109,25 +2117,27 @@ body {
 
 .model-select {
   flex: 1;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   padding: 6px 10px;
   color: var(--text, var(--ink, inherit));
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .model-select:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 30%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .model-select:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.6)))));
+  background: color-mix(in srgb, #ffffff 7%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
 }
 
 .ollama-chat {
@@ -2139,8 +2149,9 @@ body {
   overflow-y: auto;
   margin-bottom: 12px;
   padding: 12px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   font-size: 13px;
 }
@@ -2154,13 +2165,15 @@ body {
 }
 
 .chat-message.user {
-  background: rgba(0, 122, 255, 0.1);
+  /* Opaque wash — was rgba(0,122,255,0.1) glass (#14). */
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 10%, #0b0b10);
   margin-left: 20px;
   color: var(--text, var(--ink, inherit));
 }
 
 .chat-message.assistant {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
   margin-right: 20px;
   color: var(--text, var(--ink, inherit));
 }
