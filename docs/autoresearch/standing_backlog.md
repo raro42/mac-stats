@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2329
+
+- Dark (TUI) Settings toggle (Apple early + green late) + Force Quit wash + icon-line Ready/Slow/Down type opaque `#0a0a0a` mix (no glass rgba). Standing P2 #14; layout-daily / design-review adjacent Dark Settings / toolbar. Next: Dark Monitors Apple rgba falls, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2328
 
 - Dark (TUI) Settings card + theme/input/btn/help `color-mix(…, transparent)` + Apple rgba panel falls opaque `#0a0a0a` mix (no white / transparent glass). Standing P2 #14; layout-daily / design-review adjacent Dark Settings. Next: Dark early Settings toggle / force-quit / icon-line Slow·Down type / Monitors Apple rgba falls, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
