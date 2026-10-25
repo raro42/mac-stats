@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2315
+
+- Neon opaque shell tokens + body radials (`:root` `--text` / `--muted` / `--hairline` / `--panel-bg` / `--panel` / `--panel-border` / shadow·modal·glow; body green radial peaks; `body::before`; `.neon-frame` border) opaque `#08120c` mix (no green / white / black glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon shell. Next: remaining Neon chrome glass (scrollbar / icon-btn / metric tiles / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2314
 
 - Futuristic body radials + logs + Settings duplicate (body cyan/purple radial peaks; `.logs-toolbar` / `.logs-viewer` / `.logs-autorefresh`; early Settings checkbox glass duplicate removed) opaque `#0b0b10` mix (no cyan / purple / gray / black glass rgba). Standing P2 #14; design-review adjacent Futuristic shell / Logs. Next: remaining Futuristic glass (process-bar glow shadow / later rgba falls if any), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

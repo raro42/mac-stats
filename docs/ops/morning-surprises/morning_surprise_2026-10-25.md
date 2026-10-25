@@ -1,23 +1,16 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`).
+## Shipped overnight (Track B)
 
-## Shipped tonight (latest)
+- **v0.1.2315** — Neon opaque shell tokens + body radials / `body::before` / `.neon-frame` on `#08120c` (standing #14). Glass rgba gone from type, panel, shadow, glow, and field washes.
+- **v0.1.2314** — Futuristic body radials + Debug Log toolbar/viewer + Settings checkbox duplicate cleanup on `#0b0b10`.
+- Earlier same night: Futuristic markdown/history, Ollama/AI Chat, Monitors/Settings, icon-line, force-quit, history/process, and Data Poster `--panel` opaque waves (v0.1.2305–v0.1.2313).
 
-- **v0.1.2314** — Futuristic body cyan/purple radial peaks, Debug Log toolbar / viewer / autorefresh washes, and removal of the early Settings checkbox glass duplicate. Mixes on opaque `#0b0b10` (no cyan / purple / gray / black glass rgba). Design-review adjacent Futuristic shell / Logs.
+## Tried / deferred
 
-## Also kept this window (sample)
+- Design-review capture of stale `docs/screens/feature-agent-ops.png` (~39d): CPU window opened (`--cpu` + Agent Ops), but `screencapture -l` failed (Screen Recording TCC — could not create image).
+- Layout-daily Data Poster due today (remaps clean); Neon shell tokens took this tick’s experiment slot.
 
-- **v0.1.2313** — Futuristic markdown + history chrome
-- **v0.1.2312** — Futuristic Ollama / AI Chat chrome
-- **v0.1.2311** — Futuristic Monitors + Settings panel chrome
-- **v0.1.2310** — Futuristic icon-line + changelog-code
-- **v0.1.2309** — Futuristic Force Quit + Settings toggle chrome
-- **v0.1.2308** — Futuristic Changelog scrollbar + battery icons
-- **v0.1.2306–2307** — Futuristic shell tokens + history/process/metric opacity
-- Earlier in the night: Data Poster / Dark AI Chat · Processes · Monitors · Disk Cleanup · Settings inject waves (v0.1.2285–2305)
+## Next
 
-## Still deferred
-
-- Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
-- Remaining Futuristic glass (process-bar glow shadow / later rgba falls if any) and Neon glass tokens
+- Remaining Neon chrome glass, Futuristic process-bar glow, or Mac capture when TCC allows.
