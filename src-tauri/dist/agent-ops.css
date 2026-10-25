@@ -1068,8 +1068,8 @@ body.theme-neon .process-details-header-kb-hint,
 body.theme-futuristic .process-details-header-kb-hint,
 body.theme-neon .changelog-header-kb-hint,
 body.theme-futuristic .changelog-header-kb-hint {
-  /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+  /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .perplexity-setup-lead,
@@ -1156,8 +1156,8 @@ body.theme-dark .perplexity-config-status {
 }
 body.theme-neon .perplexity-config-status,
 body.theme-futuristic .perplexity-config-status {
-  /* Was opacity 0.7 on --muted. Opaque muted RGB, then 70% on #0e0e14. */
-  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0e0e14);
+  /* Was opacity 0.7 on --muted. Opaque muted RGB, then 70% on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .perplexity-setup-note:not([hidden]),
@@ -12415,13 +12415,13 @@ button.is-just-saved,
 }
 body.theme-data-poster .setting-toggle .toggle-label.is-judge-off,
 body.theme-futuristic .setting-toggle .toggle-label.is-judge-off {
-  /* Was opacity 0.55 on rgba(255,255,255,~0.73) → ~41% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 41%, #0e0e14);
+  /* Was opacity 0.55 on rgba(255,255,255,~0.73) → ~41% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 41%, #0b0b10);
   opacity: 1;
 }
 body.theme-neon .setting-toggle .toggle-label.is-judge-off {
-  /* Was opacity 0.55 on rgba(200,255,210,0.80) → ~44% of that ink on #0e0e14. */
-  color: color-mix(in srgb, #c8ffd2 44%, #0e0e14);
+  /* Was opacity 0.55 on rgba(200,255,210,0.80) → ~44% of that ink; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #c8ffd2 44%, #0b0b10);
   opacity: 1;
 }
 body.theme-dark .setting-toggle .toggle-label.is-judge-off {
