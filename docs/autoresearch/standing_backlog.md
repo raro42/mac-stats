@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2304
+
+- Data Poster / Dark (+ neon/futuristic injects) `cpu.js` / `cpu-ui.js` kb-hint + LPM (LPM busy; `.filter-chip-kb-hint`; Force Quit / Perplexity search+setup kb-hints; modal / process-details / changelog header kb-hints; Settings theme-list / Appearance / Product / Credentials kb-hints) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent Settings / AI Chat / Perplexity. Next: remaining early `#0e0e14` in orphan `dashboard.css` (`.ops-insight-line em`), or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2303
 
 - Data Poster / Neon / Futuristic judge-off + filter kb-hints + Perplexity status (`.filter-chip-kb-hint` / modal header kb-hints incl. neon/futuristic process-details + changelog; neon/futuristic `.perplexity-config-status`; `.toggle-label.is-judge-off` DP/Futuristic/Neon) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent Settings / Agent Ops chrome. Next: remaining early `#0e0e14` in `cpu.js` / `cpu-ui.js` injects (and orphan dashboard), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when TCC allows.

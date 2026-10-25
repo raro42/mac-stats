@@ -205,8 +205,8 @@
       body.theme-dark .changelog-header-kb-hint,
       body.theme-neon .changelog-header-kb-hint,
       body.theme-futuristic .changelog-header-kb-hint {
-        /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
       body.theme-data-poster .changelog-header-kb-hint {
@@ -888,7 +888,8 @@
       }
       body.theme-data-poster .theme-list-kb-hint,
       body.theme-dark .theme-list-kb-hint {
-        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        /* Mix on #0b0b10 (was early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
       .theme-list-kb-hint[hidden] {
@@ -979,7 +980,8 @@
       }
       body.theme-data-poster .appearance-setting-kb-hint,
       body.theme-dark .appearance-setting-kb-hint {
-        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        /* Mix on #0b0b10 (was early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
     `;
@@ -1224,7 +1226,8 @@
       }
       body.theme-data-poster .product-setting-kb-hint,
       body.theme-dark .product-setting-kb-hint {
-        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        /* Mix on #0b0b10 (was early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
       .product-setting-kb-hint[hidden] {
@@ -3600,7 +3603,8 @@
       }
       body.theme-data-poster .credentials-section-kb-hint,
       body.theme-dark .credentials-section-kb-hint {
-        color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+        /* Mix on #0b0b10 (was early #0e0e14). */
+        color: color-mix(in srgb, #ffffff 66%, #0b0b10);
         opacity: 1;
       }
       .credentials-section-kb-hint[hidden] {

@@ -3605,14 +3605,14 @@ function ensureRamStripStyles() {
     body.theme-dark .lpm-info.is-busy .lpm-value,
     body.theme-neon .lpm-info.is-busy .lpm-value,
     body.theme-futuristic .lpm-info.is-busy .lpm-value {
-      /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+      color: color-mix(in srgb, #ffffff 66%, #0b0b10);
     }
     body.theme-data-poster .lpm-info.is-on.is-busy .lpm-value,
     body.theme-dark .lpm-info.is-on.is-busy .lpm-value,
     body.theme-neon .lpm-info.is-on.is-busy .lpm-value,
     body.theme-futuristic .lpm-info.is-on.is-busy .lpm-value {
-      color: color-mix(in srgb, #248a3d 72%, #0e0e14);
+      color: color-mix(in srgb, #248a3d 72%, #0b0b10);
     }
     .lpm-info.is-lpm-flash {
       box-shadow: none;
@@ -5541,8 +5541,8 @@ function ensureFilterChipKbStyles() {
     body.theme-dark .filter-chip-kb-hint,
     body.theme-neon .filter-chip-kb-hint,
     body.theme-futuristic .filter-chip-kb-hint {
-      /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+      color: color-mix(in srgb, #ffffff 66%, #0b0b10);
       opacity: 1;
     }
     .processes-filter-chips,
@@ -7122,7 +7122,8 @@ function ensureForceQuitToolbarKbStyles() {
     }
     body.theme-data-poster .force-quit-toolbar-kb-hint,
     body.theme-dark .force-quit-toolbar-kb-hint {
-      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      /* Mix on #0b0b10 (was early #0e0e14). */
+      color: color-mix(in srgb, #ffffff 66%, #0b0b10);
       opacity: 1;
     }
     .force-quit-toolbar-kb-hint[hidden] {
@@ -17825,7 +17826,8 @@ function ensurePerplexitySearchKbStyles() {
     }
     body.theme-data-poster .perplexity-search-kb-hint,
     body.theme-dark .perplexity-search-kb-hint {
-      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      /* Mix on #0b0b10 (was early #0e0e14). */
+      color: color-mix(in srgb, #ffffff 66%, #0b0b10);
       opacity: 1;
     }
     .perplexity-search-kb-hint[hidden] {
@@ -18004,7 +18006,8 @@ function ensurePerplexitySetupKbStyles() {
     }
     body.theme-data-poster .perplexity-setup-kb-hint,
     body.theme-dark .perplexity-setup-kb-hint {
-      color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+      /* Mix on #0b0b10 (was early #0e0e14). */
+      color: color-mix(in srgb, #ffffff 66%, #0b0b10);
       opacity: 1;
     }
     .perplexity-setup-kb-hint[hidden] {
