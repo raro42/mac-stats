@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2335
+
+- Architect icon-line + battery chrome (`.battery-icon` resting / charging; `.icon-line-item` resting / hover; Ready / Slow / Down type) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent toolbar / battery strip (polish-without-capture grace). Next: remaining Architect light glass (shell tokens / icon-btn / scrollbar / later rgba falls if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2334
 
 - Architect Force Quit + Settings toggle chrome (early Apple `.setting-toggle` track/checked/knob shadow; later Architect ink toggle + `.toggle-label`; `.force-quit-section` hairline; `.force-quit-btn` wash/type) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-disk-cleanup` (polish-without-capture grace). Next: remaining Architect light glass (shell tokens / icon-line / battery / later rgba falls if any), or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
