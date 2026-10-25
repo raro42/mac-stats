@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2325
+
+- Neon Settings theme/input/btn/help `color-mix(…, transparent)` washes (theme-item resting / hover / current; settings-input focus; settings-btn / primary; help-sheet) opaque `#08120c` mix (no transparent glass). Standing P2 #14; layout-daily / design-review adjacent Neon Settings. Next: Futuristic process-bar glow + Futuristic Settings `color-mix(…, transparent)` washes, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2324
 
 - Neon Settings + Monitors Apple var() rgba falls (Settings header / theme-item / input / button / help-sheet; collapse / Monitors menu / settings popover / list muted·hairline·modal chains; thinking-dots) opaque `#08120c` mix (no Apple rgba glass). Standing P2 #14; layout-daily / design-review adjacent Neon Settings / Monitors. Next: remaining Neon glass (`color-mix(…, transparent)` washes / later falls if any), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
