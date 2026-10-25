@@ -271,7 +271,8 @@ body {
   position: absolute;
   inset: 14px;
   border-radius: 10px;
-  border: 1px dashed rgba(35, 45, 65, 0.18);
+  /* Opaque dashed inset — was rgba(35,45,65,0.18) glass (#14). */
+  border: 1px dashed color-mix(in srgb, #232d41 18%, #f1f1f1);
   pointer-events: none;
 }
 
@@ -398,7 +399,8 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(60, 60, 67, 0.72);
+  /* Opaque type — was rgba(60,60,67,0.72) glass (#14). */
+  color: color-mix(in srgb, #3c3c43 72%, #f1f1f1);
 }
 
 .detail-label {
@@ -1623,20 +1625,21 @@ padding: 0;
 }
 
 .monitor-remove-btn {
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  /* Opaque wash — was rgba(255,59,48,…) glass (#14). */
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+  border: 1px solid color-mix(in srgb, #ff3b30 20%, #f1f1f1);
   color: #ff3b30;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-remove-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
-  border-color: rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 20%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 30%, #f1f1f1);
 }
 
 .add-monitor-form {

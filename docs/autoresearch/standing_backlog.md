@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2339
+
+- Architect dashed metric inset + Details type + Monitors remove (`.metric-box::before`; `.details-grid`; `.monitor-remove-btn` resting/hover) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-cpu-metrics` / `feature-monitors` (polish-without-capture grace). Next: remaining Architect Apple var() rgba panel fallbacks (Monitors menu / settings popover / Ollama chains if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2338
 
 - Architect Changelog version/bullet/code + battery strip wash (`.changelog-version`; `.changelog-item::before`; `.changelog-code`; `.battery-power-strip`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent Changelog / battery (polish-without-capture grace). Next: remaining Architect light glass (dashed empty border / metric-label type / Monitors remove red / Apple var() rgba fallbacks if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
