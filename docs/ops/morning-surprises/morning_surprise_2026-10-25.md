@@ -1,26 +1,20 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque dark-shell washes (#14): Data Poster / Dark, then Futuristic shell + chrome.
+Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`).
 
-## Shipped
+## Shipped tonight (latest)
 
-- **v0.1.2307** — Futuristic history chart inset + label, Top Processes row hairline / name / bar track, Settings `.toggle-label`, and `.metric-unit` / `.metric-subtext` drop white glass rgba and opacity compositing; mix on opaque shell `#0b0b10`. Design-review adjacent `feature-processes` / Futuristic metrics.
-- **v0.1.2306** — Futuristic `:root` shell tokens + first-wave chrome (text/muted/hairline/glass/panel/shadow/modal; scrollbar; header; icon-btn; metric-tile; ring-track; section-title; details-grid).
-- **v0.1.2305** — Data Poster `--panel` + orphan Insights em on `#0b0b10`.
-- **v0.1.2304** — `cpu.js` / `cpu-ui.js` kb-hint + LPM injects.
-- **v0.1.2303** — Judge-off labels + filter/modal kb-hints + neon/futuristic Perplexity status.
-- **v0.1.2302** — Disk Cleanup empty / disabled / Recurse + Force Quit chevron.
-- **v0.1.2301** — Monitors checking / pending / removing.
-- **v0.1.2300** — Empty shells + `.process-empty` + `.ops-insight-line`.
-- Earlier tonight: **v0.1.2299**–**v0.1.2280** Processes / AI Chat / Monitors / poster opaque washes.
+- **v0.1.2308** — Futuristic Changelog scrollbar track / thumb / hover, `.changelog-error`, and battery strip `.battery-icon` resting / charging mix on opaque `#0b0b10` (no white / accent glass rgba). Design-review adjacent Changelog / battery strip.
 
-## Tried / deferred
+## Also kept this window (sample)
 
-- Design-review due=`feature-agent-ops.png` (~39d stale). Digester open candidate each tick. No on-screen CPU window / `screencapture -l` Screen Recording TCC still blocks window-only capture. Prior PNG kept.
-- Parallel races earlier: discarded duplicate locals when origin already shipped adjacent remaps; continued from standing next.
+- **v0.1.2307** — Futuristic history / process / metric opacity chrome
+- **v0.1.2306** — Futuristic opaque shell tokens + first-wave chrome
+- **v0.1.2305** — Data Poster `--panel` + orphan Insights em
+- Earlier in the night: Data Poster / Dark AI Chat · Processes · Monitors · Disk Cleanup · Settings inject waves (v0.1.2285–2304)
 
-## Next
+## Still deferred
 
-- Remaining Futuristic glass (changelog scrollbar, battery strip, later rgba(255) falls) or Neon glass tokens.
-- Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording allows window-only capture.
-- Layout-daily dark shells still due (data-poster ok today).
+- Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
+- Remaining Futuristic glass (force-quit section / setting-toggle checkbox / later rgba(255) falls) and Neon glass tokens
+
