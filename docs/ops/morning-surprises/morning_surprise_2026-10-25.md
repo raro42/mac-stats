@@ -4,16 +4,17 @@ Overnight Track B kept shipping opaque Data Poster / Dark washes (#14).
 
 ## Shipped
 
-- **v0.1.2294** — Top Processes top glances (`.processes-top-glance`, `.processes-top-gpu-glance`, `.processes-top-ram-glance` resting/hover/focus/is-hot/is-ok) mix on opaque shell `#0b0b10` instead of early `#0e0e14`.
-- **v0.1.2293** — AI Chat exec + answer cards (`.chat-exec-card`, `.chat-exec-code`, `.chat-answer-part`, `.chat-answer-final`).
-- Earlier tonight: **v0.1.2292** Processes rows + pin; **v0.1.2291** Processes filter chips + filter-miss; **v0.1.2290** Monitors filter-miss + empty CTA; **v0.1.2289** Monitors + Perplexity filter chips; **v0.1.2288** AI Chat filter chips + composer focus; **v0.1.2287** AI Chat collapsed glances; **v0.1.2286** AI Chat empty shell.
+- **v0.1.2295** — Monitors summary + collapsed + attention + filter-attention glances mix on opaque shell `#0b0b10` instead of early `#0e0e14`.
+- **v0.1.2294** — Top Processes top glances (`.processes-top-glance`, `.processes-top-gpu-glance`, `.processes-top-ram-glance`).
+- **v0.1.2293** — AI Chat exec + answer cards.
+- Earlier tonight: Processes rows/pin/filters; Monitors filter-miss; AI Chat filters/empty/collapsed; field grid + tile washes.
 
 ## Tried / deferred
 
-- Digester empty (0 runs / 7d). Sibling OpenClaw/Hermes git missing on Linux rack.
-- Window-only Mac screenshots for stale `feature-ai-chat.png` / `feature-processes.png` / `feature-monitors.png` still deferred (no TCC / no on-screen CPU window on this rack).
+- Design-review window capture of stale `feature-agent-ops.png`: CPU window opened, but `screencapture -l` failed (Screen Recording TCC).
+- Duplicate local `.poster-bg` v0.1.2280 discarded — parallel already shipped on origin.
 
 ## Next
 
-- Monitors summary / collapsed / attention glances still on early `#0e0e14` (shared dark).
+- Remaining early `#0e0e14` washes in the shared dark block (if any).
 - Mac capture when Screen Recording allows.

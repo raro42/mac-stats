@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2295
+
+- Data Poster / Dark Monitors summary + glances (`.monitors-summary`; `.monitors-collapsed-glance`; `.monitors-attention-glance`; `.monitors-filter-attention-glance` resting/hover/focus/Down/Up/Slow/filter) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-monitors`. Next: remaining early `#0e0e14` washes in shared dark block (if any), or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2294
 
 - Data Poster / Dark Top Processes top glances (`.processes-top-glance`; `.processes-top-gpu-glance`; `.processes-top-ram-glance` resting/hover/focus/is-hot/is-ok) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`. Next: Monitors summary / collapsed / attention glances still on early `#0e0e14` (shared dark), or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` when TCC allows.
