@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2309
+
+- Futuristic force-quit + Settings toggle chrome (`.force-quit-section` hairline; `.force-quit-btn` wash/type; `.setting-toggle` checkbox track / checked accent) opaque `#0b0b10` mix (no white / red / cyan glass rgba). Standing P2 #14; design-review adjacent Force Quit / Settings. Next: remaining Futuristic glass (later rgba(255) falls / panel fallbacks), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2308
 
 - Futuristic changelog scrollbar + battery icon chrome (Changelog scrollbar track / thumb / hover; `.changelog-error`; `.battery-icon` resting / charging) opaque `#0b0b10` mix (no white / accent glass rgba). Standing P2 #14; design-review adjacent Changelog / battery strip. Next: remaining Futuristic glass (force-quit section / toggle checkbox / later rgba(255) falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
