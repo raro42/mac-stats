@@ -4287,8 +4287,8 @@ body.theme-data-poster .force-quit-advanced > summary::before,
 body.theme-dark .force-quit-advanced > summary::before,
 body.theme-neon .force-quit-advanced > summary::before,
 body.theme-futuristic .force-quit-advanced > summary::before {
-  /* Was opacity 0.7 on summary ink (66% #ffffff on #0e0e14) → ~46% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 46%, #0e0e14);
+  /* Was opacity 0.7 on summary ink (66% #ffffff on #0e0e14) → ~46% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
   opacity: 1;
 }
 
@@ -10035,8 +10035,8 @@ body.theme-data-poster .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.di
 body.theme-dark .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss),
 body.theme-neon .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss),
 body.theme-futuristic .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
-  /* Was opacity 0.75 on inherit (~92% white) → ~69% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 69%, #0e0e14);
+  /* Was opacity 0.75 on inherit (~92% white) → ~69% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
 }
 
 .disk-cleanup-list-empty,
@@ -10194,8 +10194,8 @@ body.theme-data-poster .disk-cleanup-scope-row.is-disabled,
 body.theme-dark .disk-cleanup-scope-row.is-disabled,
 body.theme-neon .disk-cleanup-scope-row.is-disabled,
 body.theme-futuristic .disk-cleanup-scope-row.is-disabled {
-  /* Was opacity 0.55 on inherit (~92% white) → ~51% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 51%, #0e0e14);
+  /* Was opacity 0.55 on inherit (~92% white) → ~51% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
 }
 
 .disk-cleanup-kb-hint {
@@ -10325,8 +10325,8 @@ body.theme-data-poster .disk-cleanup-scope-row label.disk-cleanup-scope-rec,
 body.theme-dark .disk-cleanup-scope-row label.disk-cleanup-scope-rec,
 body.theme-neon .disk-cleanup-scope-row label.disk-cleanup-scope-rec,
 body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
-  /* Was opacity 0.8 on inherit (~92% white) → ~74% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 74%, #0e0e14);
+  /* Was opacity 0.8 on inherit (~92% white) → ~74% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
   opacity: 1;
 }
 

@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2302
+
+- Data Poster / Dark Disk Cleanup empty / disabled / Recurse + Force Quit chevron (`.disk-cleanup-empty` load-error; `.disk-cleanup-scope-row.is-disabled`; `label.disk-cleanup-scope-rec`; `.force-quit-advanced > summary::before`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent `feature-disk-cleanup`. Next: remaining early `#0e0e14` (judge-off labels; filter-chip kb-hints; neon/futuristic perplexity-config leftovers; cpu.js injects), or Mac capture of stale `feature-disk-cleanup.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2301
 
 - Data Poster / Dark Monitors checking / pending / removing (`.monitor-item.is-checking` / `.is-pending` / `.is-removing`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent `feature-monitors`. Next: remaining early `#0e0e14` (disk-cleanup empty/disabled/scope-rec; force-quit chevron; neon/futuristic leftovers; judge-off labels; filter-chip kb-hints), or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
