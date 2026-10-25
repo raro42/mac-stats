@@ -4,6 +4,7 @@ Overnight Track B kept shipping opaque dark-theme chrome (standing P2 #14). Quie
 
 ## Shipped tonight (highlights)
 
+- **v0.1.2325** — Neon Settings theme/input/btn/help `color-mix(…, transparent)` washes opaque on `#08120c` (P2 #14).
 - **v0.1.2324** — Neon Settings + Monitors Apple var() rgba falls opaque on `#08120c` (Settings hairlines/type; collapse / Monitors muted·hairline·modal chains; thinking-dots) (P2 #14).
 - **v0.1.2323** — Neon AI Chat markdown (blockquote / code / pre / table / hr / link) opaque on `#08120c` (P2 #14).
 - **v0.1.2322** — Neon Ollama / AI Chat + late history chrome opaque on `#08120c` (menu, model select, chat washes, late history-chart inset, time-range, tooltip).
@@ -18,6 +19,6 @@ Overnight Track B kept shipping opaque dark-theme chrome (standing P2 #14). Quie
 
 ## Next fuel
 
-- Remaining Neon `color-mix(…, transparent)` washes if any.
 - Futuristic process-bar glow (`box-shadow` cyan glass on `.process-bar-fill`).
+- Futuristic Settings `color-mix(…, transparent)` washes (theme-item / input / btn / help).
 - Mac capture of stale feature screens when Screen Recording TCC allows.
