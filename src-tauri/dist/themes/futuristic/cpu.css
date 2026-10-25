@@ -492,9 +492,10 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 22px;
-  background: var(--panel, rgba(255, 255, 255, 0.86));
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.65));
-  box-shadow: var(--panel-shadow, 0 32px 100px rgba(0, 0, 0, 0.20));
+  /* Opaque panel fallback — was white glass rgba(255,255,255,…) (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 2%, #0b0b10));
+  border: 1px solid var(--panel-border, color-mix(in srgb, #ffffff 16%, #0b0b10));
+  box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 65%, #0b0b10));
   padding: 18px 18px 16px;
   overflow: hidden;
 }
@@ -1464,11 +1465,12 @@ body {
 
 .monitors-menu {
   position: fixed;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 2%, #0b0b10));
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   border-radius: 8px;
   padding: 4px 0;
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 4px 12px rgba(0, 0, 0, 0.15))));
+  box-shadow: var(--panel-shadow, 0 4px 12px color-mix(in srgb, #000000 45%, #0b0b10));
   z-index: 1000;
   min-width: 140px;
 }
@@ -1505,9 +1507,10 @@ body {
   width: min(600px, 90vw);
   max-height: 80vh;
   border-radius: 16px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.95)))));
-  border: 1px solid var(--panel-border, var(--border, var(--rule, var(--line, var(--glass-border, rgba(0, 0, 0, 0.1))))));
-  box-shadow: var(--panel-shadow, var(--paper-shadow, var(--shadow, 0 32px 100px rgba(0, 0, 0, 0.20))));
+  /* Opaque panel — was white glass rgba(255,255,255,0.95) fallback (#14). */
+  background: var(--panel, color-mix(in srgb, #ffffff 2%, #0b0b10));
+  border: 1px solid var(--panel-border, color-mix(in srgb, #ffffff 16%, #0b0b10));
+  box-shadow: var(--panel-shadow, 0 32px 100px color-mix(in srgb, #000000 65%, #0b0b10));
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -1589,14 +1592,15 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.5) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-settings-item:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .monitor-settings-item-info {
@@ -1625,25 +1629,27 @@ body {
 }
 
 .monitor-remove-btn {
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  /* Opaque wash — was rgba(255,59,48,…) glass over the futuristic field (#14). */
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ff3b30 20%, #0b0b10);
   color: #ff3b30;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-remove-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
-  border-color: rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
 }
 
 .add-monitor-form {
   padding-top: 20px;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
 }
 
 .add-monitor-form h4 {
@@ -1664,44 +1670,46 @@ body {
 .add-monitor-form input {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.7) fallback (#14). */
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
   color: var(--text, var(--ink, inherit));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.7)))));
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   box-sizing: border-box;
   margin-bottom: 16px;
 }
 
 .add-monitor-form input:focus {
   outline: none;
-  border-color: var(--accent, rgba(0, 122, 255, 0.3));
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.9)))));
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+  background: #0b0b10;
 }
 
 .add-btn-small {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: #0b0b10;
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 6px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   padding: 4px 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   position: relative;
   z-index: 10;
 }
 
 .add-btn-small:hover {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.4)))));
-  border-color: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.15)))));
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  border-color: color-mix(in srgb, #ffffff 16%, #0b0b10);
   color: var(--text, var(--ink, inherit));
 }
 
 .add-btn-small:active {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.5)))));
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
 }
 
 .monitors-list {
@@ -1709,8 +1717,9 @@ body {
 }
 
 .monitor-item {
-  background: var(--panel, var(--panel-bg, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.3)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash — was white glass rgba(255,255,255,0.3) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 6%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;

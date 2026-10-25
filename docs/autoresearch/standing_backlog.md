@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2311
+
+- Futuristic Monitors + Settings panel chrome (`.monitors-menu` / settings popover content; `.monitor-settings-item`; `.monitor-remove-btn`; add-monitor form / `.add-btn-small`; `.monitor-item`; `.settings-card` panel fallbacks) opaque `#0b0b10` mix (no white / red glass rgba). Standing P2 #14; design-review adjacent `feature-monitors` / Settings. Next: remaining Futuristic glass (body radial falls / later Ollama popover white falls / inset highlights), Neon glass tokens, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2310
 
 - Futuristic icon-line + changelog-code chrome (`.icon-line-item` resting / hover / Ready / Slow / Down type; `.changelog-code` cyan wash) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat` / Changelog. Next: remaining Futuristic glass (panel fallbacks / monitor-remove red glass / body radial falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
