@@ -1,20 +1,24 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept **v0.1.2331** (Dark / TUI Ollama · AI Chat · logs Apple rgba chrome opaque on `#0a0a0a`, standing P2 #14).
+Overnight autoresearch (Track B) kept real product polish — not digester-empty quiet.
 
-Also earlier tonight: Dark Monitors (**v0.1.2330**), Dark Settings toggle / Force Quit / icon-line (**v0.1.2329**), Dark Settings card washes (**v0.1.2328**), Futuristic Settings/Monitors (**v0.1.2327**), and Neon/Futuristic opaque glass through **v0.1.2326**.
+## Shipped
 
-## What shipped (this tick)
+- **v0.1.2332** — Dark (TUI) history chrome opaque on `#0a0a0a`:
+  - `.history-chart-container` wash + inset shadow
+  - `.history-controls` label
+  - `.time-range-dropdown` (rest / hover / focus)
+  - `.history-tooltip` panel + border + shadow
+- No more Apple black/white/green glass rgba over the Dark shell for those controls.
+- Design-review: polish-without-capture grace on `feature-cpu-metrics` (Linux rack / Screen Recording TCC; recapture deferred).
 
-- Dark Ollama menu / settings popover backdrop, model-text / select / dropdown, chat message washes, markdown chrome, thinking-dots, and logs toolbar / viewer no longer fall back to Apple white/gray/blue glass rgba over the TUI shell.
-- Mix base: opaque `#0a0a0a` (Dark `--panel`).
+## Earlier same night
 
-## Deferred
+- **v0.1.2331** — Dark Ollama / AI Chat / logs Apple rgba chrome opaque.
+- **v0.1.2330** — Dark Monitors Apple rgba chrome opaque.
 
-- Design-review Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` / `feature-agent-ops.png` — Linux rack; Screen Recording TCC blocks `screencapture -l` when no Mac window.
-- Layout-daily already marked for today; Data Poster screen still missing (remaps already ok).
-- Next #14 fuel: Dark history time-range / tooltip Apple rgba falls, or Architect light glass (skip opaque-dark remap).
+## Fuel notes
 
-## Fuel note
-
-Digester open empty. Design-review due (recommended `feature-processes`); shipped standing #14 Dark Ollama/chat/logs adjacent `feature-ai-chat` instead of quiet.
+- Digester open empty (0 runs / 7d). Sibling OpenClaw/Hermes git missing on Linux rack.
+- Layout daily already done today. Debug.log clean in 180m window.
+- Next: remaining Dark Apple rgba if any, Architect light glass, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when TCC allows.
