@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2331
+
+- Dark (TUI) Ollama / AI Chat / logs Apple rgba falls (menu / popover backdrop / model select / chat washes / markdown / thinking-dots / logs toolbar·viewer) opaque `#0a0a0a` mix (no white / gray / blue glass). Standing P2 #14; layout-daily / design-review adjacent Dark AI Chat / Logs. Next: Dark history time-range / tooltip Apple rgba falls, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2330
 
 - Dark (TUI) Monitors Apple rgba falls (menu / settings popover / settings-item / remove / add-form / monitor-item / history hairline) opaque `#0a0a0a` mix (no white / gray / red glass). Standing P2 #14; layout-daily / design-review adjacent Dark Monitors. Next: Dark Ollama / chat / logs Apple rgba falls, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
