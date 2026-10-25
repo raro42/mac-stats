@@ -7,21 +7,24 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
 
-  --text: rgba(230, 255, 230, 0.92);
-  --muted: rgba(180, 230, 180, 0.60);
-  --hairline: rgba(70, 255, 120, 0.18);
+  /* Opaque type / chrome tokens — was green glass rgba over the neon field (#14). */
+  --text: color-mix(in srgb, #e6ffe6 92%, #08120c);
+  --muted: color-mix(in srgb, #b4e6b4 60%, #08120c);
+  --hairline: color-mix(in srgb, #46ff78 18%, #08120c);
 
   --green: #6dff7b;
   --green2: #2bff9f;
-  --panel-bg: rgba(8, 18, 12, 0.72);
-  --panel: rgba(8, 18, 12, 0.92);
-  --panel-border: rgba(120, 255, 160, 0.22);
-  --panel-shadow: 0 32px 100px rgba(0, 0, 0, 0.70);
-  --modal-backdrop: rgba(0, 0, 0, 0.70);
+  /* Opaque panel tokens — was green glass rgba over the neon field (#14). */
+  --panel-bg: color-mix(in srgb, #08120c 72%, #020302);
+  --panel: color-mix(in srgb, #08120c 92%, #020302);
+  --panel-border: color-mix(in srgb, #78ffa0 22%, #08120c);
+  --panel-shadow: 0 32px 100px color-mix(in srgb, #000000 70%, #08120c);
+  --modal-backdrop: color-mix(in srgb, #000000 70%, #08120c);
   --accent: #6dff7b;
 
-  --shadow: 0 24px 90px rgba(0, 0, 0, 0.70);
-  --glow: 0 0 22px rgba(90, 255, 140, 0.35), 0 0 60px rgba(90, 255, 140, 0.22);
+  /* Opaque shadow / glow — was black / green glass rgba (#14). */
+  --shadow: 0 24px 90px color-mix(in srgb, #000000 70%, #08120c);
+  --glow: 0 0 22px color-mix(in srgb, #5aff8c 35%, #08120c), 0 0 60px color-mix(in srgb, #5aff8c 22%, #08120c);
 }
 
 body {
@@ -32,9 +35,10 @@ body {
   color: var(--text);
 
   background:
-    radial-gradient(900px 900px at 10% 20%, rgba(70, 255, 120, 0.12), rgba(0, 0, 0, 0) 55%),
-    radial-gradient(900px 900px at 85% 20%, rgba(70, 255, 120, 0.10), rgba(0, 0, 0, 0) 60%),
-    radial-gradient(900px 900px at 60% 95%, rgba(70, 255, 120, 0.08), rgba(0, 0, 0, 0) 55%),
+    /* Opaque radial peaks — was green glass rgba over the neon field (#14). */
+    radial-gradient(900px 900px at 10% 20%, color-mix(in srgb, #46ff78 12%, #08120c), transparent 55%),
+    radial-gradient(900px 900px at 85% 20%, color-mix(in srgb, #46ff78 10%, #08120c), transparent 60%),
+    radial-gradient(900px 900px at 60% 95%, color-mix(in srgb, #46ff78 8%, #08120c), transparent 55%),
     linear-gradient(135deg, #020302, #06110a 60%, #020302);
 }
 
@@ -42,8 +46,9 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.06), transparent 45%);
-  opacity: 0.8;
+  /* Opaque wash — was white glass rgba over the neon field (#14). */
+  background: radial-gradient(circle at 30% 40%, color-mix(in srgb, #ffffff 6%, #08120c), transparent 45%);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -55,7 +60,8 @@ body::before {
   position: fixed;
   inset: 22px;
   border-radius: 42px;
-  border: 1px solid rgba(110, 255, 160, 0.22);
+  /* Opaque frame — was green glass rgba (#14). */
+  border: 1px solid color-mix(in srgb, #6effa0 22%, #08120c);
   box-shadow: var(--glow);
   pointer-events: none;
 }
