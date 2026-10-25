@@ -266,9 +266,10 @@ body::before {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: rgba(190, 255, 205, 0.75);
+  /* Was opacity 0.5 on rgba(190,255,205,0.75) → ~37% green; mix on #08120c (#14). */
+  color: color-mix(in srgb, #beffcd 37%, #08120c);
   margin-bottom: 12px;
-  opacity: 0.5;
+  opacity: 1;
   z-index: 2;
 }
 
@@ -320,16 +321,18 @@ body::before {
   transform: none;
   font-size: 10px;
   font-weight: 600;
-  color: rgba(180, 235, 190, 0.70);
+  /* Was opacity 0.8 on rgba(180,235,190,0.70) → ~56% green; mix on #08120c (#14). */
+  color: color-mix(in srgb, #b4ebbe 56%, #08120c);
   white-space: nowrap;
-  opacity: 0.8;
+  opacity: 1;
   z-index: 2;
 }
 
 .metric-hint {
   margin-top: auto;
   font-size: 10px;
-  color: rgba(120, 255, 160, 0.55);
+  /* Opaque type — was rgba(120,255,160,0.55) glass (#14). */
+  color: color-mix(in srgb, #78ffa0 55%, #08120c);
   z-index: 1;
 }
 
@@ -884,30 +887,32 @@ body::before {
 .force-quit-section {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid rgba(120, 255, 160, 0.2);
+  /* Opaque hairline — was rgba(120,255,160,0.2) glass (#14). */
+  border-top: 1px solid color-mix(in srgb, #78ffa0 20%, #08120c);
 }
 
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 59, 48, 0.15);
-  border: 1px solid rgba(255, 59, 48, 0.4);
+  /* Opaque wash — was rgba(255,59,48,…) glass (#14). */
+  background: color-mix(in srgb, #ff3b30 15%, #08120c);
+  border: 1px solid color-mix(in srgb, #ff3b30 40%, #08120c);
   border-radius: 8px;
-  color: rgba(255, 200, 200, 0.9);
+  color: color-mix(in srgb, #ffc8c8 90%, #08120c);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   font-family: inherit;
 }
 
 .force-quit-btn:hover {
-  background: rgba(255, 59, 48, 0.25);
-  border-color: rgba(255, 59, 48, 0.5);
+  background: color-mix(in srgb, #ff3b30 25%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 50%, #08120c);
 }
 
 .force-quit-btn:active {
-  background: rgba(255, 59, 48, 0.35);
+  background: color-mix(in srgb, #ff3b30 35%, #08120c);
 }
 
 .force-quit-btn:disabled {
@@ -986,17 +991,20 @@ body::before {
 }
 
 .changelog-body::-webkit-scrollbar-track {
-  background: rgba(200, 255, 210, 0.05);
+  /* Opaque track — was rgba(200,255,210,0.05) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 5%, #08120c);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb {
-  background: rgba(200, 255, 210, 0.3);
+  /* Opaque thumb — was rgba(200,255,210,0.3) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 30%, #08120c);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 255, 210, 0.5);
+  /* Opaque hover — was rgba(200,255,210,0.5) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 50%, #08120c);
 }
 
 .changelog-loading,
@@ -1008,7 +1016,8 @@ body::before {
 }
 
 .changelog-error {
-  color: rgba(255, 0, 0, 0.9);
+  /* Opaque type — was rgba(255,0,0,0.9) glass (#14). */
+  color: color-mix(in srgb, #ff0000 90%, #08120c);
 }
 
 .changelog-h2 {

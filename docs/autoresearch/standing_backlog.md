@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2317
+
+- Neon metric / Changelog / Force Quit chrome (`.metric-label` / `.metric-subtext` / `.metric-hint`; `.force-quit-section` / `.force-quit-btn`; Changelog scrollbar track/thumb/hover; `.changelog-error`) opaque `#08120c` mix (no green / red glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon metrics / Changelog. Next: remaining Neon glass (details-grid / history-chart / process rows / setting-toggle / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2316
 
 - Neon first-wave chrome (Details/Processes scrollbar thumbs; header title; `.icon-btn` / hover; divider peak; `.metric-tile` + radial; `.ring-track`; `.section-title`) opaque `#08120c` mix (no green / black glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon metrics. Next: remaining Neon glass (metric-label / changelog scrollbar / force-quit / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
