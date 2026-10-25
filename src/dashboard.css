@@ -451,8 +451,8 @@ body {
 
 .ops-insight-line em {
   font-style: normal;
-  /* Was opacity 0.7 on rgba(255,255,255,0.75) → about 53% white on the dark wash. */
-  color: color-mix(in srgb, #ffffff 53%, #0e0e14);
+  /* Was opacity 0.7 on rgba(255,255,255,0.75) → about 53% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 53%, #0b0b10);
   opacity: 1;
 }
 

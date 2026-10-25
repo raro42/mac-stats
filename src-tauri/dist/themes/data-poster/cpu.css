@@ -20,7 +20,8 @@
   --ring-track: color-mix(in srgb, #ffffff 16%, #0b0b10);
 
   /* Dark poster panels — never fall back to light glass (white-on-white Settings). */
-  --panel: color-mix(in srgb, #0e0e14 94%, #0b0b10);
+  /* Slight lift off opaque shell #0b0b10 (was early #0e0e14 94% mix). */
+  --panel: color-mix(in srgb, #ffffff 2%, #0b0b10);
   --panel-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
   /* Opaque shadow / modal tokens — was black glass rgba over the poster field (#14). */
   --panel-shadow: 0 40px 120px color-mix(in srgb, #000000 72%, #0b0b10);
