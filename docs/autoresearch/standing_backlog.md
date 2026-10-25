@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2308
+
+- Futuristic changelog scrollbar + battery icon chrome (Changelog scrollbar track / thumb / hover; `.changelog-error`; `.battery-icon` resting / charging) opaque `#0b0b10` mix (no white / accent glass rgba). Standing P2 #14; design-review adjacent Changelog / battery strip. Next: remaining Futuristic glass (force-quit section / toggle checkbox / later rgba(255) falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2307
 
 - Futuristic history / process / metric opacity chrome (history chart inset + label; process row hairline / name / bar track; `.toggle-label`; `.metric-unit` / `.metric-subtext`) opaque `#0b0b10` mix (no white glass rgba / opacity compositing). Standing P2 #14; design-review adjacent `feature-processes` / Futuristic metrics. Next: remaining Futuristic glass (changelog scrollbar, battery strip, later rgba(255) falls), Neon glass tokens, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.

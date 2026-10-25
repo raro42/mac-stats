@@ -938,17 +938,20 @@ body {
 }
 
 .changelog-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  /* Opaque track — was rgba(255,255,255,0.05) glass over the futuristic field (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb {
-  background: rgba(59, 214, 255, 0.4);
+  /* Opaque thumb — was rgba(59,214,255,0.4) glass over the futuristic field (#14). */
+  background: color-mix(in srgb, #3bd6ff 40%, #0b0b10);
   border-radius: 3px;
 }
 
 .changelog-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 214, 255, 0.6);
+  /* Opaque hover — was rgba(59,214,255,0.6) glass over the futuristic field (#14). */
+  background: color-mix(in srgb, #3bd6ff 60%, #0b0b10);
 }
 
 .changelog-loading,
@@ -960,7 +963,8 @@ body {
 }
 
 .changelog-error {
-  color: rgba(255, 59, 48, 0.9);
+  /* Opaque type — was rgba(255,59,48,0.9) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ff3b30 90%, #0b0b10);
 }
 
 .changelog-h2 {
@@ -1130,7 +1134,8 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(199, 199, 199, 0.50); /* Same grey as --muted, matching settings icon */
+  /* Opaque type — was rgba(199,199,199,0.50) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #c7c7c7 50%, #0b0b10);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1138,7 +1143,8 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque type — was rgba(52,199,89,0.8) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #34c759 80%, #0b0b10);
 }
 
 .battery-icon.no-battery {
