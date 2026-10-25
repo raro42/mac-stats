@@ -994,7 +994,8 @@ padding: 18px 18px 16px;
 }
 
 .changelog-version {
-  color: rgba(35, 45, 65, 0.9);
+  /* Opaque type — was rgba(35,45,65,0.9) glass (#14). */
+  color: color-mix(in srgb, #232d41 90%, #f1f1f1);
   font-weight: 800;
 }
 
@@ -1050,7 +1051,8 @@ padding: 18px 18px 16px;
   content: "•";
   position: absolute;
   left: 0;
-  color: rgba(35, 45, 65, 0.7);
+  /* Opaque type — was rgba(35,45,65,0.7) glass (#14). */
+  color: color-mix(in srgb, #232d41 70%, #f1f1f1);
   font-weight: bold;
 }
 
@@ -1065,7 +1067,8 @@ padding: 18px 18px 16px;
 }
 
 .changelog-code {
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque code wash — was rgba(0,0,0,0.08) glass (#14). */
+  background: color-mix(in srgb, #000000 8%, #f1f1f1);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
@@ -1087,7 +1090,8 @@ padding: 18px 18px 16px;
   align-items: center;
   padding: 12px 16px;
   margin: 0;
-  background: rgba(255, 255, 255, 0.4);
+  /* Opaque strip wash — was rgba(255,255,255,0.4) glass (#14). */
+  background: color-mix(in srgb, #ffffff 40%, #f1f1f1);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
