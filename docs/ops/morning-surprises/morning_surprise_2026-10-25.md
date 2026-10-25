@@ -4,7 +4,8 @@ Overnight Track B kept shipping Architect opaque chrome (standing P2 #14). Diges
 
 ## Shipped tonight (keep)
 
-- **v0.1.2338** — Architect Changelog version/bullet/code + `.battery-power-strip` wash opaque on `#f1f1f1` (no glass rgba).
+- **v0.1.2339** — Architect `.metric-box::before` dashed inset + `.details-grid` type + `.monitor-remove-btn` wash/hover opaque on `#f1f1f1` (no glass rgba).
+- **v0.1.2338** — Architect Changelog version/bullet/code + `.battery-power-strip` wash opaque on `#f1f1f1`.
 - **v0.1.2337** — Architect shell tokens + body grid + `.arch-sheet` + Changelog scrollbar/error opaque on `#f1f1f1`.
 - **v0.1.2336** — Architect first-wave (scrollbar thumbs, title, icon-btn, metrics, rings, section titles).
 - **v0.1.2335** — Architect icon-line + battery icons / Ready·Slow·Down type.
@@ -17,4 +18,4 @@ Overnight Track B kept shipping Architect opaque chrome (standing P2 #14). Diges
 - No digester open candidates (0 runs / 7d).
 - Mac `screencapture -l` still blocked here (Linux rack / Screen Recording TCC); polish-without-capture grace on stale feature screens.
 - ~23:00 flush: tree clean; CI already triggered today; release already cut today.
-- Next fuel: remaining Architect dashed metric inset / Details type / Monitors remove red / Apple var() fallbacks, or Mac recapture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png`.
+- Next fuel: remaining Architect Apple var() rgba panel fallbacks (Monitors menu / settings popover / Ollama chains if any), or Mac recapture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png`.
