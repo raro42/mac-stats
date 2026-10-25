@@ -4,6 +4,7 @@ Overnight autoresearch (Track B) kept shipping Architect opaque remaps on `#f1f1
 
 ## Shipped tonight (keeps)
 
+- **v0.1.2341** — Architect Settings card + theme/input/btn/help washes opaque on `#f1f1f1`.
 - **v0.1.2340** — Architect Monitors + collapse + Ollama menu Apple rgba falls (collapse muted·hairline; Monitors menu/popover/list/add-form; Ollama menu/popover backdrop).
 - **v0.1.2339** — Architect dashed metric inset + Details type + Monitors remove.
 - **v0.1.2338** — Architect Changelog version/bullet/code + battery strip wash.
@@ -23,7 +24,7 @@ Overnight autoresearch (Track B) kept shipping Architect opaque remaps on `#f1f1
 
 ## Next fuel
 
-- Remaining Architect Settings Apple var() rgba / `color-mix(…, transparent)` washes / chat markdown / logs if any.
+- Remaining Architect chat markdown / logs Apple rgba falls if any.
 - Or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when TCC allows.
 
-_Refreshed: 2026-10-26T00:01:32+01:00_
+_Refreshed: 2026-10-26T00:27:35+01:00_
