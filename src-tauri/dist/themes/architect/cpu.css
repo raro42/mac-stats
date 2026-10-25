@@ -681,18 +681,20 @@ padding: 18px 18px 16px;
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #f1f1f1);
+  background: color-mix(in srgb, #000000 8%, #f1f1f1);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
+  /* Opaque accent — was Apple rgba(59,130,246,…) glass (#14). */
+  background: color-mix(in srgb, #3b82f6 80%, #f1f1f1);
+  border-color: color-mix(in srgb, #3b82f6 60%, #f1f1f1);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -705,7 +707,7 @@ padding: 18px 18px 16px;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #f1f1f1);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -758,30 +760,32 @@ padding: 18px 18px 16px;
 .force-quit-section {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid rgba(35, 45, 65, 0.1);
+  /* Opaque hairline — was rgba(35,45,65,0.1) glass (#14). */
+  border-top: 1px solid color-mix(in srgb, #232d41 10%, #f1f1f1);
 }
 
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  /* Opaque wash — was rgba(255,59,48,…) glass (#14). */
+  background: color-mix(in srgb, #ff3b30 10%, #f1f1f1);
+  border: 1px solid color-mix(in srgb, #ff3b30 30%, #f1f1f1);
   border-radius: 8px;
-  color: rgba(255, 59, 48, 0.9);
+  color: color-mix(in srgb, #ff3b30 90%, #f1f1f1);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   font-family: inherit;
 }
 
 .force-quit-btn:hover {
-  background: rgba(255, 59, 48, 0.15);
-  border-color: rgba(255, 59, 48, 0.4);
+  background: color-mix(in srgb, #ff3b30 15%, #f1f1f1);
+  border-color: color-mix(in srgb, #ff3b30 40%, #f1f1f1);
 }
 
 .force-quit-btn:active {
-  background: rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, #ff3b30 20%, #f1f1f1);
 }
 
 .force-quit-btn:disabled {
@@ -802,17 +806,19 @@ padding: 18px 18px 16px;
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(35, 45, 65, 0.22);
-  background: rgba(35, 45, 65, 0.08);
+  /* Opaque track — was rgba(35,45,65,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #232d41 22%, #f1f1f1);
+  background: color-mix(in srgb, #232d41 8%, #f1f1f1);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(35, 45, 65, 0.4);
-  border-color: rgba(35, 45, 65, 0.3);
+  /* Opaque accent — was rgba(35,45,65,…) glass (#14). */
+  background: color-mix(in srgb, #232d41 40%, #f1f1f1);
+  border-color: color-mix(in srgb, #232d41 30%, #f1f1f1);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -825,7 +831,7 @@ padding: 18px 18px 16px;
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #f1f1f1);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -836,7 +842,8 @@ padding: 18px 18px 16px;
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(35, 45, 65, 0.70);
+  /* Opaque type — was rgba(35,45,65,0.70) glass (#14). */
+  color: color-mix(in srgb, #232d41 70%, #f1f1f1);
 }
 
 .arch-footer {

@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2334
+
+- Architect Force Quit + Settings toggle chrome (early Apple `.setting-toggle` track/checked/knob shadow; later Architect ink toggle + `.toggle-label`; `.force-quit-section` hairline; `.force-quit-btn` wash/type) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-disk-cleanup` (polish-without-capture grace). Next: remaining Architect light glass (shell tokens / icon-line / battery / later rgba falls if any), or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2333
 
 - Architect Top Processes chrome (`.process-table` type; `.process-row` hairline; `.process-bar` / `.process-bar-fill`; `.process-empty`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-processes`. Next: remaining Architect light glass (Force Quit / Settings toggle / shell tokens if any), remaining Dark Apple rgba collapses if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
