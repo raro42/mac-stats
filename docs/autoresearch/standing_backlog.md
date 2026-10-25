@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2340
+
+- Architect Monitors + collapse + Ollama menu Apple rgba falls (collapse muted·hairline; `.monitors-menu` / settings popover / settings-item / add-form / `.monitor-item` / history hairline; `.ollama-menu` / popover backdrop) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-monitors` / `feature-ai-chat` (polish-without-capture grace). Next: remaining Architect Settings Apple var() rgba / `color-mix(…, transparent)` washes / chat markdown / logs if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2339
 
 - Architect dashed metric inset + Details type + Monitors remove (`.metric-box::before`; `.details-grid`; `.monitor-remove-btn` resting/hover) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-cpu-metrics` / `feature-monitors` (polish-without-capture grace). Next: remaining Architect Apple var() rgba panel fallbacks (Monitors menu / settings popover / Ollama chains if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
