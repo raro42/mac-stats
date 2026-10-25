@@ -662,18 +662,20 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #000000 10%, #0a0a0a);
+  background: color-mix(in srgb, #000000 8%, #0a0a0a);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
+  /* Opaque accent — was Apple rgba(59,130,246,…) glass (#14). */
+  background: color-mix(in srgb, #3b82f6 80%, #0a0a0a);
+  border-color: color-mix(in srgb, #3b82f6 60%, #0a0a0a);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -686,7 +688,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #0a0a0a);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -745,24 +747,25 @@ body {
 .force-quit-btn {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
+  /* Opaque wash — was rgba(255,0,0,…) glass (#14). */
+  background: color-mix(in srgb, #ff0000 10%, #0a0a0a);
+  border: 1px solid color-mix(in srgb, #ff0000 30%, #0a0a0a);
   border-radius: 8px;
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   font-family: inherit;
 }
 
 .force-quit-btn:hover {
-  background: rgba(255, 0, 0, 0.15);
-  border-color: rgba(255, 0, 0, 0.4);
+  background: color-mix(in srgb, #ff0000 15%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff0000 40%, #0a0a0a);
 }
 
 .force-quit-btn:active {
-  background: rgba(255, 0, 0, 0.2);
+  background: color-mix(in srgb, #ff0000 20%, #0a0a0a);
 }
 
 .force-quit-btn:disabled {
@@ -783,17 +786,19 @@ body {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 255, 0, 0.2);
-  background: rgba(0, 0, 0, 0.3);
+  /* Opaque track — was green/black glass rgba (#14). */
+  border: 1px solid color-mix(in srgb, #00ff00 20%, #0a0a0a);
+  background: color-mix(in srgb, #000000 30%, #0a0a0a);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(0, 255, 0, 0.4);
-  border-color: rgba(0, 255, 0, 0.5);
+  /* Opaque accent — was green glass rgba (#14). */
+  background: color-mix(in srgb, #00ff00 40%, #0a0a0a);
+  border-color: color-mix(in srgb, #00ff00 50%, #0a0a0a);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -806,7 +811,7 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 30%, #0a0a0a);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -817,7 +822,8 @@ body {
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(0, 255, 0, 0.8);
+  /* Opaque type — was rgba(0,255,0,0.8) glass (#14). */
+  color: color-mix(in srgb, #00ff00 80%, #0a0a0a);
 }
 
 .theme-footer {
@@ -1213,14 +1219,16 @@ body {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  color: rgba(72, 210, 120, 0.85);
+  /* Opaque type — was rgba(72,210,120,0.85) glass (#14). */
+  color: color-mix(in srgb, #48d278 85%, #0a0a0a);
   background: color-mix(in srgb, #34c759 7%, #0a0a0a);
   border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  color: rgba(90, 220, 130, 0.95);
+  /* Opaque type — was rgba(90,220,130,0.95) glass (#14). */
+  color: color-mix(in srgb, #5adc82 95%, #0a0a0a);
   background: color-mix(in srgb, #34c759 10%, #0a0a0a);
   border-color: color-mix(in srgb, #34c759 36%, #0a0a0a);
   box-shadow: none;
@@ -1246,14 +1254,16 @@ body {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  color: rgba(255, 180, 70, 0.8);
+  /* Opaque type — was rgba(255,180,70,0.8) glass (#14). */
+  color: color-mix(in srgb, #ffb446 80%, #0a0a0a);
   background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
   border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  color: rgba(255, 190, 90, 0.95);
+  /* Opaque type — was rgba(255,190,90,0.95) glass (#14). */
+  color: color-mix(in srgb, #ffbe5a 95%, #0a0a0a);
   background: color-mix(in srgb, #ff9f0a 10%, #0a0a0a);
   border-color: color-mix(in srgb, #ff9f0a 36%, #0a0a0a);
 }
@@ -1272,14 +1282,16 @@ body {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  color: rgba(255, 100, 95, 0.85);
+  /* Opaque type — was rgba(255,100,95,0.85) glass (#14). */
+  color: color-mix(in srgb, #ff645f 85%, #0a0a0a);
   background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
   border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  color: rgba(255, 120, 110, 0.95);
+  /* Opaque type — was rgba(255,120,110,0.95) glass (#14). */
+  color: color-mix(in srgb, #ff786e 95%, #0a0a0a);
   background: color-mix(in srgb, #ff3b30 10%, #0a0a0a);
   border-color: color-mix(in srgb, #ff3b30 36%, #0a0a0a);
 }
