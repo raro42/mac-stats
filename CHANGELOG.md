@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2341] - 2026-10-26
+
+### Fixed
+- Architect Settings card + theme/input/btn/help washes: opaque color-mix on `#f1f1f1` for Settings panel/header hairline, theme-item resting/hover/current, settings-input focus, settings-btn / primary, and help-sheet (no Apple rgba / `color-mix(…, transparent)` glass). Standing P2 #14; layout-daily Architect; design-review adjacent Settings (polish-without-capture grace; Mac recapture deferred).
+
 ## [0.1.2340] - 2026-10-25
 
 ### Fixed
