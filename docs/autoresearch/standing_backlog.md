@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2321
+
+- Neon Settings / Monitors panel + logs chrome (`.settings-card` fallback; `.monitors-menu` / popover content; `.monitor-settings-item`; add-monitor form / `.add-btn-small`; `.monitor-item`; `.logs-toolbar` / `.logs-viewer` / `.logs-autorefresh`) opaque `#08120c` mix (no white / gray / black glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon Settings / Monitors / Logs. Next: remaining Neon glass (Ollama popover / late history-chart / time-range / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2320
 
 - Neon icon-line + early Settings toggle + monitor-remove (`.icon-line-item` resting / Ready / Slow / Down type; early Apple `.setting-toggle` track / checked / knob shadow; `.monitor-remove-btn`) opaque `#08120c` mix (no glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon toolbar / Settings / Monitors. Next: remaining Neon glass (Apple-fallback panel chains / logs toolbar / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
