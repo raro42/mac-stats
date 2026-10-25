@@ -508,7 +508,8 @@ body {
   align-items: center;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--hairline, rgba(0, 0, 0, 0.08));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #ffffff 8%, #0b0b10));
   margin-bottom: 12px;
   flex-shrink: 0;
 }
@@ -809,7 +810,8 @@ body {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Opaque knob shadow — was black glass rgba(0,0,0,0.3) (#14). */
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 30%, #0b0b10);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -1355,7 +1357,7 @@ body {
 .collapse-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -1369,7 +1371,7 @@ body {
 }
 
 .collapse-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1415,7 +1417,7 @@ body {
 .monitors-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
@@ -1427,7 +1429,7 @@ body {
 }
 
 .monitors-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1457,13 +1459,13 @@ body {
 }
 
 .monitors-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
 }
 
 .monitors-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  background: var(--modal-backdrop, color-mix(in srgb, #000000 50%, #0b0b10));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1490,7 +1492,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #0b0b10));
   flex-shrink: 0;
 }
 
@@ -1506,7 +1508,7 @@ body {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -1519,7 +1521,7 @@ body {
 }
 
 .monitors-settings-popover .popover-close:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1586,7 +1588,7 @@ body {
 
 .monitor-settings-item-url {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   word-break: break-all;
 }
 
@@ -1730,7 +1732,7 @@ body {
 
 .monitor-info > div:last-child {
   font-size: 11px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
 }
 
 .monitor-history {
@@ -1739,7 +1741,7 @@ body {
   align-items: center;
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #0b0b10));
   min-height: 12px;
   flex-wrap: wrap;
 }
@@ -1909,7 +1911,7 @@ body {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -2025,7 +2027,7 @@ body {
 
 .model-text {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   cursor: pointer;
   user-select: none;
   padding: 2px 4px;
@@ -2298,7 +2300,7 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  background: var(--muted, color-mix(in srgb, #ffffff 60%, #0b0b10));
   animation: none; /* was thinking-pulse; WebView CPU */
 }
 
