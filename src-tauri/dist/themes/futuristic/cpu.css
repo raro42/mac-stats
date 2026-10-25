@@ -254,13 +254,16 @@ body {
   position: relative;
   top: -2px;
   margin-left: 2px;
-  opacity: 0.7;
+  /* Was opacity 0.7 on inherit (~92% white) → ~64% white; mix on #0b0b10 (#14). */
+  color: color-mix(in srgb, #ffffff 64%, #0b0b10);
+  opacity: 1;
 }
 
 .metric-subtext {
   font-size: 10px;
   font-weight: 600;
-  color: var(--muted);
+  /* Was opacity 0.8 on --muted (60% white) → ~48% white; mix on #0b0b10 (#14). */
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
   position: absolute;
   /* No translate — a transform layer stays in Graphics and Media (#14). */
   top: calc(68% + 23px);
@@ -272,7 +275,7 @@ body {
   text-align: center;
   transform: none;
   white-space: nowrap;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .metric-hint {
@@ -372,14 +375,15 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.20);
+  /* Opaque inset wash — was rgba black/white glass (#14). */
+  background: color-mix(in srgb, #000000 20%, #0b0b10);
   border: none;
   padding: 0;
   margin: 0;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, #0b0b10),
+    inset 0 -1px 0 color-mix(in srgb, #000000 20%, #0b0b10),
+    0 2px 8px color-mix(in srgb, #000000 15%, #0b0b10);
 }
 
 .history-chart-label {
@@ -388,7 +392,8 @@ body {
   left: 4px;
   font-size: 8px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  /* Opaque type — was rgba(255,255,255,0.5) glass (#14). */
+  color: color-mix(in srgb, #ffffff 50%, #0b0b10);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 10;
@@ -422,12 +427,14 @@ body {
   gap: 10px;
   align-items: center;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  /* Opaque hairline — was rgba(255,255,255,0.10) glass (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #ffffff 10%, #0b0b10);
 }
 
 .process-name {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.78);
+  /* Opaque type — was rgba(255,255,255,0.78) glass (#14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -442,7 +449,8 @@ body {
 .process-bar {
   width: 50px;
   height: 3px;
-  background: rgba(255, 255, 255, 0.12);
+  /* Opaque track — was rgba(255,255,255,0.12) glass (#14). */
+  background: color-mix(in srgb, #ffffff 12%, #0b0b10);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -838,7 +846,8 @@ body {
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
+  /* Opaque type — was rgba(255,255,255,0.72) glass (#14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
 }
 
 .theme-footer {
