@@ -3825,8 +3825,8 @@ body.theme-data-poster .process-empty,
 body.theme-dark .process-empty,
 body.theme-neon .process-empty,
 body.theme-futuristic .process-empty {
-  /* Was opacity 0.78 on inherit (~92% white) → ~72% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 72%, #0e0e14) !important;
+  /* Was opacity 0.78 on inherit (~92% white) → ~72% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10) !important;
   opacity: 1;
 }
 
@@ -4760,8 +4760,8 @@ body.theme-data-poster .logs-viewer.is-empty:not(:has(.logs-filter-miss)),
 body.theme-dark .logs-viewer.is-empty:not(:has(.logs-filter-miss)),
 body.theme-neon .logs-viewer.is-empty:not(:has(.logs-filter-miss)),
 body.theme-futuristic .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
-  /* Was opacity 0.75 on inherit (~92% white) → ~69% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 69%, #0e0e14);
+  /* Was opacity 0.75 on inherit (~92% white) → ~69% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
 }
 
 .logs-filter-chips {
@@ -5136,8 +5136,8 @@ body.theme-data-poster .monitors-summary.is-empty,
 body.theme-dark .monitors-summary.is-empty,
 body.theme-neon .monitors-summary.is-empty,
 body.theme-futuristic .monitors-summary.is-empty {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
 }
 
 /* External / Monitors: fully hide when collapsed (icon off). */
@@ -5217,8 +5217,8 @@ body.theme-data-poster .monitors-collapsed-glance.is-empty,
 body.theme-dark .monitors-collapsed-glance.is-empty,
 body.theme-neon .monitors-collapsed-glance.is-empty,
 body.theme-futuristic .monitors-collapsed-glance.is-empty {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
 }
 
 /* Disk Cleanup — collapsed glance under header (Monitors parity) */
@@ -5908,8 +5908,8 @@ body.theme-data-poster .agent-ops-collapsed-glance.is-empty,
 body.theme-dark .agent-ops-collapsed-glance.is-empty,
 body.theme-neon .agent-ops-collapsed-glance.is-empty,
 body.theme-futuristic .agent-ops-collapsed-glance.is-empty {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
 }
 
 /* AI Chat: fully hide when collapsed (icon off). */
@@ -5989,8 +5989,8 @@ body.theme-data-poster .ollama-collapsed-glance.is-empty,
 body.theme-dark .ollama-collapsed-glance.is-empty,
 body.theme-neon .ollama-collapsed-glance.is-empty,
 body.theme-futuristic .ollama-collapsed-glance.is-empty {
-  /* Was opacity 0.85 on inherit (~92% white) → ~78% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 78%, #0e0e14);
+  /* Was opacity 0.85 on inherit (~92% white) → ~78% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
 }
 
 /* AI Chat — model / connection glance (Debug Log / turn-glance parity) */
@@ -10508,8 +10508,8 @@ body.theme-data-poster .ops-insight-line:not(.is-clickable),
 body.theme-dark .ops-insight-line:not(.is-clickable),
 body.theme-neon .ops-insight-line:not(.is-clickable),
 body.theme-futuristic .ops-insight-line:not(.is-clickable) {
-  /* Was opacity 0.8 on inherit (~92% white) → ~74% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 74%, #0e0e14);
+  /* Was opacity 0.8 on inherit (~92% white) → ~74% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
   opacity: 1;
 }
 
@@ -10532,8 +10532,8 @@ body.theme-data-poster .ops-insight-line.is-clickable,
 body.theme-dark .ops-insight-line.is-clickable,
 body.theme-neon .ops-insight-line.is-clickable,
 body.theme-futuristic .ops-insight-line.is-clickable {
-  /* Was opacity 0.9 on inherit (~92% white) → ~83% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 83%, #0e0e14);
+  /* Was opacity 0.9 on inherit (~92% white) → ~83% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 83%, #0b0b10);
   opacity: 1;
 }
 
@@ -10549,8 +10549,8 @@ body.theme-data-poster .ops-insight-line.is-clickable:hover,
 body.theme-dark .ops-insight-line.is-clickable:hover,
 body.theme-neon .ops-insight-line.is-clickable:hover,
 body.theme-futuristic .ops-insight-line.is-clickable:hover {
-  /* Was opacity 1 on inherit (~92% white). */
-  color: color-mix(in srgb, #ffffff 92%, #0e0e14);
+  /* Was opacity 1 on inherit (~92% white); mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   opacity: 1;
 }
 
@@ -10571,8 +10571,8 @@ body.theme-data-poster .ops-insight-line.is-clickable.is-selected,
 body.theme-dark .ops-insight-line.is-clickable.is-selected,
 body.theme-neon .ops-insight-line.is-clickable.is-selected,
 body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
-  /* Was opacity 1 on inherit (~92% white). */
-  color: color-mix(in srgb, #ffffff 92%, #0e0e14);
+  /* Was opacity 1 on inherit (~92% white); mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
   opacity: 1;
 }
 
@@ -10588,7 +10588,8 @@ body.theme-data-poster .ops-insight-line em,
 body.theme-dark .ops-insight-line em,
 body.theme-neon .ops-insight-line em,
 body.theme-futuristic .ops-insight-line em {
-  color: color-mix(in srgb, currentColor 70%, #0e0e14);
+  /* Mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, currentColor 70%, #0b0b10);
   opacity: 1;
 }
 
