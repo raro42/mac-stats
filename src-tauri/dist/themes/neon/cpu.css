@@ -635,7 +635,8 @@ body::before {
   align-items: center;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--hairline, rgba(0, 0, 0, 0.08));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #ffffff 8%, #08120c));
   margin-bottom: 12px;
   flex-shrink: 0;
 }
@@ -710,9 +711,10 @@ body::before {
 .theme-item {
   height: 32px;
   border-radius: 9px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.10));
+  /* Opaque hairline + type — was Apple rgba glass (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #08120c));
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, transparent);
-  color: var(--text, rgba(10, 10, 12, 0.78));
+  color: var(--text, color-mix(in srgb, #e6ffe6 78%, #08120c));
   font-size: 12px;
   font-weight: 550;
   cursor: pointer;
@@ -743,7 +745,8 @@ body::before {
   margin: 0;
   padding: 6px 10px;
   border-radius: 9px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.10));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.10) glass (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #08120c));
   background: color-mix(in srgb, var(--text, #0c0c10) 5%, transparent);
   color: var(--text);
   font-size: 13px;
@@ -767,7 +770,8 @@ body::before {
   height: 30px;
   padding: 0 11px;
   border-radius: 8px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.10));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.10) glass (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #08120c));
   background: color-mix(in srgb, var(--text, #0c0c10) 6%, transparent);
   color: var(--text);
   font-size: 12px;
@@ -797,7 +801,8 @@ body::before {
   max-height: 160px;
   overflow: auto;
   border-radius: 10px;
-  border: 1px solid var(--hairline, rgba(0, 0, 0, 0.08));
+  /* Opaque hairline — was Apple rgba(0,0,0,0.08) glass (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 8%, #08120c));
   background: color-mix(in srgb, var(--text, #0c0c10) 5%, transparent);
   font-size: 11px;
   line-height: 1.45;
@@ -1452,7 +1457,7 @@ body::before {
 .collapse-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -1466,7 +1471,7 @@ body::before {
 }
 
 .collapse-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #08120c));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1512,7 +1517,7 @@ body::before {
 .monitors-menu-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
   font-size: 18px;
   line-height: 1;
   padding: 4px 8px;
@@ -1524,7 +1529,7 @@ body::before {
 }
 
 .monitors-menu-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #08120c));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1554,13 +1559,13 @@ body::before {
 }
 
 .monitors-menu-item:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #08120c));
 }
 
 .monitors-settings-popover {
   position: fixed;
   inset: 0;
-  background: var(--modal-backdrop, var(--modal, rgba(0, 0, 0, 0.5)));
+  background: var(--modal-backdrop, color-mix(in srgb, #000000 50%, #08120c));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1587,7 +1592,7 @@ body::before {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border-bottom: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #08120c));
   flex-shrink: 0;
 }
 
@@ -1603,7 +1608,7 @@ body::before {
   border: none;
   font-size: 24px;
   line-height: 1;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -1616,7 +1621,7 @@ body::before {
 }
 
 .monitors-settings-popover .popover-close:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  background: var(--hairline, color-mix(in srgb, #ffffff 12%, #08120c));
   color: var(--text, var(--ink, inherit));
 }
 
@@ -1683,7 +1688,7 @@ body::before {
 
 .monitor-settings-item-url {
   font-size: 12px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
   word-break: break-all;
 }
 
@@ -1827,7 +1832,7 @@ body::before {
 
 .monitor-info > div:last-child {
   font-size: 11px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
 }
 
 .monitor-history {
@@ -1836,7 +1841,7 @@ body::before {
   align-items: center;
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 10%, #08120c));
   min-height: 12px;
   flex-wrap: wrap;
 }
@@ -2397,7 +2402,7 @@ body::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  background: var(--muted, color-mix(in srgb, #b4e6b4 60%, #08120c));
   animation: none; /* was thinking-pulse; WebView CPU */
 }
 

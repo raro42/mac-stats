@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2324
+
+- Neon Settings + Monitors Apple var() rgba falls (Settings header / theme-item / input / button / help-sheet; collapse / Monitors menu / settings popover / list muted·hairline·modal chains; thinking-dots) opaque `#08120c` mix (no Apple rgba glass). Standing P2 #14; layout-daily / design-review adjacent Neon Settings / Monitors. Next: remaining Neon glass (`color-mix(…, transparent)` washes / later falls if any), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2323
 
 - Neon AI Chat markdown chrome (`.chat-message .markdown` blockquote / code / pre / table / hr / link) opaque `#08120c` mix (no black / accent glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon AI Chat. Next: remaining Neon glass (later rgba falls / Apple var() chains if any), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
