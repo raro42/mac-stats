@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2301
+
+- Data Poster / Dark Monitors checking / pending / removing (`.monitor-item.is-checking` / `.is-pending` / `.is-removing`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review adjacent `feature-monitors`. Next: remaining early `#0e0e14` (disk-cleanup empty/disabled/scope-rec; force-quit chevron; neon/futuristic leftovers; judge-off labels; filter-chip kb-hints), or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` when TCC allows.
+
 ## Overnight merge — v0.1.2300
 
 - Data Poster / Dark empty shells + `.process-empty` + `.ops-insight-line` (logs/monitors/agent-ops/ollama empty; process-empty; Insights resting/clickable/hover/selected/`em`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat` / `feature-agent-ops`. Next: remaining early `#0e0e14` (monitor checking/pending/removing; disk-cleanup empty/disabled/scope-rec; force-quit chevron; neon/futuristic leftovers; judge-off labels), or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when TCC allows.

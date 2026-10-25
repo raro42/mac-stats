@@ -8993,8 +8993,8 @@ body.theme-data-poster .monitor-item.is-checking,
 body.theme-dark .monitor-item.is-checking,
 body.theme-neon .monitor-item.is-checking,
 body.theme-futuristic .monitor-item.is-checking {
-  /* Was opacity 0.72 on inherit (~92% white) → ~66% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+  /* Was opacity 0.72 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
 }
 
 .monitor-item.is-checking .monitor-latency {
@@ -9025,8 +9025,8 @@ body.theme-data-poster .monitor-item.is-pending,
 body.theme-dark .monitor-item.is-pending,
 body.theme-neon .monitor-item.is-pending,
 body.theme-futuristic .monitor-item.is-pending {
-  /* Was opacity 0.78 on inherit (~92% white) → ~72% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 72%, #0e0e14);
+  /* Was opacity 0.78 on inherit (~92% white) → ~72% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
 }
 
 /* Opaque wash — glass alpha stays in Graphics and Media (#14). */
@@ -9466,8 +9466,8 @@ body.theme-data-poster .monitor-item.is-removing,
 body.theme-dark .monitor-item.is-removing,
 body.theme-neon .monitor-item.is-removing,
 body.theme-futuristic .monitor-item.is-removing {
-  /* Was opacity 0.55 on inherit (~92% white) → ~51% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 51%, #0e0e14);
+  /* Was opacity 0.55 on inherit (~92% white) → ~51% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
 }
 
 .monitor-backoff-hint {
