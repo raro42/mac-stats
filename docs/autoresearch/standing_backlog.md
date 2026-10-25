@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2337
+
+- Architect opaque shell tokens + body grid + sheet + Changelog scrollbar (`:root` ink/panel/paper/shadow; body grid/radial washes; `.arch-sheet` wash/border; Changelog scrollbar track/thumb/hover + `.changelog-error`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-cpu-metrics` / Changelog (polish-without-capture grace). Next: remaining Architect light glass (changelog version/bullet/code / battery-power-strip wash / later rgba falls if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2336
 
 - Architect first-wave chrome (Details/Processes scrollbar thumbs; `.arch-title h1`; `.arch-actions` wash; `.icon-btn` type / divider / hover / active; `.metric-box`; `.ring-track`; `.section-title`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-cpu-metrics` / toolbar (polish-without-capture grace). Next: remaining Architect light glass (shell tokens / body grid / sheet / changelog scrollbar / later rgba falls if any), or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
