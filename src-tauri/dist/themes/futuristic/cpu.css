@@ -37,8 +37,9 @@ body {
 
   background:
     url('./futuristic-bg.svg'),
-    radial-gradient(900px 900px at 20% 15%, rgba(59, 214, 255, 0.25), rgba(0, 0, 0, 0) 55%),
-    radial-gradient(900px 900px at 80% 20%, rgba(166, 123, 255, 0.22), rgba(0, 0, 0, 0) 60%),
+    /* Opaque radial peaks — was cyan/purple glass rgba over the field (#14). */
+    radial-gradient(900px 900px at 20% 15%, color-mix(in srgb, #3bd6ff 25%, #0b0b10), transparent 55%),
+    radial-gradient(900px 900px at 80% 20%, color-mix(in srgb, #a67bff 22%, #0b0b10), transparent 60%),
     linear-gradient(135deg, #07070c 0%, #111123 55%, #090916 100%);
   background-size: cover, auto, auto, auto;
 }
@@ -681,55 +682,8 @@ body {
   display: none !important;
 }
 
-.setting-toggle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.setting-toggle input[type="checkbox"] {
-  width: 44px;
-  height: 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
-  appearance: none;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.2s ease;
-  flex-shrink: 0;
-}
-
-.setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
-}
-
-.setting-toggle input[type="checkbox"]::before {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  top: 2px;
-  left: 2px;
-  /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.setting-toggle input[type="checkbox"]:checked::before {
-  left: 22px;
-  transform: none;
-}
-
-.toggle-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-
+/* Early Settings checkbox duplicate (black/blue glass rgba) removed — opaque
+   futuristic remap lives with the later .setting-toggle block (#14). */
 
 .process-detail-row {
   display: flex;
@@ -2524,9 +2478,10 @@ body {
 
 .logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logs-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
-.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,rgba(128,128,128,.3));background:rgba(128,128,128,.12);color:var(--text,inherit);cursor:pointer}
-.logs-autorefresh{font-size:12px;color:var(--muted,rgba(128,128,128,.8));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
-.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:rgba(0,0,0,.08);border:1px solid var(--hairline,rgba(128,128,128,.3));border-radius:10px;white-space:pre-wrap;word-break:break-word}
+/* Opaque logs chrome — was gray/black glass rgba over the futuristic field (#14). */
+.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,color-mix(in srgb,#808080 30%,#0b0b10));background:color-mix(in srgb,#808080 12%,#0b0b10);color:var(--text,inherit);cursor:pointer}
+.logs-autorefresh{font-size:12px;color:var(--muted,color-mix(in srgb,#808080 80%,#0b0b10));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:color-mix(in srgb,#000000 8%,#0b0b10);border:1px solid var(--hairline,color-mix(in srgb,#808080 30%,#0b0b10));border-radius:10px;white-space:pre-wrap;word-break:break-word}
 
 
 /* Logs section */
