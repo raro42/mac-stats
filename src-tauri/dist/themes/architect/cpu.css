@@ -409,7 +409,8 @@ body {
   font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
-  color: rgba(60, 60, 67, 0.72);
+  /* Opaque type — was rgba(60,60,67,0.72) glass (#14). */
+  color: color-mix(in srgb, #3c3c43 72%, #f1f1f1);
 }
 
 .process-row {
@@ -418,7 +419,8 @@ body {
   gap: 12px;
   align-items: center;
   padding: 2px 0;
-  border-bottom: 1px solid rgba(35, 45, 65, 0.12);
+  /* Opaque hairline — was rgba(35,45,65,0.12) glass (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #232d41 12%, #f1f1f1);
 }
 
 .process-name {
@@ -437,7 +439,8 @@ body {
 .process-bar {
   width: 100px;
   height: 4px;
-  background: rgba(35, 45, 65, 0.12);
+  /* Opaque track — was rgba(35,45,65,0.12) glass (#14). */
+  background: color-mix(in srgb, #232d41 12%, #f1f1f1);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -445,7 +448,8 @@ body {
 .process-bar-fill {
   height: 100%;
   width: 0;
-  background: rgba(35, 45, 65, 0.55);
+  /* Opaque fill — was rgba(35,45,65,0.55) glass (#14). */
+  background: color-mix(in srgb, #232d41 55%, #f1f1f1);
 }
 
 .process-percent {
@@ -457,7 +461,8 @@ body {
 .process-empty {
   padding: 1rem;
   text-align: center;
-  color: var(--ink-muted);
+  /* Opaque type — was --ink-muted glass rgba (#14). */
+  color: color-mix(in srgb, #232d41 55%, #f1f1f1);
 }
 
 .settings-modal {

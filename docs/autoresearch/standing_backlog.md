@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2333
+
+- Architect Top Processes chrome (`.process-table` type; `.process-row` hairline; `.process-bar` / `.process-bar-fill`; `.process-empty`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-processes`. Next: remaining Architect light glass (Force Quit / Settings toggle / shell tokens if any), remaining Dark Apple rgba collapses if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2332
 
 - Dark (TUI) history chart / time-range / tooltip Apple rgba falls (`.history-chart-container` inset; `.history-controls` label; `.time-range-dropdown` hover/focus; `.history-tooltip`) opaque `#0a0a0a` mix (no black / white / green glass). Standing P2 #14; design-review adjacent `feature-cpu-metrics`. Next: remaining Dark Apple rgba if any, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
