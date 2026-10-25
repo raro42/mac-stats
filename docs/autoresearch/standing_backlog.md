@@ -1,3 +1,6 @@
+## Overnight merge — v0.1.2326
+
+- Futuristic process-bar glow + Settings theme/input/btn/help `color-mix(…, transparent)` washes opaque `#0b0b10` mix (no transparent glass). Standing P2 #14; layout-daily / design-review adjacent Futuristic Settings / processes. Next: remaining Futuristic Settings Apple rgba falls if any, other dark-theme `color-mix(…, transparent)` Settings washes, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
 ## Overnight merge — v0.1.2325
 
 - Neon Settings theme/input/btn/help `color-mix(…, transparent)` washes (theme-item resting / hover / current; settings-input focus; settings-btn / primary; help-sheet) opaque `#08120c` mix (no transparent glass). Standing P2 #14; layout-daily / design-review adjacent Neon Settings. Next: Futuristic process-bar glow + Futuristic Settings `color-mix(…, transparent)` washes, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
