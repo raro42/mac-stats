@@ -9,20 +9,24 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
 
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.60);
-  --hairline: rgba(255, 255, 255, 0.12);
+  --bg: #0b0b10;
+  /* Opaque type / chrome tokens — was white glass rgba over the field (#14). */
+  --text: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  --muted: color-mix(in srgb, #ffffff 60%, #0b0b10);
+  --hairline: color-mix(in srgb, #ffffff 12%, #0b0b10);
 
   --accent: #3bd6ff;
   --accent2: #a67bff;
 
-  --glass-bg: rgba(18, 18, 26, 0.25);
-  --glass-border: rgba(255, 255, 255, 0.16);
-  --panel: rgba(14, 14, 24, 0.92);
-  --panel-border: rgba(255, 255, 255, 0.16);
-  --panel-shadow: 0 32px 100px rgba(0, 0, 0, 0.65);
-  --modal-backdrop: rgba(0, 0, 0, 0.68);
-  --shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+  /* Opaque panel tokens — was glass rgba over the futuristic field (#14). */
+  --glass-bg: color-mix(in srgb, #12121a 55%, #0b0b10);
+  --glass-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
+  /* Slight lift off opaque shell #0b0b10 (was rgba(14,14,24,0.92) glass). */
+  --panel: color-mix(in srgb, #ffffff 2%, #0b0b10);
+  --panel-border: color-mix(in srgb, #ffffff 16%, #0b0b10);
+  --panel-shadow: 0 32px 100px color-mix(in srgb, #000000 65%, #0b0b10);
+  --modal-backdrop: color-mix(in srgb, #000000 68%, #0b0b10);
+  --shadow: 0 20px 70px color-mix(in srgb, #000000 55%, #0b0b10);
 }
 
 body {
@@ -85,13 +89,15 @@ body {
 
 .details-section::-webkit-scrollbar-thumb,
 .processes-section::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  /* Opaque thumb — was rgba(255,255,255,0.15) glass (#14). */
+  background: color-mix(in srgb, #ffffff 15%, #0b0b10);
   border-radius: 3px;
 }
 
 .details-section::-webkit-scrollbar-thumb:hover,
 .processes-section::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  /* Opaque hover — was rgba(255,255,255,0.25) glass (#14). */
+  background: color-mix(in srgb, #ffffff 25%, #0b0b10);
 }
 
 .panel-header {
@@ -115,7 +121,8 @@ body {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
-  color: rgba(255, 255, 255, 0.92);
+  /* Opaque type — was rgba(255,255,255,0.92) glass (#14). */
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
 }
 
 .subtitle {
@@ -133,8 +140,9 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.04);
+  /* Opaque chrome — was white glass rgba (#14). */
+  border: 1px solid color-mix(in srgb, #ffffff 16%, #0b0b10);
+  background: color-mix(in srgb, #ffffff 4%, #0b0b10);
   color: var(--muted);
   font-size: 16px;
   cursor: pointer;
@@ -167,8 +175,9 @@ body {
   position: relative;
   padding: 10px 16px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  /* Opaque tile wash — was white glass rgba (#14). */
+  background: color-mix(in srgb, #ffffff 4%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #ffffff 10%, #0b0b10);
   min-height: 140px;
   overflow: hidden;
   display: flex;
@@ -288,7 +297,8 @@ body {
 
 .ring-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.14);
+  /* Opaque track — was rgba(255,255,255,0.14) glass (#14). */
+  stroke: color-mix(in srgb, #ffffff 14%, #0b0b10);
   stroke-width: 3;
   opacity: 0.6;
 }
@@ -316,7 +326,8 @@ body {
   font-weight: 400;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.75);
+  /* Opaque type — was rgba(255,255,255,0.75) glass (#14). */
+  color: color-mix(in srgb, #ffffff 75%, #0b0b10);
   text-transform: uppercase;
 }
 
@@ -334,7 +345,8 @@ body {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.72);
+  /* Opaque type — was rgba(255,255,255,0.72) glass (#14). */
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
 }
 
 .detail-label {

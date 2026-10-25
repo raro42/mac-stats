@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2306
+
+- Futuristic opaque shell tokens + first-wave chrome (`:root` `--text` / `--muted` / `--hairline` / `--glass-bg` / `--glass-border` / `--panel` / `--panel-border` / shadow·modal tokens; scrollbar thumbs; header title; icon-btn; metric-tile; ring-track; section-title; details-grid) opaque `#0b0b10` mix (no white glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat` / Futuristic metrics. Next: remaining Futuristic glass (history chart inset, metric-subtext opacity, later rgba(255) falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2305
 
 - Data Poster `--panel` + orphan Insights em (`--panel` white 2% lift on `#0b0b10`; `dashboard.css` `.ops-insight-line em`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-agent-ops`. Next: remaining poster glass / Apple `#ffffff` washes if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
