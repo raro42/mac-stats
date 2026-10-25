@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2327
+
+- Futuristic Settings + Monitors Apple var() rgba falls (Settings header hairline; Settings toggle knob shadow; collapse / Monitors menu / settings popover / list muted·hairline·modal chains; Ollama close / model-text; thinking-dots) opaque `#0b0b10` mix (no Apple rgba glass). Standing P2 #14; layout-daily / design-review adjacent Futuristic Settings / Monitors. Next: remaining Futuristic glass if any, other dark-theme Apple rgba / `color-mix(…, transparent)` Settings washes, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2326
 
 - Futuristic process-bar glow + Settings theme/input/btn/help `color-mix(…, transparent)` washes opaque `#0b0b10` mix (no transparent glass). Standing P2 #14; layout-daily / design-review adjacent Futuristic Settings / processes. Next: remaining Futuristic Settings Apple rgba falls if any, other dark-theme `color-mix(…, transparent)` Settings washes, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
