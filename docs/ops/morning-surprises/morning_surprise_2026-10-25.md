@@ -1,22 +1,21 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Neon / Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`); polish-without-capture grace marked for `feature-ai-chat`.
+Overnight Track B kept shipping opaque Neon chrome (standing P2 #14) while design-review screens stayed blocked by Screen Recording TCC.
 
-## Shipped tonight (latest)
+## Shipped tonight (selected)
 
-- **v0.1.2316** — Neon first-wave chrome: Details/Processes scrollbar thumbs, header title, icon buttons, divider peak, metric tiles + radials, ring tracks, and section titles. Mixes on opaque `#08120c` (no green / black glass rgba). Layout-daily / design-review adjacent Neon metrics.
+- **v0.1.2317** — Neon metric-label / subtext / hint, Force Quit hairline + button, Changelog scrollbar + error → opaque `#08120c` mix (no green / red glass rgba).
+- **v0.1.2316** — Neon first-wave chrome (scrollbar thumbs, header title, icon-btn, divider, metric tiles, ring-track, section-title).
+- **v0.1.2315** — Neon shell tokens + body radials + neon-frame.
+- Earlier same night: Futuristic glass cascade through ~v0.1.2314 and Data Poster #14 remaps.
 
-## Also kept this window (sample)
+## Tried / deferred
 
-- **v0.1.2315** — Neon opaque shell tokens + body radials / `body::before` / `.neon-frame`
-- **v0.1.2314** — Futuristic body radials + Debug Log toolbar/viewer + Settings checkbox duplicate cleanup
-- **v0.1.2313** — Futuristic markdown + history chrome
-- **v0.1.2312** — Futuristic Ollama / AI Chat chrome
-- **v0.1.2311** — Futuristic Monitors + Settings panel chrome
-- **v0.1.2306–2310** — Futuristic shell tokens through icon-line / changelog waves
-- Earlier in the night: Data Poster / Dark AI Chat · Processes · Monitors · Disk Cleanup · Settings inject waves (v0.1.2285–2305)
+- Mac window capture of stale `feature-agent-ops.png` (~39d) — `screencapture -l` still blocked (Screen Recording TCC).
+- Layout-daily Data Poster screen still missing; remaps continue via #14 Neon path this tick.
 
-## Still deferred
+## Next
 
-- Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
-- Remaining Neon glass (metric-label / changelog scrollbar / force-quit / later rgba falls) and Futuristic process-bar glow
+- Remaining Neon details-grid / history-chart / process rows / setting-toggle glass.
+- Futuristic process-bar glow.
+- Capture Agent Ops / AI Chat screens when TCC allows.
