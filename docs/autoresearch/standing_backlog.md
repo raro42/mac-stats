@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2319
+
+- Neon Changelog code + battery strip (`.changelog-version` / `.changelog-item::before` / `.changelog-code`; `.battery-power-strip` transparent; `.battery-icon` resting / charging / no-battery) opaque `#08120c` mix (no green / white glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon Changelog / battery. Next: remaining Neon glass (later rgba falls / Apple-fallback panel chains), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2318
 
 - Neon details / history / process / Settings toggle chrome (`.details-grid` / `.detail-label` / `.detail-value`; `.history-chart-container`; `.process-row` / `.process-name` / `.process-bar` / fill glow / `.process-percent` / `.process-empty`; `.setting-toggle` checkbox + `.toggle-label`) opaque `#08120c` mix (no green / black glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon metrics / processes / Settings. Next: remaining Neon glass (changelog-code / battery strip / later rgba falls), Futuristic process-bar glow if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.

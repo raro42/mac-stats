@@ -1048,7 +1048,8 @@ body::before {
 }
 
 .changelog-version {
-  color: rgba(200, 255, 210, 0.9);
+  /* Opaque type — was rgba(200,255,210,0.9) glass (#14). */
+  color: color-mix(in srgb, #c8ffd2 90%, #08120c);
   font-weight: 800;
 }
 
@@ -1104,7 +1105,8 @@ body::before {
   content: "•";
   position: absolute;
   left: 0;
-  color: rgba(200, 255, 210, 0.7);
+  /* Opaque type — was rgba(200,255,210,0.7) glass (#14). */
+  color: color-mix(in srgb, #c8ffd2 70%, #08120c);
   font-weight: bold;
 }
 
@@ -1119,7 +1121,8 @@ body::before {
 }
 
 .changelog-code {
-  background: rgba(200, 255, 210, 0.15);
+  /* Opaque code wash — was rgba(200,255,210,0.15) glass (#14). */
+  background: color-mix(in srgb, #c8ffd2 15%, #08120c);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
@@ -1141,7 +1144,8 @@ body::before {
   align-items: center;
   padding: 12px 16px;
   margin: 0;
-  background: rgba(255, 255, 255, 0.4);
+  /* Opaque strip — was rgba(255,255,255,0.4) glass over neon (#14). */
+  background: transparent;
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
@@ -1199,7 +1203,8 @@ body::before {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(12, 12, 16, 0.50); /* Same grey as --muted, matching settings icon */
+  /* Opaque muted type on dark strip — was rgba(12,12,16,0.50) for light glass (#14). */
+  color: color-mix(in srgb, #b4e6b4 55%, #08120c);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1207,13 +1212,14 @@ body::before {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque type — was rgba(52,199,89,0.8) glass (#14). */
+  color: color-mix(in srgb, #34c759 80%, #08120c);
 }
 
 .battery-icon.no-battery {
-  /* Was opacity 0.4 on rgba(12, 12, 16, 0.50). Strip is 40% white on #08120c. */
+  /* Was opacity 0.4 on dark glass over light strip; now muted on neon field (#14). */
   opacity: 1;
-  color: color-mix(in srgb, #0c0c10 20%, color-mix(in srgb, #ffffff 40%, #08120c));
+  color: color-mix(in srgb, #b4e6b4 22%, #08120c);
 }
 
 .battery-level {
