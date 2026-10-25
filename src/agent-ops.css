@@ -1846,8 +1846,8 @@ body.theme-data-poster .ops-health-value,
 body.theme-dark .ops-health-value,
 body.theme-neon .ops-health-value,
 body.theme-futuristic .ops-health-value {
-  /* Was opacity 0.95 on inherit (~92% white) → ~87% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 87%, #0e0e14);
+  /* Was opacity 0.95 on inherit (~92% white) → ~87% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
   opacity: 1;
 }
 
@@ -2446,14 +2446,14 @@ body.theme-futuristic .ops-health-value {
 }
 body.theme-data-poster .ops-subhead,
 body.theme-dark .ops-subhead {
-  /* Was opacity 0.5 on inherit (~92% white) → ~46% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 46%, #0e0e14);
+  /* Was opacity 0.5 on inherit (~92% white) → ~46% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .ops-insight-sub,
 body.theme-dark .ops-insight-sub {
-  /* Was opacity 0.5 on inherit (~92% white) → ~46% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 46%, #0e0e14);
+  /* Was opacity 0.5 on inherit (~92% white) → ~46% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
   opacity: 1;
 }
 
@@ -2597,8 +2597,8 @@ body.theme-data-poster button.ops-badge:disabled,
 body.theme-dark button.ops-badge:disabled,
 body.theme-neon button.ops-badge:disabled,
 body.theme-futuristic button.ops-badge:disabled {
-  /* Was opacity 0.55 on inherit (~92% white) → ~51% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 51%, #0e0e14);
+  /* Was opacity 0.55 on inherit (~92% white) → ~51% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
@@ -2614,8 +2614,8 @@ body.theme-data-poster .ops-badge.off,
 body.theme-dark .ops-badge.off,
 body.theme-neon .ops-badge.off,
 body.theme-futuristic .ops-badge.off {
-  /* Was opacity 0.6 on inherit (~92% white) → ~55% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 55%, #0e0e14);
+  /* Was opacity 0.6 on inherit (~92% white) → ~55% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
 }
 
 .ops-agent-meta-row {
@@ -2759,9 +2759,9 @@ body.theme-data-poster .ops-agent-edit-actions .btn-primary:disabled,
 body.theme-dark .ops-agent-edit-actions .btn-primary:disabled,
 body.theme-neon .ops-agent-edit-actions .btn-primary:disabled,
 body.theme-futuristic .ops-agent-edit-actions .btn-primary:disabled {
-  /* Was opacity 0.45 over the blue fill on #0e0e14. */
-  background: color-mix(in srgb, #2196f3 36%, #0e0e14);
-  color: color-mix(in srgb, #ffffff 45%, #0e0e14);
+  /* Was opacity 0.45 over the blue fill; mix on #0b0b10 (was early #0e0e14). */
+  background: color-mix(in srgb, #2196f3 36%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 45%, #0b0b10);
 }
 
 /* Opaque type — glass alpha stays in Graphics and Media (#14). */
