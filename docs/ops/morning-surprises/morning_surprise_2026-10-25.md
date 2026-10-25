@@ -1,24 +1,23 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester open was design-review only (`feature-agent-ops.png` ~39d stale). Mac window capture still blocked (no on-screen CPU window / Screen Recording TCC).
+Overnight Track B kept shipping opaque Futuristic / Data Poster glass remaps (standing P2 #14). Digester stayed empty (0 runs / 7d). Design-review screens still stale on the Linux rack (no Screen Recording TCC for `screencapture -l`).
 
 ## Shipped tonight (latest)
 
-- **v0.1.2313** — Futuristic AI Chat markdown blockquote / code / pre / table / hr / link and late history-chart inset + time-range / tooltip drop black / white / cyan glass rgba; mix on opaque shell `#0b0b10`. Design-review adjacent `feature-ai-chat` / metrics history.
-- **v0.1.2312** — Futuristic Ollama / AI Chat chrome: `.ollama-menu` / menu button, settings popover backdrop, model select + dropdown, and chat message washes.
+- **v0.1.2314** — Futuristic body cyan/purple radial peaks, Debug Log toolbar / viewer / autorefresh washes, and removal of the early Settings checkbox glass duplicate. Mixes on opaque `#0b0b10` (no cyan / purple / gray / black glass rgba). Design-review adjacent Futuristic shell / Logs.
 
 ## Also kept this window (sample)
 
+- **v0.1.2313** — Futuristic markdown + history chrome
+- **v0.1.2312** — Futuristic Ollama / AI Chat chrome
 - **v0.1.2311** — Futuristic Monitors + Settings panel chrome
 - **v0.1.2310** — Futuristic icon-line + changelog-code
 - **v0.1.2309** — Futuristic Force Quit + Settings toggle chrome
 - **v0.1.2308** — Futuristic Changelog scrollbar + battery icons
-- **v0.1.2307** — Futuristic history / process / metric opacity chrome
-- **v0.1.2306** — Futuristic opaque shell tokens + first-wave chrome
+- **v0.1.2306–2307** — Futuristic shell tokens + history/process/metric opacity
 - Earlier in the night: Data Poster / Dark AI Chat · Processes · Monitors · Disk Cleanup · Settings inject waves (v0.1.2285–2305)
 
 ## Still deferred
 
 - Mac window-only recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / kin when Screen Recording TCC allows
-- Remaining Futuristic glass (body radial falls / Settings checkbox duplicate glass / logs toolbar) and Neon glass tokens
-- Layout-daily dark / neon / futuristic / architect shells still due (data-poster ok today)
+- Remaining Futuristic glass (process-bar glow shadow / later rgba falls if any) and Neon glass tokens
