@@ -1410,8 +1410,10 @@ body.theme-dark .chat-answer-part.chat-answer-final {
 }
 
 /*
- * Data Poster / Dark: Top Processes glances + pinned rows still mixed Apple
- * #ffffff washes → white slabs and unread light-on-light text (GitHub #18).
+ * Data Poster / Dark: Top Processes top glances still mixed against early
+ * #0e0e14 → wrong dark slab on the opaque shell #0b0b10. Catch up to
+ * processes-filter-attention / process-row. Design-review fuel
+ * (feature-processes) + standing P2 #14.
  */
 body.theme-data-poster .processes-top-glance,
 body.theme-data-poster .processes-top-gpu-glance,
@@ -1419,8 +1421,8 @@ body.theme-data-poster .processes-top-ram-glance,
 body.theme-dark .processes-top-glance,
 body.theme-dark .processes-top-gpu-glance,
 body.theme-dark .processes-top-ram-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
@@ -1430,8 +1432,8 @@ body.theme-data-poster .processes-top-ram-glance:hover,
 body.theme-dark .processes-top-glance:hover,
 body.theme-dark .processes-top-gpu-glance:hover,
 body.theme-dark .processes-top-ram-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .processes-top-glance:focus-visible,
 body.theme-data-poster .processes-top-gpu-glance:focus-visible,
@@ -1439,7 +1441,7 @@ body.theme-data-poster .processes-top-ram-glance:focus-visible,
 body.theme-dark .processes-top-glance:focus-visible,
 body.theme-dark .processes-top-gpu-glance:focus-visible,
 body.theme-dark .processes-top-ram-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .processes-top-glance.is-hot,
 body.theme-data-poster .processes-top-gpu-glance.is-hot,
@@ -1447,8 +1449,8 @@ body.theme-data-poster .processes-top-ram-glance.is-hot,
 body.theme-dark .processes-top-glance.is-hot,
 body.theme-dark .processes-top-gpu-glance.is-hot,
 body.theme-dark .processes-top-ram-glance.is-hot {
-  border-color: color-mix(in srgb, #ff9500 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 body.theme-data-poster .processes-top-glance.is-ok,
 body.theme-data-poster .processes-top-gpu-glance.is-ok,
@@ -1456,8 +1458,8 @@ body.theme-data-poster .processes-top-ram-glance.is-ok,
 body.theme-dark .processes-top-glance.is-ok,
 body.theme-dark .processes-top-gpu-glance.is-ok,
 body.theme-dark .processes-top-ram-glance.is-ok {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 /*
  * Data Poster / Dark: Top Processes filter-attention / hot-attention glances +

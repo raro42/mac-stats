@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2294
+
+- Data Poster / Dark Top Processes top glances (`.processes-top-glance`; `.processes-top-gpu-glance`; `.processes-top-ram-glance` resting/hover/focus/is-hot/is-ok) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-processes`. Next: Monitors summary / collapsed / attention glances still on early `#0e0e14` (shared dark), or Mac capture of stale `feature-processes.png` / `feature-ai-chat.png` when TCC allows.
+
 ## Overnight merge — v0.1.2293
 
 - Data Poster / Dark AI Chat exec + answer cards (`.chat-exec-card`; `.chat-exec-code`; `.chat-answer-part`; `.chat-answer-final`) opaque `#0b0b10` mix (no early `#0e0e14`). Standing P2 #14; design-review `feature-ai-chat`. Next: processes-top glances still on early `#0e0e14` (shared dark), or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows.
