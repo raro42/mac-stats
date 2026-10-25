@@ -1052,8 +1052,8 @@ body.theme-data-poster .process-list-header,
 body.theme-dark .process-list-header,
 body.theme-data-poster .perplexity-result-meta,
 body.theme-dark .perplexity-result-meta {
-  /* Was opacity 0.72/0.7/0.65/0.62/0.55 on inherit (~92% white) → ~66% white on #0e0e14. */
-  color: color-mix(in srgb, #ffffff 66%, #0e0e14);
+  /* Was opacity 0.72/0.7/0.65/0.62/0.55 on inherit (~92% white) → ~66% white; mix on #0b0b10 (was early #0e0e14). */
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
 body.theme-data-poster .filter-chip-kb-hint,
