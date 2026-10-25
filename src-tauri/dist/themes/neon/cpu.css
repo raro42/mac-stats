@@ -403,7 +403,8 @@ body::before {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: rgba(200, 255, 210, 0.72);
+  /* Opaque type — was rgba(200,255,210,0.72) glass (#14). */
+  color: color-mix(in srgb, #c8ffd2 72%, #08120c);
 }
 
 .detail-label {
@@ -432,12 +433,13 @@ body::before {
   border-top: none;
   border-radius: 0 0 12px 12px;
   overflow: hidden;
-  background: rgba(8, 18, 12, 0.20);
+  /* Opaque wash + inset — was rgba glass (#14). */
+  background: color-mix(in srgb, #08120c 20%, #020302);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(120, 255, 160, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
-    0 2px 8px rgba(0, 0, 0, 0.20);
+    inset 0 1px 0 color-mix(in srgb, #78ffa0 15%, #08120c),
+    inset 0 -1px 0 color-mix(in srgb, #000000 30%, #08120c),
+    0 2px 8px color-mix(in srgb, #000000 20%, #08120c);
 }
 
 .history-chart {
@@ -448,11 +450,13 @@ body::before {
 }
 
 .detail-label {
-  color: rgba(170, 230, 185, 0.58);
+  /* Opaque type — was rgba(170,230,185,0.58) glass (#14). */
+  color: color-mix(in srgb, #aae6b9 58%, #08120c);
 }
 
 .detail-value {
-  color: rgba(220, 255, 230, 0.88);
+  /* Opaque type — was rgba(220,255,230,0.88) glass (#14). */
+  color: color-mix(in srgb, #dcffe6 88%, #08120c);
   text-align: right;
   font-weight: 600;
 }
@@ -481,12 +485,14 @@ body::before {
   gap: 8px;
   align-items: center;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(120, 255, 160, 0.12);
+  /* Opaque hairline — was rgba(120,255,160,0.12) glass (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #78ffa0 12%, #08120c);
 }
 
 .process-name {
   font-size: 11px;
-  color: rgba(200, 255, 210, 0.80);
+  /* Opaque type — was rgba(200,255,210,0.80) glass (#14). */
+  color: color-mix(in srgb, #c8ffd2 80%, #08120c);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -501,7 +507,8 @@ body::before {
 .process-bar {
   width: 54px;
   height: 4px;
-  background: rgba(120, 255, 160, 0.12);
+  /* Opaque track — was rgba(120,255,160,0.12) glass (#14). */
+  background: color-mix(in srgb, #78ffa0 12%, #08120c);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -510,7 +517,8 @@ body::before {
   height: 100%;
   width: 0;
   background: linear-gradient(90deg, var(--green), var(--green2));
-  box-shadow: 0 0 10px rgba(110, 255, 155, 0.30);
+  /* Opaque glow — was rgba(110,255,155,0.30) glass (#14). */
+  box-shadow: 0 0 10px color-mix(in srgb, #6eff9b 30%, #08120c);
 }
 
 .process-percent {
@@ -518,13 +526,15 @@ body::before {
   text-align: right;
   font-size: 12px;
   font-weight: 700;
-  color: rgba(215, 255, 225, 0.88);
+  /* Opaque type — was rgba(215,255,225,0.88) glass (#14). */
+  color: color-mix(in srgb, #d7ffe1 88%, #08120c);
 }
 
 .process-empty {
   padding: 1rem;
   text-align: center;
-  color: rgba(170, 230, 185, 0.58);
+  /* Opaque type — was rgba(170,230,185,0.58) glass (#14). */
+  color: color-mix(in srgb, #aae6b9 58%, #08120c);
 }
 
 .theme-footer {
@@ -933,17 +943,18 @@ body::before {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(120, 255, 160, 0.25);
-  background: rgba(8, 18, 12, 0.4);
+  /* Opaque track — was rgba glass (#14). */
+  border: 1px solid color-mix(in srgb, #78ffa0 25%, #08120c);
+  background: color-mix(in srgb, #08120c 40%, #020302);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(120, 255, 160, 0.5);
-  border-color: rgba(120, 255, 160, 0.6);
+  background: color-mix(in srgb, #78ffa0 50%, #08120c);
+  border-color: color-mix(in srgb, #78ffa0 60%, #08120c);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -956,7 +967,7 @@ body::before {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 30%, #08120c);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -967,7 +978,8 @@ body::before {
 .toggle-label {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(200, 255, 210, 0.80);
+  /* Opaque type — was rgba(200,255,210,0.80) glass (#14). */
+  color: color-mix(in srgb, #c8ffd2 80%, #08120c);
 }
 
 /* Changelog Modal Styling */
