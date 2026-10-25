@@ -820,18 +820,20 @@ body::before {
   width: 44px;
   height: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(0, 0, 0, 0.08);
+  /* Opaque track — was Apple rgba(0,0,0,…) glass (#14). */
+  border: 1px solid color-mix(in srgb, #78ffa0 25%, #08120c);
+  background: color-mix(in srgb, #08120c 40%, #020302);
   appearance: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
 }
 
 .setting-toggle input[type="checkbox"]:checked {
-  background: rgba(59, 130, 246, 0.8);
-  border-color: rgba(59, 130, 246, 0.6);
+  /* Opaque accent — was Apple rgba(59,130,246,…) glass (#14). */
+  background: color-mix(in srgb, #78ffa0 50%, #08120c);
+  border-color: color-mix(in srgb, #78ffa0 60%, #08120c);
 }
 
 .setting-toggle input[type="checkbox"]::before {
@@ -844,7 +846,7 @@ body::before {
   top: 2px;
   left: 2px;
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px color-mix(in srgb, #000000 20%, #08120c);
 }
 
 .setting-toggle input[type="checkbox"]:checked::before {
@@ -1271,7 +1273,8 @@ body::before {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  color: rgba(235, 235, 245, 0.45);
+  /* Opaque type — was rgba(235,235,245,0.45) glass (#14). */
+  color: color-mix(in srgb, #ebebf5 45%, #08120c);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   border-radius: 9px;
@@ -1281,7 +1284,8 @@ body::before {
 }
 
 .icon-line-item:hover {
-  color: rgba(235, 235, 245, 0.85);
+  /* Opaque type — was rgba(235,235,245,0.85) glass (#14). */
+  color: color-mix(in srgb, #ebebf5 85%, #08120c);
   background: #0a1a10;
   border-color: #2a5a32;
 }
@@ -1330,14 +1334,16 @@ body::before {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  color: rgba(72, 210, 120, 0.85);
+  /* Opaque type — was rgba(72,210,120,0.85) glass (#14). */
+  color: color-mix(in srgb, #48d278 85%, #08120c);
   background: color-mix(in srgb, #34c759 7%, #06110a);
   border-color: color-mix(in srgb, #34c759 28%, #06110a);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  color: rgba(90, 220, 130, 0.95);
+  /* Opaque type — was rgba(90,220,130,0.95) glass (#14). */
+  color: color-mix(in srgb, #5adc82 95%, #08120c);
   background: color-mix(in srgb, #34c759 10%, #06110a);
   border-color: color-mix(in srgb, #34c759 36%, #06110a);
   box-shadow: none;
@@ -1363,14 +1369,16 @@ body::before {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  color: rgba(255, 180, 70, 0.8);
+  /* Opaque type — was rgba(255,180,70,0.8) glass (#14). */
+  color: color-mix(in srgb, #ffb446 80%, #08120c);
   background: color-mix(in srgb, #ff9f0a 7%, #06110a);
   border-color: color-mix(in srgb, #ff9f0a 30%, #06110a);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  color: rgba(255, 190, 90, 0.95);
+  /* Opaque type — was rgba(255,190,90,0.95) glass (#14). */
+  color: color-mix(in srgb, #ffbe5a 95%, #08120c);
   background: color-mix(in srgb, #ff9f0a 10%, #06110a);
   border-color: color-mix(in srgb, #ff9f0a 36%, #06110a);
 }
@@ -1389,14 +1397,16 @@ body::before {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  color: rgba(255, 100, 95, 0.85);
+  /* Opaque type — was rgba(255,100,95,0.85) glass (#14). */
+  color: color-mix(in srgb, #ff645f 85%, #08120c);
   background: color-mix(in srgb, #ff3b30 7%, #06110a);
   border-color: color-mix(in srgb, #ff3b30 30%, #06110a);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  color: rgba(255, 120, 110, 0.95);
+  /* Opaque type — was rgba(255,120,110,0.95) glass (#14). */
+  color: color-mix(in srgb, #ff786e 95%, #08120c);
   background: color-mix(in srgb, #ff3b30 10%, #06110a);
   border-color: color-mix(in srgb, #ff3b30 36%, #06110a);
 }
@@ -1680,20 +1690,21 @@ body::before {
 }
 
 .monitor-remove-btn {
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.2);
+  /* Opaque wash — was rgba(255,59,48,…) glass (#14). */
+  background: color-mix(in srgb, #ff3b30 10%, #08120c);
+  border: 1px solid color-mix(in srgb, #ff3b30 20%, #08120c);
   color: #ff3b30;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .monitor-remove-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
-  border-color: rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, #ff3b30 20%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
 }
 
 .add-monitor-form {
