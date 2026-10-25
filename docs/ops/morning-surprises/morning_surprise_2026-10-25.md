@@ -1,21 +1,23 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque-shell contrast (#14) while digester stayed empty.
+Overnight Track B kept shipping opaque Data Poster / Dark / Neon / Futuristic washes (#14).
 
-## Shipped tonight (highlights)
+## Shipped
 
-- **v0.1.2304** — `cpu.js` / `cpu-ui.js` injects (LPM busy, filter-chip / Force Quit / Perplexity search+setup kb-hints, modal / process-details / changelog headers, Settings theme-list / Appearance / Product / Credentials kb-hints) now mix on opaque `#0b0b10` (no early `#0e0e14`). Design-review adjacent Settings / AI Chat / Perplexity.
-- **v0.1.2303** — judge-off labels + filter kb-hints + neon/futuristic Perplexity status on `#0b0b10`.
-- **v0.1.2302** — Disk Cleanup empty / disabled / Recurse + Force Quit chevron on `#0b0b10`.
-- Earlier same night: Monitors checking/pending, empty shells + Insights, filter-miss/LPM, Perplexity/Down checked-ago, Agent Ops health, shared muted type, Monitors/Processes glances, AI Chat cards/chips (v0.1.2293–2301).
+- **v0.1.2305** — Data Poster `--panel` drops early `#0e0e14` 94% mix (white 2% lift on opaque shell `#0b0b10`). Orphan `dashboard.css` `.ops-insight-line em` matches the same shell mix. Design-review fuel: `feature-agent-ops` chrome.
+- **v0.1.2304** — `cpu.js` / `cpu-ui.js` kb-hint + LPM injects (LPM busy, filter-chip / Force Quit / Perplexity / modal / Settings kb-hints).
+- **v0.1.2303** — Judge-off labels + filter/modal kb-hints + neon/futuristic Perplexity status.
+- **v0.1.2302** — Disk Cleanup empty / disabled / Recurse + Force Quit chevron.
+- **v0.1.2301** — Monitors checking / pending / removing.
+- **v0.1.2300** — Empty shells + `.process-empty` + `.ops-insight-line`.
+- Earlier tonight: **v0.1.2299**–**v0.1.2280** Processes / AI Chat / Monitors / poster opaque washes.
 
 ## Tried / deferred
 
-- Mac window-only recapture of stale `feature-ai-chat.png` / `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` — still blocked on this Linux rack (Screen Recording TCC / no Quartz window id).
-- Digester: 0 runs / 7d (no open Slowest fuel).
-- Sibling OpenClaw/Hermes: git paths missing on rack — no port.
+- Design-review due=`feature-agent-ops.png` (~39d stale). Opened CPU window → Agent Ops; `screencapture -l` still fails with “could not create image” (Screen Recording TCC). Prior PNG kept.
+- Parallel races earlier: discarded duplicate locals when origin already shipped adjacent remaps; continued from standing next.
 
 ## Next
 
-- Remaining early `#0e0e14`: orphan `dashboard.css` (`.ops-insight-line em`).
-- Recapture stale feature screens when a Mac with TCC allows window-only grab.
+- Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording allows window-only capture.
+- Remaining Apple `#ffffff` / glass washes on dark shells if any (layout-daily dark still due).
