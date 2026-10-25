@@ -1,25 +1,19 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping Standing P2 **#14** (opaque dark-theme chrome). Digester stayed on design-review stale `feature-agent-ops.png`; Mac window capture stayed blocked (no on-screen CPU window / Screen Recording TCC). Layout-daily remained due for data-poster (screen missing) and was deferred behind #14.
+Overnight autoresearch (Track B) kept shipping opaque dark-shell glass cuts (#14).
 
-## Shipped tonight (keeps)
+## Shipped tonight (latest)
 
-| Version | What got better |
-|---------|-----------------|
-| **v0.1.2319** | Neon Changelog version / bullet / code wash + battery strip (transparent) + battery-icon resting / charging / no-battery — opaque `#08120c` mix |
-| **v0.1.2318** | Neon Details grid / history chart / process rows / Settings toggle — opaque `#08120c` mix |
-| **v0.1.2317** | Neon metric type + Force Quit + Changelog scrollbar — opaque `#08120c` mix |
-| **v0.1.2316** | Neon first-wave chrome (scrollbar / header / icon-btn / metric tiles / ring / section title) |
-| **v0.1.2315** | Neon `:root` shell tokens + body radials + neon-frame |
-| **v0.1.2314**–**2313** | Futuristic body radials / logs / markdown / history chrome |
-| Earlier | Futuristic Ollama / Monitors / force-quit / battery / shell tokens; Data Poster `#0e0e14` remaps |
+- **v0.1.2320** — Neon icon-line Ready / Slow / Down type, early Apple Settings toggle track/checked/knob, and monitor-remove wash → opaque `#08120c` mix (no glass rgba).
+- Prior same night: v0.1.2315–2319 Neon shell / chrome / Changelog / battery; earlier Futuristic + Data Poster opaque waves.
 
-## Deferred
+## Tried / deferred
 
-- Mac recapture of `docs/screens/feature-agent-ops.png` (and other stale feature screens) when Screen Recording TCC allows `screencapture -l` with an on-screen CPU window.
-- Layout-daily data-poster AI Chat + Monitors screen (missing).
-- Remaining Neon glass (later Apple-fallback panel rgba chains) and Futuristic process-bar glow shadow.
+- Design-review Mac capture of stale `docs/screens/feature-agent-ops.png` (~39.5d) — deferred (Screen Recording TCC / no on-screen CPU window for `screencapture -l`).
+- Layout-daily Data Poster screen still missing — deferred while #14 Neon glass runs.
 
 ## Next fuel
 
-Standing #14: remaining Neon rgba falls / Futuristic process-bar glow, or Mac capture when TCC allows.
+- Remaining Neon Apple-fallback panel / logs glass rgba falls
+- Futuristic process-bar glow (`box-shadow` cyan glass)
+- Mac capture when TCC allows
