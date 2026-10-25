@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2313
+
+- Futuristic markdown + history chrome (`.chat-message .markdown` blockquote / code / pre / table / hr / link; late `.history-chart-container` inset; `.time-range-dropdown` / `.history-tooltip`) opaque `#0b0b10` mix (no black / white / cyan glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat` / metrics history. Next: remaining Futuristic glass (body radial falls / Settings checkbox duplicate glass / logs toolbar), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2312
 
 - Futuristic Ollama / AI Chat chrome (`.ollama-menu` / `.ollama-menu-btn`; settings popover backdrop; `.model-select` / dropdown; `.chat-messages` / user+assistant washes) opaque `#0b0b10` mix (no white / gray / accent glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat`. Next: remaining Futuristic glass (markdown code/blockquote falls / history-chart inset highlights / body radial falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

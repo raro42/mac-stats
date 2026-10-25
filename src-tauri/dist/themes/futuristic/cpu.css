@@ -2224,14 +2224,16 @@ body {
 .chat-message .markdown blockquote {
   margin: 12px 0;
   padding: 8px 12px;
-  border-left: 3px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.2)))));
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.03)))));
+  /* Opaque hairline / wash — was black glass rgba fallback (#14). */
+  border-left: 3px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
+  background: color-mix(in srgb, #ffffff 3%, #0b0b10);
   border-radius: 4px;
   font-style: italic;
 }
 
 .chat-message .markdown code {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.08)))));
+  /* Opaque wash — was black glass rgba(0,0,0,0.08) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 8%, #0b0b10);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Consolas', monospace;
@@ -2240,8 +2242,9 @@ body {
 }
 
 .chat-message .markdown pre {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.05)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque wash / hairline — was black glass rgba fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   border-radius: 8px;
   padding: 12px;
   margin: 12px 0;
@@ -2267,24 +2270,28 @@ body {
 
 .chat-message .markdown table th,
 .chat-message .markdown table td {
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   padding: 6px 10px;
   text-align: left;
 }
 
 .chat-message .markdown table th {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.05)))));
+  /* Opaque wash — was black glass rgba(0,0,0,0.05) fallback (#14). */
+  background: color-mix(in srgb, #ffffff 5%, #0b0b10);
   font-weight: 600;
 }
 
 .chat-message .markdown hr {
   border: none;
-  border-top: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  /* Opaque hairline — was black glass rgba(0,0,0,0.1) fallback (#14). */
+  border-top: 1px solid var(--hairline, color-mix(in srgb, #ffffff 12%, #0b0b10));
   margin: 16px 0;
 }
 
 .chat-message .markdown a {
-  color: var(--accent, rgba(0, 122, 255, 0.9));
+  /* Opaque accent — was rgba(0,122,255,0.9) glass fallback (#14). */
+  color: var(--accent, color-mix(in srgb, #3bd6ff 90%, #0b0b10));
   text-decoration: none;
 }
 
@@ -2432,12 +2439,13 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.20);
+  /* Opaque inset wash — was rgba black/white glass (late duplicate of early #14). */
+  background: color-mix(in srgb, #000000 20%, #0b0b10);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, #0b0b10),
+    inset 0 -1px 0 color-mix(in srgb, #000000 20%, #0b0b10),
+    0 2px 8px color-mix(in srgb, #000000 15%, #0b0b10);
 }
 
 .history-chart {
@@ -2458,32 +2466,34 @@ body {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Opaque type — was rgba(128,128,128,0.8) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 80%, #0b0b10));
   font-weight: 500;
 }
 
 .time-range-dropdown {
-  background: rgba(59, 214, 255, 0.05);
-  border: 1px solid rgba(59, 214, 255, 0.3);
+  /* Opaque wash / hairline — was cyan glass rgba (#14). */
+  background: color-mix(in srgb, #3bd6ff 5%, #0b0b10);
+  border: 1px solid color-mix(in srgb, #3bd6ff 30%, #0b0b10);
   border-radius: 4px;
   color: #3bd6ff;
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(59, 214, 255, 0.1);
-  border-color: rgba(59, 214, 255, 0.5);
+  background: color-mix(in srgb, #3bd6ff 10%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 50%, #0b0b10);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(59, 214, 255, 0.15);
-  border-color: rgba(59, 214, 255, 0.7);
-  box-shadow: 0 0 0 2px rgba(59, 214, 255, 0.1);
+  background: color-mix(in srgb, #3bd6ff 15%, #0b0b10);
+  border-color: color-mix(in srgb, #3bd6ff 70%, #0b0b10);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #3bd6ff 10%, #0b0b10);
 }
 
 .time-range-dropdown option {
@@ -2494,10 +2504,11 @@ body {
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
+  /* Opaque panel — was black/cyan glass rgba (#14). */
+  background: color-mix(in srgb, #000000 95%, #0b0b10);
   color: #3bd6ff;
   padding: 8px 12px;
-  border: 1px solid rgba(59, 214, 255, 0.5);
+  border: 1px solid color-mix(in srgb, #3bd6ff 50%, #0b0b10);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2506,7 +2517,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #0b0b10);
 }
 
 /* Debug Log viewer */
