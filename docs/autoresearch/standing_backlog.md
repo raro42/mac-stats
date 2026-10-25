@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2342
+
+- Architect AI Chat + logs Apple rgba falls (model-text/select; chat-messages user/assistant; markdown blockquote/code/pre/table/hr/link; thinking-dots; Ollama popover-close muted; logs toolbar/viewer) opaque  mix (no glass rgba). Standing P2 #14; design-review adjacent  (polish-without-capture grace). Next: Architect history chart / time-range / tooltip Apple rgba (Dark v0.1.2332 parity), remaining metric-box inset shadows if any, or Mac capture of stale  /  when Screen Recording TCC allows .
+
 ## Overnight merge — v0.1.2341
 
 - Architect Settings card + theme/input/btn/help washes (`.settings-card` / header hairline; `.theme-item` resting/hover/current; `.settings-input` focus; `.settings-btn` / primary; `.settings-help-sheet`) opaque `#f1f1f1` mix (no Apple rgba / `color-mix(…, transparent)` glass). Standing P2 #14; layout-daily Architect; design-review adjacent Settings (polish-without-capture grace). Next: remaining Architect chat markdown / logs Apple rgba falls if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
