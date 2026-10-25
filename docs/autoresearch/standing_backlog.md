@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2310
+
+- Futuristic icon-line + changelog-code chrome (`.icon-line-item` resting / hover / Ready / Slow / Down type; `.changelog-code` cyan wash) opaque `#0b0b10` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat` / Changelog. Next: remaining Futuristic glass (panel fallbacks / monitor-remove red glass / body radial falls), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2309
 
 - Futuristic force-quit + Settings toggle chrome (`.force-quit-section` hairline; `.force-quit-btn` wash/type; `.setting-toggle` checkbox track / checked accent) opaque `#0b0b10` mix (no white / red / cyan glass rgba). Standing P2 #14; design-review adjacent Force Quit / Settings. Next: remaining Futuristic glass (later rgba(255) falls / panel fallbacks), Neon glass tokens, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

@@ -1059,7 +1059,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(59, 214, 255, 0.15);
+  /* Opaque code wash — was cyan glass rgba(59,214,255,0.15) over the futuristic field (#14). */
+  background: color-mix(in srgb, var(--accent) 15%, #0b0b10);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
@@ -1207,7 +1208,8 @@ body {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  color: rgba(235, 235, 245, 0.45);
+  /* Opaque type — was rgba(235,235,245,0.45) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ebebf5 45%, #0b0b10);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   border-radius: 9px;
@@ -1217,7 +1219,8 @@ body {
 }
 
 .icon-line-item:hover {
-  color: rgba(235, 235, 245, 0.85);
+  /* Opaque type — was rgba(235,235,245,0.85) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ebebf5 85%, #0b0b10);
   background: #12121c;
   border-color: #3a3a4a;
 }
@@ -1266,14 +1269,16 @@ body {
 
 /* Soft ok (apple Ready calm / Monitors all-up 7%/28% parity). */
 .icon-line-item.status-good {
-  color: rgba(72, 210, 120, 0.85);
+  /* Opaque type — was rgba(72,210,120,0.85) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #48d278 85%, #0b0b10);
   background: color-mix(in srgb, #34c759 7%, #0a0a12);
   border-color: color-mix(in srgb, #34c759 28%, #0a0a12);
   box-shadow: none;
 }
 
 .icon-line-item.status-good:hover {
-  color: rgba(90, 220, 130, 0.95);
+  /* Opaque type — was rgba(90,220,130,0.95) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #5adc82 95%, #0b0b10);
   background: color-mix(in srgb, #34c759 10%, #0a0a12);
   border-color: color-mix(in srgb, #34c759 36%, #0a0a12);
   box-shadow: none;
@@ -1299,14 +1304,16 @@ body {
 
 /* Soft alert (apple Monitors Slow / Ops health-warn 7%/30% parity). */
 .icon-line-item.status-warning {
-  color: rgba(255, 180, 70, 0.8);
+  /* Opaque type — was rgba(255,180,70,0.8) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ffb446 80%, #0b0b10);
   background: color-mix(in srgb, #ff9f0a 7%, #0a0a12);
   border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a12);
   box-shadow: none;
 }
 
 .icon-line-item.status-warning:hover {
-  color: rgba(255, 190, 90, 0.95);
+  /* Opaque type — was rgba(255,190,90,0.95) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ffbe5a 95%, #0b0b10);
   background: color-mix(in srgb, #ff9f0a 10%, #0a0a12);
   border-color: color-mix(in srgb, #ff9f0a 36%, #0a0a12);
 }
@@ -1325,14 +1332,16 @@ body {
 
 /* Soft alert (apple Monitors Down / Ops health-bad 7%/30% parity). */
 .icon-line-item.status-bad {
-  color: rgba(255, 100, 95, 0.85);
+  /* Opaque type — was rgba(255,100,95,0.85) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ff645f 85%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 7%, #0a0a12);
   border-color: color-mix(in srgb, #ff3b30 30%, #0a0a12);
   box-shadow: none;
 }
 
 .icon-line-item.status-bad:hover {
-  color: rgba(255, 120, 110, 0.95);
+  /* Opaque type — was rgba(255,120,110,0.95) glass over the futuristic field (#14). */
+  color: color-mix(in srgb, #ff786e 95%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 10%, #0a0a12);
   border-color: color-mix(in srgb, #ff3b30 36%, #0a0a12);
 }
