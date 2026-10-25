@@ -649,36 +649,36 @@ body.theme-futuristic .icon-line-item.is-ai-off:not(.status-good):not(.status-wa
 
 /*
  * Data Poster / dark shells: shared opaque washes mix against #ffffff for Apple.
- * Remap the always-visible monitors summary (and kin) onto dark panel ink (#15).
+ * Remap the always-visible monitors summary (and kin) onto opaque shell #0b0b10 (#14; was early #0e0e14).
  */
 body.theme-data-poster .monitors-summary,
 body.theme-dark .monitors-summary {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
 }
 body.theme-data-poster .monitors-summary:hover,
 body.theme-dark .monitors-summary:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .monitors-summary:focus-visible,
 body.theme-dark .monitors-summary:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .monitors-summary.has-down,
 body.theme-dark .monitors-summary.has-down {
-  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
 }
 body.theme-data-poster .monitors-summary.is-all-up,
 body.theme-dark .monitors-summary.is-all-up {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 body.theme-data-poster .monitors-summary.has-slowest-hint,
 body.theme-dark .monitors-summary.has-slowest-hint {
-  border-color: color-mix(in srgb, #ff9500 30%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 /*
  * Data Poster / Dark: Monitors collapsed glance still mixed Apple #ffffff
@@ -686,34 +686,34 @@ body.theme-dark .monitors-summary.has-slowest-hint {
  */
 body.theme-data-poster .monitors-collapsed-glance,
 body.theme-dark .monitors-collapsed-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-collapsed-glance:hover,
 body.theme-dark .monitors-collapsed-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .monitors-collapsed-glance:focus-visible,
 body.theme-dark .monitors-collapsed-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .monitors-collapsed-glance.has-down,
 body.theme-dark .monitors-collapsed-glance.has-down {
-  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
 }
 body.theme-data-poster .monitors-collapsed-glance.is-all-up,
 body.theme-dark .monitors-collapsed-glance.is-all-up {
-  border-color: color-mix(in srgb, #34c759 32%, #0e0e14);
-  background: color-mix(in srgb, #34c759 12%, #0e0e14);
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
 }
 body.theme-data-poster .monitors-collapsed-glance.has-slowest-hint,
 body.theme-dark .monitors-collapsed-glance.has-slowest-hint {
-  border-color: color-mix(in srgb, #ff9500 30%, #0e0e14);
-  background: color-mix(in srgb, #ff9500 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
 }
 /*
  * Data Poster / Dark: Monitors Down/Slow attention glance still mixed Apple
@@ -721,30 +721,30 @@ body.theme-dark .monitors-collapsed-glance.has-slowest-hint {
  */
 body.theme-data-poster .monitors-attention-glance,
 body.theme-dark .monitors-attention-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-attention-glance:hover,
 body.theme-dark .monitors-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .monitors-attention-glance:focus-visible,
 body.theme-dark .monitors-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .monitors-attention-glance.has-down,
 body.theme-dark .monitors-attention-glance.has-down {
-  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
   color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
 }
 body.theme-data-poster .monitors-attention-glance.has-slow,
 body.theme-dark .monitors-attention-glance.has-slow {
-  border-color: color-mix(in srgb, #ff9f0a 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9f0a 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
 /*
@@ -753,42 +753,42 @@ body.theme-dark .monitors-attention-glance.has-slow {
  */
 body.theme-data-poster .monitors-filter-attention-glance,
 body.theme-dark .monitors-filter-attention-glance {
-  border-color: color-mix(in srgb, currentColor 16%, #0e0e14);
-  background: color-mix(in srgb, currentColor 8%, #0e0e14);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
   /* Opaque type fallback — was rgba(255,255,255,0.92) glass over the poster field (#14). */
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
 }
 body.theme-data-poster .monitors-filter-attention-glance:hover,
 body.theme-dark .monitors-filter-attention-glance:hover {
-  background: color-mix(in srgb, currentColor 12%, #0e0e14);
-  border-color: color-mix(in srgb, currentColor 22%, #0e0e14);
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
 }
 body.theme-data-poster .monitors-filter-attention-glance:focus-visible,
 body.theme-dark .monitors-filter-attention-glance:focus-visible {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
 }
 body.theme-data-poster .monitors-filter-attention-glance.is-filter,
 body.theme-dark .monitors-filter-attention-glance.is-filter {
-  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0e0e14);
-  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0e0e14);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
   color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
 }
 body.theme-data-poster .monitors-filter-attention-glance.is-up-filter,
 body.theme-dark .monitors-filter-attention-glance.is-up-filter {
-  border-color: color-mix(in srgb, #30d158 32%, #0e0e14);
-  background: color-mix(in srgb, #30d158 12%, #0e0e14);
+  border-color: color-mix(in srgb, #30d158 32%, #0b0b10);
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
   color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
 }
 body.theme-data-poster .monitors-filter-attention-glance.is-down-filter,
 body.theme-dark .monitors-filter-attention-glance.is-down-filter {
-  border-color: color-mix(in srgb, #ff3b30 35%, #0e0e14);
-  background: color-mix(in srgb, #ff3b30 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
   color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
 }
 body.theme-data-poster .monitors-filter-attention-glance.is-slow-filter,
 body.theme-dark .monitors-filter-attention-glance.is-slow-filter {
-  border-color: color-mix(in srgb, #ff9f0a 32%, #0e0e14);
-  background: color-mix(in srgb, #ff9f0a 12%, #0e0e14);
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
 body.theme-data-poster .ollama-collapsed-glance,
