@@ -1,19 +1,22 @@
 # Morning surprise — 2026-10-25
 
-Overnight autoresearch (Track B) kept shipping opaque dark-shell glass cuts (#14).
+Overnight Track B kept shipping opaque dark-theme chrome (standing P2 #14). Quiet was not the default.
 
-## Shipped tonight (latest)
+## Shipped tonight (highlights)
 
-- **v0.1.2321** — Neon Settings card fallback, Monitors menu / settings popover / list / add-form / add button / row washes, and Debug Log toolbar / viewer → opaque `#08120c` mix (no white / gray / black glass rgba).
-- Prior same night: v0.1.2315–2320 Neon shell / chrome / Changelog / battery / icon-line; earlier Futuristic + Data Poster opaque waves.
+- **v0.1.2322** — Neon Ollama / AI Chat + late history chrome opaque on `#08120c` (menu, model select, chat washes, late history-chart inset, time-range, tooltip).
+- **v0.1.2321** — Neon Settings / Monitors panel + logs chrome opaque.
+- **v0.1.2320** — Neon icon-line + early Settings toggle + monitor-remove opaque.
+- Earlier same night: Neon metric/Changelog/Force Quit / details/history/process / Changelog+battery / shell tokens; Futuristic markdown+history / Ollama / Monitors+Settings / …; Data Poster panel + opaque Agent Ops / Monitors / Perplexity / processes waves.
 
 ## Tried / deferred
 
-- Design-review Mac capture of stale `docs/screens/feature-agent-ops.png` (~39.5d) — deferred (Screen Recording TCC).
-- Layout-daily Data Poster screen still missing — deferred while #14 Neon glass runs.
+- **Design review** still due: `docs/screens/feature-agent-ops.png` (~39.5d). Window-only `screencapture -l` blocked (Screen Recording TCC) or no on-screen CPU window on several ticks.
+- **Layout daily** due for data-poster (+ other dark shells) — remaps ok; screens missing; deferred while Neon #14 glass burns down.
 
 ## Next fuel
 
-- Remaining Neon Ollama popover / late history-chart / time-range glass rgba falls
-- Futuristic process-bar glow (`box-shadow` cyan glass)
-- Mac capture when TCC allows
+- Remaining Neon glass (markdown code/blockquote / later rgba falls).
+- Futuristic process-bar glow if any.
+- Mac capture of stale feature screens when Screen Recording TCC allows.
+

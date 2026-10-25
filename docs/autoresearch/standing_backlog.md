@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2322
+
+- Neon Ollama / AI Chat + late history chrome (`.ollama-menu` / btn / item; settings popover backdrop; `.model-text` / dropdown / `.model-select`; `.chat-messages` / user+assistant washes; late `.history-chart-container` inset; `.history-controls` label; `.time-range-dropdown` / `.history-tooltip`) opaque `#08120c` mix (no white / gray / green / accent glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon AI Chat / metrics history. Next: remaining Neon glass (markdown code/blockquote falls / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2321
 
 - Neon Settings / Monitors panel + logs chrome (`.settings-card` fallback; `.monitors-menu` / popover content; `.monitor-settings-item`; add-monitor form / `.add-btn-small`; `.monitor-item`; `.logs-toolbar` / `.logs-viewer` / `.logs-autorefresh`) opaque `#08120c` mix (no white / gray / black glass rgba). Standing P2 #14; layout-daily / design-review adjacent Neon Settings / Monitors / Logs. Next: remaining Neon glass (Ollama popover / late history-chart / time-range / later rgba falls), Futuristic process-bar glow, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
