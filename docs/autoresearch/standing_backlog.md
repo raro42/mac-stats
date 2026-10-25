@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2332
+
+- Dark (TUI) history chart / time-range / tooltip Apple rgba falls (`.history-chart-container` inset; `.history-controls` label; `.time-range-dropdown` hover/focus; `.history-tooltip`) opaque `#0a0a0a` mix (no black / white / green glass). Standing P2 #14; design-review adjacent `feature-cpu-metrics`. Next: remaining Dark Apple rgba if any, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2331
 
 - Dark (TUI) Ollama / AI Chat / logs Apple rgba falls (menu / popover backdrop / model select / chat washes / markdown / thinking-dots / logs toolbar·viewer) opaque `#0a0a0a` mix (no white / gray / blue glass). Standing P2 #14; layout-daily / design-review adjacent Dark AI Chat / Logs. Next: Dark history time-range / tooltip Apple rgba falls, Architect light glass (skip opaque-dark remap), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.

@@ -308,12 +308,13 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.20);
+  /* Opaque wash + inset — was black/white glass rgba (#14). */
+  background: color-mix(in srgb, #000000 20%, #0a0a0a);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, #0a0a0a),
+    inset 0 -1px 0 color-mix(in srgb, #000000 20%, #0a0a0a),
+    0 2px 8px color-mix(in srgb, #000000 15%, #0a0a0a);
 }
 
 .history-chart {
@@ -2392,32 +2393,34 @@ body {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Opaque type — was rgba(128,128,128,0.8) glass (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 80%, #0a0a0a));
   font-weight: 500;
 }
 
 .time-range-dropdown {
-  background: rgba(0, 255, 0, 0.05);
-  border: 1px solid rgba(0, 255, 0, 0.3);
+  /* Opaque wash / hairline — was green glass rgba (#14). */
+  background: color-mix(in srgb, #00ff00 5%, #0a0a0a);
+  border: 1px solid color-mix(in srgb, #00ff00 30%, #0a0a0a);
   border-radius: 4px;
   color: #00ff00;
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(0, 255, 0, 0.1);
-  border-color: rgba(0, 255, 0, 0.5);
+  background: color-mix(in srgb, #00ff00 10%, #0a0a0a);
+  border-color: color-mix(in srgb, #00ff00 50%, #0a0a0a);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(0, 255, 0, 0.15);
-  border-color: rgba(0, 255, 0, 0.7);
-  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.1);
+  background: color-mix(in srgb, #00ff00 15%, #0a0a0a);
+  border-color: color-mix(in srgb, #00ff00 70%, #0a0a0a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #00ff00 10%, #0a0a0a);
 }
 
 .time-range-dropdown option {
@@ -2428,10 +2431,11 @@ body {
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
+  /* Opaque panel — was black/green glass rgba (#14). */
+  background: color-mix(in srgb, #000000 95%, #0a0a0a);
   color: #00ff00;
   padding: 8px 12px;
-  border: 1px solid rgba(0, 255, 0, 0.5);
+  border: 1px solid color-mix(in srgb, #00ff00 50%, #0a0a0a);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2440,7 +2444,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 80%, #0a0a0a);
 }
 
 /* Debug Log viewer */
