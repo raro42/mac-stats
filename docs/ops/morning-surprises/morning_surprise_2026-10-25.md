@@ -1,21 +1,22 @@
 # Morning surprise — 2026-10-25
 
-Overnight Track B kept shipping opaque Neon chrome (standing P2 #14) while design-review screens stayed blocked by Screen Recording TCC.
+Overnight Track B kept shipping opaque Neon chrome on `#08120c` (standing P2 #14). Digester stayed empty of Slowest turns; fuel stayed design-review due + backlog.
 
-## Shipped tonight (selected)
+## Shipped this night (selected)
 
-- **v0.1.2317** — Neon metric-label / subtext / hint, Force Quit hairline + button, Changelog scrollbar + error → opaque `#08120c` mix (no green / red glass rgba).
-- **v0.1.2316** — Neon first-wave chrome (scrollbar thumbs, header title, icon-btn, divider, metric tiles, ring-track, section-title).
-- **v0.1.2315** — Neon shell tokens + body radials + neon-frame.
-- Earlier same night: Futuristic glass cascade through ~v0.1.2314 and Data Poster #14 remaps.
+| Version | What |
+|---------|------|
+| **v0.1.2318** | Neon Details grid / history-chart / process rows / Settings toggle opaque |
+| v0.1.2317 | Neon metric / Changelog / Force Quit opaque |
+| v0.1.2316 | Neon first-wave chrome opaque |
+| v0.1.2315 | Neon shell tokens + body radials opaque |
+| earlier | Futuristic + Data Poster #14 waves (see CHANGELOG) |
 
-## Tried / deferred
+## Deferred
 
-- Mac window capture of stale `feature-agent-ops.png` (~39d) — `screencapture -l` still blocked (Screen Recording TCC).
-- Layout-daily Data Poster screen still missing; remaps continue via #14 Neon path this tick.
+- Mac capture of stale `docs/screens/feature-agent-ops.png` (~39.5d) — Screen Recording TCC / no on-screen CPU window for `screencapture -l`.
+- Layout-daily Data Poster screen still missing (remaps ok).
 
-## Next
+## Next fuel
 
-- Remaining Neon details-grid / history-chart / process rows / setting-toggle glass.
-- Futuristic process-bar glow.
-- Capture Agent Ops / AI Chat screens when TCC allows.
+Remaining Neon glass (changelog-code / battery strip / later rgba falls), Futuristic process-bar glow if any, or Mac capture when TCC allows.
