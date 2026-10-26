@@ -13269,6 +13269,139 @@ body.theme-data-poster .ops-overview-body > .ops-empty-overview-cta.is-calm {
   background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
 }
 /*
+ * Dark (TUI): Agent Ops overview + empty still mixed Apple #ffffff washes
+ * (kb hint · cards ok/warn/bad/active · head-count · Open link · count ·
+ * empty / calm / fail-empty / tab-hint / Clear · overview CTA) → white slab on #0a0a0a.
+ * Design-review fuel (feature-agent-ops) + standing P2 #14 after Data Poster parity.
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-dark .ops-overview-kb-hint {
+  color: color-mix(in srgb, #00ff00 63%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card {
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card:hover {
+  background: color-mix(in srgb, currentColor 7%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.ops-overview-clickable:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 42%, #0a0a0a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.ops-health-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.ops-health-warn {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.ops-health-bad {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active.ops-health-ok,
+body.theme-dark .ops-overview-card.is-active.ops-health-warn,
+body.theme-dark .ops-overview-card.is-active.ops-health-bad {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 42%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active:hover {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active.ops-health-ok:hover,
+body.theme-dark .ops-overview-card.is-active.ops-health-warn:hover,
+body.theme-dark .ops-overview-card.is-active.ops-health-bad:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #00cc66) 52%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active .ops-overview-link {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+}
+body.theme-dark .ops-overview-head-count {
+  color: color-mix(in srgb, #00ff00 69%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+}
+body.theme-dark .ops-overview-head-count.is-zero {
+  color: color-mix(in srgb, #00ff00 37%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card:hover .ops-overview-head-count:not(.is-zero) {
+  color: color-mix(in srgb, #00ff00 81%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active .ops-overview-head-count {
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+}
+body.theme-dark .ops-overview-card.is-active .ops-overview-head-count.is-zero {
+  color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-dark .ops-overview-link {
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 66%, #0a0a0a);
+}
+body.theme-dark .ops-overview-link:hover {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-dark .ops-overview-link:focus-visible {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
+}
+body.theme-dark .ops-overview-count {
+  color: color-mix(in srgb, #00ff00 48%, #0a0a0a);
+}
+body.theme-dark .ops-empty {
+  color: color-mix(in srgb, #00ff00 69%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+}
+body.theme-dark .ops-empty:hover {
+  color: color-mix(in srgb, #00ff00 81%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+body.theme-dark .ops-empty-filter-miss.is-calm,
+body.theme-dark .ops-empty-tab.ops-empty-filter-miss.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+}
+body.theme-dark .ops-empty-filter-miss.is-fail-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .ops-empty-tab-hint {
+  color: color-mix(in srgb, #00ff00 63%, #0a0a0a);
+}
+body.theme-dark .ops-clear-filter {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+}
+body.theme-dark .ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+}
+body.theme-dark .ops-clear-filter:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+body.theme-dark .ops-overview-body > .ops-empty-overview-cta.is-calm {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+}
+/*
  * Data Poster: Agent Ops edit-actions / agent-editor still mixed Apple #ffffff
  * washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
  * + standing P2 #14 after copy/empty/preview in v0.1.2203.
