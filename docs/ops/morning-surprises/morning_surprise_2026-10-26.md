@@ -1,19 +1,24 @@
 # Morning surprise — 2026-10-26
 
-Overnight autoresearch (Track B) kept shipping **Dark + Architect opaque chrome** (standing P2 / GitHub #14). Digester stayed empty; design-review surfaces still in polish-without-capture grace.
+Overnight autoresearch (Track B) kept shipping Dark (TUI) opaque shell polish.
 
-## Shipped tonight (highlights)
+## Shipped
 
-- **v0.1.2344** — Dark (TUI) battery glyph + toolbar icon-line type + Details collapse muted·hairline: opaque `color-mix` on `#0a0a0a` (no light-theme / gray glass rgba). Battery resting was nearly invisible before.
-- **v0.1.2343** — Architect history chart / time-range / tooltip opaque on `#f1f1f1` (Dark v0.1.2332 parity; also fixed invalid 5-arg rgba on the dropdown).
-- **v0.1.2342–2340** — Architect AI Chat/logs, Settings washes, Monitors/collapse/Ollama menu opaque on `#f1f1f1`.
+- **v0.1.2346** — Dark `--panel-shadow` + `--modal-backdrop` opaque on `#0a0a0a` (no black glass rgba). Neon/Futuristic parity. Design-review adjacent Settings / Monitors modals.
+- **v0.1.2345** — Dark Changelog / process-row / Disk Cleanup meta-card chrome opaque (backfilled keep row).
+- **v0.1.2344** — Dark battery / icon-line / collapse opaque.
+- **v0.1.2343** — Architect history chart / time-range / tooltip opaque (keep backfill earlier).
 
-## Tried / deferred
+## Tried / context
 
-- Mac window-only recapture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` (Screen Recording TCC / Linux rack).
-- Sibling harness ports: OpenClaw / Hermes paths missing on this host.
+- Digester empty (0 runs / 7d). Sibling OpenClaw/Hermes git missing on Linux rack.
+- Design review due=false (grace); polish-without-capture marked feature-monitors + feature-disk-cleanup.
+- Layout daily already marked Architect earlier tonight; dark/neon/futuristic still wait on screens.
+- Debug.log: no ERROR/WARN clusters in 180m.
 
 ## Next fuel
 
-- Remaining Dark CRT green glass (changelog / icon-btn hover / process-row hairline) if still live rgba.
-- Or Mac capture when TCC allows `screencapture -l`.
+- CRT `.glass-panel::before` green border gradient rgba fades if remappable without killing the CRT look.
+- Or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
+Ratchet keep @ ec2b128e (v0.1.2346).
