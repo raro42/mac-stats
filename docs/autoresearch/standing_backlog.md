@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2345
+
+- Dark (TUI) Changelog + process + Disk Cleanup chrome (`.changelog-error` / `.changelog-version` / `.changelog-item::before` / `.changelog-code`; `.icon-btn:hover`; `.process-row` hairline; `.disk-cleanup-meta-card` washes) opaque `#0a0a0a` mix (no green / red / transparent glass). Standing P2 #14 after remote v0.1.2344 battery/icon-line/collapse. Design-review adjacent Changelog / processes / Disk Cleanup (Neon v0.1.2319 parity). Next: intentional Dark panel-shadow / modal-backdrop only, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2344
 
 - Dark (TUI) battery + icon-line + collapse Apple/light rgba falls (`.battery-icon` resting/charging/no-battery; `.icon-line-item` resting/hover type; `.collapse-btn` muted·hairline) opaque `#0a0a0a` mix (no light-theme / gray glass rgba). Standing P2 #14; design-review adjacent toolbar / battery / Details collapse. Next: remaining Dark CRT green glass (changelog / icon-btn hover / process-row hairline) if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.

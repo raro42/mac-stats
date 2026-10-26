@@ -160,7 +160,8 @@ body {
 
 .icon-btn:hover {
   color: var(--text);
-  background: rgba(0, 255, 0, 0.06);
+  /* Opaque hover wash — was rgba(0,255,0,0.06) glass (#14). */
+  background: color-mix(in srgb, #00ff00 6%, #0a0a0a);
 }
 
 .metrics-grid {
@@ -374,7 +375,8 @@ body {
   gap: 10px;
   align-items: center;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(0, 255, 0, 0.10);
+  /* Opaque hairline — was rgba(0,255,0,0.10) glass (#14). */
+  border-bottom: 1px solid color-mix(in srgb, #00ff00 10%, #0a0a0a);
 }
 
 .process-name {
@@ -919,7 +921,8 @@ body {
 }
 
 .changelog-error {
-  color: rgba(255, 0, 0, 0.8);
+  /* Opaque type — was rgba(255,0,0,0.8) glass (#14). */
+  color: color-mix(in srgb, #ff0000 80%, #0a0a0a);
 }
 
 .changelog-h2 {
@@ -938,7 +941,8 @@ body {
 }
 
 .changelog-version {
-  color: rgba(0, 255, 0, 0.9);
+  /* Opaque type — was rgba(0,255,0,0.9) glass (#14). */
+  color: color-mix(in srgb, #00ff00 90%, #0a0a0a);
   font-weight: 800;
 }
 
@@ -997,7 +1001,8 @@ body {
   content: "•";
   position: absolute;
   left: 0;
-  color: rgba(0, 255, 0, 0.7);
+  /* Opaque type — was rgba(0,255,0,0.7) glass (#14). */
+  color: color-mix(in srgb, #00ff00 70%, #0a0a0a);
   font-weight: bold;
 }
 
@@ -1012,7 +1017,8 @@ body {
 }
 
 .changelog-code {
-  background: rgba(0, 255, 0, 0.15);
+  /* Opaque code wash — was rgba(0,255,0,0.15) glass (#14). */
+  background: color-mix(in srgb, #00ff00 15%, #0a0a0a);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: "SF Mono", "Monaco", "Menlo", monospace;
@@ -2486,12 +2492,14 @@ body {
 .disk-cleanup-meta-card {
   height: 100%;
   border-color: var(--hairline, #004400);
-  background: color-mix(in srgb, var(--accent, #00cc66) 6%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
 }
 
 .disk-cleanup-meta-card:hover {
   border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, var(--hairline, #004400));
-  background: color-mix(in srgb, var(--accent, #00cc66) 10%, transparent);
+  /* Opaque wash — was color-mix(…, transparent) glass (#14). */
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
   box-shadow: none;
   transform: none;
 }
