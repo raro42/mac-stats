@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2349
+
+- Neon / Futuristic AI Chat empty + glances + filter chips + composer focus + filter-miss + exec/answer cards opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14; design-review `feature-ai-chat` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops overview remaps, layout-daily Data Poster, or Mac capture of stale `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2348
 
 - Dark (TUI) Agent Ops filter row + tab strip Apple `#ffffff` washes (`.ops-filter-row-kb-hint` / input / match / Clear / caption / `.ops-keyboard-hint`; `.ops-tab-bar-kb-hint` / digit / count; `.agent-ops-tab` / `.ops-file-tab`) opaque `#0a0a0a` mix with CRT green accents (Data Poster parity). Standing P2 #14 after v0.1.2347 overview/empty; design-review `feature-agent-ops` (polish-without-capture grace). Next: Dark Agent Ops kind-filter chips if any, Neon/Futuristic Agent Ops overview remaps, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
