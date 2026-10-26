@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2346
+
+- Dark (TUI) `--panel-shadow` + `--modal-backdrop` opaque `#0a0a0a` mix (no black glass rgba). Standing P2 #14 after v0.1.2345 Changelog/process/Disk Cleanup. Design-review adjacent Settings / Monitors modals (Neon / Futuristic parity). Next: CRT `.glass-panel::before` green border gradient rgba fades if any, remaining intentional dark-theme glass, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2345
 
 - Dark (TUI) Changelog + process + Disk Cleanup chrome (`.changelog-error` / `.changelog-version` / `.changelog-item::before` / `.changelog-code`; `.icon-btn:hover`; `.process-row` hairline; `.disk-cleanup-meta-card` washes) opaque `#0a0a0a` mix (no green / red / transparent glass). Standing P2 #14 after remote v0.1.2344 battery/icon-line/collapse. Design-review adjacent Changelog / processes / Disk Cleanup (Neon v0.1.2319 parity). Next: intentional Dark panel-shadow / modal-backdrop only, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.

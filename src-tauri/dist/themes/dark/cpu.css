@@ -18,12 +18,14 @@
   --accent: #00cc66;
   --hairline: #004400;
   --panel-border: #004400;
-  --panel-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
+  /* Opaque shadow — was black glass rgba(0,0,0,0.85) (#14). */
+  --panel-shadow: 0 24px 80px color-mix(in srgb, #000000 85%, #0a0a0a);
   --border: #004400;
   --ring-active: #00ff00;
   --ring-inactive: #003300;
   --hint: #006600;
-  --modal-backdrop: rgba(0, 0, 0, 0.80);
+  /* Opaque backdrop — was black glass rgba(0,0,0,0.80) (#14). */
+  --modal-backdrop: color-mix(in srgb, #000000 80%, #0a0a0a);
 }
 
 body {
