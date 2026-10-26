@@ -1096,7 +1096,8 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: rgba(12, 12, 16, 0.50); /* Same grey as --muted, matching settings icon */
+  /* Opaque muted TUI type — was light-theme rgba(12,12,16,0.50) glass (#14). */
+  color: color-mix(in srgb, #00cc00 55%, #0a0a0a);
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -1104,13 +1105,14 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
+  /* Opaque type — was rgba(52,199,89,0.8) glass (#14). */
+  color: color-mix(in srgb, #34c759 80%, #0a0a0a);
 }
 
 .battery-icon.no-battery {
-  /* Was opacity 0.4 on rgba(12, 12, 16, 0.50) over the strip #0a0a0a. */
+  /* Was opacity 0.4 on light rgba glass; muted green on Dark field (#14). */
   opacity: 1;
-  color: color-mix(in srgb, #0c0c10 20%, #0a0a0a);
+  color: color-mix(in srgb, #00cc00 22%, #0a0a0a);
 }
 
 .battery-level {
@@ -1162,7 +1164,8 @@ body {
   box-shadow: none;
   padding: 0;
   cursor: pointer;
-  color: rgba(235, 235, 245, 0.45);
+  /* Opaque type — was rgba(235,235,245,0.45) glass (#14). */
+  color: color-mix(in srgb, #ebebf5 45%, #0a0a0a);
   /* No transform tween — a transform layer stays in Graphics and Media (#14). */
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   border-radius: 9px;
@@ -1172,7 +1175,8 @@ body {
 }
 
 .icon-line-item:hover {
-  color: rgba(235, 235, 245, 0.85);
+  /* Opaque type — was rgba(235,235,245,0.85) glass (#14). */
+  color: color-mix(in srgb, #ebebf5 85%, #0a0a0a);
   background: #121212;
   border-color: #006600;
 }
@@ -1337,7 +1341,8 @@ body {
 .collapse-btn {
   background: transparent;
   border: none;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, color-mix(in srgb, #00cc00 60%, #0a0a0a));
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -1351,7 +1356,8 @@ body {
 }
 
 .collapse-btn:hover {
-  background: var(--hairline, var(--border, var(--rule, var(--line, rgba(128, 128, 128, 0.1)))));
+  /* Opaque hairline wash — was gray glass rgba(128,…) fallback (#14). */
+  background: var(--hairline, color-mix(in srgb, #00ff00 10%, #0a0a0a));
   color: var(--text, var(--ink, inherit));
 }
 

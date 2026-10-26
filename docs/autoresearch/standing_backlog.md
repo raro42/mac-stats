@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2344
+
+- Dark (TUI) battery + icon-line + collapse Apple/light rgba falls (`.battery-icon` resting/charging/no-battery; `.icon-line-item` resting/hover type; `.collapse-btn` muted·hairline) opaque `#0a0a0a` mix (no light-theme / gray glass rgba). Standing P2 #14; design-review adjacent toolbar / battery / Details collapse. Next: remaining Dark CRT green glass (changelog / icon-btn hover / process-row hairline) if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2343
 
 - Architect history chart / time-range / tooltip Apple rgba falls (early+late `.history-chart-container` insets; `.history-controls` label; `.time-range-dropdown` resting/hover/focus/option — fixes invalid 5-arg rgba; `.history-tooltip`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent metrics history (Dark v0.1.2332 parity). Next: remaining Architect metric-box inset shadows if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
