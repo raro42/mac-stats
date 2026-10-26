@@ -201,12 +201,13 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: transparent;
+  /* Opaque wash + inset — was white/black glass rgba (#14). */
+  background: color-mix(in srgb, #ffffff 20%, #f1f1f1);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.50),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 50%, #f1f1f1),
+    inset 0 -1px 0 color-mix(in srgb, #000000 2%, #f1f1f1),
+    0 2px 8px color-mix(in srgb, #000000 6%, #f1f1f1);
 }
 
 .history-chart {
@@ -2471,12 +2472,13 @@ body {
   height: 40px;
   border-radius: 12px;
   overflow: hidden;
-  background: transparent;
+  /* Opaque inset wash — was rgba black/white glass (late duplicate of early #14). */
+  background: color-mix(in srgb, #ffffff 12%, #f1f1f1);
   border: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    inset 0 1px 0 color-mix(in srgb, #ffffff 35%, #f1f1f1),
+    inset 0 -1px 0 color-mix(in srgb, #000000 8%, #f1f1f1),
+    0 2px 8px color-mix(in srgb, #000000 10%, #f1f1f1);
 }
 
 .history-chart {
@@ -2497,46 +2499,49 @@ body {
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  /* Opaque type — was gray glass rgba(128,…) fallback (#14). */
+  color: var(--muted, color-mix(in srgb, #808080 80%, #f1f1f1));
   font-weight: 500;
 }
 
 .time-range-dropdown {
-  background: rgba(35, 45, 65, 0.70, 0.05);
-  border: 1px solid rgba(35, 45, 65, 0.70, 0.3);
+  /* Opaque wash / hairline — was invalid 5-arg rgba(35,45,65,…) glass (#14). */
+  background: color-mix(in srgb, #232d41 5%, #f1f1f1);
+  border: 1px solid color-mix(in srgb, #232d41 30%, #f1f1f1);
   border-radius: 4px;
-  color: rgba(35, 45, 65, 0.70);
+  color: color-mix(in srgb, #232d41 70%, #f1f1f1);
   padding: 4px 8px;
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(35, 45, 65, 0.70, 0.1);
-  border-color: rgba(35, 45, 65, 0.70, 0.5);
+  background: color-mix(in srgb, #232d41 10%, #f1f1f1);
+  border-color: color-mix(in srgb, #232d41 50%, #f1f1f1);
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(35, 45, 65, 0.70, 0.15);
-  border-color: rgba(35, 45, 65, 0.70, 0.7);
-  box-shadow: 0 0 0 2px rgba(35, 45, 65, 0.70, 0.1);
+  background: color-mix(in srgb, #232d41 15%, #f1f1f1);
+  border-color: color-mix(in srgb, #232d41 70%, #f1f1f1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #232d41 10%, #f1f1f1);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
-  color: rgba(35, 45, 65, 0.70);
+  background: color-mix(in srgb, #fafaf8 94%, #f1f1f1);
+  color: color-mix(in srgb, #232d41 70%, #f1f1f1);
 }
 
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
-  color: rgba(35, 45, 65, 0.70);
+  /* Opaque panel — was black/ink glass rgba (#14). */
+  background: color-mix(in srgb, #232d41 92%, #f1f1f1);
+  color: #f1f1f1;
   padding: 8px 12px;
-  border: 1px solid rgba(35, 45, 65, 0.70, 0.5);
+  border: 1px solid color-mix(in srgb, #232d41 50%, #f1f1f1);
   border-radius: 4px;
   font-size: 11px;
   font-family: monospace;
@@ -2545,7 +2550,7 @@ body {
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000000 28%, #f1f1f1);
 }
 
 /* Debug Log viewer */

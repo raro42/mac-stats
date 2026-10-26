@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2343
+
+- Architect history chart / time-range / tooltip Apple rgba falls (early+late `.history-chart-container` insets; `.history-controls` label; `.time-range-dropdown` resting/hover/focus/option — fixes invalid 5-arg rgba; `.history-tooltip`) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent metrics history (Dark v0.1.2332 parity). Next: remaining Architect metric-box inset shadows if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2342
 
 - Architect AI Chat + logs Apple rgba falls (model-text/select; chat-messages user/assistant; markdown blockquote/code/pre/table/hr/link; thinking-dots; Ollama popover-close muted; logs toolbar/viewer) opaque `#f1f1f1` mix (no glass rgba). Standing P2 #14; design-review adjacent `feature-ai-chat` (polish-without-capture grace). Next: Architect history chart / time-range / tooltip Apple rgba (Dark v0.1.2332 parity), remaining metric-box inset shadows if any, or Mac capture of stale `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
