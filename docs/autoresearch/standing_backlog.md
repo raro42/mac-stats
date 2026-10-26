@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2348
+
+- Dark (TUI) Agent Ops filter row + tab strip Apple `#ffffff` washes (`.ops-filter-row-kb-hint` / input / match / Clear / caption / `.ops-keyboard-hint`; `.ops-tab-bar-kb-hint` / digit / count; `.agent-ops-tab` / `.ops-file-tab`) opaque `#0a0a0a` mix with CRT green accents (Data Poster parity). Standing P2 #14 after v0.1.2347 overview/empty; design-review `feature-agent-ops` (polish-without-capture grace). Next: Dark Agent Ops kind-filter chips if any, Neon/Futuristic Agent Ops overview remaps, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2347
 
 - Dark (TUI) Agent Ops overview + empty Apple `#ffffff` washes (`.ops-overview-kb-hint` / cards ok·warn·bad·active / head-count / Open link / count; `.ops-empty` / calm / fail-empty / tab-hint / Clear / overview CTA) opaque `#0a0a0a` mix with CRT green accents (Data Poster parity). Standing P2 #14 after remote v0.1.2346 panel-shadow/modal-backdrop; design-review `feature-agent-ops` (polish-without-capture grace). Next: Dark Agent Ops filter/tab Apple washes if any, Neon/Futuristic Agent Ops overview remaps, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

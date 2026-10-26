@@ -13402,6 +13402,129 @@ body.theme-dark .ops-overview-body > .ops-empty-overview-cta.is-calm {
   background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
 }
 /*
+ * Dark (TUI): Agent Ops filter row + tab strip still mixed Apple #ffffff washes
+ * (kb hints · search · match · Clear · caption · keyboard hint · tabs · digit ·
+ * count) → white slab on #0a0a0a. Design-review fuel (feature-agent-ops) +
+ * standing P2 #14 after overview/empty in v0.1.2347 (Data Poster parity).
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-dark .ops-filter-row-kb-hint {
+  color: color-mix(in srgb, #00ff00 63%, #0a0a0a);
+}
+body.theme-dark .ops-filter-input {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+}
+body.theme-dark .ops-filter-input:hover {
+  background: color-mix(in srgb, currentColor 7%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 24%, #0a0a0a);
+}
+body.theme-dark .ops-filter-input:focus {
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+}
+body.theme-dark .ops-filter-match {
+  color: color-mix(in srgb, #00ff00 75%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .ops-filter-match.is-all {
+  background: color-mix(in srgb, #30d158 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #30d158 32%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 84%, #0a0a0a);
+}
+body.theme-dark .ops-filter-match.is-partial {
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 84%, #0a0a0a);
+}
+body.theme-dark .ops-filter-match.is-zero {
+  background: color-mix(in srgb, #ff9f0a 16%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 84%, #0a0a0a);
+}
+body.theme-dark .ops-filter-clear {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 7%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 77%, #0a0a0a);
+}
+body.theme-dark .ops-filter-clear:hover {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+body.theme-dark .ops-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-dark .ops-filter-caption {
+  color: color-mix(in srgb, #00ff00 66%, #0a0a0a);
+}
+body.theme-dark .ops-keyboard-hint {
+  color: color-mix(in srgb, #00ff00 62%, #0a0a0a);
+}
+body.theme-dark .ops-tab-bar-kb-hint {
+  color: color-mix(in srgb, #00ff00 63%, #0a0a0a);
+}
+body.theme-dark .ops-tab-digit {
+  color: color-mix(in srgb, #00ff00 37%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab:hover .ops-tab-digit,
+body.theme-dark .ops-file-tab:hover .ops-tab-digit {
+  color: color-mix(in srgb, #00ff00 63%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab.active .ops-tab-digit,
+body.theme-dark .ops-file-tab.active .ops-tab-digit {
+  color: var(--accent, #00cc66);
+}
+body.theme-dark .ops-tab-count {
+  color: color-mix(in srgb, #00ff00 69%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+}
+body.theme-dark .ops-tab-count.is-zero {
+  color: color-mix(in srgb, #00ff00 37%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab:hover .ops-tab-count:not(.is-zero),
+body.theme-dark .ops-file-tab:hover .ops-tab-count:not(.is-zero) {
+  color: color-mix(in srgb, #00ff00 81%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab.active .ops-tab-count,
+body.theme-dark .ops-file-tab.active .ops-tab-count {
+  color: var(--accent, #00cc66);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab,
+body.theme-dark .ops-file-tab {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 70%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab:hover,
+body.theme-dark .ops-file-tab:hover {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 20%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab:focus-visible,
+body.theme-dark .ops-file-tab:focus-visible {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab.active,
+body.theme-dark .ops-file-tab.active {
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+}
+body.theme-dark .agent-ops-tab.active:hover,
+body.theme-dark .ops-file-tab.active:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+/*
  * Data Poster: Agent Ops edit-actions / agent-editor still mixed Apple #ffffff
  * washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
  * + standing P2 #14 after copy/empty/preview in v0.1.2203.
