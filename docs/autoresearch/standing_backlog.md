@@ -1,6 +1,10 @@
+## Overnight merge — v0.1.2350
+
+- Neon / Futuristic Agent Ops overview + empty Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2349 AI Chat; layout-daily Neon/Futuristic; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops filter/tab remaps, layout-daily Data Poster remaps if any, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2349
 
-- Neon / Futuristic AI Chat empty + glances + filter chips + composer focus + filter-miss + exec/answer cards opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14; design-review `feature-ai-chat` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops overview remaps, layout-daily Data Poster, or Mac capture of stale `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+- Neon / Futuristic AI Chat empty + glances + filter chips + composer focus + filter-miss + exec/answer cards opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14; design-review `feature-ai-chat` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops overview remaps (done in 2350), layout-daily Data Poster, or Mac capture of stale `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2348
 
