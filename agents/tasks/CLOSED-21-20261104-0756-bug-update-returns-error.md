@@ -26,3 +26,32 @@
 - Fix: is_homebrew_cask_install (Caskroom path check) gates the brew hint; DMG path shows Release notes / DMG only. Cask uses postflight_steps + plain url (no verified:).
 - Ship: v0.1.2352. cargo check PASS. Unit test detects_staged_caskroom_dir PASS.
 - Do not close GitHub #21 here (004 / tester).
+
+## Test report
+
+**Date:** 2026-11-05 17:43 CET (local) / 2026-11-05 16:43 UTC
+**Result:** PASS
+
+### Commands run
+
+```bash
+cd src-tauri && cargo check
+cd src-tauri && cargo test detects_staged_caskroom_dir -- --nocapture
+python3 scripts/scan_debug_log_errors.py
+```
+
+- `cargo check`: PASS (warnings only; unrelated unused items)
+- `cargo test detects_staged_caskroom_dir`: PASS (1 ok)
+- debug.log scan (180m window): no ERROR/WARN/panic clusters
+
+### Static review
+
+- `is_homebrew_cask_install` checks `/opt/homebrew` and `/usr/local` Caskroom paths; registered as Tauri command.
+- Update banner (`src/cpu.js` / dist sync): brew hint only when invoke returns true; otherwise Release notes / DMG only.
+- Cask (`Casks/mac-stats.rb`, tap copy): plain `url` (no `verified:`), quarantine clear via `postflight_steps`.
+- Ship version `0.1.2352` matches Cargo.toml / coder notes.
+
+### Notes
+
+- Full macOS UI banner not exercised on this Linux host; logic + unit test + cask DSL review cover the #21 acceptance path.
+- GitHub issue #21 left open (004 closes).
