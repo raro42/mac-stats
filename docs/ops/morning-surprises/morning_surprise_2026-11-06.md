@@ -1,20 +1,15 @@
-# Morning surprise — 2026-11-06
+# Morning surprise — 2026-11-06 (overnight window)
 
-Morning surprise draft — overnight Track B (mac-stats).
+## Shipped
+- **v0.1.2358** — Neon / Futuristic Agent Ops attention glances opaque on `#08120c` / `#0b0b10` (Runs · Filter · Digest · Discord · Redmine · Ollama · Brave · Browser · MCP · Cursor · Perplexity · Mastodon · Telegram · Slack · Signal). Standing P2 #14 after v0.1.2357; design-review `feature-agent-ops` (polish-without-capture grace).
 
-## Shipped tonight
-
-- **v0.1.2357** — Neon / Futuristic Agent Ops `.ops-loading` · `.ops-preview` · `.ops-session-copy-chip` opaque on `#08120c` / `#0b0b10` (Data Poster parity; design-review `feature-agent-ops`).
-- Earlier same window: **v0.1.2353–2356** (Agent Ops filter/tabs · kind chips · list rows · Monitors/Processes attention glances).
+## Also tonight
+- Earlier: v0.1.2353–2357 Neon/Futuristic Agent Ops filter/tabs, kind chips, list rows, Monitors/Processes glances, loading/preview/copy.
+- Digester empty; sibling OpenClaw/Hermes missing on Linux rack; debug.log quiet.
 
 ## Tried / deferred
-
-- Mac recapture of stale `docs/screens/feature-agent-ops.png` (51d) — no on-screen CPU window / Screen Recording TCC; polish-without-capture grace.
-- Layout-daily Data Poster screen still missing — deferred; design-review Agent Ops fuel first.
+- Layout-daily Data Poster still due (screen missing; remaps already present) — deferred while Agent Ops glances shipped.
+- Mac `screencapture -l` of stale feature screens deferred (Screen Recording TCC).
 
 ## Next fuel
-
-- Neon/Futuristic Agent Ops attention glances (Runs·Filter·Digest·…) if still Apple washes
-- Neon/Futuristic processes-filter chips
-- Dark kind-filter / copy-preview remaps
-- Layout-daily Data Poster or Mac capture when TCC allows
+- Neon/Futuristic processes-filter-chip remaps if any; Dark kind-filter / copy-preview if any; layout-daily Data Poster; Mac capture when TCC allows.
