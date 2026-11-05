@@ -1,22 +1,18 @@
-# Morning surprise — 2026-11-05 / 2026-11-06
+# Morning surprise — 2026-11-05
 
-Overnight Track B kept shipping opaque-shell remaps so dark themes stop flashing Apple white glass.
+Generated: overnight harness tick ~23:30 CET (2026-11-05).
 
-## Shipped tonight
+## Shipped
+- **v0.1.2368** — Dark AI Chat Send focus · active · disabled opaque on CRT shell `#0a0a0a` (Neon / Futuristic / Data Poster parity). Design-review `feature-ai-chat`; Mac capture still deferred (Screen Recording TCC / no reliable window).
+- **v0.1.2367** — Neon / Futuristic AI Chat Send focus · active · disabled opaque on `#08120c` / `#0b0b10`.
+- **v0.1.2366** — Data Poster Processes pin hover/focus light type opaque on `#0b0b10`.
+- Earlier tonight: **v0.1.2365** Dark Processes empty + pin + Copied; **v0.1.2364**–**2361** Neon/Futuristic Processes remaps; **v0.1.2360**–**2353** Agent Ops opaque remaps.
 
-- **v0.1.2367** — Neon / Futuristic AI Chat Send focus · active · disabled opaque on `#08120c` / `#0b0b10` (`#chat-send-btn:focus-visible` · `:active` · `:disabled`). Standing P2 #14 after Data Poster Processes pin v0.1.2366; design-review `feature-ai-chat` (polish-without-capture grace).
-- Earlier same night (already on main): Data Poster Processes pin light type (**v0.1.2366**), Dark Processes empty/pin/Copied (**v0.1.2365**), Neon/Futuristic Processes empty/pin (**v0.1.2364**).
+## Tried / deferred
+- Screenshot recapture of `feature-agent-ops.png` (51d stale) — CPU window not on-screen; second `--cpu` blocked by single-instance lock.
+- Layout-daily Data Poster screen still missing (remap polish continued instead).
 
-## Tried / context
-
-- Digester open: empty (0 turns / 7d) — not quiet-default; took standing backlog + design-review AI Chat.
-- Design review due (recommended `feature-ai-chat` ~83d); polish-without-capture (Mac Screen Recording TCC blocks `screencapture -l` on the rack).
-- Layout daily: marked neon + futuristic; Data Poster screen still missing.
-- Sibling OpenClaw/Hermes missing on Linux rack.
-- Debug.log: no ERROR/WARN clusters in the 180m window.
-
-## Next
-
-- Dark AI Chat Send focus·active·disabled if theme shell lacks remaps
-- Layout-daily Data Poster when a screen lands
-- Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows
+## Next fuel
+- Dark `#chat-send-btn.is-just-saved` Apple `#ffffff` mix if any
+- Mac capture when Screen Recording TCC allows `screencapture -l`
+- Other Data Poster pin/row leftovers if any
