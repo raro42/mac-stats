@@ -2506,6 +2506,26 @@ body::before {
   background: #007aff;
 }
 
+/* Opaque focus / active / disabled — was Apple #ffffff focus ring / active wash (#14). */
+#chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #08120c);
+  outline-offset: 2px;
+}
+
+#chat-send-btn:active {
+  box-shadow: none;
+  background: color-mix(in srgb, #0064dc 95%, #08120c);
+}
+
+#chat-send-btn:disabled {
+  /* Was opacity 0.55 on white type + accent wash → muted opaque mix on #08120c. */
+  color: color-mix(in srgb, #ffffff 55%, #007aff);
+  background: color-mix(in srgb, #007aff 50%, #08120c);
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* History section and charts */
 .history-section {
   display: grid;

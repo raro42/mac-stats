@@ -18050,3 +18050,41 @@ body.theme-data-poster .perplexity-filter-clear.is-just-saved {
   border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
   color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
+/*
+ * Neon / Futuristic: AI Chat Send focus / active / disabled still mixed Apple
+ * `#ffffff` focus ring and active wash (`#chat-send-btn:focus-visible` ·
+ * `:active` · `:disabled`) → white slab / wrong ring on opaque shells
+ * `#08120c` / `#0b0b10`. Resting / hover already opaque in theme cpu.css.
+ * Data Poster parity (v0.1.2233 / agent-ops remaps). Design-review fuel
+ * (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-neon #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #08120c);
+  outline-offset: 2px;
+}
+body.theme-neon #chat-send-btn:active {
+  box-shadow: none;
+  background: color-mix(in srgb, #0064dc 95%, #08120c);
+}
+body.theme-neon #chat-send-btn:disabled {
+  color: color-mix(in srgb, #ffffff 55%, #007aff);
+  background: color-mix(in srgb, #007aff 50%, #08120c);
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+body.theme-futuristic #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #0b0b10);
+  outline-offset: 2px;
+}
+body.theme-futuristic #chat-send-btn:active {
+  box-shadow: none;
+  background: color-mix(in srgb, #0064dc 95%, #0b0b10);
+}
+body.theme-futuristic #chat-send-btn:disabled {
+  color: color-mix(in srgb, #ffffff 55%, #007aff);
+  background: color-mix(in srgb, #007aff 50%, #0b0b10);
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
