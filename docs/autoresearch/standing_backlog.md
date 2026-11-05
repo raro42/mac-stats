@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2366
+
+- Data Poster Processes pin light type (`.process-pin` hover/focus) Apple dark-ink-on-`#ffffff` type → opaque light type on shell `#0b0b10` (Neon / Futuristic / Dark parity). Standing P2 #14 after Dark v0.1.2365; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Neon/Futuristic AI Chat Send focus·active·disabled if theme shells lack opaque remaps, other Data Poster pin/row leftovers if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2365
 
 - Dark (TUI) Processes empty + pin type + Copied (`.process-empty` border/fill · `.process-pin` hover/focus light type · `.process-row` Copied) Apple `#ffffff` / dark-ink washes opaque Dark CRT shell `#0a0a0a` with green accents (Data Poster / Neon / Futuristic parity). Standing P2 #14 after Neon/Futuristic v0.1.2364; design-review `feature-processes` (polish-without-capture grace). Next: Data Poster process-pin light type if any, layout-daily Data Poster (screen missing), Neon/Futuristic AI Chat Send leftovers if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.

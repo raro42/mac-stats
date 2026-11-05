@@ -17051,12 +17051,22 @@ body.theme-data-poster .process-row:active {
 body.theme-data-poster .process-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
 }
+/*
+ * Data Poster: Top Processes pin hover/focus still left Apple dark-ink type
+ * (`.process-pin` on `#ffffff`) after background remaps → dark ink on the
+ * opaque shell `#0b0b10`. Catch up to Neon / Futuristic / Dark pin light type
+ * (v0.1.2364 / v0.1.2365). Design-review fuel (feature-processes) + standing
+ * P2 #14; layout-daily Data Poster adjacent. Mac capture deferred (TCC).
+ */
 body.theme-data-poster .process-pin:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  /* Opaque light type — was Apple dark-ink-on-#ffffff hover (#14). */
+  color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-data-poster .process-pin:focus-visible {
   background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-data-poster .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
