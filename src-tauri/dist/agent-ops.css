@@ -18250,3 +18250,31 @@ body.theme-futuristic .details-grid > .detail-value[role='option'].is-selected {
   background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Force Quit Saved flash still mixed Apple
+ * `#ffffff` (`#force-quit-process-btn.is-just-saved`) → white slab on opaque
+ * shells. Data Poster remapped earlier (Process Details / Force Quit block).
+ * Design-review fuel (feature-processes / Force Quit) + standing P2 #14;
+ * layout-daily Data Poster adjacent (dark-shell Saved parity).
+ */
+body.theme-dark #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}
+body.theme-neon #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}
+body.theme-futuristic #force-quit-process-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}

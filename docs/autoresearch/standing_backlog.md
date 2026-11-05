@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2373
+
+- Dark / Neon / Futuristic Force Quit Saved flash (`#force-quit-process-btn.is-just-saved`) Apple `#ffffff` wash → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details / Force Quit parity). Standing P2 #14 after Details hover/focus/selected v0.1.2372; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.force-quit-btn.is-confirming` if theme shells lack opaque remaps (Data Poster has remap), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2372
 
 - Data Poster / Dark / Neon / Futuristic Details hover · focus · selected (`.details-grid > .detail-value[role='option']:hover` / `:focus-visible` / `.is-selected`) Apple `#ffffff` washes → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10` (Details Copied v0.1.2238 / v0.1.2369 parity). Standing P2 #14 after Disk Cleanup Copied v0.1.2371; design-review `feature-cpu-metrics` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `#force-quit-process-btn.is-just-saved` if missing (Data Poster has remap), other Details leftovers if any, or Mac capture of stale `feature-cpu-metrics.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
