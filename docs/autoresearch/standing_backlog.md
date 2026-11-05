@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2356
+
+- Neon / Futuristic Monitors + Processes attention glances (`.monitors-attention-glance` Down/Slow · `.monitors-filter-attention-glance` Up/Down/Slow · `.processes-filter-attention-glance` / `.processes-hot-attention-glance`) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2355 Agent Ops list rows; design-review `feature-monitors` / `feature-processes` (polish-without-capture grace). Next: Neon/Futuristic processes-filter-chip remaps if any, Dark kind-filter chips if any, layout-daily Data Poster, or Mac capture of stale `feature-monitors.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2355
 
 - Neon / Futuristic Agent Ops list rows (`.ops-row` / meta / badge On·Off / Runs Lite·Slow·Fail) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster parity). Standing P2 #14 after v0.1.2354 kind-filter chips; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops copy/empty/preview remaps if any, attention-glance remaps for Neon/Futuristic, Dark kind-filter chips if any, layout-daily Data Poster, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

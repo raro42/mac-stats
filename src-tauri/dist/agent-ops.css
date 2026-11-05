@@ -15132,6 +15132,190 @@ body.theme-futuristic #ops-runs-list .ops-row.is-fail .ops-row-meta {
   color: color-mix(in srgb, #ff3b30 88%, #ffffff);
 }
 /*
+ * Neon: Monitors + Processes attention glances still mixed Apple #ffffff washes
+ * (.monitors-attention-glance Down/Slow · .monitors-filter-attention-glance
+ *  Up/Down/Slow · .processes-filter-attention-glance · .processes-hot-attention-glance)
+ * → white slab on #08120c. Design-review fuel (feature-monitors / feature-processes)
+ * + standing P2 #14 after Agent Ops list rows in v0.1.2355 (Data Poster / Dark parity).
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-neon .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-neon .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 12%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-neon .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  color: color-mix(in srgb, var(--accent, #6dff7b) 50%, var(--text, currentColor));
+}
+body.theme-neon .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 32%, #08120c);
+  background: color-mix(in srgb, #30d158 12%, #08120c);
+  color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
+}
+body.theme-neon .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-neon .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 12%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-neon .processes-filter-attention-glance,
+body.theme-neon .processes-hot-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .processes-filter-attention-glance:hover,
+body.theme-neon .processes-hot-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .processes-filter-attention-glance:focus-visible,
+body.theme-neon .processes-hot-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .processes-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  color: color-mix(in srgb, var(--accent, #6dff7b) 50%, var(--text, currentColor));
+}
+body.theme-neon .processes-filter-attention-glance.is-pinned {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+}
+body.theme-neon .processes-filter-attention-glance.is-hot-filter,
+body.theme-neon .processes-hot-attention-glance.has-hot {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 12%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+/*
+ * Futuristic: Monitors + Processes attention glances still mixed Apple #ffffff washes
+ * (.monitors-attention-glance Down/Slow · .monitors-filter-attention-glance
+ *  Up/Down/Slow · .processes-filter-attention-glance · .processes-hot-attention-glance)
+ * → white slab on #0b0b10. Design-review fuel (feature-monitors / feature-processes)
+ * + standing P2 #14 after Agent Ops list rows in v0.1.2355 (Data Poster / Dark parity).
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-futuristic .monitors-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .monitors-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .monitors-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .monitors-attention-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-futuristic .monitors-attention-glance.has-slow {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-futuristic .monitors-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .monitors-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
+}
+body.theme-futuristic .monitors-filter-attention-glance.is-up-filter {
+  border-color: color-mix(in srgb, #30d158 32%, #0b0b10);
+  background: color-mix(in srgb, #30d158 12%, #0b0b10);
+  color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
+}
+body.theme-futuristic .monitors-filter-attention-glance.is-down-filter {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-futuristic .monitors-filter-attention-glance.is-slow-filter {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-futuristic .processes-filter-attention-glance,
+body.theme-futuristic .processes-hot-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .processes-filter-attention-glance:hover,
+body.theme-futuristic .processes-hot-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-attention-glance:focus-visible,
+body.theme-futuristic .processes-hot-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 50%, var(--text, currentColor));
+}
+body.theme-futuristic .processes-filter-attention-glance.is-pinned {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-attention-glance.is-hot-filter,
+body.theme-futuristic .processes-hot-attention-glance.has-hot {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+/*
  * Data Poster: Agent Ops edit-actions / agent-editor still mixed Apple #ffffff
  * washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
  * + standing P2 #14 after copy/empty/preview in v0.1.2203.
