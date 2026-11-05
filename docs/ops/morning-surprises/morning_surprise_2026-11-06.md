@@ -1,22 +1,19 @@
 # Morning surprise — 2026-11-06
 
-Overnight autoresearch (Track B) on the Linux rack.
-
 ## Shipped
+- **v0.1.2355** — Neon / Futuristic Agent Ops **list rows** opaque on `#08120c` / `#0b0b10` (`.ops-row` · meta · badge On/Off · Runs Lite·Slow·Fail). Design-review `feature-agent-ops`; standing P2 #14 after v0.1.2354 kind-filter chips. Mac window capture still deferred (Screen Recording TCC / no on-screen CPU window).
 
-- **v0.1.2353** (sibling race, already on main) — Neon / Futuristic Agent Ops filter row + tab strip opaque on `#08120c` / `#0b0b10` (no Apple `#ffffff` glass). Design-review `feature-agent-ops`; standing P2 #14.
-- **v0.1.2354** — Neon / Futuristic Agent Ops kind-filter chips (Sessions / Agents / Schedules / Knowledge / Runs + Clear) opaque shell mixes. Same design-review surface; Data Poster parity.
+## Also this night
+- Parallel race already landed **v0.1.2354** kind-filter chips before this tick finished the same experiment; reset to origin and continued with list rows.
+- Digester: design-review stale `feature-agent-ops.png` (~51d). Layout-daily due (Data Poster screen missing) — deferred behind design-review polish.
+- Debug.log: single-instance WARN only.
 
-## Tried / notes
-
-- Digester empty (0 turns / 7d). Sibling harnesses missing on rack.
-- Design review due (`feature-agent-ops` ~51d). Polish-without-capture grace (Screen Recording TCC / no Mac capture from this host).
-- Layout daily still due (Data Poster) — deferred after Agent Ops kind-filters.
-- First pick (filter/tabs) raced with a sibling ship; this tick continued with kind-filter chips instead of quiet.
+## Tried / deferred
+- Recapture `docs/screens/feature-agent-ops.png` — deferred (TCC / Quartz empty for mac-stats window).
 
 ## Next fuel
-
-- Neon/Futuristic Agent Ops list-row remaps if any
-- Attention glances for Neon/Futuristic (Data Poster/Dark already in #20 / v0.1.2351)
-- Layout-daily Data Poster
-- Mac window-only recapture of `feature-agent-ops.png` when TCC allows
+- Neon/Futuristic Agent Ops copy/empty/preview remaps
+- Neon/Futuristic attention-glance remaps
+- Dark kind-filter chips if any
+- Layout-daily Data Poster capture
+- Mac capture when Screen Recording allows `screencapture -l`
