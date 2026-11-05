@@ -1,16 +1,16 @@
-# Morning surprise — 2026-11-06 (overnight window)
+# Morning surprise — 2026-11-06
+
+Overnight Track B kept product remaps (not digester-empty).
 
 ## Shipped
-- **v0.1.2360** — Dark Agent Ops list rows + loading · preview · copy opaque on `#0a0a0a` (`.ops-row` / meta / badge On·Off / Runs Lite·Slow·Fail; `.ops-loading` / `.ops-preview` / `.ops-session-copy-chip`). Standing P2 #14 after v0.1.2359 kind-filter; design-review `feature-agent-ops` (polish-without-capture grace).
-
-## Also tonight
-- Earlier: v0.1.2353–2359 Neon/Futuristic Agent Ops + Monitors/Processes glances + Dark kind-filter chips.
-- Digester empty; sibling OpenClaw/Hermes missing on Linux rack; debug.log quiet.
+- **v0.1.2361** — Neon / Futuristic Processes filter chips opaque on `#08120c` / `#0b0b10` (pinned · Hot · active accents; Data Poster / Dark parity). Design-review `feature-processes` polish-without-capture (Screen Recording TCC).
+- Earlier same night: **v0.1.2360** Dark Agent Ops list rows + loading/preview/copy; **v0.1.2359** Dark kind-filter chips; **v0.1.2358** Neon/Futuristic Agent Ops attention glances; **v0.1.2357** loading/preview/copy; **v0.1.2355** list rows; **v0.1.2353** filter/tabs.
 
 ## Tried / deferred
-- Layout-daily Data Poster still due (screen missing; remaps already present) — deferred while Dark Agent Ops remaps shipped.
-- Design-review recommended `feature-ai-chat` (83d) — deferred; standing fuel was Dark list-row/copy after 2359.
-- Mac `screencapture -l` of stale feature screens deferred (Screen Recording TCC).
+- Mac recapture of stale `feature-agent-ops.png` / `feature-processes.png` — Screen Recording TCC / no reliable `screencapture -l` window.
+- Layout-daily Data Poster screen still missing — deferred while design-review remaps had clear fuel.
 
 ## Next fuel
-- Neon/Futuristic processes-filter-chip remaps if any; layout-daily Data Poster; Mac capture when TCC allows.
+- Neon/Futuristic processes-filter-miss / top-glance remaps if any
+- Layout-daily Data Poster capture when TCC allows
+- Mac capture of stale feature screens when TCC allows
