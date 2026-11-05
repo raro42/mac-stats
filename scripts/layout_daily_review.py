@@ -45,6 +45,9 @@ WASH_SELECTORS = (
     ".processes-top-ram-glance",
     ".processes-filter-chip",
     ".process-row.is-pinned",
+    ".ops-runs-attention-glance",
+    ".ops-digest-attention-glance",
+    ".ops-discord-attention-glance",
 )
 
 
