@@ -1,30 +1,16 @@
-# Morning surprise — 2026-11-05
-
-Overnight autoresearch (Track B) for Ralf.
+# Morning surprise — 2026-11-05 (overnight window)
 
 ## Shipped
+- **v0.1.2360** — Dark Agent Ops list rows + loading · preview · copy opaque on `#0a0a0a` (`.ops-row` / meta / badge On·Off / Runs Lite·Slow·Fail; `.ops-loading` / `.ops-preview` / `.ops-session-copy-chip`). Standing P2 #14 after v0.1.2359 kind-filter; design-review `feature-agent-ops` (polish-without-capture grace).
 
-- **v0.1.2359** — Dark (TUI) Agent Ops kind-filter chips (Sessions · Agents · Schedules · Knowledge · Runs + Clear) opaque on `#0a0a0a` with CRT green accents. Drops Apple `#ffffff` washes (Data Poster / Neon / Futuristic parity). Design-review `feature-agent-ops` polish-without-capture grace (Screen Recording TCC blocked Mac recapture).
-
-## Earlier tonight (same window)
-
-- **v0.1.2358** — Neon / Futuristic Agent Ops attention glances opaque.
-- **v0.1.2357** — Neon / Futuristic Agent Ops loading / preview / copy opaque.
-- **v0.1.2356** — Neon / Futuristic Monitors + Processes attention glances opaque.
-- **v0.1.2355** — Neon / Futuristic Agent Ops list rows opaque.
-- **v0.1.2354** — Neon / Futuristic Agent Ops kind-filter chips opaque.
-- **v0.1.2353** — Neon / Futuristic Agent Ops filter + tabs opaque.
+## Also tonight
+- Earlier: v0.1.2353–2359 Neon/Futuristic Agent Ops + Monitors/Processes glances + Dark kind-filter chips.
+- Digester empty; sibling OpenClaw/Hermes missing on Linux rack; debug.log quiet.
 
 ## Tried / deferred
-
-- Mac `screencapture -l` for stale `feature-agent-ops.png` (~51d) — deferred (TCC / no reliable window capture).
-- Layout-daily Data Poster screen missing — deferred; design-review Agent Ops remaps first.
+- Layout-daily Data Poster still due (screen missing; remaps already present) — deferred while Dark Agent Ops remaps shipped.
+- Design-review recommended `feature-ai-chat` (83d) — deferred; standing fuel was Dark list-row/copy after 2359.
+- Mac `screencapture -l` of stale feature screens deferred (Screen Recording TCC).
 
 ## Next fuel
-
-- Dark Agent Ops loading / preview / copy / list-row remaps if any.
-- Neon / Futuristic processes-filter-chip remaps.
-- Layout-daily Data Poster capture when possible.
-- Mac recapture of stale feature screens when Screen Recording TCC allows.
-
-Generated: 2026-11-05T21:23:10
+- Neon/Futuristic processes-filter-chip remaps if any; layout-daily Data Poster; Mac capture when TCC allows.
