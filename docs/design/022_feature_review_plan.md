@@ -912,3 +912,12 @@ Open tasks for this plan are tracked in **agents/006-feature-coder/FEATURE-CODER
 - [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `assertions_on_constants`, `manual_is_multiple_of`, `items_after_test_module`). Not caused by #19.
 - [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
 - [x] `cargo build --release` succeeds (**v0.1.1985**). Did not start a second process.
+
+### Closing reviewer smoke test 2026-11-05 (`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — GitHub #20 Data Poster Agent Ops cream glances)
+
+- [x] Entry: **`agents/004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist consulted. No **FEAT-D\*** for this GitHub issue. No **`pkill -f mac_stats`** (none running on this Linux host).
+- [x] Product fix already on `main` as **v0.1.2351** (`9bebef5c`): Data Poster / Dark remaps all 15 Agent Ops attention glances (Runs · Filter · Digest · Discord · Redmine · Ollama · Brave · Browser · MCP · Cursor · Perplexity · Mastodon · Telegram · Slack · Signal) onto opaque `#0b0b10` instead of Apple `#ffffff` washes. `src/agent-ops.css` matches `src-tauri/dist/agent-ops.css`. `scripts/layout_daily_review.py` tracks `.ops-runs-attention-glance`, `.ops-digest-attention-glance`, `.ops-discord-attention-glance`. Changelog **[0.1.2351] Fixed** already names GitHub #20. **[Unreleased]** unchanged (unrelated overnight/CI notes only).
+- [x] `cargo check` — pass (dev profile). Linux-only unused IOReport / status-bar warnings; none from the #20 fix.
+- [x] `cargo clippy --all-targets -- -D warnings` — **fail, pre-existing** (dozens of lints such as `unnecessary_get_then_check`, `assertions_on_constants`, `items_after_test_module`). Not caused by #20.
+- [x] `cargo test --offline` — **1359** passed, **0** failed; 1 doc-test ignored.
+- [x] `cargo build --release` succeeds (**v0.1.2351**). Did not start a second process.
