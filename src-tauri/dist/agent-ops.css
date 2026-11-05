@@ -14944,6 +14944,194 @@ body.theme-futuristic .ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
   border-color: color-mix(in srgb, #ff3b30 40%, #0b0b10);
 }
 /*
+ * Neon: Agent Ops list rows still mixed Apple #ffffff washes
+ * (.ops-row resting/hover/focus/selected/copied · .ops-row-meta · .ops-badge On/Off ·
+ *  Runs Lite·Slow·Fail) → white slab on #08120c. Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after kind-filter chips in v0.1.2354 (Data Poster parity).
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-neon .ops-row {
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+}
+body.theme-neon .ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 9%, #08120c);
+}
+body.theme-neon .ops-row:focus-visible {
+  outline-color: color-mix(in srgb, #6dff7b 55%, #08120c);
+}
+body.theme-neon .ops-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 42%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+}
+body.theme-neon .ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 52%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 15%, #08120c);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-neon .ops-row.is-copied,
+body.theme-neon .ops-row.is-selected.is-copied,
+body.theme-neon .ops-row.is-selected.is-copied:hover {
+  border-color: color-mix(in srgb, #34c759 48%, #08120c);
+  background: color-mix(in srgb, #34c759 14%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .ops-row.is-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-neon .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  color: color-mix(in srgb, #ffffff 51%, #08120c);
+}
+body.theme-neon .ops-badge {
+  background: color-mix(in srgb, #30d158 28%, #08120c);
+  border-color: color-mix(in srgb, #30d158 35%, #08120c);
+}
+body.theme-neon button.ops-badge:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #08120c);
+}
+body.theme-neon button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #08120c);
+}
+body.theme-neon button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+}
+body.theme-neon button.ops-badge:disabled {
+  color: color-mix(in srgb, #ffffff 51%, #08120c);
+}
+body.theme-neon .ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  border-color: color-mix(in srgb, currentColor 12%, #08120c);
+  color: color-mix(in srgb, #ffffff 55%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-lite:not(.is-selected) {
+  background: color-mix(in srgb, #6dff7b 8%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 22%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
+  background: color-mix(in srgb, #6dff7b 12%, #08120c);
+  border-color: color-mix(in srgb, #6dff7b 28%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-lite .ops-row-meta {
+  color: color-mix(in srgb, #6dff7b 70%, #ffffff);
+}
+body.theme-neon #ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 7%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-slow .ops-row-meta {
+  color: color-mix(in srgb, #ff9f0a 88%, #ffffff);
+}
+body.theme-neon #ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 10%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+}
+body.theme-neon #ops-runs-list .ops-row.is-fail .ops-row-meta {
+  color: color-mix(in srgb, #ff3b30 88%, #ffffff);
+}
+/*
+ * Futuristic: Agent Ops list rows still mixed Apple #ffffff washes
+ * (.ops-row resting/hover/focus/selected/copied · .ops-row-meta · .ops-badge On/Off ·
+ *  Runs Lite·Slow·Fail) → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after kind-filter chips in v0.1.2354 (Data Poster parity).
+ * Mac capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-futuristic .ops-row {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-futuristic .ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 9%, #0b0b10);
+}
+body.theme-futuristic .ops-row:focus-visible {
+  outline-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+}
+body.theme-futuristic .ops-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 42%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+}
+body.theme-futuristic .ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 15%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .ops-row.is-copied,
+body.theme-futuristic .ops-row.is-selected.is-copied,
+body.theme-futuristic .ops-row.is-selected.is-copied:hover {
+  border-color: color-mix(in srgb, #34c759 48%, #0b0b10);
+  background: color-mix(in srgb, #34c759 14%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .ops-row.is-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+body.theme-futuristic .ops-row-meta:not(.ops-updated-ago):not(.ops-keyboard-hint) {
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
+}
+body.theme-futuristic .ops-badge {
+  background: color-mix(in srgb, #30d158 28%, #0b0b10);
+  border-color: color-mix(in srgb, #30d158 35%, #0b0b10);
+}
+body.theme-futuristic button.ops-badge:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, #0b0b10);
+}
+body.theme-futuristic button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+body.theme-futuristic button.ops-badge:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+}
+body.theme-futuristic button.ops-badge:disabled {
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
+}
+body.theme-futuristic .ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 55%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-lite:not(.is-selected) {
+  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 22%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-lite:not(.is-selected):hover {
+  background: color-mix(in srgb, #55c7ff 12%, #0b0b10);
+  border-color: color-mix(in srgb, #55c7ff 28%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-lite .ops-row-meta {
+  color: color-mix(in srgb, #55c7ff 70%, #ffffff);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-slow .ops-row-meta {
+  color: color-mix(in srgb, #ff9f0a 88%, #ffffff);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 10%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-futuristic #ops-runs-list .ops-row.is-fail .ops-row-meta {
+  color: color-mix(in srgb, #ff3b30 88%, #ffffff);
+}
+/*
  * Data Poster: Agent Ops edit-actions / agent-editor still mixed Apple #ffffff
  * washes → white slab on #0b0b10. Design-review fuel (feature-agent-ops)
  * + standing P2 #14 after copy/empty/preview in v0.1.2203.

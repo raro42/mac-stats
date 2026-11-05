@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2355
+
+- Neon / Futuristic Agent Ops list rows (`.ops-row` / meta / badge On·Off / Runs Lite·Slow·Fail) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster parity). Standing P2 #14 after v0.1.2354 kind-filter chips; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops copy/empty/preview remaps if any, attention-glance remaps for Neon/Futuristic, Dark kind-filter chips if any, layout-daily Data Poster, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2354
 
 - Neon / Futuristic Agent Ops kind-filter chips (Sessions / Agents / Schedules / Knowledge / Runs + Clear) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster parity). Standing P2 #14 after v0.1.2353 filter/tabs; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops list-row remaps if any, attention-glance remaps for Neon/Futuristic, layout-daily Data Poster, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
