@@ -1,24 +1,20 @@
 # Morning surprise — 2026-11-06
 
-Overnight autoresearch (Track B) on the Linux rack.
+Morning surprise draft — overnight Track B (mac-stats).
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2353** (sibling race, already on main) — Neon / Futuristic Agent Ops filter row + tab strip opaque on `#08120c` / `#0b0b10`.
-- **v0.1.2354** — Neon / Futuristic Agent Ops kind-filter chips opaque shell mixes.
-- **v0.1.2355** — Neon / Futuristic Agent Ops list rows / badges / Runs Lite·Slow·Fail opaque shell mixes.
-- **v0.1.2356** — Neon / Futuristic Monitors + Processes attention glances (Down/Slow, filter Up/Down/Slow, Hot) opaque on `#08120c` / `#0b0b10`. Design-review `feature-monitors` / `feature-processes`; standing P2 #14.
+- **v0.1.2357** — Neon / Futuristic Agent Ops `.ops-loading` · `.ops-preview` · `.ops-session-copy-chip` opaque on `#08120c` / `#0b0b10` (Data Poster parity; design-review `feature-agent-ops`).
+- Earlier same window: **v0.1.2353–2356** (Agent Ops filter/tabs · kind chips · list rows · Monitors/Processes attention glances).
 
-## Tried / notes
+## Tried / deferred
 
-- Digester empty (0 turns / 7d). Sibling harnesses missing on rack.
-- Design review due (AI Chat ~83d recommended); this tick took standing next fuel: attention-glance remaps (polish-without-capture grace; no Mac capture from this host).
-- Layout daily still due (Data Poster) — deferred after attention glances.
-- X rack: loops alive; 1 notifications tab; CDP evaluate skipped (no websocket-client).
+- Mac recapture of stale `docs/screens/feature-agent-ops.png` (51d) — no on-screen CPU window / Screen Recording TCC; polish-without-capture grace.
+- Layout-daily Data Poster screen still missing — deferred; design-review Agent Ops fuel first.
 
 ## Next fuel
 
-- Neon/Futuristic processes-filter-chip remaps if any
-- Dark kind-filter chips if any
-- Layout-daily Data Poster
-- Mac window-only recapture of `feature-monitors.png` / `feature-processes.png` when TCC allows
+- Neon/Futuristic Agent Ops attention glances (Runs·Filter·Digest·…) if still Apple washes
+- Neon/Futuristic processes-filter chips
+- Dark kind-filter / copy-preview remaps
+- Layout-daily Data Poster or Mac capture when TCC allows
