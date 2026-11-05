@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2353
+
+- Neon / Futuristic Agent Ops filter row + tab strip Apple `#ffffff` washes (`.ops-filter-row-kb-hint` / input / match / Clear / caption / `.ops-keyboard-hint`; `.ops-tab-bar-kb-hint` / digit / count; `.agent-ops-tab` / `.ops-file-tab`) opaque `#08120c` / `#0b0b10` mixes with Neon green / Futuristic cyan accents (Data Poster / Dark parity). Standing P2 #14 after v0.1.2350 overview/empty; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops kind-filter chips if any, attention-glance remaps (#20 Data Poster/Dark already), layout-daily Data Poster capture, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2350
 
 - Neon / Futuristic Agent Ops overview + empty Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2349 AI Chat; layout-daily Neon/Futuristic; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic Agent Ops filter/tab remaps, layout-daily Data Poster remaps if any, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
