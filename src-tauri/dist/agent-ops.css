@@ -18203,3 +18203,50 @@ body.theme-futuristic .disk-cleanup-scope-row.is-just-copied::after {
 body.theme-futuristic .disk-cleanup-item.has-reclaim.is-just-copied {
   box-shadow: inset 3px 0 0 color-mix(in srgb, #34c759 70%, #0b0b10);
 }
+/*
+ * Data Poster / Dark / Neon / Futuristic: Details hover · focus · selected still
+ * mixed Apple #ffffff washes (.details-grid > .detail-value[role='option']:hover
+ * · :focus-visible · .is-selected) → white slab on opaque shells. Copied flash
+ * opaque in v0.1.2238 / v0.1.2369. Design-review fuel (feature-cpu-metrics /
+ * Details) + standing P2 #14; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0b0b10);
+}
+body.theme-data-poster .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+}
+body.theme-data-poster .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0b0b10);
+}
+body.theme-dark .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0a0a0a);
+}
+body.theme-dark .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0a0a0a);
+}
+body.theme-dark .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0a0a0a);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0a0a0a);
+}
+body.theme-neon .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #08120c);
+}
+body.theme-neon .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #08120c);
+}
+body.theme-neon .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #08120c);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #08120c);
+}
+body.theme-futuristic .details-grid > .detail-value[role='option']:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 12%, #0b0b10);
+}
+body.theme-futuristic .details-grid > .detail-value[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, #0b0b10);
+}
+body.theme-futuristic .details-grid > .detail-value[role='option'].is-selected {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, #0b0b10);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #0a84ff) 35%, #0b0b10);
+}
