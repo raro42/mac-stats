@@ -84,4 +84,4 @@ xattr -rd com.apple.quarantine /Applications/mac-stats.app
 open -a mac-stats
 ```
 
-Or Right-click → **Open** once. The cask `postflight` clears quarantine on install; run `xattr` by hand if an older cask was used. Full notes: [NOTARIZATION.md](NOTARIZATION.md).
+Or Right-click → **Open** once. The cask `postflight_steps` clears quarantine on install; run `xattr` by hand if an older cask was used. Full notes: [NOTARIZATION.md](NOTARIZATION.md).

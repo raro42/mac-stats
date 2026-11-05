@@ -195,8 +195,9 @@ Config templates in repo root: [`config.minimal.json`](config.minimal.json) (mon
 ## Updates
 
 In-app banner checks GitHub Releases and links the latest **Release notes / DMG**.
-If you installed with Homebrew (tap + cask), use `brew upgrade --cask mac-stats`.
-DMG / one-liner installs are not a Homebrew cask — `brew upgrade` will say the cask is not installed; grab the DMG from the release instead (or re-run [`install.sh`](install.sh)).
+When a Homebrew cask install is detected, the banner also shows `brew upgrade --cask mac-stats`.
+DMG / one-liner installs only get the release link (no brew hint), so you do not hit “Cask not installed.”
+If you use Homebrew by hand: `brew upgrade --cask mac-stats`. Otherwise grab the DMG from the release (or re-run [`install.sh`](install.sh)).
 
 ---
 

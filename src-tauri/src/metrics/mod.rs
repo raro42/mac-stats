@@ -1189,6 +1189,48 @@ pub fn get_app_version() -> String {
     crate::config::Config::version()
 }
 
+/// Homebrew Caskroom roots that may hold a staged `mac-stats` cask.
+const HOMEBREW_CASKROOM_MAC_STATS: &[&str] = &[
+    "/opt/homebrew/Caskroom/mac-stats",
+    "/usr/local/Caskroom/mac-stats",
+];
+
+fn homebrew_cask_staged_at(candidates: &[&str]) -> bool {
+    candidates
+        .iter()
+        .any(|p| std::path::Path::new(p).is_dir())
+}
+
+/// True when the Homebrew cask is staged under Caskroom (Apple Silicon or Intel prefix).
+/// Used so the update banner only suggests `brew upgrade` for real brew installs (#21).
+#[tauri::command]
+pub fn is_homebrew_cask_install() -> bool {
+    homebrew_cask_staged_at(HOMEBREW_CASKROOM_MAC_STATS)
+}
+
+#[cfg(test)]
+mod homebrew_cask_install_tests {
+    use super::homebrew_cask_staged_at;
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn detects_staged_caskroom_dir() {
+        let stamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        let dir = std::env::temp_dir().join(format!("mac-stats-caskroom-test-{stamp}"));
+        fs::create_dir_all(&dir).expect("temp caskroom");
+        let path = dir.to_string_lossy().into_owned();
+        assert!(homebrew_cask_staged_at(&[&path]));
+        assert!(!homebrew_cask_staged_at(&[
+            "/tmp/mac-stats-caskroom-missing-does-not-exist"
+        ]));
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
 /// Embedded changelog content (compiled into binary at build time)
 /// This ensures the changelog is always available regardless of where the executable is located.
 /// Path is relative to this file (src-tauri/src/metrics/mod.rs):

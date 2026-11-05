@@ -4,8 +4,7 @@ cask "mac-stats" do
   version "0.1.716"
   sha256 arm: "037e0dc92b7fa6df8a9af976eba249a98ec19147f355bde233d7c3639ee68040"
 
-  url "https://github.com/raro42/mac-stats/releases/download/v#{version}/mac-stats_#{version}_#{arch}.dmg",
-      verified: "github.com/raro42/mac-stats/"
+  url "https://github.com/raro42/mac-stats/releases/download/v#{version}/mac-stats_#{version}_#{arch}.dmg"
   name "mac-stats"
   desc "Local AI agent harness and menu-bar system stats for Apple Silicon Macs"
   homepage "https://github.com/raro42/mac-stats"
@@ -23,10 +22,11 @@ cask "mac-stats" do
   # Maintainer has no Apple Developer account to sign/notarize yet — help welcome.
   # Sequoia+ then reports “mac-stats is damaged” even after brew install.
   # Clearing quarantine after install is the supported workaround (same as
-  # scripts/install-to-applications.sh).
-  postflight do
-    system_command "/usr/bin/xattr",
-                   args: ["-dr", "com.apple.quarantine", "#{appdir}/mac-stats.app"]
+  # scripts/install-to-applications.sh). Homebrew 7+: postflight_steps + no url verified:.
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args: ["-dr", "com.apple.quarantine", "{{appdir}}/mac-stats.app"],
+        must_succeed: false
   end
 
   caveats <<~EOS

@@ -130,7 +130,8 @@ use state::*;
 // Re-export for Tauri commands
 pub use metrics::{
     force_quit_process, get_app_version, get_changelog, get_cpu_details, get_metrics,
-    get_process_details, get_window_decorations, set_window_decorations, CpuDetails, SystemMetrics,
+    get_process_details, get_window_decorations, is_homebrew_cask_install, set_window_decorations,
+    CpuDetails, SystemMetrics,
 };
 // Re-export for CLI (e.g. discord run-ollama)
 pub use commands::judge::run_judge_if_enabled;
@@ -330,6 +331,7 @@ fn run_internal(open_cpu_window: bool) {
             get_metrics,
             metrics::get_metrics_history,
             get_app_version,
+            is_homebrew_cask_install,
             get_window_decorations,
             set_window_decorations,
             metrics::get_ai_agent_enabled,

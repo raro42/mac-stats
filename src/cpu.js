@@ -6096,6 +6096,22 @@ async function checkForAppUpdate(currentVersion) {
 
   if (document.getElementById("mac-stats-update-banner")) return;
   if (windowWorkPaused()) return;
+
+  // Only show brew upgrade when Caskroom has mac-stats (#21). DMG / one-liner
+  // installs get "Cask not installed" if they copy a brew hint.
+  let brewHint = "";
+  try {
+    const inv = typeof getInvoke === "function" ? getInvoke() : invoke;
+    if (inv && (await inv("is_homebrew_cask_install"))) {
+      brewHint =
+        ' · Upgrade with Homebrew: <code>brew upgrade --cask mac-stats</code>';
+    }
+  } catch (_) {
+    /* ignore — treat as non-Homebrew */
+  }
+  if (windowWorkPaused()) return;
+  if (document.getElementById("mac-stats-update-banner")) return;
+
   const banner = document.createElement("div");
   banner.id = "mac-stats-update-banner";
   banner.setAttribute("role", "status");
@@ -6111,9 +6127,7 @@ async function checkForAppUpdate(currentVersion) {
       <div class="tip-title">Update available</div>
       <div class="tip-copy">
         <strong>${latestTag}</strong> is ready (you have v${currentVersion}).
-        <a href="${htmlUrl}" target="_blank" rel="noopener">Release notes / DMG</a>
-        · Homebrew installs only:
-        <code>brew upgrade --cask mac-stats</code>
+        <a href="${htmlUrl}" target="_blank" rel="noopener">Release notes / DMG</a>${brewHint}
       </div>
     </div>
     <button type="button" class="tip-dismiss" title="Dismiss" aria-label="Dismiss">×</button>
