@@ -1,22 +1,16 @@
-# Morning surprise — 2026-11-05 / 2026-11-06
+# Morning surprise — 2026-11-05
 
-Overnight Track B kept shipping opaque-shell remaps so dark themes stop flashing Apple white glass.
+Generated: overnight harness tick ~23:05 CET (2026-11-05).
 
-## Shipped tonight
+## Shipped
+- **v0.1.2366** — Data Poster Processes pin hover/focus light type opaque on `#0b0b10` (Neon / Futuristic / Dark parity). Design-review `feature-processes` / layout-daily Data Poster adjacent; Mac capture still deferred (Screen Recording TCC / no reliable window).
+- Earlier tonight: **v0.1.2365** Dark Processes empty + pin + Copied on `#0a0a0a`; **v0.1.2364** Neon/Futuristic empty + pin type; **v0.1.2363**–**2361** Processes row/chip remaps; **v0.1.2360**–**2353** Agent Ops opaque remaps.
 
-- **v0.1.2365** — Dark (TUI) Processes empty + pin type + Copied opaque on `#0a0a0a` (`.process-empty` border/fill · `.process-pin` hover/focus light type · `.process-row` Copied). Standing P2 #14 after Neon/Futuristic v0.1.2364; design-review `feature-processes` (polish-without-capture grace).
-- Earlier same night (already on main): Neon/Futuristic Processes empty/pin type (**v0.1.2364**), list rows/pin (**v0.1.2363**), top glances/filter-miss (**v0.1.2362**).
+## Tried / deferred
+- Screenshot recapture of `feature-agent-ops.png` (51d stale) — CPU window not on-screen; second `--cpu` blocked by single-instance lock.
+- Layout-daily Data Poster screen still missing (remap polish continued instead).
 
-## Tried / context
-
-- Digester open: empty (0 turns / 7d) — not quiet-default; took standing backlog.
-- Design review due (recommended `feature-ai-chat` ~83d); this tick continued Processes polish-without-capture (Mac Screen Recording TCC blocks `screencapture -l` on the rack).
-- Layout daily due but Data Poster screen missing; remaps already present → deferred.
-- Sibling OpenClaw/Hermes missing on Linux rack.
-- Debug.log: no ERROR/WARN clusters in the 180m window.
-
-## Next
-
-- Data Poster process-pin light type if any
-- Layout-daily Data Poster when a screen lands
-- Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when TCC allows
+## Next fuel
+- Neon/Futuristic AI Chat Send focus·active·disabled if theme shells lack opaque remaps
+- Mac capture when Screen Recording TCC allows `screencapture -l`
+- Other Data Poster pin/row leftovers if any
