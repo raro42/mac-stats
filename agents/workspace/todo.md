@@ -6,7 +6,7 @@
 - [x] Implement minimal fix
 - [x] `cargo check` in `src-tauri/`
 - [x] Rename `WIP-21-…` → `UNTESTED-21-…`
-- [ ] Commit and push `origin/main` (do not close GitHub issue)
+- [x] Commit and push `origin/main` (do not close GitHub issue)
 
 ## Notes
 GitHub: https://github.com/raro42/mac-stats/issues/21
