@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2371
+
+- Dark / Neon / Futuristic Disk Cleanup Copied flash (`.disk-cleanup-item` / `.disk-cleanup-scope-row.is-just-copied` · Copied badge · `.has-reclaim` inset) Apple `#ffffff` washes → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster v0.1.2240 parity). Standing P2 #14 after AI Chat Send Saved v0.1.2370; design-review `feature-disk-cleanup` (polish-without-capture grace). Next: Details hover/focus/selected remaps if any (`.detail-value` still Apple `#ffffff`), Dark/Neon/Futuristic `#force-quit-process-btn.is-just-saved` if missing, or Mac capture of stale `feature-disk-cleanup.png` / `feature-cpu-metrics.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2370
 
 - Dark / Neon / Futuristic AI Chat Send Saved flash (`#chat-send-btn.is-just-saved`) Apple `#ffffff` wash → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster v0.1.2233 parity). Standing P2 #14 after Details Copied v0.1.2369 / Send focus v0.1.2367–2368; design-review `feature-ai-chat` (polish-without-capture grace). Next: Details hover/focus/selected remaps if any (`.detail-value` still Apple `#ffffff`), Dark/Neon/Futuristic `#force-quit-process-btn.is-just-saved` if missing, or Mac capture of stale `feature-ai-chat.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
