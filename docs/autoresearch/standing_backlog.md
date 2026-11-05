@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2368
+
+- Dark (TUI) AI Chat Send focus · active · disabled (`#chat-send-btn:focus-visible` / `:active` / `:disabled`) Apple `#ffffff` focus ring / active wash → opaque CRT shell `#0a0a0a` (Neon / Futuristic / Data Poster parity). Standing P2 #14 after v0.1.2367; design-review `feature-ai-chat` (polish-without-capture grace). Next: Dark `#chat-send-btn.is-just-saved` Apple `#ffffff` mix if any, other Data Poster pin/row leftovers if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2367
 
 - Neon / Futuristic AI Chat Send focus · active · disabled (`#chat-send-btn:focus-visible` / `:active` / `:disabled`) Apple `#ffffff` focus ring / active wash → opaque shells `#08120c` / `#0b0b10` (Data Poster parity). Standing P2 #14 after v0.1.2366 pin light type; design-review `feature-ai-chat` (polish-without-capture grace). Next: Dark AI Chat Send focus·active·disabled if theme shell lacks opaque remaps, other Data Poster pin/row leftovers if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

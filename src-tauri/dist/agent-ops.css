@@ -18088,3 +18088,26 @@ body.theme-futuristic #chat-send-btn:disabled {
   cursor: not-allowed;
   box-shadow: none;
 }
+/*
+ * Dark (TUI): AI Chat Send focus / active / disabled still mixed Apple
+ * `#ffffff` focus ring and active wash (`#chat-send-btn:focus-visible` ·
+ * `:active` · `:disabled`) → white slab / wrong ring on opaque CRT shell
+ * `#0a0a0a`. Resting / hover already opaque in theme cpu.css.
+ * Neon / Futuristic / Data Poster parity (v0.1.2367). Design-review fuel
+ * (feature-ai-chat) + standing P2 #14.
+ */
+body.theme-dark #chat-send-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #007aff 55%, #0a0a0a);
+  outline-offset: 2px;
+}
+body.theme-dark #chat-send-btn:active {
+  box-shadow: none;
+  background: color-mix(in srgb, #0064dc 95%, #0a0a0a);
+}
+body.theme-dark #chat-send-btn:disabled {
+  color: color-mix(in srgb, #ffffff 55%, #007aff);
+  background: color-mix(in srgb, #007aff 50%, #0a0a0a);
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
