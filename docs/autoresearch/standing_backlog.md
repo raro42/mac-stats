@@ -1,6 +1,10 @@
+## Overnight merge — v0.1.2364
+
+- Neon / Futuristic Processes empty + pin type (`.process-empty` border/fill · `.process-pin` hover/focus light type) Apple `#ffffff` / dark-ink washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster parity). Standing P2 #14 after parallel v0.1.2363 rows/pin; design-review `feature-processes` (polish-without-capture grace). Next: Dark Processes leftovers if any, layout-daily Data Poster, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2363
 
-- Neon / Futuristic Processes list rows + pin / Copied (`.process-row` pinned/hover/active/focus/Copied · `.process-pin` hover/focus/Saved · `.process-name` Saved) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2362 top glances / filter-miss; design-review `feature-processes` (polish-without-capture grace). Next: layout-daily Data Poster (screen missing), Neon/Futuristic AI Chat remaining Apple falls if any, or Mac capture of stale `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+- Neon / Futuristic Processes list rows + pin / Copied (`.process-row` pinned/hover/active/focus/Copied · `.process-pin` hover/focus/Saved · `.process-name` Saved) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2362 top glances / filter-miss; design-review `feature-processes` (polish-without-capture grace). Next: Neon/Futuristic process-empty border/fill if any, layout-daily Data Poster, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2362
 

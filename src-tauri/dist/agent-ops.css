@@ -15674,10 +15674,13 @@ body.theme-neon .process-row:focus-visible {
 }
 body.theme-neon .process-pin:hover {
   background: color-mix(in srgb, currentColor 12%, #08120c);
+  /* Opaque light type — was Apple dark-ink-on-#ffffff hover (#14). */
+  color: color-mix(in srgb, #ffffff 84%, #08120c);
 }
 body.theme-neon .process-pin:focus-visible {
   background: color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6dff7b) 40%, #08120c);
+  color: color-mix(in srgb, #ffffff 84%, #08120c);
 }
 body.theme-neon .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #08120c) !important;
@@ -15691,6 +15694,18 @@ body.theme-neon .process-row.is-just-copied {
 }
 body.theme-neon .process-row.is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+/*
+ * Neon: Top Processes empty shell still mixed Apple #ffffff border/fill
+ * (.process-empty) → white slab on Neon shell #08120c. Color-only remap left
+ * the dashed border/fill on #ffffff. Design-review fuel (feature-processes) +
+ * standing P2 #14 after v0.1.2363 rows/pin (Data Poster parity). Mac capture
+ * deferred (Screen Recording TCC).
+ */
+body.theme-neon .process-empty {
+  color: color-mix(in srgb, #ffffff 72%, #08120c) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
 }
 /*
  * Futuristic: Monitors + Processes attention glances still mixed Apple #ffffff washes
@@ -15915,10 +15930,13 @@ body.theme-futuristic .process-row:focus-visible {
 }
 body.theme-futuristic .process-pin:hover {
   background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  /* Opaque light type — was Apple dark-ink-on-#ffffff hover (#14). */
+  color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-futuristic .process-pin:focus-visible {
   background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 40%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 84%, #0b0b10);
 }
 body.theme-futuristic .process-pin.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
@@ -15932,6 +15950,18 @@ body.theme-futuristic .process-row.is-just-copied {
 }
 body.theme-futuristic .process-row.is-just-copied::after {
   background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+/*
+ * Futuristic: Top Processes empty shell still mixed Apple #ffffff border/fill
+ * (.process-empty) → white slab on Futuristic shell #0b0b10. Color-only remap
+ * left the dashed border/fill on #ffffff. Design-review fuel (feature-processes)
+ * + standing P2 #14 after v0.1.2363 rows/pin (Data Poster / Neon parity). Mac
+ * capture deferred (Screen Recording TCC / screencapture -l).
+ */
+body.theme-futuristic .process-empty {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
 }
 /*
  * Neon: Agent Ops loading / preview / copy chips still mixed Apple #ffffff washes
