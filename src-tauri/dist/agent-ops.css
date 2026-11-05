@@ -15546,6 +15546,44 @@ body.theme-neon .processes-hot-attention-glance.has-hot {
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
 /*
+ * Neon: Processes filter chips still mixed Apple / early #0b0b10 washes
+ * (.processes-filter-chip resting/hover/focus/active · pinned · Hot)
+ * → wrong dark slab on Neon shell #08120c. Design-review fuel (feature-processes)
+ * + standing P2 #14 after Processes attention glances in v0.1.2356
+ * (Data Poster / Dark parity). Mac capture deferred (Screen Recording TCC).
+ */
+body.theme-neon .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .processes-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+}
+body.theme-neon .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+}
+body.theme-neon .processes-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+}
+body.theme-neon .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #08120c);
+  border-color: color-mix(in srgb, #ffd60a 32%, #08120c);
+}
+body.theme-neon .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #08120c);
+  border-color: color-mix(in srgb, #ffd60a 42%, #08120c);
+}
+body.theme-neon .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 30%, #08120c);
+}
+body.theme-neon .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 40%, #08120c);
+}
+/*
  * Futuristic: Monitors + Processes attention glances still mixed Apple #ffffff washes
  * (.monitors-attention-glance Down/Slow · .monitors-filter-attention-glance
  *  Up/Down/Slow · .processes-filter-attention-glance · .processes-hot-attention-glance)
@@ -15636,6 +15674,45 @@ body.theme-futuristic .processes-hot-attention-glance.has-hot {
   border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
   background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+/*
+ * Futuristic: Processes filter chips still mixed Apple / shared early washes
+ * (.processes-filter-chip resting/hover/focus/active · pinned · Hot)
+ * → wrong accent wash on Futuristic shell #0b0b10. Design-review fuel
+ * (feature-processes) + standing P2 #14 after Processes attention glances
+ * in v0.1.2356 (Data Poster / Dark / Neon parity). Mac capture deferred
+ * (Screen Recording TCC / screencapture -l).
+ */
+body.theme-futuristic .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .processes-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 32%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ffd60a 42%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
 }
 /*
  * Neon: Agent Ops loading / preview / copy chips still mixed Apple #ffffff washes
