@@ -4,6 +4,8 @@ Overnight Track B kept shipping opaque-shell remaps so dark themes stop flashing
 
 ## Shipped tonight
 
+- **v0.1.2373** — Dark / Neon / Futuristic Force Quit Saved flash opaque on `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Data Poster remap; layout-daily Data Poster adjacent; design-review `feature-processes` (polish-without-capture grace).
+- **v0.1.2372** — Data Poster / Dark / Neon / Futuristic Details hover · focus · selected opaque on shells.
 - **v0.1.2371** — Dark / Neon / Futuristic Disk Cleanup Copied flash opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (item / scope-row Copied + reclaim inset). Standing P2 #14 after Data Poster v0.1.2240; design-review `feature-disk-cleanup` (polish-without-capture grace).
 - **v0.1.2370** — Dark / Neon / Futuristic AI Chat Send Saved flash opaque on shells.
 - **v0.1.2369** — Dark / Neon / Futuristic Details Copied flash opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (`.details-grid` Copied badge). Standing P2 #14 after Data Poster v0.1.2238; design-review `feature-cpu-metrics` (polish-without-capture grace).
@@ -13,8 +15,8 @@ Overnight Track B kept shipping opaque-shell remaps so dark themes stop flashing
 
 ## Tried / context
 
-- Digester open: empty (0 turns / 7d) — not quiet-default; design review due recommended `feature-disk-cleanup` (~84d stale).
-- Polish-without-capture (Mac Screen Recording TCC blocks `screencapture -l` on the rack); marked `feature-disk-cleanup` grace.
-- Layout daily due=true (data-poster recommended; screens missing) — deferred this tick for design-review Disk Cleanup fuel.
+- Digester open: empty (0 turns / 7d) — not quiet-default; standing P2 #14 + layout-daily Data Poster fuel.
+- Polish-without-capture (Mac Screen Recording TCC blocks `screencapture -l` on the rack).
+- Layout daily due=true → Data Poster marked checked after Force Quit Saved remap (**v0.1.2373**).
 - Sibling OpenClaw/Hermes missing on Linux rack.
 - Debug.log: no ERROR/WARN clusters in the 180m window.
