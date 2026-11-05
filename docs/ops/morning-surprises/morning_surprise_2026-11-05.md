@@ -1,19 +1,24 @@
 # Morning surprise — 2026-11-05
 
+Overnight autoresearch (Track B) on the Linux rack.
+
 ## Shipped
-- **v0.1.2355** — Neon / Futuristic Agent Ops **list rows** opaque on `#08120c` / `#0b0b10` (`.ops-row` · meta · badge On/Off · Runs Lite·Slow·Fail). Design-review `feature-agent-ops`; standing P2 #14 after v0.1.2354 kind-filter chips. Mac window capture still deferred (Screen Recording TCC / no on-screen CPU window).
 
-## Also this night
-- Parallel race already landed **v0.1.2354** kind-filter chips before this tick finished the same experiment; reset to origin and continued with list rows.
-- Digester: design-review stale `feature-agent-ops.png` (~51d). Layout-daily due (Data Poster screen missing) — deferred behind design-review polish.
-- Debug.log: single-instance WARN only.
+- **v0.1.2353** (sibling race, already on main) — Neon / Futuristic Agent Ops filter row + tab strip opaque on `#08120c` / `#0b0b10`.
+- **v0.1.2354** — Neon / Futuristic Agent Ops kind-filter chips opaque shell mixes.
+- **v0.1.2355** — Neon / Futuristic Agent Ops list rows / badges / Runs Lite·Slow·Fail opaque shell mixes.
+- **v0.1.2356** — Neon / Futuristic Monitors + Processes attention glances (Down/Slow, filter Up/Down/Slow, Hot) opaque on `#08120c` / `#0b0b10`. Design-review `feature-monitors` / `feature-processes`; standing P2 #14.
 
-## Tried / deferred
-- Recapture `docs/screens/feature-agent-ops.png` — deferred (TCC / Quartz empty for mac-stats window).
+## Tried / notes
+
+- Digester empty (0 turns / 7d). Sibling harnesses missing on rack.
+- Design review due (AI Chat ~83d recommended); this tick took standing next fuel: attention-glance remaps (polish-without-capture grace; no Mac capture from this host).
+- Layout daily still due (Data Poster) — deferred after attention glances.
+- X rack: loops alive; 1 notifications tab; CDP evaluate skipped (no websocket-client).
 
 ## Next fuel
-- Neon/Futuristic Agent Ops copy/empty/preview remaps
-- Neon/Futuristic attention-glance remaps
+
+- Neon/Futuristic processes-filter-chip remaps if any
 - Dark kind-filter chips if any
-- Layout-daily Data Poster capture
-- Mac capture when Screen Recording allows `screencapture -l`
+- Layout-daily Data Poster
+- Mac window-only recapture of `feature-monitors.png` / `feature-processes.png` when TCC allows
