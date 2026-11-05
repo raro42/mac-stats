@@ -1,15 +1,30 @@
-# Morning surprise — 2026-11-05 (overnight window)
+# Morning surprise — 2026-11-05
+
+Overnight autoresearch (Track B) for Ralf.
 
 ## Shipped
-- **v0.1.2358** — Neon / Futuristic Agent Ops attention glances opaque on `#08120c` / `#0b0b10` (Runs · Filter · Digest · Discord · Redmine · Ollama · Brave · Browser · MCP · Cursor · Perplexity · Mastodon · Telegram · Slack · Signal). Standing P2 #14 after v0.1.2357; design-review `feature-agent-ops` (polish-without-capture grace).
 
-## Also tonight
-- Earlier: v0.1.2353–2357 Neon/Futuristic Agent Ops filter/tabs, kind chips, list rows, Monitors/Processes glances, loading/preview/copy.
-- Digester empty; sibling OpenClaw/Hermes missing on Linux rack; debug.log quiet.
+- **v0.1.2359** — Dark (TUI) Agent Ops kind-filter chips (Sessions · Agents · Schedules · Knowledge · Runs + Clear) opaque on `#0a0a0a` with CRT green accents. Drops Apple `#ffffff` washes (Data Poster / Neon / Futuristic parity). Design-review `feature-agent-ops` polish-without-capture grace (Screen Recording TCC blocked Mac recapture).
+
+## Earlier tonight (same window)
+
+- **v0.1.2358** — Neon / Futuristic Agent Ops attention glances opaque.
+- **v0.1.2357** — Neon / Futuristic Agent Ops loading / preview / copy opaque.
+- **v0.1.2356** — Neon / Futuristic Monitors + Processes attention glances opaque.
+- **v0.1.2355** — Neon / Futuristic Agent Ops list rows opaque.
+- **v0.1.2354** — Neon / Futuristic Agent Ops kind-filter chips opaque.
+- **v0.1.2353** — Neon / Futuristic Agent Ops filter + tabs opaque.
 
 ## Tried / deferred
-- Layout-daily Data Poster still due (screen missing; remaps already present) — deferred while Agent Ops glances shipped.
-- Mac `screencapture -l` of stale feature screens deferred (Screen Recording TCC).
+
+- Mac `screencapture -l` for stale `feature-agent-ops.png` (~51d) — deferred (TCC / no reliable window capture).
+- Layout-daily Data Poster screen missing — deferred; design-review Agent Ops remaps first.
 
 ## Next fuel
-- Neon/Futuristic processes-filter-chip remaps if any; Dark kind-filter / copy-preview if any; layout-daily Data Poster; Mac capture when TCC allows.
+
+- Dark Agent Ops loading / preview / copy / list-row remaps if any.
+- Neon / Futuristic processes-filter-chip remaps.
+- Layout-daily Data Poster capture when possible.
+- Mac recapture of stale feature screens when Screen Recording TCC allows.
+
+Generated: 2026-11-05T21:23:10
