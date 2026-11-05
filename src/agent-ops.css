@@ -18278,3 +18278,31 @@ body.theme-futuristic #force-quit-process-btn.is-just-saved {
   animation: none;
   box-shadow: none;
 }
+/*
+ * Dark / Neon / Futuristic: Force Quit confirming wash still mixed Apple
+ * `#ffffff` (`.force-quit-btn.is-confirming`) → white slab on opaque shells.
+ * Data Poster remapped earlier (Process Details / Force Quit block).
+ * Design-review fuel (feature-processes / Force Quit) + standing P2 #14;
+ * layout-daily Data Poster adjacent (dark-shell confirming parity).
+ */
+body.theme-dark .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 55%, #0a0a0a);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #0a0a0a);
+  animation: none;
+}
+body.theme-neon .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 55%, #08120c);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #08120c);
+  animation: none;
+}
+body.theme-futuristic .force-quit-btn.is-confirming {
+  background: color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 55%, #0b0b10);
+  color: #ff3b30;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #0b0b10);
+  animation: none;
+}

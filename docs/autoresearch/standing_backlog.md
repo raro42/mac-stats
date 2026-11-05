@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2374
+
+- Dark / Neon / Futuristic Force Quit confirming wash (`.force-quit-btn.is-confirming`) Apple `#ffffff` mix → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details / Force Quit parity). Standing P2 #14 after Force Quit Saved v0.1.2373; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.force-quit-section` border if theme shells lack opaque remaps (Data Poster has remap), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2373
 
 - Dark / Neon / Futuristic Force Quit Saved flash (`#force-quit-process-btn.is-just-saved`) Apple `#ffffff` wash → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details / Force Quit parity). Standing P2 #14 after Details hover/focus/selected v0.1.2372; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.force-quit-btn.is-confirming` if theme shells lack opaque remaps (Data Poster has remap), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
