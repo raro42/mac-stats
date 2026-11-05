@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2362
+
+- Neon / Futuristic Processes top glances + filter-miss (`.processes-top-glance` / `.processes-top-gpu-glance` / `.processes-top-ram-glance` resting/hover/focus/is-hot/is-ok · `.processes-filter-miss` Hot·Pinned empty · `.processes-filter-miss-cta`) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2361 filter chips; design-review `feature-processes` (polish-without-capture grace). Next: Neon/Futuristic process-row / pin remaps if any, layout-daily Data Poster, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2361
 
 - Neon / Futuristic Processes filter chips (`.processes-filter-chip` resting/hover/focus/active · pinned · Hot) Apple / early `#0b0b10` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2356 Processes attention glances / v0.1.2360 Dark Agent Ops; design-review `feature-processes` (polish-without-capture grace). Next: Neon/Futuristic processes-filter-miss / top-glance remaps if any, layout-daily Data Poster, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
