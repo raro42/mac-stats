@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2359
+
+- Dark (TUI) Agent Ops kind-filter chips (Sessions All·Live·Files · Agents All·On·Off · Schedules All·Jobs·Deliveries · Knowledge All·Discord·Core · Runs All·Instant·Lite·Direct·Slow·Fail + Clear) Apple `#ffffff` washes opaque `#0a0a0a` mix with CRT green accents (Data Poster / Neon / Futuristic parity). Standing P2 #14 after v0.1.2348 filter/tabs / v0.1.2358 Neon·Futuristic glances; design-review `feature-agent-ops` (polish-without-capture grace). Next: Dark loading/preview/copy/list-row remaps if any, Neon/Futuristic processes-filter-chip remaps, layout-daily Data Poster, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2358
 
 - Neon / Futuristic Agent Ops attention glances (Runs · Filter · Digest · Discord · Redmine · Ollama · Brave · Browser · MCP · Cursor · Perplexity · Mastodon · Telegram · Slack · Signal) Apple `#ffffff` washes opaque shell mixes (`#08120c` / `#0b0b10`; Data Poster / Dark parity). Standing P2 #14 after v0.1.2357 loading/preview/copy; design-review `feature-agent-ops` (polish-without-capture grace). Next: Neon/Futuristic processes-filter-chip remaps if any, Dark kind-filter / copy-preview if any, layout-daily Data Poster, or Mac capture of stale `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
