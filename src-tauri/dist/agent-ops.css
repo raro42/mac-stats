@@ -18111,3 +18111,31 @@ body.theme-dark #chat-send-btn:disabled {
   cursor: not-allowed;
   box-shadow: none;
 }
+/*
+ * Dark / Neon / Futuristic: Details Copied flash still mixed Apple #ffffff
+ * washes (.details-grid > .detail-value[role='option'].is-just-copied ·
+ * Copied badge) → white slab on opaque shells. Data Poster remapped in
+ * v0.1.2238. Design-review fuel (feature-cpu-metrics / Details) + standing
+ * P2 #14. Process-row Copied opaque on these shells already.
+ */
+body.theme-dark .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0a0a0a);
+}
+body.theme-neon .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-futuristic .details-grid > .detail-value[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .details-grid > .detail-value[role='option'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
