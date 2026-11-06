@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2419
+
+- Data Poster / Dark / Neon / Futuristic Agent Ops filter just-cleared (`.ops-filter-input.ops-filter-just-cleared`) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after overview hint v0.1.2418; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Agent Ops / Processes / Logs dark-ink leftovers still without theme remaps (e.g. `.processes-filter-count` / `.process-list-header-pin` / `.logs-filter-count`) if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2418
 
 - Data Poster / Dark / Neon / Futuristic Agent Ops overview hint (`.ops-hint`) Apple dark-ink-on-`#ffffff` (zero theme remaps) → opaque shells `#0b0b10` / `#0a0a0a` (CRT `#00ff00`) / `#08120c` / `#0b0b10`. Standing P2 #14 after editor/meta v0.1.2417; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Agent Ops / Processes / Logs dark-ink leftovers still without theme remaps (e.g. `.processes-filter-count` / `.process-list-header-pin` / `.logs-filter-count`) if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

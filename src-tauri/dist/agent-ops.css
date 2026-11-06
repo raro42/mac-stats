@@ -21579,3 +21579,32 @@ body.theme-neon .ops-hint {
 body.theme-futuristic .ops-hint {
   color: color-mix(in srgb, #ffffff 40%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Agent Ops filter just-cleared flash still
+ * mixed Apple #ffffff (`.ops-filter-input.ops-filter-just-cleared`) → white slab after
+ * Clear on opaque shells. Soft wash on shell (Clear button remapped earlier; this
+ * flash was missed). Design-review fuel (feature-agent-ops) + standing P2 #14 after
+ * overview hint v0.1.2418; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2419: Agent Ops filter just-cleared opaque on DP/Dark/Neon/Futuristic */
+body.theme-data-poster .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
+}
+body.theme-dark .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, #00cc66 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #00cc66 18%, #0a0a0a);
+  background: color-mix(in srgb, #00cc66 8%, #0a0a0a);
+}
+body.theme-neon .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, #6dff7b 55%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #6dff7b 18%, #08120c);
+  background: color-mix(in srgb, #6dff7b 8%, #08120c);
+}
+body.theme-futuristic .ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, #55c7ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
+  background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
+}
