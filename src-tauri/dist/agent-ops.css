@@ -20552,3 +20552,80 @@ body.theme-futuristic .logs-filter-clear.is-just-saved {
   border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
   color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
+
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup filter Clear still mixes Apple
+ * #ffffff washes (.disk-cleanup-filter-clear / .disk-cleanup-scope-filter-clear
+ * resting/hover/focus/is-just-saved) → white slab on opaque shells. Data Poster
+ * remapped earlier; Monitors/Processes/Logs Clear remapped in v0.1.2402.
+ * Design-review fuel (feature-disk-cleanup) + standing P2 #14; layout-daily
+ * Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .disk-cleanup-filter-clear,
+body.theme-dark .disk-cleanup-scope-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-clear:hover,
+body.theme-dark .disk-cleanup-scope-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 44%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-clear:focus-visible,
+body.theme-dark .disk-cleanup-scope-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-clear.is-just-saved,
+body.theme-dark .disk-cleanup-scope-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+
+body.theme-neon .disk-cleanup-filter-clear,
+body.theme-neon .disk-cleanup-scope-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  color: color-mix(in srgb, #ffffff 81%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-clear:hover,
+body.theme-neon .disk-cleanup-scope-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 44%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-clear:focus-visible,
+body.theme-neon .disk-cleanup-scope-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-clear.is-just-saved,
+body.theme-neon .disk-cleanup-scope-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+
+body.theme-futuristic .disk-cleanup-filter-clear,
+body.theme-futuristic .disk-cleanup-scope-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-clear:hover,
+body.theme-futuristic .disk-cleanup-scope-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-clear:focus-visible,
+body.theme-futuristic .disk-cleanup-scope-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-clear.is-just-saved,
+body.theme-futuristic .disk-cleanup-scope-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}

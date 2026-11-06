@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2403
+
+- Dark / Neon / Futuristic Disk Cleanup filter Clear (`.disk-cleanup-filter-clear` / `.disk-cleanup-scope-filter-clear` resting/hover/focus/is-just-saved) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Monitors/Processes/Logs Clear v0.1.2402; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: AI Chat `.chat-filter-clear` Dark/Neon/Futuristic if still Apple `#ffffff`, other Settings Save leftovers (`#ollama-settings-save` / `#ops-agent-save` / `#monitors-add-save`), or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2402
 
 - Dark / Neon / Futuristic Monitors · Processes · Logs filter Clear (`.monitors-filter-clear` / `.processes-filter-clear` / `.logs-filter-clear` resting/hover/focus/is-just-saved) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Settings Save flashes v0.1.2401; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: AI Chat / Disk Cleanup filter Clear if still Apple `#ffffff` on Dark/Neon/Futuristic, other Settings Save leftovers (`#ollama-settings-save` / `#ops-agent-save` / `#monitors-add-save`), or Mac capture of stale `feature-monitors.png` / `feature-processes.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
