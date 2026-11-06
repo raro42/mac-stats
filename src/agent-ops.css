@@ -21608,3 +21608,63 @@ body.theme-futuristic .ops-filter-input.ops-filter-just-cleared {
   box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 18%, #0b0b10);
   background: color-mix(in srgb, #55c7ff 8%, #0b0b10);
 }
+
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Processes + Debug Log filter counts and
+ * process-list header pin still mixed Apple dark-ink-on-#ffffff
+ * (`.processes-filter-count` / `.logs-filter-count` · `.process-list-header-pin`)
+ * with zero theme remaps → near-black type on opaque shells. Soft light type on
+ * shell (monitors-filter-count 79%/37% + process-list-header 48% pin parity).
+ * Design-review fuel (feature-processes / feature-agent-ops adjacent) + standing
+ * P2 #14 after filter just-cleared v0.1.2419; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2420: Processes/Logs filter-count + header-pin opaque on DP/Dark/Neon/Futuristic */
+body.theme-data-poster .processes-filter-count,
+body.theme-data-poster .logs-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-data-poster .processes-filter-count.is-zero,
+body.theme-data-poster .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
+body.theme-data-poster .process-list-header-pin {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
+
+body.theme-dark .processes-filter-count,
+body.theme-dark .logs-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0a0a0a);
+}
+body.theme-dark .processes-filter-count.is-zero,
+body.theme-dark .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0a0a0a);
+}
+body.theme-dark .process-list-header-pin {
+  color: color-mix(in srgb, #ffffff 48%, #0a0a0a);
+}
+
+body.theme-neon .processes-filter-count,
+body.theme-neon .logs-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #08120c);
+}
+body.theme-neon .processes-filter-count.is-zero,
+body.theme-neon .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #08120c);
+}
+body.theme-neon .process-list-header-pin {
+  color: color-mix(in srgb, #ffffff 48%, #08120c);
+}
+
+body.theme-futuristic .processes-filter-count,
+body.theme-futuristic .logs-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-futuristic .processes-filter-count.is-zero,
+body.theme-futuristic .logs-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
+body.theme-futuristic .process-list-header-pin {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
