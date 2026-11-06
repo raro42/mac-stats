@@ -19123,3 +19123,185 @@ body.theme-futuristic .details-collapsed-glance.is-ok {
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup attention glances still
+ * mix Apple `#ffffff` washes (`.disk-cleanup-attention-glance` resting/hover/
+ * focus/has-big/has-reclaim/is-due; `.disk-cleanup-filter-attention-glance`
+ * resting/hover/focus/is-filter/is-reclaim-filter/is-big-filter/is-clean-filter)
+ * → white slab on opaque shells. Catch up to Disk Cleanup collapsed glances
+ * (v0.1.2390) + Monitors/Processes attention remaps. Design-review fuel
+ * (feature-disk-cleanup) + standing P2 #14 after collapsed v0.1.2390;
+ * layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .disk-cleanup-attention-glance,
+body.theme-data-poster .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .disk-cleanup-attention-glance:hover,
+body.theme-data-poster .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-attention-glance:focus-visible,
+body.theme-data-poster .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 42%, var(--text, currentColor));
+}
+body.theme-data-poster .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-data-poster .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 6%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 45%, var(--text, currentColor));
+}
+body.theme-data-poster .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-data-poster .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 48%, var(--text, currentColor));
+}
+body.theme-data-poster .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+  background: color-mix(in srgb, #30d158 7%, #0b0b10);
+  color: color-mix(in srgb, #30d158 45%, var(--text, currentColor));
+}
+body.theme-data-poster .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+  color: color-mix(in srgb, #34c759 50%, var(--text, currentColor));
+}
+
+body.theme-dark .disk-cleanup-attention-glance,
+body.theme-dark .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .disk-cleanup-attention-glance:hover,
+body.theme-dark .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-attention-glance:focus-visible,
+body.theme-dark .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 24%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5.5%, #0a0a0a);
+  color: color-mix(in srgb, var(--accent, #00cc66) 42%, var(--text, currentColor));
+}
+body.theme-dark .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-dark .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 6%, #0a0a0a);
+  color: color-mix(in srgb, #ff9f0a 45%, var(--text, currentColor));
+}
+body.theme-dark .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-dark .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff9f0a 48%, var(--text, currentColor));
+}
+body.theme-dark .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #0a0a0a);
+  background: color-mix(in srgb, #30d158 7%, #0a0a0a);
+  color: color-mix(in srgb, #30d158 45%, var(--text, currentColor));
+}
+body.theme-dark .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+  color: color-mix(in srgb, #34c759 50%, var(--text, currentColor));
+}
+
+body.theme-neon .disk-cleanup-attention-glance,
+body.theme-neon .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .disk-cleanup-attention-glance:hover,
+body.theme-neon .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .disk-cleanup-attention-glance:focus-visible,
+body.theme-neon .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 24%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5.5%, #08120c);
+  color: color-mix(in srgb, var(--accent, #6dff7b) 42%, var(--text, currentColor));
+}
+body.theme-neon .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-neon .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 6%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 45%, var(--text, currentColor));
+}
+body.theme-neon .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-neon .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 7%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 48%, var(--text, currentColor));
+}
+body.theme-neon .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #08120c);
+  background: color-mix(in srgb, #30d158 7%, #08120c);
+  color: color-mix(in srgb, #30d158 45%, var(--text, currentColor));
+}
+body.theme-neon .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+  color: color-mix(in srgb, #34c759 50%, var(--text, currentColor));
+}
+
+body.theme-futuristic .disk-cleanup-attention-glance,
+body.theme-futuristic .disk-cleanup-filter-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .disk-cleanup-attention-glance:hover,
+body.theme-futuristic .disk-cleanup-filter-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-attention-glance:focus-visible,
+body.theme-futuristic .disk-cleanup-filter-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 42%, var(--text, currentColor));
+}
+body.theme-futuristic .disk-cleanup-filter-attention-glance.is-reclaim-filter,
+body.theme-futuristic .disk-cleanup-attention-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 6%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 45%, var(--text, currentColor));
+}
+body.theme-futuristic .disk-cleanup-filter-attention-glance.is-big-filter,
+body.theme-futuristic .disk-cleanup-attention-glance.has-big {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 48%, var(--text, currentColor));
+}
+body.theme-futuristic .disk-cleanup-filter-attention-glance.is-clean-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #0b0b10);
+  background: color-mix(in srgb, #30d158 7%, #0b0b10);
+  color: color-mix(in srgb, #30d158 45%, var(--text, currentColor));
+}
+body.theme-futuristic .disk-cleanup-attention-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+  color: color-mix(in srgb, #34c759 50%, var(--text, currentColor));
+}
