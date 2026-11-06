@@ -18472,3 +18472,39 @@ body.theme-futuristic .force-quit-advanced > summary::before {
   color: color-mix(in srgb, #ffffff 46%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup soft tip + meta label + process list
+ * header still mixed Apple dark-ink-on-`#ffffff` (`.disk-cleanup-soft-hint` ·
+ * `.disk-cleanup-meta-label` · `.process-list-header`) — Neon/Futuristic lacked
+ * any opaque remap; Dark early remap mixed on `#0b0b10` not CRT `#0a0a0a`. Data
+ * Poster remapped earlier. Design-review fuel (feature-disk-cleanup /
+ * feature-processes) + standing P2 #14; layout-daily Data Poster adjacent
+ * (dark-shell Disk Cleanup tip / process header parity).
+ */
+body.theme-dark .disk-cleanup-soft-hint,
+body.theme-dark .disk-cleanup-meta-label,
+body.theme-dark .process-list-header {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .process-list-header {
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-soft-hint,
+body.theme-neon .disk-cleanup-meta-label,
+body.theme-neon .process-list-header {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .process-list-header {
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-soft-hint,
+body.theme-futuristic .disk-cleanup-meta-label,
+body.theme-futuristic .process-list-header {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .process-list-header {
+  border-bottom-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+}
