@@ -21183,3 +21183,99 @@ body.theme-futuristic .disk-cleanup-soft-delete-label.is-just-saved {
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: AI Chat Clear (#chat-clear-btn)
+ * resting/hover/focus/disabled still mix Apple #ffffff on Dark/Neon/Futuristic
+ * (Data Poster resting remapped earlier). Cleared flash inherits shared
+ * button.is-just-saved Apple #ffffff → white slab on opaque shells.
+ * Monitors Check now / Remove (.monitor-detail-check / .monitor-detail-remove /
+ * .monitor-remove-btn) Saved flashes same shared button.is-just-saved slab.
+ * Soft 18%/40% green tint on shell (toolbar flash parity). Design-review fuel
+ * (feature-ai-chat / feature-monitors) + standing P2 #14 after soft-delete
+ * v0.1.2413; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+}
+body.theme-dark #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 28%, #0a0a0a);
+}
+body.theme-dark #chat-clear-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00ff00) 55%, #0a0a0a);
+}
+body.theme-dark #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #ffffff 40%, #0a0a0a);
+}
+
+body.theme-neon #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+}
+body.theme-neon #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 28%, #08120c);
+}
+body.theme-neon #chat-clear-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #39ff14) 55%, #08120c);
+}
+body.theme-neon #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #ffffff 40%, #08120c);
+}
+
+body.theme-futuristic #chat-clear-btn {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+}
+body.theme-futuristic #chat-clear-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 28%, #0b0b10);
+}
+body.theme-futuristic #chat-clear-btn:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+body.theme-futuristic #chat-clear-btn:disabled {
+  color: color-mix(in srgb, #ffffff 40%, #0b0b10);
+}
+
+body.theme-data-poster #chat-clear-btn.is-just-saved,
+body.theme-data-poster .monitor-detail-check.is-just-saved,
+body.theme-data-poster .monitor-detail-remove.is-just-saved,
+body.theme-data-poster .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+
+body.theme-dark #chat-clear-btn.is-just-saved,
+body.theme-dark .monitor-detail-check.is-just-saved,
+body.theme-dark .monitor-detail-remove.is-just-saved,
+body.theme-dark .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+
+body.theme-neon #chat-clear-btn.is-just-saved,
+body.theme-neon .monitor-detail-check.is-just-saved,
+body.theme-neon .monitor-detail-remove.is-just-saved,
+body.theme-neon .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+
+body.theme-futuristic #chat-clear-btn.is-just-saved,
+body.theme-futuristic .monitor-detail-check.is-just-saved,
+body.theme-futuristic .monitor-detail-remove.is-just-saved,
+body.theme-futuristic .monitor-remove-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
