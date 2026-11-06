@@ -18815,3 +18815,190 @@ body.theme-futuristic .agent-ops-collapsed-glance.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Monitors + AI Chat (Ollama) collapsed glances
+ * still mixed on shared early `#0b0b10` (Dark) or Apple `#ffffff` (Neon /
+ * Futuristic base) while Agent Ops empty glance already mixes on CRT
+ * `#0a0a0a` / Neon `#08120c` / Futuristic `#0b0b10`. Data Poster remapped
+ * earlier. Design-review fuel (feature-monitors / feature-ai-chat) +
+ * standing P2 #14; layout-daily Data Poster adjacent (dark-shell parity).
+ */
+body.theme-dark .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0a0a0a);
+}
+body.theme-dark .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+}
+body.theme-dark .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ollama-collapsed-glance,
+body.theme-dark .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .ollama-collapsed-glance:hover,
+body.theme-dark .chat-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .ollama-collapsed-glance:focus-visible,
+body.theme-dark .chat-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0a0a0a);
+}
+body.theme-dark .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+}
+body.theme-dark .ollama-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #08120c);
+}
+body.theme-neon .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+}
+body.theme-neon .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #08120c);
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+}
+body.theme-neon .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #08120c);
+  background: color-mix(in srgb, #ff9500 12%, #08120c);
+}
+body.theme-neon .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ollama-collapsed-glance,
+body.theme-neon .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .ollama-collapsed-glance:hover,
+body.theme-neon .chat-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .ollama-collapsed-glance:focus-visible,
+body.theme-neon .chat-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #08120c);
+}
+body.theme-neon .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #08120c);
+  background: color-mix(in srgb, #ff9500 12%, #08120c);
+}
+body.theme-neon .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 32%, #08120c);
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+}
+body.theme-neon .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+}
+body.theme-neon .ollama-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .monitors-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .monitors-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .monitors-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .monitors-collapsed-glance.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-collapsed-glance.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-collapsed-glance.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ollama-collapsed-glance,
+body.theme-futuristic .chat-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .ollama-collapsed-glance:hover,
+body.theme-futuristic .chat-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .ollama-collapsed-glance:focus-visible,
+body.theme-futuristic .chat-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .ollama-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
+body.theme-futuristic .ollama-collapsed-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-futuristic .ollama-collapsed-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-futuristic .ollama-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
