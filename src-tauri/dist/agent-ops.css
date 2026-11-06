@@ -18741,3 +18741,77 @@ body.theme-futuristic .ops-insight-sub {
   color: color-mix(in srgb, #ffffff 46%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Agent Ops Insights lines + collapsed empty glance
+ * still mixed on shared early `#0b0b10` (`.ops-insight-line` resting /
+ * clickable / hover / selected / `em`; `.agent-ops-collapsed-glance.is-empty`)
+ * while Insights subheads / Updated ago already mix on CRT `#0a0a0a` /
+ * Neon `#08120c` / Futuristic `#0b0b10`. Data Poster remapped earlier.
+ * Design-review fuel (feature-agent-ops) + standing P2 #14; layout-daily
+ * Data Poster adjacent (dark-shell Insights parity).
+ */
+body.theme-dark .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #ffffff 74%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #ffffff 83%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-insight-line.is-clickable:hover,
+body.theme-dark .ops-insight-line.is-clickable.is-selected {
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #ffffff 74%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #ffffff 83%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-insight-line.is-clickable:hover,
+body.theme-neon .ops-insight-line.is-clickable.is-selected {
+  color: color-mix(in srgb, #ffffff 92%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .ops-insight-line:not(.is-clickable) {
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-insight-line.is-clickable {
+  color: color-mix(in srgb, #ffffff 83%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-insight-line.is-clickable:hover,
+body.theme-futuristic .ops-insight-line.is-clickable.is-selected {
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-insight-line em {
+  color: color-mix(in srgb, currentColor 70%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .agent-ops-collapsed-glance.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
