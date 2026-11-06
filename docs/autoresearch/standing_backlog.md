@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2380
+
+- Dark / Neon / Futuristic Force Quit toolbar kb-hint (`.force-quit-toolbar-kb-hint`) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Force Quit parity; Neon/Futuristic lacked remap). Standing P2 #14 after Process Details kb-hints v0.1.2379; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.force-quit-hint` / `.force-quit-advanced > summary` if theme shells lack opaque remaps (Data Poster / Dark early remap on `#0b0b10`), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2379
 
 - Dark / Neon / Futuristic Process Details kb-hints (`.process-detail-hero-toolbar-kb-hint` / `.process-details-header-kb-hint`) Apple dark-ink-on-`#ffffff` (and early `#0b0b10` mixes) → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details parity). Standing P2 #14 after Process Details hero v0.1.2378; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.force-quit-toolbar-kb-hint` if theme shells lack opaque remaps (Data Poster has remap; Neon/Futuristic missing), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

@@ -18416,3 +18416,23 @@ body.theme-futuristic .process-details-header-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Force Quit toolbar keyboard hint still mixed Apple
+ * dark-ink-on-`#ffffff` (`.force-quit-toolbar-kb-hint`) — Neon/Futuristic lacked
+ * any opaque remap; Dark early remap mixed on `#0b0b10` not CRT `#0a0a0a`. Data
+ * Poster remapped earlier. Design-review fuel (feature-processes) + standing
+ * P2 #14; layout-daily Data Poster adjacent (dark-shell Force Quit kb-hint
+ * parity).
+ */
+body.theme-dark .force-quit-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .force-quit-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .force-quit-toolbar-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
