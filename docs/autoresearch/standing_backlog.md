@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2377
+
+- Dark / Neon / Futuristic Process Details Saved flash (`.process-detail-name` / `.process-detail-pid`.is-just-saved) Apple `#ffffff` mix → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details parity). Standing P2 #14 after Process Details panel v0.1.2376; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.process-detail-hero` border/background if theme shells lack opaque remaps (Data Poster has remap), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2376
 
 - Dark / Neon / Futuristic Process Details panel (`.process-detail-section` border/background · `.process-detail-row` border-bottom) Apple `#ffffff` mix → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Process Details parity). Standing P2 #14 after Force Quit section border v0.1.2375; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.process-detail-name` / `.process-detail-pid` Saved flash if theme shells lack opaque remaps (Data Poster has remap), other Process Details leftovers if any, or Mac capture of stale `feature-processes.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

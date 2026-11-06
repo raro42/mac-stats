@@ -18350,3 +18350,25 @@ body.theme-futuristic .process-detail-section {
 body.theme-futuristic .process-detail-section .process-detail-row {
   border-bottom-color: color-mix(in srgb, currentColor 8%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Process Details name/pid Saved flash still mixed
+ * Apple `#ffffff` (`.process-detail-name` / `.process-detail-pid`.is-just-saved)
+ * → white slab on opaque shells. Data Poster remapped earlier (Process Details
+ * block). Design-review fuel (feature-processes) + standing P2 #14; layout-daily
+ * Data Poster adjacent (dark-shell Saved flash parity).
+ */
+body.theme-dark .process-detail-name.is-just-saved,
+body.theme-dark .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-neon .process-detail-name.is-just-saved,
+body.theme-neon .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  box-shadow: none;
+}
+body.theme-futuristic .process-detail-name.is-just-saved,
+body.theme-futuristic .process-detail-pid.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
