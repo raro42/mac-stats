@@ -18602,3 +18602,50 @@ body.theme-futuristic .perplexity-result-meta {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Agent Ops health value · Refresh row kb-hint ·
+ * AI Chat response-time still mixed Apple dark-ink-on-`#ffffff` (or early
+ * `#0b0b10` for Dark response-time / shared health-value) —
+ * (`.ops-health-value` · `.ops-refresh-row-kb-hint` · `.response-time`) —
+ * Neon/Futuristic lacked opaque remaps for refresh kb-hint / response-time;
+ * Dark early remap mixed on `#0b0b10` not CRT `#0a0a0a`. Data Poster remapped
+ * earlier (value 87% · kb-hint 63% · response-time 66%). Design-review fuel
+ * (feature-agent-ops / feature-ai-chat) + standing P2 #14; layout-daily Data
+ * Poster adjacent (dark-shell health / latency label parity).
+ */
+body.theme-dark .ops-health-value {
+  color: color-mix(in srgb, #ffffff 87%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .response-time {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .ops-health-value {
+  color: color-mix(in srgb, #ffffff 87%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .response-time {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .ops-health-value {
+  color: color-mix(in srgb, #ffffff 87%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-refresh-row-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .response-time {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}

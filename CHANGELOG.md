@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2386] - 2026-11-06
+
+### Changed
+- **Dark / Neon / Futuristic Agent Ops health value · Refresh kb-hint · AI Chat response-time opaque:** `.ops-health-value` / `.ops-refresh-row-kb-hint` / `.response-time` drop Apple dark-ink-on-`#ffffff` (Neon/Futuristic had no opaque remap for refresh kb-hint / response-time; Dark early remap was on `#0b0b10`). Opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (value 87% · kb-hint 63% · response-time 66%). Standing P2 #14 after chat-exec/ops-health/perplexity meta v0.1.2385; design-review `feature-agent-ops` / `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace — Mac recapture deferred, Screen Recording TCC).
+
 ## [0.1.2385] - 2026-11-06
 
 ### Changed
