@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2408
+
+- Data Poster / Dark / Neon / Futuristic Monitors URL Saved flashes (`.monitor-url` / `button.monitor-detail-url` is-just-saved) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after soft Save leftovers v0.1.2407; design-review `feature-monitors` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Disk Cleanup path Saved flashes (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path`) or Dark/Neon/Futuristic `.setting-toggle .toggle-label.is-just-saved` if still Apple `#ffffff`, or Mac capture of stale `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2407
 
 - Data Poster / Dark / Neon / Futuristic soft Save leftovers (`#settings-help-btn` / `#ollama-settings-reset` / `#refresh-btn` / `#github-link` / `.version-clickable` · `.app-version` · `.theme-version` · `.arch-version` is-just-saved) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Load-into-Chat v0.1.2406; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other soft Save leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

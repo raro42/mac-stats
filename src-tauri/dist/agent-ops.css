@@ -20869,3 +20869,39 @@ body.theme-futuristic .arch-version.is-just-saved {
   color: color-mix(in srgb, #34c759 75%, var(--text, #ffffff)) !important;
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Monitors URL Saved flashes still mix
+ * Apple #ffffff (.monitor-url / button.monitor-detail-url is-just-saved) →
+ * white slab on opaque shells. Soft 12% green tint on shell (parity with Apple
+ * base). Design-review fuel (feature-monitors) + standing P2 #14 after soft
+ * Save leftovers v0.1.2407; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-data-poster .monitor-url.is-just-saved,
+body.theme-data-poster button.monitor-detail-url.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-dark .monitor-url.is-just-saved,
+body.theme-dark button.monitor-detail-url.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-neon .monitor-url.is-just-saved,
+body.theme-neon button.monitor-detail-url.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-futuristic .monitor-url.is-just-saved,
+body.theme-futuristic button.monitor-detail-url.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
