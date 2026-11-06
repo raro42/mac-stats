@@ -21087,3 +21087,99 @@ body.theme-futuristic #logs-open-btn.is-just-saved {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup soft-delete row still
+ * mixes Apple #ffffff (.disk-cleanup-soft-delete resting/hover/focus-within) →
+ * white slab on opaque shells. Soft-delete Saved label stayed Apple #1a7f37
+ * (dark green, low contrast on CRT/Neon). Design-review fuel (feature-disk-cleanup)
+ * + standing P2 #14 after toolbar v0.1.2412; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-data-poster .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-data-poster .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-dark .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3%, #0a0a0a);
+  box-shadow: none;
+}
+
+body.theme-dark .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+
+body.theme-dark .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #0a0a0a);
+}
+
+body.theme-dark .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  box-shadow: none;
+}
+
+body.theme-neon .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3%, #08120c);
+  box-shadow: none;
+}
+
+body.theme-neon .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+
+body.theme-neon .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #08120c);
+}
+
+body.theme-neon .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  box-shadow: none;
+}
+
+body.theme-futuristic .disk-cleanup-soft-delete {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+  box-shadow: none;
+}
+
+body.theme-futuristic .disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+
+body.theme-futuristic .disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, #0b0b10);
+}
+
+body.theme-futuristic .disk-cleanup-soft-delete-label.is-just-saved {
+  color: #34c759;
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  box-shadow: none;
+}
