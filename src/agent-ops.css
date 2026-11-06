@@ -20941,3 +20941,29 @@ body.theme-futuristic .disk-cleanup-scope-path.is-just-saved {
   color: #34c759;
   box-shadow: none;
 }
+
+/*
+ * Dark / Neon / Futuristic: Settings product-toggle Saved flash still mixes
+ * Apple #ffffff (.setting-toggle .toggle-label.is-just-saved) → white slab on
+ * opaque Settings shells. Soft 16% green tint on shell (Data Poster remapped
+ * earlier). Design-review fuel (Settings / feature-ai-chat adjacent) + standing
+ * P2 #14 after Disk Cleanup path v0.1.2409; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .setting-toggle .toggle-label.is-just-saved {
+  color: color-mix(in srgb, #34c759 72%, #ffffff);
+  background: color-mix(in srgb, #34c759 16%, #0a0a0a);
+  box-shadow: none;
+}
+
+body.theme-neon .setting-toggle .toggle-label.is-just-saved {
+  color: color-mix(in srgb, #34c759 72%, #ffffff);
+  background: color-mix(in srgb, #34c759 16%, #08120c);
+  box-shadow: none;
+}
+
+body.theme-futuristic .setting-toggle .toggle-label.is-just-saved {
+  color: color-mix(in srgb, #34c759 72%, #ffffff);
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  box-shadow: none;
+}

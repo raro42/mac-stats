@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2410
+
+- Dark / Neon / Futuristic Settings product-toggle Saved flashes (`.setting-toggle .toggle-label.is-just-saved`) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Disk Cleanup path v0.1.2409; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: `.logs-path-hint` / `.chat-empty-chip` Saved flashes if still Apple `#ffffff`, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2409
 
 - Data Poster / Dark / Neon / Futuristic Disk Cleanup path Saved flashes (`.disk-cleanup-item-path` / `.disk-cleanup-scope-path` is-just-saved) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors URL v0.1.2408; design-review `feature-disk-cleanup` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.setting-toggle .toggle-label.is-just-saved` if still Apple `#ffffff`, `.logs-path-hint` / `.chat-empty-chip` Saved flashes, or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
