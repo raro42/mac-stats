@@ -21279,3 +21279,63 @@ body.theme-futuristic .monitor-remove-btn.is-just-saved {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
+
+/*
+ * Dark / Neon / Futuristic: Agent Ops secondary buttons still mix Apple #ffffff
+ * (.btn-secondary.ops-refresh / .agent-ops-section .btn-secondary resting /
+ * hover / focus-visible) → white slab on opaque shells. Soft currentColor tint
+ * on shell (Data Poster remapped earlier). Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after Clear/check/remove v0.1.2414; layout-daily Data Poster
+ * adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2415: Agent Ops btn-secondary opaque on Dark/Neon/Futuristic */
+body.theme-dark .btn-secondary.ops-refresh,
+body.theme-dark .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+}
+
+body.theme-dark .btn-secondary.ops-refresh:hover,
+body.theme-dark .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+
+body.theme-dark .btn-secondary.ops-refresh:focus-visible,
+body.theme-dark .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #0a0a0a);
+}
+
+body.theme-neon .btn-secondary.ops-refresh,
+body.theme-neon .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+}
+
+body.theme-neon .btn-secondary.ops-refresh:hover,
+body.theme-neon .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+
+body.theme-neon .btn-secondary.ops-refresh:focus-visible,
+body.theme-neon .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #08120c);
+}
+
+body.theme-futuristic .btn-secondary.ops-refresh,
+body.theme-futuristic .agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+}
+
+body.theme-futuristic .btn-secondary.ops-refresh:hover,
+body.theme-futuristic .agent-ops-section .btn-secondary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+
+body.theme-futuristic .btn-secondary.ops-refresh:focus-visible,
+body.theme-futuristic .agent-ops-section .btn-secondary:focus-visible {
+  outline-color: color-mix(in srgb, currentColor 35%, #0b0b10);
+}

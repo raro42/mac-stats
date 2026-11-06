@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2415
+
+- Dark / Neon / Futuristic Agent Ops secondary buttons (`.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` resting/hover/focus-visible) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Clear/check/remove v0.1.2414; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Agent Ops soft leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2414
 
 - Data Poster / Dark / Neon / Futuristic AI Chat Clear + Monitors check/remove Saved flashes (`#chat-clear-btn` Cleared + Dark/Neon/Futuristic resting/hover/focus/disabled · `.monitor-detail-check` / `.monitor-detail-remove` / `.monitor-remove-btn` is-just-saved) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after soft-delete v0.1.2413; design-review `feature-ai-chat` / `feature-monitors` adjacent (polish-without-capture grace). Next: other soft Saved leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-ai-chat.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
