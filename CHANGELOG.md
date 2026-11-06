@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **README** — Notes that day-to-day development and testing often runs on Linux (agents / harness / scripts), while the shipped app stays macOS Apple Silicon only (#19).
 - **CI is batch-gated** — GitHub Actions `CI` no longer runs on every `main` push or PR. Compile locally day-to-day. Remote macOS CI runs on purpose via `python3 scripts/maybe_run_ci.py` when ≥10 patches landed since the last green CI (or a release is due; max once/day). Overnight ~23:00 flush calls that script before a possible release cut. Manual: `gh workflow run ci.yml --ref main`.
 
+## [0.1.2390] - 2026-11-06
+
+### Changed
+- **Dark / Neon / Futuristic Disk Cleanup · Details collapsed glances opaque:** `.disk-cleanup-collapsed-glance` (resting / hover / focus / has-reclaim / is-due / is-clean / has-scopes-off) and `.details-collapsed-glance` (resting / hover / focus / is-hot / is-ok) drop Apple `#ffffff` washes while Monitors / AI Chat collapsed glances already use CRT `#0a0a0a` / Neon `#08120c` / Futuristic `#0b0b10`. Opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster v0.1.2265 parity). Standing P2 #14 after Monitors/AI Chat collapsed v0.1.2389; design-review `feature-disk-cleanup` / `feature-cpu-metrics` / layout-daily Data Poster adjacent (polish-without-capture grace — Mac recapture deferred, Screen Recording TCC).
+
 ## [0.1.2389] - 2026-11-06
 
 ### Changed

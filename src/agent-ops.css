@@ -19002,3 +19002,124 @@ body.theme-futuristic .ollama-collapsed-glance.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup + Details collapsed glances still
+ * mix Apple `#ffffff` washes (`.disk-cleanup-collapsed-glance` resting/hover/
+ * focus/has-reclaim/is-due/is-clean/has-scopes-off; `.details-collapsed-glance`
+ * resting/hover/focus/is-hot/is-ok) while Monitors / AI Chat collapsed glances
+ * already mix on CRT `#0a0a0a` / Neon `#08120c` / Futuristic `#0b0b10`. Data
+ * Poster remapped earlier (v0.1.2265). Design-review fuel (feature-disk-cleanup
+ * / feature-cpu-metrics Details) + standing P2 #14 after Monitors/AI Chat
+ * collapsed v0.1.2389; layout-daily Data Poster adjacent.
+ */
+body.theme-dark .disk-cleanup-collapsed-glance,
+body.theme-dark .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .disk-cleanup-collapsed-glance:hover,
+body.theme-dark .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-collapsed-glance:focus-visible,
+body.theme-dark .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-collapsed-glance.is-due,
+body.theme-dark .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #0a0a0a);
+  background: color-mix(in srgb, #0a84ff 6%, #0a0a0a);
+}
+body.theme-dark .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 6%, #0a0a0a);
+}
+body.theme-dark .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+
+body.theme-neon .disk-cleanup-collapsed-glance,
+body.theme-neon .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .disk-cleanup-collapsed-glance:hover,
+body.theme-neon .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .disk-cleanup-collapsed-glance:focus-visible,
+body.theme-neon .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #08120c);
+  background: color-mix(in srgb, #ff9500 7%, #08120c);
+}
+body.theme-neon .disk-cleanup-collapsed-glance.is-due,
+body.theme-neon .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+body.theme-neon .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #08120c);
+  background: color-mix(in srgb, #0a84ff 6%, #08120c);
+}
+body.theme-neon .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #08120c);
+  background: color-mix(in srgb, #ff9500 6%, #08120c);
+}
+body.theme-neon .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+
+body.theme-futuristic .disk-cleanup-collapsed-glance,
+body.theme-futuristic .details-collapsed-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .disk-cleanup-collapsed-glance:hover,
+body.theme-futuristic .details-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-collapsed-glance:focus-visible,
+body.theme-futuristic .details-collapsed-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-collapsed-glance.is-due,
+body.theme-futuristic .disk-cleanup-collapsed-glance.is-clean {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, #0b0b10);
+  background: color-mix(in srgb, #0a84ff 6%, #0b0b10);
+}
+body.theme-futuristic .details-collapsed-glance.is-hot {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+body.theme-futuristic .details-collapsed-glance.is-ok {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
