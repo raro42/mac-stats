@@ -18535,3 +18535,42 @@ body.theme-futuristic .disk-cleanup-scope-kind {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup summary / paths / item stat still mixed
+ * Apple dark-ink-on-`#ffffff` (`.disk-cleanup-summary` · `.disk-cleanup-item-path` ·
+ * `.disk-cleanup-scope-path` · `.disk-cleanup-item-stat`) — Neon/Futuristic lacked
+ * any opaque remap; Dark early remap mixed on `#0b0b10` not CRT `#0a0a0a`. Data
+ * Poster remapped earlier (paths 66% · item-stat 78%). Design-review fuel
+ * (feature-disk-cleanup) + standing P2 #14; layout-daily Data Poster adjacent
+ * (dark-shell Disk Cleanup path / summary parity).
+ */
+body.theme-dark .disk-cleanup-summary,
+body.theme-dark .disk-cleanup-item-path,
+body.theme-dark .disk-cleanup-scope-path {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .disk-cleanup-item-stat {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .disk-cleanup-summary,
+body.theme-neon .disk-cleanup-item-path,
+body.theme-neon .disk-cleanup-scope-path {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .disk-cleanup-item-stat {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .disk-cleanup-summary,
+body.theme-futuristic .disk-cleanup-item-path,
+body.theme-futuristic .disk-cleanup-scope-path {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .disk-cleanup-item-stat {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
