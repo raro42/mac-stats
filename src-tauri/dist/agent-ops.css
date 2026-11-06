@@ -18436,3 +18436,39 @@ body.theme-futuristic .force-quit-toolbar-kb-hint {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: Force Quit hint + advanced summary still mixed Apple
+ * dark-ink-on-`#ffffff` (`.force-quit-hint` · `.force-quit-advanced > summary`) —
+ * Neon/Futuristic lacked any opaque remap; Dark early remap mixed on `#0b0b10`
+ * not CRT `#0a0a0a`. Chevron `::before` shared early remap also stuck on
+ * `#0b0b10` for Dark/Neon. Data Poster remapped earlier. Design-review fuel
+ * (feature-processes) + standing P2 #14; layout-daily Data Poster adjacent
+ * (dark-shell Force Quit tip parity).
+ */
+body.theme-dark .force-quit-hint,
+body.theme-dark .force-quit-advanced > summary {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #ffffff 46%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .force-quit-hint,
+body.theme-neon .force-quit-advanced > summary {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #ffffff 46%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .force-quit-hint,
+body.theme-futuristic .force-quit-advanced > summary {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .force-quit-advanced > summary::before {
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
+  opacity: 1;
+}
