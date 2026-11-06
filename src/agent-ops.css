@@ -18322,3 +18322,31 @@ body.theme-neon .force-quit-section {
 body.theme-futuristic .force-quit-section {
   border-top-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Process Details panel + row hairlines still mixed
+ * Apple `#ffffff` (`.process-detail-section` border/background · row border-bottom)
+ * → white slab on opaque shells. Data Poster remapped earlier (Process Details
+ * block). Design-review fuel (feature-processes) + standing P2 #14; layout-daily
+ * Data Poster adjacent (dark-shell Process Details parity).
+ */
+body.theme-dark .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+}
+body.theme-dark .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-neon .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+}
+body.theme-neon .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #08120c);
+}
+body.theme-futuristic .process-detail-section {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+}
+body.theme-futuristic .process-detail-section .process-detail-row {
+  border-bottom-color: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
