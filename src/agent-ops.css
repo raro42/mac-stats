@@ -19493,3 +19493,161 @@ body.theme-futuristic .monitors-summary.is-empty {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log + Perplexity attention
+ * glances still mix Apple `#ffffff` washes (`.logs-attention-glance`
+ * resting/hover/focus/has-errors/has-warns-only · `.perplexity-attention-glance`
+ * resting/hover/focus/has-error/has-top/is-filter · `.perplexity-key-attention-glance`
+ * resting/hover/focus/is-not-set) → white slab on opaque shells. Catch up to
+ * Monitors summary / Disk Cleanup attention remaps. Design-review fuel
+ * (feature-monitors adjacent / Debug Log / Perplexity) + standing P2 #14 after
+ * Monitors summary v0.1.2393; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .logs-attention-glance,
+body.theme-data-poster .perplexity-attention-glance,
+body.theme-data-poster .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .logs-attention-glance:hover,
+body.theme-data-poster .perplexity-attention-glance:hover,
+body.theme-data-poster .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .logs-attention-glance:focus-visible,
+body.theme-data-poster .perplexity-attention-glance:focus-visible,
+body.theme-data-poster .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .logs-attention-glance.has-errors,
+body.theme-data-poster .perplexity-attention-glance.has-error,
+body.theme-data-poster .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-data-poster .logs-attention-glance.has-warns-only,
+body.theme-data-poster .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9500 42%, var(--text, currentColor));
+}
+body.theme-data-poster .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 42%, var(--text, currentColor));
+}
+
+body.theme-dark .logs-attention-glance,
+body.theme-dark .perplexity-attention-glance,
+body.theme-dark .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .logs-attention-glance:hover,
+body.theme-dark .perplexity-attention-glance:hover,
+body.theme-dark .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .logs-attention-glance:focus-visible,
+body.theme-dark .perplexity-attention-glance:focus-visible,
+body.theme-dark .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .logs-attention-glance.has-errors,
+body.theme-dark .perplexity-attention-glance.has-error,
+body.theme-dark .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-dark .logs-attention-glance.has-warns-only,
+body.theme-dark .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff9500 42%, var(--text, currentColor));
+}
+body.theme-dark .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 24%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5.5%, #0a0a0a);
+  color: color-mix(in srgb, var(--accent, #00cc66) 42%, var(--text, currentColor));
+}
+
+body.theme-neon .logs-attention-glance,
+body.theme-neon .perplexity-attention-glance,
+body.theme-neon .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .logs-attention-glance:hover,
+body.theme-neon .perplexity-attention-glance:hover,
+body.theme-neon .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .logs-attention-glance:focus-visible,
+body.theme-neon .perplexity-attention-glance:focus-visible,
+body.theme-neon .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .logs-attention-glance.has-errors,
+body.theme-neon .perplexity-attention-glance.has-error,
+body.theme-neon .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-neon .logs-attention-glance.has-warns-only,
+body.theme-neon .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #08120c);
+  background: color-mix(in srgb, #ff9500 7%, #08120c);
+  color: color-mix(in srgb, #ff9500 42%, var(--text, currentColor));
+}
+body.theme-neon .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 24%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5.5%, #08120c);
+  color: color-mix(in srgb, var(--accent, #6dff7b) 42%, var(--text, currentColor));
+}
+
+body.theme-futuristic .logs-attention-glance,
+body.theme-futuristic .perplexity-attention-glance,
+body.theme-futuristic .perplexity-key-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .logs-attention-glance:hover,
+body.theme-futuristic .perplexity-attention-glance:hover,
+body.theme-futuristic .perplexity-key-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .logs-attention-glance:focus-visible,
+body.theme-futuristic .perplexity-attention-glance:focus-visible,
+body.theme-futuristic .perplexity-key-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .logs-attention-glance.has-errors,
+body.theme-futuristic .perplexity-attention-glance.has-error,
+body.theme-futuristic .perplexity-key-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-futuristic .logs-attention-glance.has-warns-only,
+body.theme-futuristic .perplexity-attention-glance.has-top {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9500 42%, var(--text, currentColor));
+}
+body.theme-futuristic .perplexity-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
+  color: color-mix(in srgb, var(--accent, #55c7ff) 42%, var(--text, currentColor));
+}
