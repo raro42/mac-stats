@@ -18306,3 +18306,19 @@ body.theme-futuristic .force-quit-btn.is-confirming {
   box-shadow: 0 0 0 4px color-mix(in srgb, #ff3b30 22%, #0b0b10);
   animation: none;
 }
+/*
+ * Dark / Neon / Futuristic: Force Quit section hairline still mixed Apple
+ * `#ffffff` (`.force-quit-section` border-top) → white dashed slab on opaque
+ * shells. Data Poster remapped earlier (Process Details / Force Quit block).
+ * Design-review fuel (feature-processes / Force Quit) + standing P2 #14;
+ * layout-daily Data Poster adjacent (dark-shell section border parity).
+ */
+body.theme-dark .force-quit-section {
+  border-top-color: color-mix(in srgb, #ff3b30 28%, #0a0a0a);
+}
+body.theme-neon .force-quit-section {
+  border-top-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+}
+body.theme-futuristic .force-quit-section {
+  border-top-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
