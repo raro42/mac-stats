@@ -18649,3 +18649,95 @@ body.theme-futuristic .response-time {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Data Poster / Dark / Neon / Futuristic: Agent Ops Updated ago still mixed
+ * Apple dark-ink-on-`#ffffff` (`.ops-updated-ago` resting / visible / hover /
+ * focus) — no opaque theme remaps yet while filter-row kb-hint / refresh kb /
+ * row-meta already mix on shells. Neon/Futuristic `.ops-subhead` /
+ * `.ops-insight-sub` lacked remaps; Dark early remap mixed on `#0b0b10` not
+ * CRT `#0a0a0a`. Catch up to Data Poster Insights muted remaps (46%) and
+ * refresh-row kb-hint (63%/69%/81%). Design-review fuel (feature-agent-ops) +
+ * standing P2 #14; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .ops-updated-ago {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+  opacity: 1;
+}
+body.theme-data-poster .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-data-poster .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+
+body.theme-dark .ops-updated-ago {
+  color: color-mix(in srgb, #ffffff 63%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #ffffff 69%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-dark .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-dark .ops-subhead,
+body.theme-dark .ops-insight-sub {
+  color: color-mix(in srgb, #ffffff 46%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .ops-updated-ago {
+  color: color-mix(in srgb, #ffffff 63%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #ffffff 69%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #ffffff 81%, #08120c);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+}
+body.theme-neon .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
+body.theme-neon .ops-subhead,
+body.theme-neon .ops-insight-sub {
+  color: color-mix(in srgb, #ffffff 46%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .ops-updated-ago {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-updated-ago:not([hidden]) {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .ops-updated-ago[role='button']:hover {
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-futuristic .ops-updated-ago[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+body.theme-futuristic .ops-subhead,
+body.theme-futuristic .ops-insight-sub {
+  color: color-mix(in srgb, #ffffff 46%, #0b0b10);
+  opacity: 1;
+}
