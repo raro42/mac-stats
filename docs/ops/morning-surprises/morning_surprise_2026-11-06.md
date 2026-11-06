@@ -1,22 +1,19 @@
 # Morning surprise — 2026-11-06
 
-Overnight Track B kept shipping opaque-shell remaps for Dark / Neon / Futuristic (standing P2 #14; design-review screens still stale — Screen Recording TCC blocks Mac window-only capture).
+Generated: overnight harness tick ~02:42 CET (2026-11-06).
 
-## Shipped this night (latest first)
+## Shipped (night of 2026-11-05 → 2026-11-06)
+- **v0.1.2383** — Dark / Neon / Futuristic Disk Cleanup policy · samples · scope kind (`.disk-cleanup-item-policy` · `.disk-cleanup-item-samples` · `.disk-cleanup-scope-kind`) opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster parity; Neon/Futuristic lacked remap; Dark early `#0b0b10`). Design-review `feature-disk-cleanup` / layout-daily Data Poster adjacent; Mac capture deferred (Screen Recording TCC).
+- **v0.1.2382** — Dark / Neon / Futuristic Disk Cleanup tip + process list header opaque on shells.
+- **v0.1.2381** — Dark / Neon / Futuristic Force Quit hint + advanced summary opaque on shells.
+- **v0.1.2380** — Dark / Neon / Futuristic Force Quit toolbar kb-hint opaque on shells.
+- **v0.1.2379** — Dark / Neon / Futuristic Process Details kb-hints opaque on shells.
+- **v0.1.2378**–**2353** — continuing dark-theme Apple `#ffffff` remaps (Process Details, Force Quit, Details, Disk Cleanup, AI Chat Send, Processes, Agent Ops).
 
-- **v0.1.2382** — Disk Cleanup soft tip + meta label + process list header (and hairline) opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (Neon/Futuristic had no remap; Dark early remap was on `#0b0b10`).
-- **v0.1.2381** — Force Quit tip + Advanced summary (+ chevron) opaque on the same shells.
-- **v0.1.2380** — Force Quit toolbar kb-hint opaque.
-- Earlier in-window keeps: Process Details kb-hints / hero / Saved / panel, Force Quit confirming / section / Saved, Details hover, AI Chat Send Saved, and more (see `results.tsv` + CHANGELOG).
-
-## Deferred
-
-- Mac recapture of stale `feature-agent-ops.png` (51d+), `feature-processes.png`, `feature-disk-cleanup.png`, `feature-cpu-metrics.png`, `feature-ai-chat.png`, `feature-monitors.png` until Screen Recording TCC allows `screencapture -l`.
-- Layout-daily Data Poster screen still missing (remap work continues as polish-without-capture grace).
+## Tried / deferred
+- Design-review Mac capture of stale `feature-agent-ops.png` (~51d) / `feature-disk-cleanup.png` / `feature-processes.png` — Screen Recording TCC / Linux rack (`screencapture -l` unavailable here).
+- Layout-daily theme screens missing — remap polish instead (Disk Cleanup policy/samples/scope-kind this tick).
+- Digester empty (0 turns / 7d); sibling OpenClaw/Hermes missing on rack.
 
 ## Next fuel
-
-- Dark/Neon/Futuristic `.disk-cleanup-item-policy` / `.disk-cleanup-item-samples` / `.disk-cleanup-scope-kind` if still early-`#0b0b10` or missing on Neon/Futuristic.
-- Or Mac capture when TCC allows.
-
-Generated: 2026-11-06T02:26:49
+- Other Disk Cleanup leftovers (`.disk-cleanup-item-stat` / path) if still Apple / early `#0b0b10` on Neon/Futuristic; Mac capture when TCC allows.
