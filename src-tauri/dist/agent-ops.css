@@ -19763,3 +19763,103 @@ body.theme-futuristic .logs-error-glance.is-quiet {
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log filter-miss shell + CTA still
+ * mix Apple `#ffffff` washes (`.logs-viewer-empty.logs-filter-miss` resting /
+ * is-error-empty / is-warn-empty · `.logs-filter-miss-cta` resting/hover/focus)
+ * → white slab on opaque shells. Catch up to chat/monitors filter-miss remaps
+ * and `.logs-error-glance` v0.1.2395. Design-review fuel (Debug Log) + standing
+ * P2 #14 after error glance; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-data-poster .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-data-poster .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-data-poster .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-data-poster .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+
+body.theme-dark .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+}
+body.theme-dark .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-dark .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+}
+body.theme-dark .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+}
+body.theme-dark .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+
+body.theme-neon .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 7%, #08120c);
+  color: color-mix(in srgb, #ffffff 92%, #08120c);
+}
+body.theme-neon .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-neon .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+body.theme-neon .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  color: color-mix(in srgb, #ffffff 92%, #08120c);
+}
+body.theme-neon .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 48%, #08120c);
+}
+body.theme-neon .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+
+body.theme-futuristic .logs-viewer-empty.logs-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-futuristic .logs-viewer-empty.logs-filter-miss.is-error-empty,
+body.theme-futuristic .logs-viewer-empty.logs-filter-miss.is-warn-empty {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-futuristic .logs-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-futuristic .logs-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-futuristic .logs-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
