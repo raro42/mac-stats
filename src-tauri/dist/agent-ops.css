@@ -20967,3 +20967,64 @@ body.theme-futuristic .setting-toggle .toggle-label.is-just-saved {
   background: color-mix(in srgb, #34c759 16%, #0b0b10);
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log path hint + AI Chat empty
+ * suggestion chip Saved flashes still mix Apple #ffffff
+ * (.logs-path-hint.is-just-saved / button.chat-empty-chip → button.is-just-saved)
+ * → white slab on opaque shells. Soft green tint on shell (path 12%; chip 18%/40%
+ * border parity with shared button flash). Design-review fuel (feature-ai-chat /
+ * Debug Log) + standing P2 #14 after product-toggle v0.1.2410; layout-daily Data
+ * Poster adjacent (polish-without-capture grace).
+ */
+body.theme-data-poster .logs-path-hint.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-dark .logs-path-hint.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-neon .logs-path-hint.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-futuristic .logs-path-hint.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-data-poster .chat-empty-chip.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+
+body.theme-dark .chat-empty-chip.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+
+body.theme-neon .chat-empty-chip.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+
+body.theme-futuristic .chat-empty-chip.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
