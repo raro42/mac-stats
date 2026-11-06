@@ -20111,3 +20111,204 @@ body.theme-futuristic .perplexity-last-glance.is-ready {
   border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
   background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Settings credential attention glances still mix
+ * Apple `#ffffff` washes (Brave · Redmine · Mastodon · MCP · Browser · Cursor ·
+ * Telegram · Slack · Signal · Perplexity · Discord) → white slab on opaque
+ * Settings shells. Catch up to Data Poster Settings remaps (v0.1.2195) and
+ * Perplexity key glance opaque (v0.1.2394). Design-review fuel (Settings) +
+ * standing P2 #14 after Perplexity last-search v0.1.2398; layout-daily
+ * Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .settings-brave-key-attention-glance,
+body.theme-dark .settings-redmine-attention-glance,
+body.theme-dark .settings-mastodon-attention-glance,
+body.theme-dark .settings-mcp-attention-glance,
+body.theme-dark .settings-browser-attention-glance,
+body.theme-dark .settings-cursor-agent-attention-glance,
+body.theme-dark .settings-telegram-attention-glance,
+body.theme-dark .settings-slack-attention-glance,
+body.theme-dark .settings-signal-attention-glance,
+body.theme-dark .settings-perplexity-key-attention-glance,
+body.theme-dark .settings-discord-token-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .settings-brave-key-attention-glance:hover,
+body.theme-dark .settings-redmine-attention-glance:hover,
+body.theme-dark .settings-mastodon-attention-glance:hover,
+body.theme-dark .settings-mcp-attention-glance:hover,
+body.theme-dark .settings-browser-attention-glance:hover,
+body.theme-dark .settings-cursor-agent-attention-glance:hover,
+body.theme-dark .settings-telegram-attention-glance:hover,
+body.theme-dark .settings-slack-attention-glance:hover,
+body.theme-dark .settings-signal-attention-glance:hover,
+body.theme-dark .settings-perplexity-key-attention-glance:hover,
+body.theme-dark .settings-discord-token-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .settings-brave-key-attention-glance:focus-visible,
+body.theme-dark .settings-redmine-attention-glance:focus-visible,
+body.theme-dark .settings-mastodon-attention-glance:focus-visible,
+body.theme-dark .settings-mcp-attention-glance:focus-visible,
+body.theme-dark .settings-browser-attention-glance:focus-visible,
+body.theme-dark .settings-cursor-agent-attention-glance:focus-visible,
+body.theme-dark .settings-telegram-attention-glance:focus-visible,
+body.theme-dark .settings-slack-attention-glance:focus-visible,
+body.theme-dark .settings-signal-attention-glance:focus-visible,
+body.theme-dark .settings-perplexity-key-attention-glance:focus-visible,
+body.theme-dark .settings-discord-token-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .settings-brave-key-attention-glance.is-not-set,
+body.theme-dark .settings-redmine-attention-glance.is-not-set,
+body.theme-dark .settings-redmine-attention-glance.is-partial,
+body.theme-dark .settings-mastodon-attention-glance.is-not-set,
+body.theme-dark .settings-mastodon-attention-glance.is-partial,
+body.theme-dark .settings-mcp-attention-glance.is-not-set,
+body.theme-dark .settings-browser-attention-glance.is-not-set,
+body.theme-dark .settings-cursor-agent-attention-glance.is-not-set,
+body.theme-dark .settings-telegram-attention-glance.is-not-set,
+body.theme-dark .settings-telegram-attention-glance.is-partial,
+body.theme-dark .settings-slack-attention-glance.is-not-set,
+body.theme-dark .settings-slack-attention-glance.is-partial,
+body.theme-dark .settings-signal-attention-glance.is-not-wired,
+body.theme-dark .settings-perplexity-key-attention-glance.is-not-set,
+body.theme-dark .settings-discord-token-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+  color: color-mix(in srgb, #ff3b30 48%, var(--text, currentColor));
+}
+
+body.theme-neon .settings-brave-key-attention-glance,
+body.theme-neon .settings-redmine-attention-glance,
+body.theme-neon .settings-mastodon-attention-glance,
+body.theme-neon .settings-mcp-attention-glance,
+body.theme-neon .settings-browser-attention-glance,
+body.theme-neon .settings-cursor-agent-attention-glance,
+body.theme-neon .settings-telegram-attention-glance,
+body.theme-neon .settings-slack-attention-glance,
+body.theme-neon .settings-signal-attention-glance,
+body.theme-neon .settings-perplexity-key-attention-glance,
+body.theme-neon .settings-discord-token-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .settings-brave-key-attention-glance:hover,
+body.theme-neon .settings-redmine-attention-glance:hover,
+body.theme-neon .settings-mastodon-attention-glance:hover,
+body.theme-neon .settings-mcp-attention-glance:hover,
+body.theme-neon .settings-browser-attention-glance:hover,
+body.theme-neon .settings-cursor-agent-attention-glance:hover,
+body.theme-neon .settings-telegram-attention-glance:hover,
+body.theme-neon .settings-slack-attention-glance:hover,
+body.theme-neon .settings-signal-attention-glance:hover,
+body.theme-neon .settings-perplexity-key-attention-glance:hover,
+body.theme-neon .settings-discord-token-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .settings-brave-key-attention-glance:focus-visible,
+body.theme-neon .settings-redmine-attention-glance:focus-visible,
+body.theme-neon .settings-mastodon-attention-glance:focus-visible,
+body.theme-neon .settings-mcp-attention-glance:focus-visible,
+body.theme-neon .settings-browser-attention-glance:focus-visible,
+body.theme-neon .settings-cursor-agent-attention-glance:focus-visible,
+body.theme-neon .settings-telegram-attention-glance:focus-visible,
+body.theme-neon .settings-slack-attention-glance:focus-visible,
+body.theme-neon .settings-signal-attention-glance:focus-visible,
+body.theme-neon .settings-perplexity-key-attention-glance:focus-visible,
+body.theme-neon .settings-discord-token-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+  box-shadow: none;
+}
+body.theme-neon .settings-brave-key-attention-glance.is-not-set,
+body.theme-neon .settings-redmine-attention-glance.is-not-set,
+body.theme-neon .settings-redmine-attention-glance.is-partial,
+body.theme-neon .settings-mastodon-attention-glance.is-not-set,
+body.theme-neon .settings-mastodon-attention-glance.is-partial,
+body.theme-neon .settings-mcp-attention-glance.is-not-set,
+body.theme-neon .settings-browser-attention-glance.is-not-set,
+body.theme-neon .settings-cursor-agent-attention-glance.is-not-set,
+body.theme-neon .settings-telegram-attention-glance.is-not-set,
+body.theme-neon .settings-telegram-attention-glance.is-partial,
+body.theme-neon .settings-slack-attention-glance.is-not-set,
+body.theme-neon .settings-slack-attention-glance.is-partial,
+body.theme-neon .settings-signal-attention-glance.is-not-wired,
+body.theme-neon .settings-perplexity-key-attention-glance.is-not-set,
+body.theme-neon .settings-discord-token-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+  color: color-mix(in srgb, #ff3b30 48%, var(--text, currentColor));
+}
+
+body.theme-futuristic .settings-brave-key-attention-glance,
+body.theme-futuristic .settings-redmine-attention-glance,
+body.theme-futuristic .settings-mastodon-attention-glance,
+body.theme-futuristic .settings-mcp-attention-glance,
+body.theme-futuristic .settings-browser-attention-glance,
+body.theme-futuristic .settings-cursor-agent-attention-glance,
+body.theme-futuristic .settings-telegram-attention-glance,
+body.theme-futuristic .settings-slack-attention-glance,
+body.theme-futuristic .settings-signal-attention-glance,
+body.theme-futuristic .settings-perplexity-key-attention-glance,
+body.theme-futuristic .settings-discord-token-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .settings-brave-key-attention-glance:hover,
+body.theme-futuristic .settings-redmine-attention-glance:hover,
+body.theme-futuristic .settings-mastodon-attention-glance:hover,
+body.theme-futuristic .settings-mcp-attention-glance:hover,
+body.theme-futuristic .settings-browser-attention-glance:hover,
+body.theme-futuristic .settings-cursor-agent-attention-glance:hover,
+body.theme-futuristic .settings-telegram-attention-glance:hover,
+body.theme-futuristic .settings-slack-attention-glance:hover,
+body.theme-futuristic .settings-signal-attention-glance:hover,
+body.theme-futuristic .settings-perplexity-key-attention-glance:hover,
+body.theme-futuristic .settings-discord-token-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .settings-brave-key-attention-glance:focus-visible,
+body.theme-futuristic .settings-redmine-attention-glance:focus-visible,
+body.theme-futuristic .settings-mastodon-attention-glance:focus-visible,
+body.theme-futuristic .settings-mcp-attention-glance:focus-visible,
+body.theme-futuristic .settings-browser-attention-glance:focus-visible,
+body.theme-futuristic .settings-cursor-agent-attention-glance:focus-visible,
+body.theme-futuristic .settings-telegram-attention-glance:focus-visible,
+body.theme-futuristic .settings-slack-attention-glance:focus-visible,
+body.theme-futuristic .settings-signal-attention-glance:focus-visible,
+body.theme-futuristic .settings-perplexity-key-attention-glance:focus-visible,
+body.theme-futuristic .settings-discord-token-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+  box-shadow: none;
+}
+body.theme-futuristic .settings-brave-key-attention-glance.is-not-set,
+body.theme-futuristic .settings-redmine-attention-glance.is-not-set,
+body.theme-futuristic .settings-redmine-attention-glance.is-partial,
+body.theme-futuristic .settings-mastodon-attention-glance.is-not-set,
+body.theme-futuristic .settings-mastodon-attention-glance.is-partial,
+body.theme-futuristic .settings-mcp-attention-glance.is-not-set,
+body.theme-futuristic .settings-browser-attention-glance.is-not-set,
+body.theme-futuristic .settings-cursor-agent-attention-glance.is-not-set,
+body.theme-futuristic .settings-telegram-attention-glance.is-not-set,
+body.theme-futuristic .settings-telegram-attention-glance.is-partial,
+body.theme-futuristic .settings-slack-attention-glance.is-not-set,
+body.theme-futuristic .settings-slack-attention-glance.is-partial,
+body.theme-futuristic .settings-signal-attention-glance.is-not-wired,
+body.theme-futuristic .settings-perplexity-key-attention-glance.is-not-set,
+body.theme-futuristic .settings-discord-token-attention-glance.is-not-set {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 48%, var(--text, currentColor));
+}
