@@ -18372,3 +18372,22 @@ body.theme-futuristic .process-detail-pid.is-just-saved {
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
   box-shadow: none;
 }
+/*
+ * Dark / Neon / Futuristic: Process Details hero still mixed Apple `#ffffff`
+ * (`.process-detail-hero` border/background) → white slab on opaque shells.
+ * Data Poster remapped earlier (Process Details block). Design-review fuel
+ * (feature-processes) + standing P2 #14; layout-daily Data Poster adjacent
+ * (dark-shell Process Details hero parity).
+ */
+body.theme-dark .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+}
+body.theme-neon .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #08120c);
+  background: color-mix(in srgb, currentColor 5%, #08120c);
+}
+body.theme-futuristic .process-detail-hero {
+  border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+}
