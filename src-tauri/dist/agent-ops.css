@@ -20772,3 +20772,100 @@ body.theme-futuristic #ops-agent-load-chat.is-just-saved {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: soft Save leftovers still mix Apple
+ * #ffffff (#settings-help-btn / #ollama-settings-reset / #refresh-btn /
+ * #github-link / .version-clickable · .app-version · .theme-version ·
+ * .arch-version is-just-saved) → white slab on opaque shells. Soft secondary
+ * 22%/45% + link/version 16% green tint. Design-review fuel (feature-agent-ops
+ * / Settings chrome) + standing P2 #14 after Load-into-Chat v0.1.2406;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-data-poster #settings-help-btn.is-just-saved,
+body.theme-data-poster #ollama-settings-reset.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+body.theme-data-poster #refresh-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  color: color-mix(in srgb, #34c759 85%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+body.theme-data-poster #github-link.is-just-saved,
+body.theme-data-poster .version-clickable.is-just-saved,
+body.theme-data-poster .app-version.is-just-saved,
+body.theme-data-poster .theme-version.is-just-saved,
+body.theme-data-poster .arch-version.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  color: color-mix(in srgb, #34c759 75%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+
+body.theme-dark #settings-help-btn.is-just-saved,
+body.theme-dark #ollama-settings-reset.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+body.theme-dark #refresh-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0a0a0a) !important;
+  color: color-mix(in srgb, #34c759 85%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+body.theme-dark #github-link.is-just-saved,
+body.theme-dark .version-clickable.is-just-saved,
+body.theme-dark .app-version.is-just-saved,
+body.theme-dark .theme-version.is-just-saved,
+body.theme-dark .arch-version.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0a0a0a);
+  color: color-mix(in srgb, #34c759 75%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+
+body.theme-neon #settings-help-btn.is-just-saved,
+body.theme-neon #ollama-settings-reset.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+body.theme-neon #refresh-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #08120c) !important;
+  color: color-mix(in srgb, #34c759 85%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+body.theme-neon #github-link.is-just-saved,
+body.theme-neon .version-clickable.is-just-saved,
+body.theme-neon .app-version.is-just-saved,
+body.theme-neon .theme-version.is-just-saved,
+body.theme-neon .arch-version.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #08120c);
+  color: color-mix(in srgb, #34c759 75%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+
+body.theme-futuristic #settings-help-btn.is-just-saved,
+body.theme-futuristic #ollama-settings-reset.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+body.theme-futuristic #refresh-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  color: color-mix(in srgb, #34c759 85%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
+body.theme-futuristic #github-link.is-just-saved,
+body.theme-futuristic .version-clickable.is-just-saved,
+body.theme-futuristic .app-version.is-just-saved,
+body.theme-futuristic .theme-version.is-just-saved,
+body.theme-futuristic .arch-version.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  color: color-mix(in srgb, #34c759 75%, var(--text, #ffffff)) !important;
+  box-shadow: none;
+}
