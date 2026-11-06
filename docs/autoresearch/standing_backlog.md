@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2400
+
+- Dark / Neon / Futuristic Perplexity filter Clear (`.perplexity-filter-clear` resting/hover/focus/is-just-saved) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier); also fixed broken `}`/`/*` before last-search remap still on main after v0.1.2398/2399. Standing P2 #14 after Settings credential glances v0.1.2399; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Monitors/Processes/Logs filter Clear if still Apple `#ffffff` on Dark/Neon/Futuristic, Settings Save flashes if still Apple `#ffffff`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2399
 
 - Dark / Neon / Futuristic Settings credential attention glances (Brave · Redmine · Mastodon · MCP · Browser · Cursor · Telegram · Slack · Signal · Perplexity · Discord) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster Settings remaps earlier). Standing P2 #14 after Perplexity last-search v0.1.2398; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Settings Save flashes Dark/Neon/Futuristic if still Apple `#ffffff`, other Perplexity leftovers (e.g. `.perplexity-filter-clear`), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

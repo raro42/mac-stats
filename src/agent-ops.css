@@ -19964,8 +19964,10 @@ body.theme-futuristic .perplexity-empty-cta:hover {
 }
 body.theme-futuristic .perplexity-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
 
-* Data Poster / Dark / Neon / Futuristic: Perplexity last-search glance still
+/*
+ * Data Poster / Dark / Neon / Futuristic: Perplexity last-search glance still
  * mixes Apple `#ffffff` washes (`.perplexity-last-glance` resting/hover/focus/
  * has-results/is-searching/has-error/needs-key/is-ready) → white slab on
  * opaque shells. Catch up to `.perplexity-attention-glance` remaps (v0.1.2394)
@@ -20311,4 +20313,70 @@ body.theme-futuristic .settings-discord-token-attention-glance.is-not-set {
   border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
   background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
   color: color-mix(in srgb, #ff3b30 48%, var(--text, currentColor));
+}
+
+/*
+ * Dark / Neon / Futuristic: Perplexity filter Clear still mixes Apple #ffffff
+ * washes (.perplexity-filter-clear resting/hover/focus/is-just-saved) to white
+ * slab on opaque shells. Data Poster remapped with Monitors/Processes/Logs Clear;
+ * Settings credential glances remapped in v0.1.2399. Catch up after that ship.
+ * Also repairs broken close-brace / comment-open before last-search remap.
+ * Design-review fuel (feature-ai-chat / Perplexity) + standing P2 #14;
+ * layout-daily Data Poster adjacent.
+ */
+body.theme-dark .perplexity-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
+}
+body.theme-dark .perplexity-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 44%, #0a0a0a);
+}
+body.theme-dark .perplexity-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-dark .perplexity-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+
+body.theme-neon .perplexity-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+  color: color-mix(in srgb, #ffffff 81%, #08120c);
+}
+body.theme-neon .perplexity-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 44%, #08120c);
+}
+body.theme-neon .perplexity-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-neon .perplexity-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+
+body.theme-futuristic .perplexity-filter-clear {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 81%, #0b0b10);
+}
+body.theme-futuristic .perplexity-filter-clear:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 44%, #0b0b10);
+}
+body.theme-futuristic .perplexity-filter-clear:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .perplexity-filter-clear.is-just-saved {
+  background: color-mix(in srgb, #34c759 16%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+  color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
