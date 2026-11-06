@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2416
+
+- Dark / Neon / Futuristic Agent Ops health strip (`.ops-close-btn` resting/hover · `.ops-health-kb-hint` · `.ops-health-card` ok/warn/bad/active) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after btn-secondary v0.1.2415; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Agent Ops overview leftovers still on Apple `#ffffff` if any on Neon/Futuristic gaps, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2415
 
 - Dark / Neon / Futuristic Agent Ops secondary buttons (`.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary` resting/hover/focus-visible) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Clear/check/remove v0.1.2414; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Agent Ops soft leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
