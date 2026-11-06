@@ -1,21 +1,18 @@
 # Morning surprise — 2026-11-07
 
-Overnight Track B kept contrast remaps on opaque shells (standing P2 #14 / design-review polish-without-capture; Mac Screen Recording TCC still blocks fresh `docs/screens/` captures).
+Overnight autoresearch (Track B) kept shipping opaque-shell remaps so Dark / Neon / Futuristic do not flash Apple white slabs on Agent Ops.
 
-## Shipped tonight (latest first)
+## Shipped
 
-- **v0.1.2415** — Dark / Neon / Futuristic Agent Ops secondary buttons (`.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary`) drop Apple `#ffffff` (Data Poster already `#0b0b10`). Shells `#0a0a0a` / `#08120c` / `#0b0b10`.
-- **v0.1.2414** — AI Chat Clear + Monitors check/remove Saved flashes opaque on dark shells.
-- **v0.1.2413** — Disk Cleanup soft-delete row + Saved label opaque.
-- **v0.1.2412** — Disk Cleanup + Debug Log toolbar Saved flashes opaque.
-- Earlier same night: path/chip, product-toggle, Monitors URL, soft Save leftovers, Load-into-Chat, Settings Save, filter Clears, credential glances, and more P2 #14 remaps (see `results.tsv` / `loop_backlog.md`).
+- **v0.1.2415** — Agent Ops secondary buttons (`.btn-secondary.ops-refresh` / `.agent-ops-section .btn-secondary`) opaque on Dark/Neon/Futuristic shells.
+- **v0.1.2416** — Agent Ops health strip (`.ops-close-btn`, `.ops-health-kb-hint`, `.ops-health-card` ok/warn/bad/active) opaque on `#0a0a0a` / `#08120c` / `#0b0b10`.
 
-## Tried / deferred
+## Tried / context
 
-- Parallel tick raced the same Clear/check/remove experiment; took origin v0.1.2414 and shipped Agent Ops secondary buttons as the next keep.
-- Mac recapture of stale `feature-agent-ops.png` (52d) — deferred (menu-bar only / Screen Recording TCC).
-- Digester Slowest empty after noise filters; fuel from design-review + standing backlog.
+- Digester empty (0 turns / 7d). Design-review + layout-daily in polish-without-capture grace (Mac Screen Recording TCC still blocks fresh `feature-*.png`).
+- Sibling OpenClaw/Hermes missing on the Linux rack.
+- Debug.log quiet (no ERROR/WARN clusters in the 180m window).
 
 ## Next
 
-- Remaining Agent Ops soft leftovers still on Apple `#ffffff` if any, or Mac capture when TCC allows.
+- More Agent Ops soft leftovers if any Apple `#ffffff` remains, or Mac window-only recapture of stale feature screens when TCC allows.
