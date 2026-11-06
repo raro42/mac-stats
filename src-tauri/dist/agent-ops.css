@@ -18508,3 +18508,30 @@ body.theme-futuristic .process-list-header {
 body.theme-futuristic .process-list-header {
   border-bottom-color: color-mix(in srgb, currentColor 12%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup item policy / samples + scope kind
+ * still mixed Apple dark-ink-on-`#ffffff` (`.disk-cleanup-item-policy` ·
+ * `.disk-cleanup-item-samples` · `.disk-cleanup-scope-kind`) — Neon/Futuristic
+ * lacked any opaque remap; Dark early remap mixed on `#0b0b10` not CRT
+ * `#0a0a0a`. Data Poster remapped earlier. Design-review fuel
+ * (feature-disk-cleanup) + standing P2 #14; layout-daily Data Poster adjacent
+ * (dark-shell Disk Cleanup meta parity).
+ */
+body.theme-dark .disk-cleanup-item-policy,
+body.theme-dark .disk-cleanup-item-samples,
+body.theme-dark .disk-cleanup-scope-kind {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .disk-cleanup-item-policy,
+body.theme-neon .disk-cleanup-item-samples,
+body.theme-neon .disk-cleanup-scope-kind {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .disk-cleanup-item-policy,
+body.theme-futuristic .disk-cleanup-item-samples,
+body.theme-futuristic .disk-cleanup-scope-kind {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
