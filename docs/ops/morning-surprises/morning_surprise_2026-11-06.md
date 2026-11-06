@@ -1,24 +1,26 @@
 # Morning surprise — 2026-11-06
 
-Overnight Track B kept shipping opaque-shell remaps on dark themes (standing P2 #14). Digester open fuel stayed design-review stale `feature-agent-ops.png` (~51d); Mac window capture stayed deferred (Screen Recording TCC / no reliable `screencapture -l` id). Layout-daily Data Poster stayed due (screen missing).
+Overnight autoresearch (Track B) kept shipping opaque theme remaps for dark shells (standing P2 #14 / GitHub #14). Digester open empty. Design-review + layout-daily on polish-without-capture grace (Mac Screen Recording TCC).
 
-## Shipped tonight (keeps)
+## Shipped this night (highlights)
 
-| Version | What |
-|---------|------|
-| v0.1.2397 | Dark / Neon / Futuristic Perplexity empty · filter-miss · CTA (`.perplexity-empty` / `.perplexity-empty-error` / `.perplexity-filter-miss` / `.perplexity-empty-cta`) opaque `#0a0a0a` / `#08120c` / `#0b0b10` |
-| v0.1.2396 | Debug Log filter-miss shell · CTA opaque `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10` |
-| v0.1.2395 | Debug Log error glance opaque on same shells |
-| v0.1.2394 | Debug Log / Perplexity attention glances opaque |
-| Earlier | Monitors summary/attention, Disk Cleanup / Details collapsed, Processes / Force Quit / AI Chat Send remaps through the night |
+- **v0.1.2398** — Data Poster / Dark / Neon / Futuristic Perplexity **last-search** glance (`.perplexity-last-glance` resting / hover / focus / has-results / is-searching / has-error / needs-key / is-ready) opaque on `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10` (was Apple `#ffffff`).
+- **v0.1.2397** — Dark / Neon / Futuristic Perplexity **empty · filter-miss · CTA** opaque on shells (sibling tick; Data Poster already remapped).
+- **v0.1.2396** — Data Poster / Dark / Neon / Futuristic Debug Log **filter-miss** shell/CTA opaque on shells.
+- **v0.1.2395** — Data Poster / Dark / Neon / Futuristic Debug Log **error** glance opaque on shells.
+- **v0.1.2394** — Data Poster / Dark / Neon / Futuristic Debug Log · Perplexity **attention** glances opaque on shells.
+- Earlier tonight: Monitors summary/attention, Disk Cleanup attention/collapsed, Agent Ops Insights, Force Quit / Process Details muted labels (see `results.tsv` + CHANGELOG).
 
-## Tried / deferred
+## Tried / context
 
-- Mac recapture of stale feature screens (`feature-agent-ops`, `feature-ai-chat`, `feature-monitors`, …) — TCC / no Quartz window id.
-- Digester Slowest empty after noise filters — design-review + standing backlog drove fuel.
+- Digester open: empty (0 turns / 7d).
+- Sibling OpenClaw/Hermes: missing on rack; no port this tick.
+- Debug.log: no ERROR/WARN/panic clusters in 180m window.
+- Mac `screencapture -l` still deferred (Screen Recording TCC) — polish-without-capture grace.
+- Race: sibling shipped v0.1.2397 empty/filter-miss while this tick targeted last-glance; rebased to **v0.1.2398** and backfilled keeps for 2396/2397.
 
 ## Next fuel
 
-Other Debug Log / Perplexity leftovers on Apple `#ffffff` if any (e.g. settings Perplexity key glance on Dark/Neon/Futuristic), or Mac capture when Screen Recording allows `screencapture -l`.
-
-Generated: overnight harness ~05:45 CET after keep v0.1.2397.
+- `.perplexity-filter-clear` / `.settings-perplexity-key-attention-glance` on Dark/Neon/Futuristic if still Apple `#ffffff`.
+- Other Perplexity leftovers if any.
+- Mac recapture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-monitors.png` when TCC allows.
