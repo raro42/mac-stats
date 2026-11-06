@@ -16370,7 +16370,9 @@ body.theme-data-poster .btn-secondary.ops-refresh:focus-visible,
 body.theme-data-poster .agent-ops-section .btn-secondary:focus-visible {
   outline-color: color-mix(in srgb, currentColor 35%, #0b0b10);
 }
-body.theme-data-poster #ops-agent-save.is-just-saved {
+body.theme-data-poster #ops-agent-save.is-just-saved,
+body.theme-data-poster #ollama-settings-save.is-just-saved,
+body.theme-data-poster #monitors-add-save.is-just-saved {
   background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
   border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
   color: #fff !important;
@@ -20692,4 +20694,39 @@ body.theme-futuristic .chat-filter-clear.is-just-saved {
   background: color-mix(in srgb, #34c759 16%, #0b0b10);
   border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
   color: color-mix(in srgb, #34c759 70%, #ffffff);
+}
+
+/*
+ * Dark / Neon / Futuristic: Settings Save leftovers still mix Apple #ffffff
+ * (#ollama-settings-save / #ops-agent-save / #monitors-add-save is-just-saved)
+ * → white slab on opaque shells. Data Poster remapped in the same tick;
+ * credential/Settings card Saves remapped in v0.1.2401. Design-review fuel
+ * (feature-ai-chat / feature-agent-ops / feature-monitors) + standing P2 #14;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark #ollama-settings-save.is-just-saved,
+body.theme-dark #ops-agent-save.is-just-saved,
+body.theme-dark #monitors-add-save.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+body.theme-neon #ollama-settings-save.is-just-saved,
+body.theme-neon #ops-agent-save.is-just-saved,
+body.theme-neon #monitors-add-save.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+body.theme-futuristic #ollama-settings-save.is-just-saved,
+body.theme-futuristic #ops-agent-save.is-just-saved,
+body.theme-futuristic #monitors-add-save.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  box-shadow: none;
 }
