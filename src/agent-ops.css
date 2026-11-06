@@ -19863,3 +19863,105 @@ body.theme-futuristic .logs-filter-miss-cta:hover {
 body.theme-futuristic .logs-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Perplexity empty shell · error · filter-miss · CTA still
+ * mix Apple `#ffffff` washes (`.perplexity-empty` / `.perplexity-empty-error` /
+ * `.perplexity-filter-miss` resting / is-top-empty / is-snippet-empty ·
+ * `.perplexity-empty-cta` resting/hover/focus) → white slab on opaque shells.
+ * Data Poster remapped earlier (v0.1.2267-adjacent). Catch up to Debug Log
+ * filter-miss v0.1.2396. Design-review fuel (Perplexity / feature-ai-chat
+ * adjacent) + standing P2 #14; layout-daily Data Poster adjacent.
+ */
+body.theme-dark .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+}
+body.theme-dark .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+body.theme-dark .perplexity-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+}
+body.theme-dark .perplexity-filter-miss.is-top-empty,
+body.theme-dark .perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
+}
+body.theme-dark .perplexity-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 35%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 12%, #0a0a0a);
+  color: color-mix(in srgb, #ffffff 92%, #0a0a0a);
+}
+body.theme-dark .perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 50%, #0a0a0a);
+}
+body.theme-dark .perplexity-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+
+body.theme-neon .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+}
+body.theme-neon .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+}
+body.theme-neon .perplexity-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 34%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 7%, #08120c);
+  color: color-mix(in srgb, #ffffff 92%, #08120c);
+}
+body.theme-neon .perplexity-filter-miss.is-top-empty,
+body.theme-neon .perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 10%, #08120c);
+}
+body.theme-neon .perplexity-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 35%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 12%, #08120c);
+  color: color-mix(in srgb, #ffffff 92%, #08120c);
+}
+body.theme-neon .perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 50%, #08120c);
+}
+body.theme-neon .perplexity-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+}
+
+body.theme-futuristic .perplexity-empty {
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+}
+body.theme-futuristic .perplexity-empty-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+}
+body.theme-futuristic .perplexity-filter-miss {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-futuristic .perplexity-filter-miss.is-top-empty,
+body.theme-futuristic .perplexity-filter-miss.is-snippet-empty {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0b0b10);
+}
+body.theme-futuristic .perplexity-empty-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 35%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 12%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 92%, #0b0b10);
+}
+body.theme-futuristic .perplexity-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 50%, #0b0b10);
+}
+body.theme-futuristic .perplexity-empty-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
