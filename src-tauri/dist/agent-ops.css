@@ -19964,4 +19964,150 @@ body.theme-futuristic .perplexity-empty-cta:hover {
 }
 body.theme-futuristic .perplexity-empty-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+
+* Data Poster / Dark / Neon / Futuristic: Perplexity last-search glance still
+ * mixes Apple `#ffffff` washes (`.perplexity-last-glance` resting/hover/focus/
+ * has-results/is-searching/has-error/needs-key/is-ready) → white slab on
+ * opaque shells. Catch up to `.perplexity-attention-glance` remaps (v0.1.2394)
+ * and Perplexity empty/filter-miss v0.1.2397. Design-review fuel (feature-ai-chat /
+ * Perplexity) + standing P2 #14; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
+}
+body.theme-data-poster .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-data-poster .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-data-poster .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-data-poster .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+
+body.theme-dark .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5%, #0a0a0a);
+}
+body.theme-dark .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+}
+body.theme-dark .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-dark .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-dark .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+
+body.theme-neon .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5%, #08120c);
+}
+body.theme-neon .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 28%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 7%, #08120c);
+}
+body.theme-neon .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-neon .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #08120c);
+  background: color-mix(in srgb, #ff9f0a 7%, #08120c);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-neon .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+
+body.theme-futuristic .perplexity-last-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .perplexity-last-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .perplexity-last-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .perplexity-last-glance.has-results {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5%, #0b0b10);
+}
+body.theme-futuristic .perplexity-last-glance.is-searching {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0b0b10);
+}
+body.theme-futuristic .perplexity-last-glance.has-error {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-futuristic .perplexity-last-glance.needs-key {
+  border-color: color-mix(in srgb, #ff9f0a 32%, #0b0b10);
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  color: color-mix(in srgb, #ff9f0a 42%, var(--text, currentColor));
+}
+body.theme-futuristic .perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
 }
