@@ -4,7 +4,8 @@ Overnight Track B kept contrast remaps on opaque shells (standing P2 #14 / desig
 
 ## Shipped tonight (latest first)
 
-- **v0.1.2419** — Data Poster / Dark / Neon / Futuristic Agent Ops filter just-cleared (`.ops-filter-input.ops-filter-just-cleared`) drops Apple `#ffffff` after Clear. Shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`.
+- **v0.1.2420** — Data Poster / Dark / Neon / Futuristic Processes + Debug Log filter counts (`.processes-filter-count` / `.logs-filter-count`) and `.process-list-header-pin` drop Apple dark-ink-on-`#ffffff`. Shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`.
+- **v0.1.2419** — Data Poster / Dark / Neon / Futuristic Agent Ops filter just-cleared (`.ops-filter-input.ops-filter-just-cleared`) drops Apple `#ffffff` after Clear.
 - **v0.1.2418** — Agent Ops overview hint (`.ops-hint`) opaque on dark shells (parallel tick).
 - **v0.1.2417** — Agent Ops editor + meta opaque on Dark / Neon / Futuristic.
 - **v0.1.2416** — Agent Ops health strip opaque on dark shells.
@@ -15,8 +16,7 @@ Overnight Track B kept contrast remaps on opaque shells (standing P2 #14 / desig
 
 - Mac recapture of stale `feature-agent-ops.png` (52d) — deferred (menu-bar only / Screen Recording TCC).
 - Digester Slowest empty after noise filters; fuel from design-review + standing backlog.
-- Race with parallel overnight tick on v0.1.2418 (ops-hint); this tick rebased and shipped just-cleared as v0.1.2419.
 
 ## Next
 
-- Processes / Logs dark-ink leftovers still without theme remaps if any, or Mac capture when TCC allows.
+- Other Processes / Logs / Agent Ops dark-ink leftovers still without theme remaps if any, or Mac capture when TCC allows.
