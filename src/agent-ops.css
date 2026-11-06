@@ -19651,3 +19651,115 @@ body.theme-futuristic .perplexity-attention-glance.is-filter {
   background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0b0b10);
   color: color-mix(in srgb, var(--accent, #55c7ff) 42%, var(--text, currentColor));
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Debug Log collapsed error glance still
+ * mixes Apple `#ffffff` washes (`.logs-error-glance` resting/hover/focus/
+ * has-errors/has-warns-only/is-quiet) → white slab when Debug Log is collapsed.
+ * Catch up to `.logs-attention-glance` opaque remaps (v0.1.2394). Design-review
+ * fuel (Debug Log / feature-monitors adjacent) + standing P2 #14 after attention
+ * glances; layout-daily Data Poster adjacent.
+ */
+body.theme-data-poster .logs-error-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .logs-error-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-data-poster .logs-error-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-data-poster .logs-error-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-data-poster .logs-error-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+body.theme-data-poster .logs-error-glance.is-quiet {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+
+body.theme-dark .logs-error-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .logs-error-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .logs-error-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .logs-error-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-dark .logs-error-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 6%, #0a0a0a);
+}
+body.theme-dark .logs-error-glance.is-quiet {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+
+body.theme-neon .logs-error-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+  background: color-mix(in srgb, currentColor 3.5%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .logs-error-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #08120c);
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+}
+body.theme-neon .logs-error-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .logs-error-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #08120c);
+  background: color-mix(in srgb, #ff3b30 7%, #08120c);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-neon .logs-error-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #08120c);
+  background: color-mix(in srgb, #ff9500 6%, #08120c);
+}
+body.theme-neon .logs-error-glance.is-quiet {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+
+body.theme-futuristic .logs-error-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3.5%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .logs-error-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+}
+body.theme-futuristic .logs-error-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .logs-error-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
+  color: color-mix(in srgb, #ff3b30 45%, var(--text, currentColor));
+}
+body.theme-futuristic .logs-error-glance.has-warns-only {
+  border-color: color-mix(in srgb, #ff9500 26%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 6%, #0b0b10);
+}
+body.theme-futuristic .logs-error-glance.is-quiet {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
