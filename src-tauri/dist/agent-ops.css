@@ -19400,3 +19400,96 @@ body.theme-dark .processes-hot-attention-glance.has-hot {
   background: color-mix(in srgb, #ff9f0a 12%, #0a0a0a);
   color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
 }
+
+/*
+ * Dark / Neon / Futuristic: Monitors summary still shared early `#0b0b10`
+ * (Dark with Data Poster) or Apple `#ffffff` (Neon / Futuristic) while
+ * Monitors attention glances already use CRT `#0a0a0a` / Neon `#08120c` /
+ * Futuristic `#0b0b10` → wrong slab on the always-visible summary strip.
+ * Data Poster remapped earlier. Design-review fuel (feature-monitors) +
+ * standing P2 #14 after Dark Monitors/Processes attention v0.1.2392;
+ * layout-daily Data Poster adjacent.
+ */
+body.theme-dark .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+}
+body.theme-dark .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-dark .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+}
+body.theme-dark .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .monitors-summary.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+
+body.theme-neon .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 16%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+}
+body.theme-neon .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-neon .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #08120c);
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+}
+body.theme-neon .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #08120c);
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+}
+body.theme-neon .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #08120c);
+  background: color-mix(in srgb, #ff9500 12%, #08120c);
+}
+body.theme-neon .monitors-summary.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+
+body.theme-futuristic .monitors-summary {
+  border-color: color-mix(in srgb, currentColor 16%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 35%, #0b0b10);
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+}
+body.theme-futuristic .monitors-summary.is-empty {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
