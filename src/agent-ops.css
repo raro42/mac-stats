@@ -21668,3 +21668,50 @@ body.theme-futuristic .logs-filter-count.is-zero {
 body.theme-futuristic .process-list-header-pin {
   color: color-mix(in srgb, #ffffff 48%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Monitors + AI Chat filter counts still mixed Apple
+ * dark-ink-on-`#ffffff` (Data Poster remapped earlier); rings filter count had
+ * zero theme remaps on all opaque shells. Soft light type on shell (79%/37%
+ * filter-count parity; rings 79%). Design-review fuel (feature-monitors /
+ * feature-ai-chat / feature-cpu-metrics) + standing P2 #14 after Processes/Logs
+ * filter-count v0.1.2420; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2421: Monitors/Chat/Rings filter-count opaque on Dark/Neon/Futuristic (+ rings DP) */
+body.theme-data-poster .rings-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-dark .monitors-filter-count,
+body.theme-dark .chat-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-count.is-zero,
+body.theme-dark .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0a0a0a);
+}
+body.theme-dark .rings-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0a0a0a);
+}
+body.theme-neon .monitors-filter-count,
+body.theme-neon .chat-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #08120c);
+}
+body.theme-neon .monitors-filter-count.is-zero,
+body.theme-neon .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #08120c);
+}
+body.theme-neon .rings-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #08120c);
+}
+body.theme-futuristic .monitors-filter-count,
+body.theme-futuristic .chat-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-count.is-zero,
+body.theme-futuristic .chat-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
