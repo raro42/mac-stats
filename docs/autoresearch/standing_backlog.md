@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2417
+
+- Dark / Neon / Futuristic Agent Ops editor + meta (`textarea.ops-agent-editor` focus/dirty · `.ops-agent-save-status` · `.ops-detail-meta` · `.ops-file-tab-kb-hint` / `.ops-agent-edit-actions-kb-hint` / `.ops-preview-row-kb-hint` / `.ops-insights-kb-hint`) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after health strip v0.1.2416; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: remaining Agent Ops Apple `#ffffff` leftovers if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2416
 
 - Dark / Neon / Futuristic Agent Ops health strip (`.ops-close-btn` resting/hover · `.ops-health-kb-hint` · `.ops-health-card` ok/warn/bad/active) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after btn-secondary v0.1.2415; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Agent Ops overview leftovers still on Apple `#ffffff` if any on Neon/Futuristic gaps, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

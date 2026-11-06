@@ -21488,3 +21488,72 @@ body.theme-futuristic .ops-health-card.is-active:not(.ops-health-ok):not(.ops-he
 body.theme-futuristic .ops-health-card.is-active.ops-health-clickable:hover {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #55c7ff) 52%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Agent Ops editor + meta still mixed Apple #ffffff
+ * (textarea focus/dirty · save-status · detail-meta · file-tab / edit-actions /
+ * preview-row / insights kb-hints) → white slab on opaque shells. Soft wash on
+ * shell (Data Poster remapped earlier). Design-review fuel (feature-agent-ops)
+ * + standing P2 #14 after health strip v0.1.2416; layout-daily Data Poster
+ * adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2417: Agent Ops editor/meta opaque on Dark/Neon/Futuristic */
+body.theme-dark textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0a0a0a);
+}
+body.theme-dark textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #0a0a0a);
+}
+body.theme-dark .ops-agent-save-status {
+  color: color-mix(in srgb, #ffffff 62%, #0a0a0a);
+}
+body.theme-dark .ops-detail-meta {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+}
+body.theme-dark .ops-file-tab-kb-hint,
+body.theme-dark .ops-agent-edit-actions-kb-hint,
+body.theme-dark .ops-preview-row-kb-hint,
+body.theme-dark .ops-insights-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0a0a0a);
+}
+
+body.theme-neon textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #08120c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #08120c);
+}
+body.theme-neon textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #08120c);
+}
+body.theme-neon .ops-agent-save-status {
+  color: color-mix(in srgb, #ffffff 62%, #08120c);
+}
+body.theme-neon .ops-detail-meta {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+}
+body.theme-neon .ops-file-tab-kb-hint,
+body.theme-neon .ops-agent-edit-actions-kb-hint,
+body.theme-neon .ops-preview-row-kb-hint,
+body.theme-neon .ops-insights-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #08120c);
+}
+
+body.theme-futuristic textarea.ops-agent-editor:focus {
+  border-color: color-mix(in srgb, #0a84ff 55%, #0b0b10);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, #0b0b10);
+}
+body.theme-futuristic textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, #0b0b10);
+}
+body.theme-futuristic .ops-agent-save-status {
+  color: color-mix(in srgb, #ffffff 62%, #0b0b10);
+}
+body.theme-futuristic .ops-detail-meta {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+}
+body.theme-futuristic .ops-file-tab-kb-hint,
+body.theme-futuristic .ops-agent-edit-actions-kb-hint,
+body.theme-futuristic .ops-preview-row-kb-hint,
+body.theme-futuristic .ops-insights-kb-hint {
+  color: color-mix(in srgb, #ffffff 63%, #0b0b10);
+}
