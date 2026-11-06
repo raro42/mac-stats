@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2397
+
+- Dark / Neon / Futuristic Perplexity empty · error · filter-miss · CTA (`.perplexity-empty` / `.perplexity-empty-error` · `.perplexity-filter-miss` resting/is-top-empty/is-snippet-empty · `.perplexity-empty-cta` resting/hover/focus) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Debug Log filter-miss v0.1.2396; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Debug Log / Perplexity leftovers still on Apple `#ffffff` if any (e.g. `.settings-perplexity-key-attention-glance` Dark/Neon/Futuristic if missing), or Mac capture of stale `feature-agent-ops.png` / `feature-monitors.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2396
 
 - Data Poster / Dark / Neon / Futuristic Debug Log filter-miss shell · CTA (`.logs-viewer-empty.logs-filter-miss` resting/is-error-empty/is-warn-empty · `.logs-filter-miss-cta` resting/hover/focus) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10` (error glance v0.1.2395 parity). Standing P2 #14 after Debug Log error glance v0.1.2395; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Debug Log / Perplexity leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-monitors.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
