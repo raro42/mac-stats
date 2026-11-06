@@ -18391,3 +18391,28 @@ body.theme-futuristic .process-detail-hero {
   border-color: color-mix(in srgb, currentColor 12%, #0b0b10);
   background: color-mix(in srgb, currentColor 5%, #0b0b10);
 }
+/*
+ * Dark / Neon / Futuristic: Process Details keyboard hints still mixed Apple
+ * dark-ink-on-`#ffffff` (`.process-detail-hero-toolbar-kb-hint` ·
+ * `.process-details-header-kb-hint`) — Neon/Futuristic hero-toolbar lacked a
+ * remap entirely; early Dark/Neon/Futuristic header remaps mixed on `#0b0b10`
+ * instead of CRT/Neon shells → wrong muted ink on Process Details chrome.
+ * Data Poster remapped earlier (Process Details kb-hint block). Design-review
+ * fuel (feature-processes) + standing P2 #14; layout-daily Data Poster
+ * adjacent (dark-shell Process Details kb-hint parity).
+ */
+body.theme-dark .process-detail-hero-toolbar-kb-hint,
+body.theme-dark .process-details-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .process-detail-hero-toolbar-kb-hint,
+body.theme-neon .process-details-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .process-detail-hero-toolbar-kb-hint,
+body.theme-futuristic .process-details-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
