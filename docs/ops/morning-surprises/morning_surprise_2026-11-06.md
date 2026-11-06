@@ -1,26 +1,22 @@
 # Morning surprise — 2026-11-06
 
-Overnight autoresearch (Track B) kept shipping opaque-shell remaps on Dark / Neon / Futuristic while digester stayed empty (0 turns / 7d). Design review screens are still stale on Mac (Screen Recording TCC); polish-without-capture grace covered Agent Ops / AI Chat / Monitors / Disk Cleanup / Processes.
+Overnight Track B kept shipping dark-theme opaque remaps (standing P2 #14 / design-review polish-without-capture; Mac Screen Recording TCC still blocks window-only recapture of stale `feature-*.png`).
 
-## Shipped tonight (keep)
+## Latest keep — v0.1.2390
 
-| Version | What got better |
-|---------|-----------------|
-| **v0.1.2389** | Monitors + AI Chat (Ollama) collapsed glances — Dark early `#0b0b10` / Neon·Futuristic Apple `#ffffff` → shells `#0a0a0a` / `#08120c` / `#0b0b10` |
-| **v0.1.2388** | Agent Ops Insights lines + collapsed empty glance → same shells (backfill keep logged) |
-| **v0.1.2387** | Agent Ops Updated ago + Insights subheads (Data Poster included for Updated ago) |
-| **v0.1.2386** | Agent Ops health value · Refresh kb-hint · AI Chat response-time |
-| **v0.1.2385** | AI Chat exec label · Agent Ops health label · Perplexity result meta |
-| **v0.1.2384** | Disk Cleanup summary / paths / item-stat |
-| **v0.1.2383** | Disk Cleanup policy · samples · scope kind |
-| **v0.1.2382** | Disk Cleanup tip + process list header |
-| **v0.1.2381** | Force Quit hint + advanced summary |
-| **v0.1.2380** | Force Quit toolbar kb-hint |
+- **Dark / Neon / Futuristic Disk Cleanup · Details collapsed glances** — `.disk-cleanup-collapsed-glance` (resting / hover / focus / has-reclaim / is-due / is-clean / has-scopes-off) and `.details-collapsed-glance` (resting / hover / focus / is-hot / is-ok) mix on CRT `#0a0a0a` / Neon `#08120c` / Futuristic `#0b0b10` instead of Apple `#ffffff` washes (Data Poster v0.1.2265 parity).
+- Commit `991b8629`. Ratchet keep logged.
+- Digester still points at stale `feature-agent-ops.png` (~51d); capture deferred.
 
-## Not a quiet night
+## Also tonight (selected)
 
-Empty digester was not treated as “done”. Standing P2 #14 (theme opaque shells) drove each tick. Sibling OpenClaw/Hermes missing on this rack. `debug.log` clean in the scan window.
+- v0.1.2389 — Monitors · AI Chat collapsed glances opaque
+- v0.1.2388 — Insights lines · Agent Ops collapsed empty glance opaque
+- v0.1.2387 — Updated ago + Insights subheads opaque
+- Earlier: Disk Cleanup labels / Force Quit / Process Details / AI Chat Send opaque cascade
 
-## Next fuel
+## Still open
 
-Dark / Neon / Futuristic Disk Cleanup / Details collapsed glances if still on Apple `#ffffff`. Mac window-only recapture of stale `feature-*.png` when TCC allows `screencapture -l`.
+- Mac window-only recapture of Agent Ops / AI Chat / Disk Cleanup / Processes feature screens when TCC allows
+- Layout-daily Data Poster screen still missing
+- More collapsed leftovers (Perplexity / Debug Log / Monitors attention Dark shell) if still on Apple `#ffffff` or early `#0b0b10`
