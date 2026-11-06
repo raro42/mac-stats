@@ -20380,3 +20380,86 @@ body.theme-futuristic .perplexity-filter-clear.is-just-saved {
   border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
   color: color-mix(in srgb, #34c759 70%, #ffffff);
 }
+
+/*
+ * Dark / Neon / Futuristic: Settings Save flashes still mix Apple #ffffff
+ * (soft .settings-card button.is-just-saved / Reset / View logs · solid
+ * Perplexity/Brave/Redmine/Mastodon/MCP/Browser/Cursor/Telegram/Slack/Discord
+ * Save) → white slab on opaque shells. Data Poster remapped earlier.
+ * Design-review fuel (Settings / feature-agent-ops adjacent) + standing P2 #14;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .settings-card button.is-just-saved,
+body.theme-dark .settings-card .popover-btn-secondary.is-just-saved,
+body.theme-dark #settings-reset-defaults-btn.is-just-saved,
+body.theme-dark #view-debug-log.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+body.theme-dark #perplexity-save-key.is-just-saved,
+body.theme-dark #brave-save-key.is-just-saved,
+body.theme-dark #redmine-save.is-just-saved,
+body.theme-dark #mastodon-save.is-just-saved,
+body.theme-dark #mcp-save.is-just-saved,
+body.theme-dark #browser-save.is-just-saved,
+body.theme-dark #cursor-agent-save.is-just-saved,
+body.theme-dark #telegram-save.is-just-saved,
+body.theme-dark #slack-save.is-just-saved,
+body.theme-dark #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0a0a0a) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+body.theme-neon .settings-card button.is-just-saved,
+body.theme-neon .settings-card .popover-btn-secondary.is-just-saved,
+body.theme-neon #settings-reset-defaults-btn.is-just-saved,
+body.theme-neon #view-debug-log.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+body.theme-neon #perplexity-save-key.is-just-saved,
+body.theme-neon #brave-save-key.is-just-saved,
+body.theme-neon #redmine-save.is-just-saved,
+body.theme-neon #mastodon-save.is-just-saved,
+body.theme-neon #mcp-save.is-just-saved,
+body.theme-neon #browser-save.is-just-saved,
+body.theme-neon #cursor-agent-save.is-just-saved,
+body.theme-neon #telegram-save.is-just-saved,
+body.theme-neon #slack-save.is-just-saved,
+body.theme-neon #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #08120c) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+body.theme-futuristic .settings-card button.is-just-saved,
+body.theme-futuristic .settings-card .popover-btn-secondary.is-just-saved,
+body.theme-futuristic #settings-reset-defaults-btn.is-just-saved,
+body.theme-futuristic #view-debug-log.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+body.theme-futuristic #perplexity-save-key.is-just-saved,
+body.theme-futuristic #brave-save-key.is-just-saved,
+body.theme-futuristic #redmine-save.is-just-saved,
+body.theme-futuristic #mastodon-save.is-just-saved,
+body.theme-futuristic #mcp-save.is-just-saved,
+body.theme-futuristic #browser-save.is-just-saved,
+body.theme-futuristic #cursor-agent-save.is-just-saved,
+body.theme-futuristic #telegram-save.is-just-saved,
+body.theme-futuristic #slack-save.is-just-saved,
+body.theme-futuristic #discord-save-token.is-just-saved {
+  background: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 95%, #0b0b10) !important;
+  color: #fff !important;
+  box-shadow: none;
+}
