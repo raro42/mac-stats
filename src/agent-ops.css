@@ -21557,3 +21557,25 @@ body.theme-futuristic .ops-preview-row-kb-hint,
 body.theme-futuristic .ops-insights-kb-hint {
   color: color-mix(in srgb, #ffffff 63%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Agent Ops overview hint (`.ops-hint`)
+ * still mixed Apple dark-ink-on-#ffffff with zero theme remaps → unreadable
+ * mute on opaque shells. Soft light type on shell (overview-count 48% parity;
+ * hint was 40% ink). Design-review fuel (feature-agent-ops) + standing P2 #14
+ * after editor/meta v0.1.2417; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2418: Agent Ops .ops-hint opaque on Data Poster/Dark/Neon/Futuristic */
+body.theme-data-poster .ops-hint {
+  color: color-mix(in srgb, #ffffff 40%, #0b0b10);
+}
+body.theme-dark .ops-hint {
+  color: color-mix(in srgb, #00ff00 40%, #0a0a0a);
+}
+body.theme-neon .ops-hint {
+  color: color-mix(in srgb, #ffffff 40%, #08120c);
+}
+body.theme-futuristic .ops-hint {
+  color: color-mix(in srgb, #ffffff 40%, #0b0b10);
+}
