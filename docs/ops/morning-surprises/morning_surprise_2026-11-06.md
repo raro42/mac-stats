@@ -1,19 +1,20 @@
 # Morning surprise — 2026-11-06
 
-Generated: overnight harness tick ~03:12 CET (2026-11-06).
+Overnight Track B kept product CSS remaps (opaque dark-shell type). Digester was empty of Slowest turns; fuel was design-review + standing P2 #14.
 
-## Shipped (night of 2026-11-05 → 2026-11-06)
-- **v0.1.2385** — Dark / Neon / Futuristic AI Chat exec label · Agent Ops health label · Perplexity result meta (`.chat-exec-label` · `.ops-health-label` · `.perplexity-result-meta`) opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster parity; Neon/Futuristic lacked remap; Dark early `#0b0b10`). Design-review `feature-ai-chat` / `feature-agent-ops` / layout-daily Data Poster adjacent; Mac capture deferred (Screen Recording TCC).
-- **v0.1.2384** — Dark / Neon / Futuristic Disk Cleanup summary / paths / item stat opaque on shells.
-- **v0.1.2383** — Dark / Neon / Futuristic Disk Cleanup policy · samples · scope kind opaque on shells.
-- **v0.1.2382** — Dark / Neon / Futuristic Disk Cleanup tip + process list header opaque on shells.
-- **v0.1.2381** — Dark / Neon / Futuristic Force Quit hint + advanced summary opaque on shells.
-- **v0.1.2380**–**2353** — continuing dark-theme Apple `#ffffff` remaps (Force Quit, Process Details, Details, AI Chat Send, Processes, Agent Ops).
+## Shipped tonight (latest first)
+
+- **v0.1.2386** — Dark / Neon / Futuristic `.ops-health-value` / `.ops-refresh-row-kb-hint` / `.response-time` opaque on `#0a0a0a` / `#08120c` / `#0b0b10` (Agent Ops health + AI Chat latency; Data Poster parity).
+- **v0.1.2385** — `.chat-exec-label` / `.ops-health-label` / `.perplexity-result-meta` opaque shells.
+- **v0.1.2384** — Disk Cleanup summary / paths / item-stat opaque shells.
+- Earlier same night: Disk Cleanup tip/meta, Force Quit / Process Details / Details / AI Chat Send remaps through v0.1.2370+.
 
 ## Tried / deferred
-- Design-review Mac capture of stale `feature-agent-ops.png` (~51d) / `feature-ai-chat.png` / `feature-disk-cleanup.png` — Screen Recording TCC / Linux rack (`screencapture -l` unavailable here).
-- Layout-daily theme screens missing — remap polish instead (muted labels this tick).
-- Digester empty (0 turns / 7d); sibling OpenClaw/Hermes missing on rack.
 
-## Next fuel
-- Dark/Neon/Futuristic `.ops-health-value` / `.ops-refresh-row-kb-hint` / `.response-time` if still Apple / early `#0b0b10`; Mac capture when TCC allows.
+- Mac window-only recapture of stale `feature-agent-ops.png` (~51d) — no on-screen CPU window / Screen Recording TCC; polish-without-capture grace used.
+- Layout-daily Data Poster screen still missing; remaps continue via standing backlog.
+
+## Why it matters
+
+Dark / Neon / Futuristic themes no longer show near-invisible dark ink (Apple wash) on Agent Ops health values, the Refresh tip, or AI Chat response-time labels. Type sits on the real opaque shells.
+
