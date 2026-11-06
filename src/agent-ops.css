@@ -20905,3 +20905,39 @@ body.theme-futuristic button.monitor-detail-url.is-just-saved {
   color: #34c759;
   box-shadow: none;
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup path Saved flashes still
+ * mix Apple #ffffff (.disk-cleanup-item-path / .disk-cleanup-scope-path
+ * is-just-saved) → white slab on opaque shells. Soft 12% green tint on shell
+ * (parity with Apple base / Monitors URL v0.1.2408). Design-review fuel
+ * (feature-disk-cleanup) + standing P2 #14 after Monitors URL v0.1.2408;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-data-poster .disk-cleanup-item-path.is-just-saved,
+body.theme-data-poster .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-dark .disk-cleanup-item-path.is-just-saved,
+body.theme-dark .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-neon .disk-cleanup-item-path.is-just-saved,
+body.theme-neon .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  color: #34c759;
+  box-shadow: none;
+}
+
+body.theme-futuristic .disk-cleanup-item-path.is-just-saved,
+body.theme-futuristic .disk-cleanup-scope-path.is-just-saved {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  color: #34c759;
+  box-shadow: none;
+}
