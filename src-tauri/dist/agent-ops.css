@@ -20730,3 +20730,45 @@ body.theme-futuristic #monitors-add-save.is-just-saved {
   color: #fff !important;
   box-shadow: none;
 }
+
+/*
+ * Dark / Neon / Futuristic: Agent Ops Load-into-Chat Saved flashes still mix
+ * Apple #ffffff (#ops-session-load-chat / #ops-runs-load-chat /
+ * #ops-schedules-load-chat / #ops-memory-load-chat / #ops-agent-load-chat
+ * is-just-saved) → white slab on opaque shells. Data Poster remapped earlier.
+ * Design-review fuel (feature-agent-ops) + standing P2 #14 after Settings
+ * Save leftovers v0.1.2405; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark #ops-session-load-chat.is-just-saved,
+body.theme-dark #ops-runs-load-chat.is-just-saved,
+body.theme-dark #ops-schedules-load-chat.is-just-saved,
+body.theme-dark #ops-memory-load-chat.is-just-saved,
+body.theme-dark #ops-agent-load-chat.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+
+body.theme-neon #ops-session-load-chat.is-just-saved,
+body.theme-neon #ops-runs-load-chat.is-just-saved,
+body.theme-neon #ops-schedules-load-chat.is-just-saved,
+body.theme-neon #ops-memory-load-chat.is-just-saved,
+body.theme-neon #ops-agent-load-chat.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+
+body.theme-futuristic #ops-session-load-chat.is-just-saved,
+body.theme-futuristic #ops-runs-load-chat.is-just-saved,
+body.theme-futuristic #ops-schedules-load-chat.is-just-saved,
+body.theme-futuristic #ops-memory-load-chat.is-just-saved,
+body.theme-futuristic #ops-agent-load-chat.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 45%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
