@@ -18574,3 +18574,31 @@ body.theme-futuristic .disk-cleanup-item-stat {
   color: color-mix(in srgb, #ffffff 78%, #0b0b10);
   opacity: 1;
 }
+/*
+ * Dark / Neon / Futuristic: AI Chat exec label · Agent Ops health label ·
+ * Perplexity result meta still mixed Apple dark-ink-on-`#ffffff`
+ * (`.chat-exec-label` · `.ops-health-label` · `.perplexity-result-meta`) —
+ * Neon/Futuristic lacked any opaque remap; Dark early remap mixed on
+ * `#0b0b10` not CRT `#0a0a0a`. Data Poster remapped earlier. Design-review
+ * fuel (feature-ai-chat / feature-agent-ops / Perplexity adjacent) +
+ * standing P2 #14; layout-daily Data Poster adjacent (dark-shell muted
+ * label parity).
+ */
+body.theme-dark .chat-exec-label,
+body.theme-dark .ops-health-label,
+body.theme-dark .perplexity-result-meta {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .chat-exec-label,
+body.theme-neon .ops-health-label,
+body.theme-neon .perplexity-result-meta {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .chat-exec-label,
+body.theme-futuristic .ops-health-label,
+body.theme-futuristic .perplexity-result-meta {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
