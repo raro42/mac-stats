@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2412
+
+- Data Poster / Dark / Neon / Futuristic Disk Cleanup + Debug Log toolbar Saved flashes (`#disk-cleanup-refresh-btn` / `#disk-cleanup-run-btn` / `#disk-cleanup-save-scopes-btn` / `#disk-cleanup-add-btn` / `#logs-refresh-btn` / `#logs-open-btn` is-just-saved) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after path/chip v0.1.2411; design-review `feature-disk-cleanup` / Debug Log adjacent (polish-without-capture grace). Next: other soft Saved leftovers still on Apple `#ffffff` if any (e.g. monitor check/remove · `#chat-clear-btn`), or Mac capture of stale `feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2411
 
 - Data Poster / Dark / Neon / Futuristic Debug Log path + AI Chat empty-chip Saved flashes (`.logs-path-hint.is-just-saved` / `.chat-empty-chip.is-just-saved`) Apple `#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after product-toggle v0.1.2410; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other soft Saved leftovers still on Apple `#ffffff` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-monitors.png` when Screen Recording TCC allows `screencapture -l`.

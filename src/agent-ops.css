@@ -21028,3 +21028,62 @@ body.theme-futuristic .chat-empty-chip.is-just-saved {
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
   box-shadow: none;
 }
+
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup + Debug Log toolbar
+ * Saved flashes still mix Apple #ffffff via shared button.is-just-saved
+ * (#disk-cleanup-refresh-btn / #disk-cleanup-run-btn /
+ * #disk-cleanup-save-scopes-btn / #disk-cleanup-add-btn /
+ * #logs-refresh-btn / #logs-open-btn) → white slab on opaque shells. Soft
+ * 18%/40% green tint on shell (shared button flash parity). Design-review
+ * fuel (feature-disk-cleanup / Debug Log) + standing P2 #14 after path/chip
+ * v0.1.2411; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-data-poster #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-data-poster #disk-cleanup-run-btn.is-just-saved,
+body.theme-data-poster #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-data-poster #disk-cleanup-add-btn.is-just-saved,
+body.theme-data-poster #logs-refresh-btn.is-just-saved,
+body.theme-data-poster #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
+
+body.theme-dark #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-dark #disk-cleanup-run-btn.is-just-saved,
+body.theme-dark #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-dark #disk-cleanup-add-btn.is-just-saved,
+body.theme-dark #logs-refresh-btn.is-just-saved,
+body.theme-dark #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0a0a0a) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+  box-shadow: none;
+}
+
+body.theme-neon #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-neon #disk-cleanup-run-btn.is-just-saved,
+body.theme-neon #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-neon #disk-cleanup-add-btn.is-just-saved,
+body.theme-neon #logs-refresh-btn.is-just-saved,
+body.theme-neon #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #08120c) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #08120c) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+  box-shadow: none;
+}
+
+body.theme-futuristic #disk-cleanup-refresh-btn.is-just-saved,
+body.theme-futuristic #disk-cleanup-run-btn.is-just-saved,
+body.theme-futuristic #disk-cleanup-save-scopes-btn.is-just-saved,
+body.theme-futuristic #disk-cleanup-add-btn.is-just-saved,
+body.theme-futuristic #logs-refresh-btn.is-just-saved,
+body.theme-futuristic #logs-open-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10) !important;
+  border-color: color-mix(in srgb, #34c759 40%, #0b0b10) !important;
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+  box-shadow: none;
+}
