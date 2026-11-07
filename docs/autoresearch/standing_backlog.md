@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2426
+
+- Dark / Neon / Futuristic Monitors filter chips (`.monitors-filter-chip` resting/hover/focus/active · Down · Up · Slow) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier; Dark early remaps completed). Standing P2 #14 after Disk Cleanup chips v0.1.2425; design-review `feature-monitors` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Settings section attention glances / other filter-chip leftovers if still Apple `#ffffff`, or Mac capture of stale `feature-monitors.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2425
 
 - Dark / Neon / Futuristic Disk Cleanup filter chips (`.disk-cleanup-filter-chip` / `.disk-cleanup-scope-filter-chip` resting/hover/focus/active · Reclaim · Big · Clean · On · Off) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Rings chips v0.1.2424; design-review `feature-disk-cleanup` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Neon·Futuristic `.monitors-filter-chip` / Settings section attention glances / other filter-chip leftovers if still Apple `#ffffff`, or Mac capture of stale `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.

@@ -22217,3 +22217,139 @@ body.theme-futuristic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-fi
   background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
   border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Monitors filter chips still mixed Apple
+ * dark-ink-on-#ffffff (`.monitors-filter-chip` resting/hover/focus/active ·
+ * Down · Up · Slow). Data Poster remapped earlier; Dark only had partial early
+ * #0b0b10 remaps (missing focus / status hits). Soft light type + shell washes
+ * (Disk Cleanup filter-chip parity v0.1.2425). Design-review fuel
+ * (feature-monitors) + standing P2 #14 after Disk Cleanup chips v0.1.2425;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2426: Monitors filter chips opaque on Dark/Neon/Futuristic */
+body.theme-dark .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 77%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 7%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff3b30 38%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 28%, #0a0a0a);
+}
+body.theme-dark .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+}
+
+body.theme-neon .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+  color: color-mix(in srgb, #ffffff 77%, #08120c);
+}
+body.theme-neon .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, currentColor 7%, #08120c);
+}
+body.theme-neon .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-neon .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 28%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #08120c);
+  border-color: color-mix(in srgb, #ff3b30 38%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 28%, #08120c);
+}
+body.theme-neon .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 40%, #08120c);
+}
+
+body.theme-futuristic .monitors-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 28%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff3b30 38%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 28%, #0b0b10);
+}
+body.theme-futuristic .monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+}
