@@ -24266,3 +24266,37 @@ body.theme-dark #chat-input:focus {
   background: color-mix(in srgb, currentColor 6%, #0a0a0a);
   color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
 }
+
+/*
+ * Dark / Neon: Top Processes empty cascade · Neon filter-chip kb-hint · Settings
+ * Judge-off still wrong after empty/disabled/chat-focus CRT v0.1.2458.
+ * Dark `.process-empty` CRT at L1923 loses to later shared `#0b0b10` color
+ * (Neon / Futuristic / Data Poster already remap after that shared rule).
+ * Neon `.filter-chip-kb-hint` stays on early shared `#0b0b10` (Dark chat kb-hint
+ * CRT already `#0a0a0a`; Futuristic shell is `#0b0b10`). Neon / Dark
+ * `.setting-toggle .toggle-label.is-judge-off` still mix on early `#0b0b10` /
+ * `#000000`. Catch up to CRT `#0a0a0a` / `#08120c`. Standing P2 #14 after
+ * empty/disabled/chat-focus CRT v0.1.2458; design-review feature-processes /
+ * feature-agent-ops / Settings adjacent (polish-without-capture grace;
+ * feature-agent-ops capture still TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2459: process-empty cascade · Neon filter kb · judge-off CRT */
+body.theme-dark .process-empty {
+  color: color-mix(in srgb, #ffffff 72%, #0a0a0a) !important;
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+}
+
+body.theme-neon .filter-chip-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+
+body.theme-neon .setting-toggle .toggle-label.is-judge-off {
+  color: color-mix(in srgb, #c8ffd2 44%, #08120c);
+  opacity: 1;
+}
+body.theme-dark .setting-toggle .toggle-label.is-judge-off {
+  color: color-mix(in srgb, #00ff00 44%, #0a0a0a);
+  opacity: 1;
+}
