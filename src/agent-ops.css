@@ -16794,6 +16794,76 @@ body.theme-data-poster .rings-filter-miss-cta:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
 }
 /*
+ * Dark / Neon / Futuristic: rings Hot-filter miss shell / hint / CTA still mix
+ * Apple `#ffffff` washes (.rings-filter-miss · .rings-filter-miss-hint ·
+ * .rings-filter-miss-cta) → white slab on opaque shells. Data Poster remapped
+ * earlier. Design-review fuel (feature-cpu-metrics) + standing P2 #14 after
+ * Settings section glances v0.1.2427; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .rings-filter-miss {
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+}
+body.theme-dark .rings-filter-miss-hint {
+  color: color-mix(in srgb, #ffffff 72%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .rings-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 48%, #0a0a0a);
+}
+body.theme-dark .rings-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+
+body.theme-neon .rings-filter-miss {
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+  border-color: color-mix(in srgb, currentColor 10%, #08120c);
+}
+body.theme-neon .rings-filter-miss-hint {
+  color: color-mix(in srgb, #ffffff 72%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .rings-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 14%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 48%, #08120c);
+}
+body.theme-neon .rings-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+
+body.theme-futuristic .rings-filter-miss {
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 10%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-miss-hint {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .rings-filter-miss-cta {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 14%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 48%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-miss-cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+/*
  * Data Poster: AI Chat filter-miss shell / CTA still mixed against early #0e0e14
  * (.chat-filter-miss · Errors/You/Assistant · .chat-filter-miss-cta) → wrong dark
  * slab on the opaque shell #0b0b10. Catch up to rings-filter-miss opaque remaps.
