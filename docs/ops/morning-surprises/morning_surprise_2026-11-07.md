@@ -4,6 +4,7 @@ Overnight Track B kept contrast remaps on opaque shells (standing P2 #14 / desig
 
 ## Shipped tonight (latest first)
 
+- **v0.1.2434** — Dark AI Chat filter-miss CRT (`.chat-filter-miss` resting · Errors · You/Assistant · `.chat-filter-miss-cta` resting/hover/focus) early `#0b0b10` → CRT `#0a0a0a` (Neon/Futuristic/Data Poster already remapped).
 - **v0.1.2433** — Dark / Neon / Futuristic Perplexity setup muted type (`.perplexity-setup-kb-hint` · `.perplexity-setup-lead` · `.perplexity-setup-note` resting · error) opaque. Shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier; Dark early remap corrected off `#0b0b10`).
 - **v0.1.2432** — Dark / Neon / Futuristic Monitors filter-miss (`.monitors-filter-miss` resting · Down/Slow empty · Up empty) opaque on dark shells (Dark early remap corrected off `#0b0b10`).
 - **v0.1.2431** — Dark / Neon / Futuristic Disk Cleanup filter-miss (`.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` resting · reclaim/big/off empty · clean/on empty) opaque on dark shells.
@@ -24,4 +25,4 @@ Overnight Track B kept contrast remaps on opaque shells (standing P2 #14 / desig
 
 ## Next
 
-- Dark AI Chat filter-miss CRT (`#0b0b10` → `#0a0a0a`) / Dark processes-filter-miss CRT / `.perplexity-search-kb-hint` Neon·Futuristic if still Apple dark-ink, or Mac window-only recapture of stale feature screens when TCC allows.
+- Dark processes-filter-miss CRT (`#0b0b10` → `#0a0a0a`) / Neon·Futuristic `.perplexity-search-kb-hint` if still Apple dark-ink, or Mac window-only recapture of stale feature screens when TCC allows.
