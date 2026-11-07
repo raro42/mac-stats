@@ -23246,3 +23246,142 @@ body.theme-dark .chat-answer-part.chat-answer-final {
   background: color-mix(in srgb, var(--accent, #00cc66) 10%, #0a0a0a);
 }
 
+/*
+ * Dark: Agent Ops attention glances still mixed on early `#0b0b10` (shared Data
+ * Poster remap) instead of CRT `#0a0a0a` (`.ops-*-attention-glance` resting /
+ * hover / focus · has-fail · has-slow/warn/not-set · filter soft states).
+ * Neon / Futuristic already remap on `#08120c` / `#0b0b10`; Data Poster stays
+ * on `#0b0b10`. Design-review fuel (feature-agent-ops) + standing P2 #14 after
+ * AI Chat exec/answer CRT v0.1.2443; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .ops-runs-attention-glance,
+body.theme-dark .ops-filter-attention-glance,
+body.theme-dark .ops-digest-attention-glance,
+body.theme-dark .ops-discord-attention-glance,
+body.theme-dark .ops-redmine-attention-glance,
+body.theme-dark .ops-ollama-attention-glance,
+body.theme-dark .ops-brave-attention-glance,
+body.theme-dark .ops-browser-attention-glance,
+body.theme-dark .ops-mcp-attention-glance,
+body.theme-dark .ops-cursor-attention-glance,
+body.theme-dark .ops-perplexity-attention-glance,
+body.theme-dark .ops-mastodon-attention-glance,
+body.theme-dark .ops-telegram-attention-glance,
+body.theme-dark .ops-slack-attention-glance,
+body.theme-dark .ops-signal-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .ops-runs-attention-glance:hover,
+body.theme-dark .ops-filter-attention-glance:hover,
+body.theme-dark .ops-digest-attention-glance:hover,
+body.theme-dark .ops-discord-attention-glance:hover,
+body.theme-dark .ops-redmine-attention-glance:hover,
+body.theme-dark .ops-ollama-attention-glance:hover,
+body.theme-dark .ops-brave-attention-glance:hover,
+body.theme-dark .ops-browser-attention-glance:hover,
+body.theme-dark .ops-mcp-attention-glance:hover,
+body.theme-dark .ops-cursor-attention-glance:hover,
+body.theme-dark .ops-perplexity-attention-glance:hover,
+body.theme-dark .ops-mastodon-attention-glance:hover,
+body.theme-dark .ops-telegram-attention-glance:hover,
+body.theme-dark .ops-slack-attention-glance:hover,
+body.theme-dark .ops-signal-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .ops-runs-attention-glance:focus-visible,
+body.theme-dark .ops-filter-attention-glance:focus-visible,
+body.theme-dark .ops-digest-attention-glance:focus-visible,
+body.theme-dark .ops-discord-attention-glance:focus-visible,
+body.theme-dark .ops-redmine-attention-glance:focus-visible,
+body.theme-dark .ops-ollama-attention-glance:focus-visible,
+body.theme-dark .ops-brave-attention-glance:focus-visible,
+body.theme-dark .ops-browser-attention-glance:focus-visible,
+body.theme-dark .ops-mcp-attention-glance:focus-visible,
+body.theme-dark .ops-cursor-attention-glance:focus-visible,
+body.theme-dark .ops-perplexity-attention-glance:focus-visible,
+body.theme-dark .ops-mastodon-attention-glance:focus-visible,
+body.theme-dark .ops-telegram-attention-glance:focus-visible,
+body.theme-dark .ops-slack-attention-glance:focus-visible,
+body.theme-dark .ops-signal-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+  box-shadow: none;
+}
+body.theme-dark .ops-runs-attention-glance.has-fail,
+body.theme-dark .ops-filter-attention-glance.is-fail-filter,
+body.theme-dark .ops-discord-attention-glance.has-offline,
+body.theme-dark .ops-redmine-attention-glance.has-bad,
+body.theme-dark .ops-ollama-attention-glance.has-bad,
+body.theme-dark .ops-brave-attention-glance.has-bad,
+body.theme-dark .ops-browser-attention-glance.has-bad,
+body.theme-dark .ops-mcp-attention-glance.has-bad,
+body.theme-dark .ops-cursor-attention-glance.has-bad,
+body.theme-dark .ops-perplexity-attention-glance.has-bad,
+body.theme-dark .ops-mastodon-attention-glance.has-bad,
+body.theme-dark .ops-telegram-attention-glance.has-bad,
+body.theme-dark .ops-slack-attention-glance.has-bad,
+body.theme-dark .ops-signal-attention-glance.has-bad {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff3b30 55%, var(--text, currentColor));
+}
+body.theme-dark .ops-runs-attention-glance.has-slow,
+body.theme-dark .ops-filter-attention-glance.is-slow-filter,
+body.theme-dark .ops-digest-attention-glance.has-open,
+body.theme-dark .ops-discord-attention-glance.has-warn,
+body.theme-dark .ops-redmine-attention-glance.has-not-set,
+body.theme-dark .ops-redmine-attention-glance.has-warn,
+body.theme-dark .ops-ollama-attention-glance.has-not-set,
+body.theme-dark .ops-ollama-attention-glance.has-warn,
+body.theme-dark .ops-brave-attention-glance.has-not-set,
+body.theme-dark .ops-brave-attention-glance.has-warn,
+body.theme-dark .ops-browser-attention-glance.has-not-set,
+body.theme-dark .ops-browser-attention-glance.has-warn,
+body.theme-dark .ops-mcp-attention-glance.has-not-set,
+body.theme-dark .ops-mcp-attention-glance.has-warn,
+body.theme-dark .ops-cursor-attention-glance.has-not-set,
+body.theme-dark .ops-cursor-attention-glance.has-warn,
+body.theme-dark .ops-perplexity-attention-glance.has-not-set,
+body.theme-dark .ops-perplexity-attention-glance.has-warn,
+body.theme-dark .ops-mastodon-attention-glance.has-not-set,
+body.theme-dark .ops-mastodon-attention-glance.has-partial,
+body.theme-dark .ops-mastodon-attention-glance.has-warn,
+body.theme-dark .ops-telegram-attention-glance.has-not-set,
+body.theme-dark .ops-telegram-attention-glance.has-partial,
+body.theme-dark .ops-telegram-attention-glance.has-warn,
+body.theme-dark .ops-slack-attention-glance.has-not-set,
+body.theme-dark .ops-slack-attention-glance.has-partial,
+body.theme-dark .ops-slack-attention-glance.has-warn,
+body.theme-dark .ops-signal-attention-glance.has-not-wired,
+body.theme-dark .ops-signal-attention-glance.has-not-set,
+body.theme-dark .ops-signal-attention-glance.has-partial,
+body.theme-dark .ops-signal-attention-glance.has-warn {
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
+  color: color-mix(in srgb, #ff9f0a 55%, var(--text, currentColor));
+}
+body.theme-dark .ops-filter-attention-glance.is-filter,
+body.theme-dark .ops-filter-attention-glance.is-off-filter,
+body.theme-dark .ops-filter-attention-glance.is-files-filter,
+body.theme-dark .ops-filter-attention-glance.is-deliveries-filter,
+body.theme-dark .ops-filter-attention-glance.is-discord-filter {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 7%, #0a0a0a);
+  color: color-mix(in srgb, var(--accent, #00cc66) 55%, var(--text, currentColor));
+}
+body.theme-dark .ops-filter-attention-glance.is-on-filter,
+body.theme-dark .ops-filter-attention-glance.is-live-filter,
+body.theme-dark .ops-filter-attention-glance.is-jobs-filter,
+body.theme-dark .ops-filter-attention-glance.is-core-filter,
+body.theme-dark .ops-filter-attention-glance.is-instant-filter,
+body.theme-dark .ops-filter-attention-glance.is-lite-filter,
+body.theme-dark .ops-filter-attention-glance.is-direct-filter {
+  border-color: color-mix(in srgb, #30d158 28%, #0a0a0a);
+  background: color-mix(in srgb, #30d158 7%, #0a0a0a);
+  color: color-mix(in srgb, #30d158 55%, var(--text, currentColor));
+}
+
