@@ -17300,7 +17300,7 @@ body.theme-futuristic .perplexity-search-kb-hint {
  * `.chat-offline-attention-glance` resting/hover · online/offline/no-model ·
  * turn active). Neon / Futuristic already remap on `#08120c` / `#0b0b10`;
  * Data Poster stays on `#0b0b10`. Design-review fuel (feature-ai-chat) +
- * standing P2 #14 after Perplexity search kb-hint v0.1.2436; layout-daily
+ * standing P2 #14 after status glances CRT v0.1.2437; layout-daily
  * Data Poster adjacent (polish-without-capture grace).
  */
 body.theme-dark .chat-model-glance,
@@ -22995,4 +22995,103 @@ body.theme-futuristic .settings-help-attention-glance.is-open {
   border-color: color-mix(in srgb, #34c759 32%, #0b0b10);
   background: color-mix(in srgb, #34c759 12%, #0b0b10);
   color: color-mix(in srgb, #34c759 55%, var(--text, currentColor));
+}
+/*
+ * Dark: AI Chat model / turn / answer / errors glances + offline attention
+ * still mixed on shared early `#0b0b10` (with Data Poster) while Neon /
+ * Futuristic already mix on `#08120c` / `#0b0b10` and Data Poster later soft
+ * remaps stay on poster `#0b0b10`. Move Dark onto CRT `#0a0a0a` (same soft
+ * wash as Data Poster v0.1.2208+). Design-review fuel (feature-ai-chat) +
+ * standing P2 #14 after Perplexity search kb-hint v0.1.2436; layout-daily
+ * Data Poster adjacent (polish-without-capture grace). Mac capture deferred (TCC).
+ */
+body.theme-dark .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-offline-attention-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-offline,
+body.theme-dark .chat-offline-attention-glance.is-circuit,
+body.theme-dark .chat-offline-attention-glance.is-no-model {
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-not-set,
+body.theme-dark .chat-offline-attention-glance.is-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-ready,
+body.theme-dark .chat-offline-attention-glance.is-last-answer {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-continue {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 28%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 7%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-filter {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 24%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 5.5%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-sending {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 38%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 10%, #0a0a0a);
+}
+body.theme-dark .chat-offline-attention-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 42%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 14%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance,
+body.theme-dark .chat-turn-glance,
+body.theme-dark .chat-answer-glance,
+body.theme-dark .chat-errors-glance {
+  border-color: color-mix(in srgb, currentColor 10%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3.5%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-model-glance:hover,
+body.theme-dark .chat-turn-glance:hover,
+body.theme-dark .chat-answer-glance:hover,
+body.theme-dark .chat-errors-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance:focus-visible,
+body.theme-dark .chat-turn-glance:focus-visible,
+body.theme-dark .chat-answer-glance:focus-visible,
+body.theme-dark .chat-errors-glance:focus-visible {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 45%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance.is-online,
+body.theme-dark .chat-turn-glance.is-ok:not(.is-active),
+body.theme-dark .chat-answer-glance.has-answer:not(.has-errors) {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance.is-offline,
+body.theme-dark .chat-model-glance.is-online.is-no-model,
+body.theme-dark .chat-model-glance.is-offline.is-circuit {
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 7%, #0a0a0a);
+}
+body.theme-dark .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 34%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 8%, #0a0a0a);
+}
+body.theme-dark .chat-answer-glance.has-errors,
+body.theme-dark .chat-errors-glance.has-errors {
+  border-color: color-mix(in srgb, #ff3b30 30%, #0a0a0a);
+  background: color-mix(in srgb, #ff3b30 7%, #0a0a0a);
+}
+body.theme-dark .chat-answer-glance.is-just-copied {
+  border-color: color-mix(in srgb, #34c759 40%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 10%, #0a0a0a);
 }
