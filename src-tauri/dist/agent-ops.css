@@ -22023,3 +22023,197 @@ body.theme-futuristic .rings-filter-chip[data-rings-filter='hot'].is-active {
   background: color-mix(in srgb, #ff9500 22%, #0b0b10);
   border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup filter + scope filter chips still mix
+ * Apple dark-ink-on-`#ffffff` → white slab on opaque shells (Data Poster remapped
+ * in v0.1.2268). Standing P2 #14 after Rings chips v0.1.2424; design-review
+ * feature-disk-cleanup / layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2425: Disk Cleanup filter chips opaque on Dark/Neon/Futuristic */
+body.theme-dark .disk-cleanup-filter-chip,
+body.theme-dark .disk-cleanup-scope-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 4%, #0a0a0a);
+  color: color-mix(in srgb, #00ff00 77%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip:hover,
+body.theme-dark .disk-cleanup-scope-filter-chip:hover {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 7%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip:focus-visible,
+body.theme-dark .disk-cleanup-scope-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 20%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip.is-active,
+body.theme-dark .disk-cleanup-scope-filter-chip.is-active {
+  color: color-mix(in srgb, #00ff00 88%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 16%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 32%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff453a 28%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff453a 38%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #34c759 38%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0a0a0a);
+}
+
+body.theme-neon .disk-cleanup-filter-chip,
+body.theme-neon .disk-cleanup-scope-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 4%, #08120c);
+  color: color-mix(in srgb, #ffffff 77%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip:hover,
+body.theme-neon .disk-cleanup-scope-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, currentColor 7%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip:focus-visible,
+body.theme-neon .disk-cleanup-scope-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 20%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip.is-active,
+body.theme-neon .disk-cleanup-scope-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 16%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 32%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, #08120c);
+  border-color: color-mix(in srgb, #ff453a 28%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, #08120c);
+  border-color: color-mix(in srgb, #ff453a 38%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+}
+body.theme-neon .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+}
+body.theme-neon .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #08120c);
+  border-color: color-mix(in srgb, #34c759 38%, #08120c);
+}
+body.theme-neon .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #08120c);
+}
+body.theme-neon .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #08120c);
+}
+
+body.theme-futuristic .disk-cleanup-filter-chip,
+body.theme-futuristic .disk-cleanup-scope-filter-chip {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 4%, #0b0b10);
+  color: color-mix(in srgb, #ffffff 77%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip:hover,
+body.theme-futuristic .disk-cleanup-scope-filter-chip:hover {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, currentColor 7%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip:focus-visible,
+body.theme-futuristic .disk-cleanup-scope-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 20%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip.is-active,
+body.theme-futuristic .disk-cleanup-scope-filter-chip.is-active {
+  color: color-mix(in srgb, #ffffff 88%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #55c7ff) 16%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 32%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='reclaim'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 28%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff453a 38%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, #0b0b10);
+  border-color: color-mix(in srgb, #34c759 38%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 28%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 38%, #0b0b10);
+}
