@@ -24858,3 +24858,179 @@ body.theme-futuristic .disk-cleanup-meta-card.is-action.has-periodic-off:focus-v
   border-color: color-mix(in srgb, #64d2ff 48%, #0b0b10);
   box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Disk Cleanup last-run strip + primary
+ * Scan button still mix Apple `#ffffff` washes → white slabs on opaque shells.
+ * Meta-card CRT landed as v0.1.2464. Catch up `.disk-cleanup-last` resting /
+ * hover / focus / has-skip / is-ok and toolbar `.disk-cleanup-primary`
+ * resting / hover / disabled. Standing P2 #14 after meta-card CRT v0.1.2464;
+ * design-review feature-disk-cleanup adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2465: disk-cleanup-last + primary CRT */
+body.theme-data-poster .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 2%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 2%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #08120c);
+  background: color-mix(in srgb, currentColor 2%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last {
+  border-color: color-mix(in srgb, currentColor 14%, #0b0b10);
+  background: color-mix(in srgb, currentColor 2%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #55c7ff) 55%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 55%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 55%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action.has-last-run {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #08120c);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 7%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9f0a 30%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  border-color: color-mix(in srgb, #34c759 28%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 7%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  border-color: color-mix(in srgb, #34c759 28%, #08120c);
+  background: color-mix(in srgb, #34c759 7%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action.is-ok:not(.has-skip) {
+  border-color: color-mix(in srgb, #34c759 28%, #0b0b10);
+  background: color-mix(in srgb, #34c759 7%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-last.is-action.is-ok:not(.has-skip):focus-visible {
+  outline-color: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 30%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #0a84ff 30%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #08120c);
+  border-color: color-mix(in srgb, #0a84ff 30%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 30%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 42%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #0a84ff 42%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #08120c);
+  border-color: color-mix(in srgb, #0a84ff 42%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, #0b0b10);
+  border-color: color-mix(in srgb, #0a84ff 42%, #0b0b10);
+}
+
+body.theme-data-poster .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
+body.theme-dark .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  color: color-mix(in srgb, #ffffff 48%, #0b0b10);
+}
