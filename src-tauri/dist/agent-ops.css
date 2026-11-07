@@ -24164,3 +24164,34 @@ body.theme-neon .monitor-item.is-checking {
 body.theme-futuristic .monitor-item.is-checking {
   color: color-mix(in srgb, #ffffff 66%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Monitors pending / removing still mixed on early
+ * shared `#0b0b10` (`.monitor-item.is-pending` · `.monitor-item.is-removing`)
+ * while `.is-checking` already CRT on `#0a0a0a` / `#08120c` / `#0b0b10`.
+ * Data Poster stays on opaque `#0b0b10`. Catch up so pending/removing type
+ * matches the CRT shell. Design-review fuel (feature-monitors; feature-agent-ops
+ * capture still TCC-blocked) + standing P2 #14 after disabled Save / path hover /
+ * checking CRT v0.1.2456; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2457: Monitors pending / removing CRT */
+body.theme-dark .monitor-item.is-pending {
+  color: color-mix(in srgb, #ffffff 72%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-pending {
+  color: color-mix(in srgb, #ffffff 72%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-pending {
+  color: color-mix(in srgb, #ffffff 72%, #0b0b10);
+}
+
+body.theme-dark .monitor-item.is-removing {
+  color: color-mix(in srgb, #ffffff 51%, #0a0a0a);
+}
+body.theme-neon .monitor-item.is-removing {
+  color: color-mix(in srgb, #ffffff 51%, #08120c);
+}
+body.theme-futuristic .monitor-item.is-removing {
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
+}
