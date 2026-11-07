@@ -1,23 +1,22 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B kept shipping Dark/Neon/Futuristic opaque CRT catch-ups (#14) while Screen Recording TCC still blocks window capture of stale `docs/screens/feature-agent-ops.png` (~53d).
+Overnight autoresearch (20:00–06:00) kept shipping standing P2 #14 CRT catch-up while digester stayed empty.
 
-## Shipped tonight (selected)
+## Shipped tonight
 
-- **v0.1.2462** — Dark / Neon / Futuristic AI Chat `.chat-message` hover / focus / selected / Copied washes off Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped).
-- **v0.1.2461** — Dark / Neon / Futuristic `.metric-card` + `.history-chart-container` Hot / Ok / Fair washes off Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped).
-- **v0.1.2460** — Neon Agent Ops Runs Lite/Slow/Fail meta · Ops filter-clear Saved phosphor `#c8ffd2`.
-- **v0.1.2459** — Dark `.process-empty` cascade CRT · Neon `.filter-chip-kb-hint` · Neon/Dark Judge-off CRT.
-- **v0.1.2458** — Logs empty · Disk Cleanup empty/disabled/Recurse · Dark `#chat-input:focus` CRT.
-- **v0.1.2457** — Monitors `.monitor-item.is-pending` / `.is-removing` CRT.
-- Earlier in the window: disabled Save / path hover / checking, Perplexity chips, section kb-hints, process rows, empty chips, filter-miss muted, Perplexity muted, LPM busy, metrics kb-hints, Processes filter chips, Agent Ops collapsed glances (through ~v0.1.2445+).
+- **v0.1.2463** — Dark / Neon / Futuristic Debug Log `.logs-line` hover / selected / Copied off Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster hover/selected catch-up included).
+- **v0.1.2462** — Dark / Neon / Futuristic AI Chat `.chat-message` hover / focus / selected / Copied CRT (sibling ship; keep backfilled).
+- **v0.1.2461** — Dark / Neon / Futuristic metric + history Hot / Ok / Fair CRT (keep backfilled).
+- **v0.1.2460** — Neon Agent Ops Runs Lite/Slow/Fail meta + Ops filter-clear Saved ink onto phosphor `#c8ffd2`.
+- Earlier tonight: process-empty cascade, Logs/Disk Cleanup empty CRT, Monitors pending/removing, section kb-hints, process-row washes, empty chips, muted hints (see `results.tsv` / CHANGELOG).
 
-## Tried / deferred
+## Why it matters
 
-- Mac `screencapture -l` for `feature-agent-ops.png` — TCC / no on-screen CPU window (polish-without-capture grace).
-- Digester Slowest empty after instant noise filters — design-review + standing P2 #14 carried the night.
+Debug Log keyboard selection and hover still mixed onto Apple white on Dark / Neon / Futuristic while AI Chat messages already remapped in v0.1.2462. Selecting a log line no longer flashes a white slab.
 
-## Next
+## Still open
 
-- Other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (logs-line hover/selected, disk-cleanup-meta-card).
-- Recapture stale feature screens when Screen Recording allows.
+- Digester: 0 turns / 7d (no Werner fuel).
+- Sibling OpenClaw / Hermes missing on this rack.
+- Mac Screen Recording TCC still blocks fresh `feature-*.png` captures; polish-without-capture grace continues.
+- Next: `.disk-cleanup-meta-card` resting / hover / status washes still on Apple `#ffffff` if any.
