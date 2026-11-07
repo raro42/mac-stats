@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2423
+
+- Dark / Neon / Futuristic Disk Cleanup + Perplexity filter counts (`.disk-cleanup-filter-count` / `.disk-cleanup-scope-filter-count` / `.perplexity-filter-count` + `.is-zero`) Apple dark-ink-on-`#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Debug Log filter chips v0.1.2422 (race rebase); design-review `feature-disk-cleanup` / Perplexity adjacent / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.rings-filter-chip` / Disk Cleanup filter chips / Settings section attention glances if still Apple `#ffffff`, or Mac capture of stale `feature-disk-cleanup.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2422
 
 - Data Poster / Dark / Neon / Futuristic Debug Log filter chips (`.logs-toolbar .logs-filter-chip` resting/hover/focus/active · Error · Warn) Apple dark-ink-on-`#ffffff` → opaque shells `#0b0b10` / `#0a0a0a` / `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors/Chat/Rings counts v0.1.2421; design-review / layout-daily Data Poster adjacent (polish-without-capture grace). Next: rings-filter-chip / other Processes leftovers still without theme remaps if any, or Mac capture of stale `feature-agent-ops.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
