@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2454
+
+- Dark / Neon / Futuristic section toolbar kb-hints + muted captions CRT (`.icon-line-kb-hint` · footer/header · Disk Cleanup / Monitors / Processes / Details / Perplexity / Logs / Changelog / Settings / integration toolbars · `.modal-header-kb-hint` · `.logs-viewer-prefix` · `.monitor-checked-ago` · `.history-chart-caption` · `.monitor-detail-note`) early Dark `#0b0b10` / Apple `#ffffff` → CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped; AI Chat kb-hints already CRT). Standing P2 #14 after process-row CRT v0.1.2453; design-review `feature-agent-ops` / Monitors / CPU metrics / Settings adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` if any, or Mac capture of stale `feature-agent-ops.png` / `feature-monitors.png` / `feature-cpu-metrics.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2453
 
 - Dark Top Processes row washes CRT (`.process-row` is-pinned / hover / active / focus-visible) early shared `#0b0b10` → CRT `#0a0a0a` (Neon / Futuristic / Data Poster already remapped; pin type / empty / Copied already CRT). Standing P2 #14 after empty-chip CRT v0.1.2452; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Dark CRT leftovers still on early `#0b0b10` if any, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.

@@ -23816,3 +23816,175 @@ body.theme-dark .process-row:active {
 body.theme-dark .process-row:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, #00cc66) 55%, #0a0a0a);
 }
+
+/*
+ * Dark / Neon / Futuristic: section toolbar kb-hints still mix early Dark
+ * shared `#0b0b10` or Apple dark-ink-on-`#ffffff` (`.icon-line-kb-hint` ·
+ * footer/header · Disk Cleanup · Monitors · Processes · Details · Perplexity ·
+ * Logs · Changelog · Settings / Ollama / integration toolbars · theme/product /
+ * credentials · `.modal-header-kb-hint`) while AI Chat kb-hints / Force Quit
+ * toolbar already CRT on `#0a0a0a` / `#08120c` / `#0b0b10`. Data Poster
+ * remapped earlier. Catch up so section chrome matches opaque shells.
+ * Design-review fuel (feature-agent-ops / Settings / Monitors / Disk Cleanup
+ * adjacent) + standing P2 #14 after process-row CRT v0.1.2453; layout-daily
+ * Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .icon-line-kb-hint,
+body.theme-dark .footer-toolbar-kb-hint,
+body.theme-dark .header-toolbar-kb-hint,
+body.theme-dark .disk-cleanup-meta-kb-hint,
+body.theme-dark .disk-cleanup-toolbar-kb-hint,
+body.theme-dark .disk-cleanup-list-kb-hint,
+body.theme-dark .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-dark .disk-cleanup-kb-hint,
+body.theme-dark .monitors-kb-hint,
+body.theme-dark .processes-kb-hint,
+body.theme-dark .details-kb-hint,
+body.theme-dark .perplexity-kb-hint,
+body.theme-dark .logs-kb-hint,
+body.theme-dark .changelog-header-kb-hint,
+body.theme-dark .changelog-body-toolbar-kb-hint,
+body.theme-dark .logs-toolbar-kb-hint,
+body.theme-dark .settings-header-kb-hint,
+body.theme-dark .ollama-settings-header-kb-hint,
+body.theme-dark .ollama-settings-toolbar-kb-hint,
+body.theme-dark .monitor-add-toolbar-kb-hint,
+body.theme-dark .monitor-detail-toolbar-kb-hint,
+body.theme-dark .discord-toolbar-kb-hint,
+body.theme-dark .perplexity-settings-toolbar-kb-hint,
+body.theme-dark .brave-settings-toolbar-kb-hint,
+body.theme-dark .redmine-settings-toolbar-kb-hint,
+body.theme-dark .mastodon-settings-toolbar-kb-hint,
+body.theme-dark .mcp-settings-toolbar-kb-hint,
+body.theme-dark .browser-settings-toolbar-kb-hint,
+body.theme-dark .cursor-agent-settings-toolbar-kb-hint,
+body.theme-dark .telegram-settings-toolbar-kb-hint,
+body.theme-dark .slack-settings-toolbar-kb-hint,
+body.theme-dark .theme-list-kb-hint,
+body.theme-dark .appearance-setting-kb-hint,
+body.theme-dark .product-setting-kb-hint,
+body.theme-dark .credentials-section-kb-hint,
+body.theme-dark .modal-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .icon-line-kb-hint,
+body.theme-neon .footer-toolbar-kb-hint,
+body.theme-neon .header-toolbar-kb-hint,
+body.theme-neon .disk-cleanup-meta-kb-hint,
+body.theme-neon .disk-cleanup-toolbar-kb-hint,
+body.theme-neon .disk-cleanup-list-kb-hint,
+body.theme-neon .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-neon .disk-cleanup-kb-hint,
+body.theme-neon .monitors-kb-hint,
+body.theme-neon .processes-kb-hint,
+body.theme-neon .details-kb-hint,
+body.theme-neon .perplexity-kb-hint,
+body.theme-neon .logs-kb-hint,
+body.theme-neon .changelog-header-kb-hint,
+body.theme-neon .changelog-body-toolbar-kb-hint,
+body.theme-neon .logs-toolbar-kb-hint,
+body.theme-neon .settings-header-kb-hint,
+body.theme-neon .ollama-settings-header-kb-hint,
+body.theme-neon .ollama-settings-toolbar-kb-hint,
+body.theme-neon .monitor-add-toolbar-kb-hint,
+body.theme-neon .monitor-detail-toolbar-kb-hint,
+body.theme-neon .discord-toolbar-kb-hint,
+body.theme-neon .perplexity-settings-toolbar-kb-hint,
+body.theme-neon .brave-settings-toolbar-kb-hint,
+body.theme-neon .redmine-settings-toolbar-kb-hint,
+body.theme-neon .mastodon-settings-toolbar-kb-hint,
+body.theme-neon .mcp-settings-toolbar-kb-hint,
+body.theme-neon .browser-settings-toolbar-kb-hint,
+body.theme-neon .cursor-agent-settings-toolbar-kb-hint,
+body.theme-neon .telegram-settings-toolbar-kb-hint,
+body.theme-neon .slack-settings-toolbar-kb-hint,
+body.theme-neon .theme-list-kb-hint,
+body.theme-neon .appearance-setting-kb-hint,
+body.theme-neon .product-setting-kb-hint,
+body.theme-neon .credentials-section-kb-hint,
+body.theme-neon .modal-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .icon-line-kb-hint,
+body.theme-futuristic .footer-toolbar-kb-hint,
+body.theme-futuristic .header-toolbar-kb-hint,
+body.theme-futuristic .disk-cleanup-meta-kb-hint,
+body.theme-futuristic .disk-cleanup-toolbar-kb-hint,
+body.theme-futuristic .disk-cleanup-list-kb-hint,
+body.theme-futuristic .disk-cleanup-add-scope-toolbar-kb-hint,
+body.theme-futuristic .disk-cleanup-kb-hint,
+body.theme-futuristic .monitors-kb-hint,
+body.theme-futuristic .processes-kb-hint,
+body.theme-futuristic .details-kb-hint,
+body.theme-futuristic .perplexity-kb-hint,
+body.theme-futuristic .logs-kb-hint,
+body.theme-futuristic .changelog-header-kb-hint,
+body.theme-futuristic .changelog-body-toolbar-kb-hint,
+body.theme-futuristic .logs-toolbar-kb-hint,
+body.theme-futuristic .settings-header-kb-hint,
+body.theme-futuristic .ollama-settings-header-kb-hint,
+body.theme-futuristic .ollama-settings-toolbar-kb-hint,
+body.theme-futuristic .monitor-add-toolbar-kb-hint,
+body.theme-futuristic .monitor-detail-toolbar-kb-hint,
+body.theme-futuristic .discord-toolbar-kb-hint,
+body.theme-futuristic .perplexity-settings-toolbar-kb-hint,
+body.theme-futuristic .brave-settings-toolbar-kb-hint,
+body.theme-futuristic .redmine-settings-toolbar-kb-hint,
+body.theme-futuristic .mastodon-settings-toolbar-kb-hint,
+body.theme-futuristic .mcp-settings-toolbar-kb-hint,
+body.theme-futuristic .browser-settings-toolbar-kb-hint,
+body.theme-futuristic .cursor-agent-settings-toolbar-kb-hint,
+body.theme-futuristic .telegram-settings-toolbar-kb-hint,
+body.theme-futuristic .slack-settings-toolbar-kb-hint,
+body.theme-futuristic .theme-list-kb-hint,
+body.theme-futuristic .appearance-setting-kb-hint,
+body.theme-futuristic .product-setting-kb-hint,
+body.theme-futuristic .credentials-section-kb-hint,
+body.theme-futuristic .modal-header-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+
+/*
+ * Dark / Neon / Futuristic: muted captions / age / notes still mix early Dark
+ * `#0b0b10` or Apple dark-ink-on-`#ffffff` (`.logs-viewer-prefix` ·
+ * `.monitor-checked-ago` · `.history-chart-caption` · `.monitor-detail-note`)
+ * while Disk Cleanup summary / path Saved flashes already CRT. Data Poster
+ * remapped earlier. Design-review fuel (feature-monitors / feature-cpu-metrics /
+ * Debug Log) + standing P2 #14; layout-daily Data Poster adjacent.
+ */
+body.theme-dark .logs-viewer-prefix,
+body.theme-dark .monitor-checked-ago,
+body.theme-dark .history-chart-caption,
+body.theme-dark .monitor-detail-note {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .monitor-item.is-down .monitor-checked-ago {
+  color: color-mix(in srgb, #ffffff 78%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .logs-viewer-prefix,
+body.theme-neon .monitor-checked-ago,
+body.theme-neon .history-chart-caption,
+body.theme-neon .monitor-detail-note {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .monitor-item.is-down .monitor-checked-ago {
+  color: color-mix(in srgb, #ffffff 78%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .logs-viewer-prefix,
+body.theme-futuristic .monitor-checked-ago,
+body.theme-futuristic .history-chart-caption,
+body.theme-futuristic .monitor-detail-note {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+body.theme-futuristic .monitor-item.is-down .monitor-checked-ago {
+  color: color-mix(in srgb, #ffffff 78%, #0b0b10);
+  opacity: 1;
+}
