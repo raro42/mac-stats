@@ -1,10 +1,14 @@
+## Overnight merge — v0.1.2446
+
+- Dark Top Processes filter chips CRT (`.processes-filter-chip` resting / hover / focus / is-active · pinned · Hot) early `#0b0b10` → CRT `#0a0a0a` with `#00cc66` active (Neon/Futuristic/Data Poster already remapped; collapsed chat/ollama glances already CRT). Standing P2 #14 after Agent Ops collapsed glance opaque v0.1.2445; design-review `feature-processes` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark Perplexity muted leftovers (`.perplexity-result-list` / `.perplexity-result-snippet` / `.perplexity-config-status`) still on early `#0b0b10` / `.chat-filter-miss-msg` / `.process-name.is-just-saved`, or Mac capture of stale `feature-processes.png` / `feature-agent-ops.png` / `feature-ai-chat.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2445
 
 - Data Poster / Dark / Neon / Futuristic Agent Ops collapsed glance opaque (`.agent-ops-collapsed-glance` resting / hover / focus · is-ready · is-warn · is-offline) Apple `#ffffff` → `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10` (`.is-empty` type already remapped). Standing P2 #14 after ops attention CRT v0.1.2444; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: other Apple `#ffffff` collapsed/chrome leftovers if any (e.g. power-strip / ring kb-hints still on early Dark `#0b0b10`), or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2444
 
-- Dark Agent Ops attention glances CRT (`.ops-*-attention-glance` resting / hover / focus · has-fail · has-slow/warn/not-set · filter soft states · Runs · Filter · Digest · Discord · integrations) early `#0b0b10` → CRT `#0a0a0a` with `#00cc66` filter accent (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat exec/answer CRT v0.1.2443; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark collapsed chat/ollama glances CRT (`#0b0b10` → `#0a0a0a`) / Dark response-time CRT leftovers, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+- Dark Agent Ops attention glances CRT (`.ops-*-attention-glance` resting / hover / focus · has-fail · has-slow/warn/not-set · filter soft states · Runs · Filter · Digest · Discord · integrations) early `#0b0b10` → CRT `#0a0a0a` with `#00cc66` filter accent (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat exec/answer CRT v0.1.2443; design-review `feature-agent-ops` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark Top Processes filter chips CRT (`#0b0b10` → `#0a0a0a`) / Dark Perplexity muted leftovers, or Mac capture of stale `feature-agent-ops.png` / `feature-ai-chat.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2443
 

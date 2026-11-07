@@ -23502,3 +23502,44 @@ body.theme-futuristic .agent-ops-collapsed-glance.is-offline {
   background: color-mix(in srgb, #ff3b30 7%, #0b0b10);
 }
 
+/*
+ * Dark: Top Processes filter chips still mixed on early `#0b0b10` (shared Data
+ * Poster remap) instead of CRT `#0a0a0a` (`.processes-filter-chip` resting /
+ * hover / focus / is-active · pinned · Hot). Neon / Futuristic already remap
+ * on `#08120c` / `#0b0b10`; Data Poster stays on `#0b0b10`. Collapsed
+ * chat/ollama glances already CRT. Design-review fuel (feature-processes) +
+ * standing P2 #14 after Agent Ops collapsed glance opaque v0.1.2445;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .processes-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .processes-filter-chip:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip.is-active {
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip[data-processes-filter='pinned'].has-hits {
+  background: color-mix(in srgb, #ffd60a 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #ffd60a 32%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip[data-processes-filter='pinned'].is-active {
+  background: color-mix(in srgb, #ffd60a 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ffd60a 42%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+}
+body.theme-dark .processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+}
+
