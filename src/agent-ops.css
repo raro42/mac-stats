@@ -23541,5 +23541,32 @@ body.theme-dark .processes-filter-chip[data-processes-filter='hot'].has-hits {
 body.theme-dark .processes-filter-chip[data-processes-filter='hot'].is-active {
   background: color-mix(in srgb, #ff9500 22%, #0a0a0a);
   border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+ * Dark / Neon / Futuristic: metrics keyboard hints still wrong on dark shells
+ * (`.power-strip-kb-hint` · `.ring-gauge-kb-hint` · `.history-sparkline-kb-hint`).
+ * Dark stays on early shared `#0b0b10` (Data Poster remap) instead of CRT
+ * `#0a0a0a`. Neon / Futuristic still inherit Apple dark-ink-on-`#ffffff` → white
+ * slab under Bat/LPM/Power and the ring / sparkline rows. Data Poster already
+ * remaps on `#0b0b10`. Catch up to AI Chat kb-hint CRT / opaque remaps.
+ * Design-review fuel (feature-cpu-metrics) + standing P2 #14 after Dark Top
+ * Processes filter chips CRT v0.1.2446; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .power-strip-kb-hint,
+body.theme-dark .ring-gauge-kb-hint,
+body.theme-dark .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .power-strip-kb-hint,
+body.theme-neon .ring-gauge-kb-hint,
+body.theme-neon .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .power-strip-kb-hint,
+body.theme-futuristic .ring-gauge-kb-hint,
+body.theme-futuristic .history-sparkline-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
 }
 
