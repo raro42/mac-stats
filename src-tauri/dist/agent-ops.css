@@ -23680,3 +23680,80 @@ body.theme-dark .process-pin.is-just-saved {
 body.theme-dark .process-name.is-just-saved {
   background: color-mix(in srgb, #34c759 14%, #0a0a0a);
 }
+
+/*
+ * Dark / Neon: filter-miss / empty hints + Monitors detail muted type still mix
+ * on early shared `#0b0b10` (`.processes-filter-miss-hint` ·
+ * `.perplexity-filter-miss-hint` · `.logs-filter-miss-hint` ·
+ * `.monitors-filter-miss-hint` · `.disk-cleanup-filter-miss-hint` ·
+ * `.disk-cleanup-empty-hint` · `.monitors-empty-hint` · `.perplexity-empty-hint` ·
+ * `.monitor-latency` · `.monitor-detail-k` · `.monitor-backoff-hint`) while
+ * filter-miss shells / CTAs already CRT on Dark `#0a0a0a` and Neon `#08120c`.
+ * Data Poster remapped earlier; Futuristic shell is already `#0b0b10`. Catch up
+ * so empty-filter tips and Monitors detail keys match opaque shells.
+ * Design-review fuel (feature-monitors / feature-processes / feature-ai-chat /
+ * feature-disk-cleanup) + standing P2 #14 after filter-miss msg CRT v0.1.2450;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .processes-filter-miss-hint,
+body.theme-dark .perplexity-filter-miss-hint,
+body.theme-dark .logs-filter-miss-hint,
+body.theme-dark .monitors-filter-miss-hint,
+body.theme-dark .disk-cleanup-filter-miss-hint,
+body.theme-dark .disk-cleanup-empty-hint,
+body.theme-dark .monitors-empty-hint,
+body.theme-dark .perplexity-empty-hint,
+body.theme-dark .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-dark .monitor-detail-k,
+body.theme-dark .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .processes-filter-miss-hint,
+body.theme-neon .perplexity-filter-miss-hint,
+body.theme-neon .logs-filter-miss-hint,
+body.theme-neon .monitors-filter-miss-hint,
+body.theme-neon .disk-cleanup-filter-miss-hint,
+body.theme-neon .disk-cleanup-empty-hint,
+body.theme-neon .monitors-empty-hint,
+body.theme-neon .perplexity-empty-hint,
+body.theme-neon .monitor-latency {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 90%, #08120c);
+  opacity: 1;
+}
+body.theme-neon .monitor-detail-k,
+body.theme-neon .monitor-backoff-hint {
+  color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 78%, #08120c);
+  opacity: 1;
+}
+
+/*
+ * Dark / Neon: Process Detail muted labels still mix on early shared `#0b0b10`
+ * (`.process-detail-section .process-detail-label` · `.process-detail-pid`)
+ * while Force Quit / Disk Cleanup muted tips already CRT. Data Poster remapped
+ * earlier; Futuristic shell is already `#0b0b10`. Catch up so Process Detail
+ * rows match opaque shells. Design-review fuel (feature-processes) + standing
+ * P2 #14 after filter-miss msg CRT v0.1.2450; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .process-detail-section .process-detail-label,
+body.theme-dark .process-detail-pid {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .process-detail-section .process-detail-label,
+body.theme-neon .process-detail-pid {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-dark .process-detail-pid:hover,
+body.theme-dark .process-detail-pid:focus-visible {
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-neon .process-detail-pid:hover,
+body.theme-neon .process-detail-pid:focus-visible {
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
