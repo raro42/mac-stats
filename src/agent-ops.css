@@ -17272,6 +17272,28 @@ body.theme-dark .processes-filter-miss-cta:focus-visible {
 }
 
 /*
+ * Dark / Neon / Futuristic: Perplexity search kb-hint still mixes Apple
+ * dark-ink-on-`#ffffff` on Neon / Futuristic (`.perplexity-search-kb-hint`);
+ * Dark early shared remap mixed on `#0b0b10` not CRT `#0a0a0a`. Data Poster
+ * remapped earlier (66% white on `#0b0b10`). Match setup kb-hint opaque shells.
+ * Design-review fuel (feature-ai-chat / Perplexity adjacent) + standing P2 #14
+ * after processes-filter-miss CRT v0.1.2435; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .perplexity-search-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .perplexity-search-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #08120c);
+  opacity: 1;
+}
+body.theme-futuristic .perplexity-search-kb-hint {
+  color: color-mix(in srgb, #ffffff 66%, #0b0b10);
+  opacity: 1;
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /
