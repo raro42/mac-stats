@@ -21905,3 +21905,121 @@ body.theme-futuristic .disk-cleanup-scope-filter-count.is-zero,
 body.theme-futuristic .perplexity-filter-count.is-zero {
   color: color-mix(in srgb, #ffffff 37%, #0b0b10);
 }
+
+/*
+ * Data Poster / Dark / Neon / Futuristic: Rings filter chips still mixed
+ * Apple dark-ink-on-#ffffff (`.rings-filter-chip` resting/hover/focus/active · Hot)
+ * with zero theme remaps → near-black type on white slabs over opaque shells.
+ * Soft light type + shell washes (Processes / Debug Log filter-chip parity;
+ * count remapped in v0.1.2421). Design-review fuel (feature-cpu-metrics) +
+ * standing P2 #14 after Disk Cleanup/Perplexity counts v0.1.2423;
+ * layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2424: Rings filter chips opaque on DP/Dark/Neon/Futuristic */
+body.theme-data-poster .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-data-poster .rings-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+}
+body.theme-data-poster .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+}
+
+body.theme-dark .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #00ff00 88%, #0a0a0a));
+}
+body.theme-dark .rings-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #00ff00 96%, #0a0a0a));
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+}
+body.theme-dark .rings-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #00ff00 96%, #0a0a0a));
+  background: color-mix(in srgb, var(--accent, #00cc66) 18%, #0a0a0a);
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+}
+body.theme-dark .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 30%, #0a0a0a);
+}
+body.theme-dark .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0a0a0a);
+  border-color: color-mix(in srgb, #ff9500 40%, #0a0a0a);
+}
+
+body.theme-neon .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 8%, #08120c);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #08120c));
+}
+body.theme-neon .rings-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #08120c));
+  background: color-mix(in srgb, currentColor 12%, #08120c);
+  border-color: color-mix(in srgb, currentColor 22%, #08120c);
+}
+body.theme-neon .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+}
+body.theme-neon .rings-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #08120c));
+  background: color-mix(in srgb, var(--accent, #6dff7b) 18%, #08120c);
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 36%, #08120c);
+}
+body.theme-neon .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 30%, #08120c);
+}
+body.theme-neon .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #08120c);
+  border-color: color-mix(in srgb, #ff9500 40%, #08120c);
+}
+
+body.theme-futuristic .rings-filter-chip {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 8%, #0b0b10);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0b0b10));
+}
+body.theme-futuristic .rings-filter-chip:hover {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, currentColor 12%, #0b0b10);
+  border-color: color-mix(in srgb, currentColor 22%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-chip:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #55c7ff) 22%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-chip.is-active {
+  color: var(--text, color-mix(in srgb, #ffffff 96%, #0b0b10));
+  background: color-mix(in srgb, var(--accent, #55c7ff) 18%, #0b0b10);
+  border-color: color-mix(in srgb, var(--accent, #55c7ff) 36%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 14%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 30%, #0b0b10);
+}
+body.theme-futuristic .rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 22%, #0b0b10);
+  border-color: color-mix(in srgb, #ff9500 40%, #0b0b10);
+}
