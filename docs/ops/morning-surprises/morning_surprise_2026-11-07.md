@@ -1,28 +1,16 @@
 # Morning surprise — 2026-11-07
 
-Ralf: overnight Track B kept shipping Dark CRT opaque remaps (design-review polish-without-capture; Screen Recording TCC blocked window captures).
+Generated: 2026-11-07T20:58:06
 
-## Shipped this night (highlights)
+## Shipped overnight
 
-- **v0.1.2444** — Dark Agent Ops `.ops-*-attention-glance` (resting / hover / focus · fail · warn/not-set · filter soft) → CRT `#0a0a0a` (`#00cc66` filter)
-- **v0.1.2443** — Dark AI Chat exec/answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) → CRT `#0a0a0a` (`#00cc66` final)
-- **v0.1.2442** — Dark AI Chat `.chat-filter-chip` resting/hover/active → CRT `#0a0a0a` (`#00cc66` active)
-- **v0.1.2441** — Dark AI Chat kb-hints → CRT `#0a0a0a`
-- **v0.1.2440** — Dark Top Processes top glances → CRT `#0a0a0a`
-- **v0.1.2439–2437** — Dark AI Chat empty + status glances CRT + soft catch-up
-- Earlier same night: Perplexity / filter-miss / empty CTA / chips / Settings glances opaque remaps through the CRT stack
+- **v0.1.2449** — Dark / Neon / Futuristic Perplexity muted type opaque (`.perplexity-result-list` · `.perplexity-result-snippet` · `.perplexity-config-status`) off early `#0b0b10` / Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10`.
+- Earlier same window: **v0.1.2448** LPM busy CRT; **v0.1.2447** metrics kb-hints; **v0.1.2446** Processes filter chips; **v0.1.2445** Agent Ops collapsed glance.
 
 ## Tried / deferred
 
-- Digester open candidates: none (0 turns / 7d)
-- Sibling OpenClaw/Hermes: missing on this rack
-- Mac recapture of stale `docs/screens/feature-agent-ops.png` (~52d) — deferred (Screen Recording TCC; no on-screen CPU window)
-- Layout-daily Data Poster screens missing — remaps_missing=none; deferred behind design-review CRT leftovers
+- Mac window-only recapture of stale `feature-agent-ops.png` (53d) deferred — Screen Recording TCC / menu-bar only (no on-screen CPU window).
 
 ## Next fuel
 
-- Dark collapsed chat/ollama glances still on early `#0b0b10` → CRT `#0a0a0a`
-- Other Dark CRT leftovers / Mac capture when TCC allows
-- Layout-daily Data Poster screen when a window grab works
-
-Generated: 2026-11-07T05:54:45+01:00
+- Dark `.chat-filter-miss-msg` / `.process-name.is-just-saved` still on early `#0b0b10`, or Mac capture when TCC allows.
