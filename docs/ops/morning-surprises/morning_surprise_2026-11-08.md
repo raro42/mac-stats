@@ -1,21 +1,25 @@
 # Morning surprise — 2026-11-08
 
-Overnight Track B (mac-stats product ratchet). Window 20:00–06:00 local.
+Overnight autoresearch (20:00–06:00) kept shipping standing P2 #14 CRT catch-up while digester stayed empty. Layout-daily Data Poster also closed tonight.
 
-## Shipped
+## Shipped tonight
 
-- **v0.1.2466** — Data Poster / Dark / Neon / Futuristic Perplexity result rows + weather card CRT (`.perplexity-result-item` resting / hover / selected / focus / is-top / Copied · `.perplexity-weather-card`) off Apple `#ffffff` onto opaque shells. Design-review `feature-ai-chat` polish-without-capture (Mac Screen Recording TCC still blocks `screencapture -l`).
-- **v0.1.2465** (sibling tick) — Disk Cleanup last-run strip + Scan primary CRT on the same opaque shells.
-- **v0.1.2464** — Disk Cleanup meta-card CRT remaps.
+- **v0.1.2467** — Data Poster / Dark / Neon / Futuristic Monitors `.monitor-detail-log` off Apple `#ffffff` onto `#0b0b10` / CRT `#0a0a0a` / `#08120c` / `#0b0b10`.
+- **v0.1.2466** — Data Poster / Dark / Neon / Futuristic Perplexity `.perplexity-result-item` + `.perplexity-weather-card` CRT.
+- **v0.1.2465** — Data Poster / Dark / Neon / Futuristic Disk Cleanup `.disk-cleanup-last` + Scan `.disk-cleanup-primary` CRT.
+- **v0.1.2464** — Data Poster / Dark / Neon / Futuristic Disk Cleanup `.disk-cleanup-meta-card` CRT.
+- **v0.1.2463** — Dark / Neon / Futuristic Debug Log `.logs-line` hover / selected / Copied CRT.
+- **v0.1.2462** — Dark / Neon / Futuristic AI Chat `.chat-message` hover / focus / selected / Copied CRT.
+- **v0.1.2461** — Dark / Neon / Futuristic metric + history Hot / Ok / Fair CRT.
+- Earlier tonight: process-empty cascade, Logs/Disk Cleanup empty CRT, Monitors pending/removing, section kb-hints, process-row washes, empty chips, muted hints (see `results.tsv` / CHANGELOG).
 
-## Tried / discarded
+## Why it matters
 
-- Duplicate attempt at Disk Cleanup `.disk-cleanup-primary` CRT after origin already shipped it in v0.1.2465 → rebase skipped (no second ship).
+Monitors detail still painted the response log pre on Apple white after the surrounding CRT shells went opaque. Opening a monitor on Dark / Neon / Futuristic / Data Poster no longer flashes that white slab.
 
-## Notes
+## Still open
 
-- Digester Slowest empty (filtered instant noise). Fuel = design-review + standing P2 #14.
-- Layout-daily due (theme screens missing) deferred; CRT remaps continue standing #14.
-- Next: `.monitor-detail-log` Apple `#ffffff` wash if still unmapped, or Mac capture of stale feature screens when TCC allows.
-
-Generated: 2026-11-08T00:43:53
+- Digester: 0 turns / 7d (no Werner fuel).
+- Sibling OpenClaw / Hermes missing on this rack.
+- Mac Screen Recording TCC still blocks fresh `feature-*.png` captures; polish-without-capture grace continues.
+- Next: other Apple `#ffffff` washes still missing Dark remaps if any, or Mac capture of stale `feature-monitors.png` / `feature-ai-chat.png` / `feature-agent-ops.png` when TCC allows.
