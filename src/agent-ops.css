@@ -23654,3 +23654,29 @@ body.theme-futuristic .perplexity-config-status {
   color: color-mix(in srgb, rgb(from var(--muted, #ffffff) r g b) 70%, #0b0b10);
   opacity: 1;
 }
+
+/*
+ * Dark / Neon: AI Chat filter-miss message + Dark Processes Saved flashes still
+ * mix on early shared `#0b0b10` (`.chat-filter-miss-msg` · `.process-name.is-just-saved`
+ * · `.process-pin.is-just-saved`) while filter-miss shell / CTA already CRT on
+ * Dark `#0a0a0a` and Neon `#08120c`. Data Poster / Futuristic already correct on
+ * `#0b0b10`; Neon process Saved flashes already `#08120c`. Catch up so empty
+ * You/Assistant/Errors copy and process Saved flashes match opaque shells.
+ * Design-review fuel (feature-ai-chat / feature-processes) + standing P2 #14
+ * after Perplexity muted CRT v0.1.2449; layout-daily Data Poster adjacent
+ * (polish-without-capture grace).
+ */
+body.theme-dark .chat-filter-miss-msg {
+  color: color-mix(in srgb, #ffffff 81%, #0a0a0a);
+  opacity: 1;
+}
+body.theme-neon .chat-filter-miss-msg {
+  color: color-mix(in srgb, #ffffff 81%, #08120c);
+  opacity: 1;
+}
+body.theme-dark .process-pin.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, #0a0a0a) !important;
+}
+body.theme-dark .process-name.is-just-saved {
+  background: color-mix(in srgb, #34c759 14%, #0a0a0a);
+}
