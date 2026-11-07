@@ -17294,6 +17294,46 @@ body.theme-futuristic .perplexity-search-kb-hint {
 }
 
 /*
+ * Dark: AI Chat status glances still mixed on early `#0b0b10` (shared Data
+ * Poster remap) instead of CRT `#0a0a0a` (`.chat-model-glance` ·
+ * `.chat-turn-glance` · `.chat-answer-glance` · `.chat-errors-glance` ·
+ * `.chat-offline-attention-glance` resting/hover · online/offline/no-model ·
+ * turn active). Neon / Futuristic already remap on `#08120c` / `#0b0b10`;
+ * Data Poster stays on `#0b0b10`. Design-review fuel (feature-ai-chat) +
+ * standing P2 #14 after Perplexity search kb-hint v0.1.2436; layout-daily
+ * Data Poster adjacent (polish-without-capture grace).
+ */
+body.theme-dark .chat-model-glance,
+body.theme-dark .chat-turn-glance,
+body.theme-dark .chat-answer-glance,
+body.theme-dark .chat-errors-glance,
+body.theme-dark .chat-offline-attention-glance {
+  border-color: color-mix(in srgb, currentColor 16%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 8%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
+body.theme-dark .chat-model-glance:hover,
+body.theme-dark .chat-turn-glance:hover {
+  background: color-mix(in srgb, currentColor 12%, #0a0a0a);
+  border-color: color-mix(in srgb, currentColor 22%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance.is-online,
+body.theme-dark .chat-turn-glance.is-ok:not(.is-active) {
+  border-color: color-mix(in srgb, #34c759 32%, #0a0a0a);
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-dark .chat-model-glance.is-offline,
+body.theme-dark .chat-model-glance.is-online.is-no-model,
+body.theme-dark .chat-offline-attention-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, #0a0a0a);
+  background: color-mix(in srgb, #ff9500 12%, #0a0a0a);
+}
+body.theme-dark .chat-turn-glance.is-active {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 36%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 14%, #0a0a0a);
+}
+
+/*
  * Data Poster: AI Chat exec / answer cards still mixed against early #0e0e14
  * (.chat-exec-card · .chat-exec-code · .chat-answer-part · .chat-answer-final) →
  * wrong dark slab on the opaque shell #0b0b10. Catch up to chat-filter-miss /
