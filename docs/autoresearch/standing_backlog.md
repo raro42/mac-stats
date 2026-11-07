@@ -1,3 +1,7 @@
+## Overnight merge — v0.1.2430
+
+- Dark / Neon / Futuristic Disk Cleanup empty CTA (`.disk-cleanup-empty-cta` resting/hover/focus) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier). Standing P2 #14 after Monitors empty CTA v0.1.2429; design-review `feature-disk-cleanup` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Neon·Futuristic `.monitors-filter-miss` / Dark/Neon/Futuristic `.disk-cleanup-filter-miss` / `.disk-cleanup-scope-filter-miss` if still Apple `#ffffff`, or Mac capture of stale `feature-disk-cleanup.png` / `feature-monitors.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
+
 ## Overnight merge — v0.1.2429
 
 - Dark / Neon / Futuristic Monitors empty CTA (`.monitors-empty-cta` resting/hover/focus) Apple `#ffffff` → opaque shells `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster remapped earlier; Dark early remap corrected off `#0b0b10`). Standing P2 #14 after Rings filter-miss v0.1.2428; design-review `feature-monitors` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark/Neon/Futuristic `.disk-cleanup-empty-cta` / `.perplexity-empty-cta` if still Apple `#ffffff`, or Mac capture of stale `feature-monitors.png` / `feature-disk-cleanup.png` / `feature-agent-ops.png` when Screen Recording TCC allows `screencapture -l`.
