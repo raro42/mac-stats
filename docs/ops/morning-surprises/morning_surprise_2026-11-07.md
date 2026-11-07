@@ -4,6 +4,7 @@ Ralf: overnight Track B kept shipping Dark CRT opaque remaps (design-review poli
 
 ## Shipped this night (highlights)
 
+- **v0.1.2444** — Dark Agent Ops `.ops-*-attention-glance` (resting / hover / focus · fail · warn/not-set · filter soft) → CRT `#0a0a0a` (`#00cc66` filter)
 - **v0.1.2443** — Dark AI Chat exec/answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) → CRT `#0a0a0a` (`#00cc66` final)
 - **v0.1.2442** — Dark AI Chat `.chat-filter-chip` resting/hover/active → CRT `#0a0a0a` (`#00cc66` active)
 - **v0.1.2441** — Dark AI Chat kb-hints → CRT `#0a0a0a`
@@ -15,12 +16,11 @@ Ralf: overnight Track B kept shipping Dark CRT opaque remaps (design-review poli
 
 - Mac recapture of stale `docs/screens/feature-agent-ops.png` (~52d) — deferred (Screen Recording TCC; no on-screen CPU window)
 - Layout-daily Data Poster screens missing — remaps_missing=none; deferred behind design-review CRT leftovers
-- ~05:30 tick raced another agent on the same v0.1.2443 exec/answer CRT; rebased to `origin/main`
 
 ## Next fuel
 
-- Dark Agent Ops attention glances (`.ops-*-attention-glance` warn/filter soft states) still on early `#0b0b10`
+- Other Dark CRT leftovers still on early `#0b0b10` if any
 - Mac capture when TCC allows
 - Layout-daily Data Poster screen when a window grab works
 
-Generated: 2026-11-07T05:30:54.641358+01:00
+Generated: 2026-11-07T05:53:35+01:00
