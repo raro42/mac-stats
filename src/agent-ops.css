@@ -21866,3 +21866,42 @@ body.theme-futuristic .logs-toolbar .logs-filter-chip[data-logs-filter='warn'].i
   background: color-mix(in srgb, #ff9f0a 22%, #0b0b10);
   border-color: color-mix(in srgb, #ff9f0a 40%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Disk Cleanup + Perplexity filter counts still mixed
+ * Apple dark-ink-on-`#ffffff` (Data Poster remapped earlier). Soft light type on
+ * shell (79%/37% filter-count parity). Design-review fuel (feature-disk-cleanup /
+ * Perplexity adjacent) + standing P2 #14 after Debug Log filter chips
+ * v0.1.2422; layout-daily Data Poster adjacent (polish-without-capture grace).
+ */
+/* OVERNIGHT v0.1.2423: Disk Cleanup/Perplexity filter-count opaque on Dark/Neon/Futuristic */
+body.theme-dark .disk-cleanup-filter-count,
+body.theme-dark .disk-cleanup-scope-filter-count,
+body.theme-dark .perplexity-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0a0a0a);
+}
+body.theme-dark .disk-cleanup-filter-count.is-zero,
+body.theme-dark .disk-cleanup-scope-filter-count.is-zero,
+body.theme-dark .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-filter-count,
+body.theme-neon .disk-cleanup-scope-filter-count,
+body.theme-neon .perplexity-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #08120c);
+}
+body.theme-neon .disk-cleanup-filter-count.is-zero,
+body.theme-neon .disk-cleanup-scope-filter-count.is-zero,
+body.theme-neon .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-filter-count,
+body.theme-futuristic .disk-cleanup-scope-filter-count,
+body.theme-futuristic .perplexity-filter-count {
+  color: color-mix(in srgb, #ffffff 79%, #0b0b10);
+}
+body.theme-futuristic .disk-cleanup-filter-count.is-zero,
+body.theme-futuristic .disk-cleanup-scope-filter-count.is-zero,
+body.theme-futuristic .perplexity-filter-count.is-zero {
+  color: color-mix(in srgb, #ffffff 37%, #0b0b10);
+}
