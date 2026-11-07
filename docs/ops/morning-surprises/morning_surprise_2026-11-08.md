@@ -4,6 +4,7 @@ Overnight Track B kept shipping Dark/Neon/Futuristic opaque CRT catch-ups (#14) 
 
 ## Shipped tonight (selected)
 
+- **v0.1.2462** — Dark / Neon / Futuristic AI Chat `.chat-message` hover / focus / selected / Copied washes off Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped).
 - **v0.1.2461** — Dark / Neon / Futuristic `.metric-card` + `.history-chart-container` Hot / Ok / Fair washes off Apple `#ffffff` onto CRT `#0a0a0a` / `#08120c` / `#0b0b10` (Data Poster already remapped).
 - **v0.1.2460** — Neon Agent Ops Runs Lite/Slow/Fail meta · Ops filter-clear Saved phosphor `#c8ffd2`.
 - **v0.1.2459** — Dark `.process-empty` cascade CRT · Neon `.filter-chip-kb-hint` · Neon/Dark Judge-off CRT.
@@ -18,5 +19,5 @@ Overnight Track B kept shipping Dark/Neon/Futuristic opaque CRT catch-ups (#14) 
 
 ## Next
 
-- Other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (chat-message hover/selected, logs-line hover/selected, disk-cleanup-meta-card).
+- Other Apple `#ffffff` washes still missing Dark/Neon/Futuristic remaps (logs-line hover/selected, disk-cleanup-meta-card).
 - Recapture stale feature screens when Screen Recording allows.
