@@ -24416,3 +24416,80 @@ body.theme-futuristic .history-chart-container.is-fair:not(.is-hot) {
   background-color: color-mix(in srgb, #ff9500 5%, #0b0b10);
   box-shadow: none;
 }
+
+/*
+ * Dark / Neon / Futuristic: AI Chat message hover / focus / selected / Copied
+ * still inherit Apple `#ffffff` washes → white slab on opaque CRT shells.
+ * Data Poster remapped onto `#0b0b10` in v0.1.2205. Catch up to CRT `#0a0a0a` /
+ * `#08120c` / `#0b0b10`. Standing P2 #14 after metric/history Hot/Ok/Fair CRT
+ * v0.1.2461; design-review feature-ai-chat / feature-agent-ops adjacent
+ * (polish-without-capture grace; feature-agent-ops capture still TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2462: chat-message hover/selected/Copied CRT */
+body.theme-dark .chat-message[role='option']:hover,
+body.theme-dark .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, #0a0a0a);
+}
+body.theme-neon .chat-message[role='option']:hover,
+body.theme-neon .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #6dff7b) 6%, #08120c);
+}
+body.theme-futuristic .chat-message[role='option']:hover,
+body.theme-futuristic .chat-message[role='button']:hover {
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 6%, #0b0b10);
+}
+
+body.theme-dark .chat-message[role='option']:focus-visible,
+body.theme-dark .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #00cc66) 45%, #0a0a0a);
+}
+body.theme-neon .chat-message[role='option']:focus-visible,
+body.theme-neon .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #6dff7b) 45%, #08120c);
+}
+body.theme-futuristic .chat-message[role='option']:focus-visible,
+body.theme-futuristic .chat-message[role='button']:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, #3bd6ff) 45%, #0b0b10);
+}
+
+body.theme-dark .chat-message[role='option'].is-selected,
+body.theme-dark .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 22%, #0a0a0a);
+  background: color-mix(in srgb, var(--accent, #00cc66) 5%, #0a0a0a);
+}
+body.theme-neon .chat-message[role='option'].is-selected,
+body.theme-neon .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #6dff7b) 22%, #08120c);
+  background: color-mix(in srgb, var(--accent, #6dff7b) 5%, #08120c);
+}
+body.theme-futuristic .chat-message[role='option'].is-selected,
+body.theme-futuristic .chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #3bd6ff) 22%, #0b0b10);
+  background: color-mix(in srgb, var(--accent, #3bd6ff) 5%, #0b0b10);
+}
+
+body.theme-dark .chat-message[role='option'].is-just-copied,
+body.theme-dark .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0a0a0a);
+}
+body.theme-neon .chat-message[role='option'].is-just-copied,
+body.theme-neon .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #08120c);
+}
+body.theme-futuristic .chat-message[role='option'].is-just-copied,
+body.theme-futuristic .chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, #0b0b10);
+}
+
+body.theme-dark .chat-message[role='option'].is-just-copied::after,
+body.theme-dark .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0a0a0a);
+}
+body.theme-neon .chat-message[role='option'].is-just-copied::after,
+body.theme-neon .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #08120c);
+}
+body.theme-futuristic .chat-message[role='option'].is-just-copied::after,
+body.theme-futuristic .chat-message[role='button'].is-just-copied::after {
+  background: color-mix(in srgb, #34c759 55%, #0b0b10);
+}
