@@ -1,6 +1,6 @@
 ## Overnight merge — v0.1.2443
 
-- Dark AI Chat exec/answer cards CRT (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) early `#0b0b10` → CRT `#0a0a0a` with `#00cc66` final (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat filter chips CRT v0.1.2442; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark collapsed chat/ollama glances still on early `#0b0b10`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
+- Dark AI Chat exec/answer cards CRT (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) early `#0b0b10` → CRT `#0a0a0a` with `#00cc66` final (Neon/Futuristic/Data Poster already remapped). Standing P2 #14 after AI Chat filter chips CRT v0.1.2442; design-review `feature-ai-chat` / layout-daily Data Poster adjacent (polish-without-capture grace). Next: Dark Agent Ops attention glances (`.ops-*-attention-glance` warn/filter soft states) still on early `#0b0b10`, or Mac capture of stale `feature-ai-chat.png` / `feature-agent-ops.png` / `feature-processes.png` when Screen Recording TCC allows `screencapture -l`.
 
 ## Overnight merge — v0.1.2442
 

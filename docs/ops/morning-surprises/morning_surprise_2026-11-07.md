@@ -1,24 +1,26 @@
 # Morning surprise — 2026-11-07
 
-Overnight autoresearch kept shipping Dark CRT opaque remaps (standing P2 #14 / design-review polish-without-capture grace).
+Ralf: overnight Track B kept shipping Dark CRT opaque remaps (design-review polish-without-capture; Screen Recording TCC blocked window captures).
 
 ## Shipped this night (highlights)
 
-- **v0.1.2443** — Dark AI Chat exec/answer cards CRT: `.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final` on `#0a0a0a` (`#00cc66` final; was early shared `#0b0b10`).
-- **v0.1.2442** — Dark AI Chat filter chips CRT: `.chat-filter-chip` resting/hover/active on `#0a0a0a`.
-- **v0.1.2441** — Dark AI Chat kb-hint CRT: `.chat-empty-kb-hint` · `.chat-composer-kb-hint` · `.chat-kb-hint` · `.filter-chip-kb-hint` on `#0a0a0a`.
-- **v0.1.2440** — Dark Top Processes top glances CRT on `#0a0a0a`.
-- Earlier same window: empty CRT, soft glances, status glances, Perplexity kb-hint, filter-miss / empty CTA / chip / Save-flash opaque chain from ~v0.1.2400 upward.
+- **v0.1.2443** — Dark AI Chat exec/answer cards (`.chat-exec-card` · `.chat-exec-code` · `.chat-answer-part` · `.chat-answer-final`) → CRT `#0a0a0a` (`#00cc66` final)
+- **v0.1.2442** — Dark AI Chat `.chat-filter-chip` resting/hover/active → CRT `#0a0a0a` (`#00cc66` active)
+- **v0.1.2441** — Dark AI Chat kb-hints → CRT `#0a0a0a`
+- **v0.1.2440** — Dark Top Processes top glances → CRT `#0a0a0a`
+- **v0.1.2439–2437** — Dark AI Chat empty + status glances CRT + soft catch-up
+- Earlier same night: Perplexity / filter-miss / empty CTA / chips / Settings glances opaque remaps through the CRT stack
 
-## Tried / context
+## Tried / deferred
 
-- Digester open empty all night (0 runs / 7d).
-- Design review + layout daily not due (grace / already marked); still polished AI Chat surfaces.
-- Sibling OpenClaw/Hermes missing on this rack.
-- Debug.log clean (no ERROR/WARN clusters).
+- Mac recapture of stale `docs/screens/feature-agent-ops.png` (~52d) — deferred (Screen Recording TCC; no on-screen CPU window)
+- Layout-daily Data Poster screens missing — remaps_missing=none; deferred behind design-review CRT leftovers
+- ~05:30 tick raced another agent on the same v0.1.2443 exec/answer CRT; rebased to `origin/main`
 
-## Next
+## Next fuel
 
-- Dark collapsed chat/ollama glances still on early `#0b0b10`, Mac `screencapture -l` when Screen Recording TCC allows.
+- Dark Agent Ops attention glances (`.ops-*-attention-glance` warn/filter soft states) still on early `#0b0b10`
+- Mac capture when TCC allows
+- Layout-daily Data Poster screen when a window grab works
 
-Generated: 2026-11-07T05:29:20+01:00
+Generated: 2026-11-07T05:30:54.641358+01:00
