@@ -24195,3 +24195,74 @@ body.theme-neon .monitor-item.is-removing {
 body.theme-futuristic .monitor-item.is-removing {
   color: color-mix(in srgb, #ffffff 51%, #0b0b10);
 }
+
+/*
+ * Dark / Neon / Futuristic: Logs empty · Disk Cleanup empty/disabled/Recurse ·
+ * Dark AI Chat composer focus still mixed on early shared `#0b0b10` (or Apple
+ * `#ffffff` border/fill for `.disk-cleanup-empty`). Data Poster already on
+ * opaque `#0b0b10`; Neon/Futuristic `#chat-input:focus` already CRT. Catch up
+ * so empty shells + disabled scope + Dark focus match CRT `#0a0a0a` /
+ * `#08120c` / `#0b0b10`. Standing P2 #14 after Monitors pending/removing CRT
+ * v0.1.2457; design-review feature-disk-cleanup / feature-ai-chat adjacent
+ * (polish-without-capture grace; feature-agent-ops capture still TCC-blocked).
+ */
+/* OVERNIGHT v0.1.2458: empty / disabled / chat-focus CRT */
+body.theme-dark .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #ffffff 69%, #0a0a0a);
+}
+body.theme-neon .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #ffffff 69%, #08120c);
+}
+body.theme-futuristic .logs-viewer.is-empty:not(:has(.logs-filter-miss)) {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+}
+
+body.theme-dark .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 3%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #08120c);
+  background: color-mix(in srgb, currentColor 3%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-empty {
+  border-color: color-mix(in srgb, currentColor 18%, #0b0b10);
+  background: color-mix(in srgb, currentColor 3%, #0b0b10);
+}
+
+body.theme-dark .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #ffffff 69%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #ffffff 69%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-empty:not(.disk-cleanup-list-empty):not(.disk-cleanup-scopes-empty):not(.disk-cleanup-filter-miss):not(.disk-cleanup-scope-filter-miss) {
+  color: color-mix(in srgb, #ffffff 69%, #0b0b10);
+}
+
+body.theme-dark .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #ffffff 51%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #ffffff 51%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row.is-disabled {
+  color: color-mix(in srgb, #ffffff 51%, #0b0b10);
+}
+
+body.theme-dark .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #ffffff 74%, #0a0a0a);
+}
+body.theme-neon .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #ffffff 74%, #08120c);
+}
+body.theme-futuristic .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  color: color-mix(in srgb, #ffffff 74%, #0b0b10);
+}
+
+body.theme-dark #chat-input:focus {
+  border-color: color-mix(in srgb, #55c7ff 55%, #0a0a0a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #55c7ff 22%, #0a0a0a);
+  background: color-mix(in srgb, currentColor 6%, #0a0a0a);
+  color: var(--text, color-mix(in srgb, #ffffff 92%, #0a0a0a));
+}
