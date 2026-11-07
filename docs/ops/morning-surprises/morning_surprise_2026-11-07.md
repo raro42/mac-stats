@@ -1,20 +1,22 @@
 # Morning surprise — 2026-11-07
 
-Overnight autoresearch kept shipping opaque-shell contrast fixes (standing P2 #14) while Mac window capture stayed blocked (Screen Recording TCC / menu-bar-only).
+Overnight autoresearch kept shipping Dark CRT opaque remaps (standing P2 #14 / design-review polish-without-capture grace).
 
-## Shipped (latest)
+## Shipped this night (highlights)
 
-- **v0.1.2438** — Dark AI Chat glances soft CRT catch-up: model / turn / answer / errors / offline-attention get Data Poster–style soft washes plus focus, has-answer, has-errors, Copied, and offline Ready·Continue·Sending·filter·circuit on CRT `#0a0a0a` (after thin resting CRT in v0.1.2437).
-- **v0.1.2437** — Dark AI Chat status glances thin CRT (resting/hover · online/offline · turn active) `#0b0b10` → `#0a0a0a` (sibling tick race).
-- Earlier same night: Perplexity search kb-hint (2436), processes-filter-miss CRT (2435), chat-filter-miss CRT (2434), and a long chain of filter-chip / empty-CTA / Saved-flash opaque remaps on Dark / Neon / Futuristic.
+- **v0.1.2439** — Dark AI Chat empty CRT: `.chat-empty` (ready / no-model / offline / circuit / not-set) + title/copy on `#0a0a0a` (was early shared `#0b0b10`).
+- **v0.1.2438** — Dark AI Chat glances soft CRT catch-up (status glances soft wash + focus / Copied / offline Ready·Continue·Sending…).
+- Earlier same window: **v0.1.2437** status glances thin CRT, **v0.1.2436** Perplexity search kb-hint, filter-miss / empty CTA / chip / Save-flash opaque chain from ~v0.1.2400 upward.
 
-## Tried / deferred
+## Tried / context
 
-- Fresh `docs/screens/feature-agent-ops.png` (and other stale feature screens) — capture deferred; no on-screen CPU window / TCC.
-- Layout-daily Data Poster screen still due (remap debt mostly cleared; screenshot missing).
+- Digester open empty all night (0 runs / 7d).
+- Design review + layout daily not due (grace / already marked); still polished AI Chat surfaces and marked grace/checked.
+- Sibling OpenClaw/Hermes missing on this rack.
+- Debug.log clean (no ERROR/WARN clusters).
 
-## Next fuel
+## Next
 
-- Dark `.chat-empty` CRT (`#0b0b10` → `#0a0a0a`)
-- Dark processes-top glances still on early `#0b0b10`
-- Mac recapture when Screen Recording allows `screencapture -l`
+- Dark processes-top glances still on early `#0b0b10`, chat-empty-kb-hint CRT leftovers, Mac `screencapture -l` when Screen Recording TCC allows.
+
+Generated: 2026-11-07T04:36:50.220679+01:00
